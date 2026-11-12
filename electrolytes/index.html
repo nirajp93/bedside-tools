@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Electrolyte Repletion · bedside.tools</title>
+<meta name="description" content="Potassium, magnesium, phosphate, and calcium repletion with rate guards and the reasoning behind each dose.">
+<style>
+:root{--bg:#FBFBFA;--ink:#111113;--muted:#55555D;--accent:#2B4BDB;--line:#ECECEE;--warn:#9A3B00;--warnbg:#FFF6EC;--card:#FFFFFF}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:16px;line-height:1.5}
+.mono{font-family:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.wrap{max-width:720px;margin:0 auto;padding:20px 16px 48px}
+a{color:var(--accent)}
+.back{font-size:14px;text-decoration:none;display:inline-block;min-height:44px;line-height:44px}
+h1{font-size:26px;margin:4px 0 4px;letter-spacing:-.01em}
+.purpose{color:var(--muted);margin:0 0 20px}
+.tabs{display:flex;gap:8px;margin-bottom:16px}
+.tab{flex:1;min-height:44px;border:1px solid var(--line);background:var(--card);border-radius:14px;font:inherit;font-weight:600;color:var(--muted);cursor:pointer}
+.tab[aria-selected="true"]{border-color:var(--accent);color:var(--accent)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
+.label{font-family:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.field label{display:block;font-size:13px;color:var(--muted);margin-bottom:4px}
+.field input,.field select{width:100%;min-height:44px;border:1px solid var(--line);border-radius:10px;padding:8px 10px;font:inherit;font-family:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;background:#fff;color:var(--ink)}
+.field select{font-family:inherit;font-size:14px;padding-right:4px}
+.field input:focus,.field select:focus,.tab:focus-visible,.chk:focus-within,button:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.checks{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.chk{display:flex;align-items:center;gap:10px;min-height:44px;border:1px solid var(--line);border-radius:10px;padding:6px 10px;font-size:14px;cursor:pointer}
+.chk input{width:20px;height:20px;accent-color:var(--accent);flex:none}
+.res h2{font-size:18px;margin:0 0 2px}
+.head{font-family:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;font-size:17px;font-weight:600;margin:6px 0 8px;overflow-wrap:anywhere}
+.res ul{margin:6px 0 0;padding-left:20px}
+.res li{margin-bottom:4px}
+.guard{border-left:3px solid var(--warn);background:var(--warnbg);padding:8px 10px;border-radius:0 10px 10px 0;margin-top:8px;font-size:14.5px}
+.tier{display:inline-block;font-family:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;font-size:11px;border:1px solid var(--line);border-radius:999px;padding:2px 8px;color:var(--muted);margin-top:10px}
+details{margin-top:10px;border-top:1px solid var(--line);padding-top:8px}
+summary{cursor:pointer;color:var(--accent);font-weight:600;min-height:44px;line-height:44px}
+details p{margin:0 0 8px;color:var(--ink);font-size:15px}
+.empty{color:var(--muted)}
+.btn{min-height:44px;border:1px solid var(--accent);background:var(--accent);color:#fff;border-radius:10px;padding:8px 14px;font:inherit;font-weight:600;cursor:pointer}
+.btn.ghost{background:#fff;color:var(--accent)}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.note{font-size:14px;color:var(--muted)}
+footer{margin-top:28px;border-top:1px solid var(--line);padding-top:16px;font-size:13.5px;color:var(--muted)}
+footer p{margin:0 0 8px}
+[hidden]{display:none!important}
+@media (max-width:420px){.checks{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="/">← bedside.tools</a>
+<h1>Electrolyte Repletion</h1>
+<p class="purpose">Doses, rates, and rechecks for low K, Mg, phosphate, and calcium, with the reasoning shown.</p>
+
+<div class="tabs" role="tablist">
+  <button class="tab" role="tab" id="t-calc" aria-selected="true" aria-controls="p-calc">Calculator</button>
+  <button class="tab" role="tab" id="t-prac" aria-selected="false" aria-controls="p-prac">Practice</button>
+</div>
+
+<section id="p-calc" role="tabpanel" aria-labelledby="t-calc">
+  <div class="card">
+    <p class="label">Labs</p>
+    <div class="grid">
+      <div class="field"><label for="k">Potassium (mEq/L)</label><input id="k" inputmode="decimal" autocomplete="off"></div>
+      <div class="field"><label for="mg">Magnesium (mg/dL)</label><input id="mg" inputmode="decimal" autocomplete="off"></div>
+      <div class="field"><label for="phos">Phosphate (mg/dL)</label><input id="phos" inputmode="decimal" autocomplete="off"></div>
+      <div class="field"><label for="ca">Total calcium (mg/dL)</label><input id="ca" inputmode="decimal" autocomplete="off"></div>
+      <div class="field"><label for="alb">Albumin (g/dL)</label><input id="alb" inputmode="decimal" autocomplete="off"></div>
+      <div class="field"><label for="ica">Ionized Ca (mmol/L), optional</label><input id="ica" inputmode="decimal" autocomplete="off"></div>
+    </div>
+  </div>
+  <div class="card">
+    <p class="label">Patient</p>
+    <div class="grid">
+      <div class="field"><label for="crcl">CrCl or eGFR (mL/min)</label><input id="crcl" inputmode="decimal" autocomplete="off"></div>
+      <div class="field"><label for="wt">Weight (kg)</label><input id="wt" inputmode="decimal" autocomplete="off"></div>
+      <div class="field"><label for="route">Gut</label><select id="route"><option value="po">Oral/enteral OK</option><option value="npo">NPO / no gut</option></select></div>
+      <div class="field"><label for="access">IV access</label><select id="access"><option value="peripheral">Peripheral</option><option value="central">Central</option></select></div>
+    </div>
+    <div class="checks">
+      <label class="chk"><input type="checkbox" id="cardiac">Cardiac disease or on telemetry</label>
+      <label class="chk"><input type="checkbox" id="sympt">Symptoms, arrhythmia, or ECG changes</label>
+      <label class="chk"><input type="checkbox" id="diur">On loop or thiazide diuretic</label>
+      <label class="chk"><input type="checkbox" id="hd">On dialysis</label>
+      <label class="chk"><input type="checkbox" id="icu">ICU / high phosphate requirement</label>
+      <label class="chk"><input type="checkbox" id="refeed">Restarting nutrition after poor intake</label>
+    </div>
+    <div class="row"><button class="btn ghost" id="clear" type="button">Clear</button></div>
+  </div>
+  <div id="out" aria-live="polite"></div>
+</section>
+
+<section id="p-prac" role="tabpanel" aria-labelledby="t-prac" hidden>
+  <p class="note">Decide what you would order, then reveal. Each answer is produced by the same engine as the calculator.</p>
+  <div id="cases"></div>
+</section>
+
+<footer>
+  <p><strong>For education only. Not a substitute for clinical judgment.</strong> Doses are common practice drawn from the sources below, not a national guideline; none exists for routine repletion. Adjust to your institution's protocol and formulary.</p>
+  <p>Privacy: everything runs in your browser. No network calls, no analytics, nothing is stored. Do not enter names, record numbers, or dates of birth.</p>
+  <p class="mono">Last reviewed: 2026-11-11</p>
+  <p><strong>Sources:</strong> Kraft MD et al., Treatment of electrolyte disorders in adult patients in the ICU, Am J Health-Syst Pharm 2005 · Clark CL et al., graduated phosphorus dosing, Crit Care Med 1995 · Brown KA et al., revised phosphorus dosing, JPEN 2006 · StatPearls, Potassium Chloride (2024) · UW Health adult inpatient enteral and intravenous electrolyte guideline · Vanderbilt electrolyte replacement guideline (2025) · Merck Manual Professional, Hypomagnesemia · UCSF Hospital Handbook, Hypocalcemia.</p>
+</footer>
+</div>
+
+<script id="engine">
+/* Pure decision engine. No DOM access. Units: K mEq/L; Mg, phosphate, Ca mg/dL; albumin g/dL; ionized Ca mmol/L. */
+var KPHOS_K_PER_MMOL = 4.4 / 3;      // potassium phosphate injection: 3 mmol phosphate + 4.4 mEq K per mL
+var PHOS_MAX_RATE = 7.5;             // mmol/h
+var K_RISE_PER_MEQ = 0.25 / 20;      // ~0.25 mEq/L per 20 mEq IV KCl
+
+function r10(x){ return Math.round(x / 10) * 10; }
+function fmtRange(lo, hi, unit){ return (lo === hi ? lo : lo + '–' + hi) + ' ' + unit; }
+function hrs(x){ var v = Math.round(x * 10) / 10; return v + ' h'; }
+
+function kNeed(i){
+  if (i.k == null) return null;
+  var target = i.cardiac ? 4.0 : 3.5;
+  if (i.k >= target) return {target: target, lo: 0, hi: 0, tier: 'none'};
+  var severe = i.k < 2.5 || i.sympt;
+  var lo, hi, tier;
+  if (severe){ lo = 40; hi = 40; tier = 'severe'; }
+  else if (i.k < 3.1){ lo = 60; hi = 80; tier = 'moderate'; }
+  else if (i.k < 3.6){ lo = 40; hi = 40; tier = 'mild'; }
+  else { lo = 20; hi = 20; tier = 'borderline'; }
+  var renal = i.crcl != null && i.crcl < 30;
+  if (renal){ lo = lo / 2; hi = hi / 2; }
+  return {target: target, lo: lo, hi: hi, tier: tier, renal: renal};
+}
+
+function phosPlan(i, need){
+  if (i.phos == null) return null;
+  var o = {name: 'Phosphate', lines: [], guards: [], kFromPhos: 0};
+  if (i.phos > 4.5){ o.head = 'High (' + i.phos + ' mg/dL). No repletion.'; return o; }
+  if (i.phos > 3.0){ o.head = 'No repletion needed'; return o; }
+  if (i.hd){
+    o.head = 'On dialysis: no routine repletion';
+    o.guards.push('Phosphate accumulates without renal clearance. Replace only for severe (<1.0 mg/dL) or symptomatic hypophosphatemia, at a reduced dose, after discussing with nephrology.');
+    return o;
+  }
+  var per = i.phos < 1.6 ? 0.64 : (i.phos < 2.3 ? 0.32 : 0.16);
+  var sev = i.phos < 1.6 ? 'severe' : (i.phos < 2.3 ? 'moderate' : 'mild');
+  if (i.icu) per = i.phos < 1.6 ? 1.0 : (i.phos < 2.3 ? 0.64 : 0.32);
+  var renal = i.crcl != null && i.crcl < 30;
+  if (i.wt == null){
+    o.head = fmtRange(per, per, 'mmol/kg') + (renal ? ', then halve for CrCl <30' : '');
+    o.lines.push('Enter weight to calculate the dose.');
+    return o;
+  }
+  var dose = per * i.wt; if (renal) dose = dose / 2;
+  dose = Math.round(dose);
+  o.dose = dose; o.per = per; o.sev = sev;
+  var oralOk = i.route === 'po' && sev === 'mild' && !i.sympt;
+  if (oralOk){
+    o.head = 'Oral: about ' + dose + ' mmol today in divided doses';
+    o.lines.push('Round to 8 mmol tablets (K-Phos Neutral 250 mg = 8 mmol phosphate, 1.1 mEq K, 13 mEq Na). Diarrhea limits the dose.');
+    o.lines.push('Levels of 2.5–3.0 mg/dL are often simply observed on the wards if the patient is eating.');
+    o.lines.push('IV alternative if not absorbing: ' + dose + ' mmol at no more than ' + PHOS_MAX_RATE + ' mmol/h.');
+    o.product = 'oral';
+  } else {
+    var kContent = Math.round(dose * KPHOS_K_PER_MMOL);
+    var cap = renal ? (need ? need.hi : 0) : Math.max(need ? need.hi : 0, 40);
+    var useK = i.k != null && i.k < 4.0 && kContent <= cap;
+    o.product = useK ? 'K' : 'Na';
+    o.head = dose + ' mmol IV ' + (useK ? 'potassium' : 'sodium') + ' phosphate';
+    o.lines.push('Dose: ' + per + ' mmol/kg × ' + i.wt + ' kg' + (renal ? ' × 0.5 (CrCl <30)' : '') + ' = ' + dose + ' mmol. Round to your pharmacy\'s standard bag.');
+    o.lines.push('Rate: no faster than ' + PHOS_MAX_RATE + ' mmol/h, so over at least ' + hrs(Math.max(dose / PHOS_MAX_RATE, 1)) + '. Many wards run 15 mmol over 4–6 h.');
+    if (useK){
+      o.kFromPhos = kContent;
+      o.lines.push('This delivers about ' + kContent + ' mEq of potassium (1.47 mEq per mmol); it is counted against the potassium dose.');
+    } else if (i.k == null){
+      o.lines.push('Sodium phosphate chosen because potassium was not entered. Use potassium phosphate if K is below 4.0.');
+    } else if (i.k < 4.0){
+      o.lines.push('Potassium phosphate would deliver about ' + kContent + ' mEq of K, more than this patient should get from phosphate. Use sodium phosphate and replace potassium separately as KCl.');
+    } else {
+      o.lines.push('Sodium phosphate because K is 4.0 or higher.');
+    }
+    o.lines.push('Recheck phosphate, calcium, and potassium ' + (sev === 'severe' ? 'about 6 h after the infusion ends' : 'with next morning labs') + '.');
+  }
+  if (i.icu) o.lines.push('ICU / high-requirement tier in use (Brown 2006): double the general-ward dose.');
+  if (renal) o.guards.push('CrCl <30: dose halved. Phosphate accumulates; recheck before any repeat dose.');
+  if (i.refeed && i.phos < 2.0) o.guards.push('Refeeding risk: phosphate below 2.0 with nutrition restarting. Replace phosphate, potassium, and magnesium and give thiamine before advancing feeds; advance calories slowly and recheck daily.');
+  o.guards.push('Never run phosphate in the same line as calcium. IV phosphate can lower calcium; check it before dosing.');
+  return o;
+}
+
+function kPlan(i, need, kFromPhos){
+  if (i.k == null) return null;
+  var o = {name: 'Potassium', lines: [], guards: []};
+  if (i.k > 5.0){ o.head = 'High (' + i.k + ' mEq/L). No repletion.'; o.guards.push('This tool does not manage hyperkalemia. Get an ECG and treat per your hyperkalemia pathway.'); return o; }
+  if (need.tier === 'none'){ o.head = 'At or above target (' + need.target.toFixed(1) + ')'; if (i.diur) o.lines.push('On a diuretic: expect ongoing losses; recheck with next labs.'); return o; }
+  if (i.hd && need.tier !== 'severe'){
+    o.head = 'On dialysis: no routine repletion';
+    o.guards.push('Without renal excretion a standard dose can overshoot. Mild hypokalemia before dialysis is usually handled with the dialysate bath. Discuss with nephrology.');
+    return o;
+  }
+  var lo = need.lo, hi = need.hi;
+  if (i.hd){ lo = 20; hi = 20; }
+  if (kFromPhos > 0){ lo = Math.max(0, r10(lo - kFromPhos)); hi = Math.max(0, r10(hi - kFromPhos)); }
+  var rate = (i.access === 'central' && i.cardiac) ? 20 : 10;
+  var iv = need.tier === 'severe' || i.route === 'npo';
+  if (hi === 0){
+    o.head = 'Covered by the potassium phosphate dose';
+    o.lines.push('Potassium phosphate supplies about ' + kFromPhos + ' mEq. No additional KCl now; recheck after the infusion.');
+  } else {
+    o.head = fmtRange(lo, hi, 'mEq') + ' KCl ' + (iv ? 'IV' : 'PO') + (kFromPhos > 0 ? ' (in addition to K from phosphate)' : '');
+    if (iv){
+      o.lines.push('Rate: ' + rate + ' mEq/h (' + (rate === 20 ? 'central line on telemetry' : 'peripheral maximum; central lines allow 20 mEq/h only with continuous ECG monitoring') + '), so ' + (lo === hi ? hrs(hi / rate) : hrs(lo / rate) + ' to ' + hrs(hi / rate)) + '.');
+      if (need.tier === 'severe' && i.route === 'po') o.lines.push('Add oral KCl 20–40 mEq alongside the infusion if the patient can swallow.');
+      if (i.route === 'npo' && need.tier !== 'severe') o.lines.push('Switch to oral as soon as the gut works; it is as effective and safer.');
+    } else {
+      o.lines.push('Give in 20 mEq increments every 2 h if the total exceeds 20 mEq (many institutions allow 40 mEq as one dose).');
+      if (need.tier === 'moderate') o.lines.push('If faster correction is needed, split between oral and IV (' + rate + ' mEq/h).');
+    }
+    var rl = Math.round(lo * K_RISE_PER_MEQ * 10) / 10, rh = Math.round(hi * K_RISE_PER_MEQ * 10) / 10;
+    o.lines.push('Expected rise: about ' + (rl === rh ? rh : rl + '–' + rh) + ' mEq/L (roughly 0.25 per 20 mEq), less with ongoing losses.');
+  }
+  o.lines.push('Recheck: ' + (need.tier === 'severe' ? 'after every 40 mEq, with continuous telemetry.' : need.tier === 'moderate' ? 'in 4–6 h.' : 'with next morning labs.'));
+  if (need.tier === 'severe') o.guards.push('Severe or symptomatic hypokalemia: continuous telemetry, ECG now, and avoid dextrose-containing fluids, which drive potassium into cells.');
+  if (i.hd) o.guards.push('On dialysis: dose limited to 20 mEq, then recheck. Call nephrology.');
+  else if (need.renal) o.guards.push('CrCl <30: dose halved. Recheck before repeating.');
+  if (i.mg == null ? i.k < 3.0 : i.mg < 1.8) o.guards.push(i.mg == null ? 'Magnesium not entered. Check it: with K below 3.0, low magnesium is common and potassium will not hold until it is corrected.' : 'Magnesium is low (' + i.mg + '). Replace it first or together; potassium will not hold otherwise.');
+  if (i.diur) o.lines.push('On a diuretic: losses will continue. Consider scheduled supplementation or a potassium-sparing agent if this recurs.');
+  return o;
+}
+
+function mgPlan(i){
+  if (i.mg == null) return null;
+  var o = {name: 'Magnesium', lines: [], guards: []};
+  var target = i.cardiac ? 2.0 : 1.8;
+  if (i.mg > 2.6){ o.head = 'High (' + i.mg + ' mg/dL). No repletion.'; return o; }
+  if (i.mg >= target){ o.head = 'At or above target (' + target.toFixed(1) + ')'; return o; }
+  if (i.hd && i.mg >= 1.0 && !i.sympt){
+    o.head = 'On dialysis: no routine repletion';
+    o.guards.push('Magnesium is cleared by the kidney. Replace only if severe or symptomatic, at a reduced dose, with nephrology.');
+    return o;
+  }
+  var lo, hi, over, tier;
+  if (i.mg < 1.0){ lo = 4; hi = 8; over = '12–24 h'; tier = 'severe'; }
+  else if (i.mg < 1.6){ lo = 2; hi = 4; over = '4–12 h'; tier = 'moderate'; }
+  else { lo = 1; hi = 2; over = '1–2 h'; tier = 'mild'; }
+  var renal = i.hd || (i.crcl != null && i.crcl < 30);
+  if (renal){ lo = lo / 2; hi = hi / 2; }
+  o.head = fmtRange(lo, hi, 'g') + ' magnesium sulfate IV over ' + over;
+  if (tier === 'mild' && i.route === 'po') o.lines.push('Oral alternative: magnesium oxide 400 mg twice daily if no diarrhea. Absorption is poor and diarrhea is dose-limiting.');
+  o.lines.push('1 g magnesium sulfate = 8 mEq (4 mmol) elemental magnesium.');
+  o.lines.push('Recheck with next morning labs. A level drawn right after the infusion overstates the correction.');
+  o.lines.push('Continue for 1–2 days after the level normalizes; intracellular stores refill slowly.');
+  if (i.sympt) o.guards.push('Torsades, seizure, or unstable arrhythmia: 1–2 g IV over 2–15 minutes (push if pulseless), then the infusion above.');
+  if (renal) o.guards.push((i.hd ? 'On dialysis' : 'CrCl <30') + ': dose halved. Watch for hypermagnesemia (loss of reflexes, hypotension) and recheck before repeating.');
+  return o;
+}
+
+function caPlan(i){
+  if (i.ca == null && i.ica == null) return null;
+  var o = {name: 'Calcium', lines: [], guards: []};
+  var corr = null;
+  if (i.ca != null && i.alb != null){
+    corr = Math.round((i.ca + 0.8 * (4 - i.alb)) * 10) / 10;
+    o.corrected = corr;
+    o.lines.push('Corrected calcium = ' + i.ca + ' + 0.8 × (4 − ' + i.alb + ') = ' + corr + ' mg/dL.');
+    if (i.alb < 2) o.guards.push('Albumin below 2: the correction is unreliable. Check an ionized calcium before treating.');
+  } else if (i.ca != null){
+    o.lines.push('Albumin not entered; using the measured total. Enter albumin or check an ionized calcium.');
+  }
+  var val = corr != null ? corr : i.ca;
+  var ivNow = false, low = false;
+  if (i.ica != null){
+    if (i.ica > 1.32){ o.head = 'Ionized calcium high (' + i.ica + '). No repletion.'; return o; }
+    if (i.ica >= 1.15 && !i.sympt){ o.head = 'Ionized calcium normal'; return o; }
+    low = i.ica < 1.15; ivNow = i.ica < 1.0 || (i.sympt && low);
+    if (!low){ o.head = 'Ionized calcium normal'; o.lines.push('Symptoms are unlikely to be from calcium.'); return o; }
+  } else {
+    if (val > 10.5){ o.head = 'High (' + val + ' mg/dL). No repletion.'; o.guards.push('This tool does not manage hypercalcemia.'); return o; }
+    if (val >= 8.5){ o.head = 'Normal' + (corr != null ? ' after correction' : ''); return o; }
+    low = true; ivNow = val < 7.5 || i.sympt;
+  }
+  if (ivNow){
+    o.head = '1–2 g calcium gluconate IV over 10–20 min';
+    o.lines.push('On telemetry. Repeat or start an infusion if symptoms or QT prolongation persist; recheck ionized calcium in 4–6 h.');
+    o.lines.push('Gluconate is safe peripherally. Calcium chloride has about three times the elemental calcium and needs a central line.');
+  } else if (i.ica != null){
+    o.head = '1 g calcium gluconate IV over 60 min, or oral calcium';
+    o.lines.push('Mild and asymptomatic: oral calcium is enough if the gut works. Recheck with next labs.');
+  } else {
+    o.head = 'Confirm with an ionized calcium';
+    o.lines.push('Asymptomatic with a total of 7.5–8.4: check ionized calcium, then give oral calcium or 1 g gluconate over 60 min if it is low.');
+  }
+  if (i.mg != null && i.mg < 1.8) o.guards.push('Magnesium is low (' + i.mg + '). Correct it first; low magnesium blocks PTH release and calcium will not hold.');
+  else if (i.mg == null) o.lines.push('Check magnesium; hypocalcemia does not correct while magnesium is low.');
+  if (i.phos != null && i.phos > 4.5) o.guards.push('Phosphate is high (' + i.phos + '). IV calcium can precipitate with phosphate; treat only if symptomatic.');
+  o.guards.push('Never run calcium in the same line as phosphate or bicarbonate.');
+  return o;
+}
+
+function compute(i){
+  var need = kNeed(i);
+  var phos = phosPlan(i, need);
+  var k = kPlan(i, need, phos ? phos.kFromPhos : 0);
+  return {k: k, mg: mgPlan(i), phos: phos, ca: caPlan(i)};
+}
+if (typeof module !== 'undefined') module.exports = {compute: compute};
+</script>
+
+<script>
+(function(){
+  var WHY = {
+    Potassium: [
+      'About 98% of body potassium is inside cells, so the serum level is a small window onto a large store. A fall from 4.0 to 3.0 usually reflects a deficit of a few hundred mEq, which is why one dose rarely finishes the job.',
+      'The rule of thumb (about 0.1 mEq/L per 10 mEq) describes the immediate rise. Insulin, beta-agonists, and alkalosis push potassium into cells and blunt it; acidosis does the opposite and can hide a deficit, as in DKA.',
+      'Rate limits exist because the heart sees the infused potassium before it distributes. Concentrated peripheral infusions also cause pain and phlebitis.',
+      'Low magnesium opens ROMK channels in the collecting duct, so the kidney wastes potassium. Until magnesium is replaced, what you give is lost in the urine.'
+    ],
+    Magnesium: [
+      'Only about 1% of magnesium is extracellular, so serum levels track stores poorly and lag behind repletion.',
+      'The kidney reabsorbs magnesium up to a threshold. A fast infusion pushes the serum level above it and roughly half the dose is excreted. Slow infusions and repeat dosing over days refill cells better.',
+      'With poor renal function that escape valve is gone, which is why the dose is halved and rechecked.',
+      'Magnesium stabilizes the cardiac membrane, hence the higher target for patients on telemetry and its role in torsades.'
+    ],
+    Phosphate: [
+      'Phosphate is needed to make ATP and 2,3-DPG. Severe depletion causes weakness (including the diaphragm), rhabdomyolysis, hemolysis, and impaired oxygen delivery.',
+      'Refeeding: after starvation, carbohydrate triggers insulin, which drives phosphate, potassium, and magnesium into cells to build ATP and glycogen. Serum levels fall within days of restarting nutrition.',
+      'The rate cap protects against calcium-phosphate precipitation and acute hypocalcemia.',
+      'Potassium phosphate is a potassium infusion too: each mmol of phosphate carries about 1.5 mEq of potassium, so it must be counted.'
+    ],
+    Calcium: [
+      'About 40% of serum calcium is bound to albumin. When albumin is low the total falls but the ionized, active fraction may be normal. The 0.8 correction estimates this and becomes unreliable in critical illness, pH shifts, and very low albumin.',
+      'Alkalosis increases binding to albumin and lowers ionized calcium, which is why hyperventilation can cause tingling and spasm.',
+      'Magnesium is required for PTH release and action. In hypomagnesemia, calcium stays low until magnesium is replaced.',
+      'Hypocalcemia prolongs the QT interval by lengthening the ST segment; this is the ECG sign that calls for IV treatment.'
+    ]
+  };
+  var ids = ['k','mg','phos','ca','alb','ica','crcl','wt'];
+  var checks = ['cardiac','sympt','diur','hd','icu','refeed'];
+  function $(id){ return document.getElementById(id); }
+  function num(id){ var v = $(id).value.trim().replace(',', '.'); if (v === '') return null; var n = parseFloat(v); return isFinite(n) && n >= 0 ? n : null; }
+  function read(){
+    var i = {}; ids.forEach(function(d){ i[d] = num(d); });
+    checks.forEach(function(c){ i[c] = $(c).checked; });
+    i.route = $('route').value; i.access = $('access').value; return i;
+  }
+  function el(tag, cls, text){ var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+  function cardFor(p){
+    var c = el('div', 'card res');
+    c.appendChild(el('h2', null, p.name));
+    c.appendChild(el('div', 'head', p.head));
+    p.guards.forEach(function(g){ c.appendChild(el('div', 'guard', g)); });
+    var d = el('details'); d.appendChild(el('summary', null, 'Why'));
+    WHY[p.name].forEach(function(t){ d.appendChild(el('p', null, t)); });
+    if (p.lines.length){
+      var more = el('details'); more.appendChild(el('summary', null, 'Details'));
+      var ul = el('ul'); p.lines.forEach(function(l){ ul.appendChild(el('li', null, l)); }); more.appendChild(ul);
+      more.appendChild(el('span', 'tier', 'Evidence: common practice / expert opinion'));
+      more.appendChild(d); c.appendChild(more);
+    } else { c.appendChild(d); }
+    return c;
+  }
+  function render(target, i){
+    var r = compute(i); target.textContent = '';
+    var any = false;
+    ['k','mg','phos','ca'].forEach(function(key){ if (r[key]){ any = true; target.appendChild(cardFor(r[key])); } });
+    if (!any) target.appendChild(el('p', 'empty', 'Enter at least one lab value to see a plan.'));
+  }
+  function update(){ render($('out'), read()); }
+  ids.concat(checks, ['route','access']).forEach(function(d){ $(d).addEventListener('input', update); $(d).addEventListener('change', update); });
+  $('clear').addEventListener('click', function(){ ids.forEach(function(d){ $(d).value = ''; }); checks.forEach(function(c){ $(c).checked = false; }); $('route').value = 'po'; $('access').value = 'peripheral'; update(); });
+
+  function show(tab){
+    var calc = tab === 'calc';
+    $('p-calc').hidden = !calc; $('p-prac').hidden = calc;
+    $('t-calc').setAttribute('aria-selected', calc); $('t-prac').setAttribute('aria-selected', !calc);
+  }
+  $('t-calc').addEventListener('click', function(){ show('calc'); });
+  $('t-prac').addEventListener('click', function(){ show('prac'); });
+
+  var CASES = [
+    {t: 'Heart failure on IV furosemide', s: 'On telemetry, eating. K 3.3, Mg 1.6, CrCl 70.', q: 'What do you order, and in what sequence?', i: {k:3.3, mg:1.6, crcl:70, route:'po', access:'peripheral', cardiac:true, diur:true}, p: 'Both are below the cardiac targets. Magnesium goes first or alongside, or the potassium will be lost in the urine. Ongoing diuresis means this will recur.'},
+    {t: 'Post-operative ileus', s: 'NPO, one peripheral IV, not on telemetry. K 2.9, Mg 2.0, CrCl 85.', q: 'How fast can this potassium go in?', i: {k:2.9, mg:2.0, crcl:85, route:'npo', access:'peripheral'}, p: 'A peripheral line caps the rate at 10 mEq/h, so 60–80 mEq takes most of a shift. Plan the recheck around that.'},
+    {t: 'Advanced CKD', s: 'CrCl 22, eating. K 3.1, Mg 1.4.', q: 'How do you change the doses?', i: {k:3.1, mg:1.4, crcl:22, route:'po', access:'peripheral'}, p: 'Both doses are halved because the kidney cannot excrete an overshoot. Recheck before repeating either.'},
+    {t: 'Alcohol use disorder, tube feeds starting', s: '60 kg, poor intake for two weeks. Phosphate 1.3, K 3.2, Mg 1.2, CrCl 90.', q: 'What is the risk, and which phosphate product?', i: {phos:1.3, k:3.2, mg:1.2, crcl:90, wt:60, route:'po', access:'peripheral', refeed:true}, p: 'This is refeeding risk. The phosphate dose is large enough that potassium phosphate would deliver more potassium than the patient should receive that way, so the engine picks sodium phosphate and separate KCl.'},
+    {t: 'Decompensated cirrhosis', s: 'Asymptomatic. Total calcium 7.0, albumin 1.8.', q: 'Do you give calcium?', i: {ca:7.0, alb:1.8, route:'po', access:'peripheral'}, p: 'The corrected value is normal, but with albumin this low the formula cannot be trusted. Check an ionized calcium rather than treating the total.'},
+    {t: 'ESRD, dialysis tomorrow', s: 'K 3.2, phosphate 2.1, eating.', q: 'What do you order tonight?', i: {k:3.2, phos:2.1, wt:70, route:'po', access:'peripheral', hd:true}, p: 'Nothing routine. Without renal excretion, standard doses overshoot. Tell nephrology so the dialysate bath can be adjusted.'},
+    {t: 'Profound hypokalemia', s: 'Weakness and U waves. Central line, on telemetry. K 2.3, Mg not sent.', q: 'First hour: what and how fast?', i: {k:2.3, route:'po', access:'central', cardiac:true, sympt:true}, p: 'IV at 20 mEq/h through the central line with telemetry, oral alongside, recheck after 40 mEq, and send a magnesium now.'}
+  ];
+  var holder = $('cases');
+  CASES.forEach(function(c, n){
+    var card = el('div', 'card');
+    card.appendChild(el('p', 'label', 'Case ' + (n + 1)));
+    card.appendChild(el('h2', null, c.t)).style.cssText = 'font-size:18px;margin:0 0 6px';
+    card.appendChild(el('p', null, c.s)).style.margin = '0 0 6px';
+    card.appendChild(el('p', 'note', c.q));
+    var ans = el('div'); ans.hidden = true;
+    var row = el('div', 'row');
+    var b1 = el('button', 'btn', 'Show answer'); b1.type = 'button';
+    var b2 = el('button', 'btn ghost', 'Open in calculator'); b2.type = 'button';
+    b1.addEventListener('click', function(){
+      if (ans.hidden){
+        var full = {}; ids.forEach(function(d){ full[d] = null; }); checks.forEach(function(d){ full[d] = false; });
+        Object.keys(c.i).forEach(function(d){ full[d] = c.i[d]; });
+        render(ans, full); ans.insertBefore(el('div', 'guard', c.p), ans.firstChild);
+        ans.hidden = false; b1.textContent = 'Hide answer';
+      } else { ans.hidden = true; b1.textContent = 'Show answer'; }
+    });
+    b2.addEventListener('click', function(){
+      ids.forEach(function(d){ $(d).value = c.i[d] != null ? c.i[d] : ''; });
+      checks.forEach(function(d){ $(d).checked = !!c.i[d]; });
+      $('route').value = c.i.route; $('access').value = c.i.access;
+      update(); show('calc'); window.scrollTo(0, 0);
+    });
+    row.appendChild(b1); row.appendChild(b2); card.appendChild(row); card.appendChild(ans); holder.appendChild(card);
+  });
+  update();
+})();
+</script>
+</body>
+</html>
