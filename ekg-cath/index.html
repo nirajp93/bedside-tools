@@ -757,7 +757,8 @@ function aRender(){
   $("#alm").innerHTML=`<div class="lmap">${order.map(l=>`<span class="${s.up.includes(l)?"g1":s.dn.includes(l)?"g2":(s.may||[]).includes(l)?"gm":""}">${l}</span>`).join("")}</div><div class="lleg"><span><i class="g1"></i>ST elevation</span><span><i class="g2"></i>ST depression</span>${s.may?`<span><i class="gm"></i>Sometimes involved</span>`:""}</div>`;
   $("#aecgt").textContent=s.e;
   $("#atsub").textContent=(aIf?"If the critical narrowing goes on to occlude the "+s.n[0].toLowerCase()+s.n.slice(1)+".":s.h||("After an infarct from a "+s.n[0].toLowerCase()+s.n.slice(1)+" occlusion."))+" Each period lines up the tissue, the ECG and what goes wrong.";
-  const wide=window.matchMedia("(min-width:980px)").matches;
+  // The five-column table needs a wide right-hand column; below 1340px the timeline keeps the tap-to-open list.
+  const wide=window.matchMedia("(min-width:1340px)").matches;
   $("#arail").innerHTML=A_SLOTS.map((sl,i)=>{
     const head=`<h4>${sl.t}<small>${sl.sub}</small></h4><dl><dt>Tissue</dt><dd>${sl.tis}</dd><dt>ECG</dt><dd>${sl.ecg}</dd></dl>`;
     if(wide){const rows=sl.ev.slice().sort((a,b)=>["mine","any","other"].indexOf(aRel(a))-["mine","any","other"].indexOf(aRel(b)));
@@ -776,6 +777,7 @@ function aGo(site,sub,cond){aSite=site; aIf=!!cond; aOpen=null; aRender(); showV
   $$(".aseg button").forEach(b=>b.addEventListener("click",()=>aSub(b.dataset.sub)));
   $("#atotime").addEventListener("click",()=>{aSub("time"); window.scrollTo({top:0});});
   window.matchMedia("(min-width:980px)").addEventListener("change",aRender);
+  window.matchMedia("(min-width:1340px)").addEventListener("change",aRender);
   aRender();
 })();
 
