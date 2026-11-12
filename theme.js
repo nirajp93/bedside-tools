@@ -6,7 +6,9 @@
    Extra names any tool may use (light and dark both set here): --fill (subtle panel), --ok --okbg, --bad --badbg,
    --scrim (overlay behind a sheet), --ecg-paper --ecg-grid --ecg-grid5 --ecg-ink (ECG tracings).
    It also collapses each page's footer text (disclaimer, privacy, last reviewed, sources) into a
-   "Disclaimers and sources" dropdown, so tools write a plain <footer> and get the same control. */
+   "Disclaimers and sources" dropdown, so tools write a plain <footer> and get the same control.
+   It also makes every page installable and available offline: it adds the manifest and home-screen icon
+   links and registers /sw.js, so tools add nothing of their own for that either. */
 (function () {
   var KEY = 'bt-theme';
   var root = document.documentElement;
@@ -89,6 +91,22 @@
     });
     paint();
   }
+  // Installable app and offline copy, the same on every page.
+  function headTag(tag, key, val, attr, to) {
+    if (document.head.querySelector(tag + '[' + key + '="' + val + '"]')) return;
+    var el = document.createElement(tag);
+    el.setAttribute(key, val);
+    el.setAttribute(attr, to);
+    document.head.appendChild(el);
+  }
+  headTag('link', 'rel', 'manifest', 'href', '/manifest.webmanifest');
+  headTag('link', 'rel', 'apple-touch-icon', 'href', '/icons/apple-touch-icon.png');
+  headTag('link', 'rel', 'icon', 'href', '/icons/icon-192.png');
+  headTag('meta', 'name', 'theme-color', 'content', '#FBFBFA');
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function () { navigator.serviceWorker.register('/sw.js').catch(function () {}); });
+  }
+
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', ready); else ready();
   if (sysDark.addEventListener) sysDark.addEventListener('change', paint);
   // Another tab changed the theme: follow it.
