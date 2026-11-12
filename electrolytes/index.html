@@ -37,6 +37,9 @@ h1{font-size:26px;margin:4px 0 4px;letter-spacing:-.01em}
 .guard{border-left:3px solid var(--warn);background:var(--warnbg);padding:8px 10px;border-radius:0 10px 10px 0;margin-top:8px;font-size:14.5px}
 .tier{display:inline-block;font-family:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;font-size:11px;border:1px solid var(--line);border-radius:999px;padding:2px 8px;color:var(--muted);margin-top:10px}
 details{margin-top:10px;border-top:1px solid var(--line);padding-top:8px}
+.whyline{margin:10px 0 0;font-size:14.5px;color:var(--muted)}
+.whyline b{color:var(--ink);font-weight:600}
+.sub{font-family:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:10px 0 6px}
 summary{cursor:pointer;color:var(--accent);font-weight:600;min-height:44px;line-height:44px}
 details p{margin:0 0 8px;color:var(--ink);font-size:15px}
 .empty{color:var(--muted)}
@@ -345,25 +348,64 @@ if (typeof module !== 'undefined') module.exports = {compute: compute};
     i.route = $('route').value; i.access = $('access').value; return i;
   }
   function el(tag, cls, text){ var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
-  function cardFor(p){
+  /* Which "Why" paragraph answers the question this patient raises. Returns an index into WHY[name], or -1 when
+     nothing is being replaced. LEAD is how many sentences of that paragraph are shown without a tap. */
+  var LEAD = {Potassium: [1,1,1,1], Magnesium: [1,2,1,1], Phosphate: [1,1,1,1], Calcium: [2,1,2,1]};
+  function whyIndex(p, i){
+    var h = p.head || '';
+    if (p.name === 'Potassium'){
+      if (/^High|^At or above|no routine repletion|^Covered by/.test(h)) return -1;
+      if (i.mg != null && i.mg < 1.8) return 3;
+      if (/ IV/.test(h)) return 2;
+      return 0;
+    }
+    if (p.name === 'Magnesium'){
+      if (/^High|^At or above|no routine repletion/.test(h)) return -1;
+      if (i.sympt) return 3;
+      if (i.cardiac && i.mg >= 1.8) return 3;
+      return 1;
+    }
+    if (p.name === 'Phosphate'){
+      if (/^High|^No repletion needed|no routine repletion/.test(h) || p.dose == null) return -1;
+      if (i.refeed) return 1;
+      if (p.product === 'K') return 3;
+      if (p.product === 'Na') return 2;
+      return 0;
+    }
+    if (/high \(|^High|^Ionized calcium normal/.test(h)) return -1;
+    if (/^Normal/.test(h)) return p.corrected != null ? 0 : -1;
+    if (i.mg != null && i.mg < 1.8) return 2;
+    if (/over 10–20 min/.test(h)) return 3;
+    return 0;
+  }
+  function leadText(name, idx){
+    var parts = WHY[name][idx].match(/.*?\.(?:\s+|$)/g) || [WHY[name][idx]];
+    return parts.slice(0, LEAD[name][idx]).join('').trim();
+  }
+  function cardFor(p, i){
     var c = el('div', 'card res');
     c.appendChild(el('h2', null, p.name));
     c.appendChild(el('div', 'head', p.head));
     p.guards.forEach(function(g){ c.appendChild(el('div', 'guard', g)); });
-    var d = el('details'); d.appendChild(el('summary', null, 'Why'));
-    WHY[p.name].forEach(function(t){ d.appendChild(el('p', null, t)); });
+    var idx = whyIndex(p, i), lead = idx < 0 ? null : leadText(p.name, idx);
+    if (lead){
+      var w = el('p', 'whyline'); w.appendChild(el('b', null, 'Why: ')); w.appendChild(document.createTextNode(lead)); c.appendChild(w);
+    }
+    var more = el('details'); more.appendChild(el('summary', null, 'More'));
     if (p.lines.length){
-      var more = el('details'); more.appendChild(el('summary', null, 'Details'));
+      more.appendChild(el('p', 'sub', 'Details'));
       var ul = el('ul'); p.lines.forEach(function(l){ ul.appendChild(el('li', null, l)); }); more.appendChild(ul);
-      more.appendChild(el('span', 'tier', 'Evidence: common practice / expert opinion'));
-      more.appendChild(d); c.appendChild(more);
-    } else { c.appendChild(d); }
+    }
+    more.appendChild(el('p', 'sub', 'Why'));
+    WHY[p.name].forEach(function(t, n){ if (!(n === idx && t === lead)) more.appendChild(el('p', null, t)); });
+    more.appendChild(el('span', 'tier', 'Evidence: common practice / expert opinion'));
+    c.appendChild(more);
     return c;
   }
   function render(target, i){
     var r = compute(i); target.textContent = '';
     var any = false;
-    ['k','mg','phos','ca'].forEach(function(key){ if (r[key]){ any = true; target.appendChild(cardFor(r[key])); } });
+    ['k','mg','phos','ca'].forEach(function(key){ if (r[key]){ any = true; target.appendChild(cardFor(r[key], i)); } });
     if (!any) target.appendChild(el('p', 'empty', 'Enter at least one lab value to see a plan.'));
   }
   function update(){ render($('out'), read()); }
