@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>EKG Emergencies &amp; Cath-Lab Call · bedside.tools</title>
+<meta name="description" content="Pattern library, timing-tier calculator and practice drills for recognising coronary occlusion on the 12-lead ECG.">
+<script src="/theme.js"></script>
+<style>
+/* Colours: shared site names only. Dark values and the extra names (--fill --ok --bad --ecg-*) live in /theme.js. */
+:root{--bg:#FBFBFA; --card:#FFFFFF; --ink:#111113; --muted:#55555D; --line:#ECECEE; --accent:#2B4BDB; --warn:#9A3B00; --warnbg:#FFF6EC}
+:root{
+  --sans:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --serif:var(--sans);
+  --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --r:14px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+[hidden]{display:none!important}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.45;padding-bottom:calc(76px + env(safe-area-inset-bottom))}
+a{color:var(--accent);text-decoration:none}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;-webkit-tap-highlight-color:transparent}
+h1,h2,h3{font-family:var(--serif);font-weight:600;letter-spacing:-0.01em;line-height:1.15}
+h1{font-size:26px} h2{font-size:22px} h3{font-size:18px}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.kicker{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.muted{color:var(--muted)}
+.wrap{max-width:720px;margin:0 auto;padding:0 16px}
+
+/* ---- header with live strip ---- */
+header{border-bottom:1px solid var(--line);background:var(--bg)}
+header .wrap{padding-top:12px;padding-bottom:0}
+.back{font-size:14px;color:var(--accent);display:inline-block;min-height:44px;line-height:44px}
+.title{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+.title p{font-size:14px;color:var(--muted);margin-top:2px}
+.strip{height:52px;overflow:hidden;position:relative;margin-top:10px;border-top:1px solid var(--line);background:var(--ecg-paper)}
+.strip svg{position:absolute;left:0;top:0;height:52px;animation:scroll 22s linear infinite}
+@keyframes scroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@media (prefers-reduced-motion: reduce){.strip svg{animation:none}}
+
+/* ---- tabs ---- */
+nav.tabs{position:fixed;left:0;right:0;bottom:0;background:var(--bg);border-top:1px solid var(--line);display:flex;justify-content:center;padding-bottom:env(safe-area-inset-bottom);z-index:20}
+nav.tabs .wrap{display:flex;width:100%;padding:0}
+nav.tabs button{flex:1;min-height:56px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:var(--muted);font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;border-top:2px solid transparent}
+nav.tabs button .n{font-family:var(--mono);font-size:20px;line-height:1;color:var(--ink)}
+nav.tabs button[aria-selected=true]{color:var(--accent);border-top-color:var(--accent)}
+nav.tabs button[aria-selected=true] .n{color:var(--accent)}
+section.view{display:none;padding:16px 0 24px}
+section.view.on{display:block}
+
+/* ---- cards / rules ---- */
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px;margin:12px 0}
+.rule{display:grid;grid-template-columns:36px 1fr;gap:12px;align-items:start;padding:12px 0;border-top:1px solid var(--line)}
+.rule:first-of-type{border-top:0}
+.rule .num{font-family:var(--mono);font-size:26px;line-height:1;color:var(--accent)}
+.rule b{display:block;font-family:var(--serif);font-weight:600;font-size:17px;margin-bottom:2px}
+.rule p{font-size:15px;color:var(--ink)}
+.why{margin-top:10px;border-top:1px dashed var(--line);padding-top:8px}
+.why summary{font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);cursor:pointer;list-style:none;display:flex;align-items:center;gap:8px;min-height:44px}
+.why summary::before{content:"";width:8px;height:8px;border-right:1.5px solid var(--accent);border-bottom:1.5px solid var(--accent);transform:rotate(-45deg);transition:transform .15s}
+.why[open] summary::before{transform:rotate(45deg)}
+.why p{font-size:15px;line-height:1.5;margin:6px 0}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);text-align:left;padding:8px 6px;border-bottom:1px solid var(--line)}
+td{padding:9px 6px;border-bottom:1px solid var(--line);vertical-align:top}
+.tier{display:inline-block;font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;padding:4px 8px;border-radius:6px;color:var(--accent-ink);white-space:nowrap}
+.t-emergent{background:var(--accent)} .t-immediate{background:var(--warn)} .t-early{background:var(--ok)} .t-delayed{background:var(--muted)} .t-none{background:var(--muted)}
+
+/* ---- pattern library ---- */
+.chips{display:flex;gap:8px;overflow-x:auto;padding:4px 0 10px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.chips::-webkit-scrollbar{display:none}
+.chips button{flex:0 0 auto;min-height:36px;padding:0 12px;border:1px solid var(--line);border-radius:999px;font-family:var(--mono);font-size:12px;background:var(--card);color:var(--muted)}
+.chips button[aria-pressed=true]{border-color:var(--ink);color:var(--ink)}
+.plist{list-style:none}
+.plist li{border-top:1px solid var(--line)}
+.plist button{width:100%;text-align:left;display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;padding:14px 0;min-height:56px}
+.plist .name{font-family:var(--serif);font-size:18px}
+.plist .sub{font-size:13px;color:var(--muted);margin-top:2px}
+.plist .ter{font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.06em}
+
+/* ---- tracing ---- */
+.ecg{background:var(--ecg-paper);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;position:relative}
+.ecg svg{display:block;width:100%;height:auto}
+.leadbox{cursor:pointer}
+.leadbox:active rect.hit{fill:var(--accent);fill-opacity:.08}
+.hl rect.hit{stroke:var(--accent);stroke-width:2}
+.ecg .cap{position:absolute;right:8px;bottom:6px;font-family:var(--mono);font-size:10px;color:var(--muted);background:var(--ecg-paper);padding:1px 4px;border-radius:4px}
+.toolbar{display:flex;gap:8px;margin:10px 0;flex-wrap:wrap}
+.toolbar button,.btn{min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);font-family:var(--mono);font-size:13px}
+.toolbar button[aria-pressed=true],.btn.primary{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.btn.acc{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.zoom{overflow-x:auto;-webkit-overflow-scrolling:touch;background:var(--ecg-paper);border:1px solid var(--line);border-radius:var(--r);position:relative;touch-action:pan-x}
+.zoom svg{display:block}
+.readout{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.readout div{background:var(--fill);border-radius:10px;padding:10px;text-align:center}
+.readout .v{font-family:var(--mono);font-size:20px;font-variant-numeric:tabular-nums}
+.readout .k{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.callbox{border-left:4px solid var(--accent);background:var(--fill);padding:12px 14px;border-radius:0 10px 10px 0;margin-top:12px}
+.callbox .kicker{color:var(--accent)}
+.callbox p{font-family:var(--serif);font-size:17px;margin-top:4px}
+.tell{list-style:none;margin-top:8px}
+.tell li{padding:6px 0 6px 18px;position:relative;font-size:15px}
+.tell li::before{content:"";position:absolute;left:0;top:14px;width:8px;height:2px;background:var(--accent)}
+.detail h2{margin-top:4px}
+.detail .ter{font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:.06em;margin-bottom:8px}
+.closebar{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+
+/* ---- call tab ---- */
+.q{margin:14px 0}
+.q .kicker{margin-bottom:6px}
+.opts{display:grid;gap:6px}
+.opts label{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--card);min-height:44px;font-size:15px}
+.opts label:has(input:checked){border-color:var(--ink);background:var(--fill)}
+.opts input{margin-top:4px;accent-color:var(--accent)}
+.verdict{border-radius:var(--r);padding:16px;color:var(--accent-ink);margin:14px 0}
+.verdict .kicker{color:inherit;opacity:.85}
+.verdict .big{font-family:var(--serif);font-size:28px;line-height:1.1}
+.verdict .cls{font-family:var(--mono);font-size:12px;letter-spacing:.1em;margin-top:6px;opacity:.9}
+.verdict ul{margin:10px 0 0 18px;font-size:15px}
+.script{font-family:var(--mono);font-size:13.5px;line-height:1.6;background:var(--fill);border-radius:10px;padding:12px;white-space:pre-wrap}
+.script b{color:var(--accent);font-weight:600}
+.calc{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.calc label{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block}
+.calc input,.calc select{width:100%;min-height:44px;border:1px solid var(--line);border-radius:10px;padding:0 10px;font:inherit;font-family:var(--mono);background:var(--card);color:var(--ink);margin-top:4px}
+.out{margin-top:10px;font-family:var(--serif);font-size:18px}
+.out .mono{font-size:16px}
+
+/* ---- practice ---- */
+.score{display:flex;justify-content:space-between;align-items:baseline;font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:.06em;margin-bottom:8px}
+.choices{display:grid;gap:6px;margin-top:10px}
+.choices button{min-height:48px;text-align:left;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);font-size:15px}
+.choices button.ok{border-color:var(--ok);background:var(--okbg)}
+.choices button.bad{border-color:var(--bad);background:var(--badbg)}
+.choices button[disabled]{opacity:.8}
+.fb{margin-top:12px}
+
+footer{margin-top:32px;padding:16px 0 8px;border-top:1px solid var(--line);font-size:12px;color:var(--muted);line-height:1.6}
+footer b{color:var(--ink);font-weight:600}
+a:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <a class="back" href="/">← bedside.tools</a>
+    <div class="title">
+      <div><h1>EKG Emergencies &amp; the Cath-Lab Call</h1><p>Occlusion patterns, mimics, 2025 ACC/AHA timing tiers, and a call script. Wards and ICU.</p></div>
+    </div>
+  </div>
+  <div class="strip" aria-hidden="true" id="strip"></div>
+</header>
+
+<main class="wrap">
+
+<!-- ================= READ ================= -->
+<section class="view on" id="v-read">
+  <p class="kicker">Method</p>
+  <h2 id="read">The 60-second occlusion read</h2>
+  <p class="muted" style="margin:6px 0 12px;font-size:15px">Fixed order, every tracing, before the computer interpretation is consulted. The question is <i>occlusion</i>, not whether a millimetre threshold is met.</p>
+  <div class="card">
+    <div class="rule"><span class="num">1</span><div><b>Context</b><p>Symptoms present or resolved; onset time; prior ECG on screen. Rate, rhythm, QRS width. Wide QRS or paced → Sgarbossa rules apply.</p></div></div>
+    <div class="rule"><span class="num">2</span><div><b>ST in every lead</b><p>Measure at the J point against the TP segment. Elevation: which contiguous group. Depression maximal V1–V4 → posterior OMI until excluded.</p></div></div>
+    <div class="rule"><span class="num">3</span><div><b>T wave and QRS</b><p>T wave bulky relative to its own QRS → hyperacute. Biphasic or deep symmetric inversion V2–V3, pain-free → Wellens. Loss of R, terminal QRS distortion → LAD occlusion over early repolarisation.</p></div></div>
+    <div class="rule"><span class="num">4</span><div><b>Reciprocity</b><p>STE with reciprocal STD is occlusion until proven otherwise. aVL depression is the earliest inferior clue. No reciprocal change → consider mimic.</p></div></div>
+    <div class="rule"><span class="num">5</span><div><b>Decide, then repeat</b><p>Pattern + symptoms → call. Uncertain → V7–V9, V4R, repeat ECG in 15 min. Troponin confirms; it does not gate the call.</p></div></div>
+    <details class="why"><summary>Why reciprocal depression is the discriminator</summary>
+      <p>Transmural injury produces a current that points toward the infarcting wall. Leads viewing from the opposite side record the same vector pointing away from them: depression. Pericarditis and early repolarisation inflame or repolarise diffusely and have no single injury vector, so they rarely produce reciprocal depression outside aVR and V1.</p>
+      <p>Corollary: an inferior STE pattern with depression in aVL is not pericarditis.</p>
+    </details>
+  </div>
+
+  <p class="kicker" style="margin-top:20px">Fourth Universal Definition of MI (2018)</p>
+  <h2 id="thresholds">ST-elevation thresholds at the J point</h2>
+  <div class="card">
+    <table>
+      <tr><th>Leads</th><th>Threshold</th><th>Note</th></tr>
+      <tr><td>Two contiguous leads, except V2–V3</td><td class="mono">≥ 1.0 mm</td><td>Limb, V1, V4–V6</td></tr>
+      <tr><td>V2–V3, men ≥ 40 y</td><td class="mono">≥ 2.0 mm</td><td></td></tr>
+      <tr><td>V2–V3, men &lt; 40 y</td><td class="mono">≥ 2.5 mm</td><td>Higher baseline STE</td></tr>
+      <tr><td>V2–V3, women</td><td class="mono">≥ 1.5 mm</td><td>Any age</td></tr>
+      <tr><td>V7–V9 (posterior)</td><td class="mono">≥ 0.5 mm</td><td>≥ 1 mm men &lt; 40 y</td></tr>
+      <tr><td>V3R–V4R (right)</td><td class="mono">≥ 0.5 mm</td><td>≥ 1 mm men &lt; 30 y</td></tr>
+    </table>
+    <details class="why"><summary>Why V2–V3 are different</summary><p>Young men carry 1–2 mm of concave anterior STE as a normal variant. The threshold rises so the rule does not fire on physiology; women have less baseline STE, so the bar is lower. The criteria assume no LBBB, paced rhythm, or LVH; in those settings use the Smith-modified Sgarbossa criteria (Call tab).</p></details>
+  </div>
+
+  <p class="kicker" style="margin-top:20px">Localisation</p>
+  <h2 id="territories">Leads → territory → probable culprit</h2>
+  <div class="card">
+    <table>
+      <tr><th>STE in</th><th>Territory · artery</th><th>Reciprocal</th></tr>
+      <tr><td>V1–V4</td><td>Anteroseptal · LAD (proximal if aVL/V1 involved; new RBBB, AV block)</td><td>II, III, aVF</td></tr>
+      <tr><td>I, aVL, V5–V6</td><td>Lateral · diagonal, OM, distal LAD. aVL + V2 only → D1</td><td>III, aVF</td></tr>
+      <tr><td>II, III, aVF</td><td>Inferior · RCA if III &gt; II and aVL STD; LCx if II ≥ III. RV: STE V1 or V4R ≥ 0.5 mm</td><td>I, aVL</td></tr>
+      <tr><td>STD V1–V3, tall R, upright T</td><td>Posterior · LCx or distal RCA; V7–V9 confirm</td><td>(these are the reciprocal leads)</td></tr>
+      <tr><td>aVR with diffuse STD</td><td>Global subendocardial · LM, proximal LAD, 3-vessel, or supply–demand</td><td>I, II, V4–V6</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- ================= PATTERNS ================= -->
+<section class="view" id="v-patterns">
+  <div id="plib">
+    <p class="kicker">Library</p>
+    <h2 id="patterns">Patterns</h2>
+    <p class="muted" style="margin:6px 0 10px;font-size:15px">Tap a pattern. Tap any lead on the tracing to zoom and measure.</p>
+    <div class="chips" id="chips"></div>
+    <ul class="plist" id="plist"></ul>
+  </div>
+  <div id="pdetail" class="detail" hidden></div>
+</section>
+
+<!-- ================= CALL ================= -->
+<section class="view" id="v-call">
+  <p class="kicker">Timing tier · 2025 ACC/AHA/ACEP/NAEMSP/SCAI ACS guideline</p>
+  <h2 id="call">Who goes, and how fast</h2>
+  <form id="tierform" onsubmit="return false">
+    <div class="q"><p class="kicker">1 · ECG</p><div class="opts">
+      <label><input type="radio" name="ecg" value="stemi" checked> STEMI criteria met (Fourth UDMI thresholds, contiguous leads)</label>
+      <label><input type="radio" name="ecg" value="equiv"> STEMI equivalent: posterior OMI, de Winter, Smith-Sgarbossa positive LBBB/paced, hyperacute T with symptoms</label>
+      <label><input type="radio" name="ecg" value="isch"> Ischemic without STE: ST depression, T inversion, aVR pattern, Wellens</label>
+      <label><input type="radio" name="ecg" value="none"> Nondiagnostic or normal, suspected ACS</label>
+    </div></div>
+    <div class="q"><p class="kicker">2 · Symptom onset</p><div class="opts">
+      <label><input type="radio" name="onset" value="lt12" checked> &lt; 12 h</label>
+      <label><input type="radio" name="onset" value="12to24"> 12–24 h</label>
+      <label><input type="radio" name="onset" value="gt24"> &gt; 24 h</label>
+    </div></div>
+    <div class="q"><p class="kicker">3 · Instability (any)</p><div class="opts">
+      <label><input type="checkbox" name="shock"> Cardiogenic shock (SBP &lt; 90 with hypoperfusion, or pressors)</label>
+      <label><input type="checkbox" name="hemo"> Hemodynamic instability, acute HF, new or worsening MR</label>
+      <label><input type="checkbox" name="elec"> Electrical instability: sustained VT or VF</label>
+      <label><input type="checkbox" name="refr"> Refractory or recurrent angina despite anti-ischemic therapy</label>
+    </div></div>
+    <div class="q"><p class="kicker">4 · High-risk features (NSTE-ACS)</p><div class="opts">
+      <label><input type="checkbox" name="dyn"> Dynamic ST changes on serial ECGs</label>
+      <label><input type="checkbox" name="trop"> Rising troponin consistent with MI</label>
+      <label><input type="checkbox" name="grace"> GRACE &gt; 140 or Wellens pattern</label>
+    </div></div>
+  </form>
+  <div id="verdict"></div>
+
+  <p class="kicker" style="margin-top:20px">Script</p>
+  <h2 id="script-h">The 45-second call</h2>
+  <div class="card">
+    <div class="script" id="script"></div>
+    <details class="why"><summary>Have in hand · do not</summary>
+      <p><b>Have in hand:</b> ECG timed and filed, prior ECG pulled; two large-bore IVs; pads on if unstable; aspirin 162–325 mg chewed; weight, creatinine, Hgb, platelets, INR if on warfarin; anticoagulant and last dose; PDE5-inhibitor use (no nitrates within 24–48 h); contrast allergy; code status and goals.</p>
+      <p><b>Do not:</b> wait for troponin to call a STEMI; give nitrates to an RV infarct or a hypotensive patient; give fibrinolytics for NSTE-ACS (Class 3: harm) except true posterior MI; load a P2Y12 inhibitor before the lab confirms unless the local pathway says so.</p>
+    </details>
+  </div>
+
+  <p class="kicker" style="margin-top:20px">Calculator</p>
+  <h2 id="sgarbossa">Smith-modified Sgarbossa (LBBB or paced)</h2>
+  <div class="card">
+    <div class="opts" style="margin-bottom:10px">
+      <label><input type="checkbox" id="sg1"> Concordant STE ≥ 1 mm in any lead</label>
+      <label><input type="checkbox" id="sg2"> Concordant STD ≥ 1 mm in V1–V3</label>
+    </div>
+    <div class="calc">
+      <div><label for="ste">Discordant STE (mm)</label><input id="ste" type="number" inputmode="decimal" step="0.5" min="0" placeholder="e.g. 4.5"></div>
+      <div><label for="sdep">Preceding S depth (mm)</label><input id="sdep" type="number" inputmode="decimal" step="0.5" min="0" placeholder="e.g. 12"></div>
+    </div>
+    <div class="out" id="sgout"></div>
+    <details class="why"><summary>Why a ratio, not 5 mm</summary><p>In LBBB the ST segment is normally discordant, opposite the dominant QRS deflection, and its magnitude scales with the QRS. A fixed 5 mm rule fires on big QRS complexes and misses small ones. Discordant STE ≥ 25% of the preceding S-wave depth marks excess beyond expected discordance. Concordance of any size is abnormal. Any single criterion is positive (Smith 2012; sensitivity ≈ 80%, specificity ≈ 99% in the validation cohort). A new LBBB alone is no longer a STEMI equivalent.</p></details>
+  </div>
+
+  <h2 id="ste-lookup" style="margin-top:16px">ST-elevation threshold lookup</h2>
+  <div class="card">
+    <div class="calc">
+      <div><label for="lead">Lead</label><select id="lead"><option value="other">Any except V2–V3</option><option value="v23">V2 or V3</option><option value="post">V7–V9</option><option value="right">V3R–V4R</option></select></div>
+      <div><label for="sex">Sex</label><select id="sex"><option value="m">Male</option><option value="f">Female</option></select></div>
+      <div><label for="age">Age (years)</label><input id="age" type="number" inputmode="numeric" min="18" max="110" placeholder="e.g. 58"></div>
+      <div><label for="meas">Measured STE (mm)</label><input id="meas" type="number" inputmode="decimal" step="0.5" min="0" placeholder="e.g. 1.5"></div>
+    </div>
+    <div class="out" id="thout"></div>
+  </div>
+</section>
+
+<!-- ================= PRACTICE ================= -->
+<section class="view" id="v-practice">
+  <span id="practice"></span>
+  <div class="score"><span>Practice · unannotated, randomised</span><span id="score">0 / 0</span></div>
+  <h2 id="pstem"></h2>
+  <div id="ptrace"></div>
+  <div class="toolbar"><button id="pzoomhint" class="muted" style="border:0;background:none;padding:0;font-family:var(--mono);font-size:12px">Tap a lead to zoom and measure</button></div>
+  <p class="kicker" style="margin-top:8px">Pattern</p>
+  <div class="choices" id="pchoices"></div>
+  <div id="ptier" hidden><p class="kicker" style="margin-top:12px">Tier</p><div class="choices" id="tchoices"></div></div>
+  <div class="fb" id="pfb"></div>
+  <div class="toolbar"><button class="btn primary" id="pnext">Next case</button></div>
+</section>
+
+<!-- ================= ZOOM MODAL ================= -->
+<div id="zoomwrap" hidden style="position:fixed;inset:0;background:var(--scrim);z-index:30;display:flex;align-items:flex-end">
+  <div style="background:var(--bg);width:100%;max-height:92vh;overflow:auto;border-radius:18px 18px 0 0;padding:12px 16px calc(16px + env(safe-area-inset-bottom))">
+    <div class="closebar"><div><span class="kicker">Lead</span> <span class="mono" id="zlead" style="font-size:20px"></span></div><button class="btn" id="zclose">Close</button></div>
+    <div class="zoom" id="zoom"></div>
+    <div class="readout"><div><div class="v" id="r-mm">—</div><div class="k">Δ amplitude (mm)</div></div><div><div class="v" id="r-ms">—</div><div class="k">Δ time (ms)</div></div><div><div class="v" id="r-mv">—</div><div class="k">Δ mV</div></div></div>
+    <p class="muted" style="font-size:13px;margin-top:8px">Calipers: tap once on the TP baseline, tap again at the J point. 1 small square = 1 mm = 0.1 mV = 40 ms. Tap <span class="mono">Reset</span> to clear.</p>
+    <div class="toolbar"><button class="btn" id="zreset">Reset calipers</button></div>
+  </div>
+</div>
+
+<footer>
+  <p><b>For education only. Not a substitute for clinical judgment.</b> Activation criteria and call pathways are institution-specific: adjust to your cath lab's protocol. All tracings are synthetic, generated in the browser from parametric waveforms; no patient data were used.</p>
+  <p style="margin-top:6px">Privacy: everything runs in your browser. Nothing you enter is sent anywhere or stored, and there are no analytics; only your light/dark choice is saved on this device. Do not enter names, record numbers, or dates of birth.</p>
+  <p style="margin-top:6px"><b>Last reviewed:</b> 2026-11-11. <b>Sources:</b> Rao SV et al., 2025 ACC/AHA/ACEP/NAEMSP/SCAI Guideline for ACS, Circulation 2025;151:e771 (timing tiers, shock, arrest, fibrinolysis; class of recommendation shown); Thygesen K et al., Fourth Universal Definition of MI, Circulation 2018 (thresholds); Kontos MC et al., 2022 ACC ECDP on acute chest pain in the ED, JACC 2022 (named STEMI equivalents); Smith SW et al., Ann Emerg Med 2012 (modified Sgarbossa); de Winter RJ et al., NEJM 2008; de Zwaan C et al., Am Heart J 1982 (Wellens); Meyers HP et al., JACC Adv 2025 (hyperacute T); COACT 2019, TOMAHAWK 2021, CULPRIT-SHOCK 2017, IABP-SHOCK II 2012, DanGer Shock 2024, OAT 2006; AHA ACLS 2020 / 2023 update. Mimic "tells" and hyperacute-T activation thresholds are expert practice.</p>
+</footer>
+</main>
+
+<nav class="tabs" role="tablist"><div class="wrap">
+  <button role="tab" aria-selected="true" data-v="read"><span class="n">1</span>Read</button>
+  <button role="tab" aria-selected="false" data-v="patterns"><span class="n">2</span>Patterns</button>
+  <button role="tab" aria-selected="false" data-v="call"><span class="n">3</span>Call</button>
+  <button role="tab" aria-selected="false" data-v="practice"><span class="n">4</span>Practice</button>
+</div></nav>
+
+<script>
+/* ===================== waveform engine (port of gen.py) ===================== */
+const LEADS=["I","II","III","aVR","aVL","aVF","V1","V2","V3","V4","V5","V6"];
+const BASE={I:{p:.10,q:.06,r:.70,s:.10,t:.25},II:{p:.15,q:.05,r:1.2,s:.15,t:.35},III:{p:.08,q:.04,r:.5,s:.3,t:.1},
+ aVR:{p:-.1,q:0,r:.1,s:1,t:-.25},aVL:{p:.05,q:.05,r:.4,s:.2,t:.1},aVF:{p:.12,q:.04,r:.9,s:.2,t:.25},
+ V1:{p:.05,q:0,r:.2,s:1,t:-.1},V2:{p:.06,q:0,r:.4,s:1.6,t:.45},V3:{p:.06,q:0,r:.8,s:1.2,t:.5},
+ V4:{p:.08,q:.04,r:1.5,s:.6,t:.45},V5:{p:.08,q:.06,r:1.6,s:.3,t:.4},V6:{p:.08,q:.06,r:1.3,s:.15,t:.3}};
+const DEF={st_j:0,st_t:null,tw:.045,t2:0,pr:0,jnotch:0,qrsw:1,notch:0,tpeak:false};
+const PAT={"normal":{"hr":72,"rhythm":"sinus","arate":null,"vrate":null,"all":{},"leads":{},"ann":[],"title":"Normal sinus rhythm"},"anterior_stemi":{"hr":88,"rhythm":"sinus","arate":null,"vrate":null,"all":{},"leads":{"V1":{"st_j":0.2,"st_t":0.25,"t":0.3,"tw":0.06},"V2":{"st_j":0.5,"st_t":0.625,"t":0.6,"tw":0.06},"V3":{"st_j":0.6,"st_t":0.75,"t":0.6,"tw":0.06},"V4":{"st_j":0.4,"st_t":0.5,"t":0.5,"tw":0.06},"V5":{"st_j":0.15,"t":0.4},"aVL":{"st_j":0.15,"t":0.2},"II":{"st_j":-0.08,"t":0.1},"III":{"st_j":-0.2,"t":-0.15},"aVF":{"st_j":-0.15,"t":-0.05}},"ann":["V1","V2","V3","V4","III","aVF"],"title":"Anterior STEMI (proximal LAD)"},"inferior_stemi":{"hr":58,"rhythm":"sinus","arate":null,"vrate":null,"all":{},"leads":{"II":{"st_j":0.25,"st_t":0.3,"t":0.4},"III":{"st_j":0.4,"st_t":0.5,"t":0.45,"tw":0.06},"aVF":{"st_j":0.32,"st_t":0.4,"t":0.4,"tw":0.06},"I":{"st_j":-0.1,"t":-0.05},"aVL":{"st_j":-0.25,"t":-0.25},"V1":{"st_j":0.12,"t":0.1},"V2":{"st_j":-0.1,"t":0.5},"V3":{"st_j":-0.05}},"ann":["II","III","aVF","aVL","V1"],"title":"Inferior STEMI with RV involvement (RCA)"},"lateral_stemi":{"hr":84,"rhythm":"sinus","arate":null,"vrate":null,"all":{},"leads":{"I":{"st_j":0.15,"t":0.35},"aVL":{"st_j":0.3,"st_t":0.375,"t":0.4,"tw":0.06},"V5":{"st_j":0.18,"t":0.5},"V6":{"st_j":0.2,"t":0.45},"V2":{"st_j":0.12},"III":{"st_j":-0.25,"t":-0.25},"aVF":{"st_j":-0.15,"t":-0.1},"II":{"st_j":-0.05}},"ann":["I","aVL","V5","V6","III"],"title":"High-lateral STEMI (D1 / OM)"},"posterior_omi":{"hr":80,"rhythm":"sinus","arate":null,"vrate":null,"all":{},"leads":{"V1":{"r":0.7,"s":0.5,"st_j":-0.15,"st_t":-0.12,"t":0.45},"V2":{"r":1.3,"s":0.5,"st_j":-0.32,"st_t":-0.28,"t":0.65},"V3":{"r":1.5,"s":0.5,"st_j":-0.28,"st_t":-0.22,"t":0.6},"V4":{"st_j":-0.12,"t":0.5},"II":{"st_j":0.05},"III":{"st_j":0.08},"aVF":{"st_j":0.06}},"ann":["V1","V2","V3","V4"],"title":"Posterior OMI (circumflex) \u2014 the mirror image"},"hyperacute_t":{"hr":90,"rhythm":"sinus","arate":null,"vrate":null,"all":{},"leads":{"V1":{"t":0.35,"tw":0.07,"st_j":0.05},"V2":{"t":1.1,"tw":0.075,"st_j":0.1},"V3":{"t":1.25,"tw":0.08,"st_j":0.12},"V4":{"t":1.0,"tw":0.075,"st_j":0.08},"V5":{"t":0.6,"tw":0.06},"aVL":{"t":0.3,"tw":0.06},"III":{"st_j":-0.06,"t":-0.15},"aVF":{"st_j":-0.04,"t":-0.05}},"ann":["V2","V3","V4","III"],"title":"Hyperacute T waves (early LAD occlusion)"},"de_winter":{"hr":92,"rhythm":"sinus","arate":null,"vrate":null,"all":{},"leads":{"V2":{"st_j":-0.25,"st_t":0.0,"t":1.0,"tw":0.06},"V3":{"st_j":-0.3,"st_t":0.0,"t":1.1,"tw":0.06},"V4":{"st_j":-0.28,"st_t":0.0,"t":1.0,"tw":0.06},"V5":{"st_j":-0.18,"st_t":0.0,"t":0.8,"tw":0.055},"V6":{"st_j":-0.1,"t":0.5},"aVR":{"st_j":0.1,"t":-0.2},"I":{"st_j":-0.05}},"ann":["V2","V3","V4","aVR"],"title":"de Winter pattern (proximal LAD)"},"wellens_a":{"hr":70,"rhythm":"sinus","arate":null,"vrate":null,"all":{},"leads":{"V2":{"t":0.35,"t2":-0.45,"tw":0.035},"V3":{"t":0.4,"t2":-0.55,"tw":0.035},"V4":{"t":0.3,"t2":-0.3,"tw":0.035},"V5":{"t":0.25,"t2":-0.1}},"ann":["V2","V3","V4"],"title":"Wellens pattern A (biphasic T, pain-free)"},"wellens_b":{"hr":68,"rhythm":"sinus","arate":null,"vrate":null,"all":{},"leads":{"V2":{"t":-0.65,"tw":0.06},"V3":{"t":-0.8,"tw":0.065},"V4":{"t":-0.65,"tw":0.06},"V5":{"t":-0.3,"tw":0.055},"V1":{"t":-0.25},"aVL":{"t":-0.12}},"ann":["V2","V3","V4"],"title":"Wellens pattern B (deep symmetric TWI, pain-free)"},"lbbb_sgarbossa":{"hr":86,"rhythm":"sinus","arate":null,"vrate":null,"all":{"qrsw":1.7},"leads":{"V1":{"r":0.1,"s":1.6,"notch":0.0,"st_j":0.15,"st_t":0.2,"t":0.4},"V2":{"r":0.15,"s":1.2,"st_j":0.45,"st_t":0.5,"t":0.6},"V3":{"r":0.3,"s":1.1,"st_j":0.25,"t":0.4},"V4":{"r":0.9,"s":0.6,"notch":0.5,"st_j":0.0,"t":-0.2},"V5":{"r":1.3,"s":0.1,"notch":0.8,"st_j":0.15,"st_t":0.18,"t":0.3},"V6":{"r":1.2,"s":0.05,"notch":0.8,"st_j":0.15,"st_t":0.18,"t":0.3},"I":{"r":0.9,"notch":0.6,"st_j":0.12,"t":0.2},"aVL":{"r":0.8,"notch":0.5,"st_j":0.1,"t":0.15},"II":{"r":0.8,"notch":0.4,"st_j":0.0,"t":-0.15},"III":{"r":0.2,"s":0.7,"st_j":0.1,"t":0.2},"aVF":{"r":0.5,"s":0.4,"st_j":0.0,"t":0.0},"aVR":{"s":1.2,"st_j":0.1,"t":0.2}},"ann":["V2","V5","V6","I"],"title":"LBBB with positive Smith-modified Sgarbossa"},"avr_diffuse_std":{"hr":108,"rhythm":"sinus","arate":null,"vrate":null,"all":{},"leads":{"aVR":{"st_j":0.22,"st_t":0.2,"t":0.1},"V1":{"st_j":0.1,"t":0.1},"I":{"st_j":-0.12,"t":-0.05},"II":{"st_j":-0.22,"t":-0.1},"III":{"st_j":-0.12},"aVF":{"st_j":-0.18,"t":-0.05},"aVL":{"st_j":-0.08},"V3":{"st_j":-0.15,"t":0.1},"V4":{"st_j":-0.3,"t":-0.1},"V5":{"st_j":-0.35,"t":-0.2},"V6":{"st_j":-0.3,"t":-0.15}},"ann":["aVR","V4","V5","II","V6"],"title":"STE in aVR with diffuse ST depression"},"pericarditis":{"hr":94,"rhythm":"sinus","arate":null,"vrate":null,"all":{"pr":-0.07},"leads":{"I":{"st_j":0.08,"st_t":0.15,"t":0.3},"II":{"st_j":0.12,"st_t":0.22,"t":0.4},"III":{"st_j":0.06,"st_t":0.12,"t":0.2},"aVF":{"st_j":0.1,"st_t":0.18,"t":0.3},"aVL":{"st_j":0.04,"st_t":0.08},"V2":{"st_j":0.08,"st_t":0.15},"V3":{"st_j":0.12,"st_t":0.22},"V4":{"st_j":0.14,"st_t":0.25},"V5":{"st_j":0.14,"st_t":0.24},"V6":{"st_j":0.1,"st_t":0.18},"aVR":{"st_j":-0.1,"st_t":-0.12,"pr":0.08,"t":-0.2},"V1":{"st_j":-0.02,"pr":0.0}},"ann":["II","aVR","V4","III"],"title":"MIMIC \u2014 Acute pericarditis"},"early_repol":{"hr":56,"rhythm":"sinus","arate":null,"vrate":null,"all":{},"leads":{"V2":{"st_j":0.15,"st_t":0.22,"jnotch":0.12,"t":0.7,"tw":0.06},"V3":{"st_j":0.2,"st_t":0.28,"jnotch":0.15,"t":0.8,"tw":0.065},"V4":{"st_j":0.18,"st_t":0.25,"jnotch":0.15,"t":0.75,"tw":0.06},"V5":{"st_j":0.1,"st_t":0.15,"jnotch":0.1,"t":0.55},"II":{"st_j":0.05,"st_t":0.08},"aVF":{"st_j":0.04}},"ann":["V3","V4","III"],"title":"MIMIC \u2014 Benign early repolarization"},"lvh_strain":{"hr":76,"rhythm":"sinus","arate":null,"vrate":null,"all":{},"leads":{"V1":{"s":2.4,"st_j":0.2,"st_t":0.25,"t":0.5},"V2":{"s":3.0,"st_j":0.28,"st_t":0.32,"t":0.7},"V3":{"s":2.2,"st_j":0.15,"t":0.5},"V4":{"r":2.2,"s":0.6,"st_j":-0.05,"t":0.1},"V5":{"r":3.0,"s":0.2,"st_j":-0.15,"st_t":-0.25,"t":-0.5,"tw":0.07},"V6":{"r":2.6,"s":0.1,"st_j":-0.15,"st_t":-0.25,"t":-0.45,"tw":0.07},"I":{"r":1.1,"st_j":-0.08,"st_t":-0.12,"t":-0.25},"aVL":{"r":1.3,"st_j":-0.1,"st_t":-0.15,"t":-0.3}},"ann":["V2","V5","V6","aVL"],"title":"MIMIC \u2014 LVH with strain"},"hyperkalemia":{"hr":66,"rhythm":"sinus","arate":null,"vrate":null,"all":{"tpeak":true,"qrsw":1.3},"leads":{"I":{"p":0.03,"t":0.6},"II":{"p":0.04,"t":1.0},"III":{"p":0.02,"t":0.6},"aVF":{"p":0.03,"t":0.8},"aVL":{"p":0.02,"t":0.3},"V2":{"p":0.02,"t":1.2},"V3":{"p":0.02,"t":1.3},"V4":{"p":0.02,"t":1.2},"V5":{"p":0.02,"t":1.0},"V6":{"p":0.02,"t":0.8},"V1":{"p":0.02,"t":0.2},"aVR":{"p":-0.02,"t":-0.5}},"ann":["V3","II","V4"],"title":"MIMIC / EMERGENCY \u2014 Hyperkalemia"},"vt":{"hr":168,"rhythm":"vt","arate":null,"vrate":null,"all":{"qrsw":1.9,"p":0.0},"leads":{"V1":{"r":1.4,"s":0.3,"notch":0.3,"st_j":-0.2,"t":-0.6,"tw":0.06},"V2":{"r":1.3,"s":0.5,"st_j":-0.2,"t":-0.6,"tw":0.06},"V3":{"r":0.9,"s":0.9,"t":-0.4,"tw":0.06},"V4":{"r":0.5,"s":1.3,"st_j":0.15,"t":0.5,"tw":0.06},"V5":{"r":0.3,"s":1.5,"st_j":0.2,"t":0.6,"tw":0.06},"V6":{"r":0.2,"s":1.4,"st_j":0.2,"t":0.6,"tw":0.06},"I":{"r":0.2,"s":1.0,"st_j":0.15,"t":0.4,"tw":0.06},"II":{"r":1.1,"s":0.4,"t":-0.4,"tw":0.06},"III":{"r":1.3,"s":0.2,"t":-0.5,"tw":0.06},"aVF":{"r":1.2,"s":0.3,"t":-0.45,"tw":0.06},"aVL":{"r":0.1,"s":1.1,"t":0.4,"tw":0.06},"aVR":{"r":0.6,"s":0.5,"t":-0.2,"tw":0.06}},"ann":["V1","V6","II"],"title":"EMERGENCY \u2014 Monomorphic ventricular tachycardia"},"chb_inferior":{"hr":36,"rhythm":"chb","arate":88,"vrate":36,"all":{"qrsw":1.25},"leads":{"II":{"st_j":0.2,"st_t":0.25,"t":0.35},"III":{"st_j":0.35,"st_t":0.4375,"t":0.4,"tw":0.06},"aVF":{"st_j":0.3,"st_t":0.375,"t":0.35,"tw":0.06},"aVL":{"st_j":-0.2,"t":-0.2},"I":{"st_j":-0.08},"V1":{"st_j":0.05}},"ann":["II","III","aVF","aVL"],"title":"EMERGENCY \u2014 Complete heart block with inferior STEMI"}};
+const FS=250, DUR=10;
+const g=(t,c,w,a)=>a*Math.exp(-0.5*((t-c)/w)**2);
+const sg=(x,k)=>1/(1+Math.exp(Math.max(-40,Math.min(40,-x/k))));
+function rng(seed){let s=seed>>>0||1;return()=>{s^=s<<13;s>>>=0;s^=s>>>17;s^=s<<5;s>>>=0;return (s>>>0)/4294967296}}
+function leadSignal(t,qrs,ps,prm){
+  prm=Object.assign({},DEF,prm); const stt=prm.st_t==null?prm.st_j:prm.st_t, w=prm.qrsw; const n=t.length; const y=new Float32Array(n);
+  for(const pt of ps){for(let i=0;i<n;i++){const x=t[i]; if(x<pt-.15||x>pt+.25)continue; y[i]+=g(x,pt,.022,prm.p); if(prm.pr)y[i]+=prm.pr*(sg(x-(pt+.05),.004)-sg(x-(pt+.14),.004));}}
+  for(const q0 of qrs){const qc=q0+.015*w,rc=q0+.035*w,sc=q0+.06*w,J=q0+.085*w,Ton=J+.09,Tc=J+.19;
+    for(let i=0;i<n;i++){const x=t[i]; if(x<q0-.05||x>Tc+.3)continue; let v=0;
+      v+=g(x,qc,.008*w,-prm.q)+g(x,rc,.011*w,prm.r)+g(x,sc,.010*w,-prm.s); if(prm.notch)v+=g(x,rc+.03*w,.012*w,prm.notch);
+      const ramp=Math.min(1,Math.max(0,(x-J)/(Ton-J))); const st=prm.st_j+(stt-prm.st_j)*ramp; v+=st*(sg(x-J,.005)-sg(x-(Tc+.02),.03));
+      if(prm.jnotch)v+=g(x,J+.005,.006,prm.jnotch);
+      v+=g(x,Tc,prm.tpeak?prm.tw*.6:prm.tw,prm.t); if(prm.t2)v+=g(x,Tc+.09,prm.tw*.9,prm.t2); y[i]+=v;}}
+  return y;
+}
+function build(pat,opts={}){
+  const t=new Float32Array(FS*DUR); for(let i=0;i<t.length;i++)t[i]=i/FS;
+  const hr=(pat.hr||75)*(opts.hrScale||1), rr=60/hr; let qrs=[],ps=[];
+  if(pat.rhythm==="vt"){for(let x=.3;x<DUR;x+=rr)qrs.push(x)}
+  else if(pat.rhythm==="chb"){for(let x=.5;x<DUR;x+=60/(pat.vrate||36))qrs.push(x); for(let x=.2;x<DUR;x+=60/(pat.arate||85))ps.push(x)}
+  else{for(let x=.4;x<DUR;x+=rr){qrs.push(x);ps.push(x-.16)}}
+  const R=rng(opts.seed||1), amp=opts.ampScale||1, leads={};
+  for(const L of LEADS){const prm=Object.assign({},BASE[L],pat.all||{},(pat.leads||{})[L]||{});
+    if(amp!==1)for(const k of ["p","q","r","s","t","t2","st_j","st_t","notch"])if(typeof prm[k]==="number")prm[k]*=amp;
+    const y=leadSignal(t,qrs,ps,prm); const ph=R()*6; for(let i=0;i<y.length;i++)y[i]+=.012*(R()-.5)*2+.025*Math.sin(2*Math.PI*.25*t[i]+ph); leads[L]=y}
+  return {t,leads,hr};
+}
+/* ===================== SVG rendering ===================== */
+function gridRect(x,y,w,h,mm){ // mm = px per mm
+  let s=`<rect x="${x}" y="${y}" width="${w}" height="${h}" style="fill:var(--ecg-paper)"/>`;
+  s+=`<path style="stroke:var(--ecg-grid)" stroke-width="${mm*.08}" d="`; for(let i=x;i<=x+w+.1;i+=mm)s+=`M${i.toFixed(1)} ${y}V${y+h}`; for(let j=y;j<=y+h+.1;j+=mm)s+=`M${x} ${j.toFixed(1)}H${x+w}`; s+=`"/>`;
+  s+=`<path style="stroke:var(--ecg-grid5)" stroke-width="${mm*.14}" d="`; for(let i=x;i<=x+w+.1;i+=mm*5)s+=`M${i.toFixed(1)} ${y}V${y+h}`; for(let j=y;j<=y+h+.1;j+=mm*5)s+=`M${x} ${j.toFixed(1)}H${x+w}`; s+=`"/>`;
+  return s;
+}
+function tracePath(sig,t,t0,t1,x0,yb,mm){ // 25 mm/s, 10 mm/mV
+  const i0=Math.max(0,Math.floor(t0*FS)), i1=Math.min(t.length-1,Math.floor(t1*FS)); let d="";
+  for(let i=i0;i<=i1;i++){const x=x0+(t[i]-t0)*25*mm, y=yb-sig[i]*10*mm; d+=(i===i0?"M":"L")+x.toFixed(1)+" "+y.toFixed(1)} return d;
+}
+const GRID=[["I","aVR","V1","V4"],["II","aVL","V2","V5"],["III","aVF","V3","V6"]]; // 3 rows x 4 cols (columns are time windows)
+function render12(data,{highlight=[],rows=4}={}){
+  // phone-first: 4 rows x 3 cols; each cell 2.5 s. Width 100%.
+  const layout=rows===4?[["I","II","III"],["aVR","aVL","aVF"],["V1","V2","V3"],["V4","V5","V6"]]:GRID;
+  const cols=layout[0].length, mm=4, cw=62.5*mm, ch=30*mm, W=cols*cw, H=layout.length*ch+ 28*mm;
+  let s=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="12-lead ECG">${gridRect(0,0,W,H,mm)}`;
+  layout.forEach((row,r)=>row.forEach((L,c)=>{const x0=c*cw,yb=r*ch+ch*.6; const win=rows===4?[c*2.5,(c+1)*2.5]:[c*2.5,(c+1)*2.5];
+    s+=`<g class="leadbox${highlight.includes(L)?" hl":""}" data-lead="${L}"><rect class="hit" x="${x0+1}" y="${r*ch+1}" width="${cw-2}" height="${ch-2}" fill="transparent" rx="4"/>`;
+    s+=`<path d="${tracePath(data.leads[L],data.t,win[0],win[1],x0,yb,mm)}" style="fill:none;stroke:var(--ecg-ink)" stroke-width="1.3" stroke-linejoin="round" stroke-linecap="round"/>`;
+    s+=`<text x="${x0+6}" y="${r*ch+14}" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="700" style="fill:var(--ecg-ink)">${L}</text>`;
+    if(c>0)s+=`<path d="M${x0} ${yb-6*mm}V${yb+6*mm}" style="stroke:var(--ecg-ink)" stroke-width="1"/>`; s+=`</g>`}));
+  // rhythm strip lead II, 10 s compressed into W
+  const yb=layout.length*ch+14*mm; const mm2=W/250; // fit 10 s (250 mm) to width
+  s+=`<path d="${tracePath(data.leads.II,data.t,0,DUR,0,yb,mm2)}" style="fill:none;stroke:var(--ecg-ink)" stroke-width="1.1"/><text x="6" y="${layout.length*ch+12}" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="700" style="fill:var(--ecg-ink)">II</text>`;
+  s+=`</svg>`; return s;
+}
+function renderZoom(data,L){
+  const mm=10, W=250*mm/4, H=40*mm; // 2.5 s window at 10 px/mm -> 625 px wide, scrollable
+  const t0=0.3; let s=`<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" id="zsvg">${gridRect(0,0,W,H,mm)}`;
+  s+=`<path d="${tracePath(data.leads[L],data.t,t0,t0+2.5,0,H*.55,mm)}" style="fill:none;stroke:var(--ecg-ink)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/>`;
+  s+=`<g id="cal"></g></svg>`; return {svg:s,mm,W,H};
+}
+/* ===================== content ===================== */
+const TIER={emergent:"Emergent",immediate:"Immediate · ≤ 2 h",early:"Early · ≤ 24 h",delayed:"Delayed / selective",none:"Not an activation"};
+const LIB=[
+ {id:"anterior_stemi",cat:"Territory",name:"Anterior STEMI",ter:"V1–V4 · proximal LAD",tier:"emergent",
+  tell:["Convex (tombstone) STE V1–V4 above the V2–V3 cut-point.","Reciprocal STD in III and aVF confirms.","STE in aVL and V1 places the occlusion proximal to D1.","Watch: new RBBB, Mobitz II, cardiogenic shock."],
+  call:"Cath-lab activation now. Primary PCI ≤ 12 h from onset, FMC-to-device ≤ 90 min (Class 1).",
+  why:"The LAD supplies the anterior wall and septum. Transmural injury current points anteriorly, so V1–V4 elevate; the inferior leads view the same vector receding, so they depress. Proximal occlusions also take the septal perforators (bundle branches, His) and the first diagonal (aVL)."},
+ {id:"inferior_stemi",cat:"Territory",name:"Inferior STEMI with RV involvement",ter:"II, III, aVF · RCA",tier:"emergent",
+  tell:["STE II, III, aVF with III > II and STD in aVL: RCA.","STE V1 with STD V2: RV signature; confirm with V4R ≥ 0.5 mm.","Sinus bradycardia and AV block are common.","RV infarct is preload-dependent: fluids, no nitrates."],
+  call:"Cath-lab activation now. Obtain right-sided leads; do not delay the call for them.",
+  why:"The RCA supplies the inferior wall, the RV free wall (acute marginal branches), the SA node (≈60%) and the AV node (≈90%). STE III > II because lead III's axis (+120°) is closer to the RCA territory's injury vector than lead II's (+60°); aVL (−30°) sits opposite and depresses first, often before the inferior STE is diagnostic."},
+ {id:"lateral_stemi",cat:"Territory",name:"High-lateral STEMI",ter:"I, aVL, V5–V6 · D1 / OM",tier:"emergent",
+  tell:["STE I, aVL, V5–V6 with reciprocal STD III, aVF.","aVL is a low-voltage lead: 1 mm there is substantial.","Isolated aVL + V2 STE with inferior STD (South African flag) = first diagonal.","The most under-called territory."],
+  call:"Cath-lab activation now.",
+  why:"Lateral wall injury points left and superior (toward aVL at −30°); the inferior leads see it receding. Because the lateral wall is thinner and further from the precordial electrodes, voltages are small: judge STE in aVL against its own QRS amplitude."},
+ {id:"posterior_omi",cat:"Equivalent",name:"Posterior OMI",ter:"STD V1–V3 · LCx or distal RCA",tier:"emergent",
+  tell:["Horizontal STD V1–V3 with tall, broad R and upright T.","This is reciprocal to posterior STE; not 'anterior ischemia'.","V7–V9 STE ≥ 0.5 mm confirms; ischemic STD maximal V1–V4 is already specific.","Check for inferior and lateral extension."],
+  call:"Treat as STEMI: cath-lab activation now (2022 ACC ECDP; 2025 ACS guideline).",
+  why:"No standard lead faces the posterior wall; V1–V3 view it from the front. Posterior injury produces STE and Q waves on that wall; from the front they appear as STD and tall R waves (the mirror of a Q). Fibrinolysis is permitted for true posterior MI but contraindicated for other NSTE-ACS."},
+ {id:"hyperacute_t",cat:"Equivalent",name:"Hyperacute T waves",ter:"V2–V4 · early LAD occlusion",tier:"emergent",
+  tell:["Broad-based, bulky T waves that tower over their own QRS.","Area under the curve matters, not height alone.","Subtle reciprocal change in III or aVL supports occlusion.","Precede STE; repeat ECG in 10–15 min usually declares."],
+  call:"Call the fellow now; repeat the ECG while you talk. Symptomatic and new = activation (expert practice; Meyers 2025).",
+  why:"Within minutes of occlusion, ischemic myocytes lose potassium and shorten their action potential; the resulting repolarisation gradient enlarges the T wave before enough injury current exists to elevate the ST segment. Hyperkalemic T waves are narrow and tented by contrast; hyperacute T waves are broad."},
+ {id:"de_winter",cat:"Equivalent",name:"de Winter pattern",ter:"V2–V5 · proximal LAD",tier:"emergent",
+  tell:["Upsloping STD ≥ 1 mm at the J point in V2–V5 into tall symmetric T waves.","About 1 mm STE in aVR; no precordial STE.","Seen in ≈2% of anterior MIs; may persist rather than evolve.","Not reciprocal, not posterior: it is the anterior wall."],
+  call:"Cath-lab activation now (named STEMI equivalent, 2022 ACC ECDP).",
+  why:"Proposed mechanism: subendocardial-predominant injury with a transmural repolarisation gradient; the J-point depression reflects subendocardial injury while the tall T reflects the same ischemic potassium efflux as hyperacute T waves. de Winter RJ et al., NEJM 2008."},
+ {id:"lbbb_sgarbossa",cat:"Equivalent",name:"LBBB · Smith-modified Sgarbossa positive",ter:"LBBB or paced rhythm",tier:"emergent",
+  tell:["Concordant STE ≥ 1 mm in any lead (here I, V5, V6).","Concordant STD ≥ 1 mm in V1–V3.","Discordant STE ≥ 25% of the preceding S depth (here V2: 4.5 / 12 = 38%).","Any one criterion is positive. New LBBB alone is not."],
+  call:"Cath-lab activation now. Applies equally to ventricular paced rhythm.",
+  why:"Delayed left-ventricular depolarisation makes repolarisation proceed in the opposite direction, so ST and T are normally discordant. Injury current adds a vector that either flips discordance to concordance or exaggerates it beyond the expected proportion of the QRS. Smith 2012 replaced the fixed 5 mm rule with the ratio."},
+ {id:"avr_diffuse_std",cat:"High-risk",name:"aVR STE with diffuse ST depression",ter:"aVR ≥ 1 mm, STD ≥ 6 leads · LM / 3-vessel / demand",tier:"immediate",
+  tell:["STE ≥ 1 mm in aVR (often V1) with STD ≥ 1 mm in ≥ 6 leads, maximal V4–V6 and II.","Global subendocardial ischemia: left main, proximal LAD, triple-vessel, or supply–demand mismatch.","Correct the driver first: rate, BP, Hgb, O₂; repeat.","Persisting pain and pattern = refractory ischemia."],
+  call:"Not an automatic activation. Immediate invasive strategy (≤ 2 h) if refractory after correction or unstable; discuss with the fellow now.",
+  why:"Diffuse subendocardial ischemia creates an injury vector pointing away from the apex and lateral wall, toward the base. aVR, which looks at the heart from the right shoulder, records that vector as elevation; most other leads record depression. The pattern is not specific for left-main occlusion; it is a marker of a large ischemic burden from any cause."},
+ {id:"wellens_a",cat:"Pre-infarction",name:"Wellens pattern A",ter:"Biphasic T V2–V3 · critical proximal LAD",tier:"early",
+  tell:["Biphasic T (up then down) in V2–V3; pain-free at the time of the ECG.","Preserved R waves; minimal or no STE; troponin normal or mildly elevated.","Recent angina. The artery has reperfused and will re-occlude.","No stress testing."],
+  call:"Urgent angiography during this admission, usually ≤ 24 h. Pain returning with STE converts it to an activation.",
+  why:"Spontaneous reperfusion after transient occlusion leaves the anterior wall stunned; reperfusion T-wave inversion evolves from biphasic (A) to deep symmetric (B). de Zwaan 1982: most untreated patients infarcted within weeks."},
+ {id:"wellens_b",cat:"Pre-infarction",name:"Wellens pattern B",ter:"Deep symmetric TWI V2–V4 · critical proximal LAD",tier:"early",
+  tell:["Deep, symmetric T inversion V2–V4, pain-free.","Preserved R waves, no STE; distinguishes from completed anterior MI.","Same lesion as pattern A, later in evolution.","No stress testing."],
+  call:"Urgent angiography during this admission, usually ≤ 24 h.",
+  why:"Same physiology as pattern A. Distinguish from pulmonary embolism (TWI V1–V4 with right-heart strain, often with TWI in III) and from hypertrophic cardiomyopathy (giant TWI with LVH voltages)."},
+ {id:"pericarditis",cat:"Mimic",name:"Acute pericarditis",ter:"Diffuse concave STE · PR depression",tier:"none",
+  tell:["Concave STE across limb and precordial leads; respects no territory.","PR depression; PR elevation in aVR (most specific).","STD only in aVR and V1: no reciprocal depression.","Pleuritic, positional pain; STE/T ratio in V6 > 0.25."],
+  call:"Not an activation. Any lead with reciprocal STD or convex STE: call anyway. Pericarditis is a diagnosis of exclusion.",
+  why:"Epicardial inflammation produces a diffuse injury current directed from the centre of the heart outward, so nearly every lead elevates; aVR and V1, which view from the base, depress. Atrial epicardial injury produces the PR-segment shift."},
+ {id:"early_repol",cat:"Mimic",name:"Benign early repolarization",ter:"Concave STE V2–V5 · J-point notch",tier:"none",
+  tell:["Concave STE with a notched or slurred J point (fish-hook).","Tall asymmetric T waves; STE proportionate to the T wave.","Stable on serial ECGs; no reciprocal change; often young.","Terminal QRS distortion, Q waves V2–V3, or any inferior STD exclude BER."],
+  call:"Not an activation when stable and asymptomatic. Symptoms plus change from baseline: repeat and call.",
+  why:"A normal-variant transmural voltage gradient at the end of depolarisation produces J-point elevation that is proportional to the T wave. LAD occlusion can hide here; Smith's 4-variable formula (QTc, QRS V2, R V4, STE V3) separates subtle occlusion from BER."},
+ {id:"lvh_strain",cat:"Mimic",name:"LVH with strain",ter:"Deep S V1–V2 · tall R V5–V6",tier:"none",
+  tell:["Large voltages: deep S V1–V2, tall R V5–V6.","Discordant STE V1–V3 proportional to the S wave mimics anterior STEMI.","Lateral asymmetric downsloping STD with TWI: strain.","STE out of proportion, or new versus old, breaks the mimic."],
+  call:"Not an activation if voltage explains the STE and it matches prior tracings. Compare with old; when in doubt, call.",
+  why:"A thick ventricle prolongs depolarisation and reverses the repolarisation sequence in the lateral wall, producing secondary (discordant) ST–T changes. As in LBBB, discordant STE under about 25% of the S-wave depth is expected."},
+ {id:"hyperkalemia",cat:"Mimic",name:"Hyperkalemia",ter:"Tented T · wide QRS · flat P",tier:"none",
+  tell:["Narrow-based, tented T waves in most leads; flattened P; QRS widening.","Pseudo-STE in V1–V2 and Brugada-like patterns occur.","Progression: peaked T, lost P, wide QRS, sine wave, asystole.","Treat on the ECG, not the lab value."],
+  call:"Not an activation. Calcium gluconate now; insulin–dextrose, β-agonist, bicarbonate if acidotic; dialysis if refractory.",
+  why:"Raised extracellular potassium depolarises the resting membrane, inactivating sodium channels (slow conduction: wide QRS, flat P) and accelerating phase-3 repolarisation (tall narrow T). Calcium restores the gap between resting and threshold potential within minutes."},
+ {id:"vt",cat:"Rhythm",name:"Monomorphic ventricular tachycardia",ter:"Wide, regular, ~170/min",tier:"immediate",
+  tell:["Wide, regular, fast; VT until proven otherwise with structural heart disease.","Unstable: synchronised cardioversion.","Stable: procainamide or amiodarone per ACLS.","Post-conversion ECG for ischemia."],
+  call:"Sustained VT or VF in ACS is electrical instability: immediate invasive strategy (≤ 2 h) once stabilised (Class 1).",
+  why:"Re-entry around scar or ischemic tissue drives a ventricular focus; conduction outside the His–Purkinje system is slow, so the QRS is wide. AV dissociation, capture or fusion beats, and precordial concordance are specific but insensitive."},
+ {id:"chb_inferior",cat:"Rhythm",name:"Complete heart block with inferior STEMI",ter:"P ~88/min, escape ~36/min · RCA",tier:"emergent",
+  tell:["P waves march through, independent of a slow QRS escape.","Inferior STE with aVL STD: RCA with AV-nodal artery.","Usually junctional escape that recovers with reperfusion; atropine may help.","Anterior STEMI with block is infranodal: pace early."],
+  call:"Cath-lab activation now; pads on, atropine and transcutaneous pacing ready. Reperfusion treats the block.",
+  why:"The AV nodal artery arises from the RCA in most people; inferior occlusion causes ischemic, often vagally mediated nodal block with a reliable junctional escape. Anterior occlusion damages the bundle branches below the node, so the escape is ventricular, slow, and unreliable."},
+ {id:"normal",cat:"Baseline",name:"Normal sinus rhythm",ter:"Reference tracing",tier:"none",
+  tell:["Upright P in I, II, aVF; PR 120–200 ms; QRS < 120 ms.","Isoelectric ST; T concordant with QRS except V1 and aVR.","R-wave progression V1 → V6.","Use as the comparison for every pattern above."],
+  call:"No activation. Symptomatic patient with a normal ECG: repeat in 15–30 min, troponin, posterior leads if the story fits.",
+  why:"Reference for the library. Normal T-wave inversion is expected in aVR and often V1; isolated TWI in III is a normal variant."},
+];
+const CATS=["All","Territory","Equivalent","High-risk","Pre-infarction","Mimic","Rhythm"];
+const SCRIPT=`<b>WHO</b>  Dr ____ (IM, Team ____), re ____-year-old ____ in ____.
+<b>PATTERN</b>  ____ — STE ____ mm in ____ with reciprocal STD in ____ / STD V1–V3 with tall R / Sgarbossa-positive LBBB.
+<b>CLOCK</b>  Symptoms since ____; this ECG at ____; prior ECG ____ (new / unchanged).
+<b>PATIENT</b>  BP ____, HR ____, rhythm ____, pain ____/10 now. History: ____. Prior cath/CABG: ____.
+<b>BLOCKERS</b>  Anticoagulant ____ last dose ____; Cr ____; Hgb ____; contrast allergy ____; code status ____.
+<b>ASK</b>  "Are you activating? What do you want given now?"`;
+
+/* ===================== state & helpers ===================== */
+const $=s=>document.querySelector(s); const $$=s=>[...document.querySelectorAll(s)];
+let current=null; // {data, lead}
+function showView(v){$$("section.view").forEach(s=>s.classList.toggle("on",s.id==="v-"+v));$$("nav.tabs button").forEach(b=>b.setAttribute("aria-selected",b.dataset.v===v));window.scrollTo({top:0});}
+$$("nav.tabs button").forEach(b=>b.addEventListener("click",()=>showView(b.dataset.v)));
+function goHash(){const id=decodeURIComponent(location.hash.slice(1)); if(!id)return; const el=document.getElementById(id); if(!el)return; const sec=el.closest("section.view"); if(sec){showView(sec.id.slice(2)); requestAnimationFrame(()=>el.scrollIntoView({block:"start"}));}}
+window.addEventListener("hashchange",goHash);
+
+/* header strip */
+(function(){const d=build(PAT.normal,{seed:7}); const mm=2.6, W=250*mm; const p=tracePath(d.leads.II,d.t,0,10,0,32,mm);
+ $("#strip").innerHTML=`<svg width="${2*W}" height="52" viewBox="0 0 ${2*W} 52">${gridRect(0,0,2*W,52,mm)}<path d="${p}" style="fill:none;stroke:var(--ecg-ink)" stroke-width="1.1"/><path transform="translate(${W} 0)" d="${p}" style="fill:none;stroke:var(--ecg-ink)" stroke-width="1.1"/></svg>`;})();
+
+/* ---- zoom / calipers ---- */
+let cal=[];
+function openZoom(data,L){current={data,lead:L}; $("#zlead").textContent=L; const z=renderZoom(data,L); $("#zoom").innerHTML=z.svg; $("#zoom").dataset.mm=z.mm; cal=[]; drawCal(); $("#zoomwrap").hidden=false; document.body.style.overflow="hidden";
+  const svg=$("#zsvg"); svg.addEventListener("click",e=>{const r=svg.getBoundingClientRect(); const x=(e.clientX-r.left)*(z.W/r.width), y=(e.clientY-r.top)*(z.H/r.height); if(cal.length>=2)cal=[]; cal.push({x,y}); drawCal();});}
+function drawCal(){const mm=+$("#zoom").dataset.mm||10; const g=$("#cal"); if(!g)return; let s=""; cal.forEach((c,i)=>{s+=`<line x1="${c.x}" y1="0" x2="${c.x}" y2="400" style="stroke:var(--accent)" stroke-width="1" stroke-dasharray="4 3"/><line x1="0" y1="${c.y}" x2="625" y2="${c.y}" style="stroke:var(--accent)" stroke-width="1" stroke-dasharray="4 3"/><circle cx="${c.x}" cy="${c.y}" r="6" style="fill:var(--accent);fill-opacity:.9"/><text x="${c.x+9}" y="${c.y-9}" font-family="ui-monospace,Menlo,monospace" font-size="13" style="fill:var(--accent)">${i===0?"A":"B"}</text>`});
+  g.innerHTML=s; if(cal.length===2){const dmm=(cal[0].y-cal[1].y)/mm, dms=Math.abs(cal[1].x-cal[0].x)/mm*40; $("#r-mm").textContent=(dmm>=0?"+":"")+dmm.toFixed(1); $("#r-ms").textContent=Math.round(dms); $("#r-mv").textContent=(dmm/10).toFixed(2);} else {$("#r-mm").textContent=$("#r-ms").textContent=$("#r-mv").textContent="—";}}
+$("#zreset").addEventListener("click",()=>{cal=[];drawCal()});
+$("#zclose").addEventListener("click",()=>{$("#zoomwrap").hidden=true;document.body.style.overflow=""});
+function attachLeadTaps(container,data){container.querySelectorAll(".leadbox").forEach(gel=>gel.addEventListener("click",()=>openZoom(data,gel.dataset.lead)));}
+
+/* ---- pattern library ---- */
+let cat="All";
+function renderChips(){$("#chips").innerHTML=CATS.map(c=>`<button aria-pressed="${c===cat}">${c}</button>`).join(""); $$("#chips button").forEach(b=>b.addEventListener("click",()=>{cat=b.textContent;renderChips();renderList()}));}
+function renderList(){const items=LIB.filter(p=>cat==="All"||p.cat===cat); $("#plist").innerHTML=items.map(p=>`<li><button data-id="${p.id}"><span><span class="name">${p.name}</span><span class="sub">${p.ter}</span></span><span class="tier t-${p.tier}">${p.tier==="none"?"no cath":p.tier}</span></button></li>`).join(""); $$("#plist button").forEach(b=>b.addEventListener("click",()=>openPattern(b.dataset.id)));}
+function openPattern(id){const p=LIB.find(x=>x.id===id); const pat=PAT[id]; const data=build(pat,{seed:3}); let hl=true;
+  const html=`<div class="closebar"><button class="btn" id="pback">← Library</button><span class="tier t-${p.tier}">${TIER[p.tier]}</span></div>
+  <p class="kicker">${p.cat}</p><h2>${p.name}</h2><p class="ter">${p.ter} · HR ≈ ${Math.round(data.hr)}</p>
+  <div class="ecg" id="ptr"></div>
+  <div class="toolbar"><button id="hlbtn" aria-pressed="true">Highlight leads</button><button id="relook">Re-draw variant</button></div>
+  <ul class="tell">${p.tell.map(t=>`<li>${t}</li>`).join("")}</ul>
+  <div class="callbox"><p class="kicker">Call</p><p>${p.call}</p></div>
+  <details class="why"><summary>Why</summary><p>${p.why}</p></details>`;
+  $("#pdetail").innerHTML=html; $("#pdetail").hidden=false; $("#plib").hidden=true; window.scrollTo({top:0});
+  let seed=3; const draw=()=>{const d=build(pat,{seed,hrScale:1+((seed*7)%9-4)/40,ampScale:1+((seed*13)%7-3)/30}); $("#ptr").innerHTML=render12(d,{highlight:hl?pat.ann:[]})+`<span class="cap">25 mm/s · 10 mm/mV · synthetic</span>`; attachLeadTaps($("#ptr"),d);};
+  draw(); $("#hlbtn").addEventListener("click",e=>{hl=!hl;e.currentTarget.setAttribute("aria-pressed",hl);draw()}); $("#relook").addEventListener("click",()=>{seed++;draw()});
+  $("#pback").addEventListener("click",()=>{$("#pdetail").hidden=true;$("#plib").hidden=false});}
+renderChips(); renderList();
+
+/* ---- call tab: tier logic ---- */
+function tier(){const f=$("#tierform"); const v=n=>f.querySelector(`[name=${n}]:checked`)?.value; const c=n=>f.querySelector(`[name=${n}]`).checked;
+  const ecg=v("ecg"), onset=v("onset"); const shock=c("shock"), unstable=c("hemo")||c("elec")||c("refr"), high=c("dyn")||c("trop")||c("grace");
+  let t,cls,why=[],act=[];
+  if(shock){t="emergent";cls="Class 1 · emergency revascularisation of the culprit regardless of time from onset";why.push("Cardiogenic shock: culprit-only PCI in the index procedure (routine non-culprit PCI: Class 3, harm; CULPRIT-SHOCK).","Microaxial flow pump is reasonable in selected STEMI shock (Class 2a; DanGer Shock). Routine IABP not recommended.");act.push("Activate the lab; pressors, arterial line, lactate, SCAI stage for the fellow.")}
+  else if(ecg==="stemi"||ecg==="equiv"){
+    if(onset==="lt12"){t="emergent";cls="Class 1 · primary PCI, FMC-to-device ≤ 90 min (≤ 120 min if transfer)";why.push(ecg==="equiv"?"STEMI equivalents follow the STEMI algorithm (2022 ACC ECDP; 2025 ACS guideline)." : "STE meeting Fourth UDMI thresholds in contiguous leads.","If PCI cannot be delivered within 120 min of FMC: fibrinolysis within 30 min of arrival (Class 1), then transfer for angiography ≤ 24 h.");act.push("Activate per institutional STEMI pathway, then call the fellow.")}
+    else if(onset==="12to24"){ if(unstable){t="emergent";cls="Class 2a · PCI reasonable at 12–24 h with ongoing ischemia, HF or instability";act.push("Activate and discuss; ongoing symptoms keep the window open.")} else {t="early";cls="Discuss now · stable late STEMI: angiography during admission; PCI of a stable totally occluded artery beyond 24 h is not beneficial (Class 3; OAT)";act.push("Call the fellow now; serial ECGs; anti-ischemic and antithrombotic therapy.")}}
+    else { if(unstable){t="immediate";cls="Class 1 · refractory ischemia or instability: angiography ≤ 2 h";act.push("Call now.")} else {t="delayed";cls="Class 3 (no benefit) for routine PCI of a stable totally occluded artery > 24 h (OAT); angiography for anatomy is still reasonable";act.push("Routine consult; echo; risk stratify.")}}}
+  else { // NSTE-ACS
+    if(unstable){t="immediate";cls="Class 1 · immediate invasive strategy (≤ 2 h)";why.push("Refractory angina, hemodynamic instability, or sustained VT/VF.");act.push("Call the fellow now; escalate anti-ischemic therapy; anticoagulate; prepare for transfer.")}
+    else if(high){t="early";cls="Class 2a · early invasive strategy (≤ 24 h) for stabilised high-risk NSTE-ACS";why.push("Dynamic ST changes, rising troponin, GRACE > 140, or Wellens pattern. No stress testing for Wellens.");act.push("Page cardiology tonight; DAPT and anticoagulation per lab; serial ECGs.")}
+    else if(ecg==="isch"){t="early";cls="Class 1 · invasive strategy during hospitalisation for intermediate or high ischemic risk";act.push("Routine consult; serial troponin and ECG; reassess for high-risk features.")}
+    else {t="delayed";cls="Class 1 · low-risk NSTE-ACS: routine invasive or selective invasive approach with further risk stratification; serial ECG and troponin";why.push("A normal ECG does not exclude occlusion: repeat in 15–30 min while symptomatic; posterior leads if the story fits.");act.push("Observe, risk stratify (HEART, GRACE), consult if features change.")}}
+  $("#verdict").innerHTML=`<div class="verdict t-${t}"><p class="kicker">Tier</p><p class="big">${TIER[t]}</p><p class="cls">${cls}</p><ul>${act.concat(why).map(x=>`<li>${x}</li>`).join("")}</ul></div>`;}
+$("#tierform").addEventListener("change",tier); tier(); $("#script").innerHTML=SCRIPT;
+
+/* Sgarbossa */
+function sgarb(){const a=$("#sg1").checked,b=$("#sg2").checked,ste=parseFloat($("#ste").value),s=parseFloat($("#sdep").value); let ratio=null; if(ste>0&&s>0)ratio=ste/s;
+  const pos=a||b||(ratio!==null&&ratio>=0.25); let txt=""; if(ratio!==null)txt+=`Discordant STE / S = <span class="mono">${ste} / ${s} = ${(ratio*100).toFixed(0)}%</span> ${ratio>=0.25?"(≥ 25%: positive)":"(< 25%: expected discordance)"}. `;
+  if(a||b||ratio!==null)txt+=pos?`<b style="color:var(--accent)">Positive — treat as STEMI equivalent.</b>`:`<b>Negative</b> by the three criteria. Sensitivity ≈ 80%: a negative result does not exclude occlusion; repeat ECG, compare with prior.`; else txt=`<span class="muted">Enter STE and S depth, or tick a concordance criterion.</span>`; $("#sgout").innerHTML=txt;}
+["sg1","sg2","ste","sdep"].forEach(id=>$("#"+id).addEventListener("input",sgarb)); sgarb();
+
+/* threshold */
+function thr(){const lead=$("#lead").value,sex=$("#sex").value,age=parseFloat($("#age").value),m=parseFloat($("#meas").value); let th,note="";
+  if(lead==="other")th=1; else if(lead==="v23"){th=sex==="f"?1.5:(age&&age<40?2.5:2); if(sex==="m"&&!age)note=" (assumes ≥ 40 y; enter age)"} else if(lead==="post"){th=(sex==="m"&&age&&age<40)?1:0.5} else {th=(sex==="m"&&age&&age<30)?1:0.5}
+  let txt=`Threshold <span class="mono">≥ ${th} mm</span>${note}, in two contiguous leads, at the J point.`; if(m>=0&&$("#meas").value!=="")txt+=` Measured <span class="mono">${m} mm</span>: <b style="color:${m>=th?"var(--accent)":"var(--ink)"}">${m>=th?"meets criteria":"below threshold"}</b>${m<th?" — threshold not met is not reassurance; read for equivalents and reciprocal change.":""}.`; $("#thout").innerHTML=txt;}
+["lead","sex","age","meas"].forEach(id=>$("#"+id).addEventListener("input",thr)); thr();
+
+/* ---- practice ---- */
+const STEMS={anterior_stemi:"58-year-old, 45 min of crushing chest pain, diaphoretic.",inferior_stemi:"66-year-old, chest pain 2 h, HR 54, BP 96/60, nauseated.",lateral_stemi:"61-year-old, pressure radiating to the left arm, 90 min.",posterior_omi:"64-year-old, 40 min of chest pressure; computer read 'ST abnormality, consider ischemia'.",hyperacute_t:"52-year-old, chest pain began 20 min ago, still in pain.",de_winter:"49-year-old smoker, 30 min of chest pain, diaphoretic.",lbbb_sgarbossa:"58-year-old with known LBBB, 2 h of epigastric pain and nausea.",avr_diffuse_std:"71-year-old admitted for COPD exacerbation, now with chest pain; HR 108, SpO₂ 90%, Hgb 8.1.",wellens_a:"45-year-old, chest pain yesterday, now pain-free; troponin mildly elevated.",wellens_b:"47-year-old, two episodes of angina this week, pain-free now.",pericarditis:"29-year-old, pleuritic chest pain for a day, worse supine, afebrile.",early_repol:"24-year-old athlete, atypical chest pain after a workout, asymptomatic now.",lvh_strain:"70-year-old with long-standing hypertension, dyspnea on exertion, no chest pain.",hyperkalemia:"63-year-old on dialysis, missed two sessions, weak.",vt:"72-year-old with ischemic cardiomyopathy, palpitations and lightheadedness.",chb_inferior:"68-year-old, 3 h of chest pain, HR 36, BP 84/50.",normal:"55-year-old, atypical chest pain, no risk factors, asymptomatic now."};
+let score={n:0,ok:0}, pc=null;
+function pick(){const ids=LIB.map(p=>p.id); return ids[Math.floor(Math.random()*ids.length)];}
+function newCase(){const id=pick(); const p=LIB.find(x=>x.id===id); const seed=Math.floor(Math.random()*1e6); const d=build(PAT[id],{seed,hrScale:1+(Math.random()-.5)*.25,ampScale:.85+Math.random()*.3}); pc={id,p,d,phase:0};
+  $("#pstem").textContent=STEMS[id]; $("#ptrace").innerHTML=`<div class="ecg">${render12(d)}<span class="cap">25 mm/s · 10 mm/mV</span></div>`; attachLeadTaps($("#ptrace"),d);
+  const others=LIB.filter(x=>x.id!==id).sort(()=>Math.random()-.5).slice(0,3); const opts=[p,...others].sort(()=>Math.random()-.5);
+  $("#pchoices").innerHTML=opts.map(o=>`<button data-id="${o.id}">${o.name}</button>`).join(""); $("#ptier").hidden=true; $("#pfb").innerHTML=""; $("#tchoices").innerHTML=Object.keys(TIER).map(t=>`<button data-t="${t}">${TIER[t]}</button>`).join("");
+  $$("#pchoices button").forEach(b=>b.addEventListener("click",()=>answer(b))); $$("#tchoices button").forEach(b=>b.addEventListener("click",()=>answerTier(b)));}
+function answer(b){if(pc.phase!==0)return; pc.phase=1; const ok=b.dataset.id===pc.id; score.n++; if(ok)score.ok++; $("#score").textContent=`${score.ok} / ${score.n}`;
+  $$("#pchoices button").forEach(x=>{x.disabled=true; if(x.dataset.id===pc.id)x.classList.add("ok"); else if(x===b&&!ok)x.classList.add("bad")}); $("#ptier").hidden=false; $("#ptier").scrollIntoView({behavior:"smooth",block:"nearest"});}
+function answerTier(b){if(pc.phase!==1)return; pc.phase=2; const ok=b.dataset.t===pc.p.tier; $$("#tchoices button").forEach(x=>{x.disabled=true; if(x.dataset.t===pc.p.tier)x.classList.add("ok"); else if(x===b&&!ok)x.classList.add("bad")});
+  $("#pfb").innerHTML=`<div class="card"><p class="kicker">${pc.p.cat} · ${pc.p.ter}</p><h3>${pc.p.name}</h3><ul class="tell">${pc.p.tell.map(t=>`<li>${t}</li>`).join("")}</ul><div class="callbox"><p class="kicker">Call</p><p>${pc.p.call}</p></div><details class="why"><summary>Why</summary><p>${pc.p.why}</p></details><div class="toolbar"><button class="btn" id="showhl">Show highlighted leads</button></div></div>`;
+  $("#showhl").addEventListener("click",()=>{$("#ptrace").innerHTML=`<div class="ecg">${render12(pc.d,{highlight:PAT[pc.id].ann})}<span class="cap">25 mm/s · 10 mm/mV</span></div>`; attachLeadTaps($("#ptrace"),pc.d); $("#ptrace").scrollIntoView({behavior:"smooth"})}); $("#pfb").scrollIntoView({behavior:"smooth",block:"nearest"});}
+$("#pnext").addEventListener("click",newCase); newCase(); goHash();
+</script>
+</body>
+</html>
