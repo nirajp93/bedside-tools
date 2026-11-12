@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Atrial Fibrillation · bedside.tools</title>
+<meta name="description" content="Stroke-prevention decision and DOAC dosing, rapid AF rate control, cardioversion timing, and the reasoning behind each step.">
+<script src="/theme.js"></script>
+<style>
+:root{--bg:#FBFBFA; --card:#FFFFFF; --ink:#111113; --muted:#55555D; --line:#ECECEE; --accent:#2B4BDB; --warn:#9A3B00; --warnbg:#FFF6EC}
+:root{--sans:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;--mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5;padding-bottom:76px}
+.wrap{max-width:720px;margin:0 auto;padding:0 16px}
+a{color:var(--accent)}
+.back{font-size:14px;text-decoration:none;display:inline-block;min-height:44px;line-height:44px}
+h1{font-size:26px;margin:0 0 4px;letter-spacing:-.01em}
+h2{font-size:18px;margin:0}
+.purpose{color:var(--muted);margin:0 0 16px}
+.mono{font-family:var(--mono)}
+.label{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin:0 0 14px;display:flex;flex-direction:column;gap:12px}
+.card p{margin:0}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.field label{display:block;font-size:13px;color:var(--muted);margin-bottom:4px}
+.field input,.field select{width:100%;min-height:44px;border:1px solid var(--line);border-radius:10px;padding:0 10px;font:inherit;font-family:var(--mono);font-size:15px;background:var(--card);color:var(--ink)}
+.field select{font-family:inherit}
+.checks{display:grid;gap:8px}
+.chk{display:flex;align-items:flex-start;gap:10px;min-height:44px;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:15px;background:var(--card);cursor:pointer}
+.chk:has(input:checked){border-color:var(--accent)}
+.chk input{width:20px;height:20px;margin:2px 0 0;accent-color:var(--accent);flex:none}
+.chk small{display:block;color:var(--muted);font-size:13px}
+.answer{border-color:var(--accent)}
+.big{font-size:20px;font-weight:600}
+.dose{font-family:var(--mono);font-size:16px}
+.muted{color:var(--muted);font-size:14px}
+.tier{align-self:flex-start;display:inline-block;font-family:var(--mono);font-size:11px;border:1px solid var(--line);border-radius:999px;padding:3px 9px;color:var(--muted)}
+.guard{border-left:3px solid var(--warn);background:var(--warnbg);padding:10px 12px;border-radius:0 10px 10px 0;font-size:14.5px}
+.guard b{color:var(--warn)}
+ul.plain{margin:0;padding-left:20px}
+ul.plain li{margin-bottom:4px}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);text-align:left;padding:8px 6px;border-bottom:1px solid var(--line);font-weight:500}
+td{padding:9px 6px;border-bottom:1px solid var(--line);vertical-align:top}
+tr:last-child td{border-bottom:0}
+td .mono{font-size:13.5px}
+.tblwrap{overflow-x:auto}
+details{border-top:1px solid var(--line);padding-top:4px}
+summary{cursor:pointer;color:var(--accent);font-weight:600;font-size:14px;min-height:44px;line-height:44px}
+details p{font-size:14.5px;margin:0 0 8px}
+.cases{display:flex;flex-wrap:wrap;gap:8px}
+.cases button,.btn{min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--ink);font:inherit;font-size:14px;cursor:pointer}
+.cases button[aria-pressed=true]{border-color:var(--accent);background:var(--accent);color:var(--accent-ink)}
+.note{background:var(--fill);border-radius:10px;padding:10px 12px;font-size:14.5px}
+section.view{display:none;padding:4px 0 8px}
+section.view.on{display:block}
+nav.tabs{position:fixed;left:0;right:0;bottom:0;background:var(--bg);border-top:1px solid var(--line);z-index:20;padding-bottom:env(safe-area-inset-bottom)}
+nav.tabs .wrap{display:flex;padding:0}
+nav.tabs button{flex:1;min-height:60px;border:0;border-top:2px solid transparent;background:none;font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);cursor:pointer}
+nav.tabs button[aria-selected=true]{color:var(--accent);border-top-color:var(--accent)}
+a:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visible,.chk:focus-within{outline:2px solid var(--accent);outline-offset:2px}
+footer{margin-top:24px;padding:16px 0 8px;border-top:1px solid var(--line);font-size:12.5px;color:var(--muted);line-height:1.6}
+footer p{margin:0 0 6px}
+footer strong{color:var(--ink)}
+</style>
+</head>
+<body>
+<header class="wrap">
+  <a class="back" href="/">← bedside.tools</a>
+  <h1>Atrial fibrillation</h1>
+  <p class="purpose">Stroke prevention and DOAC dose, rapid AF tonight, and when to cardiovert.</p>
+</header>
+
+<main class="wrap">
+
+<!-- ============ ANTICOAGULATE ============ -->
+<section class="view on" id="v-oac">
+  <div class="card" id="patient">
+    <p class="label">Patient</p>
+    <div class="grid">
+      <div class="field"><label for="age">Age (years)</label><input id="age" type="number" inputmode="numeric" min="18" max="110"></div>
+      <div class="field"><label for="sex">Sex</label><select id="sex"><option value="">Select</option><option value="m">Male</option><option value="f">Female</option></select></div>
+      <div class="field"><label for="wt">Weight (kg)</label><input id="wt" type="number" inputmode="decimal" min="30" max="300" step="0.1"></div>
+      <div class="field"><label for="cr">Creatinine (mg/dL)</label><input id="cr" type="number" inputmode="decimal" min="0.2" max="20" step="0.1"></div>
+    </div>
+    <label class="chk"><input type="checkbox" id="hd"><span>On dialysis</span></label>
+  </div>
+
+  <div class="card" id="chadsvasc">
+    <p class="label">CHA₂DS₂-VASc risk factors</p>
+    <div class="checks">
+      <label class="chk"><input type="checkbox" id="f-hf"><span>Heart failure<small>Clinical HF or reduced LV function · 1 point</small></span></label>
+      <label class="chk"><input type="checkbox" id="f-htn"><span>Hypertension<small>1 point</small></span></label>
+      <label class="chk"><input type="checkbox" id="f-dm"><span>Diabetes<small>1 point</small></span></label>
+      <label class="chk"><input type="checkbox" id="f-st"><span>Prior stroke, TIA or thromboembolism<small>2 points</small></span></label>
+      <label class="chk"><input type="checkbox" id="f-va"><span>Vascular disease<small>Prior MI, peripheral artery disease or aortic plaque · 1 point</small></span></label>
+    </div>
+    <p class="muted">Age (65–74: 1 point; ≥ 75: 2 points) and female sex (1 point) are added from the patient card.</p>
+  </div>
+
+  <div class="card" id="valve">
+    <p class="label">Valve check · on by default</p>
+    <div class="checks">
+      <label class="chk"><input type="checkbox" id="v-mech"><span>Mechanical heart valve</span></label>
+      <label class="chk"><input type="checkbox" id="v-ms"><span>Mitral stenosis, moderate or worse (or rheumatic)</span></label>
+    </div>
+  </div>
+
+  <div class="card answer" id="answer" aria-live="polite"></div>
+
+  <div class="card" id="doses">
+    <p class="label">DOAC dose for this patient</p>
+    <div id="dosebody"></div>
+    <details><summary>Why the doses differ</summary>
+      <p>Each DOAC is cleared by the kidney to a different degree: dabigatran about 80%, edoxaban about 50%, rivaroxaban about a third, apixaban about a quarter. The more renal the clearance, the earlier the dose falls as creatinine clearance drops.</p>
+      <p>Apixaban is the exception in form: its reduction needs two of three criteria (age ≥ 80, weight ≤ 60 kg, creatinine ≥ 1.5 mg/dL), because that is how the ARISTOTLE trial dosed it. One criterion alone keeps the full dose. Under-dosing outside these rules gives up stroke protection without a proven bleeding benefit (Class 3: Harm for non-evidence-based doses).</p>
+      <p>Edoxaban is not used when creatinine clearance is above 95 mL/min: the drug is cleared so quickly that ischemic stroke was more frequent than with warfarin in that subgroup of ENGAGE AF-TIMI 48.</p>
+      <p>Creatinine clearance here is Cockcroft-Gault with actual body weight (the rivaroxaban label specifies actual weight). It is not the eGFR on the lab report.</p>
+    </details>
+  </div>
+
+  <div class="card" id="hasbled">
+    <p class="label">Bleeding risk · HAS-BLED (optional)</p>
+    <div class="checks" id="hbchecks">
+      <label class="chk"><input type="checkbox" data-hb><span>Uncontrolled hypertension<small>Systolic &gt; 160 mmHg</small></span></label>
+      <label class="chk"><input type="checkbox" data-hb><span>Abnormal renal function<small>Dialysis, transplant, or creatinine &gt; 2.26 mg/dL</small></span></label>
+      <label class="chk"><input type="checkbox" data-hb><span>Abnormal liver function<small>Cirrhosis, or bilirubin &gt; 2× / AST, ALT or ALP &gt; 3× upper limit</small></span></label>
+      <label class="chk"><input type="checkbox" data-hb><span>Prior stroke</span></label>
+      <label class="chk"><input type="checkbox" data-hb><span>Bleeding history or predisposition<small>Prior major bleed, anemia</small></span></label>
+      <label class="chk"><input type="checkbox" data-hb><span>Labile INR<small>On warfarin, time in range &lt; 60%</small></span></label>
+      <label class="chk"><input type="checkbox" data-hb id="hb-age"><span>Age &gt; 65</span></label>
+      <label class="chk"><input type="checkbox" data-hb><span>Drugs that promote bleeding<small>Antiplatelets or NSAIDs</small></span></label>
+      <label class="chk"><input type="checkbox" data-hb><span>Alcohol<small>≥ 8 drinks per week</small></span></label>
+    </div>
+    <div id="hbout"></div>
+    <details><summary>Why a high score is not a reason to withhold</summary>
+      <p>The same things that raise bleeding risk (age, prior stroke, hypertension, kidney disease) also raise stroke risk, so the patients with high HAS-BLED scores are usually the ones who gain the most from anticoagulation. The guideline says bleeding scores should not be used in isolation to decide eligibility (Class 3: No Benefit). Use the score as a checklist of what to fix: blood pressure, NSAIDs, alcohol, an unneeded antiplatelet.</p>
+    </details>
+  </div>
+
+  <div class="card" id="practice">
+    <p class="label">Practice · load a case, predict, then read the answer</p>
+    <div class="cases" id="cases"></div>
+    <div id="caseout"></div>
+  </div>
+</section>
+
+<!-- ============ RAPID AF ============ -->
+<section class="view" id="v-rvr">
+  <div class="card" id="rvr">
+    <p class="label">AF with rapid ventricular response</p>
+    <div class="checks">
+      <label class="chk"><input type="checkbox" id="r-un"><span>Unstable because of the AF<small>Hypotension, shock, ischemia or pulmonary edema driven by the rate</small></span></label>
+      <label class="chk"><input type="checkbox" id="r-pre"><span>Pre-excited AF<small>Known WPW, or wide, irregular, very fast QRS with changing shape</small></span></label>
+      <label class="chk"><input type="checkbox" id="r-ef"><span>EF ≤ 40%, or moderate or severe LV systolic dysfunction<small>With or without decompensated heart failure. Use for EF of exactly 40% too: diltiazem and verapamil are recommended only above 40%.</small></span></label>
+      <label class="chk"><input type="checkbox" id="r-icu"><span>Critically ill</span></label>
+    </div>
+    <div id="rvrout" aria-live="polite" style="display:flex;flex-direction:column;gap:10px"></div>
+    <details><summary>Why the ejection fraction changes the drug</summary>
+      <p>Diltiazem and verapamil slow the AV node but also weaken contraction. A ventricle that is already failing cannot afford the negative inotropy, and in trials of diltiazem after MI, patients with EF below 40% developed more heart failure. Beta blockers are also negative inotropes acutely, so start low in decompensated failure. Digoxin and amiodarone slow the rate without that cost, which is why they are the fallbacks.</p>
+      <p>In pre-excited AF the impulses reach the ventricle through an accessory pathway. Blocking the AV node removes the competing route and can speed conduction down the pathway, turning AF into ventricular fibrillation.</p>
+    </details>
+  </div>
+
+  <div class="card" id="rate-doses">
+    <p class="label">IV rate-control doses</p>
+    <div class="tblwrap"><table>
+      <tr><th>Drug</th><th>Dose</th></tr>
+      <tr><td>Metoprolol tartrate</td><td><span class="mono">2.5–5 mg IV over 2 min; up to 3 doses</span></td></tr>
+      <tr><td>Esmolol</td><td><span class="mono">500 mcg/kg IV over 1 min, then 50–300 mcg/kg/min</span></td></tr>
+      <tr><td>Diltiazem</td><td><span class="mono">0.25 mg/kg IV over 2 min; may repeat 0.35 mg/kg; then 5–15 mg/h</span></td></tr>
+      <tr><td>Verapamil</td><td><span class="mono">5–10 mg IV over ≥ 2 min; may repeat twice; then 5 mg/h (max 20 mg/h)</span></td></tr>
+      <tr><td>Digoxin</td><td><span class="mono">0.25–0.5 mg IV, then 0.25 mg every 6 h; max 1.5 mg in 24 h</span></td></tr>
+      <tr><td>Amiodarone</td><td><span class="mono">150–300 mg IV over 1 h, then 10–50 mg/h for 24 h</span></td></tr>
+    </table></div>
+    <p class="note">Adjust to your institution: drip concentrations, maximum rates and order sets vary. Doses are from the dose table of the 2023 ACC/AHA/ACCP/HRS guideline.</p>
+    <p class="muted">Resting rate target without heart failure: guided by symptoms, in general below 100 to 110 bpm (Class 2a; RACE II).</p>
+  </div>
+
+  <div class="card" id="cardioversion">
+    <p class="label">Cardioversion: is it safe for stroke risk?</p>
+    <div class="grid">
+      <div class="field"><label for="c-dur">AF duration</label><select id="c-dur"><option value="">Select</option><option value="lt12">&lt; 12 h</option><option value="12to48">12 to 48 h</option><option value="ge48">≥ 48 h or unknown</option></select></div>
+      <div class="field"><label for="c-sc">CHA₂DS₂-VASc</label><input id="c-sc" type="number" inputmode="numeric" min="0" max="9" placeholder="from tab 1"></div>
+    </div>
+    <label class="chk"><input type="checkbox" id="c-ac"><span>Therapeutic anticoagulation for ≥ 3 weeks without interruption</span></label>
+    <div id="cvout" aria-live="polite" style="display:flex;flex-direction:column;gap:10px"></div>
+    <details><summary>Why three weeks before and four weeks after</summary>
+      <p>Thrombus forms in the left atrial appendage when the atrium stops contracting. Three weeks of anticoagulation lets an existing clot organise or resolve; imaging (transesophageal echo) is the shortcut that looks for it directly.</p>
+      <p>After conversion the ECG shows sinus rhythm, but the atrium stays mechanically stunned for days to weeks. New clot can form during that window and embolise when contraction returns, which is why anticoagulation continues at least four weeks whatever the baseline score.</p>
+    </details>
+  </div>
+</section>
+
+<!-- ============ REFERENCE ============ -->
+<section class="view" id="v-ref">
+  <div class="card" id="rhythm">
+    <p class="label">Rate or rhythm control</p>
+    <ul class="plain">
+      <li>AF diagnosed within the past year: rhythm control can be useful to reduce hospitalisation, stroke and death. <span class="tier">Class 2a · EAST-AFNET 4</span></li>
+      <li>New heart failure with reduced EF and AF: suspect arrhythmia-induced cardiomyopathy; early, aggressive rhythm control. <span class="tier">Class 1</span></li>
+      <li>HFrEF on guideline-directed therapy, suitable candidate: catheter ablation. <span class="tier">Class 1</span></li>
+      <li>Younger, few comorbidities, symptomatic paroxysmal AF: catheter ablation as first-line therapy. <span class="tier">Class 1</span></li>
+      <li>Symptomatic AF: rhythm control can be useful to improve symptoms. <span class="tier">Class 2a</span></li>
+    </ul>
+    <details><summary>Why early rhythm control</summary>
+      <p>AF remodels the atrium: the longer it persists, the more fibrosis and electrical change, and the harder sinus rhythm is to restore ("AF begets AF"). EAST-AFNET 4 randomised patients within a year of diagnosis and found a lower rate of a composite of cardiovascular death, stroke, or hospitalisation for heart failure or acute coronary syndrome with a rhythm-control strategy. Older trials that showed no advantage enrolled patients with long-standing AF and used antiarrhythmic drugs without ablation.</p>
+    </details>
+  </div>
+
+  <div class="card" id="laao">
+    <p class="label">Left atrial appendage occlusion</p>
+    <ul class="plain">
+      <li>CHA₂DS₂-VASc ≥ 2 and a contraindication to long-term anticoagulation from a nonreversible cause: percutaneous occlusion is reasonable. <span class="tier">Class 2a</span></li>
+      <li>High risk of major bleeding on anticoagulation: may be a reasonable alternative based on patient preference; the evidence for anticoagulation is more extensive. <span class="tier">Class 2b</span></li>
+    </ul>
+  </div>
+
+  <div class="card" id="device">
+    <p class="label">Device-detected AF (pacemaker, ICD, loop recorder)</p>
+    <div class="tblwrap"><table>
+      <tr><th>Longest episode</th><th>Anticoagulate?</th></tr>
+      <tr><td>≥ 24 h, CHA₂DS₂-VASc ≥ 2</td><td>Reasonable, shared decision <span class="tier">Class 2a</span></td></tr>
+      <tr><td>5 min to 24 h, CHA₂DS₂-VASc ≥ 3</td><td>May be reasonable <span class="tier">Class 2b</span></td></tr>
+      <tr><td>&lt; 5 min, no other indication</td><td>Do not anticoagulate <span class="tier">Class 3: No Benefit</span></td></tr>
+    </table></div>
+    <details><summary>Why duration matters</summary>
+      <p>Stroke risk from device-detected episodes is lower than from clinical AF and rises with episode length and with the CHA₂DS₂-VASc score. Very short episodes are often artefact or brief atrial tachycardia and are not linked to clinical events. Confirm the tracing before acting on a device count.</p>
+    </details>
+  </div>
+
+  <div class="card" id="other">
+    <p class="label">Also</p>
+    <ul class="plain">
+      <li>Aspirin, alone or with clopidogrel, is not a substitute for anticoagulation. <span class="tier">Class 3: Harm</span></li>
+      <li>Warfarin target INR 2.0 to 3.0 for AF. <span class="tier">Class 1</span></li>
+      <li>After cardioversion or ablation of atrial flutter, anticoagulate at least 4 weeks. <span class="tier">Class 1</span></li>
+      <li>Strong CYP3A4 or P-glycoprotein inhibitors and inducers change DOAC levels: check interactions. <span class="tier">Class 1</span></li>
+    </ul>
+  </div>
+</section>
+
+<footer>
+  <p><strong>For education only. Not a substitute for clinical judgment.</strong> Built to national guidelines; adjust to your institution's formulary and protocols.</p>
+  <p>Privacy: everything runs in your browser. Nothing you enter is sent anywhere or stored, and there are no analytics; only your light/dark choice is saved on this device. Do not enter names, record numbers, or dates of birth.</p>
+  <p class="mono">Last reviewed: 2026-11-11</p>
+  <p><strong>Sources:</strong> Joglar JA et al., 2023 ACC/AHA/ACCP/HRS Guideline for the Diagnosis and Management of Atrial Fibrillation, J Am Coll Cardiol 2024 (class of recommendation shown on each output) · FDA prescribing information for apixaban (Eliquis), rivaroxaban (Xarelto), dabigatran (Pradaxa) and edoxaban (Savaysa) (doses) · Lip GYH et al., Chest 2010 (CHA₂DS₂-VASc) · Pisters R et al., Chest 2010 (HAS-BLED) · Cockcroft DW, Gault MH, Nephron 1976 (creatinine clearance) · Eikelboom JW et al., RE-ALIGN, N Engl J Med 2013 · Connolly SJ et al., INVICTUS, N Engl J Med 2022 · Kirchhof P et al., EAST-AFNET 4, N Engl J Med 2020 · Van Gelder IC et al., RACE II, N Engl J Med 2010. Outputs marked "expert practice" or "label" are not guideline recommendations.</p>
+</footer>
+</main>
+
+<nav class="tabs" role="tablist"><div class="wrap">
+  <button role="tab" aria-selected="true" data-v="oac">Anticoagulate</button>
+  <button role="tab" aria-selected="false" data-v="rvr">Rapid AF</button>
+  <button role="tab" aria-selected="false" data-v="ref">Reference</button>
+</div></nav>
+
+<script id="engine">
+/* ---------- engine: pure functions, used by the calculator and the practice cases ---------- */
+function crcl(age, wt, cr, sex){ // Cockcroft-Gault, actual body weight, mL/min
+  if(!(age>=18&&age<=110&&wt>0&&cr>0&&sex)) return null;
+  return (140-age)*wt/(72*cr)*(sex==="f"?0.85:1);
+}
+function chadsvasc(p){ // p: {age, sex, hf, htn, dm, stroke, vasc}
+  if(!(p.age>=18&&p.age<=110&&p.sex)) return null;
+  return (p.age>=75?2:p.age>=65?1:0)+(p.sex==="f"?1:0)+(p.hf?1:0)+(p.htn?1:0)+(p.dm?1:0)+(p.stroke?2:0)+(p.vasc?1:0);
+}
+function oacDecision(p){ // p may carry band: "esrd" | "ckd4" | "ckd3" | "ok"
+  if(p.mech) return {key:"valve", head:"Warfarin", tier:"Guideline text · no numbered recommendation in the AF guideline", text:"Mechanical heart valve: warfarin is the anticoagulant of choice, whatever the CHA₂DS₂-VASc score. Dabigatran caused more clots and more bleeding than warfarin (RE-ALIGN), and apixaban more clots (PROACT Xa). The INR target is set by the valve, not by the AF."};
+  if(p.ms) return {key:"valve", head:"Warfarin", tier:"Class 1", text:"Rheumatic mitral stenosis, or mitral stenosis of moderate or greater severity: warfarin is recommended over DOACs, whatever the CHA₂DS₂-VASc score."};
+  const s=chadsvasc(p); if(s==null) return null;
+  const nonsex=s-(p.sex==="f"?1:0);
+  if(nonsex===0) return {key:"below", score:s, head:"Below the treatment thresholds", tier:"No guideline recommendation to anticoagulate", text:"Score 0 in men or 1 in women. The guideline's recommendations start at score 1 (men) or 2 (women). Reassess when age or risk factors change."};
+  const risk=nonsex>=2?"Score ≥ 2 in men or ≥ 3 in women (annual stroke risk about 2% or more).":"Score 1 in men or 2 in women (annual stroke risk 1% to under 2%).";
+  if(p.band==="esrd"&&nonsex===1) return {key:"esrd", score:s, head:"Anticoagulation might be reasonable", tier:"Class 2b applies to elevated stroke risk; not addressed at this score", text:risk+" The guideline's kidney-failure recommendation (warfarin or apixaban might be reasonable, Class 2b) is written for patients at elevated stroke risk; it does not address this score. Decide with the patient and nephrology."};
+  if(p.band==="esrd") return {key:"esrd", score:s, head:"Anticoagulation might be reasonable", tier:"Class 2b", text:risk+" With CrCl < 15 mL/min or dialysis the recommendation is weaker: warfarin (INR 2 to 3) or apixaban might be reasonable. These patients were not in the DOAC trials; decide with the patient and nephrology."};
+  if(p.band==="ckd4") return {key:"ckd4", score:s, head:"Anticoagulation is reasonable", tier:"Class 2a", text:risk+" With CrCl 15 to 29 mL/min (CKD stage 4 range), warfarin or a labeled-dose DOAC is reasonable."};
+  if(nonsex>=2) return {key:"yes", score:s, head:"Anticoagulate", tier:"Class 1", text:risk+" A DOAC is recommended over warfarin (Class 1)."};
+  return {key:"reasonable", score:s, head:"Anticoagulation is reasonable", tier:"Class 2a", text:risk+" Decide with the patient; a DOAC is preferred over warfarin if you treat."};
+}
+function kidneyBand(c, hd){
+  if(hd||(c!=null&&c<15)) return {band:"esrd", text:"CrCl < 15 mL/min or dialysis: warfarin (INR 2 to 3) or apixaban might be reasonable.", tier:"Class 2b"};
+  if(c==null) return null;
+  if(c<30) return {band:"ckd4", text:"CrCl 15 to 29 mL/min (CKD stage 4 range): warfarin or a labeled-dose DOAC is reasonable.", tier:"Class 2a"};
+  if(c<60) return {band:"ckd3", text:"CrCl 30 to 59 mL/min (CKD stage 3 range): a DOAC at an evidence-based dose is preferred over warfarin.", tier:"Class 1"};
+  return {band:"ok", text:"", tier:""};
+}
+function doacDoses(p){ // p: {age, wt, cr, sex, hd}
+  const c=crcl(p.age,p.wt,p.cr,p.sex);
+  if(!(p.age>=18&&p.age<=110&&p.sex&&p.wt>0)||(c==null&&!p.hd)) return null;
+  const esrd=!!p.hd||c<15, out=[];
+  // apixaban
+  if(esrd){ const n=(p.age>=80?1:0)+(p.wt<=60?1:0)+((p.hd||p.cr>=1.5)?1:0);
+    out.push({drug:"Apixaban", dose:n>=2?"2.5 mg twice daily":"5 mg twice daily", note:"Label: usual rule (2.5 mg if 2 of: age ≥ 80, weight ≤ 60 kg, creatinine ≥ 1.5). On dialysis the creatinine criterion is assumed met. Dialysis and CrCl < 15 were not in the efficacy trials; whether the results carry over is unknown."});
+  } else { const n=(p.age>=80?1:0)+(p.wt<=60?1:0)+(p.cr>=1.5?1:0);
+    out.push({drug:"Apixaban", dose:n>=2?"2.5 mg twice daily":"5 mg twice daily", note:n>=2?"Reduced: "+n+" of 3 criteria (age ≥ 80, weight ≤ 60 kg, creatinine ≥ 1.5).":n+" of 3 reduction criteria; 2 are needed."});
+  }
+  // rivaroxaban
+  if(esrd) out.push({drug:"Rivaroxaban", dose:"Not named by the guideline", note:"Label: 15 mg once daily gives trial-like drug levels, but CrCl < 30 and dialysis were not studied and outcomes are unknown. The guideline names only warfarin or apixaban here (Class 2b)."});
+  else out.push({drug:"Rivaroxaban", dose:(c>50?"20 mg":"15 mg")+" once daily with the evening meal", note:c>50?"CrCl > 50.":"Reduced: CrCl 15 to 50."});
+  // dabigatran
+  if(esrd) out.push({drug:"Dabigatran", dose:"No dose", note:"Label: dosing recommendations cannot be provided for CrCl < 15 or dialysis."});
+  else out.push({drug:"Dabigatran", dose:(c>30?"150 mg":"75 mg")+" twice daily", note:c>30?"CrCl > 30.":"Reduced: CrCl 15 to 30."});
+  // edoxaban
+  if(esrd) out.push({drug:"Edoxaban", dose:"Not recommended", note:"Label: not recommended for CrCl < 15."});
+  else if(c>95) out.push({drug:"Edoxaban", dose:"Do not use", note:"CrCl > 95: more ischemic stroke than warfarin."});
+  else out.push({drug:"Edoxaban", dose:(c>50?"60 mg":"30 mg")+" once daily", note:c>50?"CrCl > 50 to 95.":"Reduced: CrCl 15 to 50."});
+  return {crcl:c, rows:out};
+}
+function rvrDecision(r){ // r: {unstable, pre, lowef, icu}
+  if(r.unstable) return {head:"Immediate synchronized electrical cardioversion", tier:"Class 1", list:["Do not wait for rate-control drugs or imaging.","Anticoagulate before or as close to cardioversion as the emergency allows (expert practice), and continue at least 4 weeks (Class 1)."], warn:r.pre?"Pre-excited AF: no AV-nodal blockers.":""};
+  if(r.pre) return {head:"No AV-nodal blockers", tier:"Class 3: Harm", list:["Contraindicated: verapamil, diltiazem, beta blockers, digoxin, adenosine, amiodarone.","IV procainamide or ibutilide, or electrical cardioversion (Class 1).","Call cardiology; refer for accessory-pathway ablation (Class 1)."], warn:"These drugs can precipitate ventricular fibrillation in pre-excited AF."};
+  if(r.lowef) return {head:"Beta blocker; no IV diltiazem or verapamil", tier:"Beta blocker Class 1 · IV diltiazem, verapamil Class 3: Harm", list:["Beta blocker for acute rate control (Class 1); start low in decompensated failure (expert practice).","Digoxin if beta blocker is ineffective or contraindicated (Class 2a).","IV amiodarone if beta blockers are ineffective or contraindicated: reasonable in AF with heart failure (Class 2a); may be considered in the critically ill (Class 2b).","Adding IV magnesium to standard rate control is reasonable (Class 2a)."], warn:"Moderate or severe LV systolic dysfunction, with or without decompensated heart failure: IV diltiazem and verapamil should not be given. They are recommended only when EF is above 40%."};
+  return {head:"Beta blocker, or diltiazem or verapamil", tier:"Class 1", list:["Either class is recommended when EF > 40% and the patient is stable.","Digoxin if those are ineffective or contraindicated (Class 2a).","Adding IV magnesium to standard rate control is reasonable (Class 2a)."+(r.icu?" IV amiodarone may be considered in the critically ill when the others are ineffective or contraindicated (Class 2b).":"")], warn:""};
+}
+function cvDecision(c){ // c: {dur, score, anticoag}
+  if(!c.dur) return null;
+  const after="Therapeutic anticoagulation before cardioversion and for at least 4 weeks after, without interruption (Class 1).";
+  if(c.dur==="ge48"){
+    if(c.anticoag) return {head:"Proceed", tier:"Class 1", list:["3 weeks of uninterrupted therapeutic anticoagulation is complete.",after]};
+    return {head:"3 weeks of anticoagulation, or imaging first", tier:"Class 1", list:["AF ≥ 48 h or unknown duration: 3 weeks of uninterrupted anticoagulation, or imaging to exclude left atrial thrombus, before elective cardioversion.",after]};
+  }
+  if(c.anticoag) return {head:"Proceed", tier:"Class 1", list:["Already therapeutically anticoagulated.",after]};
+  if(c.score==null) return {head:"Enter the CHA₂DS₂-VASc score", tier:"", list:["For AF under 48 h the next step depends on the score."]};
+  if(c.score>=2) return {head:"Imaging before cardioversion may be considered", tier:"Class 2b", list:["AF < 48 h, not anticoagulated, CHA₂DS₂-VASc ≥ 2: stroke risk after cardioversion is not uniformly low.",after]};
+  if(c.dur==="lt12") return {head:"Benefit of imaging or anticoagulation is uncertain", tier:"Class 2b", list:["AF < 12 h and CHA₂DS₂-VASc 0 to 1: very low thromboembolic risk around cardioversion.","Decide with the patient; many still anticoagulate for 4 weeks (expert practice)."]};
+  return {head:"Anticoagulate; imaging not specifically recommended", tier:"Class 1 for anticoagulation", list:["AF 12 to 48 h and CHA₂DS₂-VASc 0 to 1: the guideline makes no imaging recommendation for this group.",after]};
+}
+function hasbled(n){ return {score:n, high:n>=3}; }
+</script>
+<script>
+/* ---------- interface ---------- */
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const num=id=>{const v=parseFloat($(id).value); return isFinite(v)?v:null};
+function readPatient(){ return {age:num("#age"), sex:$("#sex").value, wt:num("#wt"), cr:num("#cr"), hd:$("#hd").checked, hf:$("#f-hf").checked, htn:$("#f-htn").checked, dm:$("#f-dm").checked, stroke:$("#f-st").checked, vasc:$("#f-va").checked, mech:$("#v-mech").checked, ms:$("#v-ms").checked}; }
+const esc=s=>String(s).replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+function renderOac(){
+  const p=readPatient(), c=crcl(p.age,p.wt,p.cr,p.sex), k=kidneyBand(c,p.hd); p.band=k?k.band:null; const d=oacDecision(p), dd=doacDoses(p);
+  let h="";
+  if(!d){ h='<p class="label">Answer</p><p class="muted">Enter age and sex to score. Add weight and creatinine for the dose.</p>'; }
+  else{
+    const s=chadsvasc(p);
+    h=`<p class="label">${s!=null?"CHA₂DS₂-VASc "+s:"Score not needed"}${c!=null?" · CrCl "+c.toFixed(1)+" mL/min":""}</p><p class="big">${esc(d.head)}</p>`;
+    if(d.key==="valve"){}
+    else if(d.key==="esrd"&&dd) h+=`<p class="dose">Warfarin (INR 2 to 3), or apixaban ${esc(dd.rows[0].dose)}</p><p class="muted">${esc(dd.rows[0].note)}</p>`;
+    else if(d.key==="ckd4"&&dd) h+=`<p class="dose">Apixaban ${esc(dd.rows[0].dose)}, or warfarin</p><p class="muted">${esc(dd.rows[0].note)} Other DOACs are in the table below.</p>`;
+    else if(d.key!=="below"&&dd) h+=`<p class="dose">Apixaban ${esc(dd.rows[0].dose)}</p><p class="muted">${esc(dd.rows[0].note)} Other DOACs are in the table below.</p>`;
+    if(d.key!=="valve"&&d.key!=="below"&&!dd) h+=`<p class="muted">Add weight and creatinine for the dose.</p>`;
+    h+=`<p>${esc(d.text)}</p><span class="tier">${esc(d.tier)}</span>`;
+    if(k&&k.band==="ckd3"&&d.key==="yes") h+=`<p class="note">${esc(k.text)} <span class="tier">${esc(k.tier)}</span></p>`;
+    if(d.key!=="below") h+=`<p class="guard"><b>Not a substitute:</b> aspirin, alone or with clopidogrel, in place of anticoagulation (Class 3: Harm).</p>`;
+    h+=`<details><summary>Why this threshold</summary><p>Anticoagulation cuts AF stroke risk by about two thirds but adds bleeding. Around an annual stroke risk of 2% the benefit clearly outweighs the bleeding; between 1% and 2% it is closer, so the guideline calls treatment reasonable and asks for a shared decision.</p><p>Female sex is a risk modifier, not a risk factor on its own: it raises risk when other factors are present, which is why the thresholds are one point higher in women.</p><p>Mechanical valves and rheumatic mitral stenosis did worse on a DOAC than on a vitamin K antagonist (RE-ALIGN, INVICTUS), so warfarin remains the drug.</p><p>In advanced kidney disease the evidence thins out: the DOAC trials excluded creatinine clearance below 25 to 30 mL/min and dialysis, so the class of recommendation falls to 2a and then 2b.</p></details>`;
+  }
+  $("#answer").innerHTML=h;
+  let t="";
+  if(p.mech||p.ms) t='<p class="guard"><b>Valve check:</b> DOACs are not recommended with a mechanical valve or moderate or worse mitral stenosis.</p>';
+  else if(!dd) t='<p class="muted">Enter age, sex, weight and creatinine.</p>';
+  else if(d&&d.key==="below") t='<p class="muted">No anticoagulation is recommended at this score, so no dose is shown.</p>';
+  else t=`<div class="tblwrap"><table><tr><th>Drug</th><th>Dose</th></tr>${dd.rows.map(r=>`<tr><td>${r.drug}</td><td><span class="mono">${esc(r.dose)}</span><br><span class="muted">${esc(r.note)}</span></td></tr>`).join("")}</table></div><span class="tier">Doses: FDA labels</span><p class="note">Check interactions before prescribing. Dabigatran label: 75 mg twice daily with dronedarone or systemic ketoconazole when CrCl is 30 to 50; avoid P-glycoprotein inhibitors when CrCl is 15 to 30.</p>`;
+  $("#dosebody").innerHTML=t;
+  const s=chadsvasc(p); if(s!=null&&document.activeElement!==$("#c-sc")&&!$("#c-sc").dataset.touched) $("#c-sc").value=s;
+  renderCv();
+}
+function renderHb(){
+  if(num("#age")!=null&&!$("#hb-age").dataset.touched) $("#hb-age").checked=num("#age")>65;
+  const n=$$("[data-hb]").filter(x=>x.checked).length, r=hasbled(n);
+  $("#hbout").innerHTML=n?`<p><span class="mono">HAS-BLED ${r.score}</span> ${r.high?"· high bleeding risk (≥ 3)":"· not high (< 3)"}</p>${r.high?'<p class="guard"><b>Do not withhold on this alone.</b> Correct what can be corrected (blood pressure, NSAIDs, alcohol, unneeded antiplatelet) and follow closely. Class 3: No Benefit for using a bleeding score in isolation to decide eligibility.</p>':""}`:"";
+}
+function block(d){ if(!d) return ""; return `<p class="big">${esc(d.head)}</p>${d.tier?`<span class="tier">${esc(d.tier)}</span>`:""}${d.warn?`<p class="guard"><b>Guard:</b> ${esc(d.warn)}</p>`:""}<ul class="plain">${d.list.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`; }
+function renderRvr(){ $("#rvrout").innerHTML=block(rvrDecision({unstable:$("#r-un").checked, pre:$("#r-pre").checked, lowef:$("#r-ef").checked, icu:$("#r-icu").checked})); }
+function renderCv(){ $("#cvout").innerHTML=block(cvDecision({dur:$("#c-dur").value, score:num("#c-sc"), anticoag:$("#c-ac").checked})); }
+
+/* practice cases run through the same engine */
+const CASES=[
+ {name:"Case 1", stem:"78-year-old woman, hypertension and diabetes, 58 kg, creatinine 1.6.", p:{age:78,sex:"f",wt:58,cr:1.6,htn:1,dm:1}, notice:"Two apixaban criteria are met (weight and creatinine), so the dose drops even though she is under 80. Her creatinine clearance is in the CKD 4 range, where the recommendation is Class 2a."},
+ {name:"Case 2", stem:"52-year-old man, no other history, 85 kg, creatinine 0.9.", p:{age:52,sex:"m",wt:85,cr:0.9}, notice:"Score 0: no recommendation to anticoagulate. Aspirin is not an alternative."},
+ {name:"Case 3", stem:"60-year-old woman, no other history, 70 kg, creatinine 0.8.", p:{age:60,sex:"f",wt:70,cr:0.8}, notice:"Her only point is sex, which modifies risk but does not count on its own."},
+ {name:"Case 4", stem:"82-year-old man, heart failure, 75 kg, creatinine 1.2.", p:{age:82,sex:"m",wt:75,cr:1.2,hf:1}, notice:"Age alone is one apixaban criterion; two are needed, so the dose stays 5 mg. His creatinine clearance is 50.3, just above the 50 cut-off for rivaroxaban and edoxaban."},
+ {name:"Case 5", stem:"66-year-old man, diabetes, 110 kg, creatinine 0.8.", p:{age:66,sex:"m",wt:110,cr:0.8,dm:1}, notice:"Creatinine clearance is above 95: edoxaban should not be used."},
+ {name:"Case 6", stem:"71-year-old man, hypertension, mechanical mitral valve, 80 kg, creatinine 1.0.", p:{age:71,sex:"m",wt:80,cr:1.0,htn:1,mech:1}, notice:"The valve decides, not the score."},
+ {name:"Case 7", stem:"74-year-old woman on hemodialysis, hypertension, prior stroke, 55 kg.", p:{age:74,sex:"f",wt:55,cr:6.0,hd:1,htn:1,stroke:1}, notice:"On dialysis the recommendation drops to Class 2b, and only warfarin or apixaban are named. Weight and creatinine give the lower apixaban dose."}
+];
+function loadCase(i){ const c=CASES[i], p=c.p;
+  $("#age").value=p.age; $("#sex").value=p.sex; $("#wt").value=p.wt; $("#cr").value=p.cr; $("#hd").checked=!!p.hd;
+  $("#f-hf").checked=!!p.hf; $("#f-htn").checked=!!p.htn; $("#f-dm").checked=!!p.dm; $("#f-st").checked=!!p.stroke; $("#f-va").checked=!!p.vasc; $("#v-mech").checked=!!p.mech; $("#v-ms").checked=!!p.ms;
+  delete $("#hb-age").dataset.touched; delete $("#c-sc").dataset.touched;
+  $$("#cases button").forEach((b,j)=>b.setAttribute("aria-pressed",j===i));
+  $("#caseout").innerHTML=`<p>${esc(c.stem)}</p><p class="muted">Predict the score, the decision and the apixaban dose, then check.</p><details><summary>Show the answer</summary><p id="caseans"></p><p><b>Notice:</b> ${esc(c.notice)}</p></details>`;
+  renderOac(); renderHb();
+  const pp=readPatient(), kk=kidneyBand(crcl(pp.age,pp.wt,pp.cr,pp.sex),pp.hd); pp.band=kk?kk.band:null;
+  const d=oacDecision(pp), dd=doacDoses(pp), s=chadsvasc(pp);
+  $("#caseans").textContent=`CHA₂DS₂-VASc ${s}. ${d.head} (${d.tier}).`+((d.key==="valve"||d.key==="below")?"":` Apixaban dose: ${dd.rows[0].dose}.`);
+}
+$("#cases").innerHTML=CASES.map((c,i)=>`<button type="button" aria-pressed="false" data-i="${i}">${c.name}</button>`).join("");
+$$("#cases button").forEach(b=>b.addEventListener("click",()=>loadCase(+b.dataset.i)));
+
+$("#hb-age").addEventListener("change",e=>e.target.dataset.touched=1);
+$("#c-sc").addEventListener("input",e=>e.target.dataset.touched=1);
+$("#v-oac").addEventListener("input",()=>{renderOac();renderHb()});
+$("#rvr").addEventListener("input",renderRvr);
+$("#cardioversion").addEventListener("input",renderCv);
+
+/* tabs and hash jumps (home-page search links land inside a tab) */
+function showView(v){ $$("section.view").forEach(s=>s.classList.toggle("on",s.id==="v-"+v)); $$("nav.tabs button").forEach(b=>b.setAttribute("aria-selected",b.dataset.v===v)); window.scrollTo({top:0}); }
+$$("nav.tabs button").forEach(b=>b.addEventListener("click",()=>showView(b.dataset.v)));
+function goHash(){ const id=decodeURIComponent(location.hash.slice(1)); if(!id) return; const el=document.getElementById(id); if(!el) return; const sec=el.closest("section.view"); if(sec){ showView(sec.id.slice(2)); requestAnimationFrame(()=>el.scrollIntoView({block:"start"})); } }
+window.addEventListener("hashchange",goHash);
+renderOac(); renderHb(); renderRvr(); renderCv(); goHash();
+</script>
+</body>
+</html>
