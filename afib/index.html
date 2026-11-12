@@ -154,7 +154,7 @@ footer strong{color:var(--ink)}
     <div class="checks">
       <label class="chk"><input type="checkbox" id="r-un"><span>Unstable because of the AF<small>Hypotension, shock, ischemia or pulmonary edema driven by the rate</small></span></label>
       <label class="chk"><input type="checkbox" id="r-pre"><span>Pre-excited AF<small>Known WPW, or wide, irregular, very fast QRS with changing shape</small></span></label>
-      <label class="chk"><input type="checkbox" id="r-ef"><span>EF ≤ 40%, or moderate or severe LV systolic dysfunction<small>With or without decompensated heart failure</small></span></label>
+      <label class="chk"><input type="checkbox" id="r-ef"><span>EF ≤ 40%, or moderate or severe LV systolic dysfunction<small>With or without decompensated heart failure. Use for EF of exactly 40% too: diltiazem and verapamil are recommended only above 40%.</small></span></label>
       <label class="chk"><input type="checkbox" id="r-icu"><span>Critically ill</span></label>
     </div>
     <div id="rvrout" aria-live="polite" style="display:flex;flex-direction:column;gap:10px"></div>
@@ -246,7 +246,7 @@ footer strong{color:var(--ink)}
   <p><strong>For education only. Not a substitute for clinical judgment.</strong> Built to national guidelines; adjust to your institution's formulary and protocols.</p>
   <p>Privacy: everything runs in your browser. Nothing you enter is sent anywhere or stored, and there are no analytics; only your light/dark choice is saved on this device. Do not enter names, record numbers, or dates of birth.</p>
   <p class="mono">Last reviewed: 2026-11-11</p>
-  <p><strong>Sources:</strong> Joglar JA et al., 2023 ACC/AHA/ACCP/HRS Guideline for the Diagnosis and Management of Atrial Fibrillation, J Am Coll Cardiol 2024 (class of recommendation shown on each output) · FDA prescribing information for apixaban (Eliquis), rivaroxaban (Xarelto), dabigatran (Pradaxa) and edoxaban (Savaysa) (doses) · Lip GYH et al., Chest 2010 (CHA₂DS₂-VASc) · Pisters R et al., Chest 2010 (HAS-BLED) · Cockcroft DW, Gault MH, Nephron 1976 (creatinine clearance) · Kirchhof P et al., EAST-AFNET 4, N Engl J Med 2020 · Van Gelder IC et al., RACE II, N Engl J Med 2010. Outputs marked "expert practice" or "label" are not guideline recommendations.</p>
+  <p><strong>Sources:</strong> Joglar JA et al., 2023 ACC/AHA/ACCP/HRS Guideline for the Diagnosis and Management of Atrial Fibrillation, J Am Coll Cardiol 2024 (class of recommendation shown on each output) · FDA prescribing information for apixaban (Eliquis), rivaroxaban (Xarelto), dabigatran (Pradaxa) and edoxaban (Savaysa) (doses) · Lip GYH et al., Chest 2010 (CHA₂DS₂-VASc) · Pisters R et al., Chest 2010 (HAS-BLED) · Cockcroft DW, Gault MH, Nephron 1976 (creatinine clearance) · Eikelboom JW et al., RE-ALIGN, N Engl J Med 2013 · Connolly SJ et al., INVICTUS, N Engl J Med 2022 · Kirchhof P et al., EAST-AFNET 4, N Engl J Med 2020 · Van Gelder IC et al., RACE II, N Engl J Med 2010. Outputs marked "expert practice" or "label" are not guideline recommendations.</p>
 </footer>
 </main>
 
@@ -267,12 +267,13 @@ function chadsvasc(p){ // p: {age, sex, hf, htn, dm, stroke, vasc}
   return (p.age>=75?2:p.age>=65?1:0)+(p.sex==="f"?1:0)+(p.hf?1:0)+(p.htn?1:0)+(p.dm?1:0)+(p.stroke?2:0)+(p.vasc?1:0);
 }
 function oacDecision(p){ // p may carry band: "esrd" | "ckd4" | "ckd3" | "ok"
-  if(p.mech) return {key:"valve", head:"Warfarin", tier:"Guideline text · no numbered recommendation in the AF guideline", text:"Mechanical heart valve: warfarin is the anticoagulant of choice, whatever the CHA₂DS₂-VASc score. DOACs caused more clots and more bleeding (RE-ALIGN). The INR target is set by the valve, not by the AF."};
+  if(p.mech) return {key:"valve", head:"Warfarin", tier:"Guideline text · no numbered recommendation in the AF guideline", text:"Mechanical heart valve: warfarin is the anticoagulant of choice, whatever the CHA₂DS₂-VASc score. Dabigatran caused more clots and more bleeding than warfarin (RE-ALIGN), and apixaban more clots (PROACT Xa). The INR target is set by the valve, not by the AF."};
   if(p.ms) return {key:"valve", head:"Warfarin", tier:"Class 1", text:"Rheumatic mitral stenosis, or mitral stenosis of moderate or greater severity: warfarin is recommended over DOACs, whatever the CHA₂DS₂-VASc score."};
   const s=chadsvasc(p); if(s==null) return null;
   const nonsex=s-(p.sex==="f"?1:0);
   if(nonsex===0) return {key:"below", score:s, head:"Below the treatment thresholds", tier:"No guideline recommendation to anticoagulate", text:"Score 0 in men or 1 in women. The guideline's recommendations start at score 1 (men) or 2 (women). Reassess when age or risk factors change."};
   const risk=nonsex>=2?"Score ≥ 2 in men or ≥ 3 in women (annual stroke risk about 2% or more).":"Score 1 in men or 2 in women (annual stroke risk 1% to under 2%).";
+  if(p.band==="esrd"&&nonsex===1) return {key:"esrd", score:s, head:"Anticoagulation might be reasonable", tier:"Class 2b applies to elevated stroke risk; not addressed at this score", text:risk+" The guideline's kidney-failure recommendation (warfarin or apixaban might be reasonable, Class 2b) is written for patients at elevated stroke risk; it does not address this score. Decide with the patient and nephrology."};
   if(p.band==="esrd") return {key:"esrd", score:s, head:"Anticoagulation might be reasonable", tier:"Class 2b", text:risk+" With CrCl < 15 mL/min or dialysis the recommendation is weaker: warfarin (INR 2 to 3) or apixaban might be reasonable. These patients were not in the DOAC trials; decide with the patient and nephrology."};
   if(p.band==="ckd4") return {key:"ckd4", score:s, head:"Anticoagulation is reasonable", tier:"Class 2a", text:risk+" With CrCl 15 to 29 mL/min (CKD stage 4 range), warfarin or a labeled-dose DOAC is reasonable."};
   if(nonsex>=2) return {key:"yes", score:s, head:"Anticoagulate", tier:"Class 1", text:risk+" A DOAC is recommended over warfarin (Class 1)."};
@@ -287,16 +288,16 @@ function kidneyBand(c, hd){
 }
 function doacDoses(p){ // p: {age, wt, cr, sex, hd}
   const c=crcl(p.age,p.wt,p.cr,p.sex);
-  if(!(p.age>0&&p.wt>0)||(c==null&&!p.hd)) return null;
+  if(!(p.age>=18&&p.age<=110&&p.sex&&p.wt>0)||(c==null&&!p.hd)) return null;
   const esrd=!!p.hd||c<15, out=[];
   // apixaban
   if(esrd){ const n=(p.age>=80?1:0)+(p.wt<=60?1:0)+((p.hd||p.cr>=1.5)?1:0);
-    out.push({drug:"Apixaban", dose:n>=2?"2.5 mg twice daily":"5 mg twice daily", note:"Label: usual rule (2.5 mg if 2 of: age ≥ 80, weight ≤ 60 kg, creatinine ≥ 1.5; creatinine counts on dialysis). Dialysis and CrCl < 15 were not in the efficacy trials; whether the results carry over is unknown."});
+    out.push({drug:"Apixaban", dose:n>=2?"2.5 mg twice daily":"5 mg twice daily", note:"Label: usual rule (2.5 mg if 2 of: age ≥ 80, weight ≤ 60 kg, creatinine ≥ 1.5). On dialysis the creatinine criterion is assumed met. Dialysis and CrCl < 15 were not in the efficacy trials; whether the results carry over is unknown."});
   } else { const n=(p.age>=80?1:0)+(p.wt<=60?1:0)+(p.cr>=1.5?1:0);
     out.push({drug:"Apixaban", dose:n>=2?"2.5 mg twice daily":"5 mg twice daily", note:n>=2?"Reduced: "+n+" of 3 criteria (age ≥ 80, weight ≤ 60 kg, creatinine ≥ 1.5).":n+" of 3 reduction criteria; 2 are needed."});
   }
   // rivaroxaban
-  if(esrd) out.push({drug:"Rivaroxaban", dose:"Not recommended by the guideline", note:"Label: 15 mg once daily gives trial-like drug levels, but CrCl < 30 and dialysis were not studied and outcomes are unknown. The guideline names only warfarin or apixaban here (Class 2b)."});
+  if(esrd) out.push({drug:"Rivaroxaban", dose:"Not named by the guideline", note:"Label: 15 mg once daily gives trial-like drug levels, but CrCl < 30 and dialysis were not studied and outcomes are unknown. The guideline names only warfarin or apixaban here (Class 2b)."});
   else out.push({drug:"Rivaroxaban", dose:(c>50?"20 mg":"15 mg")+" once daily with the evening meal", note:c>50?"CrCl > 50.":"Reduced: CrCl 15 to 50."});
   // dabigatran
   if(esrd) out.push({drug:"Dabigatran", dose:"No dose", note:"Label: dosing recommendations cannot be provided for CrCl < 15 or dialysis."});
@@ -347,7 +348,7 @@ function renderOac(){
     else if(d.key!=="below"&&dd) h+=`<p class="dose">Apixaban ${esc(dd.rows[0].dose)}</p><p class="muted">${esc(dd.rows[0].note)} Other DOACs are in the table below.</p>`;
     if(d.key!=="valve"&&d.key!=="below"&&!dd) h+=`<p class="muted">Add weight and creatinine for the dose.</p>`;
     h+=`<p>${esc(d.text)}</p><span class="tier">${esc(d.tier)}</span>`;
-    if(k&&k.band==="ckd3"&&(d.key==="yes"||d.key==="reasonable")) h+=`<p class="note">${esc(k.text)} <span class="tier">${esc(k.tier)}</span></p>`;
+    if(k&&k.band==="ckd3"&&d.key==="yes") h+=`<p class="note">${esc(k.text)} <span class="tier">${esc(k.tier)}</span></p>`;
     if(d.key!=="below") h+=`<p class="guard"><b>Not a substitute:</b> aspirin, alone or with clopidogrel, in place of anticoagulation (Class 3: Harm).</p>`;
     h+=`<details><summary>Why this threshold</summary><p>Anticoagulation cuts AF stroke risk by about two thirds but adds bleeding. Around an annual stroke risk of 2% the benefit clearly outweighs the bleeding; between 1% and 2% it is closer, so the guideline calls treatment reasonable and asks for a shared decision.</p><p>Female sex is a risk modifier, not a risk factor on its own: it raises risk when other factors are present, which is why the thresholds are one point higher in women.</p><p>Mechanical valves and rheumatic mitral stenosis did worse on a DOAC than on a vitamin K antagonist (RE-ALIGN, INVICTUS), so warfarin remains the drug.</p><p>In advanced kidney disease the evidence thins out: the DOAC trials excluded creatinine clearance below 25 to 30 mL/min and dialysis, so the class of recommendation falls to 2a and then 2b.</p></details>`;
   }
@@ -378,7 +379,7 @@ const CASES=[
  {name:"Case 4", stem:"82-year-old man, heart failure, 75 kg, creatinine 1.2.", p:{age:82,sex:"m",wt:75,cr:1.2,hf:1}, notice:"Age alone is one apixaban criterion; two are needed, so the dose stays 5 mg. His creatinine clearance is 50.3, just above the 50 cut-off for rivaroxaban and edoxaban."},
  {name:"Case 5", stem:"66-year-old man, diabetes, 110 kg, creatinine 0.8.", p:{age:66,sex:"m",wt:110,cr:0.8,dm:1}, notice:"Creatinine clearance is above 95: edoxaban should not be used."},
  {name:"Case 6", stem:"71-year-old man, hypertension, mechanical mitral valve, 80 kg, creatinine 1.0.", p:{age:71,sex:"m",wt:80,cr:1.0,htn:1,mech:1}, notice:"The valve decides, not the score."},
- {name:"Case 7", stem:"74-year-old woman on hemodialysis, hypertension, prior stroke, 55 kg.", p:{age:74,sex:"f",wt:55,cr:6.0,hd:1,htn:1,stroke:1}, notice:"On dialysis the recommendation drops to Class 2b, and only warfarin or apixaban are named. Weight and creatinine (which counts on dialysis) give the lower apixaban dose."}
+ {name:"Case 7", stem:"74-year-old woman on hemodialysis, hypertension, prior stroke, 55 kg.", p:{age:74,sex:"f",wt:55,cr:6.0,hd:1,htn:1,stroke:1}, notice:"On dialysis the recommendation drops to Class 2b, and only warfarin or apixaban are named. Weight and creatinine give the lower apixaban dose."}
 ];
 function loadCase(i){ const c=CASES[i], p=c.p;
   $("#age").value=p.age; $("#sex").value=p.sex; $("#wt").value=p.wt; $("#cr").value=p.cr; $("#hd").checked=!!p.hd;
