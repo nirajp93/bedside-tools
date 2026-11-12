@@ -10,9 +10,7 @@
 /* Colours: shared site names only. Dark values and the extra names (--fill --ok --bad --ecg-*) live in /theme.js. */
 :root{--bg:#FBFBFA; --card:#FFFFFF; --ink:#111113; --muted:#55555D; --line:#ECECEE; --accent:#2B4BDB; --warn:#9A3B00; --warnbg:#FFF6EC}
 :root{
-  --sans:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
   --serif:var(--sans);
-  --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
   --r:14px;
 }
 *{box-sizing:border-box;margin:0;padding:0}
@@ -559,11 +557,11 @@ function render12(data,{highlight=[],rows=4}={}){
   layout.forEach((row,r)=>row.forEach((L,c)=>{const x0=c*cw,yb=r*ch+ch*.6; const win=rows===4?[c*2.5,(c+1)*2.5]:[c*2.5,(c+1)*2.5];
     s+=`<g class="leadbox${highlight.includes(L)?" hl":""}" data-lead="${L}"><rect class="hit" x="${x0+1}" y="${r*ch+1}" width="${cw-2}" height="${ch-2}" fill="transparent" rx="4"/>`;
     s+=`<path d="${tracePath(data.leads[L],data.t,win[0],win[1],x0,yb,mm)}" style="fill:none;stroke:var(--ecg-ink)" stroke-width="1.3" stroke-linejoin="round" stroke-linecap="round"/>`;
-    s+=`<text x="${x0+6}" y="${r*ch+14}" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="700" style="fill:var(--ecg-ink)">${L}</text>`;
+    s+=`<text x="${x0+6}" y="${r*ch+14}" font-size="11" font-weight="700" style="font-family:var(--mono);fill:var(--ecg-ink)">${L}</text>`;
     if(c>0)s+=`<path d="M${x0} ${yb-6*mm}V${yb+6*mm}" style="stroke:var(--ecg-ink)" stroke-width="1"/>`; s+=`</g>`}));
   // rhythm strip lead II, 10 s compressed into W
   const yb=layout.length*ch+14*mm; const mm2=W/250; // fit 10 s (250 mm) to width
-  s+=`<path d="${tracePath(data.leads.II,data.t,0,DUR,0,yb,mm2)}" style="fill:none;stroke:var(--ecg-ink)" stroke-width="1.1"/><text x="6" y="${layout.length*ch+12}" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="700" style="fill:var(--ecg-ink)">II</text>`;
+  s+=`<path d="${tracePath(data.leads.II,data.t,0,DUR,0,yb,mm2)}" style="fill:none;stroke:var(--ecg-ink)" stroke-width="1.1"/><text x="6" y="${layout.length*ch+12}" font-size="11" font-weight="700" style="font-family:var(--mono);fill:var(--ecg-ink)">II</text>`;
   s+=`</svg>`; return s;
 }
 function renderZoom(data,L){
@@ -790,7 +788,7 @@ function aGo(site,sub,cond){aSite=site; aIf=!!cond; aOpen=null; aRender(); showV
 let cal=[];
 function openZoom(data,L){current={data,lead:L}; $("#zlead").textContent=L; const z=renderZoom(data,L); $("#zoom").innerHTML=z.svg; $("#zoom").dataset.mm=z.mm; cal=[]; drawCal(); $("#zoomwrap").hidden=false; document.body.style.overflow="hidden";
   const svg=$("#zsvg"); svg.addEventListener("click",e=>{const r=svg.getBoundingClientRect(); const x=(e.clientX-r.left)*(z.W/r.width), y=(e.clientY-r.top)*(z.H/r.height); if(cal.length>=2)cal=[]; cal.push({x,y}); drawCal();});}
-function drawCal(){const mm=+$("#zoom").dataset.mm||10; const g=$("#cal"); if(!g)return; let s=""; cal.forEach((c,i)=>{s+=`<line x1="${c.x}" y1="0" x2="${c.x}" y2="400" style="stroke:var(--accent)" stroke-width="1" stroke-dasharray="4 3"/><line x1="0" y1="${c.y}" x2="625" y2="${c.y}" style="stroke:var(--accent)" stroke-width="1" stroke-dasharray="4 3"/><circle cx="${c.x}" cy="${c.y}" r="6" style="fill:var(--accent);fill-opacity:.9"/><text x="${c.x+9}" y="${c.y-9}" font-family="ui-monospace,Menlo,monospace" font-size="13" style="fill:var(--accent)">${i===0?"A":"B"}</text>`});
+function drawCal(){const mm=+$("#zoom").dataset.mm||10; const g=$("#cal"); if(!g)return; let s=""; cal.forEach((c,i)=>{s+=`<line x1="${c.x}" y1="0" x2="${c.x}" y2="400" style="stroke:var(--accent)" stroke-width="1" stroke-dasharray="4 3"/><line x1="0" y1="${c.y}" x2="625" y2="${c.y}" style="stroke:var(--accent)" stroke-width="1" stroke-dasharray="4 3"/><circle cx="${c.x}" cy="${c.y}" r="6" style="fill:var(--accent);fill-opacity:.9"/><text x="${c.x+9}" y="${c.y-9}" font-size="13" style="font-family:var(--mono);fill:var(--accent)">${i===0?"A":"B"}</text>`});
   g.innerHTML=s; if(cal.length===2){const dmm=(cal[0].y-cal[1].y)/mm, dms=Math.abs(cal[1].x-cal[0].x)/mm*40; $("#r-mm").textContent=(dmm>=0?"+":"")+dmm.toFixed(1); $("#r-ms").textContent=Math.round(dms); $("#r-mv").textContent=(dmm/10).toFixed(2);} else {$("#r-mm").textContent=$("#r-ms").textContent=$("#r-mv").textContent="—";}}
 $("#zreset").addEventListener("click",()=>{cal=[];drawCal()});
 $("#zclose").addEventListener("click",()=>{$("#zoomwrap").hidden=true;document.body.style.overflow=""});
