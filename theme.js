@@ -4,7 +4,9 @@
    and that choice is remembered across every tool on the site.
    Pages only need to use the shared colour names: --bg --card --ink --muted --line --accent --accent-ink --warn --warnbg
    Extra names any tool may use (light and dark both set here): --fill (subtle panel), --ok --okbg, --bad --badbg,
-   --scrim (overlay behind a sheet), --ecg-paper --ecg-grid --ecg-grid5 --ecg-ink (ECG tracings). */
+   --scrim (overlay behind a sheet), --ecg-paper --ecg-grid --ecg-grid5 --ecg-ink (ECG tracings).
+   It also collapses each page's footer text (disclaimer, privacy, last reviewed, sources) into a
+   "Disclaimers and sources" dropdown, so tools write a plain <footer> and get the same control. */
 (function () {
   var KEY = 'bt-theme';
   var root = document.documentElement;
@@ -25,7 +27,13 @@
     ':root[data-theme="dark"]{' + DARK + '}' +
     '.bt-theme{display:inline-grid;grid-template-columns:repeat(3,auto);gap:4px;padding:4px;margin-top:8px;background:var(--line);border-radius:12px}' +
     '.bt-theme button{height:36px;min-width:60px;padding:0 12px;border:0;border-radius:9px;background:transparent;font:inherit;font-size:13px;font-weight:500;color:var(--muted);cursor:pointer}' +
-    '.bt-theme button[aria-pressed="true"]{background:var(--card);color:var(--ink);font-weight:600}';
+    '.bt-theme button[aria-pressed="true"]{background:var(--card);color:var(--ink);font-weight:600}' +
+    '.disc{border:0;padding:0;margin:0}' +
+    '.disc summary{min-height:44px;display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:500;line-height:1.4;letter-spacing:0;text-transform:none;color:var(--ink);cursor:pointer;list-style:none}' +
+    '.disc summary::-webkit-details-marker{display:none}' +
+    '.disc summary::before{content:none}' +
+    '.disc summary::after{content:"";width:7px;height:7px;border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:rotate(45deg) translateY(-2px);transition:transform .15s}' +
+    '.disc[open] summary::after{transform:rotate(225deg) translateY(-2px)}';
   var style = document.createElement('style');
   style.textContent = css;
   document.head.appendChild(style);
@@ -45,6 +53,18 @@
   }
 
   function ready() {
+    // Footer disclaimers, privacy note and sources are collapsed into one dropdown on every page.
+    // A page that already has its own <details class="disc"> in the footer is left alone.
+    var foot = document.querySelector('footer');
+    if (foot && !foot.querySelector('details.disc')) {
+      var disc = document.createElement('details');
+      disc.className = 'disc';
+      var sum = document.createElement('summary');
+      sum.textContent = 'Disclaimers and sources';
+      disc.appendChild(sum);
+      while (foot.firstChild) disc.appendChild(foot.firstChild);
+      foot.appendChild(disc);
+    }
     // Pages without their own theme control get one at the end of the footer.
     if (!document.querySelector('[data-theme-set]')) {
       var host = document.querySelector('footer') || document.body;
