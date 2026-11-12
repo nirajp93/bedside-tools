@@ -18,7 +18,6 @@
   :root{
     --bg:#FBFBFA; --card:#FFFFFF; --ink:#111113; --muted:#55555D; --line:#ECECEE; --field:#DCDCE0;
     --accent:#2B4BDB; --accent-ink:#FFFFFF; --soft:#F1F1F3; --mark:#FFF1B8;
-    --feat-bg:#111113; --feat-ink:#FFFFFF; --feat-muted:#D4D4D8; --feat-eyebrow:#C9D2FF;
     --c-cards:#1D3FC4; --c-renal:#0F6B5E; --c-endo:#9A3412; --c-heme:#A61E4D; --c-id:#6D28D9;
     --c-icu:#0B6577; --c-gi:#7A5200; --c-onc:#3F3F46; --c-other:#3F3F46;
     --mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
@@ -29,7 +28,6 @@
     :root:not([data-theme="light"]){
       --bg:#0F0F11; --card:#1A1A1E; --ink:#F2F2F3; --muted:#A6A6AE; --line:#2A2A30; --field:#3A3A42;
       --accent:#AFBEFF; --accent-ink:#0F0F11; --soft:#232328; --mark:#5C4A00;
-      --feat-bg:#232B52; --feat-ink:#FFFFFF; --feat-muted:#C9CCDA; --feat-eyebrow:#AFBEFF;
       --c-cards:#AFBEFF; --c-renal:#6FD3C0; --c-endo:#F4A97B; --c-heme:#FF9DB5; --c-id:#C9B0FF;
       --c-icu:#7DD3E8; --c-gi:#E8C56A; --c-onc:#D4D4D8; --c-other:#D4D4D8;
       color-scheme:dark;
@@ -38,7 +36,6 @@
   :root[data-theme="dark"]{
     --bg:#0F0F11; --card:#1A1A1E; --ink:#F2F2F3; --muted:#A6A6AE; --line:#2A2A30; --field:#3A3A42;
     --accent:#AFBEFF; --accent-ink:#0F0F11; --soft:#232328; --mark:#5C4A00;
-    --feat-bg:#232B52; --feat-ink:#FFFFFF; --feat-muted:#C9CCDA; --feat-eyebrow:#AFBEFF;
     --c-cards:#AFBEFF; --c-renal:#6FD3C0; --c-endo:#F4A97B; --c-heme:#FF9DB5; --c-id:#C9B0FF;
     --c-icu:#7DD3E8; --c-gi:#E8C56A; --c-onc:#D4D4D8; --c-other:#D4D4D8;
     color-scheme:dark;
@@ -86,10 +83,21 @@
   .shift{height:44px;border-radius:10px;border:1px solid var(--field);background:var(--card);font-size:14px;font-weight:500;cursor:pointer}
   .shift[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:600}
 
-  .feat{display:flex;flex-direction:column;gap:6px;padding:18px;border-radius:16px;background:var(--feat-bg);color:var(--feat-ink)}
-  .feat .eyebrow{color:var(--feat-eyebrow)}
-  .feat .name{font-size:22px;font-weight:600;letter-spacing:-.02em;line-height:1.2}
-  .feat .desc{font-size:14px;color:var(--feat-muted)}
+  /* Banner: the tool last opened on this device ("Continue"), with the rotation's pick underneath.
+     On a first visit it shows the rotation's pick alone ("Start here"). */
+  .cont{display:flex;flex-direction:column;background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+  .cont-main{display:flex;align-items:center;gap:12px;padding:16px 14px 16px 18px}
+  .cont-main .txt{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+  .cont .eyebrow{color:var(--accent)}
+  .cont [aria-disabled="true"] .eyebrow{color:var(--muted)}
+  .cont .name{font-size:21px;font-weight:600;letter-spacing:-.02em;line-height:1.2}
+  .cont .desc{font-size:14px;color:var(--muted)}
+  .cont .desc b{font-weight:500;color:var(--ink)}
+  .go{flex:none;width:44px;height:44px;border-radius:999px;display:inline-flex;align-items:center;justify-content:center;background:var(--accent);color:var(--accent-ink)}
+  .cont-alt{min-height:48px;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 14px 0 18px;border-top:1px solid var(--line);background:var(--bg);font-size:13px;color:var(--muted)}
+  .cont-alt b{font-weight:500;color:var(--ink)}
+  .cont-alt svg{flex:none}
+  a.cont-main:hover .name,a.cont-alt:hover b{text-decoration:underline;text-underline-offset:3px}
 
   .tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:10px}
   .tile{min-height:76px;padding:12px 14px;background:var(--card);border:1px solid var(--line);border-radius:14px;display:flex;flex-direction:column;justify-content:space-between;gap:6px}
@@ -161,8 +169,9 @@
     #main{padding-top:28px}
     .tiles{grid-template-columns:repeat(3,minmax(0,1fr))}
     .home{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:32px;align-items:start}
-    .feat{padding:28px}
-    .feat .name{font-size:30px}
+    .cont-main{padding:24px 20px 24px 24px}
+    .cont .name{font-size:26px}
+    .cont-alt{padding:0 20px 0 24px;font-size:14px}
     .rows{grid-template-columns:repeat(2,minmax(0,1fr))}
     .rows>.row{border-bottom:1px solid var(--line)}
     .chips{flex-wrap:wrap;overflow:visible}
@@ -332,7 +341,7 @@
     sheet.addEventListener('click', e => { if (e.target === sheet) sheet.close(); });
   })();
 
-  /* Which tools each rotation shows first. The first live tool in a list is featured. */
+  /* Which tools each rotation shows first. The first live tool in a list is the rotation's pick in the banner. */
   const SHIFTS = {
     wards:  { label:'Wards',  tools:['electrolytes','insulin','aki','hyponatremia','chest-pain','afib','vte-ppx','anticoag-periop','abx-empiric'] },
     nights: { label:'Nights', tools:['cross-cover','rrt','electrolytes','insulin','chest-pain','ekg-cath','afib','hyponatremia','reversal','onc-emergencies'] },
@@ -357,6 +366,7 @@
     return i < 0 ? esc(text) : esc(text.slice(0, i)) + '<mark>' + esc(text.slice(i, i + term.length)) + '</mark>' + esc(text.slice(i + term.length));
   };
   const chevron = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg>';
+  const arrow = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
   const soon = '<span class="soon">Soon</span>';
   // Live tools are links; tools not built yet are shown but not clickable.
   const open = (t, cls, hash) => t.live ? `<a class="${cls}" href="/${t.slug}/${hash ? '#' + hash : ''}">` : `<div class="${cls}" aria-disabled="true">`;
@@ -366,10 +376,39 @@
     return `${open(t, 'row')}<span class="txt"><span class="name"><span>${hl(t.name, term)}</span></span><span class="desc">${hl(t.desc, term)}</span></span>${t.live ? (right || '') : soon}${close(t)}`;
   }
 
+  /* The tool last opened on this device, and the section the reader was in. /theme.js records this on every
+     tool page (key bt-last: the tool's slug and the ids of what was on screen); nothing leaves the device. */
+  function lastOpened(){
+    try {
+      const v = JSON.parse(store.get('bt-last') || 'null');
+      const t = v && bySlug[v.s];
+      if (!t || !t.live) return null;
+      let sec = null;
+      (Array.isArray(v.ids) ? v.ids : []).forEach(id => { const m = (t.sections || []).find(x => x[1] === id); if (m) sec = m; });
+      return { t, sec };
+    } catch (e) { return null; }
+  }
+
+  function banner(feat, last){
+    if (!last) return `<div class="cont">${open(feat, 'cont-main')}
+          <span class="txt"><span class="eyebrow">${feat.live ? 'Start here' : 'Coming soon'}</span><span class="name">${esc(feat.name)}</span><span class="desc">${esc(feat.desc)}</span></span>
+          ${feat.live ? `<span class="go">${arrow}</span>` : ''}
+        ${close(feat)}</div>`;
+    const t = last.t, sec = last.sec;
+    return `<div class="cont">
+        <a class="cont-main" href="/${t.slug}/${sec ? '#' + sec[1] : ''}">
+          <span class="txt"><span class="eyebrow">Continue</span><span class="name">${esc(t.name)}</span><span class="desc">${sec ? `You were in <b>${esc(sec[0])}</b>` : esc(t.desc)}</span></span>
+          <span class="go">${arrow}</span>
+        </a>
+        ${feat !== t && feat.live ? `<a class="cont-alt" href="/${feat.slug}/"><span>For ${esc(SHIFTS[shift].label.toLowerCase())}: <b>${esc(feat.name)}</b></span>${chevron}</a>` : ''}
+      </div>`;
+  }
+
   function renderHome(){
     const list = SHIFTS[shift].tools.map(s => bySlug[s]).filter(Boolean);
     const feat = list.find(t => t.live) || list[0];
-    const rest = list.filter(t => t !== feat).sort((a, b) => (b.live ? 1 : 0) - (a.live ? 1 : 0)).slice(0, 6);
+    const last = lastOpened();
+    const rest = list.filter(t => t !== feat && !(last && t === last.t)).sort((a, b) => (b.live ? 1 : 0) - (a.live ? 1 : 0)).slice(0, 6);
     main.innerHTML = `<div class="home stack">
       <div class="stack">
         <div>
@@ -378,11 +417,7 @@
             ${Object.entries(SHIFTS).map(([k, v]) => `<button class="shift" type="button" data-shift="${k}" aria-pressed="${k === shift}">${v.label}</button>`).join('')}
           </div>
         </div>
-        ${open(feat, 'feat')}
-          <span class="eyebrow">${feat.live ? 'Start here' : 'Coming soon'}</span>
-          <span class="name">${esc(feat.name)}</span>
-          <span class="desc">${esc(feat.desc)}</span>
-        ${close(feat)}
+        ${banner(feat, last)}
       </div>
       <div class="stack">
         <section>
@@ -453,6 +488,9 @@
     if (e.key === '/' && document.activeElement !== q){ e.preventDefault(); q.focus(); }
     else if (e.key === 'Escape' && document.activeElement === q){ q.value = ''; render(); q.blur(); }
   });
+
+  // Coming back from a tool with the Back button can restore this page without reloading it: redraw the banner.
+  window.addEventListener('pageshow', e => { if (e.persisted) render(); });
 
   render();
 </script>

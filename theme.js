@@ -9,7 +9,9 @@
    It also collapses each page's footer text (disclaimer, privacy, last reviewed, sources) into a
    "Disclaimers and sources" dropdown, so tools write a plain <footer> and get the same control.
    It also makes every page installable and available offline: it adds the manifest and home-screen icon
-   links and registers /sw.js, so tools add nothing of their own for that either. */
+   links and registers /sw.js, so tools add nothing of their own for that either.
+   It also remembers, on this device only, which tool was last open and what was on screen in it, so the
+   home page can offer "Continue". Tools add nothing for this; a section is recognised by its id. */
 (function () {
   var KEY = 'bt-theme';
   var root = document.documentElement;
@@ -106,6 +108,28 @@
   headTag('meta', 'name', 'theme-color', 'content', '#FBFBFA');
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', function () { navigator.serviceWorker.register('/sw.js').catch(function () {}); });
+  }
+
+  // Last-opened tool for the home page's "Continue" banner. Saved on this device only (key bt-last):
+  // the tool's slug and the ids of the elements that had reached the top of the screen when the page was left.
+  var slug = location.pathname.split('/')[1] || '';
+  if (slug && slug.indexOf('.') < 0) {
+    var remember = function () {
+      try {
+        var ids = [], els = document.querySelectorAll('[id]'), mid = 140; // px from the top: a section counts once its start has reached the top of the screen
+        for (var i = 0; i < els.length; i++) {
+          if (!els[i].getClientRects().length) continue;
+          var top = Math.round(els[i].getBoundingClientRect().top);
+          if (top < mid) ids.push([els[i].id, top, i]);
+        }
+        // Furthest down the page last; of two side by side, the first one last (the home page reads from the end).
+        ids.sort(function (a, b) { return a[1] - b[1] || b[2] - a[2]; });
+        localStorage.setItem('bt-last', JSON.stringify({ s: slug, ids: ids.slice(-40).map(function (x) { return x[0]; }) }));
+      } catch (e) {}
+    };
+    window.addEventListener('pagehide', remember);
+    document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'hidden') remember(); });
+    window.addEventListener('load', remember);
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', ready); else ready();
