@@ -106,6 +106,64 @@ td{padding:9px 6px;border-bottom:1px solid var(--line);vertical-align:top}
 .detail .ter{font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:.06em;margin-bottom:8px}
 .closebar{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
 
+/* ---- visual guides (Read tab) ---- */
+.figchips{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.figchip{min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--accent);font-size:14px;font-weight:500}
+.figchip[aria-pressed=true]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.rowfig{display:flex;align-items:center;justify-content:space-between;gap:6px;width:100%;min-height:44px;text-align:left;color:var(--accent);font-weight:500}
+.rowfig::after{content:"›";font-size:18px;line-height:1}
+tr:has(.rowfig[aria-pressed=true]) td{background:var(--fill)}
+#figwrap{position:fixed;inset:0;background:var(--scrim);z-index:30;display:flex;align-items:flex-end}
+#figsheet{background:var(--bg);width:100%;max-height:92vh;overflow:auto;border-radius:18px 18px 0 0;padding:14px 16px calc(16px + env(safe-area-inset-bottom))}
+#figsheet h3,#figpanel h3{font-size:19px;margin-top:2px}
+#figsheet .closebar,#figpanel .closebar{gap:12px;align-items:flex-start}
+#figsheet .closebar>div{min-width:0}
+#figsheet .closebar .btn{flex:none}
+.fig{display:block;width:100%;height:auto;border-radius:10px}
+.fig.plain{background:var(--fill)}
+.fig .tr{fill:none;stroke:var(--ecg-ink);stroke-width:1.7;stroke-linejoin:round;stroke-linecap:round}
+.fig.plain .tr{stroke:var(--ink)}
+.fig .an{fill:none;stroke:var(--accent);stroke-width:1.6}
+.fig .dash{stroke-dasharray:5 4}
+.fig .dotf{fill:var(--accent)}
+.fig .fl{font-family:var(--mono);font-size:12px;font-weight:500;fill:var(--accent);paint-order:stroke;stroke:var(--ecg-paper);stroke-width:3.5px;stroke-linejoin:round}
+.fig .fl.k{fill:var(--ecg-ink)}
+.fig .fl2{font-family:var(--mono);font-size:12px;font-weight:500;fill:var(--accent)}
+.fig .fl2.k{fill:var(--muted)}
+.fig .fl2.w{fill:var(--warn)}
+.fig .ax{fill:none;stroke:var(--muted);stroke-width:1.2}
+.fig .vec{stroke:var(--accent);stroke-width:4;stroke-linecap:round;fill:none}
+.figbody{display:grid;gap:12px;margin-top:4px}
+.fpair{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.fcell{display:grid;gap:6px;align-content:start}
+.fcell figcaption b,.frow b{display:block;font-size:15px}
+.fcell figcaption span,.frow span{display:block;font-size:14px;color:var(--muted)}
+.frow{display:grid;grid-template-columns:150px 1fr;gap:12px;align-items:center}
+.figpts{margin:12px 0 0 20px;display:grid;gap:6px;font-size:15px;line-height:1.45}
+.figsrc{font-size:12.5px;color:var(--muted);margin-top:10px}
+.fignav{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:12px}
+.fignav .mono{font-size:12px;color:var(--muted)}
+.lmap{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.lmap span{height:48px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:15px;font-weight:500;background:var(--fill);color:var(--muted)}
+.lmap .g1,.lleg i.g1{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.lmap .g2,.lleg i.g2{background:var(--warn);color:var(--accent-ink);border-color:var(--warn)}
+.lmap .g3,.lleg i.g3{background:var(--ok);color:var(--accent-ink);border-color:var(--ok)}
+.lleg{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13.5px;color:var(--muted)}
+.lleg span{display:flex;align-items:center;gap:6px}
+.lleg i{width:12px;height:12px;border-radius:3px;background:var(--fill);border:1px solid var(--line)}
+#figpanel{display:none}
+@media (min-width:980px){
+  body:has(#v-read.on) .wrap{max-width:1180px}
+  #v-read.on{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:32px;align-items:start}
+  #figpanel{display:block;position:sticky;top:16px;margin:12px 0 0;padding:20px;max-height:calc(100vh - 110px);overflow:auto}
+  #figpanel h3{font-size:22px}
+  #figpanel .figpts{font-size:16px}
+  .also{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:8px}
+  .also button{display:grid;gap:6px;align-content:start;text-align:left;border:1px solid var(--line);border-radius:10px;padding:8px;background:var(--card);min-height:44px}
+  .alsofig{display:block;max-height:96px;overflow:hidden;border-radius:6px;pointer-events:none}
+  .alsot{font-size:13.5px;color:var(--accent);font-weight:500}
+}
+
 /* ---- call tab ---- */
 .q{margin:14px 0}
 .q .kicker{margin-bottom:6px}
@@ -156,15 +214,16 @@ a:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible,s
 
 <!-- ================= READ ================= -->
 <section class="view on" id="v-read">
+<div class="readmain">
   <p class="kicker">Method</p>
   <h2 id="read">The 60-second occlusion read</h2>
-  <p class="muted" style="margin:6px 0 12px;font-size:15px">Fixed order, every tracing, before the computer interpretation is consulted. The question is <i>occlusion</i>, not whether a millimetre threshold is met.</p>
+  <p class="muted" style="margin:6px 0 12px;font-size:15px">Fixed order, every tracing, before the computer interpretation is consulted. The question is <i>occlusion</i>, not whether a millimetre threshold is met. Tap a label to see what to look for.</p>
   <div class="card">
-    <div class="rule"><span class="num">1</span><div><b>Context</b><p>Symptoms present or resolved; onset time; prior ECG on screen. Rate, rhythm, QRS width. Wide QRS or paced → Sgarbossa rules apply.</p></div></div>
-    <div class="rule"><span class="num">2</span><div><b>ST in every lead</b><p>Measure at the J point against the TP segment. Elevation: which contiguous group. Depression maximal V1–V4 → posterior OMI until excluded.</p></div></div>
-    <div class="rule"><span class="num">3</span><div><b>T wave and QRS</b><p>T wave bulky relative to its own QRS → hyperacute. Biphasic or deep symmetric inversion V2–V3, pain-free → Wellens. Loss of R, terminal QRS distortion → LAD occlusion over early repolarisation.</p></div></div>
-    <div class="rule"><span class="num">4</span><div><b>Reciprocity</b><p>STE with reciprocal STD is occlusion until proven otherwise. aVL depression is the earliest inferior clue. No reciprocal change → consider mimic.</p></div></div>
-    <div class="rule"><span class="num">5</span><div><b>Decide, then repeat</b><p>Pattern + symptoms → call. Uncertain → V7–V9, V4R, repeat ECG in 15 min. Troponin confirms; it does not gate the call.</p></div></div>
+    <div class="rule"><span class="num">1</span><div><b>Context</b><p>Symptoms present or resolved; onset time; prior ECG on screen. Rate, rhythm, QRS width. Wide QRS or paced → Sgarbossa rules apply.</p><div class="figchips"><button type="button" class="figchip" data-fig="rate" aria-pressed="false">Rate</button><button type="button" class="figchip" data-fig="rhythm" aria-pressed="false">Rhythm</button><button type="button" class="figchip" data-fig="qrs" aria-pressed="false">QRS width</button><button type="button" class="figchip" data-fig="sgarbossa" aria-pressed="false">Sgarbossa</button></div></div></div>
+    <div class="rule"><span class="num">2</span><div><b>ST in every lead</b><p>Measure at the J point against the TP segment. Elevation: which contiguous group. Depression maximal V1–V4 → posterior OMI until excluded.</p><div class="figchips"><button type="button" class="figchip" data-fig="jpoint" aria-pressed="false">J point</button><button type="button" class="figchip" data-fig="groups" aria-pressed="false">Lead groups</button><button type="button" class="figchip" data-fig="posterior" aria-pressed="false">Posterior clue</button></div></div></div>
+    <div class="rule"><span class="num">3</span><div><b>T wave and QRS</b><p>T wave bulky relative to its own QRS → hyperacute. Biphasic or deep symmetric inversion V2–V3, pain-free → Wellens. Loss of R, terminal QRS distortion → LAD occlusion over early repolarisation.</p><div class="figchips"><button type="button" class="figchip" data-fig="hyperacute" aria-pressed="false">Hyperacute T</button><button type="button" class="figchip" data-fig="wellens" aria-pressed="false">Wellens</button><button type="button" class="figchip" data-fig="tqrsd" aria-pressed="false">QRS distortion</button></div></div></div>
+    <div class="rule"><span class="num">4</span><div><b>Reciprocity</b><p>STE with reciprocal STD is occlusion until proven otherwise. aVL depression is the earliest inferior clue. No reciprocal change → consider mimic.</p><div class="figchips"><button type="button" class="figchip" data-fig="vector" aria-pressed="false">Injury vector</button><button type="button" class="figchip" data-fig="mimic" aria-pressed="false">Occlusion vs mimic</button></div></div></div>
+    <div class="rule"><span class="num">5</span><div><b>Decide, then repeat</b><p>Pattern + symptoms → call. Uncertain → V7–V9, V4R, repeat ECG in 15 min. Troponin confirms; it does not gate the call.</p><div class="figchips"><button type="button" class="figchip" data-fig="extra" aria-pressed="false">Extra leads</button></div></div></div>
     <details class="why"><summary>Why reciprocal depression is the discriminator</summary>
       <p>Transmural injury produces a current that points toward the infarcting wall. Leads viewing from the opposite side record the same vector pointing away from them: depression. Pericarditis and early repolarisation inflame or repolarise diffusely and have no single injury vector, so they rarely produce reciprocal depression outside aVR and V1.</p>
       <p>Corollary: an inferior STE pattern with depression in aVL is not pericarditis.</p>
@@ -173,31 +232,35 @@ a:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible,s
 
   <p class="kicker" style="margin-top:20px">Fourth Universal Definition of MI (2018)</p>
   <h2 id="thresholds">ST-elevation thresholds at the J point</h2>
+  <p class="muted" style="margin-top:4px;font-size:14px">Tap a row to see that threshold on a beat.</p>
   <div class="card">
     <table>
       <tr><th>Leads</th><th>Threshold</th><th>Note</th></tr>
-      <tr><td>Two contiguous leads, except V2–V3</td><td class="mono">≥ 1.0 mm</td><td>Limb, V1, V4–V6</td></tr>
-      <tr><td>V2–V3, men ≥ 40 y</td><td class="mono">≥ 2.0 mm</td><td></td></tr>
-      <tr><td>V2–V3, men &lt; 40 y</td><td class="mono">≥ 2.5 mm</td><td>Higher baseline STE</td></tr>
-      <tr><td>V2–V3, women</td><td class="mono">≥ 1.5 mm</td><td>Any age</td></tr>
-      <tr><td>V7–V9 (posterior)</td><td class="mono">≥ 0.5 mm</td><td>≥ 1 mm men &lt; 40 y</td></tr>
-      <tr><td>V3R–V4R (right)</td><td class="mono">≥ 0.5 mm</td><td>≥ 1 mm men &lt; 30 y</td></tr>
+      <tr><td><button type="button" class="rowfig" data-fig="thr0" aria-pressed="false"><span>Two contiguous leads, except V2–V3</span></button></td><td class="mono">≥ 1.0 mm</td><td>Limb, V1, V4–V6</td></tr>
+      <tr><td><button type="button" class="rowfig" data-fig="thr1" aria-pressed="false"><span>V2–V3, men ≥ 40 y</span></button></td><td class="mono">≥ 2.0 mm</td><td></td></tr>
+      <tr><td><button type="button" class="rowfig" data-fig="thr2" aria-pressed="false"><span>V2–V3, men &lt; 40 y</span></button></td><td class="mono">≥ 2.5 mm</td><td>Higher baseline STE</td></tr>
+      <tr><td><button type="button" class="rowfig" data-fig="thr3" aria-pressed="false"><span>V2–V3, women</span></button></td><td class="mono">≥ 1.5 mm</td><td>Any age</td></tr>
+      <tr><td><button type="button" class="rowfig" data-fig="thr4" aria-pressed="false"><span>V7–V9 (posterior)</span></button></td><td class="mono">≥ 0.5 mm</td><td>≥ 1 mm men &lt; 40 y</td></tr>
+      <tr><td><button type="button" class="rowfig" data-fig="thr5" aria-pressed="false"><span>V3R–V4R (right)</span></button></td><td class="mono">≥ 0.5 mm</td><td>≥ 1 mm men &lt; 30 y</td></tr>
     </table>
     <details class="why"><summary>Why V2–V3 are different</summary><p>Young men carry 1–2 mm of concave anterior STE as a normal variant. The threshold rises so the rule does not fire on physiology; women have less baseline STE, so the bar is lower. The criteria assume no LBBB, paced rhythm, or LVH; in those settings use the Smith-modified Sgarbossa criteria (Call tab).</p></details>
   </div>
 
   <p class="kicker" style="margin-top:20px">Localisation</p>
   <h2 id="territories">Leads → territory → probable culprit</h2>
+  <p class="muted" style="margin-top:4px;font-size:14px">Tap a row to see where it sits on the 12-lead.</p>
   <div class="card">
     <table>
       <tr><th>STE in</th><th>Territory · artery</th><th>Reciprocal</th></tr>
-      <tr><td>V1–V4</td><td>Anteroseptal · LAD (proximal if aVL/V1 involved; new RBBB, AV block)</td><td>II, III, aVF</td></tr>
-      <tr><td>I, aVL, V5–V6</td><td>Lateral · diagonal, OM, distal LAD. aVL + V2 only → D1</td><td>III, aVF</td></tr>
-      <tr><td>II, III, aVF</td><td>Inferior · RCA if III &gt; II and aVL STD; LCx if II ≥ III. RV: STE V1 or V4R ≥ 0.5 mm</td><td>I, aVL</td></tr>
-      <tr><td>STD V1–V3, tall R, upright T</td><td>Posterior · LCx or distal RCA; V7–V9 confirm</td><td>(these are the reciprocal leads)</td></tr>
-      <tr><td>aVR with diffuse STD</td><td>Global subendocardial · LM, proximal LAD, 3-vessel, or supply–demand</td><td>I, II, V4–V6</td></tr>
+      <tr><td><button type="button" class="rowfig" data-fig="terr0" aria-pressed="false"><span>V1–V4</span></button></td><td>Anteroseptal · LAD (proximal if aVL/V1 involved; new RBBB, AV block)</td><td>II, III, aVF</td></tr>
+      <tr><td><button type="button" class="rowfig" data-fig="terr1" aria-pressed="false"><span>I, aVL, V5–V6</span></button></td><td>Lateral · diagonal, OM, distal LAD. aVL + V2 only → D1</td><td>III, aVF</td></tr>
+      <tr><td><button type="button" class="rowfig" data-fig="terr2" aria-pressed="false"><span>II, III, aVF</span></button></td><td>Inferior · RCA if III &gt; II and aVL STD; LCx if II ≥ III. RV: STE V1 or V4R ≥ 0.5 mm</td><td>I, aVL</td></tr>
+      <tr><td><button type="button" class="rowfig" data-fig="terr3" aria-pressed="false"><span>STD V1–V3, tall R, upright T</span></button></td><td>Posterior · LCx or distal RCA; V7–V9 confirm</td><td>(these are the reciprocal leads)</td></tr>
+      <tr><td><button type="button" class="rowfig" data-fig="terr4" aria-pressed="false"><span>aVR with diffuse STD</span></button></td><td>Global subendocardial · LM, proximal LAD, 3-vessel, or supply–demand</td><td>I, II, V4–V6</td></tr>
     </table>
   </div>
+</div>
+<aside id="figpanel" class="card" aria-label="Figure"></aside>
 </section>
 
 <!-- ================= PATTERNS ================= -->
@@ -293,6 +356,9 @@ a:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible,s
   <div class="toolbar"><button class="btn primary" id="pnext">Next case</button></div>
 </section>
 
+<!-- ================= FIGURE SHEET (phone) ================= -->
+<div id="figwrap" hidden><div id="figsheet" role="dialog" aria-modal="true" aria-labelledby="figtitle"></div></div>
+
 <!-- ================= ZOOM MODAL ================= -->
 <div id="zoomwrap" hidden style="position:fixed;inset:0;background:var(--scrim);z-index:30;display:flex;align-items:flex-end">
   <div style="background:var(--bg);width:100%;max-height:92vh;overflow:auto;border-radius:18px 18px 0 0;padding:12px 16px calc(16px + env(safe-area-inset-bottom))">
@@ -307,7 +373,7 @@ a:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible,s
 <footer>
   <p><b>For education only. Not a substitute for clinical judgment.</b> Activation criteria and call pathways are institution-specific: adjust to your cath lab's protocol. All tracings are synthetic, generated in the browser from parametric waveforms; no patient data were used.</p>
   <p style="margin-top:6px">Privacy: everything runs in your browser. Nothing you enter is sent anywhere or stored, and there are no analytics; only your light/dark choice is saved on this device. Do not enter names, record numbers, or dates of birth.</p>
-  <p style="margin-top:6px"><b>Last reviewed:</b> 2026-11-11. <b>Sources:</b> Rao SV et al., 2025 ACC/AHA/ACEP/NAEMSP/SCAI Guideline for ACS, Circulation 2025;151:e771 (timing tiers, shock, arrest, fibrinolysis; class of recommendation shown); Thygesen K et al., Fourth Universal Definition of MI, Circulation 2018 (thresholds); Kontos MC et al., 2022 ACC ECDP on acute chest pain in the ED, JACC 2022 (named STEMI equivalents); Smith SW et al., Ann Emerg Med 2012 (modified Sgarbossa); de Winter RJ et al., NEJM 2008; de Zwaan C et al., Am Heart J 1982 (Wellens); Meyers HP et al., JACC Adv 2025 (hyperacute T); COACT 2019, TOMAHAWK 2021, CULPRIT-SHOCK 2017, IABP-SHOCK II 2012, DanGer Shock 2024, OAT 2006; AHA ACLS 2020 / 2023 update. Mimic "tells" and hyperacute-T activation thresholds are expert practice.</p>
+  <p style="margin-top:6px"><b>Last reviewed:</b> 2026-11-12. <b>Sources:</b> Rao SV et al., 2025 ACC/AHA/ACEP/NAEMSP/SCAI Guideline for ACS, Circulation 2025;151:e771 (timing tiers, shock, arrest, fibrinolysis; class of recommendation shown); Thygesen K et al., Fourth Universal Definition of MI, Circulation 2018 (thresholds); Kontos MC et al., 2022 ACC ECDP on acute chest pain in the ED, JACC 2022 (named STEMI equivalents); Smith SW et al., Ann Emerg Med 2012 (modified Sgarbossa); de Winter RJ et al., NEJM 2008; de Zwaan C et al., Am Heart J 1982 (Wellens); Lee DH, Walsh B, Smith SW, Am J Emerg Med 2016 (terminal QRS distortion); Surawicz B et al., AHA/ACCF/HRS recommendations for the standardization and interpretation of the ECG, part III, 2009 (QRS duration); Meyers HP et al., JACC Adv 2025 (hyperacute T); COACT 2019, TOMAHAWK 2021, CULPRIT-SHOCK 2017, IABP-SHOCK II 2012, DanGer Shock 2024, OAT 2006; AHA ACLS 2020 / 2023 update. Mimic "tells" and hyperacute-T activation thresholds are expert practice.</p>
 </footer>
 </main>
 
@@ -550,6 +616,146 @@ function answer(b){if(pc.phase!==0)return; pc.phase=1; const ok=b.dataset.id===p
 function answerTier(b){if(pc.phase!==1)return; pc.phase=2; const ok=b.dataset.t===pc.p.tier; $$("#tchoices button").forEach(x=>{x.disabled=true; if(x.dataset.t===pc.p.tier)x.classList.add("ok"); else if(x===b&&!ok)x.classList.add("bad")});
   $("#pfb").innerHTML=`<div class="card"><p class="kicker">${pc.p.cat} · ${pc.p.ter}</p><h3>${pc.p.name}</h3><ul class="tell">${pc.p.tell.map(t=>`<li>${t}</li>`).join("")}</ul><div class="callbox"><p class="kicker">Call</p><p>${pc.p.call}</p></div><details class="why"><summary>Why</summary><p>${pc.p.why}</p></details><div class="toolbar"><button class="btn" id="showhl">Show highlighted leads</button></div></div>`;
   $("#showhl").addEventListener("click",()=>{$("#ptrace").innerHTML=`<div class="ecg">${render12(pc.d,{highlight:PAT[pc.id].ann})}<span class="cap">25 mm/s · 10 mm/mV</span></div>`; attachLeadTaps($("#ptrace"),pc.d); $("#ptrace").scrollIntoView({behavior:"smooth"})}); $("#pfb").scrollIntoView({behavior:"smooth",block:"nearest"});}
+/* ===================== visual guides (Read tab) ===================== */
+/* Every figure is drawn by the same waveform model as the tracings (leadSignal), so shapes match the pattern library. */
+const P_=(lead,over)=>Object.assign({},BASE[lead],over||{});
+const PL=(pat,lead)=>Object.assign({},BASE[lead],PAT[pat].all||{},(PAT[pat].leads||{})[lead]||{});
+function sigOf(prm,q,dur,ps,post){const fs=500,n=Math.round(dur*fs),t=new Float32Array(n);for(let i=0;i<n;i++)t[i]=i/fs;
+  const y=leadSignal(t,q,ps||q.map(x=>x-.16),prm); if(post)for(let i=0;i<n;i++)y[i]+=post(t[i]); return {t,y,fs,at:x=>y[Math.max(0,Math.min(n-1,Math.round(x*fs)))]};}
+function pathOf(s,X,Y){let d="";for(let i=0;i<s.t.length;i++)d+=(i?"L":"M")+X(s.t[i]).toFixed(1)+" "+Y(s.y[i]).toFixed(1);return `<path class="tr" d="${d}"/>`;}
+const fl=(x,y,txt,a="middle",cls="")=>`<text class="fl ${cls}" x="${x.toFixed(1)}" y="${y.toFixed(1)}" text-anchor="${a}">${txt}</text>`;
+const vbr=(x,y1,y2)=>`<path class="an" d="M${x} ${y1.toFixed(1)}V${y2.toFixed(1)}M${x-5} ${y1.toFixed(1)}h10M${x-5} ${y2.toFixed(1)}h10"/>`;
+const hbr=(x1,x2,y)=>`<path class="an" d="M${x1.toFixed(1)} ${y}H${x2.toFixed(1)}M${x1.toFixed(1)} ${y-5}v10M${x2.toFixed(1)} ${y-5}v10"/>`;
+const jm=(c,k,v,txt,w)=>{const xj=c.X(c.J(k)),yj=c.Y(v),bx=c.X(c.on(k))-18;return `<path class="an dash" d="M0 ${c.Y(0)}H${w}"/><path class="an dash" d="M${bx} ${yj.toFixed(1)}H${xj.toFixed(1)}"/>`+dot(xj,yj)+vbr(bx,c.Y(0),yj)+fl(bx,Math.min(yj,c.Y(0))-9,txt);};
+const dot=(x,y)=>`<circle class="dotf" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="4.5"/>`;
+/* one strip on ECG paper. o: {w,h,yb,mm,q,dur,ps,post,ann(c),label,flip} ; c gives X,Y,s and landmark times for beat k */
+function strip(prm,o){const mm=o.mm||8,q=o.q||[.3],dur=o.dur||o.w/(25*mm),X=t=>t*25*mm,Y=v=>o.yb-v*10*mm,s=sigOf(prm,q,dur,o.ps,o.post),w=prm.qrsw||1;
+  const c={X,Y,s,mm,q,J:k=>q[k]+.085*w+.02,R:k=>q[k]+.035*w,S:k=>q[k]+.06*w,T:k=>q[k]+.085*w+.19,Pw:k=>q[k]-.16,on:k=>q[k],off:k=>q[k]+.085*w};
+  const tr=o.flip?`<g transform="translate(0 ${o.h}) scale(1 -1)">${pathOf(s,X,Y)}</g>`:pathOf(s,X,Y);
+  return `<svg class="fig" viewBox="0 0 ${o.w} ${o.h}" role="img" aria-label="${o.label}">${gridRect(0,0,o.w,o.h,mm)}${tr}${o.ann?o.ann(c):""}</svg>`;}
+const cap=(svg,t,sub)=>`<figure class="fcell">${svg}<figcaption><b>${t}</b>${sub?`<span>${sub}</span>`:""}</figcaption></figure>`;
+const pair=(a,b)=>`<div class="fpair">${a}${b}</div>`;
+
+/* 12-lead map: which leads belong together */
+const MAP=[["I","aVR","V1","V4"],["II","aVL","V2","V5"],["III","aVF","V3","V6"]];
+function leadMap(groups,legend){ // groups: {lead: className}
+  return `<div class="lmap" role="img" aria-label="12-lead layout with lead groups shaded">${MAP.flat().map(L=>`<span class="${groups[L]||"none"}">${L}</span>`).join("")}</div><div class="lleg">${legend.map(([c,t])=>`<span><i class="${c}"></i>${t}</span>`).join("")}</div>`;}
+
+const FIG_SRC={std:"AHA/ACCF/HRS recommendations for the standardization and interpretation of the ECG, 2009",udmi:"Fourth Universal Definition of MI, 2018",smith:"Smith SW et al., Ann Emerg Med 2012",lee:"Lee DH, Walsh B, Smith SW, Am J Emerg Med 2016",dez:"de Zwaan C et al., Am Heart J 1982",mey:"Meyers HP et al., JACC Adv 2025",phys:"Injury-current physiology; see the Why panel on this page"};
+const FIGS=[
+ {id:"rate",grp:"Step 1 · Context",chip:"Rate",title:"Rate: count the large boxes",src:FIG_SRC.std,
+  draw:()=>strip(P_("II"),{w:340,h:150,yb:112,q:[.25,1.05],dur:1.7,label:"Lead II, two beats four large boxes apart, rate 75 per minute",
+    ann:c=>{const x1=c.X(c.R(0)),x2=c.X(c.R(1));let s=`<path class="an dash" d="M${x1.toFixed(1)} 20V${c.Y(1.1).toFixed(1)}M${x2.toFixed(1)} 20V${c.Y(1.1).toFixed(1)}"/>`+hbr(x1,x2,28);
+      for(let k=1;k<4;k++)s+=`<path class="an" d="M${(x1+k*5*c.mm).toFixed(1)} 24v8"/>`; return s+fl((x1+x2)/2,16,"4 large boxes")+fl((x1+x2)/2,50,"300 ÷ 4 = 75/min");}}),
+  pts:["Regular rhythm: 300 ÷ the number of large boxes between two R waves.","Irregular rhythm: count the QRS complexes on the 10-second rhythm strip and multiply by 6.","Normal sinus rate is 60 to 100 per minute."]},
+ {id:"rhythm",grp:"Step 1 · Context",chip:"Rhythm",title:"Rhythm: P waves and R–R spacing",src:FIG_SRC.std,
+  draw:()=>cap(strip(P_("II"),{w:340,h:104,yb:78,q:[.22,1.02],dur:1.7,label:"Sinus rhythm: a P wave before each QRS and equal R to R intervals",
+     ann:c=>fl(c.X(c.Pw(0)),c.Y(.15)-10,"P")+fl(c.X(c.Pw(1)),c.Y(.15)-10,"P")+hbr(c.X(c.R(0)),c.X(c.R(1)),14)+fl((c.X(c.R(0))+c.X(c.R(1)))/2,32,"equal R–R")}),"Sinus rhythm","A P wave before every QRS, constant PR, even spacing.")
+   +cap(strip(P_("II",{p:0}),{w:340,h:104,yb:78,q:[.12,.56,1.22,1.5],ps:[],dur:1.7,post:t=>.035*Math.sin(2*Math.PI*6.3*t)+.022*Math.sin(2*Math.PI*9.1*t+1),label:"Atrial fibrillation: no P waves and unequal R to R intervals",
+     ann:c=>hbr(c.X(c.R(0)),c.X(c.R(1)),14)+hbr(c.X(c.R(1)),c.X(c.R(2)),14)+fl(c.X(.9),32,"unequal R–R")+fl(c.X(.9),c.Y(-.22),"no P waves")}),"Atrial fibrillation","Irregularly irregular, with a wavy baseline in place of P waves."),
+  pts:["Look for an upright P wave in lead II before every QRS, at a constant PR interval.","Irregularly irregular with no P waves is atrial fibrillation.","March out the R–R intervals with calipers or the edge of a sheet of paper."]},
+ {id:"qrs",grp:"Step 1 · Context",chip:"QRS width",title:"QRS width: under or over 3 small boxes",src:FIG_SRC.std,
+  draw:()=>{const one=(w,txt,lbl)=>strip(P_("V5",{qrsw:w,notch:w>1?.5:0,t:w>1?-.3:.4}),{w:168,h:150,yb:104,q:[.28],label:lbl,ann:c=>hbr(c.X(c.on(0)),c.X(c.off(0)),128)+fl((c.X(c.on(0))+c.X(c.off(0)))/2,146,txt)});
+    return pair(cap(one(1,"about 80 ms","Narrow QRS, about 80 milliseconds"),"Narrow","Two small boxes."),cap(one(1.7,"about 140 ms","Wide QRS, about 140 milliseconds"),"Wide","More than three small boxes."));},
+  pts:["At 25 mm/s one small box is 40 ms and one large box is 200 ms.","Narrow QRS: under 120 ms, less than 3 small boxes.","Wide QRS (120 ms or more): bundle branch block, paced or ventricular rhythm. The usual ST criteria do not apply; use the Sgarbossa rules."]},
+ {id:"sgarbossa",grp:"Step 1 · Context",chip:"Sgarbossa",title:"Smith-modified Sgarbossa rules",src:FIG_SRC.smith,
+  draw:()=>{const row=(svg,t,d)=>`<div class="frow">${svg}<div><b>${t}</b><span>${d}</span></div></div>`;
+    const a=strip({p:.08,q:0,r:1.0,s:0,t:.25,notch:.45,qrsw:1.7,st_j:.15,st_t:.18},{w:150,h:120,mm:6,yb:92,q:[.28],label:"Positive QRS with ST elevation in the same direction",ann:c=>dot(c.X(c.J(0)),c.Y(c.s.at(c.J(0))))+fl(c.X(c.J(0))+8,c.Y(.15)-10,"ST up","start")});
+    const b=strip({p:.05,q:0,r:.15,s:1.3,t:-.2,qrsw:1.7,st_j:-.15,st_t:-.15},{w:150,h:120,mm:6,yb:30,q:[.28],label:"Negative QRS with ST depression in the same direction",ann:c=>dot(c.X(c.J(0)),c.Y(c.s.at(c.J(0))))+fl(c.X(c.J(0))+8,c.Y(-.15)+20,"ST down","start")});
+    const d=strip({p:.05,q:0,r:.15,s:1.2,t:.6,qrsw:1.7,st_j:.45,st_t:.5},{w:150,h:156,mm:6,yb:76,q:[.28],label:"Negative QRS with ST elevation of 4.5 millimetres over an S wave of 12 millimetres",
+      ann:c=>vbr(c.X(c.S(0))-16,c.Y(0),c.Y(-1.2))+fl(c.X(c.S(0))-24,c.Y(-.75),"S 12","end")+vbr(c.X(c.J(0))+14,c.Y(0),c.Y(.45))+fl(c.X(c.J(0))+22,c.Y(.2)+4,"ST 4.5","start")});
+    return row(a,"Concordant ST elevation","≥ 1 mm in any lead. The ST segment and the QRS point the same way.")+row(b,"Concordant ST depression","≥ 1 mm in V1, V2 or V3.")+row(d,"Excessively discordant ST elevation","≥ 25% of the S wave before it. Here 4.5 ÷ 12 = 38%.");},
+  pts:["In left bundle branch block or a paced rhythm, the ST segment normally points away from the QRS (discordant).","Any one of the three findings is positive.","The calculator is on the Call tab."],link:{view:"call",id:"sgarbossa",text:"Open the calculator"}},
+ {id:"jpoint",grp:"Step 2 · ST in every lead",chip:"J point",title:"J point and baseline",src:FIG_SRC.udmi,
+  draw:()=>strip({p:.1,q:0,r:.9,s:.25,t:.42,tw:.06,st_j:.3,st_t:.33},{w:340,h:200,yb:150,q:[.3,1.2],dur:1.7,label:"One beat with 3 millimetres of ST elevation measured at the J point against the TP segment",
+    ann:c=>jm(c,0,.3,"3 mm",340)+fl(c.X(c.J(0))+34,c.Y(0)+20,"J point")+`<path class="an" d="M${(c.X(c.J(0))+14).toFixed(1)} ${c.Y(0)+8}L${(c.X(c.J(0))+3).toFixed(1)} ${(c.Y(.3)+6).toFixed(1)}"/>`+fl(c.X(.95),c.Y(0)+20,"TP segment")}),
+  pts:["The J point is where the QRS ends and the ST segment begins.","Measure it against the flat TP segment between beats. If the baseline wanders, use the start of the QRS.","One small box is 1 mm, or 0.1 mV."]},
+ {id:"groups",grp:"Step 2 · ST in every lead",chip:"Lead groups",title:"Contiguous lead groups",src:FIG_SRC.udmi,
+  draw:()=>leadMap({II:"g1",III:"g1",aVF:"g1",I:"g2",aVL:"g2",V1:"g3",V2:"g3",V3:"g3",V4:"g3",V5:"g3",V6:"g3"},[["g1","Inferior: II, III, aVF"],["g2","Lateral: I, aVL"],["g3","Anterior: V1 to V6"],["none","aVR stands alone"]]),
+  pts:["Contiguous leads look at the same wall. ST elevation counts when it is in two contiguous leads.","Chest leads are contiguous with their neighbours: V1 with V2, V2 with V3, and so on.","Common teaching split of the chest leads: V1–V2 septal, V3–V4 anterior, V5–V6 lateral."]},
+ {id:"posterior",grp:"Step 2 · ST in every lead",chip:"Posterior clue",title:"ST depression in V1–V4: think posterior",src:FIG_SRC.udmi,
+  draw:()=>{const o={w:168,h:160,mm:6,yb:112,q:[.28]};return pair(cap(strip(PL("posterior_omi","V2"),Object.assign({label:"Lead V2 with horizontal ST depression, a tall R wave and an upright T wave"},o)),"V2 as recorded","Horizontal depression, tall R, upright T."),cap(strip(PL("posterior_omi","V2"),Object.assign({flip:true,label:"The same V2 flipped upside down, resembling ST elevation with a Q wave"},o)),"The same beat, flipped","Now it reads as ST elevation with a Q wave."));},
+  pts:["V1 to V4 see the posterior wall from the front, so its ST elevation is recorded upside down.","Depression that is maximal in V1–V4 is posterior occlusion until excluded.","Confirm with leads V7 to V9: 0.5 mm of elevation or more."]},
+ {id:"hyperacute",grp:"Step 3 · T wave and QRS",chip:"Hyperacute T",title:"Hyperacute T wave",src:FIG_SRC.mey,
+  draw:()=>{const o={w:168,h:170,mm:6,yb:92,q:[.28]};return pair(cap(strip(P_("V3"),Object.assign({label:"Normal V3 with a T wave smaller than its QRS"},o)),"Normal V3","The T wave is modest next to its QRS."),cap(strip(PL("hyperacute_t","V3"),Object.assign({label:"V3 with a broad, tall, symmetric T wave that towers over its QRS"},o)),"Hyperacute","Broad, bulky and symmetric; towers over the R wave."));},
+  pts:["Judge the T wave against its own QRS, not by its height in millimetres.","It can be the first sign of occlusion, before the ST segment rises.","If in doubt, repeat the ECG in 15 minutes."]},
+ {id:"wellens",grp:"Step 3 · T wave and QRS",chip:"Wellens",title:"Wellens patterns in V2–V3",src:FIG_SRC.dez,
+  draw:()=>{const o={w:168,h:170,mm:6,yb:86,q:[.28]};return pair(cap(strip(PL("wellens_a","V3"),Object.assign({label:"Biphasic T wave in V3: up, then down"},o)),"Type A","Biphasic: up, then down."),cap(strip(PL("wellens_b","V3"),Object.assign({label:"Deep symmetric T wave inversion in V3"},o)),"Type B","Deep, symmetric inversion."));},
+  pts:["Seen when the pain has gone, with R waves preserved and little or no ST elevation.","It marks a critical proximal LAD lesion that has reperfused.","Angiography within 24 hours; no stress test."]},
+ {id:"tqrsd",grp:"Step 3 · T wave and QRS",chip:"QRS distortion",title:"Terminal QRS distortion",src:FIG_SRC.lee,
+  draw:()=>{const o={w:168,h:170,mm:6,yb:104,q:[.28]};return pair(cap(strip(P_("V3",{s:0,st_j:.35,st_t:.45,t:.6,tw:.06}),Object.assign({label:"V3 with ST elevation rising straight from the R wave, with no S wave and no J wave",ann:c=>fl(c.X(c.on(0))+2,c.Y(0)+22,"no S, no J","start")},o)),"LAD occlusion","The ST segment takes off straight from the R wave."),cap(strip(PL("early_repol","V3"),Object.assign({label:"V3 in early repolarisation, with a preserved S wave and a notch at the J point",ann:c=>fl(c.X(c.S(0))+16,c.Y(-1.0),"S wave","start")+fl(c.X(c.J(0))+34,c.Y(0)+22,"J notch")+`<path class="an" d="M${(c.X(c.J(0))+14).toFixed(1)} ${c.Y(0)+10}L${(c.X(c.J(0))-6).toFixed(1)} ${(c.Y(.3)).toFixed(1)}"/>`},o)),"Early repolarisation","Keeps its S wave or a J-point notch."));},
+  pts:["Terminal QRS distortion: no S wave and no J wave in V2 or V3.","In one series it was absent in all 171 cases of benign early repolarisation.","Anterior ST elevation with this finding is LAD occlusion, not early repolarisation."]},
+ {id:"vector",grp:"Step 4 · Reciprocity",chip:"Injury vector",title:"Why opposite leads show depression",src:FIG_SRC.phys,
+  draw:()=>{const cx=112,cy=112,r=74,pt=(deg,k=1)=>[cx+r*k*Math.cos(deg*Math.PI/180),cy+r*k*Math.sin(deg*Math.PI/180)];
+    const ax=[["I",0],["II",60],["aVF",90],["III",120],["aVR",-150],["aVL",-30]];
+    let s=`<svg class="fig plain" viewBox="0 0 340 224" role="img" aria-label="Frontal-plane lead directions with an inferior injury vector pointing toward lead III and away from aVL"><circle class="ax" cx="${cx}" cy="${cy}" r="${r}"/>`;
+    ax.forEach(([L,d])=>{const [x,y]=pt(d),[lx,ly]=pt(d,1.22);const cls=L==="III"?"":L==="aVL"?"w":"k";s+=`<path class="ax" d="M${cx} ${cy}L${x.toFixed(1)} ${y.toFixed(1)}"/><text class="fl2 ${cls}" x="${lx.toFixed(1)}" y="${(ly+4).toFixed(1)}" text-anchor="middle">${L}</text>`;});
+    const [vx,vy]=pt(112,.86);s+=`<path class="vec" d="M${cx} ${cy}L${vx.toFixed(1)} ${vy.toFixed(1)}"/><circle class="dotf" cx="${vx.toFixed(1)}" cy="${vy.toFixed(1)}" r="6"/><text class="fl2" x="${cx+10}" y="${cy-8}" text-anchor="start">injury</text>`;
+    const mini=(prm,y0,L,txt,cls)=>{const X=t=>236+t*25*4.4,Y=v=>y0-v*44;return pathOf(sigOf(prm,[.25],.85),X,Y)+`<text class="fl2 ${cls}" x="236" y="${y0-34}" text-anchor="start">${L}: ${txt}</text>`;};
+    return s+mini(PL("inferior_stemi","III"),86,"III","ST up","")+mini(PL("inferior_stemi","aVL"),176,"aVL","ST down","w")+`</svg>`;},
+  pts:["Injury current points toward the infarcting wall. Leads that face it record ST elevation.","Leads on the opposite side see the same vector going away: ST depression.","Inferior wall: lead III faces it and aVL is opposite. Depression in aVL is the earliest inferior clue."]},
+ {id:"mimic",grp:"Step 4 · Reciprocity",chip:"Occlusion vs mimic",title:"Occlusion or pericarditis?",src:FIG_SRC.phys,
+  draw:()=>{const two=(pat,a,b,lbl)=>{const mm=5.6,w=168,h=190,X=t=>t*25*mm,ya=62,yb=150;const pa=pathOf(sigOf(PL(pat,a),[.3],w/(25*mm)),X,v=>ya-v*10*mm),pb=pathOf(sigOf(PL(pat,b),[.3],w/(25*mm)),X,v=>yb-v*10*mm);
+      return `<svg class="fig" viewBox="0 0 ${w} ${h}" role="img" aria-label="${lbl}">${gridRect(0,0,w,h,mm)}${pa}${pb}${fl(8,18,a,"start","k")}${fl(8,112,b,"start","k")}</svg>`;};
+    return pair(cap(two("inferior_stemi","III","aVL","Lead III with ST elevation above lead aVL with ST depression"),"Occlusion","III up, aVL down: reciprocal."),cap(two("pericarditis","II","aVL","Leads II and aVL both with mild concave ST elevation and PR depression"),"Pericarditis","Elevation in both; PR depression; nothing reciprocal."));},
+  pts:["Occlusion: elevation in one territory with depression in the opposite leads.","Pericarditis: widespread concave elevation with PR depression, and no reciprocal depression outside aVR and V1.","Inferior ST elevation with depression in aVL is not pericarditis."]},
+ {id:"extra",grp:"Step 5 · Decide, then repeat",chip:"Extra leads",title:"Posterior and right-sided leads",src:FIG_SRC.udmi,
+  draw:()=>{let s=`<svg class="fig plain" viewBox="0 0 340 214" role="img" aria-label="Back view showing V7, V8 and V9 across the left back at the level of V6, and front view showing V4R on the right chest">`;
+    s+=`<text class="fl2 k" x="85" y="16" text-anchor="middle">Back</text><rect class="ax" x="20" y="26" width="130" height="170" rx="26"/><path class="ax dash" d="M85 30V192"/><path class="ax" d="M36 66l32 -8l-12 54z"/><path class="an dash" d="M14 132H156"/>`;
+    [["V7",28],["V8",54],["V9",76]].forEach(([L,x])=>{s+=`<circle class="dotf" cx="${x}" cy="132" r="6"/><text class="fl2" x="${x}" y="154" text-anchor="middle">${L}</text>`;});
+    s+=`<text class="fl2 k" x="92" y="124" text-anchor="start">V6 level</text><text class="fl2 k" x="50" y="50" text-anchor="middle">scapula</text><text class="fl2 k" x="92" y="184" text-anchor="start">spine</text>`;
+    s+=`<text class="fl2 k" x="255" y="16" text-anchor="middle">Front</text><rect class="ax" x="190" y="26" width="130" height="170" rx="26"/><path class="ax dash" d="M255 30V192"/><circle class="dotf" cx="222" cy="120" r="6"/><text class="fl2" x="222" y="142" text-anchor="middle">V4R</text><circle class="ax" cx="288" cy="120" r="5"/><text class="fl2 k" x="288" y="142" text-anchor="middle">V4</text><text class="fl2 k" x="222" y="54" text-anchor="middle">right</text><text class="fl2 k" x="288" y="54" text-anchor="middle">left</text><text class="fl2 k" x="261" y="184" text-anchor="start">sternum</text>`;
+    return s+`</svg>`;},
+  pts:["V7: left posterior axillary line. V8: left mid-scapular line, at the tip of the scapula. V9: left paraspinal border. All at the same horizontal level as V6.","V4R: right fifth intercostal space in the midclavicular line, the mirror image of V4.","ST elevation of 0.5 mm or more in these leads is significant (1 mm in V7–V9 for men under 40; 1 mm in V3R–V4R for men under 30)."]}
+];
+/* threshold rows: one beat drawn at exactly the threshold */
+const THR=[
+ {mm:1.0,lead:"II",prm:P_("II"),who:"Any two contiguous leads other than V2–V3",pts:["Applies to the limb leads, V1 and V4 to V6.","Needs two contiguous leads, each at or above the threshold."]},
+ {mm:2.0,lead:"V2",prm:P_("V2",{s:1.2}),who:"V2–V3, men aged 40 or older",pts:["V2 and V3 carry more baseline ST elevation than other leads, so the bar is higher."]},
+ {mm:2.5,lead:"V2",prm:P_("V2",{s:1.2}),who:"V2–V3, men under 40",pts:["Young men often have 1 to 2 mm of concave anterior elevation as a normal variant."]},
+ {mm:1.5,lead:"V2",prm:P_("V2",{s:1.2}),who:"V2–V3, women of any age",pts:["Women have less baseline ST elevation in V2–V3, so the bar is lower."]},
+ {mm:0.5,lead:"V8",prm:{p:.05,q:.05,r:.4,s:.08,t:.12},who:"V7–V9, posterior leads",pts:["Small complexes this far from the heart: half a millimetre counts.","1 mm in men under 40."]},
+ {mm:0.5,lead:"V4R",prm:{p:.05,q:0,r:.3,s:.25,t:.1},who:"V3R–V4R, right-sided leads",pts:["Points to right ventricular infarction. Avoid nitrates.","1 mm in men under 30."]}
+];
+THR.forEach((r,i)=>FIGS.push({id:"thr"+i,grp:"ST-elevation thresholds",chip:r.who,title:`${r.who}: ≥ ${r.mm.toFixed(1)} mm`,src:FIG_SRC.udmi,
+  draw:()=>{const mm=r.mm<1?14:r.mm<=1?11:8,w=340,h=r.mm<1?150:200,yb=r.mm<1?104:(r.lead==="V2"?92:150);const q0=r.mm<1?.3:.36;
+    return strip(Object.assign({},r.prm,{st_j:r.mm/10,st_t:r.mm/10*1.1,t:Math.max(r.prm.t,r.mm/10+.12)}),{w,h,mm,yb,q:[q0],label:`Lead ${r.lead} with ${r.mm} millimetres of ST elevation at the J point`,
+      ann:c=>jm(c,0,r.mm/10,r.mm.toFixed(1)+" mm",w)+fl(12,20,r.lead,"start","k")});},
+  pts:r.pts.concat(["Measured at the J point. The criteria assume no left bundle branch block, paced rhythm or LV hypertrophy."])}));
+/* territory rows: where the elevation and the reciprocal depression sit on the 12-lead */
+const TERR=[
+ {t:"Anteroseptal · LAD",ste:["V1","V2","V3","V4"],rec:["II","III","aVF"],pat:"anterior_stemi",pts:["Elevation in aVL or V1 as well suggests a proximal LAD occlusion."]},
+ {t:"Lateral · diagonal, OM or distal LAD",ste:["I","aVL","V5","V6"],rec:["III","aVF"],pat:"lateral_stemi",pts:["Elevation in aVL and V2 alone points to the first diagonal."]},
+ {t:"Inferior · RCA or LCx",ste:["II","III","aVF"],rec:["I","aVL"],pat:"inferior_stemi",pts:["III greater than II with aVL depression: RCA. II equal to or greater than III: LCx.","Check V1 and V4R for right ventricular involvement."]},
+ {t:"Posterior · LCx or distal RCA",ste:[],rec:["V1","V2","V3"],pat:"posterior_omi",pts:["There is no elevation on the standard 12 leads: V1–V3 show the reciprocal depression.","The elevation itself is in V7–V9."]},
+ {t:"aVR with diffuse depression",ste:["aVR"],rec:["I","II","V4","V5","V6"],pat:"avr_diffuse_std",pts:["Global subendocardial ischaemia: left main, proximal LAD, three-vessel disease, or supply–demand mismatch.","Correct rate, pressure, haemoglobin and oxygenation first."]}
+];
+TERR.forEach((r,i)=>FIGS.push({id:"terr"+i,grp:"Leads → territory",chip:r.t,title:r.t,src:FIG_SRC.udmi,
+  draw:()=>{const g={};r.ste.forEach(L=>g[L]="g1");r.rec.forEach(L=>g[L]="g2");return leadMap(g,[["g1","ST elevation"],["g2","Reciprocal ST depression"]]);},
+  pts:r.pts,link:{pattern:r.pat,text:"Open the full tracing"}}));
+
+const figIx=id=>FIGS.findIndex(f=>f.id===id);
+const wide=window.matchMedia("(min-width: 980px)");
+let figCur=-1;
+function figInner(i,withAlso){const f=FIGS[i];const sibs=FIGS.map((x,j)=>j).filter(j=>FIGS[j].grp===f.grp);const pos=sibs.indexOf(i);
+  let h=`<div class="closebar"><div><p class="kicker">${f.grp}</p><h3 id="figtitle">${f.title}</h3></div>${withAlso?"":`<button class="btn" id="figclose">Close</button>`}</div><div class="figbody">${f.draw()}</div><ol class="figpts">${f.pts.map(p=>`<li>${p}</li>`).join("")}</ol>`;
+  if(f.link)h+=`<div class="toolbar"><button class="btn acc" data-figlink="${i}">${f.link.text}</button></div>`;
+  h+=`<p class="figsrc">Source: ${f.src}. Tracings are synthetic.</p>`;
+  if(sibs.length>1){ if(withAlso){h+=`<p class="kicker" style="margin-top:14px">Also in ${f.grp.replace(/^Step \d · /,"")}</p><div class="also">${sibs.filter(j=>j!==i).map(j=>`<button data-fig="${FIGS[j].id}"><span class="alsofig" aria-hidden="true">${FIGS[j].draw()}</span><span class="alsot">${FIGS[j].chip}</span></button>`).join("")}</div>`;}
+    else h+=`<div class="fignav"><button class="btn" data-fig="${FIGS[sibs[(pos-1+sibs.length)%sibs.length]].id}">‹ Back</button><span class="mono">${pos+1} of ${sibs.length}</span><button class="btn" data-fig="${FIGS[sibs[(pos+1)%sibs.length]].id}">Next ›</button></div>`;}
+  return h;}
+function openFig(id){const i=figIx(id); if(i<0)return; figCur=i;
+  $$("[data-fig]").forEach(b=>{if(b.closest("#v-read .readmain"))b.setAttribute("aria-pressed",b.dataset.fig===id)});
+  if(wide.matches){$("#figpanel").innerHTML=figInner(i,true);}
+  else{$("#figsheet").innerHTML=figInner(i,false); $("#figwrap").hidden=false; document.body.style.overflow="hidden"; $("#figsheet").scrollTop=0; const c=$("#figclose"); if(c)c.focus({preventScroll:true});}}
+function closeFig(){$("#figwrap").hidden=true; document.body.style.overflow="";}
+document.addEventListener("click",e=>{const l=e.target.closest("[data-figlink]"); if(l){const f=FIGS[+l.dataset.figlink].link; closeFig(); if(f.pattern){showView("patterns"); openPattern(f.pattern);} else {showView(f.view); requestAnimationFrame(()=>{const el=document.getElementById(f.id); if(el)el.scrollIntoView({block:"start"})});} return;}
+  const b=e.target.closest("[data-fig]"); if(b){openFig(b.dataset.fig); return;}
+  if(e.target.id==="figclose"||e.target.id==="figwrap")closeFig();});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!$("#figwrap").hidden)closeFig();});
+function figLayout(){ if(wide.matches){closeFig(); openFig(FIGS[figCur<0?figIx("jpoint"):figCur].id);} }
+wide.addEventListener("change",figLayout); figLayout();
+
 $("#pnext").addEventListener("click",newCase); newCase(); goHash();
 </script>
 </body>
