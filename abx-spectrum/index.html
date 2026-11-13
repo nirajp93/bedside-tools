@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Antibiotic Spectrum Map · bedside.tools</title>
+<meta name="description" content="What each antibiotic covers and misses, by drug, by organism, and as one grid, with the mechanism behind each gap and practice drills.">
+<script src="/theme.js"></script>
+<style>
+:root{--bg:#FBFBFA; --card:#FFFFFF; --ink:#111113; --muted:#55555D; --line:#ECECEE; --accent:#2B4BDB; --warn:#9A3B00; --warnbg:#FFF6EC}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5;padding-bottom:76px}
+.wrap{max-width:720px;margin:0 auto;padding:0 16px}
+a{color:var(--accent)}
+.back{font-size:14px;text-decoration:none;display:inline-block;min-height:44px;line-height:44px}
+h1{font-size:26px;margin:0 0 4px;letter-spacing:-.01em}
+h2{font-size:20px;margin:0;font-weight:600}
+.purpose{color:var(--muted);margin:0 0 16px}
+.mono{font-family:var(--mono)}
+.label{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin:0 0 14px;display:flex;flex-direction:column;gap:12px}
+.card p{margin:0}
+.answer{border-color:var(--accent)}
+.field label{display:block;font-size:13px;color:var(--muted);margin-bottom:4px}
+.field select{width:100%;min-height:44px;border:1px solid var(--line);border-radius:10px;padding:0 10px;font:inherit;font-size:16px;background:var(--card);color:var(--ink)}
+.muted{color:var(--muted);font-size:14px}
+.sub{color:var(--muted);font-size:14px;margin-top:-8px!important}
+.why{font-size:15px}
+.why b{font-weight:600}
+.note{background:var(--fill);border-radius:10px;padding:10px 12px;font-size:14px}
+.guard{border-left:3px solid var(--warn);background:var(--warnbg);padding:10px 12px;border-radius:0 10px 10px 0;font-size:14.5px}
+.guard b{color:var(--warn)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{min-height:44px;padding:0 13px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--ink);font:inherit;font-size:14px;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+.chip[aria-pressed=true]{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.dot{width:12px;height:12px;border-radius:50%;flex:none;display:inline-block}
+.d2{background:var(--ok)}
+.d1{border:3px solid var(--warn)}
+.d0{width:10px;height:2px;border-radius:0;background:var(--muted)}
+.grp{display:flex;flex-direction:column;gap:8px}
+.pair{border-top:1px solid var(--line);padding-top:12px;display:flex;flex-direction:column;gap:6px}
+.hd{font-weight:600;display:flex;align-items:center;gap:8px}
+#gridPair{position:sticky;bottom:72px;z-index:5;border-color:var(--accent);margin-top:14px}
+.row{display:flex;flex-wrap:wrap;gap:8px}
+.tier{align-self:flex-start;display:inline-block;font-family:var(--mono);font-size:11px;border:1px solid var(--line);border-radius:999px;padding:3px 9px;color:var(--muted)}
+details{border-top:1px solid var(--line);padding-top:4px}
+summary{cursor:pointer;color:var(--accent);font-weight:600;font-size:14px;min-height:44px;line-height:44px}
+dl{margin:0;display:grid;grid-template-columns:1fr;gap:8px;font-size:14.5px}
+dt{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+dd{margin:0}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:13.5px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:7px}
+.filters{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px}
+.filters .chip{flex:none}
+.filters .chip[aria-pressed=true]{background:var(--accent);color:var(--accent-ink);box-shadow:none}
+.gridwrap{overflow:auto;border:1px solid var(--line);border-radius:14px;background:var(--card);max-height:58vh}
+table.map{border-collapse:separate;border-spacing:0;font-size:13.5px}
+table.map th,table.map td{padding:0;border-bottom:1px solid var(--line)}
+table.map thead th{position:sticky;top:0;background:var(--card);z-index:3;height:92px;vertical-align:bottom;min-width:44px}
+table.map thead th span{display:inline-block;writing-mode:vertical-rl;transform:rotate(180deg);font-family:var(--mono);font-size:11.5px;font-weight:500;color:var(--muted);padding:6px 0;white-space:nowrap}
+table.map thead th.corner{left:0;z-index:4;min-width:132px}
+table.map tbody th{position:sticky;left:0;background:var(--card);z-index:2;text-align:left;font-weight:500;padding:0 8px 0 12px;min-width:132px;max-width:132px;border-right:1px solid var(--line);line-height:1.2}
+table.map tr.cls th{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);background:var(--fill);height:28px;font-weight:500}
+table.map tr.cls td{background:var(--fill)}
+table.map td button{width:44px;height:44px;border:0;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}
+table.map td button[aria-pressed=true]{background:var(--fill);box-shadow:inset 0 0 0 2px var(--accent)}
+.q{font-size:17px;font-weight:600}
+.opts{display:grid;gap:8px}
+.opt{min-height:48px;text-align:left;padding:10px 14px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);font:inherit;font-size:15.5px;cursor:pointer}
+.opt.right{border-color:var(--ok);background:var(--okbg)}
+.opt.wrong{border-color:var(--bad);background:var(--badbg)}
+.opt:disabled{cursor:default;color:var(--ink);opacity:1}
+.btn{min-height:44px;padding:0 16px;border:1px solid var(--accent);border-radius:999px;background:var(--accent);color:var(--accent-ink);font:inherit;font-size:15px;font-weight:600;cursor:pointer;align-self:flex-start}
+.btn.ghost{background:var(--card);color:var(--accent)}
+.score{font-family:var(--mono);font-size:13px;color:var(--muted)}
+section.view{display:none;padding:4px 0 8px}
+section.view.on{display:block}
+nav.tabs{position:fixed;left:0;right:0;bottom:0;background:var(--bg);border-top:1px solid var(--line);z-index:20;padding-bottom:env(safe-area-inset-bottom)}
+nav.tabs .wrap{display:flex;padding:0}
+nav.tabs button{flex:1;min-height:60px;border:0;border-top:2px solid transparent;background:none;font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);cursor:pointer}
+nav.tabs button[aria-selected=true]{color:var(--accent);border-top-color:var(--accent)}
+a:focus-visible,button:focus-visible,summary:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+footer{margin-top:24px;padding:16px 0 8px;border-top:1px solid var(--line);font-size:12.5px;color:var(--muted);line-height:1.6}
+footer p{margin:0 0 6px}
+footer strong{color:var(--ink)}
+@media (min-width:1000px){
+  main.wrap.wide{max-width:960px}
+  dl{grid-template-columns:1fr 1fr;column-gap:24px}
+  .gridwrap{max-height:none;overflow:visible}
+  table.map{width:100%}
+  table.map thead th{top:0}
+  table.map td button{width:100%}
+}
+</style>
+</head>
+<body>
+<header class="wrap">
+  <a class="back" href="/">← bedside.tools</a>
+  <h1>Antibiotic spectrum map</h1>
+  <p class="purpose">What each antibiotic covers, what it misses, and why.</p>
+</header>
+
+<main class="wrap" id="main">
+
+<section class="view on" id="v-drug">
+  <div class="card" id="drug">
+    <div class="field"><label for="selDrug">Antibiotic</label><select id="selDrug"></select></div>
+  </div>
+  <div class="card answer" id="drugCard" aria-live="polite"></div>
+</section>
+
+<section class="view" id="v-bug">
+  <div class="card" id="bug">
+    <div class="field"><label for="selOrg">Organism</label><select id="selOrg"></select></div>
+  </div>
+  <div class="card answer" id="orgCard" aria-live="polite"></div>
+</section>
+
+<section class="view" id="v-grid">
+  <div class="card" id="grid">
+    <div class="legend" aria-hidden="true">
+      <span><i class="dot d2"></i>Reliable</span>
+      <span><i class="dot d1"></i>Variable: some isolates or one setting only</span>
+      <span><i class="dot d0"></i>Not covered</span>
+    </div>
+    <div class="filters" id="filters" role="group" aria-label="Drug class"></div>
+    <p class="muted">Tap a cell for the reason.</p>
+  </div>
+  <div class="gridwrap"><table class="map" id="map"></table></div>
+  <div class="card" id="gridPair" aria-live="polite" hidden></div>
+</section>
+
+<section class="view" id="v-practice">
+  <div class="card" id="practice">
+    <p class="label">Practice · 30 questions drawn from the map</p>
+    <div id="quiz"></div>
+  </div>
+</section>
+
+<div class="note" id="local"><b>Adjust to your institution.</b> This map shows national patterns. Your hospital's antibiogram and the patient's own culture results override it.</div>
+
+<footer>
+  <p><strong>For education only. Not a substitute for clinical judgment.</strong> "Reliable" means active against typical isolates and a standard choice in guidelines or labelling; "variable" means only some isolates, or one setting such as urine or skin. Neither replaces susceptibility testing. Local resistance, formulary and infectious-disease advice take priority.</p>
+  <p>Privacy: everything runs in your browser. Nothing you enter is sent anywhere or stored, and there are no analytics. Do not enter names, record numbers, or dates of birth.</p>
+  <p class="mono">Last reviewed: 2026-11-13</p>
+  <p><strong>Sources:</strong> FDA prescribing information for each drug · EUCAST Expected Resistant Phenotypes v1.2 (2023) · IDSA guidance on antimicrobial-resistant gram-negative infections 2026 (Tamma, Clin Infect Dis) · IDSA MRSA guideline 2011 (Liu) · IDSA/SHEA C. difficile focused update 2021 (Johnson) · ATS/IDSA community-acquired pneumonia 2019 (Metlay) · MERINO trial 2018 (Harris, JAMA) · Silverman 2005 (daptomycin and surfactant, J Infect Dis) · C. difficile risk by class: Slimings and Riley 2014 (J Antimicrob Chemother), Brown 2013 (Antimicrob Agents Chemother). Each cell shows its basis: expected resistance (EUCAST), guideline, prescribing information, label and standard references, or expert practice. Activity is summarised from these sources; no proprietary table is reproduced.</p>
+</footer>
+</main>
+
+<nav class="tabs" role="tablist"><div class="wrap">
+  <button role="tab" aria-selected="true" data-v="drug">By drug</button>
+  <button role="tab" aria-selected="false" data-v="bug">By bug</button>
+  <button role="tab" aria-selected="false" data-v="grid">Grid</button>
+  <button role="tab" aria-selected="false" data-v="practice">Practice</button>
+</div></nav>
+
+<script id="data">
+/* Coverage: 2 = reliable, 1 = variable (check susceptibilities or limited setting), 0 = not covered.
+   One digit per organism, in ORGS order. */
+const ORGS = [
+  {id:'MSSA', s:'MSSA', n:'Staph. aureus, methicillin-susceptible (MSSA)', g:'gp',
+   w:'A beta-lactam is the best drug: cefazolin or nafcillin clear MSSA better than vancomycin does.'},
+  {id:'MRSA', s:'MRSA', n:'Staph. aureus, methicillin-resistant (MRSA)', g:'gp',
+   w:'The mecA gene makes PBP2a, a cell-wall enzyme that beta-lactams cannot bind. Ceftaroline is the one exception here.'},
+  {id:'BHS', s:'Strep A/B', n:'Group A and B streptococci', g:'gp',
+   w:'Penicillin resistance is essentially absent. The resistance problems are with clindamycin, macrolides and tetracyclines.'},
+  {id:'PNE', s:'Pneumococcus', n:'Streptococcus pneumoniae', g:'gp',
+   w:'Resistance comes from altered PBPs, not a beta-lactamase, so adding an inhibitor gains nothing. Ceftriaxone and high-dose amoxicillin still cover most isolates outside the meninges; macrolide resistance is common.'},
+  {id:'EFS', s:'E. faecalis', n:'Enterococcus faecalis', g:'gp',
+   w:'Every cephalosporin misses it (low-affinity PBPs), as do clindamycin and TMP-SMX. Ampicillin is the drug of choice.'},
+  {id:'VRE', s:'VRE', n:'Vancomycin-resistant Enterococcus faecium (VRE)', g:'gp',
+   w:'The van genes change the cell-wall target from D-Ala-D-Ala to D-Ala-D-Lac, so vancomycin cannot bind. Most isolates resist ampicillin too. Linezolid and daptomycin remain.'},
+  {id:'HFLU', s:'H. flu / Morax.', n:'Haemophilus influenzae and Moraxella', g:'gn',
+   w:'A beta-lactamase defeats amoxicillin in a share of Haemophilus and nearly all Moraxella. An inhibitor or a later cephalosporin gets around it.'},
+  {id:'ENT', s:'E. coli / Kleb.', n:'E. coli, Klebsiella, Proteus (no ESBL)', g:'gn',
+   w:'Resistance to ampicillin, TMP-SMX and fluoroquinolones is common in the community, so check the antibiogram. Ceftriaxone remains dependable.'},
+  {id:'ESBL', s:'ESBL', n:'ESBL-producing Enterobacterales', g:'gn',
+   w:'ESBLs break down penicillins, cephalosporins and aztreonam. Carbapenems withstand them and are preferred outside the urinary tract (IDSA 2026).'},
+  {id:'AMPC', s:'AmpC group', n:'Enterobacter cloacae, Klebsiella aerogenes, Citrobacter freundii (AmpC)', g:'gn',
+   w:'A chromosomal AmpC beta-lactamase lets resistance emerge during ceftriaxone treatment, even when the isolate first tests susceptible. Cefepime withstands it (IDSA 2026).'},
+  {id:'CRE', s:'CRE (KPC)', n:'Carbapenem-resistant Enterobacterales, KPC type', g:'gn',
+   w:'KPC destroys carbapenems. Avibactam inhibits KPC; the older inhibitors do not. Metallo-beta-lactamases such as NDM are a separate problem that needs aztreonam with avibactam.'},
+  {id:'PSA', s:'Pseudomonas', n:'Pseudomonas aeruginosa', g:'gn',
+   w:'A tight outer membrane, efflux pumps and its own AmpC keep most drugs out. Only a short list gets in.'},
+  {id:'OAN', s:'Oral anaerobes', n:'Oral anaerobes (above the diaphragm)', g:'an',
+   w:'Mostly penicillin-susceptible, but some Prevotella make a beta-lactamase. Metronidazole alone misses the aerotolerant streptococci and Actinomyces that travel with them.'},
+  {id:'BFR', s:'B. fragilis', n:'Bacteroides fragilis group (below the diaphragm)', g:'an',
+   w:'Nearly all make a beta-lactamase, so it takes an inhibitor combination, a carbapenem or metronidazole. Clindamycin and moxifloxacin resistance is now common.'},
+  {id:'ATY', s:'Atypicals', n:'Mycoplasma, Chlamydia, Legionella', g:'aty',
+   w:'Mycoplasma has no cell wall, and Legionella and Chlamydia live inside cells, so no beta-lactam works.'},
+  {id:'CDF', s:'C. difficile', n:'Clostridioides difficile (treatment)', g:'cdf',
+   w:'It is treated inside the gut. Oral vancomycin and fidaxomicin are not absorbed and stay there; intravenous vancomycin never arrives.'}
+];
+const BL = 'Beta-lactam: binds penicillin-binding proteins and blocks cell-wall cross-linking.';
+const DRUGS = [
+ {id:'penG', n:'Penicillin G / V', c:'Penicillins', t:'bl pen', v:'0022100000001000', hole:'MSSA',
+  mech:BL, tox:'Allergy; seizures at high dose in kidney failure.', renal:'Yes', po:'Penicillin V is oral; penicillin G is IV or IM only.', cns:'Yes, at high IV doses with inflamed meninges.', cdi:'Intermediate'},
+ {id:'amp', n:'Ampicillin / amoxicillin', c:'Penicillins', t:'bl pen', v:'0022201100001000', hole:'ENT',
+  mech:BL, tox:'Rash, diarrhea.', renal:'Yes', po:'Amoxicillin is well absorbed; ampicillin is poorly absorbed and given IV.', cns:'Yes for IV ampicillin at meningitis doses.', cdi:'Intermediate'},
+ {id:'naf', n:'Nafcillin / oxacillin', c:'Penicillins', t:'bl pen', v:'2021000000000000', hole:'EFS',
+  mech:BL+' Resists staphylococcal penicillinase.', tox:'Phlebitis, interstitial nephritis, neutropenia, liver injury.', renal:'No (cleared by the liver)', po:'Dicloxacillin is the oral relative.', cns:'Yes, at high IV doses.', cdi:'Intermediate'},
+ {id:'amc', n:'Amoxicillin-clavulanate', c:'Penicillins', t:'bl pen inh', v:'2022202100002200', hole:'PSA',
+  mech:BL+' Clavulanate blocks many beta-lactamases.', tox:'Diarrhea; cholestatic liver injury.', renal:'Yes', po:'Oral only in the US.', cns:'Not used for meningitis.', cdi:'Intermediate'},
+ {id:'sam', n:'Ampicillin-sulbactam', c:'Penicillins', t:'bl pen inh', v:'2022202100002200', hole:'PSA',
+  mech:BL+' Sulbactam blocks many beta-lactamases and is itself active against Acinetobacter.', tox:'Rash, diarrhea.', renal:'Yes', po:'IV only.', cns:'Not used for meningitis.', cdi:'Intermediate'},
+ {id:'tzp', n:'Piperacillin-tazobactam', c:'Penicillins', t:'bl pen inh', v:'2022202211022200', hole:'MRSA',
+  mech:BL+' Tazobactam blocks many beta-lactamases.', tox:'Low platelets or neutrophils on long courses; creatinine rise when combined with vancomycin; sodium load.', renal:'Yes', po:'IV only.', cns:'Poor: not for meningitis.', cdi:'Intermediate'},
+ {id:'cfz', n:'Cefazolin / cephalexin', c:'Cephalosporins', t:'bl ceph', v:'2021000100001000', hole:'EFS',
+  mech:BL, tox:'Well tolerated; rash.', renal:'Yes', po:'Cephalexin is the oral relative and is well absorbed.', cns:'Poor: not for meningitis.', cdi:'Intermediate'},
+ {id:'cro', n:'Ceftriaxone', c:'Cephalosporins', t:'bl ceph', v:'1022002201001000', hole:'PSA',
+  mech:BL, tox:'Biliary sludging; rash.', renal:'No', po:'IV or IM only.', cns:'Yes.', cdi:'Higher'},
+ {id:'caz', n:'Ceftazidime', c:'Cephalosporins', t:'bl ceph', v:'0011002201020000', hole:'MSSA',
+  mech:BL, tox:'Neurotoxicity in kidney failure.', renal:'Yes', po:'IV only.', cns:'Yes.', cdi:'Higher'},
+ {id:'fep', n:'Cefepime', c:'Cephalosporins', t:'bl ceph', v:'2022002202021000', hole:'BFR',
+  mech:BL, tox:'Encephalopathy, myoclonus and non-convulsive seizures, mostly when the dose is not reduced for kidney function.', renal:'Yes', po:'IV only.', cns:'Yes.', cdi:'Higher'},
+ {id:'cpt', n:'Ceftaroline', c:'Cephalosporins', t:'bl ceph', v:'2222002200001000', hole:'PSA',
+  mech:BL+' Also binds PBP2a, the MRSA cell-wall enzyme.', tox:'Rash; neutropenia on long courses.', renal:'Yes', po:'IV only.', cns:'Limited data.', cdi:'Higher (class effect; little direct data)'},
+ {id:'czv', n:'Ceftazidime-avibactam', c:'Cephalosporins', t:'bl ceph newinh', v:'0011002222220000', hole:'BFR',
+  mech:BL+' Avibactam inhibits ESBL, AmpC, KPC and OXA-48 enzymes, not metallo-beta-lactamases.', tox:'As for ceftazidime.', renal:'Yes', po:'IV only.', cns:'Limited data.', cdi:'Higher (class effect; little direct data)'},
+ {id:'ctz', n:'Ceftolozane-tazobactam', c:'Cephalosporins', t:'bl ceph newinh', v:'0011002210020000', hole:'CRE',
+  mech:BL+' Ceftolozane resists the Pseudomonas AmpC and efflux pumps.', tox:'Well tolerated.', renal:'Yes', po:'IV only.', cns:'Limited data.', cdi:'Higher (class effect; little direct data)'},
+ {id:'etp', n:'Ertapenem', c:'Carbapenems, aztreonam', t:'bl carb', v:'2022002222002200', hole:'PSA',
+  mech:BL+' Stable to ESBL and AmpC enzymes.', tox:'Seizures, mainly with kidney impairment or brain disease; lowers valproate levels.', renal:'Yes', po:'IV or IM, once daily.', cns:'Not used for meningitis.', cdi:'Higher'},
+ {id:'mem', n:'Meropenem', c:'Carbapenems, aztreonam', t:'bl carb', v:'2022002222022200', hole:'MRSA',
+  mech:BL+' Stable to ESBL and AmpC enzymes.', tox:'Seizures (less than imipenem); lowers valproate levels.', renal:'Yes', po:'IV only.', cns:'Yes.', cdi:'Higher'},
+ {id:'atm', n:'Aztreonam', c:'Carbapenems, aztreonam', t:'bl mono', v:'0000002200020000', hole:'MSSA',
+  mech:'Monobactam: binds PBP3 of aerobic gram-negatives only.', tox:'Well tolerated. Safe in penicillin allergy, but shares a side chain with ceftazidime.', renal:'Yes', po:'IV only.', cns:'Enters with inflamed meninges; second-line.', cdi:'Intermediate (little direct data)'},
+ {id:'van', n:'Vancomycin (IV)', c:'Gram-positive agents', t:'gp', v:'2222200000001000', hole:'ENT',
+  mech:'Glycopeptide: binds the D-Ala-D-Ala end of cell-wall precursors.', tox:'Kidney injury; infusion reaction; rash with eosinophilia.', renal:'Yes (dose by levels)', po:'Not absorbed by mouth.', cns:'Limited; used at high dose for meningitis.', cdi:'Lower'},
+ {id:'lzd', n:'Linezolid', c:'Gram-positive agents', t:'gp', v:'2222220000001000', hole:'ENT',
+  mech:'Oxazolidinone: binds the 50S ribosome and blocks the start of protein synthesis.', tox:'Low platelets and marrow suppression after about 2 weeks; serotonin syndrome with serotonergic drugs; neuropathy and lactic acidosis on long courses.', renal:'No', po:'About 100% absorbed.', cns:'Yes.', cdi:'Lower'},
+ {id:'dap', n:'Daptomycin', c:'Gram-positive agents', t:'gp', v:'2220220000000000', hole:'PNE',
+  mech:'Lipopeptide: inserts into the gram-positive cell membrane and depolarises it.', tox:'Muscle injury (check CK weekly); eosinophilic pneumonia.', renal:'Yes (longer interval)', po:'IV only.', cns:'Poor.', cdi:'Lower'},
+ {id:'cip', n:'Ciprofloxacin', c:'Fluoroquinolones', t:'fq', v:'0000002111110010', hole:'PNE',
+  mech:'Fluoroquinolone: blocks DNA gyrase and topoisomerase IV.', tox:'Tendon rupture, QT prolongation, confusion, glucose swings, neuropathy, aortic aneurysm warning. Bound by calcium, iron and antacids in the gut.', renal:'Yes', po:'About 70% absorbed.', cns:'Moderate.', cdi:'Higher'},
+ {id:'lvx', n:'Levofloxacin', c:'Fluoroquinolones', t:'fq', v:'1012002111110020', hole:'BFR',
+  mech:'Fluoroquinolone: blocks DNA gyrase and topoisomerase IV.', tox:'As for ciprofloxacin.', renal:'Yes', po:'About 99% absorbed.', cns:'Moderate.', cdi:'Higher'},
+ {id:'mxf', n:'Moxifloxacin', c:'Fluoroquinolones', t:'fq', v:'1012002100001120', hole:'PSA',
+  mech:'Fluoroquinolone: blocks DNA gyrase and topoisomerase IV.', tox:'As for ciprofloxacin, with the most QT prolongation of the three.', renal:'No', po:'About 90% absorbed.', cns:'Good.', cdi:'Higher'},
+ {id:'ag', n:'Gentamicin / tobramycin / amikacin', c:'Other', t:'ag', v:'0000000111110000', hole:'BFR',
+  mech:'Aminoglycoside: binds the 30S ribosome and causes misreading. Entry into the cell needs oxygen.', tox:'Kidney injury; hearing and balance loss, which can be permanent; neuromuscular blockade.', renal:'Yes (dose by levels)', po:'Not absorbed by mouth.', cns:'Poor.', cdi:'Lower'},
+ {id:'azm', n:'Azithromycin', c:'Other', t:'mac', v:'0011002000000020', hole:'PNE',
+  mech:'Macrolide: binds the 50S ribosome.', tox:'QT prolongation; stomach upset.', renal:'No', po:'Oral or IV; concentrates in tissue.', cns:'Poor.', cdi:'Intermediate'},
+ {id:'dox', n:'Doxycycline', c:'Other', t:'tet', v:'1111002000001020', hole:'BHS',
+  mech:'Tetracycline: binds the 30S ribosome.', tox:'Sun sensitivity; pill esophagitis; avoided in pregnancy. Bound by calcium, iron and antacids in the gut.', renal:'No', po:'Almost completely absorbed.', cns:'Moderate.', cdi:'Lower'},
+ {id:'cli', n:'Clindamycin', c:'Other', t:'cli', v:'1111000000002100', hole:'EFS',
+  mech:'Lincosamide: binds the 50S ribosome. Also shuts down toxin production in streptococcal and staphylococcal toxic shock.', tox:'C. difficile infection; diarrhea.', renal:'No', po:'About 90% absorbed.', cns:'Poor.', cdi:'Higher'},
+ {id:'sxt', n:'TMP-SMX', c:'Other', t:'sxt', v:'1111001111100000', hole:'PSA',
+  mech:'Blocks two steps of bacterial folate synthesis.', tox:'High potassium; creatinine rise without a true fall in filtration; rash including Stevens-Johnson; low blood counts; raises INR on warfarin.', renal:'Yes', po:'Almost completely absorbed.', cns:'Good.', cdi:'Intermediate'},
+ {id:'mtz', n:'Metronidazole', c:'Other', t:'mtz', v:'0000000000001201', hole:'ENT',
+  mech:'Nitroimidazole: reduced inside anaerobic cells to a form that breaks DNA.', tox:'Metallic taste; neuropathy on long courses; label warns against alcohol; raises INR on warfarin.', renal:'No', po:'About 100% absorbed.', cns:'Good.', cdi:'Lower'},
+ {id:'nit', n:'Nitrofurantoin', c:'Urine or gut only', t:'uri', v:'0000110111100000', hole:'PSA',
+  mech:'Reduced by bacterial enzymes to products that damage several targets.', tox:'Lung reactions and neuropathy with long use; hemolysis in G6PD deficiency.', renal:'Avoid at low creatinine clearance (label: below 60 mL/min; Beers criteria: below 30).', po:'Oral only. Reaches useful levels in urine only.', cns:'No.', cdi:'Lower'},
+ {id:'fos', n:'Fosfomycin (oral)', c:'Urine or gut only', t:'uri', v:'0000110110000000', hole:'PSA',
+  mech:'Blocks MurA, the first step of cell-wall synthesis.', tox:'Diarrhea.', renal:'No change for a single dose', po:'Single oral sachet for cystitis.', cns:'No.', cdi:'Lower'},
+ {id:'vpo', n:'Vancomycin (oral)', c:'Urine or gut only', t:'gut', v:'0000000000000002', hole:'MRSA',
+  mech:'Glycopeptide. Not absorbed, so it stays in the colon.', tox:'Little, as almost none is absorbed.', renal:'No', po:'Oral only for this use.', cns:'No.', cdi:'Treats it'},
+ {id:'fdx', n:'Fidaxomicin', c:'Urine or gut only', t:'gut', v:'0000000000000002', hole:'MRSA',
+  mech:'Blocks bacterial RNA polymerase. Barely absorbed and narrow, so it spares most gut flora.', tox:'Little, as almost none is absorbed.', renal:'No', po:'Oral only.', cns:'No.', cdi:'Treats it'}
+];
+const BASIS = {E:'Expected resistance (EUCAST 2023)', I:'IDSA 2026 guidance', L:'Prescribing information', G:'Guideline', S:'Label and standard references', X:'Expert practice'};
+/* Pair-specific notes: [text, basis] */
+const P = {
+ 'penG|MSSA':['Almost all S. aureus make a penicillinase that destroys it. The rare penicillin-susceptible isolate can be treated with penicillin once the lab confirms it.','X'],
+ 'amp|MSSA':['Almost all S. aureus make a penicillinase that destroys it. Adding clavulanate or sulbactam restores activity.','X'],
+ 'penG|EFS':['Active, but ampicillin is more potent and is the standard choice.','X'],
+ 'amp|ENT':['E. coli resistance is common and Klebsiella is always resistant (it carries its own beta-lactamase). Proteus mirabilis is usually susceptible.','E'],
+ 'amp|HFLU':['A share of Haemophilus and nearly all Moraxella make a beta-lactamase. Clavulanate or sulbactam restores activity.','X'],
+ 'amc|ENT':['Covers many E. coli, Klebsiella and Proteus, but resistance is common enough to check the antibiogram.','X'],
+ 'sam|ENT':['E. coli resistance to ampicillin-sulbactam is now common; check the antibiogram before relying on it.','X'],
+ 'cfz|ENT':['Covers most E. coli, Klebsiella and Proteus mirabilis; resistance varies by hospital.','X'],
+ 'cro|MSSA':['Active in the lab, but the outcome data in MSSA bacteremia and endocarditis are weaker than for cefazolin or nafcillin, which stay first choice.','X'],
+ 'van|MSSA':['It works, but cefazolin or nafcillin clear MSSA bloodstream infection better. Switch once MSSA is confirmed.','X'],
+ 'dap|PNE':['Not a pneumonia drug: it is inactivated by lung surfactant (Silverman 2005), the label excludes pneumonia, and it has no labelled pneumococcal use.','L'],
+ 'dap|VRE':['Active, usually at higher doses. Not a labelled indication; linezolid is the labelled drug.','X'],
+ 'lzd|VRE':['Labelled for vancomycin-resistant E. faecium.','L'],
+ 'tzp|ESBL':['Tazobactam blocks ESBLs in the lab, yet in the MERINO trial piperacillin-tazobactam had higher mortality than meropenem in bloodstream infection. IDSA 2026: an alternative only for complicated urinary infection in patients who are not critically ill or bacteremic; not suggested outside the urinary tract even if the lab reports it susceptible.','I'],
+ 'fep|ESBL':['ESBLs commonly break down cefepime. IDSA 2026: avoid it for ESBL infection beyond simple cystitis even if the lab reports it susceptible.','I'],
+ 'ctz|ESBL':['Effective against many ESBL producers, but IDSA 2026 reserves it for carbapenem-resistant organisms.','I'],
+ 'cip|ESBL':['An option only when the isolate tests susceptible; ESBL producers often resist quinolones too. Used for urinary infection or oral step-down (IDSA 2026).','I'],
+ 'lvx|ESBL':['An option only when the isolate tests susceptible; ESBL producers often resist quinolones too. Used for urinary infection or oral step-down (IDSA 2026).','I'],
+ 'mxf|ESBL':['Not the quinolone used here: IDSA 2026 does not mention moxifloxacin, and it does not reach useful urine levels. Ciprofloxacin and levofloxacin are the ones used.','X'],
+ 'sxt|ESBL':['When the isolate tests susceptible: a preferred drug for cystitis and for complicated urinary infection, and an oral step-down option (IDSA 2026). Many ESBL producers resist it.','I'],
+ 'ag|ESBL':['Often still active. IDSA 2026: a single dose is a preferred option for ESBL cystitis and an alternative for complicated urinary infection.','I'],
+ 'nit|ESBL':['A preferred drug for ESBL cystitis when the isolate is susceptible (IDSA 2026). Cystitis only.','I'],
+ 'fos|ESBL':['An alternative for cystitis from ESBL E. coli only. Klebsiella and others carry fosA, which inactivates it (IDSA 2026).','I'],
+ 'cro|AMPC':['Tests susceptible at first, but resistance can emerge during treatment. IDSA 2026: avoid for invasive infection; finishing a course is reasonable only in a non-severe infection that is improving with source control.','I'],
+ 'caz|AMPC':['Same problem as ceftriaxone: resistance can emerge during treatment. IDSA 2026: avoid for invasive infection.','I'],
+ 'tzp|AMPC':['IDSA 2026: not suggested for invasive infection from these species. Cefepime or a carbapenem is used.','I'],
+ 'fep|AMPC':['Preferred by IDSA 2026 when the isolate is susceptible (MIC 8 or below) and no ESBL is found: cefepime barely induces AmpC and resists it.','I'],
+ 'ctz|AMPC':['Tazobactam does not protect against AmpC. IDSA 2026: not suggested for these organisms.','I'],
+ 'cip|AMPC':['Not affected by AmpC. An option when the isolate tests susceptible (IDSA 2026).','I'],
+ 'lvx|AMPC':['Not affected by AmpC. An option when the isolate tests susceptible (IDSA 2026).','I'],
+ 'mxf|AMPC':['Not the quinolone used here: IDSA 2026 does not mention moxifloxacin, and it does not reach useful urine levels. Ciprofloxacin and levofloxacin are the ones used.','X'],
+ 'sxt|AMPC':['Not affected by AmpC. An option when the isolate tests susceptible (IDSA 2026).','I'],
+ 'ag|AMPC':['Not affected by AmpC. An alternative, mainly for urinary infection, when the isolate tests susceptible (IDSA 2026).','I'],
+ 'nit|AMPC':['An option for cystitis when the isolate tests susceptible (IDSA 2026). Cystitis only.','I'],
+ 'etp|ESBL':['Carbapenems withstand ESBLs and are the preferred drugs for ESBL infection outside the urinary tract (IDSA 2026).','I'],
+ 'mem|ESBL':['Carbapenems withstand ESBLs and are the preferred drugs for ESBL infection outside the urinary tract; meropenem is favoured over ertapenem in critical illness (IDSA 2026).','I'],
+ 'czv|ESBL':['Active, but kept in reserve for carbapenem-resistant organisms.','I'],
+ 'czv|AMPC':['Active, but kept in reserve for carbapenem-resistant organisms.','I'],
+ 'czv|CRE':['Avibactam inhibits KPC and OXA-48 carbapenemases. It does not inhibit metallo-beta-lactamases such as NDM.','I'],
+ 'ag|CRE':['Some isolates remain susceptible; rates vary widely (IDSA 2026). Mainly a urinary option.','I'],
+ 'cip|ENT':['Resistance in E. coli is common. Use empirically only where local resistance is low, or once the isolate tests susceptible.','G'],
+ 'lvx|ENT':['Resistance in E. coli is common. Use empirically only where local resistance is low, or once the isolate tests susceptible.','G'],
+ 'mxf|ENT':['Resistance in E. coli is common, and moxifloxacin does not reach useful urine levels.','X'],
+ 'sxt|ENT':['Resistance in E. coli is common. Use empirically only where local resistance is low, or once the isolate tests susceptible.','G'],
+ 'nit|ENT':['E. coli is nearly always susceptible; Klebsiella often is not; Proteus never is. Cystitis only.','E'],
+ 'fos|ENT':['Reliable for E. coli cystitis. Klebsiella carries fosA, which inactivates it. Cystitis only.','I'],
+ 'nit|EFS':['Active in the urine. Cystitis only, so it is not a drug for enterococcal infection anywhere else.','L'],
+ 'nit|VRE':['Less dependable against E. faecium than E. faecalis; the label names only E. faecalis. Cystitis only; test the isolate.','X'],
+ 'fos|EFS':['Labelled for E. faecalis cystitis. Cystitis only.','L'],
+ 'fos|VRE':['Sometimes active in the urine. Cystitis only; test the isolate.','X'],
+ 'dox|MSSA':['Covers most isolates, but only as an oral drug for skin and soft-tissue infection. Not for bloodstream infection.','X'],
+ 'dox|MRSA':['Covers most isolates, but only as an oral drug for skin and soft-tissue infection (IDSA 2011). Not for bloodstream infection.','G'],
+ 'sxt|MSSA':['Covers most isolates, but only as an oral drug for skin and soft-tissue infection. Not for bloodstream infection.','X'],
+ 'sxt|MRSA':['Covers most isolates, but only as an oral drug for skin and soft-tissue infection (IDSA 2011). Not for bloodstream infection.','G'],
+ 'cli|MSSA':['Resistance is common, including a hidden inducible form the lab finds with a D-test. Check susceptibility.','G'],
+ 'cli|MRSA':['Resistance is common, including a hidden inducible form the lab finds with a D-test. Check susceptibility.','G'],
+ 'cli|BHS':['Resistance in group A and especially group B streptococci has risen. Still added for its anti-toxin effect in necrotizing infection.','X'],
+ 'cli|PNE':['Active against susceptible isolates, but resistance tracks with macrolide resistance.','X'],
+ 'cli|BFR':['Resistance is now common, and guidelines no longer recommend it for abdominal infection.','G'],
+ 'mxf|BFR':['Resistance is now common; not relied on alone for abdominal infection.','G'],
+ 'mxf|OAN':['Active against many oral anaerobes; resistance varies.','X'],
+ 'azm|PNE':['Macrolide resistance in pneumococcus is common in the US, so it is not relied on alone for pneumonia where resistance is high (ATS/IDSA 2019).','G'],
+ 'azm|BHS':['Macrolide resistance in group A and B streptococci is common enough to check.','X'],
+ 'dox|PNE':['Covers most isolates; an outpatient pneumonia option (ATS/IDSA 2019). Resistance occurs.','G'],
+ 'dox|BHS':['Activity against group A streptococci is unreliable (IDSA 2011).','G'],
+ 'sxt|BHS':['Long taught as inactive; newer data suggest it works for skin infection, but it is not a first choice for streptococci.','X'],
+ 'sxt|PNE':['Resistance is common.','X'],
+ 'sxt|HFLU':['Resistance is common enough to check.','X'],
+ 'mtz|OAN':['Kills strict anaerobes but misses the aerotolerant streptococci and Actinomyces of the mouth, which is why it fails alone in lung abscess.','X'],
+ 'mtz|CDF':['No longer first-line. IDSA/SHEA 2021 keeps it only for a non-severe first episode when vancomycin and fidaxomicin are unavailable.','G'],
+ 'vpo|CDF':['Stays in the colon, where the organism is. An accepted alternative to fidaxomicin (IDSA/SHEA 2021).','G'],
+ 'fdx|CDF':['Preferred by IDSA/SHEA 2021: similar cure to oral vancomycin with fewer recurrences.','G'],
+ 'van|CDF':['Intravenous vancomycin is not secreted into the colon, so it never reaches C. difficile. Only oral (or rectal) vancomycin treats it.','G'],
+ 'van|OAN':['Covers the gram-positive anaerobes (Peptostreptococcus, Actinomyces) but none of the gram-negative ones.','X'],
+ 'lzd|OAN':['Covers the gram-positive anaerobes; not relied on for mixed anaerobic infection.','X'],
+ 'lvx|MSSA':['Active in the lab, but resistance emerges quickly. Not a first-line drug for staphylococci.','X'],
+ 'mxf|MSSA':['Active in the lab, but resistance emerges quickly. Not a first-line drug for staphylococci.','X'],
+ 'lvx|BHS':['Active, but a beta-lactam is the standard choice.','X'],
+ 'mxf|BHS':['Active, but a beta-lactam is the standard choice.','X'],
+ 'cip|ATY':['Good for Legionella; less reliable than levofloxacin or moxifloxacin for Mycoplasma and Chlamydia.','X'],
+ 'ag|PSA':['Active against most isolates, but not used alone outside the urinary tract.','X'],
+ 'atm|PSA':['Active against most isolates; resistance is somewhat more frequent than to cefepime or piperacillin-tazobactam.','X'],
+ 'mem|CRE':['KPC breaks down carbapenems; these isolates test resistant.','I'],
+ 'etp|CRE':['KPC breaks down carbapenems; these isolates test resistant.','I'],
+ 'etp|PSA':['Ertapenem is the carbapenem with no Pseudomonas (or Acinetobacter) activity: efflux and the outer membrane keep it out.','E'],
+ 'mxf|PSA':['The weakest of the quinolones against Pseudomonas; ciprofloxacin and levofloxacin are the oral options.','X'],
+ 'cip|PNE':['Ciprofloxacin is weak against pneumococcus. The "respiratory" quinolones are levofloxacin and moxifloxacin.','L'],
+ 'cip|BHS':['Ciprofloxacin is weak against streptococci.','X'],
+ 'cip|MSSA':['Weak, and resistance emerges quickly. Not relied on for staphylococci.','X'],
+ 'cpt|MRSA':['The only beta-lactam on this map that binds PBP2a. Labelled for MRSA in skin infection only; use in MRSA pneumonia or bloodstream infection is off-label.','L'],
+ 'czv|BFR':['No dependable anaerobic activity: the label pairs it with metronidazole for abdominal infection.','L'],
+ 'ctz|BFR':['Not dependable against Bacteroides: the label pairs it with metronidazole for abdominal infection.','L'],
+ 'azm|ENT':['Enteric gram-negatives keep macrolides out. (Azithromycin is still used for Salmonella, Shigella and Campylobacter.)','X'],
+ 'azm|MSSA':['Macrolide resistance in S. aureus is common; not relied on.','X'],
+ 'sxt|EFS':['Looks active in the lab but fails in patients: enterococci take up folate from their surroundings.','E'],
+ 'sxt|PSA':['Pseudomonas does not respond to TMP-SMX: trimethoprim is inactive against it. (TMP-SMX does cover Stenotrophomonas, Nocardia and Pneumocystis.)','X'],
+ 'cip|PSA':['Fluoroquinolones are the only oral class for Pseudomonas, but resistance is common. Use once the isolate tests susceptible; for serious infection, not as the only empiric drug.','X'],
+ 'lvx|PSA':['Fluoroquinolones are the only oral class for Pseudomonas, but resistance is common. Use once the isolate tests susceptible; for serious infection, not as the only empiric drug.','X'],
+ 'ag|ENT':['Active against most isolates, but used alone only for urinary infection; elsewhere it is a short add-on to another drug.','X'],
+ 'cip|CRE':['A urinary option only, and only when the isolate tests susceptible, which is a minority of these isolates (IDSA 2026).','I'],
+ 'lvx|CRE':['A urinary option only, and only when the isolate tests susceptible, which is a minority of these isolates (IDSA 2026).','I'],
+ 'sxt|CRE':['A urinary option only, and only when the isolate tests susceptible, which is a minority of these isolates (IDSA 2026).','I'],
+ 'nit|CRE':['An option for cystitis only, when the isolate tests susceptible, which is a minority of these isolates (IDSA 2026).','I'],
+ 'fos|CRE':['IDSA 2026 lists oral fosfomycin only as an alternative for cystitis from E. coli. Most KPC producers are Klebsiella, which carry fosA and inactivate it.','I'],
+ 'penG|PNE':['Covers most isolates outside the meninges. In meningitis, resistance is too frequent to rely on it until the isolate is tested.','X'],
+ 'amp|PNE':['Covers most isolates outside the meninges. In meningitis, resistance is too frequent to rely on it until the isolate is tested.','X'],
+ 'cro|EFS':['No cephalosporin alone covers enterococci. (Ceftriaxone is added to ampicillin for E. faecalis endocarditis, where the pair works together.)','E'],
+ 'dap|EFS':['Active. Labelled only for vancomycin-susceptible E. faecalis in skin infection; ampicillin remains the standard drug.','L'],
+ 'lzd|EFS':['Active, but ampicillin remains the standard drug when the isolate is susceptible.','X'],
+ 'nit|MSSA':['Not relied on. The label lists S. aureus in urine, but S. aureus in the urine should prompt a search for bloodstream infection.','X'],
+ 'nit|MRSA':['Not relied on. The label lists S. aureus in urine, but S. aureus in the urine should prompt a search for bloodstream infection.','X'],
+ 'fos|PSA':['Pseudomonas carries fosA, which inactivates it.','X'],
+};
+</script>
+<script id="engine">
+/* Pure functions: no DOM. Used by every view and by Practice. */
+const OI = {}; ORGS.forEach((o,i)=>OI[o.id]=i);
+const DI = {}; DRUGS.forEach(d=>DI[d.id]=d);
+function cov(d,o){ return +DI[d].v[OI[o]]; }
+function has(d,tag){ return (' '+DI[d].t+' ').indexOf(' '+tag+' ')>=0; }
+function why(d,o){
+  const k=d+'|'+o, v=cov(d,o), g=ORGS[OI[o]].g;
+  if(P[k]) return {t:P[k][0], b:P[k][1]};
+  if(has(d,'gut')) return {t:'Not absorbed: it stays in the gut and has no activity anywhere else in the body.', b:'L'};
+  if(has(d,'uri') && v===0) return {t:'Not relied on for this organism. This drug reaches useful levels only in urine.', b:'X'};
+  if(o==='CDF') return {t:'Not a treatment for C. difficile. Treatment is oral fidaxomicin or oral vancomycin.', b:'G'};
+  if(o==='ATY' && has(d,'bl')) return {t:'Beta-lactams act on the cell wall. Mycoplasma has none, and Legionella and Chlamydia sit inside host cells where beta-lactams do not reach.', b:'X'};
+  if(o==='ATY' && v===0) return {t:'No dependable activity against the atypical organisms; use a macrolide, doxycycline or a respiratory quinolone.', b:'G'};
+  if(has(d,'gp') && (g==='gn'||o==='BFR')){
+    if(d==='van') return {t:'Vancomycin is too large to pass through the outer membrane of gram-negative bacteria.', b:o==='BFR'?'X':'E'};
+    if(d==='lzd') return o==='BFR' ? {t:'Not relied on for Bacteroides.', b:'X'} : {t:'Gram-negative bacteria pump linezolid back out before it reaches the ribosome.', b:'E'};
+    return {t:'Daptomycin cannot get through the gram-negative outer membrane to reach the cell membrane it acts on.', b:'X'};
+  }
+  if(d==='dap' && o==='OAN') return {t:'Not relied on for anaerobic infection.', b:'X'};
+  if(has(d,'mtz') && g!=='an') return {t:'Metronidazole has to be chemically reduced inside an anaerobic cell to work. Aerobic bacteria never activate it.', b:'X'};
+  if(d==='atm' && (g==='gp'||g==='an')) return {t:'Aztreonam binds only PBP3 of aerobic gram-negatives, so it has no gram-positive or anaerobic activity.', b:g==='gp'?'E':'X'};
+  if(has(d,'ag') && g==='an') return {t:'Aminoglycosides need oxygen-dependent transport to enter the cell. Anaerobes never take them up.', b:'E'};
+  if(has(d,'ag') && g==='gp') return {t:'Not used alone for gram-positive infection. Gentamicin is only added to a cell-wall drug for synergy in selected endocarditis.', b:'X'};
+  if(has(d,'ag') && o==='HFLU') return {t:'Not used for respiratory gram-negatives; aminoglycosides penetrate lung poorly.', b:'X'};
+  if(o==='MRSA' && has(d,'bl')) return {t:'MRSA makes PBP2a, a cell-wall enzyme this drug cannot bind. Among beta-lactams only ceftaroline binds it.', b:'X'};
+  if(o==='VRE'){
+    if(has(d,'bl')) return {t:'E. faecium has a low-affinity PBP5 that resists ampicillin and every other beta-lactam.', b:has(d,'ceph')?'E':'X'};
+    return {t:'No dependable activity against E. faecium. Linezolid and daptomycin are the systemic options.', b:'X'};
+  }
+  if(o==='EFS' && v===0){
+    if(has(d,'ceph')) return {t:'No cephalosporin covers enterococci: their penicillin-binding proteins have low affinity for the whole class.', b:'E'};
+    if(has(d,'carb')) return {t:'Ertapenem and meropenem are not dependable against enterococci. (Imipenem has some E. faecalis activity.)', b:'X'};
+    if(d==='naf') return {t:'Antistaphylococcal penicillins bind enterococcal PBPs poorly. Use ampicillin.', b:'X'};
+    if(d==='cli') return {t:'E. faecalis is inherently resistant to clindamycin: it pumps the drug out.', b:'E'};
+    if(has(d,'fq')) return {t:'Weak activity; at most a urinary option when the isolate tests susceptible.', b:'X'};
+    return {t:'Not relied on for enterococci. Ampicillin is the drug of choice.', b:'X'};
+  }
+  if(o==='PSA' && v===0){
+    if(has(d,'pen')) return {t:'Among the penicillins only piperacillin gets into Pseudomonas.', b:d==='naf'?'X':'E'};
+    if(has(d,'ceph')) return {t:'No Pseudomonas activity. Among cephalosporins only ceftazidime, cefepime and the newer combinations cover it.', b:d==='cpt'?'X':'E'};
+    return {t:'Pseudomonas is inherently resistant: its outer membrane and efflux pumps keep the drug out.', b:'X'};
+  }
+  if(o==='ESBL' && has(d,'bl') && v===0) return {t:'ESBLs break down penicillins, cephalosporins and aztreonam. For infection outside the urinary tract the preferred drugs are carbapenems (IDSA 2026).', b:'I'};
+  if(o==='AMPC' && has(d,'bl') && v===0){
+    if(d==='cpt'||d==='atm') return {t:'Broken down by AmpC once the enzyme is switched on; not relied on. Cefepime or a carbapenem is used.', b:'X'};
+    return {t:'These species are inherently resistant: their AmpC breaks down ampicillin, its inhibitor combinations and first-generation cephalosporins.', b:d==='naf'?'X':'E'};
+  }
+  if(o==='CRE' && has(d,'bl')) return {t:'KPC breaks down every standard beta-lactam. It takes a new inhibitor (avibactam, vaborbactam) to block it.', b:'I'};
+  if(o==='CRE') return {t:'Not relied on: these isolates usually resist several other drug classes as well. Treat by susceptibility results.', b:'X'};
+  if(o==='BFR' && v===0){
+    if(has(d,'bl')) return {t:'The Bacteroides beta-lactamase destroys it. It takes an inhibitor combination, a carbapenem or metronidazole.', b:'X'};
+    if(has(d,'fq')) return {t:'Ciprofloxacin and levofloxacin have poor anaerobic activity; add metronidazole.', b:'X'};
+    return {t:'No dependable activity against Bacteroides.', b:'X'};
+  }
+  if(o==='OAN'){
+    if(v===1 && has(d,'bl')) return {t:'Most oral anaerobes are susceptible, but beta-lactamase-producing Prevotella are not. An inhibitor combination closes the gap.', b:'X'};
+    if(v===0 && has(d,'fq')) return {t:'Ciprofloxacin and levofloxacin have poor anaerobic activity.', b:'X'};
+    if(v===0 && has(d,'ceph')) return {t:'Ceftazidime and its combinations have little anaerobic activity.', b:'X'};
+    if(v===0) return {t:'Not relied on for anaerobes.', b:'X'};
+  }
+  if(g==='gn' && v===0){
+    if(d==='penG'||d==='naf') return {t:'Too little activity against gram-negative bacteria to be useful.', b:(o==='HFLU'||d==='naf')?'X':'E'};
+    if(d==='cli') return {t:'Aerobic gram-negatives are inherently resistant: clindamycin cannot cross their outer membrane.', b:'E'};
+    if(d==='cfz') return {t:'First-generation cephalosporins are broken down by the beta-lactamases common in this group.', b:'X'};
+    return {t:'Not relied on for this group; resistance is widespread.', b:'X'};
+  }
+  if(g==='gp' && v<2 && has(d,'ceph') && !(d==='cfz'||d==='cro'||d==='fep'||d==='cpt'))
+    return {t:'Ceftazidime-based drugs trade away gram-positive activity: weak against streptococci and poor against staphylococci.', b:'X'};
+  if(g==='gp' && d==='atm') return {t:'Aztreonam binds only PBP3 of aerobic gram-negatives.', b:'E'};
+  if(v===2) return {t:'Active against typical isolates and a standard choice.', b:'S'};
+  if(v===1) return {t:'Covers some isolates only. Check susceptibility before relying on it.', b:'X'};
+  return {t:'No useful activity.', b:'X'};
+}
+function lists(d){ const r=[[],[],[]]; ORGS.forEach(o=>r[cov(d,o.id)].push(o.id)); return r; }
+function drugsFor(o){ const r=[[],[],[]]; DRUGS.forEach(d=>r[cov(d.id,o)].push(d.id)); return r; }
+function shuffle(a,rnd){ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(rnd()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+/* Practice items come from the same table. Variable cells are never offered as options, so every item has one clear answer. */
+function makeQuiz(rnd, n){
+  const items=[];
+  const orgs=shuffle(ORGS.map(o=>o.id),rnd), drugs=shuffle(DRUGS.filter(d=>lists(d.id)[2].length>=3 && lists(d.id)[0].length>=1).map(d=>d.id),rnd);
+  let oi=0, di=0;
+  while(items.length<n){
+    if(items.length%2===0){
+      const o=orgs[oi++%orgs.length], f=drugsFor(o);
+      const right=shuffle(f[2],rnd)[0], wrong=shuffle(f[0].filter(x=>!has(x,'gut')||o==='CDF'),rnd).slice(0,3);
+      items.push({type:'covers', o:o, answer:right, options:shuffle([right].concat(wrong),rnd)});
+    } else {
+      const d=drugs[di++%drugs.length], l=lists(d);
+      const miss=shuffle(l[0].filter(x=>x!=='CDF'),rnd)[0], hit=shuffle(l[2],rnd).slice(0,3);
+      items.push({type:'misses', d:d, answer:miss, options:shuffle([miss].concat(hit),rnd)});
+    }
+  }
+  return items;
+}
+</script>
+<script id="ui">
+const $=s=>document.querySelector(s), $$=s=>Array.from(document.querySelectorAll(s));
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const WORD=['Not covered','Variable','Reliable'];
+const dot=v=>'<i class="dot d'+v+'" aria-hidden="true"></i>';
+const oName=o=>ORGS[OI[o]].n, oShort=o=>ORGS[OI[o]].s;
+function pairHTML(d,o){
+  const w=why(d,o), v=cov(d,o);
+  return '<div class="hd">'+dot(v)+esc(DI[d].n)+' and '+esc(oShort(o))+': '+WORD[v].toLowerCase()+'</div><p class="why">'+esc(w.t)+'</p><span class="tier">'+esc(BASIS[w.b])+'</span>';
+}
+function chipRow(title, ids, v, kind, sel){
+  if(!ids.length) return '';
+  return '<div class="grp"><p class="label">'+title+'</p><div class="chips">'+ids.map(id=>
+    '<button type="button" class="chip" data-'+kind+'="'+id+'" aria-pressed="'+(id===sel)+'">'+dot(v)+esc(kind==='o'?oShort(id):DI[id].n)+'</button>').join('')+'</div></div>';
+}
+/* ---------- By drug ---------- */
+let curDrug='cfz', drugPair=null;
+function renderDrug(){
+  const d=DI[curDrug], l=lists(curDrug), hole=drugPair||d.hole;
+  $('#drugCard').innerHTML=
+    '<p class="label">'+esc(d.c)+'</p><h2>'+esc(d.n)+'</h2>'+
+    chipRow('Covers reliably', l[2], 2, 'o', drugPair)+
+    chipRow('Variable: some isolates or one setting only', l[1], 1, 'o', drugPair)+
+    chipRow('Misses', l[0], 0, 'o', drugPair)+
+    '<div class="pair"><p class="label">'+(drugPair?'Why':'Why: the gap to remember')+'</p>'+pairHTML(curDrug,hole)+'</div>'+
+    '<p class="muted">Tap any organism for its reason.</p>'+
+    '<details><summary>More</summary><dl>'+
+      '<div><dt>How it works</dt><dd>'+esc(d.mech)+'</dd></div>'+
+      '<div><dt>Main toxicities</dt><dd>'+esc(d.tox)+'</dd></div>'+
+      '<div><dt>Kidney dose change</dt><dd>'+esc(d.renal)+'</dd></div>'+
+      '<div><dt>By mouth</dt><dd>'+esc(d.po)+'</dd></div>'+
+      '<div><dt>Reaches the spinal fluid</dt><dd>'+esc(d.cns)+'</dd></div>'+
+      '<div><dt>C. difficile risk</dt><dd>'+esc(d.cdi)+' <span class="muted">(relative ranking from meta-analyses; expert practice)</span></dd></div>'+
+    '</dl></details>';
+}
+/* ---------- By bug ---------- */
+let curOrg='MRSA', orgPair=null;
+function renderOrg(){
+  const o=ORGS[OI[curOrg]], f=drugsFor(curOrg);
+  $('#orgCard').innerHTML=
+    '<h2>'+esc(o.n)+'</h2>'+
+    chipRow('Reliable', f[2], 2, 'd', orgPair)+
+    chipRow('Variable: some isolates or one setting only', f[1], 1, 'd', orgPair)+
+    '<div class="pair"><p class="label">Why</p>'+(orgPair?pairHTML(orgPair,curOrg):'<p class="why">'+esc(o.w)+'</p>')+'</div>'+
+    '<details'+(orgPair&&cov(orgPair,curOrg)===0?' open':'')+'><summary>More: what does not cover it</summary>'+chipRow('Not covered', f[0], 0, 'd', orgPair)+'<p class="muted" style="margin-top:8px">Tap any drug for its reason.</p></details>';
+}
+/* ---------- Grid ---------- */
+let curCls='All', gridSel=null;
+const CLASSES=['All'].concat(DRUGS.map(d=>d.c).filter((c,i,a)=>a.indexOf(c)===i));
+function renderGrid(){
+  $('#filters').innerHTML=CLASSES.map(c=>'<button type="button" class="chip" data-cls="'+esc(c)+'" aria-pressed="'+(c===curCls)+'">'+esc(c)+'</button>').join('');
+  let h='<thead><tr><th class="corner"></th>'+ORGS.map(o=>'<th scope="col" title="'+esc(o.n)+'"><span>'+esc(o.s)+'</span></th>').join('')+'</tr></thead><tbody>', last='';
+  DRUGS.filter(d=>curCls==='All'||d.c===curCls).forEach(d=>{
+    if(d.c!==last){ last=d.c; h+='<tr class="cls"><th scope="rowgroup">'+esc(d.c)+'</th><td colspan="'+ORGS.length+'"></td></tr>'; }
+    h+='<tr><th scope="row">'+esc(d.n)+'</th>'+ORGS.map(o=>{ const v=cov(d.id,o.id), k=d.id+'|'+o.id;
+      return '<td><button type="button" data-cell="'+k+'" aria-pressed="'+(k===gridSel)+'" aria-label="'+esc(d.n+', '+o.s+': '+WORD[v])+'">'+dot(v)+'</button></td>'; }).join('')+'</tr>';
+  });
+  $('#map').innerHTML=h+'</tbody>';
+  const gp=$('#gridPair');
+  if(gridSel){ const p=gridSel.split('|'); gp.hidden=false; gp.innerHTML=pairHTML(p[0],p[1])+'<div class="row"><button type="button" class="btn ghost" data-open="'+p[0]+'">Open '+esc(DI[p[0]].n)+'</button><button type="button" class="btn ghost" data-closepair="1">Close</button></div>'; } else gp.hidden=true;
+}
+/* ---------- Practice ---------- */
+let quiz=null, qi=0, score=0, picked=null;
+function startQuiz(){ quiz=makeQuiz(Math.random,30); qi=0; score=0; picked=null; renderQuiz(); }
+function renderQuiz(){
+  const el=$('#quiz');
+  if(!quiz){ el.innerHTML='<p>Two kinds of question: which drug reliably covers an organism, and which organism a drug misses. Each answer shows the reason.</p><button type="button" class="btn" data-quiz="start">Start</button>'; return; }
+  if(qi>=quiz.length){ el.innerHTML='<p class="q">'+score+' of '+quiz.length+' correct</p><button type="button" class="btn" data-quiz="start">New set</button>'; return; }
+  const it=quiz[qi], isC=it.type==='covers';
+  const q=isC?'Which of these reliably covers '+oName(it.o)+'?':'Which of these does '+DI[it.d].n+' miss?';
+  let h='<p class="score">Question '+(qi+1)+' of '+quiz.length+' · '+score+' correct</p><p class="q">'+esc(q)+'</p><div class="opts">';
+  it.options.forEach(x=>{ const lab=isC?DI[x].n:oName(x); let cls='opt';
+    if(picked){ if(x===it.answer) cls+=' right'; else if(x===picked) cls+=' wrong'; }
+    h+='<button type="button" class="'+cls+'" data-pick="'+x+'"'+(picked?' disabled':'')+'>'+esc(lab)+'</button>'; });
+  h+='</div>';
+  if(picked){
+    const d=isC?it.answer:it.d, o=isC?it.o:it.answer;
+    h+='<div class="pair"><p class="label">'+(picked===it.answer?'Correct':'Not quite')+'</p>'+pairHTML(d,o);
+    if(picked!==it.answer) h+=pairHTML(isC?picked:it.d, isC?it.o:picked);
+    h+='</div><button type="button" class="btn" data-quiz="next">'+(qi+1<quiz.length?'Next':'See score')+'</button>';
+  }
+  el.innerHTML=h;
+}
+/* ---------- wiring ---------- */
+(function init(){
+  let last='', h='';
+  DRUGS.forEach(d=>{ if(d.c!==last){ if(last) h+='</optgroup>'; h+='<optgroup label="'+esc(d.c)+'">'; last=d.c; } h+='<option value="'+d.id+'">'+esc(d.n)+'</option>'; });
+  $('#selDrug').innerHTML=h+'</optgroup>'; $('#selDrug').value=curDrug;
+  $('#selOrg').innerHTML=ORGS.map(o=>'<option value="'+o.id+'">'+esc(o.n)+'</option>').join(''); $('#selOrg').value=curOrg;
+})();
+$('#selDrug').addEventListener('change',e=>{ curDrug=e.target.value; drugPair=null; renderDrug(); });
+$('#selOrg').addEventListener('change',e=>{ curOrg=e.target.value; orgPair=null; renderOrg(); });
+function openDrug(id){ curDrug=id; drugPair=null; $('#selDrug').value=id; renderDrug(); showView('drug'); }
+document.addEventListener('click',e=>{
+  const b=e.target.closest('button'); if(!b) return;
+  if(b.dataset.o && b.closest('#drugCard')){ drugPair=b.dataset.o; renderDrug(); }
+  else if(b.dataset.d && b.closest('#orgCard')){ orgPair=b.dataset.d; renderOrg(); }
+  else if(b.dataset.cls){ curCls=b.dataset.cls; gridSel=null; renderGrid(); }
+  else if(b.dataset.cell){ const w=$('.gridwrap'), x=w.scrollLeft, y=w.scrollTop; gridSel=(gridSel===b.dataset.cell?null:b.dataset.cell); renderGrid(); w.scrollLeft=x; w.scrollTop=y; }
+  else if(b.dataset.closepair){ const w=$('.gridwrap'), x=w.scrollLeft, y=w.scrollTop; gridSel=null; renderGrid(); w.scrollLeft=x; w.scrollTop=y; }
+  else if(b.dataset.open){ openDrug(b.dataset.open); }
+  else if(b.dataset.quiz==='start'){ startQuiz(); }
+  else if(b.dataset.quiz==='next'){ qi++; picked=null; renderQuiz(); }
+  else if(b.dataset.pick && !picked){ picked=b.dataset.pick; if(picked===quiz[qi].answer) score++; renderQuiz(); }
+});
+function showView(v){ $$('section.view').forEach(s=>s.classList.toggle('on',s.id==='v-'+v)); $$('nav.tabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.v===v)); $('#main').classList.toggle('wide',v==='grid'); window.scrollTo({top:0}); }
+$$('nav.tabs button').forEach(b=>b.addEventListener('click',()=>showView(b.dataset.v)));
+function goHash(){ const id=decodeURIComponent(location.hash.slice(1)); if(!id) return; const el=document.getElementById(id); if(!el) return; const sec=el.closest('section.view'); if(sec){ showView(sec.id.slice(2)); requestAnimationFrame(()=>el.scrollIntoView({block:'start'})); } }
+window.addEventListener('hashchange',goHash);
+renderDrug(); renderOrg(); renderGrid(); renderQuiz(); goHash();
+</script>
+</body>
+</html>
