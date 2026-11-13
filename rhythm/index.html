@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Arrhythmias · bedside.tools</title>
+<meta name="description" content="Read a rhythm strip in four steps, see the likely rhythms and their look-alikes, and get the first action with the reasoning. Tachycardia, bradycardia, conduction, QT, devices and antiarrhythmic drugs.">
+<script src="/theme.js"></script>
+<style>
+:root{--bg:#FBFBFA; --card:#FFFFFF; --ink:#111113; --muted:#55555D; --line:#ECECEE; --accent:#2B4BDB; --warn:#9A3B00; --warnbg:#FFF6EC}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5;padding-bottom:76px}
+.wrap{max-width:720px;margin:0 auto;padding:0 16px}
+a{color:var(--accent)}
+button{font:inherit;color:inherit}
+.back{font-size:14px;text-decoration:none;display:inline-block;min-height:44px;line-height:44px}
+h1{font-size:26px;margin:0 0 4px;letter-spacing:-.01em}
+h2{font-size:18px;margin:0}
+h3{font-size:15px;margin:0}
+.purpose{color:var(--muted);margin:0 0 16px}
+.mono{font-family:var(--mono)}
+.label{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin:0 0 14px;display:flex;flex-direction:column;gap:12px}
+.card p{margin:0}
+.muted{color:var(--muted);font-size:14px}
+.tier{display:inline-block;font-family:var(--mono);font-size:11px;border:1px solid var(--line);border-radius:999px;padding:1px 8px;color:var(--muted);vertical-align:1px}
+.guard{border-left:3px solid var(--warn);background:var(--warnbg);padding:10px 12px;border-radius:0 10px 10px 0;font-size:14.5px}
+.guard b{color:var(--warn)}
+.note{background:var(--fill);border-radius:10px;padding:10px 12px;font-size:14px}
+ul.plain{margin:0;padding-left:20px}
+ul.plain li{margin-bottom:6px}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);text-align:left;padding:8px 6px;border-bottom:1px solid var(--line);font-weight:500}
+td{padding:9px 6px;border-bottom:1px solid var(--line);vertical-align:top}
+tr:last-child td{border-bottom:0}
+.tblwrap{overflow-x:auto}
+details.more{border-top:1px solid var(--line);padding-top:4px}
+details.more summary{cursor:pointer;color:var(--accent);font-weight:600;font-size:14px;min-height:44px;line-height:44px}
+details.more p,details.more li{font-size:14.5px}
+details.more p{margin:0 0 8px}
+
+/* unstable bar */
+.shock{width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;text-align:left;min-height:56px;border:1px solid transparent;border-radius:12px;padding:8px 14px;background:var(--badbg);color:var(--bad);font-size:14.5px;font-weight:600;margin:0 0 12px;cursor:pointer}
+.shock small{font-weight:400;display:block;font-size:13px}
+.shock[aria-pressed=true]{border-color:var(--bad)}
+.shock .go{white-space:nowrap}
+
+/* shortcut */
+details.jump{border:1px solid var(--line);border-radius:12px;background:var(--card);margin:0 0 14px}
+details.jump summary{display:flex;justify-content:space-between;align-items:center;min-height:48px;padding:0 14px;font-size:14.5px;cursor:pointer;list-style:none}
+details.jump summary::-webkit-details-marker{display:none}
+details.jump summary span:last-child{color:var(--accent);font-weight:600}
+details.jump[open] summary span:last-child::after{content:""}
+.gal{padding:0 12px 14px;display:grid;gap:8px}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.tile{min-height:44px;border:1px solid var(--line);border-radius:12px;background:var(--card);padding:6px 6px 8px;font-size:13.5px;text-align:center;cursor:pointer;line-height:1.3}
+.tile svg{display:block;width:100%;height:auto;border-radius:7px;margin-bottom:6px}
+
+/* read steps */
+#steps{display:grid;gap:12px}
+.step{display:grid;gap:6px}
+.step .hd{display:flex;justify-content:space-between;align-items:center;font-size:14.5px;font-weight:600}
+.step .hd i{font-style:normal;font-family:var(--mono);color:var(--muted);margin-right:8px}
+.how{border:0;background:none;color:var(--accent);font-size:13.5px;font-weight:500;min-height:44px;padding:0 0 0 12px;cursor:pointer}
+.seg{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.seg.three{grid-template-columns:1fr 1fr 1fr}
+.seg button{min-height:44px;border:1px solid var(--line);border-radius:10px;background:var(--card);font-size:14px;padding:4px 6px;cursor:pointer;line-height:1.25}
+.seg button[aria-pressed=true]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:600}
+
+/* differential */
+.dxlist{display:grid;gap:8px;margin:0 0 14px}
+.dx{display:grid;grid-template-columns:112px 1fr;gap:10px;align-items:center;text-align:left;border:1px solid var(--line);border-radius:12px;padding:8px;background:var(--card);cursor:pointer;min-height:60px}
+.dx[aria-pressed=true]{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.dx svg{display:block;width:100%;height:auto;border-radius:7px}
+.dx b{display:block;font-size:14.5px}
+.dx small{display:block;font-size:13px;color:var(--muted);line-height:1.35}
+
+/* answer */
+.answer{border-color:var(--accent)}
+.big{font-size:20px;font-weight:600;line-height:1.3}
+.strip svg{display:block;width:100%;height:auto;border-radius:8px}
+.acts{margin:0;padding-left:20px;display:grid;gap:8px}
+.acts li{font-size:15px}
+.acts .d{font-family:var(--mono);font-size:14px}
+.why{font-size:14.5px}
+.why b{font-weight:600}
+.unst{border:1px solid var(--bad);background:var(--badbg);border-radius:10px;padding:10px 12px;display:grid;gap:8px}
+.unst .label{color:var(--bad)}
+.ctx{display:flex;flex-wrap:wrap;gap:6px}
+.ctx button{min-height:44px;border:1px solid var(--line);border-radius:999px;background:var(--card);padding:0 14px;font-size:13.5px;cursor:pointer}
+.ctx button[aria-pressed=true]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:600}
+.btn{min-height:44px;padding:0 18px;border:1px solid var(--accent);border-radius:999px;background:var(--accent);color:var(--accent-ink);font-weight:600;font-size:14.5px;cursor:pointer}
+.btn.ghost{background:var(--card);color:var(--accent)}
+.btn[disabled]{opacity:.45;cursor:default}
+
+/* reference */
+.chips{display:flex;gap:6px;overflow-x:auto;padding:2px 0 12px;margin:0 -16px;padding-left:16px;padding-right:16px}
+.chips a{flex:none;min-height:44px;display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:999px;background:var(--card);padding:0 14px;font-size:13.5px;text-decoration:none;color:var(--ink)}
+.ref h2{scroll-margin-top:12px}
+.ref .card{scroll-margin-top:12px}
+
+/* practice */
+.pagemsg{background:var(--fill);border-radius:10px;padding:10px 12px;font-size:15px}
+.mark{font-size:14px;display:grid;gap:4px}
+.mark .ok{color:var(--ok)} .mark .no{color:var(--bad)}
+.verdict{border-radius:10px;padding:10px 12px;font-weight:600}
+.verdict.ok{background:var(--okbg);color:var(--ok)} .verdict.no{background:var(--badbg);color:var(--bad)}
+
+/* how-to sheet */
+#sheetwrap{position:fixed;inset:0;background:var(--scrim);z-index:40;display:flex;align-items:flex-end;justify-content:center}
+#sheet{background:var(--card);border-radius:18px 18px 0 0;max-width:720px;width:100%;max-height:88vh;overflow:auto;padding:8px 16px 24px;display:grid;gap:12px}
+#sheet>*{min-width:0}
+#sheet .top{display:flex;justify-content:space-between;align-items:center}
+#sheet figure{margin:0}
+#sheet figure svg{display:block;width:100%;height:auto;border-radius:8px}
+#sheet figcaption{font-size:13.5px;color:var(--muted);margin-top:6px}
+#sheetclose{min-height:44px;min-width:44px;border:0;background:none;color:var(--accent);font-weight:600;cursor:pointer}
+svg .tr{fill:none;stroke:var(--ecg-ink);stroke-width:1.4;stroke-linejoin:round;stroke-linecap:round;vector-effect:non-scaling-stroke}
+svg .spk{stroke:var(--ecg-ink);stroke-width:1.4;vector-effect:non-scaling-stroke}
+svg .an{fill:none;stroke:var(--accent);stroke-width:1.6;vector-effect:non-scaling-stroke}
+svg .anf{fill:var(--accent)}
+svg text.fl{font-family:var(--mono);font-size:13px;fill:var(--accent);font-weight:600}
+
+section.view{display:none;padding:4px 0 8px}
+section.view.on{display:block}
+nav.tabs{position:fixed;left:0;right:0;bottom:0;background:var(--bg);border-top:1px solid var(--line);z-index:20;padding-bottom:env(safe-area-inset-bottom)}
+nav.tabs .wrap{display:flex;padding:0}
+nav.tabs button{flex:1;min-height:60px;border:0;border-top:2px solid transparent;background:none;font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);cursor:pointer}
+nav.tabs button[aria-selected=true]{color:var(--accent);border-top-color:var(--accent)}
+a:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+footer{margin-top:24px;padding:16px 0 8px;border-top:1px solid var(--line);font-size:12.5px;color:var(--muted);line-height:1.6}
+footer p{margin:0 0 6px}
+footer strong{color:var(--ink)}
+@media (min-width:1000px){
+  .wrap{max-width:1040px}
+  .readgrid{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
+  .readgrid>div:last-child{position:sticky;top:12px}
+  .ref .cols{columns:2;column-gap:20px}
+  .ref .cols .card{break-inside:avoid}
+  #sheetwrap{align-items:center}
+  #sheet{border-radius:18px}
+}
+</style>
+</head>
+<body>
+<header class="wrap">
+  <a class="back" href="/">← bedside.tools</a>
+  <h1>Arrhythmias</h1>
+  <p class="purpose">Fast or slow rhythm: what it is, what to do first, and why.</p>
+</header>
+
+<main class="wrap">
+
+<!-- ============ READ ============ -->
+<section class="view on" id="v-read">
+  <button class="shock" id="unstable" type="button" aria-pressed="false">
+    <span>Unstable?<small>Hypotension, acutely altered mental status, signs of shock, ischemic chest discomfort, or acute heart failure</small></span>
+    <span class="go" id="shockgo">Act now ›</span>
+  </button>
+
+  <details class="jump" id="jump">
+    <summary><span>Know the rhythm already?</span><span id="jumplbl">Jump to it ›</span></summary>
+    <div class="gal" id="gallery"></div>
+  </details>
+
+  <div class="readgrid">
+    <div>
+      <div class="card" id="read">
+        <p class="label">Read the strip</p>
+        <div id="steps"></div>
+      </div>
+      <p class="label" id="dxlabel" style="margin:0 0 8px">Most likely, in order</p>
+      <div class="dxlist" id="differential" aria-live="polite"></div>
+    </div>
+    <div>
+      <div id="answer" aria-live="polite"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ REFERENCE ============ -->
+<section class="view ref" id="v-ref">
+  <nav class="chips" aria-label="Reference sections">
+    <a href="#blocks">AV block</a><a href="#pacing">Who needs a pacemaker</a><a href="#bundle">Bundle branch</a><a href="#preexcitation">Pre-excitation</a><a href="#qt">QT</a><a href="#channelopathies">Channelopathies</a><a href="#ecg-drugs">Electrolytes and drugs</a><a href="#devices">Devices</a><a href="#icd-crt">ICD and CRT</a><a href="#antiarrhythmics">Antiarrhythmics</a>
+  </nav>
+  <div class="cols">
+
+  <div class="card" id="blocks">
+    <h2>AV block on the strip</h2>
+    <ul class="plain">
+      <li><b>First degree:</b> PR longer than 200 ms, every P conducted.</li>
+      <li><b>Mobitz I (Wenckebach):</b> PR lengthens beat by beat until a P is not conducted.</li>
+      <li><b>Mobitz II:</b> PR constant, then a P is not conducted.</li>
+      <li><b>High grade:</b> two or more consecutive P waves not conducted.</li>
+      <li><b>Third degree:</b> no P is conducted; atria and ventricles beat independently.</li>
+    </ul>
+    <p class="why"><b>Why it matters:</b> block in the AV node (Mobitz I, narrow escape) is usually benign and responds to atropine. Block below the node (Mobitz II, wide escape) can progress to asystole without warning.</p>
+    <details class="more"><summary>More: where is a 2:1 block?</summary>
+      <p>With 2:1 conduction there are never two conducted beats in a row, so the PR cannot be seen to lengthen and the strip alone cannot separate Mobitz I from II.</p>
+      <ul class="plain">
+        <li><b>In the node:</b> narrow QRS, long PR on conducted beats, improves with atropine or exercise.</li>
+        <li><b>Below the node:</b> wide QRS, worsens with atropine or exercise, improves with carotid massage.</li>
+      </ul>
+      <p><span class="tier">2018 bradycardia guideline, definitions</span></p>
+    </details>
+  </div>
+
+  <div class="card" id="pacing">
+    <h2>Who needs a permanent pacemaker</h2>
+    <div class="tblwrap"><table>
+      <tr><th>Finding</th><th>Pace?</th></tr>
+      <tr><td>Acquired Mobitz II, high-grade, or third-degree block not due to a reversible or physiologic cause</td><td>Yes, with or without symptoms <span class="tier">Class 1</span></td></tr>
+      <tr><td>Sinus node dysfunction</td><td>Only when symptoms line up in time with the bradycardia. No minimum rate or pause length. <span class="tier">Class 1</span></td></tr>
+      <tr><td>Permanent AF with symptomatic bradycardia</td><td>Yes <span class="tier">Class 1</span></td></tr>
+      <tr><td>Alternating bundle branch block</td><td>Yes <span class="tier">Class 1</span></td></tr>
+      <tr><td>Syncope with bundle branch block and HV interval ≥ 70 ms at EP study</td><td>Yes <span class="tier">Class 1</span></td></tr>
+      <tr><td>Neuromuscular disease (for example myotonic dystrophy) with second- or third-degree block or HV ≥ 70 ms</td><td>Yes, with or without symptoms <span class="tier">Class 1</span></td></tr>
+      <tr><td>Marked first-degree or Mobitz I block with symptoms clearly due to the block</td><td>Reasonable <span class="tier">Class 2a</span></td></tr>
+      <tr><td>Asymptomatic sinus bradycardia; block during sleep or from high vagal tone</td><td>No <span class="tier">Class 3: Harm</span></td></tr>
+      <tr><td>Block after MI that resolves</td><td>No. Wait before deciding; pace only persistent Mobitz II, high-grade, alternating bundle branch, or third-degree block. <span class="tier">Class 3: Harm if transient</span></td></tr>
+    </table></div>
+    <p class="why"><b>Why:</b> a pacemaker treats symptoms from a slow rate, or prevents asystole where the block is below the AV node. Where neither applies it adds risk without benefit.</p>
+    <details class="more"><summary>More: reversible causes, and which lead</summary>
+      <p><b>Look for a reversible cause first:</b> inferior MI; beta blocker, diltiazem or verapamil, digoxin, amiodarone, clonidine, donepezil, ivabradine; hyperkalemia; hypothyroidism; Lyme carditis (treat the infection; a pacemaker is usually not needed); sleep apnea; raised intracranial pressure; hypothermia. Bradycardia that is mainly nocturnal should prompt a sleep apnea screen.</p>
+      <p><b>Which lead:</b> with an EF of 36 to 50% and substantial ventricular pacing expected, physiologic pacing (biventricular or conduction-system pacing) is reasonable to avoid pacing-induced cardiomyopathy <span class="tier">Class 2a, HRS 2023</span>. With EF above 35% and little ventricular pacing expected, a conventional right ventricular lead with pacing minimized is reasonable <span class="tier">Class 2a, HRS 2023</span>.</p>
+      <p><span class="tier">2018 ACC/AHA/HRS bradycardia guideline unless marked</span></p>
+    </details>
+  </div>
+
+  <div class="card" id="bundle">
+    <h2>Bundle branch and fascicular blocks</h2>
+    <ul class="plain">
+      <li><b>RBBB:</b> QRS ≥ 120 ms, rsR′ in V1 to V2, wide S in I and V6.</li>
+      <li><b>LBBB:</b> QRS ≥ 120 ms, broad notched R in I, aVL, V5 to V6, no septal q in those leads.</li>
+      <li><b>Left anterior fascicular block:</b> axis −45° to −90°, qR in aVL, rS in the inferior leads, QRS under 120 ms.</li>
+      <li><b>Left posterior fascicular block:</b> axis +90° to +180°, rS in I and aVL, qR in III and aVF.</li>
+      <li><b>Bifascicular block:</b> RBBB with either fascicular block. The 2018 guideline still uses the term; the 2009 ECG statement discourages both it and "trifascicular block".</li>
+    </ul>
+    <div class="guard"><b>New LBBB:</b> get an echocardiogram to look for structural heart disease <span class="tier">Class 1</span>.</div>
+    <p class="muted">Criteria: AHA/ACCF/HRS ECG standardization, 2009. LBBB and ischemia: see <a href="/ekg-cath/">EKG emergencies</a> for the Sgarbossa rules.</p>
+  </div>
+
+  <div class="card" id="preexcitation">
+    <h2>Pre-excitation (WPW pattern)</h2>
+    <p>PR under 120 ms, a slurred upstroke (delta wave), and a widened QRS in sinus rhythm.</p>
+    <ul class="plain">
+      <li><b>Orthodromic AVRT:</b> down the node, up the pathway. Narrow and regular. Treat as SVT; adenosine is fine.</li>
+      <li><b>Antidromic AVRT:</b> down the pathway. Wide and regular; looks like VT.</li>
+      <li><b>Pre-excited AF:</b> wide, irregular, very fast, with QRS shape changing beat to beat.</li>
+    </ul>
+    <div class="guard"><b>Pre-excited AF:</b> no digoxin, IV amiodarone, beta blocker, diltiazem or verapamil <span class="tier">Class 3: Harm</span>. Give IV procainamide or ibutilide <span class="tier">Class 1</span>, or cardiovert.</div>
+    <p class="why"><b>Why:</b> with the AV node blocked, conduction runs over the accessory pathway, which has no built-in delay.</p>
+    <details class="more"><summary>More: the asymptomatic delta wave</summary>
+      <p>Abrupt loss of pre-excitation during an exercise test marks a pathway that cannot conduct fast, and is low risk <span class="tier">Class 1</span>. An EP study to stratify risk is reasonable <span class="tier">Class 2a</span>. At EP study, a shortest pre-excited R–R interval of 250 ms or less in AF marks high risk. Symptomatic patients are referred for ablation <span class="tier">Class 1</span>.</p>
+      <p><span class="tier">2015 ACC/AHA/HRS SVT guideline</span></p>
+    </details>
+  </div>
+
+  <div class="card" id="qt">
+    <h2>QT interval</h2>
+    <ul class="plain">
+      <li>Measure in lead II or V5 to V6, whichever is longest, to the point where the tangent of the T-wave downslope meets the baseline.</li>
+      <li><b>Prolonged:</b> QTc of 450 ms or more in men, 460 ms or more in women.</li>
+      <li><b>Torsades risk rises</b> with QTc above 500 ms, or a rise of more than 60 ms from baseline.</li>
+      <li>Bazett's formula overcorrects at fast heart rates; Fridericia's is the usual bedside alternative.</li>
+    </ul>
+    <p class="why"><b>Why:</b> a long QT means ventricular cells are slow to repolarize. An early afterdepolarization landing in that window, typically after a pause, starts torsades.</p>
+    <details class="more"><summary>More: congenital long QT</summary>
+      <ul class="plain">
+        <li><b>LQT1:</b> events with exertion, especially swimming.</li>
+        <li><b>LQT2:</b> sudden noise, and the postpartum period.</li>
+        <li><b>LQT3:</b> events at rest or in sleep.</li>
+      </ul>
+      <p>Beta blocker for long QT syndrome with a resting QTc above 470 ms <span class="tier">Class 1, 2017 guideline</span>. Avoid QT-prolonging drugs and keep potassium and magnesium replete. Modern review: Schwartz and Crotti, N Engl J Med 2025.</p>
+      <p><span class="tier">AHA/ACCF/HRS 2009; AHA/ACCF torsades statement 2010</span></p>
+    </details>
+  </div>
+
+  <div class="card" id="channelopathies">
+    <h2>Channelopathies and inherited patterns</h2>
+    <ul class="plain">
+      <li><b>Brugada, type 1:</b> coved ST elevation of 2 mm or more in V1 or V2 (standard or higher intercostal position). Treat fever promptly and avoid sodium-channel-blocking drugs. With a spontaneous type 1 pattern: ICD after cardiac arrest, sustained ventricular arrhythmia, or recent syncope presumed arrhythmic <span class="tier">Class 1</span>. Quinidine for recurrent ICD shocks <span class="tier">Class 1</span>; isoproterenol is used for electrical storm <span class="tier">2013 consensus</span>.</li>
+      <li><b>CPVT:</b> bidirectional or polymorphic VT with exercise or emotion, normal resting ECG. Beta blocker; flecainide is added if events continue.</li>
+      <li><b>Arrhythmogenic right ventricular cardiomyopathy:</b> epsilon wave and T inversion in V1 to V3; VT with left bundle shape.</li>
+      <li><b>Short QT</b> and <b>hypertrophic cardiomyopathy</b> patterns: refer.</li>
+    </ul>
+    <p class="muted">2017 AHA/ACC/HRS ventricular arrhythmia guideline; 2013 HRS/EHRA/APHRS consensus on inherited arrhythmia syndromes.</p>
+  </div>
+
+  <div class="card" id="ecg-drugs">
+    <h2>Electrolytes and drugs on the ECG</h2>
+    <ul class="plain">
+      <li><b>Hyperkalemia:</b> peaked T, then long PR and flat P, then wide QRS, then sine wave. It can imitate any block or wide rhythm.</li>
+      <li><b>Hypokalemia:</b> flat T, prominent U wave, long QU interval.</li>
+      <li><b>Hypocalcemia:</b> long ST segment (long QT with a normal T). <b>Hypercalcemia:</b> short QT.</li>
+      <li><b>Digoxin effect:</b> scooped ST depression; not toxicity. <b>Digoxin toxicity:</b> atrial tachycardia with block, bidirectional VT, regularized AF.</li>
+      <li><b>Tricyclic or other sodium-channel poisoning:</b> QRS over 100 ms predicts seizures and over 160 ms ventricular arrhythmia; tall terminal R in aVR. Treat with sodium bicarbonate 1 to 2 mEq/kg IV.</li>
+    </ul>
+    <p class="muted">Electrolyte patterns: teaching convention. Tricyclic thresholds: Boehnert and Lovejoy 1985; AHA 2023 toxicology update. Repletion doses: <a href="/electrolytes/">Electrolyte repletion</a>.</p>
+  </div>
+
+  <div class="card" id="devices">
+    <h2>Pacemakers and ICDs on the ward</h2>
+    <p><b>Reading the mode:</b> first letter is the chamber paced, second the chamber sensed, third the response to sensing (I inhibit, D both inhibit and trigger, O none), fourth R for rate response. VVI paces and senses the ventricle only; DDD does both chambers; VOO and DOO pace at a fixed rate and ignore the heart's own beats.</p>
+    <ul class="plain">
+      <li><b>Failure to capture:</b> spike with no complex after it. Check potassium, ischemia, new drugs, and lead position on a chest film.</li>
+      <li><b>Undersensing:</b> spikes land where they should not, on top of native beats.</li>
+      <li><b>Oversensing:</b> unexpected pauses; the device is inhibited by something that is not a heartbeat.</li>
+      <li><b>Pacemaker-mediated tachycardia:</b> paced tachycardia at the upper rate limit in a dual-chamber device.</li>
+    </ul>
+    <p><b>Magnet:</b> on a pacemaker, asynchronous pacing at the manufacturer's magnet rate. On an ICD, shock therapy is suspended and pacing is unchanged. <span class="tier">HRS/ASA 2011 consensus</span></p>
+    <details class="more"><summary>More: the patient whose ICD fired</summary>
+      <p>One shock and feeling well: arrange device interrogation soon. Three or more shocks in 24 hours, or a shock with syncope or chest pain: emergency evaluation and treat as electrical storm. <span class="tier">Expert practice</span></p>
+      <p class="note">Adjust to your institution: who interrogates devices after hours, and how to reach them.</p>
+    </details>
+  </div>
+
+  <div class="card" id="icd-crt">
+    <h2>Who gets an ICD or CRT</h2>
+    <div class="tblwrap"><table>
+      <tr><th>Situation</th><th>Recommendation</th></tr>
+      <tr><td>Survivor of VF or hemodynamically unstable VT with no reversible cause</td><td>ICD <span class="tier">Class 1</span></td></tr>
+      <tr><td>Ischemic cardiomyopathy, EF ≤ 35% and NYHA II–III, or EF ≤ 30% and NYHA I; at least 40 days after MI and 90 days after revascularization; on guideline-directed therapy; expected survival over 1 year</td><td>ICD <span class="tier">Class 1</span></td></tr>
+      <tr><td>Non-ischemic cardiomyopathy, EF ≤ 35%, NYHA II–III on guideline-directed therapy</td><td>ICD <span class="tier">Class 1</span></td></tr>
+      <tr><td>Prior MI, EF ≤ 40%, non-sustained VT, and inducible sustained VT at EP study</td><td>ICD <span class="tier">Class 1</span></td></tr>
+      <tr><td>Clinically relevant ventricular arrhythmia more than 48 hours and within 40 days after MI</td><td>ICD is reasonable <span class="tier">Class 2a, 2025 ACS guideline</span></td></tr>
+      <tr><td>EF ≤ 35%, NYHA II–IV, sinus rhythm, LBBB, QRS ≥ 150 ms</td><td>CRT <span class="tier">Class 1, HRS 2023</span></td></tr>
+      <tr><td>EF ≤ 35%, NYHA II–IV, sinus rhythm, LBBB, QRS 120–149 ms</td><td>CRT <span class="tier">Class 1 in women, 2a otherwise, HRS 2023</span></td></tr>
+      <tr><td>EF 36–50%, NYHA II–IV, sinus rhythm, LBBB, QRS ≥ 150 ms</td><td>CRT may be considered <span class="tier">Class 2b, HRS 2023</span></td></tr>
+    </table></div>
+    <p class="why"><b>Why the waiting periods:</b> EF often recovers after MI, revascularization or starting medical therapy, and early ICD implantation after MI lowered arrhythmic death but not overall death.</p>
+    <details class="more"><summary>More</summary>
+      <p>A wearable defibrillator is not routine after MI: in VEST it did not significantly reduce the primary endpoint. When biventricular pacing cannot be achieved, conduction-system pacing is a reasonable alternative <span class="tier">Class 2a, HRS 2023</span>.</p>
+      <p><span class="tier">2017 AHA/ACC/HRS ventricular arrhythmia guideline unless marked</span></p>
+    </details>
+  </div>
+
+  <div class="card" id="antiarrhythmics">
+    <h2>Antiarrhythmic drugs</h2>
+    <div class="tblwrap"><table>
+      <tr><th>Class</th><th>Drugs</th><th>Blocks</th></tr>
+      <tr><td class="mono">Ia</td><td>Procainamide, quinidine, disopyramide</td><td>Sodium and potassium channels</td></tr>
+      <tr><td class="mono">Ib</td><td>Lidocaine, mexiletine</td><td>Sodium channel (fast off)</td></tr>
+      <tr><td class="mono">Ic</td><td>Flecainide, propafenone</td><td>Sodium channel (slow off)</td></tr>
+      <tr><td class="mono">II</td><td>Beta blockers</td><td>Sympathetic drive</td></tr>
+      <tr><td class="mono">III</td><td>Amiodarone, sotalol, dofetilide, ibutilide, dronedarone</td><td>Potassium channel</td></tr>
+      <tr><td class="mono">IV</td><td>Verapamil, diltiazem</td><td>Calcium channel</td></tr>
+    </table></div>
+    <ul class="plain">
+      <li><b>Flecainide, propafenone:</b> not with prior MI, coronary disease or structural heart disease <span class="tier">Class 3: Harm</span>. Pair with an AV-nodal blocker.</li>
+      <li><b>Amiodarone:</b> baseline TSH, liver tests, chest film, pulmonary function with DLCO, and eye exam; TSH and liver tests every 6 months; chest film yearly. It raises warfarin and digoxin effect (reduce both). Simvastatin maximum 20 mg daily.</li>
+      <li><b>Sotalol:</b> start in hospital with QTc monitoring; dose by kidney function. Do not start with QTc above 450 ms; reduce or stop at 500 ms or more.</li>
+      <li><b>Dofetilide:</b> start in hospital for at least 3 days. <span class="mono">CrCl &gt; 60: 500 mcg BID · 40–60: 250 mcg BID · 20 to &lt; 40: 125 mcg BID · &lt; 20: contraindicated.</span> Do not start if QTc is above 440 ms. ECG 2 to 3 hours after each dose: after the first dose, halve the dose if QTc rises more than 15% or exceeds 500 ms; after any later dose, stop if QTc exceeds 500 ms.</li>
+      <li><b>Dronedarone:</b> not in NYHA III–IV or recently decompensated heart failure, and not in permanent AF.</li>
+      <li><b>Ibutilide:</b> <span class="mono">1 mg IV over 10 min (0.01 mg/kg if under 60 kg); may repeat once.</span> Monitor at least 4 hours for torsades.</li>
+      <li><b>Lidocaine:</b> <span class="mono">1–1.5 mg/kg IV; repeat 0.5–0.75 mg/kg to a maximum of 3 mg/kg; then 1–4 mg/min.</span> <span class="tier">Earlier AHA life-support editions</span></li>
+    </ul>
+    <p class="why"><b>Why class Ic is barred in structural disease:</b> in CAST, flecainide and encainide given after MI suppressed ectopy and raised mortality.</p>
+    <details class="more"><summary>More: choosing a rhythm drug, and newer options</summary>
+      <p><b>By substrate:</b> no structural heart disease: flecainide, propafenone, dofetilide, dronedarone or sotalol. Coronary disease: no class Ic. Heart failure with reduced EF: amiodarone or dofetilide. <span class="tier">2023 AF guideline</span></p>
+      <p><b>Dofetilide must not be combined with</b> verapamil, hydrochlorothiazide, trimethoprim, cimetidine, ketoconazole, dolutegravir, prochlorperazine or megestrol.</p>
+      <p><b>Pill in the pocket:</b> flecainide 200 to 300 mg or propafenone 450 to 600 mg once, after a first monitored dose.</p>
+      <p><b>Etripamil nasal spray</b> was FDA-approved in December 2025 for adults to convert acute symptomatic PSVT themselves outside hospital. In the RAPID trial 64% converted by 30 minutes against 31% on placebo. It belongs in discharge and clinic planning for recurrent PSVT; dose and contraindications are in the label.</p>
+      <p class="note">Adjust to your institution: the inpatient loading protocol for dofetilide and sotalol, and the telemetry QTc policy.</p>
+      <p><span class="tier">FDA labels; HRS 2007 amiodarone guide; AHA 2025 life support</span></p>
+    </details>
+  </div>
+
+  </div>
+</section>
+
+<!-- ============ PRACTICE ============ -->
+<section class="view" id="v-practice">
+  <div id="practice"></div>
+</section>
+
+<footer>
+  <p><strong>For education only. Not a substitute for clinical judgment.</strong> Built to US national guidelines; adjust to your institution's formulary, defibrillator and protocols. Rhythm strips are synthetic drawings, not patient recordings.</p>
+  <p>Privacy: everything runs in your browser. Nothing you enter is sent anywhere or stored, and there are no analytics. Do not enter names, record numbers, or dates of birth.</p>
+  <p class="mono">Last reviewed: 2026-11-12</p>
+  <p><strong>Sources:</strong> 2025 American Heart Association Guidelines for CPR and Emergency Cardiovascular Care, Part 9: Adult Advanced Life Support (tachycardia and bradycardia algorithms and doses) · Page RL et al., 2015 ACC/AHA/HRS Guideline for the Management of Adult Patients With Supraventricular Tachycardia · Al-Khatib SM et al., 2017 AHA/ACC/HRS Guideline for Management of Patients With Ventricular Arrhythmias and the Prevention of Sudden Cardiac Death · Kusumoto FM et al., 2018 ACC/AHA/HRS Guideline on Bradycardia and Cardiac Conduction Delay · Chung MK et al., 2023 HRS/APHRS/LAHRS Guideline on Cardiac Physiologic Pacing · Joglar JA et al., 2023 ACC/AHA/ACCP/HRS Atrial Fibrillation Guideline · Rao SV et al., 2025 ACC/AHA Acute Coronary Syndromes Guideline · Zeppenfeld K et al., 2022 ESC Guidelines for ventricular arrhythmias · Brugada J et al., 2019 ESC Guidelines for supraventricular tachycardia · Surawicz B et al., AHA/ACCF/HRS ECG standardization part III (conduction), and Rautaharju PM et al., part IV (QT interval), 2009 · Drew BJ et al., Prevention of torsade de pointes in hospital settings, 2010 · Appelboam A et al., REVERT, Lancet 2015 · Ortiz M et al., PROCAMIO, Eur Heart J 2017 · Stambler BS et al., RAPID, Lancet 2023 · Brugada P et al., Circulation 1991; Vereckei A et al., Heart Rhythm 2008; Pava LF et al., Heart Rhythm 2010 (wide-complex criteria) · FDA prescribing information for adenosine, procainamide, amiodarone, sotalol, dofetilide, dronedarone, ibutilide, flecainide and etripamil. Recommendations show their guideline class where one is assigned, and are otherwise marked with their source, "expert practice" or "teaching convention". The four-step read and the order of the rhythm lists are teaching conventions.</p>
+</footer>
+</main>
+
+<div id="sheetwrap" hidden><div id="sheet" role="dialog" aria-modal="true" aria-label="How to measure"></div></div>
+
+<nav class="tabs" role="tablist"><div class="wrap">
+  <button role="tab" aria-selected="true" data-v="read">Read</button>
+  <button role="tab" aria-selected="false" data-v="ref">Reference</button>
+  <button role="tab" aria-selected="false" data-v="practice">Practice</button>
+</div></nav>
+<script id="engine">
+/* ---------- engine: pure data and functions, used by the Read tab and the practice cases ---------- */
+const tg = t => ` <span class="tier">${t}</span>`;
+const DOSE = {
+  proc: `<span class="d">Procainamide 20–50 mg/min IV</span> until the rhythm ends, hypotension, QRS widens by more than 50%, or 17 mg/kg is given; then <span class="d">1–4 mg/min</span>. Avoid with a long QT or heart failure.`,
+  amio: `<span class="d">Amiodarone 150 mg IV over 10 min</span>, repeat if VT recurs; then <span class="d">1 mg/min for the first 6 h</span>.`,
+  aden: `<span class="d">Adenosine 6 mg rapid IV push</span> with a saline flush; <span class="d">12 mg</span> if needed.`
+};
+
+/* Each rhythm: n name, g group, tell (the feature that separates it), act (first actions when stable), un (what to do if unstable),
+   guard, why, mt/more (the single disclosure). */
+const R = {
+  st: { n: "Sinus tachycardia", g: "fast",
+    tell: "Upright P in II before every QRS; the rate drifts up and down gradually.",
+    act: [`Find and treat the cause: pain, fever, bleeding, low volume, hypoxia, pulmonary embolism, sepsis, withdrawal.` + tg("Expert practice"),
+          `No cardioversion and no rate-slowing drug.` + tg("Expert practice")],
+    un: { t: "cause" },
+    why: "Sinus tachycardia is a response, not the problem. Slowing it removes the compensation and leaves the cause untreated.",
+    mt: "telling it from SVT",
+    more: `<p>Sinus tachycardia speeds and slows gradually; re-entrant SVT starts and stops abruptly and holds one fixed rate. A rule of thumb for the upper limit of sinus rate is about 220 minus age. A P wave buried in the preceding T can be exposed by a vagal maneuver, which slows sinus tachycardia transiently and does not terminate it.</p><p>${tg("Teaching convention")}</p>` },
+
+  svt: { n: "SVT (AVNRT, AVRT or atrial tachycardia)", g: "fast",
+    tell: "Abrupt onset, one fixed rate, no P wave or a small one just after the QRS.",
+    act: [`Vagal maneuver. Modified Valsalva: strain for 15 s sitting up, then lie flat with legs raised.` + tg("Class 1"),
+          DOSE.aden + tg("Class 1"),
+          `If it persists: IV diltiazem or verapamil, or an IV beta blocker.` + tg("Class 2a"),
+          `Synchronized cardioversion if drugs fail or are not feasible.` + tg("Class 1")],
+    un: { t: "cv", j: "100 J", lbl: "narrow-complex tachycardia", pre: "If the rhythm is regular and narrow, adenosine may be tried while the shock is being prepared, without delaying it." },
+    guard: `<b>Adenosine:</b> reduce the dose through a central line or after heart transplant (AHA 2025: 1 mg may be enough). Dipyridamole strengthens its effect and carbamazepine raises the risk of heart block. Record a strip during the push.` + tg("AHA 2025; label"),
+    why: "Adenosine blocks the AV node for a few seconds. That breaks a circuit that needs the node, and unmasks an atrial rhythm that does not.",
+    mt: "mechanism clues and what happens after",
+    more: `<p><b>Short RP</b> (P just after the QRS): typical AVNRT gives a pseudo-R′ in V1 and pseudo-S in the inferior leads; an RP under about 90 ms on the surface ECG points to typical AVNRT, a longer one to AVRT. <b>Long RP</b> (P nearer the next QRS): atrial tachycardia, atypical AVNRT, or a slowly conducting pathway.</p>
+<p><b>Response to adenosine:</b> ends with a P wave: the AV node was part of the circuit. Ventricular rate slows and flutter or atrial waves appear: the rhythm is atrial.</p>
+<p>A narrow tachycardia with P waves unrelated to the QRS is junctional tachycardia, which is uncommon in adults: think digoxin toxicity, recent cardiac surgery or ischemia. Treat the cause, and avoid cardioversion in digoxin toxicity.</p>
+<p><b>After:</b> teach vagal maneuvers ${tg("Class 1")} and refer recurrent SVT to electrophysiology for ablation ${tg("Class 1")}. Etripamil nasal spray (FDA-approved December 2025) lets adults treat recurrent PSVT themselves outside hospital. The 2019 ESC guideline gives the same acute sequence.</p>
+<p>${tg("2015 ACC/AHA/HRS SVT guideline; REVERT 2015")}</p>` },
+
+  afl: { n: "Atrial flutter", g: "fast",
+    tell: "Sawtooth waves near 300/min in II, III and aVF; ventricular rate fixed near 150 (2:1) or 75 (4:1).",
+    act: [`Rate control with a beta blocker, diltiazem or verapamil.` + tg("Class 1") + ` Doses are in <a href="/afib/#rvr">Atrial fibrillation: rapid AF</a>.`,
+          `Anticoagulate by the same rules as AF.` + tg("Class 1"),
+          `For rhythm control: synchronized cardioversion, or IV ibutilide or oral dofetilide.` + tg("Class 1")],
+    un: { t: "cv", j: "200 J", lbl: "atrial flutter" },
+    why: "Flutter is one re-entry circuit in the right atrium. The AV node passes every second wave, which is why the rate sits at 150 and is hard to slow.",
+    mt: "why adenosine helps the diagnosis",
+    more: `<p>Adenosine does not end flutter. It blocks the node for a few seconds so the sawtooth shows between QRS complexes. A regular narrow tachycardia at exactly 150 is flutter until proven otherwise.</p><p>Recurrent or symptomatic flutter is referred for ablation of the cavotricuspid isthmus ${tg("Class 1")}.</p><p>${tg("2015 ACC/AHA/HRS SVT guideline")}</p>` },
+
+  af: { n: "Atrial fibrillation", g: "fast",
+    tell: "No P waves, fibrillating baseline, R–R intervals with no pattern at all.",
+    act: [`Rate control, cardioversion timing and anticoagulation are in <a href="/afib/#rvr">Atrial fibrillation</a>.`],
+    un: { t: "cv", j: "200 J", lbl: "atrial fibrillation" },
+    why: "Irregularly irregular with no P waves is AF until proven otherwise. What to give turns on stability, ejection fraction and whether there is pre-excitation.",
+    mt: "look-alikes",
+    more: `<p>Multifocal atrial tachycardia has visible P waves of several shapes. Flutter with variable block is irregular in groups, with sawtooth waves. Frequent atrial ectopy has a P before each early beat.</p><p>${tg("Teaching convention")}</p>` },
+
+  mat: { n: "Multifocal atrial tachycardia", g: "fast",
+    tell: "Three or more P-wave shapes with varying PR intervals; usually severe lung disease.",
+    act: [`Treat the trigger: hypoxia, a COPD flare, theophylline, low potassium or magnesium.` + tg("2015 SVT guideline"),
+          `IV metoprolol or verapamil is reasonable if the rate itself is a problem.` + tg("Class 2a")],
+    un: { t: "cause" },
+    guard: `<b>Cardioversion does not work</b> and antiarrhythmic drugs have no role.` + tg("2015 SVT guideline text"),
+    why: "Several atrial foci are firing from stretched, hypoxic atria. There is no circuit to break, so a shock changes nothing.",
+    mt: "more",
+    more: `<p>The irregularity is often mistaken for AF and anticoagulated. Look for discrete P waves before each QRS. Beta blockers need care in bronchospasm; verapamil is the alternative.</p><p>${tg("2015 ACC/AHA/HRS SVT guideline")}</p>` },
+
+  vt: { n: "Ventricular tachycardia", g: "fast",
+    tell: "P waves march through unrelated to the QRS; capture or fusion beats; prior MI or cardiomyopathy.",
+    act: [`Call cardiology and get a 12-lead ECG.` + tg("AHA 2025"),
+          DOSE.proc + tg("Class 2a, 2017 guideline"),
+          `or ` + DOSE.amio + tg("Class 2b, 2017 guideline"),
+          `Synchronized cardioversion if drugs fail or the patient worsens.` + tg("Class 1")],
+    un: { t: "cv", j: "100 J", lbl: "monomorphic VT", post: "No pulse: start CPR and defibrillate." },
+    guard: `<b>Do not give</b> verapamil or diltiazem for a wide tachycardia of unknown cause.` + tg("Class 3: Harm"),
+    why: "Most wide regular tachycardia in adults is VT, and treating VT as SVT is the dangerous error.",
+    mt: "VT or SVT with aberrancy?",
+    more: `<p><b>Favors VT:</b> prior MI or cardiomyopathy; AV dissociation; capture or fusion beats; no RS complex in any precordial lead; an RS interval over 100 ms (Brugada 1991); an initial R wave in aVR (Vereckei 2008); R-wave peak time in lead II of 50 ms or more (Pava 2010). Stable blood pressure does not make it SVT.</p>
+<p><b>Drug choice:</b> procainamide ended more VT with fewer adverse events than amiodarone in PROCAMIO; the 2022 ESC guideline also ranks it first for tolerated VT. AHA 2025 rates IV amiodarone, procainamide and sotalol together as Class 2b; its algorithm box no longer lists a sotalol dose. Lidocaine is an alternative (see <a href="#antiarrhythmics">Antiarrhythmics</a>).</p>
+<p><b>Wide and bizarre in a patient with kidney failure or an overdose:</b> think hyperkalemia or sodium-channel poisoning before VT; see <a href="#ecg-drugs">Electrolytes and drugs</a>.</p>
+<p><b>Storm</b> (three or more sustained episodes in 24 hours): beta blocker, amiodarone, sedation, correct triggers, and electrophysiology for ablation.</p>
+<p class="note">Adjust to your institution: whether IV procainamide is stocked and how fast it arrives.</p>
+<p>${tg("2017 AHA/ACC/HRS ventricular arrhythmia guideline; AHA 2025")}</p>` },
+
+  aberr: { n: "SVT with aberrancy", g: "fast",
+    tell: "Typical bundle-branch shape, identical to the baseline ECG; one P per QRS; no structural heart disease.",
+    act: [`Only if you are sure, and the patient is stable: treat as SVT with a vagal maneuver, then adenosine.` + tg("Class 2b, AHA 2025"),
+          `Any doubt: treat as VT.` + tg("Expert practice")],
+    un: { t: "cv", j: "100 J", lbl: "a regular wide tachycardia" },
+    guard: `<b>Do not give</b> verapamil or diltiazem for a wide tachycardia of unknown cause.` + tg("Class 3: Harm"),
+    why: "Adenosine is short-acting and may be considered in a stable, regular, monomorphic wide tachycardia; it is harmful if the rhythm is unstable, irregular or polymorphic. Verapamil given to VT can cause collapse.",
+    mt: "how to be sure",
+    more: `<p>Compare with an old ECG in sinus rhythm: the same bundle-branch shape at a faster rate supports aberrancy. Flutter or sinus tachycardia with a bundle branch block also lands here. Apply the criteria listed under ventricular tachycardia; if any favors VT, treat as VT.</p><p>${tg("2017 AHA/ACC/HRS ventricular arrhythmia guideline")}</p>` },
+
+  anti: { n: "Pre-excited tachycardia", g: "fast",
+    tell: "Young patient without structural disease; delta wave on a previous ECG in sinus rhythm.",
+    act: [DOSE.proc + tg("Expert practice"),
+          `or synchronized cardioversion.` + tg("Class 1")],
+    un: { t: "cv", j: "100 J", lbl: "a regular wide tachycardia" },
+    guard: `<b>If the rhythm is irregular it is pre-excited AF:</b> no AV-nodal blockers.` + tg("Class 3: Harm"),
+    why: "The impulse travels down the accessory pathway and back up the node, so the QRS is fully pre-excited and looks like VT.",
+    mt: "more",
+    more: `<p>Antidromic tachycardia cannot be reliably told from VT at the bedside; treating it as VT is safe. After conversion the sinus ECG shows a short PR and delta wave. Refer for ablation ${tg("Class 1")}.</p><p>${tg("2015 ACC/AHA/HRS SVT guideline")}</p>` },
+
+  afbbb: { n: "AF with bundle branch block", g: "fast",
+    tell: "Irregular, every QRS the same shape, rate usually under 200; bundle branch block on the old ECG.",
+    act: [`Unless an old ECG shows the same bundle branch block: treat as pre-excited AF, with procainamide or cardioversion and no AV-nodal blockers.` + tg("Expert practice"),
+          `Same QRS as the old ECG: manage as AF. See <a href="/afib/#rvr">Atrial fibrillation: rapid AF</a>.`],
+    un: { t: "cv", j: "200 J", lbl: "atrial fibrillation" },
+    guard: `<b>If the QRS shape changes beat to beat or the rate passes 200,</b> treat as pre-excited AF: no AV-nodal blockers.` + tg("Class 3: Harm"),
+    why: "A fixed bundle branch block widens every beat the same way. A pathway conducts a different amount each beat, so the shape keeps changing.",
+    mt: "more",
+    more: `<p>AF with a bundle branch block is far more common than pre-excited AF, but giving diltiazem to pre-excited AF can cause VF. Procainamide or cardioversion treats both, which is why it is the default when the old ECG is not to hand.</p><p>${tg("Expert practice")}</p>` },
+
+  paf: { n: "Pre-excited atrial fibrillation", g: "fast",
+    tell: "Irregular, very fast (often over 200), QRS width and shape changing from beat to beat.",
+    act: [DOSE.proc + tg("Class 1"),
+          `or <span class="d">ibutilide 1 mg IV over 10 min</span>.` + tg("Class 1"),
+          `Cardiovert if there is any instability.` + tg("Class 1")],
+    un: { t: "cv", j: "200 J", lbl: "atrial fibrillation" },
+    guard: `<b>Do not give</b> digoxin, IV amiodarone, beta blockers, diltiazem or verapamil.` + tg("Class 3: Harm"),
+    why: "With the AV node blocked, conduction runs over the accessory pathway, which has no built-in delay, and the ventricular rate can degenerate into VF.",
+    mt: "after conversion",
+    more: `<p>The sinus ECG usually shows a delta wave. Admit to a monitored bed and refer for ablation of the pathway ${tg("Class 1")}.</p><p>${tg("2015 ACC/AHA/HRS SVT guideline; 2023 AF guideline")}</p>` },
+
+  tdp: { n: "Torsades de pointes", g: "fast",
+    tell: "QRS axis twists around the baseline; long QT on the sinus beats before it; often starts after a pause.",
+    act: [`<span class="d">Magnesium sulfate 1–2 g IV</span>, even if the level is normal.` + tg("Class 1, 2017 guideline; dose is common practice"),
+          `Stop every QT-prolonging drug. Bring potassium to 4.0 mEq/L or above and replete magnesium.` + tg("Class 1"),
+          `Recurrent or pause-dependent: overdrive pacing or isoproterenol.` + tg("Class 1")],
+    un: { t: "defib" },
+    why: "Magnesium suppresses the early afterdepolarizations that trigger torsades. Pacing or isoproterenol shortens the QT by removing the pauses.",
+    mt: "who is at risk",
+    more: `<p>AHA 2025 rates magnesium for polymorphic VT with a long QT as Class 2b. Risk rises with a QTc above 500 ms or a rise of more than 60 ms: several QT-prolonging drugs together, low potassium or magnesium, bradycardia, female sex, and kidney or liver impairment that raises drug levels. See <a href="#qt">QT interval</a>.</p><p>${tg("2017 AHA/ACC/HRS ventricular arrhythmia guideline; AHA/ACCF 2010")}</p>` },
+
+  pvt: { n: "Polymorphic VT with a normal QT", g: "fast",
+    tell: "QRS shape changes continuously, but the QT on the sinus beats is normal.",
+    act: [`Treat as ischemia until proven otherwise: beta blocker, amiodarone, and urgent coronary angiography. See <a href="/ekg-cath/">EKG emergencies</a>.` + tg("2017 guideline")],
+    un: { t: "defib" },
+    why: "With a normal QT the usual trigger is acute ischemia, not repolarization. Magnesium is unlikely to help; reperfusion is the treatment.",
+    mt: "other causes",
+    more: `<p>Less common causes with a normal QT: catecholaminergic polymorphic VT, Brugada syndrome, and short-coupled idiopathic VF. See <a href="#channelopathies">Channelopathies</a>.</p><p>${tg("2017 AHA/ACC/HRS ventricular arrhythmia guideline")}</p>` },
+
+  sb: { n: "Sinus bradycardia", g: "slow",
+    tell: "A normal P wave before every QRS with a constant PR; the rate is simply slow.",
+    act: [`No symptoms: no treatment. It is normal in sleep and in fit people.` + tg("2018 guideline"),
+          `Look for a cause: beta blocker, diltiazem or verapamil, digoxin, clonidine; hypothyroidism; sleep apnea; raised intracranial pressure; inferior MI.` + tg("2018 guideline"),
+          `A pacemaker only when symptoms line up in time with the slow rate.` + tg("Class 1")],
+    un: { t: "brady" },
+    why: "A slow sinus rate is harmful only when it causes symptoms. A pacemaker for an incidental number adds risk with no benefit.",
+    mt: "more",
+    more: `<p>There is no minimum heart rate or pause length that mandates pacing in sinus node dysfunction. Bradycardia that is mainly nocturnal should prompt a sleep apnea screen. A wide QRS with a normal P before each means a bundle branch block is also present: see <a href="#bundle">Bundle branch</a>.</p><p>${tg("2018 ACC/AHA/HRS bradycardia guideline")}</p>` },
+
+  junc: { n: "Junctional rhythm", g: "slow",
+    tell: "Narrow QRS, regular, no P wave or an inverted P just before or after the QRS.",
+    act: [`It is an escape rhythm: ask why the sinus node is silent. Check drugs (digoxin, beta blocker, diltiazem or verapamil), ischemia and potassium.` + tg("Expert practice"),
+          `No treatment if the patient is well.` + tg("Expert practice")],
+    un: { t: "brady" },
+    why: "The AV junction takes over only when nothing faster arrives from above. The rhythm is the backup; the question is what failed.",
+    mt: "more",
+    more: `<p>A junctional escape typically runs at 40 to 60/min. If the underlying rhythm is AF and the ventricular response becomes slow and regular, there is complete AV block with a junctional escape: think digoxin toxicity.</p><p>${tg("Teaching convention")}</p>` },
+
+  m1: { n: "Mobitz I (Wenckebach)", g: "slow",
+    tell: "PR lengthens beat by beat, then one P is not conducted; beats come in groups.",
+    act: [`Usually in the AV node and benign. No pacing unless symptoms are clearly due to the block.` + tg("Class 2a if symptomatic"),
+          `Look for a cause: AV-nodal drugs, inferior MI, high vagal tone, sleep.` + tg("2018 guideline")],
+    un: { t: "brady" },
+    why: "The AV node tires progressively and then recovers. Block at this level has a reliable escape rhythm and responds to atropine.",
+    mt: "more",
+    more: `<p>The PR after the dropped beat is the shortest of the cycle; comparing it with the PR just before the drop is the quickest way to see the lengthening. A wide QRS with Mobitz I can still mean disease below the node and deserves cardiology review.</p><p>${tg("2018 ACC/AHA/HRS bradycardia guideline")}</p>` },
+
+  m2: { n: "Mobitz II", g: "slow",
+    tell: "PR stays constant, then a P is dropped without warning; the QRS is usually wide.",
+    act: [`Monitored bed, pacing pads on, cardiology now.` + tg("Expert practice"),
+          `Permanent pacemaker even without symptoms, unless the cause is reversible.` + tg("Class 1")],
+    un: { t: "brady", warn: "Go to pacing early: atropine is unlikely to work below the AV node." },
+    guard: `<b>Atropine is unlikely to work</b> and can worsen block below the AV node. Go to pacing early.` + tg("2018 guideline"),
+    why: "The block is below the AV node, where atropine does not help and the escape rhythm is unreliable. It can become asystole without warning.",
+    mt: "more",
+    more: `<p>Two or more P waves in a row not conducted is high-grade block and is managed the same way. See <a href="#pacing">Who needs a pacemaker</a>.</p><p>${tg("2018 ACC/AHA/HRS bradycardia guideline")}</p>` },
+
+  b21: { n: "2:1 AV block", g: "slow",
+    tell: "Every second P wave is not conducted, so the PR cannot be seen to lengthen.",
+    act: [`The strip cannot tell Mobitz I from II. Use the QRS and the PR.` + tg("2018 guideline"),
+          `Narrow QRS and long PR, improves with atropine or exercise: in the node. Manage as Mobitz I.` + tg("2018 guideline"),
+          `Wide QRS, worsens with atropine or exercise: below the node. Manage as Mobitz II with pads on.` + tg("2018 guideline")],
+    un: { t: "brady", warn: "If the QRS is wide, go to pacing early: atropine is unlikely to work below the AV node." },
+    why: "The level of block decides the risk. A long rhythm strip often catches a stretch of 3:2 conduction that settles the question.",
+    mt: "more",
+    more: `<p>Carotid massage slows the sinus rate and can improve conduction in block below the node, while it worsens block in the node. See <a href="#blocks">AV block on the strip</a>.</p><p>${tg("2018 ACC/AHA/HRS bradycardia guideline")}</p>` },
+
+  chb: { n: "Complete (third-degree) AV block", g: "slow",
+    tell: "P waves and QRS complexes are each regular but unrelated; more P waves than QRS.",
+    act: [`Pacing pads on, cardiology now, and look for a reversible cause.` + tg("Expert practice"),
+          `Permanent pacemaker with or without symptoms, unless the cause is reversible.` + tg("Class 1")],
+    un: { t: "brady", warn: "If the QRS is wide, go to pacing early: atropine is unlikely to work below the AV node." },
+    guard: `<b>Wide, slow escape:</b> the block is below the node. Atropine is unlikely to work; go to pacing.` + tg("2018 guideline"),
+    why: "Nothing conducts from atria to ventricles, so the heart runs on an escape focus. The lower and wider the escape, the slower and less reliable it is.",
+    mt: "reading the escape rhythm",
+    more: `<p>A narrow escape at 40 to 60/min arises in the junction and is fairly stable. A wide escape at 20 to 40/min arises in the ventricle and can stop. Temporary transvenous pacing is reasonable for compromise that does not respond to drugs ${tg("Class 2a")}; transcutaneous pacing is a bridge ${tg("Class 2b")}.</p><p>Reversible causes: inferior MI, AV-nodal drugs, hyperkalemia, Lyme carditis, hypothyroidism. See <a href="#pacing">Who needs a pacemaker</a>.</p><p>${tg("2018 ACC/AHA/HRS bradycardia guideline")}</p>` },
+
+  saf: { n: "AF with a slow ventricular response", g: "slow",
+    tell: "No P waves, irregular, slow.",
+    act: [`Hold AV-nodal drugs. Check a digoxin level, potassium and TSH.` + tg("Expert practice"),
+          `Permanent AF with symptomatic bradycardia: pacemaker.` + tg("Class 1")],
+    un: { t: "brady" },
+    guard: `<b>If the rhythm turns slow and regular,</b> it is complete AV block with an escape rhythm: think digoxin toxicity.` + tg("Teaching convention"),
+    why: "In AF the ventricular rate is set by the AV node alone, so a slow rate means the node is diseased or over-drugged.",
+    mt: "more",
+    more: `<p>Anticoagulation decisions are unchanged by the slow rate: see <a href="/afib/">Atrial fibrillation</a>.</p><p>${tg("2018 ACC/AHA/HRS bradycardia guideline")}</p>` },
+
+  snd: { n: "Sinus pauses (sinus node dysfunction)", g: "slow",
+    tell: "A normal P before each QRS, but with pauses, or fast and slow spells alternating.",
+    act: [`Review drugs that slow the sinus node.` + tg("2018 guideline"),
+          `Record symptoms against the rhythm (telemetry or an ambulatory monitor).` + tg("Class 1"),
+          `Pacemaker when symptoms line up with the pauses. No pause length mandates it on its own.` + tg("Class 1")],
+    un: { t: "brady" },
+    why: "Sinus node disease is mostly age-related fibrosis. It is treated for symptoms, not for numbers.",
+    mt: "more",
+    more: `<p>Tachy-brady syndrome: pauses when AF or atrial tachycardia stops. Rate-controlling drugs for the fast phase can worsen the slow phase, which is a common reason for pacing.</p><p>${tg("2018 ACC/AHA/HRS bradycardia guideline")}</p>` },
+
+  hk: { n: "Hyperkalemia", g: "slow",
+    tell: "Wide QRS, flat or absent P waves, tall narrow T waves; it can imitate any block.",
+    act: [`Send a potassium now and treat on suspicion: IV calcium first, then shift and remove potassium by your hyperkalemia protocol.` + tg("Expert practice"),
+          `Treat the potassium before antiarrhythmics or pacing.` + tg("Expert practice")],
+    un: { t: "hk" },
+    why: "High potassium slows conduction everywhere. Calcium steadies the cell membrane within minutes; pacing often fails to capture until the potassium falls.",
+    mt: "more",
+    more: `<p>Sequence with rising potassium: peaked T, long PR and flat P, wide QRS, sine wave. Suspect it in any wide rhythm, slow or fast, in a patient with kidney disease or on potassium-retaining drugs.</p><p>${tg("Teaching convention")}</p>` },
+
+  nsr: { n: "Sinus rhythm", g: "norm",
+    tell: "A normal P before every QRS, rate 60 to 100.",
+    act: [`The rhythm is not the problem. Check the intervals: PR over 200 ms, QRS 120 ms or more, and the QT.` + tg("Teaching convention")],
+    un: { t: "cause" },
+    why: "A normal rhythm with a sick patient means the cause is elsewhere. The intervals can still hold the diagnosis.",
+    mt: "what to check",
+    more: `<p>See <a href="#blocks">AV block</a>, <a href="#bundle">Bundle branch</a>, <a href="#qt">QT interval</a> and <a href="#preexcitation">Pre-excitation</a>. Irregular sinus rhythm with early beats is ectopy; note whether the early beats are narrow or wide.</p>` },
+
+  bbb: { n: "Sinus rhythm with bundle branch block", g: "norm",
+    tell: "A normal P before every QRS, and every QRS wide with the same shape.",
+    act: [`Decide left or right: see <a href="#bundle">Bundle branch and fascicular blocks</a>.`,
+          `New LBBB: echocardiogram.` + tg("Class 1")],
+    un: { t: "cause" },
+    why: "A bundle branch block delays one ventricle. New LBBB often signals structural heart disease, which is why it earns an echo.",
+    mt: "more",
+    more: `<p>Chest pain with LBBB: use the Sgarbossa rules in <a href="/ekg-cath/">EKG emergencies</a>. Syncope with a bundle branch block raises the question of intermittent complete block: see <a href="#pacing">Who needs a pacemaker</a>.</p><p>${tg("2018 ACC/AHA/HRS bradycardia guideline")}</p>` },
+
+  aivr: { n: "Accelerated idioventricular rhythm", g: "norm",
+    tell: "Wide and regular at about 50 to 110/min, with P waves unrelated or absent; typically soon after reperfusion of an MI.",
+    act: [`Observe. It is usually short-lived and tolerated.` + tg("Expert practice"),
+          `Do not give antiarrhythmic drugs to suppress it.` + tg("Expert practice"),
+          `Check potassium, digoxin and ongoing ischemia.` + tg("Expert practice")],
+    un: { t: "cause" },
+    why: "A ventricular focus is firing slightly faster than the sinus node. Where it is acting as the escape rhythm, suppressing it can leave the patient with none.",
+    mt: "telling it from VT",
+    more: `<p>The rate is the difference: under about 110/min it is an accelerated ventricular rhythm; faster is VT and is managed as VT. It starts and stops gradually as the sinus rate crosses it, often with fusion beats.</p><p>${tg("Teaching convention")}</p>` },
+
+  paced: { n: "Paced rhythm", g: "norm",
+    tell: "A narrow vertical spike before the P wave, the QRS, or both; paced QRS complexes are wide.",
+    act: [`Does every spike capture? A spike with no complex after it is failure to capture.` + tg("Teaching convention"),
+          `Check potassium, ischemia and new drugs, and lead position on a chest film.` + tg("Expert practice"),
+          `Call cardiology for device interrogation.` + tg("Expert practice")],
+    un: { t: "paced" },
+    why: "Capture fails when the heart muscle at the lead tip cannot be excited: high potassium, ischemia, drugs, or a lead that has moved.",
+    mt: "more",
+    more: `<p>See <a href="#devices">Pacemakers and ICDs on the ward</a> for sensing problems and the magnet response.</p>` }
+};
+
+/* The four-step read: which rhythms to show, in order, for each combination. Teaching convention. */
+const TABLE = {
+  "fast|reg|narrow": { before: ["st","svt","afl"], none: ["svt","afl","st"], more: ["afl","svt"], unrel: ["svt","afl"] },
+  "fast|reg|wide":   { before: ["vt","aberr","anti"], none: ["vt","aberr","anti","hk","tdp"], more: ["vt","aberr"], unrel: ["vt","aberr","anti"] },
+  "fast|irr|narrow": { before: ["mat","af"], none: ["af","afl","mat"], more: ["afl","mat","af"], unrel: ["af","mat"] },
+  "fast|irr|wide":   { before: ["afbbb","paf","tdp","pvt"], none: ["afbbb","paf","tdp","pvt"], more: ["afbbb","paf","tdp","pvt"], unrel: ["afbbb","paf","tdp","pvt"] },
+  "slow|reg|narrow": { before: ["sb"], none: ["junc","chb"], more: ["b21","chb"], unrel: ["chb","junc"] },
+  "slow|reg|wide":   { before: ["sb","hk"], none: ["chb","hk","paced","aivr"], more: ["b21","chb"], unrel: ["chb","hk","aivr"] },
+  "slow|irr|narrow": { before: ["snd","m1"], none: ["saf"], more: ["m1","m2"], unrel: ["saf","chb"] },
+  "slow|irr|wide":   { before: ["snd","m2"], none: ["saf","hk"], more: ["m2","m1"], unrel: ["m2","chb"] },
+  "norm|reg|narrow": { before: ["nsr"], none: ["junc","afl"], more: ["afl","b21"], unrel: ["junc","chb"] },
+  "norm|reg|wide":   { before: ["bbb","paced"], none: ["aivr","paced","hk","bbb"], more: ["b21","afl"], unrel: ["aivr","chb","paced"] },
+  "norm|irr|narrow": { before: ["nsr","m1"], none: ["af"], more: ["m1","m2","afl"], unrel: ["af"] },
+  "norm|irr|wide":   { before: ["bbb","m2"], none: ["afbbb"], more: ["m2","m1"], unrel: ["afbbb","m2"] }
+};
+function cand(r) { const row = TABLE[r.rate + "|" + r.reg + "|" + r.qrs]; return row && row[r.p] ? row[r.p].slice() : []; }
+const complete = r => !!(r.rate && r.reg && r.qrs && r.p);
+
+/* Context that changes bradycardia management. */
+const CTX = {
+  mi: { n: "Inferior MI",
+    h: `<ul class="plain"><li>Reperfusion treats the block: see <a href="/ekg-cath/">EKG emergencies</a>.</li><li>If atropine fails, <span class="mono">aminophylline 250 mg IV</span> may be considered for block in the AV node.${tg("Class 2b")}</li><li>Do not rush to a permanent pacemaker: block that resolves should not be paced.${tg("Class 3: Harm")}</li></ul>`,
+    why: "The AV node shares the right coronary artery's blood supply. Block in inferior MI is usually in the node and recovers with reperfusion.",
+    whyInfra: "Block in inferior MI is usually in the node and recovers with reperfusion. Here the block looks to be below the node: do not rely on atropine or on recovery; pace temporarily and reassess after the waiting period." },
+  tx: { n: "Heart transplant",
+    h: `<div class="guard"><b>Do not give atropine</b> for sinus bradycardia after heart transplant${tg("Class 3: Harm")}; in other slow rhythms it is unlikely to work. Use aminophylline or theophylline${tg("Class 2a")}, or pace.</div>`,
+    why: "A denervated heart has no vagal tone for atropine to remove, and atropine has caused paradoxical heart block after transplant." },
+  od: { n: "Beta blocker or calcium blocker overdose",
+    h: `<ul class="plain"><li><b>Calcium channel blocker:</b> IV calcium and high-dose insulin.${tg("Class 2a")}</li><li><b>Beta blocker:</b> <span class="mono">glucagon 3–10 mg IV, then 3–5 mg/h</span>, and high-dose insulin.${tg("Class 2a")}</li><li>Call your poison center.${tg("Expert practice")}</li></ul>`,
+    why: "Pacing can capture the heart but does not reverse the drug's effect on contractility and vascular tone. The antidote does." },
+  dig: { n: "Digoxin toxicity",
+    h: `<ul class="plain"><li>Digoxin-specific antibody fragments.${tg("Class 2a")}</li><li>Dialysis does not remove digoxin and is not recommended.${tg("Class 3: No Benefit")}</li></ul>`,
+    why: "Digoxin raises vagal tone at the AV node and makes ectopic foci fire. Binding the drug is the only treatment that reverses both." }
+};
+
+/* o: rate (from the read), ctx (bradycardia context), infra (block judged to be below the AV node). */
+function unstableHTML(id, o) {
+  o = o || {};
+  const u = id ? R[id].un : null, t = u ? u.t : (o.rate === "slow" ? "brady" : o.rate === "fast" ? "cvall" : "both");
+  const inst = `<p class="note">Adjust to your institution: your defibrillator's recommended energies.</p>`;
+  const cv = (j, lbl) => `<ul class="plain"><li><b>Synchronized cardioversion now.</b> Sedate first if the patient is conscious.${tg("AHA 2025")}</li><li>Energy: your defibrillator's recommended setting; if unknown, the maximum. AHA 2025 starting energy for ${lbl}: <span class="mono">${j}</span>.</li></ul>`;
+  const cvall = `<ul class="plain"><li><b>Synchronized cardioversion now.</b> Sedate first if the patient is conscious.${tg("AHA 2025")}</li><li>Energy: your defibrillator's recommended setting; if unknown, the maximum. AHA 2025 starting energies: <span class="mono">narrow-complex 100 J · monomorphic VT 100 J · AF 200 J · flutter 200 J</span>.</li><li>Polymorphic VT: defibrillate, unsynchronized.${tg("Class 1, AHA 2025")}</li><li>Rate under 150/min, or sinus tachycardia: look for another cause.</li></ul>` + inst;
+  const pace = `transcutaneous pacing and/or <span class="mono">dopamine 5–20 mcg/kg/min</span> or <span class="mono">epinephrine 2–10 mcg/min</span>`;
+  const atro = `<span class="mono">Atropine 1 mg IV</span>, repeat every 3 to 5 min, maximum 3 mg`;
+  const tail = `<li>Call cardiology; prepare for transvenous pacing.${tg("AHA 2025")}</li><li>Rate 50/min or above: look for another cause of the instability.</li>`;
+  const antidote = o.ctx === "od" ? `<li><b>Give the antidote at the same time:</b> IV calcium and high-dose insulin for a calcium channel blocker; glucagon and high-dose insulin for a beta blocker.${tg("Class 2a")}</li>`
+    : o.ctx === "dig" ? `<li><b>Give digoxin-specific antibody fragments at the same time.</b>${tg("Class 2a")}</li>` : "";
+  let steps;
+  if (o.ctx === "tx") steps = `<li><b>No atropine after heart transplant</b> (Class 3: Harm for sinus bradycardia; unlikely to work otherwise). Aminophylline or theophylline${tg("Class 2a")}, or go straight to pacing.</li><li>${pace.charAt(0).toUpperCase() + pace.slice(1)}.${tg("AHA 2025")}</li>`;
+  else if (o.infra) steps = `<li><b>Pace first:</b> ${pace}.${tg("doses AHA 2025; order per 2018 guideline")}</li><li>Atropine is unlikely to work below the AV node and should not delay pacing.${tg("2018 guideline")}</li>`;
+  else steps = `<li>${atro}.${tg("AHA 2025")}</li><li>If atropine fails or is unlikely to work: ${pace}.${tg("AHA 2025")}</li>`;
+  const brady = `<ul class="plain">${antidote}${steps}${tail}</ul>`;
+  const generic = `<ul class="plain"><li>${atro}.${tg("AHA 2025")}</li><li>If atropine fails or is unlikely to work (wide escape rhythm, Mobitz II): ${pace}.${tg("AHA 2025")}</li><li>After heart transplant: no atropine; aminophylline or theophylline, or pace.${tg("2018 guideline")}</li>${tail}</ul>`;
+  let h = "";
+  if (t === "cv") h = (u.pre ? `<p>${u.pre}</p>` : "") + cv(u.j, u.lbl) + `<p>Ventricular rate under 150/min: the rhythm is less likely to be the cause; look for another.</p>` + (u.post ? `<p>${u.post}</p>` : "") + inst;
+  else if (t === "defib") h = `<ul class="plain"><li><b>Defibrillate now, unsynchronized.</b> A polymorphic rhythm cannot be synchronized.${tg("Class 1, AHA 2025")}</li><li>No pulse: CPR and the cardiac arrest algorithm.</li></ul>`;
+  else if (t === "brady") h = brady;
+  else if (t === "paced") h = `<p><b>The pacemaker is not protecting the patient.</b> Put transcutaneous pacing pads on and treat a reversible cause of failed capture at once: IV calcium if potassium is high; treat ischemia. Call cardiology.${tg("Expert practice")}</p>` + brady;
+  else if (t === "hk") h = `<ul class="plain"><li><b>IV calcium now</b>, then treat the potassium by your hyperkalemia protocol.${tg("Expert practice")}</li><li>Pacing and atropine often fail until the potassium falls.</li></ul>`;
+  else if (t === "cause") h = `<p><b>This rhythm is not the cause of the instability.</b> Treat the underlying problem; do not cardiovert.</p>`;
+  else if (t === "cvall") h = cvall;
+  else h = `<p class="label">Fast rhythm</p>` + cvall + `<p class="label">Slow rhythm</p>` + generic;
+  if (!id && t === "brady") h = generic;
+  if (id && o.rate === "norm" && (t === "cv" || t === "brady" || t === "paced"))
+    h = `<p><b>At 60 to 100/min this rhythm is unlikely to be the cause of the instability.</b> Look for another cause first. If none is found:</p>` + h;
+  return `<div class="unst"><p class="label">Unstable: do this now</p>${h}</div>`;
+}
+
+/* The answer card. Layers: answer and guard, one Why line, one More.
+   o: unstable, ctx, rate and qrs (from the read), fixed (practice: no controls), strip. */
+function answerHTML(id, o) {
+  o = o || {};
+  if (!id) return o.unstable ? `<div class="card answer">${unstableHTML(null, { rate: o.rate })}</div>` : "";
+  const r = R[id], slow = r.un.t === "brady" || r.un.t === "paced", c = slow && o.ctx ? CTX[o.ctx] : null;
+  const infra = id === "m2" || ((id === "chb" || id === "b21") && o.qrs === "wide");
+  let h = `<div class="card answer"><p class="label">Likely rhythm</p><p class="big">${r.n}</p><div class="strip">${stripSvg(o.strip || id, { dur: r.g === "fast" ? 4 : 6, label: "Synthetic strip: " + r.n })}</div>`;
+  if (o.unstable) h += unstableHTML(id, { rate: o.rate, ctx: slow ? o.ctx : null, infra });
+  const slowAfbbb = id === "afbbb" && o.rate && o.rate !== "fast"; // pre-excited AF is not a realistic concern at a controlled rate
+  h += `<p class="label">${o.unstable ? "Then" : "First action"}</p><ol class="acts">${(slowAfbbb ? r.act.slice(1) : r.act).map(a => `<li>${a}</li>`).join("")}</ol>`;
+  if (slow && !(o.fixed && !o.ctx)) {
+    h += `<p class="label">${o.fixed ? "Context" : "Does one of these apply?"}</p><div class="ctx">${Object.keys(CTX).filter(k => !(k === "mi" && r.un.t === "paced")).map(k => o.fixed ? (o.ctx === k ? `<span class="tier">${CTX[k].n}</span>` : "") : `<button type="button" data-ctx="${k}" aria-pressed="${o.ctx === k}">${CTX[k].n}</button>`).join("")}</div>`;
+    if (c) h += c.h;
+  }
+  if (r.guard && !slowAfbbb) h += `<div class="guard">${r.guard}</div>`;
+  h += `<p class="why"><b>Why:</b> ${c ? (infra && c.whyInfra ? c.whyInfra : c.why) : r.why}</p>`;
+  h += `<details class="more"><summary>More: ${r.mt}</summary>${r.more}</details></div>`;
+  return h;
+}
+
+/* Practice cases: each runs through cand() and answerHTML() above. */
+const CASES = [
+  { page: "Bed 9, 34 F. Heart rate jumped to 190 a minute ago, BP 124/78, she feels her heart racing.", strip: "svt", read: { rate: "fast", reg: "reg", qrs: "narrow", p: "none" }, ans: "svt", teach: "Abrupt onset and a fixed rate with no P waves: re-entrant SVT. Vagal maneuver first." },
+  { page: "Bed 14, 68 M, prior MI. Heart rate 172 on the monitor, BP 118/70, says his chest feels funny.", strip: "vt", read: { rate: "fast", reg: "reg", qrs: "wide", p: "unrel" }, ans: "vt", teach: "A normal blood pressure does not make it SVT. Prior MI plus a wide regular tachycardia is VT." },
+  { page: "Bed 3, 71 M. Heart rate 180, BP 72/40, confused and clammy.", strip: "vt", read: { rate: "fast", reg: "reg", qrs: "wide", p: "none" }, ans: "vt", unstable: true, teach: "Hypotension and confusion: shock first. The exact diagnosis can wait." },
+  { page: "ED hallway, 24 M, no history. Palpitations, heart rate about 230, BP 110/70.", strip: "paf", read: { rate: "fast", reg: "irr", qrs: "wide", p: "none" }, ans: "paf", teach: "Irregular, very fast, with the QRS changing shape: pre-excited AF. Diltiazem here can cause VF." },
+  { page: "Bed 21, 58 F on methadone, started ondansetron and levofloxacin yesterday. Brief runs on the monitor with dizziness; QTc 560 ms this morning.", strip: "tdp", read: { rate: "fast", reg: "irr", qrs: "wide", p: "none" }, alt: { reg: "reg" }, ans: "tdp", teach: "Twisting QRS after long-QT sinus beats on three QT-prolonging drugs: torsades. Magnesium, stop the drugs, fix potassium." },
+  { page: "Bed 6, 79 M. Dizzy on standing, heart rate 44, BP 118/64. Old ECG shows right bundle branch block.", strip: "m2", read: { rate: "slow", reg: "irr", qrs: "wide", p: "more" }, ans: "m2", teach: "Constant PR with dropped beats and a wide QRS: block below the node. Pads on; this patient needs a pacemaker." },
+  { page: "CCU, 62 F, inferior STEMI two hours ago. Heart rate 44, BP 104/60, comfortable.", strip: "chbn", read: { rate: "slow", reg: "reg", qrs: "narrow", p: "unrel" }, ans: "chb", ctx: "mi", teach: "Complete block with a narrow escape in inferior MI is in the AV node and usually recovers with reperfusion." },
+  { page: "Bed 30, 3 am, 55 M admitted for cellulitis. Telemetry alarm: heart rate 42. He is asleep, BP 122/70.", strip: "sb", read: { rate: "slow", reg: "reg", qrs: "narrow", p: "before" }, ans: "sb", teach: "Asleep, normal blood pressure, a P before every QRS: no treatment. Ask about snoring." },
+  { page: "ED, 47 F, took a bottle of verapamil. Heart rate 38, BP 68/30, drowsy.", strip: "junc", read: { rate: "slow", reg: "reg", qrs: "narrow", p: "none" }, ans: "junc", unstable: true, ctx: "od", teach: "The rhythm is a junctional escape; the problem is the drug. Calcium and high-dose insulin; pacing alone will not restore blood pressure." },
+  { page: "Bed 11, 81 M with a pacemaker, missed dialysis. Heart rate 32, BP 96/50, weak. Potassium 7.1.", strip: "nocap", read: { rate: "slow", reg: "reg", qrs: "wide", p: "none" }, ans: "paced", also: ["hk"], unstable: true, teach: "Pacing spikes with no QRS after them: failure to capture, here from hyperkalemia. Either call is right; IV calcium and treating the potassium bring capture back." }
+];
+</script>
+<script id="ui">
+const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+
+/* ---------- synthetic rhythm strips: 25 mm/s, 10 mm/mV. Drawn from formulas; not patient recordings. ---------- */
+const FS = 250;
+function rng(seed) { let a = seed >>> 0; return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+const G = (x, c, s, a) => a * Math.exp(-(x - c) * (x - c) / (2 * s * s));
+function spec(id, dur) {
+  const q = [], p = [], sp = []; let post = null; const rnd = rng(11 + id.charCodeAt(0) * 7 + id.length * 31);
+  const reg = (rate, start, o, pr) => { for (let x = start; x < dur + 1; x += 60 / rate) { q.push(Object.assign({ t: x }, o)); if (pr) p.push({ t: x - pr, a: .12 }); } };
+  const pwaves = (every, start) => { for (let x = start; x < dur + 1; x += every) p.push({ t: x, a: .12 }); };
+  const cyc = (every, start, prs, o) => { let i = 0; for (let x = start; x < dur + 1; x += every, i++) { p.push({ t: x, a: .12 }); const pr = prs[i % prs.length]; if (pr != null) q.push(Object.assign({ t: x + pr }, o)); } };
+  const fib = t => .035 * Math.sin(2 * Math.PI * 7.3 * t) + .025 * Math.sin(2 * Math.PI * 11.1 * t + 1) + .02 * Math.sin(2 * Math.PI * 5.2 * t + 2);
+  const WIDE = { w: 1.5, r: .45, s: .5, notch: .55, ta: -.2 };
+  switch (id) {
+    case "nsr": reg(72, .5, {}, .16); break;
+    case "st": reg(125, .3, {}, .14); break;
+    case "sb": reg(44, .6, {}, .16); break;
+    case "svt": reg(185, .2, { ta: .15 }); q.forEach(b => p.push({ t: b.t + .11, a: -.07 })); break;
+    case "afl": reg(150, .25, { ta: .04 }); post = t => { const ph = (t * 5) % 1; return -.16 * (ph < .72 ? ph / .72 : (1 - ph) / .28) + .08; }; break;
+    case "af": for (let x = .2; x < dur + 1; x += .3 + rnd() * .3) q.push({ t: x, ta: .18 }); post = fib; break;
+    case "saf": for (let x = .4; x < dur + 1; x += 1.0 + rnd() * .8) q.push({ t: x, ta: .2 }); post = fib; break;
+    case "afbbb": for (let x = .2; x < dur + 1; x += .33 + rnd() * .3) q.push(Object.assign({ t: x }, WIDE)); post = fib; break;
+    case "mat": { const pr = [.12, .2, .15], am = [.13, -.09, .18]; let i = 0; for (let x = .3; x < dur + 1; x += .38 + rnd() * .28, i++) { q.push({ t: x }); p.push({ t: x - pr[i % 3], a: am[i % 3] }); } break; }
+    case "vt": reg(180, .15, { w: 3.1, r: 1, s: .3, qa: 0, ta: -.6 }); for (let x = .1; x < dur; x += .77) p.push({ t: x, a: .1 }); break;
+    case "aberr": reg(170, .2, WIDE, .11); break;
+    case "anti": reg(200, .15, { w: 2.1, r: 1, s: .1, qa: -.35, ta: -.4 }); break;
+    case "paf": for (let x = .15; x < dur + 1; x += .2 + rnd() * .2) q.push({ t: x, w: 1.2 + rnd(), r: .6 + rnd() * .6, s: .15, qa: -.2 * rnd(), ta: -.3 }); break;
+    case "tdp": q.push({ t: .35, qt: 1.6, ta: .35 }, { t: 1.25, qt: 1.6, ta: .35 }); p.push({ t: .19, a: .12 }, { t: 1.09, a: .12 });
+      post = t => t < 1.85 ? 0 : (.25 + .85 * Math.abs(Math.sin(Math.PI * (t - 1.85) / 1.15))) * Math.sin(2 * Math.PI * 3.9 * (t - 1.85)) * .9; break;
+    case "pvt": q.push({ t: .3 }); p.push({ t: .14, a: .12 });
+      post = t => t < .9 ? 0 : (.5 + .3 * Math.sin(2 * Math.PI * t / 1.9) + .2 * Math.sin(2 * Math.PI * t / .7 + 1)) * Math.sin(2 * Math.PI * (4.2 * t + .25 * Math.sin(2 * Math.PI * t / 1.3))); break;
+    case "junc": reg(48, .5, {}); break;
+    case "m1": cyc(.8, .25, [.16, .26, .36, null], {}); break;
+    case "m2": cyc(.8, .25, [.18, .18, null], WIDE); break;
+    case "b21": cyc(.68, .25, [.18, null], {}); break;
+    case "chb": pwaves(.7, .15); reg(36, .6, { w: 1.7, r: .8, s: .4, ta: -.3 }); break;
+    case "chbn": pwaves(.7, .15); reg(44, .6, {}); break;
+    case "snd": [.5, 1.45, 4.5, 5.45, 6.4].forEach(x => { q.push({ t: x }); p.push({ t: x - .16, a: .12 }); }); break;
+    case "hk": reg(50, .5, { w: 2, r: .55, s: .6, ta: .75, tpk: 1, qa: 0 }); break;
+    case "bbb": reg(72, .5, WIDE, .17); break;
+    case "paced": reg(70, .5, { w: 1.9, r: .2, s: .9, qa: 0, ta: .35 }); q.forEach(b => sp.push(b.t - .012)); break;
+    case "nocap": for (let x = .3; x < dur; x += .86) sp.push(x); reg(32, .95, { w: 1.9, r: .6, s: .5, ta: .7, tpk: 1, qa: 0 }); break;
+  }
+  return { q, p, sp, post };
+}
+function signal(id, dur) {
+  const S = spec(id, dur), n = Math.round(dur * FS), y = new Float32Array(n);
+  for (const b of S.q) {
+    const w = b.w || 1, r = b.r == null ? 1 : b.r, s = b.s == null ? .25 : b.s, qa = b.qa == null ? .08 : b.qa, ta = b.ta == null ? .28 : b.ta, qt = b.qt || 1;
+    const J = b.t + .085 * w, Tc = J + .19 * qt, tw = b.tpk ? .03 : .05 * qt;
+    const i0 = Math.max(0, Math.floor((b.t - .08) * FS)), i1 = Math.min(n - 1, Math.ceil((Tc + .3) * FS));
+    for (let i = i0; i <= i1; i++) { const x = i / FS; y[i] += G(x, b.t + .015 * w, .008 * w, -qa) + G(x, b.t + .035 * w, .011 * w, r) + G(x, b.t + .06 * w, .010 * w, -s) + (b.notch ? G(x, b.t + .066 * w, .012 * w, b.notch) : 0) + G(x, Tc, tw, ta); }
+  }
+  for (const k of S.p) { const i0 = Math.max(0, Math.floor((k.t - .1) * FS)), i1 = Math.min(n - 1, Math.ceil((k.t + .1) * FS)); for (let i = i0; i <= i1; i++) y[i] += G(i / FS, k.t, .022, k.a); }
+  if (S.post) for (let i = 0; i < n; i++) y[i] += S.post(i / FS);
+  return { y, S };
+}
+function stripSvg(id, o) {
+  o = o || {}; const dur = o.dur || 6, mm = o.mm || 4, W = dur * 25 * mm, H = (o.hmm || 24) * mm, yb = H * .62, { y, S } = signal(id, dur);
+  const X = t => t * 25 * mm, Y = v => yb - v * 10 * mm;
+  let d = ""; for (let i = 0; i < y.length; i++) d += (i ? "L" : "M") + X(i / FS).toFixed(1) + " " + Y(y[i]).toFixed(1);
+  let g = `<rect width="${W}" height="${H}" style="fill:var(--ecg-paper)"/>`;
+  if (!o.coarse) { g += `<path style="stroke:var(--ecg-grid)" stroke-width="${mm * .08}" d="`; for (let x = 0; x <= W; x += mm) g += `M${x} 0V${H}`; for (let v = 0; v <= H; v += mm) g += `M0 ${v}H${W}`; g += `"/>`; }
+  g += `<path style="stroke:var(--ecg-grid5)" stroke-width="${mm * .14}" d="`; for (let x = 0; x <= W; x += mm * 5) g += `M${x} 0V${H}`; for (let v = 0; v <= H; v += mm * 5) g += `M0 ${v}H${W}`; g += `"/>`;
+  const spikes = S.sp.filter(t => t < dur).map(t => `<path class="spk" d="M${X(t).toFixed(1)} ${Y(.75).toFixed(1)}V${Y(-.15).toFixed(1)}"/>`).join("");
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${o.label || "Synthetic rhythm strip"}">${g}<path class="tr" d="${d}"/>${spikes}${o.ann ? o.ann({ X, Y, W, H, S, mm }) : ""}</svg>`;
+}
+
+/* ---------- how-to-measure figures ---------- */
+const hbr = (x1, x2, y) => `<path class="an" d="M${x1.toFixed(1)} ${y}H${x2.toFixed(1)}M${x1.toFixed(1)} ${y - 5}v10M${x2.toFixed(1)} ${y - 5}v10"/>`;
+const lbl = (x, y, t, a) => `<text class="fl" x="${x.toFixed(1)}" y="${y}" text-anchor="${a || "middle"}">${t}</text>`;
+const ticks = c => c.S.q.filter(b => b.t < c.W / (25 * c.mm)).map(b => `<path class="an" d="M${c.X(b.t + .035 * (b.w || 1)).toFixed(1)} 4v10"/>`).join("");
+const HOW = {
+  rate: { t: "Rate", figs: [
+      [() => stripSvg("afl", { dur: 3, label: "Regular rhythm with two large boxes between R waves", ann: c => hbr(c.X(.25 + .035), c.X(.65 + .035), 12) + lbl(c.X(.65), 28, "2 large boxes: 300 ÷ 2 = 150/min", "start") }), "Regular rhythm: 300 divided by the number of large boxes between two R waves."],
+      [() => stripSvg("af", { dur: 6, label: "Irregular rhythm over six seconds", ann: c => ticks(c) + lbl(c.W / 2, c.H - 6, "6 seconds: count the QRS complexes × 10") }), "Irregular rhythm: count the QRS complexes in 6 seconds (30 large boxes) and multiply by 10."]],
+    pts: ["One large box is 0.2 s; one small box is 0.04 s (paper speed 25 mm/s).", "The monitor's number can double-count tall T waves or miss small QRS complexes. Count it yourself.", "For the unstable patient, a tachycardia is likely the cause at about 150/min or more, and a bradycardia at under 50/min."] },
+  reg: { t: "Rhythm", figs: [
+      [() => stripSvg("svt", { dur: 3, label: "Regular rhythm with equal R to R intervals", ann: ticks }), "Regular: every R–R interval is the same."],
+      [() => stripSvg("m1", { dur: 6, label: "Grouped beating", ann: ticks }), "Regularly irregular: the beats come in repeating groups (here, Wenckebach)."],
+      [() => stripSvg("af", { dur: 3, label: "Irregularly irregular rhythm", ann: ticks }), "Irregularly irregular: no pattern at all. This is AF until proven otherwise."]],
+    pts: ["Mark three R waves on the edge of a sheet of paper and slide it along the strip.", "At very fast rates small irregularities are hard to see. Use a long strip.", "Choose Irregular for either irregular pattern, and for a wide rhythm whose QRS shape keeps changing (polymorphic)."] },
+  qrs: { t: "QRS width", figs: [
+      [() => stripSvg("nsr", { dur: 1.1, mm: 10, hmm: 16, label: "Narrow QRS", ann: c => hbr(c.X(.5), c.X(.585), 14) + lbl(c.X(.6), 34, "about 2 small boxes: narrow", "start") }), "Narrow: under 0.12 s, fewer than 3 small boxes."],
+      [() => stripSvg("bbb", { dur: 1.1, mm: 10, hmm: 16, label: "Wide QRS", ann: c => hbr(c.X(.5), c.X(.5 + .085 * 1.5), 14) + lbl(c.X(.64), 34, "3 small boxes or more: wide", "start") }), "Wide: 0.12 s or more, 3 small boxes or more."]],
+    pts: ["Measure from the first deflection to where the QRS returns to baseline, in the lead where it is widest.", "Use a 12-lead ECG when you can. A single monitor lead can hide part of the QRS and make it look narrow.", "A wide QRS means the ventricles are not being activated through the normal conduction system: VT, a bundle branch block, a pathway, pacing, or potassium."] },
+  p: { t: "P waves", figs: [
+      [() => stripSvg("chb", { dur: 6, label: "P waves marching through unrelated to QRS complexes", ann: c => c.S.p.filter(k => k.t < 6).map(k => `<circle class="anf" cx="${c.X(k.t).toFixed(1)}" cy="10" r="3.5"/>`).join("") }), "Dots mark each P wave. They keep their own regular rate and bear no fixed relation to the QRS: unrelated."],
+      [() => stripSvg("m2", { dur: 6, label: "More P waves than QRS complexes", ann: c => c.S.p.filter(k => k.t < 6).map(k => `<circle class="anf" cx="${c.X(k.t).toFixed(1)}" cy="10" r="3.5"/>`).join("") }), "More P than QRS: some P waves are not followed by a QRS, but the conducted ones have a fixed PR."]],
+    pts: ["Look in lead II and V1, where P waves are clearest.", "Ask in order: is there a P before each QRS? Are there extra P waves? Do the P waves ignore the QRS?", "A P wave can hide in the T wave or the QRS. Compare T-wave shapes: one that looks different may hold a P.", "Sawtooth or fibrillating baseline with no discrete P waves: choose None clear."] }
+};
+let lastFocus = null;
+function openHow(k) {
+  const h = HOW[k]; lastFocus = document.activeElement;
+  $("#sheet").innerHTML = `<div class="top"><h2>How to measure: ${h.t}</h2><button type="button" id="sheetclose">Close</button></div>` +
+    h.figs.map(f => `<figure>${f[0]()}<figcaption>${f[1]}</figcaption></figure>`).join("") +
+    `<ul class="plain">${h.pts.map(x => `<li>${x}</li>`).join("")}</ul><p><span class="tier">Teaching convention · AHA 2025 for the 150 and 50 thresholds</span></p>`;
+  $("#sheetwrap").hidden = false; document.body.style.overflow = "hidden"; $("#sheetclose").focus({ preventScroll: true });
+}
+function closeHow() { $("#sheetwrap").hidden = true; document.body.style.overflow = ""; if (lastFocus && lastFocus.focus) lastFocus.focus({ preventScroll: true }); }
+
+/* ---------- Read tab ---------- */
+const STEPS = [
+  { k: "rate", n: "Rate", o: [["slow", "Slow &lt; 60"], ["norm", "60–100"], ["fast", "Fast &gt; 100"]] },
+  { k: "reg", n: "Rhythm", o: [["reg", "Regular"], ["irr", "Irregular"]] },
+  { k: "qrs", n: "QRS width", o: [["narrow", "Narrow"], ["wide", "Wide ≥ 0.12 s"]] },
+  { k: "p", n: "P waves", o: [["before", "One before each QRS"], ["none", "None clear"], ["more", "More P than QRS"], ["unrel", "Unrelated to QRS"]] }
+];
+const stepsHTML = (r, attr, how) => STEPS.map((s, i) => `<div class="step"><div class="hd"><span><i>${i + 1}</i>${s.n}</span>${how ? `<button type="button" class="how" data-how="${s.k}" aria-label="How to measure ${s.n}">How to measure</button>` : ""}</div><div class="seg${s.o.length === 3 ? " three" : ""}" role="group" aria-label="${s.n}">${s.o.map(o => `<button type="button" ${attr}="${s.k}" data-val="${o[0]}" aria-pressed="${r[s.k] === o[0]}">${o[1]}</button>`).join("")}</div></div>`).join("");
+const dxHTML = (ids, pick, attr) => ids.map(id => `<button type="button" class="dx" ${attr}="${id}" aria-pressed="${id === pick}">${stripSvg(id, { dur: 2.8, hmm: 20, coarse: true, label: "Synthetic strip: " + R[id].n })}<span><b>${R[id].n}</b><small>${R[id].tell}</small></span></button>`).join("");
+
+const S = { rate: null, reg: null, qrs: null, p: null, pick: null, unstable: false, ctx: null };
+const JUMP = [
+  ["Fast", [["svt", "Narrow · regular", "fast", "reg", "narrow", "none"], ["af", "Narrow · irregular", "fast", "irr", "narrow", "none"], ["vt", "Wide · regular", "fast", "reg", "wide", "none"], ["afbbb", "Wide · irregular", "fast", "irr", "wide", "none"], ["tdp", "Polymorphic", "fast", "irr", "wide", "none"], ["st", "Sinus tachycardia", "fast", "reg", "narrow", "before"]]],
+  ["Slow", [["sb", "Sinus bradycardia", "slow", "reg", "narrow", "before"], ["m2", "Dropped beats, fixed PR", "slow", "irr", "wide", "more"], ["chb", "P and QRS unrelated", "slow", "reg", "wide", "unrel"], ["saf", "Irregular, no P waves", "slow", "irr", "narrow", "none"]]]
+];
+function renderGallery() {
+  $("#gallery").innerHTML = JUMP.map(g => `<p class="label">${g[0]}</p><div class="tiles">${g[1].map(t => `<button type="button" class="tile" data-j="${t.join("|")}">${stripSvg(t[0], { dur: 3.2, hmm: 20, coarse: true, label: "Synthetic strip: " + t[1] })}${t[1]}</button>`).join("")}</div>`).join("");
+}
+function current() { const ids = complete(S) ? cand(S) : []; const pick = ids.includes(S.pick) ? S.pick : (ids[0] || null); return { ids, pick }; }
+function renderRead() {
+  $("#steps").innerHTML = stepsHTML(S, "data-step", true);
+  const { ids, pick } = current();
+  $("#dxlabel").hidden = !ids.length;
+  $("#differential").innerHTML = ids.length ? dxHTML(ids, pick, "data-dx") : `<p class="muted">Choose all four to see the likely rhythms.</p>`;
+  $("#answer").innerHTML = answerHTML(pick, { unstable: S.unstable, ctx: S.ctx, rate: S.rate, qrs: S.qrs });
+  const u = $("#unstable"); u.setAttribute("aria-pressed", S.unstable); $("#shockgo").textContent = S.unstable ? "Clear" : "Act now ›";
+}
+
+/* ---------- Practice tab ---------- */
+const dayOrder = (() => { const d = new Date(), rnd = rng(d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate()); const a = CASES.map((_, i) => i); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; })();
+const P = { i: 0, read: {}, call: null, done: false };
+const optName = (k, v) => { const o = STEPS.find(s => s.k === k).o.find(o => o[0] === v); return o ? o[1] : ""; };
+function renderPractice() {
+  const c = CASES[dayOrder[P.i]], ids = complete(P.read) ? cand(P.read) : [];
+  let h = `<div class="card" id="case"><p class="label">Case ${P.i + 1} of ${CASES.length} · order changes daily</p><p class="pagemsg">${c.page}</p><div class="strip">${stripSvg(c.strip, { dur: R[c.ans].g === "fast" ? 4 : 6, label: "Synthetic rhythm strip for this case" })}</div>`;
+  if (!P.done) {
+    h += `<p class="label">Your read</p><div style="display:grid;gap:12px">${stepsHTML(P.read, "data-ps", false)}</div>`;
+    if (ids.length) h += `<p class="label">Your call</p><div class="dxlist" style="margin:0">${dxHTML(ids, P.call, "data-pcall")}</div>`;
+    h += `<button type="button" class="btn" id="pcommit"${P.call ? "" : " disabled"}>Commit and see the answer</button></div>`;
+  } else {
+    const right = P.call === c.ans || (c.also || []).includes(P.call);
+    h += `<p class="verdict ${right ? "ok" : "no"}">${right ? "Correct" : "Not this time"}: ${R[c.ans].n}${c.unstable ? ", unstable" : ""}</p><div class="mark">` +
+      STEPS.map(s => { const ok = P.read[s.k] === c.read[s.k] || (c.alt && c.alt[s.k] === P.read[s.k]); return `<span class="${ok ? "ok" : "no"}">${s.n}: ${optName(s.k, c.read[s.k])}${ok ? "" : ` (you chose ${optName(s.k, P.read[s.k])})`}</span>`; }).join("") +
+      `</div><p>${c.teach}</p><button type="button" class="btn" id="pnext">Next case</button></div>` + answerHTML(c.ans, { unstable: !!c.unstable, ctx: c.ctx || null, fixed: true, strip: c.strip, rate: c.read.rate, qrs: c.read.qrs });
+  }
+  $("#practice").innerHTML = h;
+}
+
+/* ---------- events ---------- */
+document.addEventListener("click", e => {
+  const t = e.target, b = t.closest("button");
+  if (t.id === "sheetwrap" || (b && b.id === "sheetclose")) return closeHow();
+  if (!b) return;
+  if (b.dataset.how) return openHow(b.dataset.how);
+  if (b.dataset.step) { S[b.dataset.step] = b.dataset.val; S.pick = null; S.ctx = null; return renderRead(); }
+  if (b.dataset.dx) { S.pick = b.dataset.dx; S.ctx = null; renderRead(); if (window.matchMedia("(max-width:999px)").matches) $("#answer").scrollIntoView({ block: "start", behavior: "smooth" }); return; }
+  if (b.dataset.ctx && b.closest("#answer")) { S.ctx = S.ctx === b.dataset.ctx ? null : b.dataset.ctx; return renderRead(); }
+  if (b.dataset.j) { const j = b.dataset.j.split("|"); Object.assign(S, { pick: j[0], rate: j[2], reg: j[3], qrs: j[4], p: j[5], ctx: null }); $("#jump").open = false; renderRead(); $("#read").scrollIntoView({ block: "start" }); return; }
+  if (b.id === "unstable") { S.unstable = !S.unstable; renderRead(); if (S.unstable) $("#answer").scrollIntoView({ block: "start", behavior: "smooth" }); return; }
+  if (b.dataset.ps) { P.read[b.dataset.ps] = b.dataset.val; P.call = null; return renderPractice(); }
+  if (b.dataset.pcall) { P.call = b.dataset.pcall; return renderPractice(); }
+  if (b.id === "pcommit") { P.done = true; renderPractice(); $("#case").scrollIntoView({ block: "start" }); return; }
+  if (b.id === "pnext") { P.i = (P.i + 1) % CASES.length; P.read = {}; P.call = null; P.done = false; renderPractice(); window.scrollTo({ top: 0 }); return; }
+});
+document.addEventListener("keydown", e => { if (e.key === "Escape" && !$("#sheetwrap").hidden) closeHow(); });
+$("#jump").addEventListener("toggle", () => { $("#jumplbl").textContent = $("#jump").open ? "Close" : "Jump to it ›"; });
+
+function showView(v) { $$("section.view").forEach(s => s.classList.toggle("on", s.id === "v-" + v)); $$("nav.tabs button").forEach(b => b.setAttribute("aria-selected", b.dataset.v === v)); window.scrollTo({ top: 0 }); }
+$$("nav.tabs button").forEach(b => b.addEventListener("click", () => showView(b.dataset.v)));
+function goHash() { const id = decodeURIComponent(location.hash.slice(1)); if (!id) return; const el = document.getElementById(id); if (!el) return; const sec = el.closest("section.view"); if (sec) { showView(sec.id.slice(2)); requestAnimationFrame(() => el.scrollIntoView({ block: "start" })); } }
+window.addEventListener("hashchange", goHash);
+renderGallery(); renderRead(); renderPractice(); goHash();
+</script>
+</body>
+</html>
