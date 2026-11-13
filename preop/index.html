@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pre-op Evaluation · bedside.tools</title>
+<meta name="description" content="Perioperative assessment for the internist: stepwise cardiac risk, medications to hold or continue, anticoagulant planning, timing after stents and stroke, with practice cases.">
+<script src="/theme.js"></script>
+<style>
+:root{--bg:#FBFBFA; --card:#FFFFFF; --ink:#111113; --muted:#55555D; --line:#ECECEE; --accent:#2B4BDB; --warn:#9A3B00; --warnbg:#FFF6EC}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5;padding-bottom:76px}
+.wrap{max-width:720px;margin:0 auto;padding:0 16px}
+a{color:var(--accent)}
+.back{font-size:14px;text-decoration:none;display:inline-block;min-height:44px;line-height:44px}
+h1{font-size:26px;margin:0 0 4px;letter-spacing:-.01em}
+h2{font-size:19px;margin:0;font-weight:600}
+h3{font-size:16px;margin:0;font-weight:600}
+.purpose{color:var(--muted);margin:0 0 16px}
+.mono{font-family:var(--mono)}
+.label{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin:0 0 14px;display:flex;flex-direction:column;gap:12px}
+.card p{margin:0}
+.answer{border-color:var(--accent)}
+.answer.ok{border-color:var(--ok)}
+.answer.stop{border-color:var(--bad)}
+.answer.caution{border-color:var(--warn)}
+.verdict{font-size:20px;font-weight:600;line-height:1.25}
+.field label,.flabel{display:block;font-size:13px;color:var(--muted);margin-bottom:4px}
+.field select,.field input{width:100%;min-height:44px;border:1px solid var(--line);border-radius:10px;padding:0 10px;font:inherit;font-size:16px;background:var(--card);color:var(--ink)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.muted{color:var(--muted);font-size:14px}
+.why{font-size:15px}
+.note{background:var(--fill);border-radius:10px;padding:10px 12px;font-size:14px}
+.guard{border-left:3px solid var(--warn);background:var(--warnbg);padding:10px 12px;border-radius:0 10px 10px 0;font-size:14.5px}
+.guard b{color:var(--warn)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{min-height:44px;padding:0 13px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--ink);font:inherit;font-size:14px;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+.chip[aria-pressed=true]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.check{display:grid;grid-template-columns:28px 1fr auto;gap:8px;align-items:start;min-height:44px;padding:9px 0;border-top:1px solid var(--line);cursor:pointer;font-size:15px}
+.check:first-of-type{border-top:0}
+.check input{width:22px;height:22px;margin:1px 0 0;accent-color:var(--accent)}
+.check small{display:block;color:var(--muted);font-size:13px}
+.check .pts{font-family:var(--mono);font-size:12px;color:var(--muted);padding-top:2px}
+.stats{display:flex;flex-wrap:wrap;gap:8px}
+.stat{flex:1 1 96px;background:var(--fill);border-radius:10px;padding:8px 10px}
+.stat small{display:block;font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.stat b{font-family:var(--mono);font-size:19px;font-weight:600}
+.tier{align-self:flex-start;display:inline-block;font-family:var(--mono);font-size:11px;border:1px solid var(--line);border-radius:999px;padding:3px 9px;color:var(--muted)}
+.pill{display:inline-block;font-family:var(--mono);font-size:11px;padding:3px 9px;border-radius:999px;white-space:nowrap}
+.pill.continue{background:var(--okbg);color:var(--ok)}
+.pill.hold{background:var(--warnbg);color:var(--warn)}
+.pill.adjust{background:var(--fill);color:var(--ink)}
+details{border-top:1px solid var(--line);padding-top:4px}
+summary{cursor:pointer;color:var(--accent);font-weight:600;font-size:14px;min-height:44px;line-height:44px}
+details>*:not(summary){margin-bottom:10px}
+.steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.steps li{display:grid;grid-template-columns:26px 1fr;gap:8px;font-size:14.5px;color:var(--muted)}
+.steps li i{font-style:normal;font-family:var(--mono);font-size:12px;width:24px;height:24px;border-radius:50%;border:1px solid var(--line);display:flex;align-items:center;justify-content:center}
+.steps li.here{color:var(--ink);font-weight:600}
+.steps li.here i{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.steps li.past i{background:var(--fill)}
+table.t{width:100%;border-collapse:collapse;font-size:14px}
+table.t th{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);text-align:left;font-weight:500;padding:6px 8px 6px 0;border-bottom:1px solid var(--line)}
+table.t td{padding:8px 8px 8px 0;border-bottom:1px solid var(--line);vertical-align:top}
+table.t tr.on td{background:var(--fill)}
+.scroll{overflow-x:auto}
+.med{display:flex;flex-direction:column;gap:6px;padding:12px 0;border-top:1px solid var(--line)}
+.med:first-child{border-top:0}
+.med .hd{display:flex;align-items:center;justify-content:space-between;gap:10px;font-weight:600}
+.cal{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px}
+.day{flex:none;width:86px;border:1px solid var(--line);border-radius:10px;padding:8px;font-size:12.5px;display:flex;flex-direction:column;gap:2px}
+.day b{font-family:var(--mono);font-size:12px}
+.day .tag{font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+.day.off{background:var(--warnbg)} .day.off .tag{color:var(--warn)}
+.day.surg{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)} .day.surg .tag{color:var(--accent-ink)}
+.day.dose{background:var(--okbg)} .day.dose .tag{color:var(--ok)}
+.wait{display:grid;grid-template-columns:1fr;gap:4px;padding:10px 0;border-top:1px solid var(--line)}
+.wait:first-of-type{border-top:0}
+.track{height:10px;border-radius:99px;background:var(--fill);position:relative;overflow:hidden}
+.track i{position:absolute;left:0;top:0;bottom:0;border-radius:99px}
+.track .soft{background:var(--warnbg);border:1px solid var(--warn)}
+.track .hard{background:var(--warn)}
+.axis{display:flex;justify-content:space-between;font-family:var(--mono);font-size:10.5px;color:var(--muted)}
+.flow{display:flex;flex-direction:column;gap:4px;font-size:14px}
+.flow span{background:var(--fill);border-radius:8px;padding:6px 10px}
+.flow b{font-family:var(--mono);font-weight:500;color:var(--muted);text-align:center;font-size:12px}
+.q{font-size:16.5px;font-weight:600}
+.opts{display:grid;gap:8px}
+.opt{min-height:48px;text-align:left;padding:10px 14px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);font:inherit;font-size:15.5px;cursor:pointer}
+.opt.right{border-color:var(--ok);background:var(--okbg)}
+.opt.wrong{border-color:var(--bad);background:var(--badbg)}
+.opt:disabled{cursor:default;color:var(--ink);opacity:1}
+.btn{min-height:44px;padding:0 16px;border:1px solid var(--accent);border-radius:999px;background:var(--accent);color:var(--accent-ink);font:inherit;font-size:15px;font-weight:600;cursor:pointer;align-self:flex-start}
+.btn.ghost{background:var(--card);color:var(--accent)}
+.score{font-family:var(--mono);font-size:13px;color:var(--muted)}
+section.view{display:none;padding:4px 0 8px}
+section.view.on{display:block}
+nav.tabs{position:fixed;left:0;right:0;bottom:0;background:var(--bg);border-top:1px solid var(--line);z-index:20;padding-bottom:env(safe-area-inset-bottom)}
+nav.tabs .wrap{display:flex;padding:0}
+nav.tabs button{flex:1;min-height:60px;border:0;border-top:2px solid transparent;background:none;font-family:var(--mono);font-size:10.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);cursor:pointer;padding:0 2px}
+nav.tabs button[aria-selected=true]{color:var(--accent);border-top-color:var(--accent)}
+a:focus-visible,button:focus-visible,summary:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+footer{margin-top:24px;padding:16px 0 8px;border-top:1px solid var(--line);font-size:12.5px;color:var(--muted);line-height:1.6}
+footer p{margin:0 0 6px}
+footer strong{color:var(--ink)}
+@media (min-width:1000px){
+  main.wrap{max-width:960px}
+  .cols{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start}
+  .cols>.stick{position:sticky;top:12px}
+}
+</style>
+</head>
+<body>
+<header class="wrap">
+  <a class="back" href="/">← bedside.tools</a>
+  <h1>Pre-op evaluation</h1>
+  <p class="purpose">Estimate the risk, test only if it changes care, and plan the medications.</p>
+</header>
+
+<main class="wrap" id="main">
+
+<!-- ================= RISK ================= -->
+<section class="view on" id="v-risk">
+ <div class="cols">
+  <div>
+   <div class="card" id="pathway">
+    <p class="label">The patient and the operation</p>
+    <div><span class="flabel">How soon is surgery?</span>
+     <div class="chips" id="urg" role="group" aria-label="Urgency">
+      <button type="button" class="chip" data-v="elective" aria-pressed="true">Elective</button>
+      <button type="button" class="chip" data-v="urgent" aria-pressed="false">Urgent or time-sensitive</button>
+      <button type="button" class="chip" data-v="emergency" aria-pressed="false">Emergency</button>
+     </div></div>
+    <div><span class="flabel">Active cardiac condition</span>
+     <label class="check"><input type="checkbox" id="ac0"><span>Acute coronary syndrome</span><span></span></label>
+     <label class="check"><input type="checkbox" id="ac1"><span>Decompensated heart failure</span><span></span></label>
+     <label class="check"><input type="checkbox" id="ac2"><span>Unstable or uncontrolled arrhythmia</span><span></span></label>
+     <label class="check"><input type="checkbox" id="ac3"><span>Symptomatic severe valve disease</span><span></span></label>
+    </div>
+    <label class="check" style="border-top:1px solid var(--line)"><input type="checkbox" id="lowproc"><span>Low-risk procedure<small>Cataract, endoscopy, superficial or breast surgery: under 1% risk whatever the patient's score</small></span><span></span></label>
+   </div>
+
+   <div class="card" id="rcri">
+    <p class="label">Revised Cardiac Risk Index</p>
+    <div id="rcriBox"></div>
+    <div class="field"><label for="other">Risk from NSQIP or another calculator, % (optional; overrides RCRI for the pathway)</label><input id="other" type="number" inputmode="decimal" min="0" max="100" step="0.1"></div>
+   </div>
+
+   <div class="card" id="capacity">
+    <p class="label">Functional capacity</p>
+    <div class="chips" id="cap" role="group" aria-label="Functional capacity">
+      <button type="button" class="chip" data-v="none" aria-pressed="true">Not assessed</button>
+      <button type="button" class="chip" data-v="good" aria-pressed="false">4 METs or more</button>
+      <button type="button" class="chip" data-v="poor" aria-pressed="false">Under 4 METs</button>
+    </div>
+    <p class="muted">4 METs is two flights of stairs or a walk up a hill without stopping. Judge the baseline before the surgical illness.</p>
+    <details id="dasiD"><summary>Score it with DASI instead</summary>
+      <p class="muted">Tick what the patient can do. Any tick switches the pathway to the DASI score.</p>
+      <div id="dasiBox"></div>
+      <button type="button" class="btn ghost" id="dasiClear">Clear DASI</button>
+    </details>
+    <div class="two">
+      <div class="field"><label for="bnp">BNP, pg/mL (optional)</label><input id="bnp" type="number" inputmode="decimal" min="0"></div>
+      <div class="field"><label for="ntp">NT-proBNP, pg/mL (optional)</label><input id="ntp" type="number" inputmode="decimal" min="0"></div>
+    </div>
+    <label class="check" style="border-top:0"><input type="checkbox" id="change"><span>A stress test result would change management<small>You would revascularize for a standard indication, or change or cancel the operation</small></span><span></span></label>
+   </div>
+  </div>
+
+  <div class="stick">
+   <div class="card answer" id="riskOut" aria-live="polite"></div>
+   <div class="card" id="tests">
+    <p class="label">Which cardiac test, and when</p>
+    <div class="scroll"><table class="t"><thead><tr><th>Test</th><th>Order it when</th><th>Skip it when</th></tr></thead><tbody>
+      <tr><td>ECG</td><td>Cardiac symptoms; or known coronary, arrhythmic, peripheral arterial, cerebrovascular or structural heart disease before elevated-risk surgery</td><td>Low-risk surgery in a patient without symptoms</td></tr>
+      <tr><td>Resting echo</td><td>New dyspnea or worsening symptoms; suspected moderate or severe valve disease; known HF or valve disease with a change</td><td>Stable and asymptomatic with an echo in the past year; routine screening of LV function</td></tr>
+      <tr><td>Stress test</td><td>Elevated risk, poor or unknown capacity, and the result would change management</td><td>Low risk, low-risk surgery, or adequate capacity</td></tr>
+      <tr><td>Coronary angiography</td><td>Same indications as without surgery</td><td>To get the patient through surgery</td></tr>
+    </tbody></table></div>
+    <span class="tier">ACC/AHA 2024, reaffirmed 2026</span>
+   </div>
+   <div class="card" id="systems">
+    <p class="label">Beyond the heart</p>
+    <details><summary>Lungs, liver, kidneys, blood, glands, brain</summary>
+      <p><b>Lungs.</b> Risk rises with age over 60, COPD, heart failure, functional dependence, sleep apnea, low albumin, and upper abdominal, thoracic or long operations. Lower it with smoking cessation, lung expansion, CPAP and early mobilization. No routine chest film or spirometry.</p>
+      <p><b>Liver.</b> Child-Pugh and MELD estimate mortality. Child C: avoid elective surgery. Acute hepatitis: delay.</p>
+      <p><b>Kidney.</b> CKD raises the risk of AKI. Avoid NSAIDs and hypotension, dose drugs for kidney function, and time dialysis for the day before.</p>
+      <p><b>Anemia.</b> Treat iron deficiency, by vein if surgery is weeks away. Transfuse restrictively.</p>
+      <p><b>Thyroid and adrenal.</b> Mild hypothyroidism: proceed. Severe hypothyroidism or overt hyperthyroidism: control first. Long-term steroids: see Meds.</p>
+      <p><b>Frailty and delirium.</b> Frailty predicts complications better than age. Screen cognition, avoid benzodiazepines and anticholinergics, and discuss goals of care.</p>
+      <span class="tier">Expert practice</span>
+    </details>
+    <details><summary>Which labs to order</summary>
+      <div class="scroll"><table class="t"><thead><tr><th>Lab</th><th>Order it if</th><th>What the number tells you</th></tr></thead><tbody>
+        <tr><td>CBC</td><td>Expected blood loss, anemia symptoms, kidney or liver disease</td><td>Low hemoglobin cuts oxygen delivery and primes demand ischemia</td></tr>
+        <tr><td>Basic metabolic panel</td><td>Kidney disease, diuretics, ACE inhibitor or ARB, diabetes, nephrotoxins</td><td>Potassium sets arrhythmia risk; creatinine sets doses and AKI risk</td></tr>
+        <tr><td>INR, PTT</td><td>Warfarin, liver disease, bleeding history; never routine</td><td>INR mostly reflects factor VII</td></tr>
+        <tr><td>A1c, glucose</td><td>Diabetes or strong suspicion</td><td>Poor control raises infection and wound risk</td></tr>
+        <tr><td>Pregnancy test</td><td>Anyone who could be pregnant</td><td>Changes anesthetic and drug choices</td></tr>
+      </tbody></table></div>
+      <span class="tier">Expert practice</span>
+    </details>
+   </div>
+  </div>
+ </div>
+</section>
+
+<!-- ================= MEDS ================= -->
+<section class="view" id="v-meds">
+  <div class="card" id="meds">
+    <div class="field"><label for="medSearch">Find a drug or class</label><input id="medSearch" type="search" placeholder="insulin, stent, lisinopril…" autocomplete="off"></div>
+    <div class="chips" id="medChips" role="group" aria-label="Filter"></div>
+    <div id="medList" aria-live="polite"></div>
+  </div>
+  <div class="card" id="edka">
+    <p class="label">Why SGLT2 inhibitors are held</p>
+    <div class="flow"><span>Sugar spills into urine, so blood glucose falls</span><b>↓</b><span>Insulin falls and glucagon rises</span><b>↓</b><span>Fat breakdown feeds ketone production; the kidney holds on to ketones</span><b>↓</b><span>Ketoacidosis with a glucose under 250: it hides</span></div>
+    <p class="why">Surgery adds fasting, stress hormones, less insulin and volume loss. An anion gap with a near-normal glucose after surgery: send a serum beta-hydroxybutyrate (urine dipsticks miss it) and treat with insulin plus dextrose from the start.</p>
+  </div>
+</section>
+
+<!-- ================= ANTICOAG ================= -->
+<section class="view" id="v-anticoag">
+ <div class="cols">
+  <div>
+   <div class="card" id="doac">
+    <p class="label">DOAC hold planner</p>
+    <div class="two">
+      <div class="field"><label for="dDrug">Drug</label><select id="dDrug"><option value="apixaban">Apixaban</option><option value="rivaroxaban">Rivaroxaban</option><option value="edoxaban">Edoxaban</option><option value="dabigatran">Dabigatran</option></select></div>
+      <div class="field"><label for="dCrcl">CrCl, mL/min</label><input id="dCrcl" type="number" inputmode="decimal" min="0" max="250"></div>
+    </div>
+    <div class="two">
+      <div class="field"><label for="dRisk">Bleeding risk of the procedure</label><select id="dRisk"><option value="low">Low or moderate</option><option value="high">High</option></select></div>
+      <div class="field"><label for="dDate">Surgery date</label><input id="dDate" type="date"></div>
+    </div>
+    <label class="check" style="border-top:0"><input type="checkbox" id="dNeur"><span>Spinal or epidural anesthesia planned<small>Counts as high bleeding risk and lengthens the hold</small></span><span></span></label>
+    <div id="doacOut" class="card answer" style="margin:0" aria-live="polite"></div>
+    <details><summary>What counts as high bleeding risk</summary>
+      <p class="why">Major surgery with extensive tissue injury or lasting over 45 minutes; cancer surgery; major orthopedic surgery; cardiac, thoracic, intracranial and spinal surgery; urologic and gastrointestinal surgery, including bowel resection; kidney biopsy; any procedure with neuraxial anesthesia.</p>
+      <p class="why">Minimal-risk procedures (cataract, minor dental work, minor skin procedures) usually go ahead without stopping the anticoagulant, or with only the dose on the day held.</p>
+      <span class="tier">PAUSE 2019; CHEST 2022</span>
+    </details>
+   </div>
+  </div>
+  <div>
+   <div class="card" id="warfarin">
+    <p class="label">Warfarin: bridge or not</p>
+    <div class="field"><label for="wInd">Why the patient takes it</label><select id="wInd"><option value="af">Atrial fibrillation</option><option value="valve">Mechanical heart valve</option><option value="vte">Venous thromboembolism</option></select></div>
+    <div id="wBox"></div>
+    <div id="wOut" class="card answer" style="margin:0" aria-live="polite"></div>
+    <details><summary>The BRIDGE trial, and why warfarin takes 5 days</summary>
+      <div class="scroll"><table class="t"><thead><tr><th>BRIDGE, 1,884 patients with AF</th><th>No bridge</th><th>Bridged</th></tr></thead><tbody>
+        <tr><td>Arterial thromboembolism</td><td class="mono">0.4%</td><td class="mono">0.3%</td></tr>
+        <tr><td>Major bleeding</td><td class="mono">1.3%</td><td class="mono">3.2%</td></tr></tbody></table></div>
+      <p class="why">INR mostly tracks factor VII (half-life about 6 hours), but clotting rests on prothrombin (factor II, 60 to 72 hours). That is why the effect takes about 5 days to wear off, and why a normal INR lags behind. Oral vitamin K lets the liver make new factors over 24 to 48 hours; 4-factor PCC supplies them directly, for emergencies.</p>
+      <span class="tier">BRIDGE, NEJM 2015</span>
+    </details>
+   </div>
+  </div>
+ </div>
+</section>
+
+<!-- ================= TIMING ================= -->
+<section class="view" id="v-timing">
+  <div class="card" id="wait">
+    <p class="label">How long to wait for elective surgery</p>
+    <div id="waitBox"></div>
+    <div class="axis" aria-hidden="true"><span>0</span><span>3 mo</span><span>6 mo</span><span>9 mo</span><span>12 mo</span></div>
+    <p class="muted">Solid: avoid elective surgery. Outlined: delay if you can; if surgery is time-sensitive, decide with cardiology or neurology.</p>
+    <p class="why"><b>Why:</b> a new stent is bare metal until the vessel lining grows over it, and stopping antiplatelets in that window invites stent thrombosis just as surgery makes blood clot more easily.</p>
+    <details><summary>More</summary>
+      <p class="why">Surgery that cannot wait may be considered from 3 months after a drug-eluting stent, if the harm of delay outweighs the cardiac risk (2b). If surgery cannot wait, keep dual antiplatelet therapy going when the bleeding risk allows, especially within 30 days of a bare-metal stent or 3 months of a drug-eluting stent. If the P2Y12 inhibitor must stop, continue aspirin and restart the second drug as soon as possible. A patient on an anticoagulant alone after remote PCI may take aspirin until the anticoagulant resumes.</p>
+      <p class="why">After a stroke, the excess risk of a second stroke and cardiac events falls over time and levelled off at about 9 months in a Danish registry (Jørgensen, JAMA 2014).</p>
+      <span class="tier">ACC/AHA 2024, reaffirmed 2026 · MI without a stent: ACC/AHA 2014</span>
+    </details>
+  </div>
+  <div class="card" id="conditions">
+    <p class="label">Conditions that change the plan</p>
+    <div class="med"><h3>Severe aortic stenosis</h3><p class="why">Symptomatic, or meeting valve criteria: evaluate for valve replacement before elective surgery. No symptoms, normal LV function and an echo within a year: low-risk elective surgery may proceed (2a). For larger operations, decide with cardiology and anesthesia and plan close hemodynamic monitoring.</p><p class="why"><b>Why:</b> a fixed valve cannot raise output, so pressure depends on preload and filling time. Avoid hypotension and tachycardia.</p></div>
+    <div class="med"><h3>Heart failure</h3><p class="why">Decompensated: delay and treat. Compensated: optimize volume, continue guideline therapy, and hold the SGLT2 inhibitor (see Meds).</p><p class="why"><b>Why:</b> fluid shifts and the catecholamine surge of surgery tip a heart with little reserve into congestion or low output.</p></div>
+    <div class="med"><h3>Pacemakers and defibrillators</h3><p class="why">Know the device, why it was placed, and whether the patient is pacer-dependent. Agree a plan for electrocautery with anesthesia: a magnet or reprogramming, tachycardia therapies off for defibrillators, then back on before the patient leaves monitoring. Interference matters most for surgery above the navel. A magnet on a defibrillator stops shocks but does not change how it paces, so a pacer-dependent patient with a defibrillator needs reprogramming.</p><p class="why"><b>Why:</b> cautery noise can be read as the heart's own beat (pacing stops) or as ventricular fibrillation (a shock).</p></div>
+    <div class="med"><h3>Pulmonary hypertension, congenital heart disease</h3><p class="why">High risk and not captured by RCRI. Involve the specialist team and a center with experience.</p></div>
+    <span class="tier">ACC/AHA 2024, reaffirmed 2026</span>
+  </div>
+  <div class="card" id="mins">
+    <p class="label">After surgery: troponin and silent injury</p>
+    <p class="why">Most perioperative heart injury is painless under analgesia. In high-risk patients, a troponin on postoperative days 1 and 2 can be considered to find it.</p>
+    <p class="why"><b>Why:</b> injury is usually a supply and demand mismatch from hypotension, tachycardia and anemia, and it predicts 30-day mortality even without symptoms (VISION).</p>
+    <details><summary>More</summary>
+      <p class="why">If troponin rises: look for and treat the cause, get an ECG, and arrange follow-up for risk-factor control (ACC/AHA: reasonable, 2a). ACC/AHA says antithrombotic therapy may be considered (2b); the Canadian guideline recommends starting aspirin and a statin. Write the consult as a risk estimate ("elevated risk, RCRI 2; no testing indicated"), not as "cleared".</p>
+      <span class="tier">ACC/AHA 2024 (2b for surveillance) · CCS 2017 · VISION</span>
+    </details>
+  </div>
+</section>
+
+<!-- ================= PRACTICE ================= -->
+<section class="view" id="v-practice">
+  <div class="card" id="case">
+    <p class="label">Worked case: urgent cervical decompression</p>
+    <p class="why">A 70-year-old woman with heart failure (EF 45%, non-ischemic), atrial fibrillation, hypertension and type 2 diabetes has progressive cervical myelopathy with grip strength 3/5. Neurosurgery plans decompression and fusion within days.</p>
+    <p class="why">She rode a recumbent bike daily and climbed the two flights to her apartment without stopping until the weakness began. Weight 72 kg; her last echo was 8 months ago. Medications: metformin, lisinopril, metoprolol succinate, furosemide, warfarin. HR 62, BP 128/82, lungs clear, 1+ pedal edema. Creatinine 0.85, hemoglobin 12.5, A1c 7.6, INR 2.6. ECG: rate-controlled AF. Amoxicillin causes a rash.</p>
+    <div id="caseBox"></div>
+  </div>
+  <div class="card" id="quiz">
+    <p class="label">Ten questions</p>
+    <div id="quizBox" aria-live="polite"></div>
+  </div>
+</section>
+
+<div class="note" id="local"><b>Adjust to your institution.</b> Hold times for neuraxial anesthesia, bridging protocols and device management follow your anesthesia, pharmacy and cardiology services where they differ from this page.</div>
+
+<footer>
+  <p><strong>For education only. Not a substitute for clinical judgment.</strong> A pre-op assessment estimates risk; it does not clear a patient. Decisions about timing, anticoagulation and antiplatelet drugs are made with the surgical, anesthesia and cardiology teams.</p>
+  <p>Privacy: everything runs in your browser. Nothing you enter is sent anywhere or stored, and there are no analytics. Do not enter names, record numbers, or dates of birth.</p>
+  <p class="mono">Last reviewed: 2026-11-13</p>
+  <p><strong>Sources:</strong> AHA/ACC guideline for perioperative cardiovascular management for noncardiac surgery 2024 (Thompson, Circulation), reaffirmed 2026 · ACC/AHA perioperative guideline 2014 (timing after MI) · CHEST guideline on perioperative antithrombotic management 2022 (Douketis) · PAUSE (Douketis, JAMA Intern Med 2019) · BRIDGE (Douketis, NEJM 2015) · ACC/AHA valvular heart disease guideline 2020 · ASRA regional anesthesia and antithrombotic therapy, 5th edition 2025 · Multisociety guidance on GLP-1 receptor agonists in the perioperative period 2024 · ADA Standards of Care, diabetes care in the hospital · FDA labels for SGLT2 inhibitors · Lee 1999 (RCRI) and Duceppe 2017 (Canadian Cardiovascular Society, recalibrated risk and natriuretic peptide thresholds) · Hlatky 1989 (DASI) and the METS study (Wijeysundera, Lancet 2018; DASI cut-off analysis, Br J Anaesth 2020) · VISION · POISE and POISE-2 · CARP · Jørgensen 2014. Each card shows its basis: guideline (with its class of recommendation where shown), trial, label, or expert practice.</p>
+</footer>
+</main>
+
+<nav class="tabs" role="tablist"><div class="wrap">
+  <button role="tab" aria-selected="true" data-v="risk">Risk</button>
+  <button role="tab" aria-selected="false" data-v="meds">Meds</button>
+  <button role="tab" aria-selected="false" data-v="anticoag">Anticoag</button>
+  <button role="tab" aria-selected="false" data-v="timing">Timing</button>
+  <button role="tab" aria-selected="false" data-v="practice">Practice</button>
+</div></nav>
+
+<script id="data">
+const RCRI = [
+ ['High-risk surgery','Intraperitoneal, intrathoracic or suprainguinal vascular'],
+ ['Ischemic heart disease','Prior MI, positive stress test, angina, nitrate use, Q waves'],
+ ['Heart failure','History of HF, pulmonary edema, S3, paroxysmal nocturnal dyspnea'],
+ ['Cerebrovascular disease','Prior stroke or TIA'],
+ ['Diabetes treated with insulin','Insulin, not oral agents alone'],
+ ['Creatinine above 2 mg/dL','Preoperative value']
+];
+/* Risk of major cardiac events by RCRI points 0, 1, 2, 3 or more. */
+const RCRI_LEE = [0.4, 0.9, 6.6, 11];        /* Lee 1999, validation cohort */
+const RCRI_RECAL = [3.9, 6.0, 10.1, 15.0];   /* Duceppe 2017, pooled modern cohorts */
+const DASI = [
+ ['Take care of yourself: eating, dressing, bathing, using the toilet',2.75],
+ ['Walk indoors, such as around the house',1.75],
+ ['Walk a block or two on level ground',2.75],
+ ['Climb a flight of stairs or walk up a hill',5.5],
+ ['Run a short distance',8.0],
+ ['Light housework, like dusting or washing dishes',2.7],
+ ['Moderate housework, like vacuuming, sweeping or carrying groceries',3.5],
+ ['Heavy housework, like scrubbing floors or moving heavy furniture',8.0],
+ ['Yard work, like raking, weeding or pushing a power mower',4.5],
+ ['Sexual relations',5.25],
+ ['Moderate recreation: golf, bowling, dancing, doubles tennis',6.0],
+ ['Strenuous sports: swimming, singles tennis, basketball, skiing',7.5]
+];
+const DASI_CUT = 34;       /* above 34: lower risk (METS, Wijeysundera 2020; ACC/AHA 2024 uses 34 or below as poor) */
+const BNP_CUT = 92, NTP_CUT = 300;   /* pg/mL; Canadian Cardiovascular Society 2017 */
+
+/* Medications: [name, plan, what to do, why, more, basis] */
+const MEDS = [
+ ['Beta-blocker','continue','Continue, including the morning of surgery. Do not start one on the day of surgery.','Stopping causes rebound tachycardia and ischemia; starting high doses just before surgery cut heart attacks but raised stroke and death in POISE.','If one is newly indicated, start it more than a week ahead so the dose can be adjusted to heart rate and blood pressure.','ACC/AHA 2024: continue (1); starting on the day of surgery (3: harm); starting more than 7 days ahead (2b)'],
+ ['Statin','continue','Continue. Start one before surgery if the patient has an indication.','Stabilizes plaque through a period of inflammation and clotting.','','ACC/AHA 2024: continue (1)'],
+ ['ACE inhibitor or ARB','adjust','For hypertension: holding it for 24 hours before surgery may reduce low blood pressure in the operating room. For heart failure with reduced EF: continuing is reasonable. Restart when the patient is stable.','With angiotensin blocked, anesthesia leaves little to defend blood pressure.','','ACC/AHA 2024: hold in hypertension (2b); continue in HFrEF (2a)'],
+ ['Clonidine','continue','Continue if already taking it. Do not start it before surgery.','Stopping abruptly causes rebound hypertension; starting it lowered pressure without preventing events (POISE-2).','','ACC/AHA 2024: starting it (3: no benefit)'],
+ ['Aspirin','adjust','Continue with a coronary stent if at all possible. For other secondary prevention, continuing may be reasonable when cardiac risk outweighs bleeding. Stop when taken for primary prevention. Do not start it for surgery.','POISE-2: starting or continuing aspirin raised bleeding without preventing heart attacks, outside the stent population.','When it is stopped, the interval is 4 to 7 days before surgery: platelet function recovers in about 4 days.','ACC/AHA 2024; CHEST 2022'],
+ ['Clopidogrel','hold','Stop 5 days before, with cardiology input if there is a stent.','Irreversible platelet inhibition; early interruption risks stent thrombosis. See Timing.','','ACC/AHA 2024'],
+ ['Ticagrelor','hold','Stop 3 to 5 days before, with cardiology input if there is a stent.','Reversible, so platelet function returns sooner than with clopidogrel.','','ACC/AHA 2024'],
+ ['Prasugrel','hold','Stop 7 days before, with cardiology input if there is a stent.','The longest platelet effect of the three.','','ACC/AHA 2024'],
+ ['Loop diuretic','hold','Usually hold on the morning of surgery; resume with oral intake. Continue if the patient is congested.','Fasting plus a diuretic risks low volume and low potassium.','','Expert practice'],
+ ['SGLT2 inhibitor','hold','Hold 3 days before surgery (ertugliflozin 4 days). Restart when eating normally and volume status is normal.','Ketoacidosis with a near-normal glucose during fasting and surgical stress.','The same hold applies whether the drug is for diabetes, heart failure or kidney disease.','ACC/AHA 2024 (1): 3 to 4 days; FDA labels'],
+ ['GLP-1 receptor agonist','adjust','Most patients continue. Higher risk of a full stomach (dose escalation, higher dose, weekly drug, nausea or vomiting, gastroparesis): a liquid diet for at least 24 hours before, and tell anesthesia. Holding is an individual decision.','Slows stomach emptying, so food can remain despite fasting.','If it is held, the earlier convention was the day of surgery for daily drugs and a week for weekly drugs; the 2024 guidance says the right duration is unknown.','Multisociety guidance 2024'],
+ ['Metformin','hold','Hold on the day of surgery.','Lactic acidosis if kidney perfusion falls.','The two guidelines differ: the ADA advises holding it on the day of surgery, while ACC/AHA 2024 considers continuing it reasonable (2a). Follow local practice.','ADA Standards of Care; ACC/AHA 2024 differs'],
+ ['Sulfonylurea and other oral diabetes drugs','hold','Hold on the morning of surgery.','Low glucose while fasting.','','ADA Standards of Care'],
+ ['Basal insulin','adjust','Give 75 to 80% of the usual long-acting dose (half of an NPH dose) the evening before or the morning of surgery.','Enough to prevent high glucose and ketosis without causing a low while fasting.','','ADA Standards of Care'],
+ ['Mealtime insulin','hold','Hold while not eating; use a correction scale.','No carbohydrate to cover.','','ADA Standards of Care'],
+ ['Long-term steroids','adjust','Continue the usual dose. Add stress dosing for major surgery if the patient has taken prednisone 20 mg a day or more for over 3 weeks, or looks cushingoid. Under 5 mg a day: no stress dose.','A suppressed adrenal axis cannot raise cortisol for surgery.','Between those doses the axis may or may not be suppressed: decide by the size of the operation, or test.','Expert practice'],
+ ['Levothyroxine','continue','Continue. A missed dose does no harm.','Half-life is about a week.','','Expert practice'],
+ ['Warfarin','hold','Stop 5 days before surgery; check an INR the day before. Bridge only at high thrombotic risk. See Anticoag.','Prothrombin takes days to recover.','','CHEST 2022'],
+ ['Apixaban, rivaroxaban, edoxaban','hold','Skip 1 day before low or moderate bleeding-risk surgery, 2 days before high-risk surgery. No bridging. See Anticoag.','Short half-lives make a timed gap enough.','Edoxaban was not in PAUSE; the same schedule is applied by extrapolation.','PAUSE 2019; CHEST 2022'],
+ ['Dabigatran','hold','CrCl 50 or above: skip 1 day (low or moderate risk) or 2 days (high). CrCl 30 to 49: 2 or 4 days. Under 30: not studied; plan a longer hold. See Anticoag.','Cleared by the kidney, so it lingers when clearance is low.','','PAUSE 2019; CHEST 2022'],
+ ['NSAIDs','hold','Stop a few days before: about 1 to 3 days for short-acting drugs such as ibuprofen, longer for long-acting ones.','Reversible platelet effect and kidney injury.','','Expert practice'],
+ ['SSRIs','continue','Usually continue.','Withdrawal and relapse outweigh a small bleeding effect.','','Expert practice'],
+ ['Buprenorphine','continue','Usually continue, and plan pain control with the anesthesia or pain team.','Stopping risks relapse and makes pain harder to control.','','Expert practice'],
+ ['MAO inhibitors','adjust','Discuss with anesthesia well ahead.','Dangerous interactions with some pressors and with meperidine.','','Expert practice']
+];
+const PLAN = {continue:'Continue', hold:'Hold', adjust:'Adjust'};
+
+/* Waiting times, in months: [label, rule, solid bar, outlined bar, basis] */
+const WAITS = [
+ ['Balloon angioplasty, no stent','At least 14 days',0.5,0,'ACC/AHA 2024 (1)'],
+ ['Bare-metal stent','At least 30 days',1,0,'ACC/AHA 2024 (3: harm within 30 days)'],
+ ['Drug-eluting stent, stable coronary disease','No elective surgery in the first 30 days. Ideally 6 months.',1,6,'ACC/AHA 2024 (2a)'],
+ ['Drug-eluting stent after an acute coronary syndrome','Ideally 12 months',1,12,'ACC/AHA 2024 (1)'],
+ ['Heart attack without a stent','At least 60 days',2,0,'ACC/AHA 2014'],
+ ['Stroke or TIA','At least 3 months after the most recent event; risk keeps falling to about 9 months',3,9,'ACC/AHA 2024 (2a); Jørgensen 2014']
+];
+
+const CHADS = [['Heart failure or LV dysfunction',1],['Hypertension',1],['Age 75 or older',2],['Diabetes',1],['Prior stroke, TIA or thromboembolism',2],['Vascular disease (MI, peripheral arterial disease, aortic plaque)',1],['Age 65 to 74',1],['Female sex',1]];
+const W_AF = ['Stroke or TIA within the past 3 months','Rheumatic mitral valve disease'];
+const W_VALVE = ['Mechanical mitral valve','Older-generation aortic valve (caged-ball or tilting-disc)','Mechanical aortic valve with a risk factor: atrial fibrillation, prior thromboembolism, LV dysfunction or a clotting disorder'];
+const W_VTE = ['Clot within the past 3 months','Severe thrombophilia: antiphospholipid syndrome, or protein C, protein S or antithrombin deficiency'];
+
+const CASE = [
+ ['What is her RCRI and estimated risk?','RCRI 1, for heart failure. Spine surgery is not RCRI high-risk surgery, metformin is not insulin, and creatinine is 0.85. ACC/AHA draws its elevated line at RCRI 2, so by the score she is on the low side of it, though modern recalibrated estimates put RCRI 1 near 6%. Her capacity (next question) points the same way.'],
+ ['Does she need a stress test or an echo?','No. Before the myelopathy she climbed two flights without stopping, which is 4 METs. Her lungs are clear and she has no orthopnea, so her heart failure is compensated: the 1+ pedal edema is isolated, without orthopnea, rales or weight gain, and does not signal decompensation. An echo is for a change in status, or none within a year; hers was 8 months ago.'],
+ ['Should surgery wait for anything?','Only for the INR. Her deficit is progressing, so delay risks permanent loss of hand function, and no test would change management.'],
+ ['What happens to each home medication?','Continue metoprolol. Hold lisinopril for 24 hours before surgery (an EF of 45% is not reduced-EF heart failure, so the hypertension rule applies; continuing it is also acceptable), and furosemide and metformin on the morning. A statin is indicated and can be started. Cefazolin is acceptable with a rash-only amoxicillin history.'],
+ ['Bridge her warfarin?','No. CHA₂DS₂-VASc is 5 with no high-risk feature. Bridging would add bleeding next to the spinal cord without preventing stroke.'],
+ ['How do you get the INR down in time?','With under 5 days to surgery, stopping warfarin alone will not do it: give low-dose oral vitamin K and recheck. Agree the INR target with neurosurgery. Keep 4-factor PCC for an emergency.'],
+ ['If she were on apixaban instead?','CrCl is about 70 and spine surgery is high bleeding risk: at least 2 full days off, and many spine and neuraxial protocols ask for 72 hours. No bridge; resume 48 to 72 hours after surgery when neurosurgery agrees.']
+];
+const QUIZ = [
+ {q:'A 68-year-old with a prior MI plays doubles tennis weekly and is scheduled for a colectomy. Next step?', o:['Pharmacologic stress test','Resting echocardiogram','Proceed without further testing','Coronary angiography'], a:2, e:'Elevated-risk surgery and RCRI 2 (intraperitoneal surgery plus ischemic heart disease), but capacity is well above 4 METs. No test would change management.'},
+ {q:'A patient with RCRI 3 who has never taken a beta-blocker has surgery tomorrow. Start metoprolol tonight?', o:['Yes, at a high dose','Yes, at a low dose','No: do not start a beta-blocker right before surgery','Only if the heart rate is above 80'], a:2, e:'POISE: starting a beta-blocker just before surgery lowered heart attacks but raised stroke and death, through hypotension and bradycardia.'},
+ {q:'A drug-eluting stent was placed for stable angina 3 months ago. Elective hip replacement is requested.', o:['Proceed; stop both antiplatelets 7 days before','Delay until at least 6 months after the stent','Bridge with LMWH and proceed','Proceed on both antiplatelets'], a:1, e:'For stable coronary disease the guideline favors waiting 6 months after a drug-eluting stent (12 months after an acute coronary syndrome). Three months is the floor for surgery that cannot wait, not for elective surgery.'},
+ {q:'AF on warfarin, CHA₂DS₂-VASc 4, elective colectomy. Best plan?', o:['Stop warfarin 5 days before, no bridging','Bridge with enoxaparin','Continue warfarin through surgery','Switch to apixaban the day before'], a:0, e:'BRIDGE: bridging did not reduce thromboembolism (0.3% vs 0.4%) and more than doubled major bleeding (3.2% vs 1.3%).'},
+ {q:'Apixaban, CrCl 80, high bleeding-risk surgery on Friday. When is the last dose?', o:['Thursday','Wednesday','Tuesday','The Friday before'], a:2, e:'PAUSE, high bleeding risk: 2 full days off (Wednesday and Thursday), so the last dose is Tuesday.'},
+ {q:'Postoperative day 1: anion gap 22, glucose 168, the patient takes empagliflozin. Most useful test?', o:['Urine ketone dipstick','Serum beta-hydroxybutyrate','Lactate only','Serum osmolality'], a:1, e:'Ketoacidosis with a near-normal glucose. Dipsticks detect acetoacetate, not beta-hydroxybutyrate, the dominant ketone. Treat with insulin plus dextrose.'},
+ {q:'A healthy 45-year-old before cataract surgery. Which pre-op tests?', o:['CBC and metabolic panel','ECG','Chest X-ray','None'], a:3, e:'A low-risk procedure in a healthy patient: routine tests find false positives and delay care.'},
+ {q:'Prednisone 20 mg daily for 2 months, major abdominal surgery. Plan?', o:['Stop prednisone 3 days before','Continue, plus stress-dose steroids around surgery','Continue the same dose only','Check a random cortisol and decide'], a:1, e:'At least 20 mg a day for over 3 weeks predicts a suppressed adrenal axis. Under 5 mg a day does not need stress dosing.'},
+ {q:'Which patient most clearly warrants bridging when warfarin is held?', o:['AF, CHA₂DS₂-VASc 3','Mechanical mitral valve','Bileaflet mechanical aortic valve, no risk factors','Provoked DVT 2 years ago'], a:1, e:'A mechanical mitral valve carries high thrombotic risk. A bileaflet aortic valve without risk factors is interrupted without bridging.'},
+ {q:'Hypertension on lisinopril only, elective knee replacement. Morning-of plan?', o:['Give it as usual','Hold it for 24 hours before surgery','Double the dose','Switch to amlodipine'], a:1, e:'For hypertension alone, holding the ACE inhibitor or ARB for 24 hours may reduce low blood pressure during surgery. In heart failure with reduced EF, continuing is reasonable. This is a weak recommendation (2b): giving the dose is not an error.'}
+];
+</script>
+<script id="engine">
+/* Pure functions: no DOM. */
+function rcriRisk(points){ const k=Math.min(points,3); return {lee:RCRI_LEE[k], recal:RCRI_RECAL[k]}; }
+function dasiScore(ticks){ let s=0; ticks.forEach((t,i)=>{ if(t) s+=DASI[i][1]; }); const vo2=0.43*s+9.6; return {score:Math.round(s*100)/100, mets:vo2/3.5, good:s>DASI_CUT}; }
+/* inp: {urgency, active(bool), lowProc(bool), rcri(points), other(% or null), cap('none'|'good'|'poor'), dasi(score or null), bnp, ntp, change(bool)} */
+function pathway(inp){
+  const elevatedByScore = inp.other!=null ? inp.other>=1 : inp.rcri>=2;   /* ACC/AHA 2024: RCRI above 1 is elevated */
+  const basis = inp.other!=null ? 'calculator' : 'rcri';
+  const cap = inp.dasi!=null ? (inp.dasi>DASI_CUT?'good':'poor') : inp.cap;
+  const bm = (inp.bnp!=null||inp.ntp!=null) ? (((inp.bnp!=null&&inp.bnp>=BNP_CUT)||(inp.ntp!=null&&inp.ntp>=NTP_CUT))?'high':'normal') : null;
+  if(inp.urgency==='emergency') return {step:1, key:'emergency', tone:'caution', basis, cap, bm};
+  if(inp.active) return {step:2, key:inp.urgency==='urgent'?'activeUrgent':'active', tone:'stop', basis, cap, bm};
+  if(inp.lowProc) return {step:3, key:'lowProc', tone:'ok', basis, cap, bm};
+  if(!elevatedByScore) return {step:3, key:'low', tone:'ok', basis, cap, bm};
+  if(cap==='good') return {step:4, key:'capGood', tone:'ok', basis, cap, bm};
+  if(bm==='normal') return {step:5, key:'bmNormal', tone:'ok', basis, cap, bm};
+  if(cap==='none'&&bm==null) return {step:4, key:'assess', tone:'caution', basis, cap, bm};
+  if(!inp.change) return {step:5, key:'noTest', tone:'ok', basis, cap, bm};
+  if(bm==null) return {step:5, key:'peptide', tone:'caution', basis, cap, bm};
+  return {step:5, key:'test', tone:'caution', basis, cap, bm};
+}
+/* PAUSE protocol (apixaban, rivaroxaban, dabigatran; edoxaban by extrapolation), lengthened to the ASRA interval when a spinal or epidural is planned. Returns days fully off before surgery, and resume day(s) after. */
+function doacPlan(drug, crcl, high, neuraxial){
+  const hi = high||neuraxial, r={flags:[]};
+  if(crcl < (drug==='apixaban'?25:30)) return {outside:true, flags:[]};
+  if(drug==='dabigatran') r.off = crcl>=50 ? (hi?2:1) : (hi?4:2);
+  else r.off = hi?2:1;
+  if(neuraxial){
+    /* ASRA 5th edition 2025, treatment doses: factor Xa inhibitors 72 h; dabigatran 72 h (CrCl 50 or above) or 120 h (CrCl 30 to 49) */
+    const asra = drug==='dabigatran' ? (crcl>=50?3:5) : 3;
+    if(asra>r.off){ r.off=asra; r.flags.push('asra'); }
+    r.flags.push('neuraxial');
+  }
+  r.lastDoseDay = -(r.off+1);
+  r.resumeFrom = hi?2:1; r.resumeTo = hi?3:1;
+  r.high = hi;
+  return r;
+}
+function chadsScore(ticks){ let s=0; ticks.forEach((t,i)=>{ if(t && !(i===6&&ticks[2])) s+=CHADS[i][1]; }); return s; }  /* age 75 or older and 65 to 74 cannot both count */
+/* Bridge when thrombotic risk is high. AF: CHA2DS2-VASc 7 or more, or a listed feature (CHEST 2022 high-risk group). Valve: ACC/AHA 2020. VTE: CHEST 2022. */
+function bridge(ind, score, features){
+  const any = features.some(Boolean);
+  if(ind==='af') return {bridge: score>=7||any, score};
+  return {bridge: any};
+}
+</script>
+<script id="ui">
+const $=s=>document.querySelector(s), $$=s=>Array.from(document.querySelectorAll(s));
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const num=id=>{ const v=$(id).value.trim(); return v===''||isNaN(+v)?null:+v; };
+const pct=n=>(Number.isInteger(n)?n:n.toFixed(1))+'%';
+function checks(box,prefix,rows,fmt){ $(box).innerHTML=rows.map((r,i)=>'<label class="check"><input type="checkbox" id="'+prefix+i+'"><span>'+fmt(r)+'</span><span class="pts">'+(Array.isArray(r)&&typeof r[1]==='number'?'+'+r[1]:'')+'</span></label>').join(''); }
+const ticked=(prefix,n)=>Array.from({length:n},(_,i)=>$('#'+prefix+i).checked);
+
+/* ---------- Risk ---------- */
+checks('#rcriBox','r',RCRI,r=>esc(r[0])+'<small>'+esc(r[1])+'</small>');
+$$('#rcriBox .pts').forEach(p=>p.textContent='+1');
+checks('#dasiBox','d',DASI,r=>esc(r[0]));
+let urgency='elective', capSel='none';
+const STEPS=['Emergency?','Active cardiac condition?','Low risk?','Capacity 4 METs or more?','Peptide normal, or would a test change nothing?'];
+const OUT={
+ emergency:['Proceed to surgery','Manage risk during and after the operation: monitoring, heart-rate control, avoid hypotension, and a postoperative troponin in a high-risk patient. If a cardiac condition is active, involve cardiology at the same time.','there is no time for testing to change anything, so the work shifts to the operating room and recovery.'],
+ active:['Delay elective surgery and treat the cardiac condition','Evaluate and treat it as you would without surgery, then reassess.','an unstable heart is the strongest predictor of a perioperative event, and it is the one thing that can be fixed first.'],
+ activeUrgent:['Treat the cardiac condition as far as time allows','Decide timing with surgery, anesthesia and cardiology together: weigh the harm of delay against operating on an unstable heart.','an unstable heart is the strongest predictor of a perioperative event; for surgery that cannot wait, the question is how much stabilizing fits in the time available.'],
+ lowProc:['Proceed. No further cardiac testing','Low-risk procedure.','the operation itself carries under 1% risk, so no test result would change the plan.'],
+ low:['Proceed. No further cardiac testing','Estimated risk is low.','below 1% risk, testing finds more false alarms than disease.'],
+ capGood:['Proceed. No further cardiac testing','Elevated risk, but capacity is adequate. Continue home cardiac medications.','a patient who reaches 4 METs has shown the reserve that a stress test would be looking for.'],
+ bmNormal:['Proceed. No further cardiac testing','Elevated risk and poor or unknown capacity, but the natriuretic peptide is normal.','a normal BNP argues against hidden congestion or limited reserve.'],
+ test:['Stress test, then decide with the surgical team','Pharmacologic stress imaging if the patient cannot exercise. Revascularize only for the indications that would apply without surgery.','you said the result would change the operation or the treatment, which is the only reason to test.'],
+ noTest:['Proceed on guideline therapy. No stress test','Testing would not change management. Consider troponin on postoperative days 1 and 2.','revascularizing before surgery does not lower risk on its own (CARP), so a test that cannot change the plan only adds delay.'],
+ peptide:['Measure BNP or NT-proBNP before a stress test','Elevated risk with poor capacity. A normal value ends the workup; a raised one supports stress testing. If a peptide is not available, go to the stress test.','a normal natriuretic peptide makes hidden heart disease unlikely enough that a stress test would rarely change the plan.'],
+ assess:['Assess functional capacity next','Elevated risk. Ask about 4 METs or score DASI; if capacity is poor or unknown, a BNP or NT-proBNP is the next step.','capacity is the fork in the pathway: adequate capacity ends the workup.']
+};
+function riskRender(){
+  const rt=ticked('r',6), pts=rt.filter(Boolean).length, rr=rcriRisk(pts);
+  const dt=ticked('d',12), dAny=dt.some(Boolean), ds=dasiScore(dt);
+  const inp={urgency, active:ticked('ac',4).some(Boolean), lowProc:$('#lowproc').checked, rcri:pts, other:num('#other'), cap:capSel, dasi:dAny?ds.score:null, bnp:num('#bnp'), ntp:num('#ntp'), change:$('#change').checked};
+  const p=pathway(inp), o=OUT[p.key], box=$('#riskOut');
+  box.className='card answer '+p.tone;
+  const stats='<div class="stats"><div class="stat"><small>RCRI</small><b>'+pts+'</b></div><div class="stat"><small>Lee 1999</small><b>'+pct(rr.lee)+'</b></div><div class="stat"><small>Recalibrated</small><b>'+pct(rr.recal)+'</b></div>'+(dAny?'<div class="stat"><small>DASI</small><b>'+ds.score.toFixed(1)+'</b></div><div class="stat"><small>Est. METs</small><b>'+ds.mets.toFixed(1)+'</b></div>':'')+'</div>';
+  const guard=(inp.rcri<=1&&inp.other==null&&!inp.lowProc&&p.key==='low')?'<p class="guard"><b>A low RCRI is not zero risk.</b> Modern cohorts put RCRI 0 near 4% and RCRI 1 near 6%, and RCRI misses valve disease, pulmonary hypertension, frailty and the specific operation. Use NSQIP for a procedure-specific number.</p>':'';
+  box.innerHTML='<p class="label">Step '+p.step+' of 5</p><p class="verdict">'+esc(o[0])+'</p><p class="why">'+esc(o[1])+'</p>'+guard+stats+
+   '<p class="why"><b>Why:</b> '+esc(o[2])+'</p>'+
+   '<details><summary>More</summary><ol class="steps">'+STEPS.map((s,i)=>'<li class="'+(i+1===p.step?'here':i+1<p.step?'past':'')+'"><i>'+(i+1)+'</i><span>'+s+'</span></li>').join('')+'</ol>'+
+   '<p class="why">Risk here is '+(p.basis==='calculator'?'taken from the calculator value you entered (1% or more counts as elevated).':'taken from RCRI: 0 or 1 point is treated as low and 2 or more as elevated, the line ACC/AHA lists (RCRI above 1). The Canadian guideline is stricter and acts at RCRI 1, because modern cohorts put RCRI 1 near 6%. Lee\'s 1999 figures undercount events found by troponin testing.')+'</p>'+
+   (dAny?'<p class="why">DASI above 34 is the validated lower-risk cut-off. On the oxygen-uptake equation a score of 34 is about 7 METs, so it is stricter than the bedside 4-MET rule.</p>':'')+
+   '<p class="why">Natriuretic peptide counts as raised at BNP 92 or NT-proBNP 300 pg/mL or more. Risk modifiers that no score captures: severe valve disease, pulmonary hypertension, congenital heart disease, a recent stent or stroke, an implanted device, frailty.</p>'+
+   '<span class="tier">ACC/AHA 2024, reaffirmed 2026: stepwise approach · peptide cut-offs and RCRI recalibration: CCS 2017 · DASI cut-off: METS (Wijeysundera 2020)</span></details>';
+}
+$('#urg').addEventListener('click',e=>{ const b=e.target.closest('.chip'); if(!b) return; urgency=b.dataset.v; $$('#urg .chip').forEach(c=>c.setAttribute('aria-pressed',c===b)); riskRender(); });
+$('#cap').addEventListener('click',e=>{ const b=e.target.closest('.chip'); if(!b) return; capSel=b.dataset.v; $$('#cap .chip').forEach(c=>c.setAttribute('aria-pressed',c===b)); riskRender(); });
+$('#dasiClear').addEventListener('click',()=>{ $$('#dasiBox input').forEach(i=>i.checked=false); riskRender(); });
+$('#v-risk').addEventListener('input',riskRender);
+
+/* ---------- Meds ---------- */
+let medFilter='all';
+$('#medChips').innerHTML=[['all','All'],['continue','Continue'],['hold','Hold'],['adjust','Adjust']].map(c=>'<button type="button" class="chip" data-f="'+c[0]+'" aria-pressed="'+(c[0]==='all')+'">'+c[1]+'</button>').join('');
+function medsRender(){
+  const q=$('#medSearch').value.trim().toLowerCase();
+  const rows=MEDS.filter(m=>(medFilter==='all'||m[1]===medFilter)&&(!q||m.join(' ').toLowerCase().includes(q)));
+  $('#medList').innerHTML=rows.length?rows.map(m=>'<div class="med"><div class="hd"><span>'+esc(m[0])+'</span><span class="pill '+m[1]+'">'+PLAN[m[1]]+'</span></div><p class="why">'+esc(m[2])+'</p><p class="why"><b>Why:</b> '+esc(m[3])+'</p><details><summary>More</summary>'+(m[4]?'<p class="why">'+esc(m[4])+'</p>':'')+'<span class="tier">'+esc(m[5])+'</span></details></div>').join(''):'<p class="muted">No match. Try a class, like "insulin" or "antiplatelet".</p>';
+}
+$('#medChips').addEventListener('click',e=>{ const b=e.target.closest('.chip'); if(!b) return; medFilter=b.dataset.f; $$('#medChips .chip').forEach(c=>c.setAttribute('aria-pressed',c===b)); medsRender(); });
+$('#medSearch').addEventListener('input',medsRender);
+
+/* ---------- DOAC ---------- */
+const addDays=(d,n)=>{ const x=new Date(d.getTime()); x.setDate(x.getDate()+n); return x; };
+const fmt=d=>d.toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'});
+function doacRender(){
+  const out=$('#doacOut'), crcl=num('#dCrcl'), drug=$('#dDrug').value, parts=$('#dDate').value.split('-').map(Number);
+  if(crcl==null){ out.className='card answer'; out.innerHTML='<p class="muted">Enter the creatinine clearance to build the schedule. Applies to treatment doses.</p>'; return; }
+  const p=doacPlan(drug,crcl,$('#dRisk').value==='high',$('#dNeur').checked);
+  if(p.outside){ out.className='card answer stop'; out.innerHTML='<p class="verdict">Outside the tested protocol</p><p class="why">Kidney function this low is below the limits studied (PAUSE excluded CrCl under 25 for apixaban and under 30 for rivaroxaban and dabigatran), and the drug lingers. Plan a longer hold with pharmacy or hematology.</p><span class="tier">PAUSE exclusions</span>'; return; }
+  const hasDate=parts.length===3&&parts[0]>1900, surg=hasDate?new Date(parts[0],parts[1]-1,parts[2]):null;
+  out.className='card answer '+(p.high?'caution':'ok');
+  let h='<p class="verdict">'+p.off+' full day'+(p.off>1?'s':'')+' off before surgery</p>'+
+   '<p class="why">Last dose '+(surg?fmt(addDays(surg,p.lastDoseDay)):(-p.lastDoseDay)+' days before surgery')+'. Resume '+(p.high?'2 to 3 days':'the day')+' after surgery'+(surg?' ('+fmt(addDays(surg,p.resumeFrom))+(p.resumeTo>p.resumeFrom?' to '+fmt(addDays(surg,p.resumeTo)):'')+')':'')+' once bleeding is controlled. No bridging and no drug level.</p>';
+  if(p.flags.includes('neuraxial')) h+='<p class="guard"><b>Spinal or epidural planned.</b> '+'The hold is lengthened to the anesthesia guideline interval (ASRA 2025): at least 72 hours for a treatment-dose factor Xa inhibitor or for dabigatran with CrCl 50 or above, and 120 hours for dabigatran with CrCl 30 to 49. Confirm with anesthesia; a drug level is an option if the gap is shorter.</p>';
+  if(drug==='edoxaban') h+='<p class="muted">Edoxaban was not in the PAUSE trial; the same schedule is applied by extrapolation (CHEST 2022).</p>';
+  if(p.high) h+='<p class="muted">A preventive dose of heparin against leg clots can be given during the gap after surgery.</p>';
+  if(surg){ h+='<div class="cal">'; for(let k=p.lastDoseDay;k<=p.resumeTo;k++){ const cls=k===0?'surg':(k===p.lastDoseDay||k>=p.resumeFrom)?'dose':'off', tag=k===0?'Surgery':k===p.lastDoseDay?'Last dose':k>=p.resumeFrom?(k===p.resumeFrom?'Resume':'Dose'):'No dose'; h+='<div class="day '+cls+'"><b>Day '+(k>0?'+':'')+k+'</b><span>'+fmt(addDays(surg,k))+'</span><span class="tag">'+tag+'</span></div>'; } h+='</div>'; }
+  h+='<p class="why"><b>Why:</b> '+(drug==='dabigatran'&&!p.flags.includes('asra')?'dabigatran leaves through the kidney, so the gap stretches as clearance falls.':(p.flags.includes('asra')?'a bleed around the spinal cord is rare but catastrophic, so the gap before a spinal or epidural is longer than for the operation alone.':'with a half-life of about half a day, each day off removes most of the remaining drug; a high-risk operation gets a second day so almost none is left.'))+'</p><span class="tier">'+(p.flags.includes('asra')?'ASRA 2025; ':'')+(drug==='edoxaban'?'CHEST 2022 (extrapolated)':'PAUSE 2019; CHEST 2022')+'</span>';
+  out.innerHTML=h;
+}
+$('#doac').addEventListener('input',doacRender);
+
+/* ---------- Warfarin ---------- */
+function wBuild(){
+  const ind=$('#wInd').value; let h='';
+  if(ind==='af'){ h+='<span class="flabel">CHA₂DS₂-VASc</span>'+CHADS.map((r,i)=>'<label class="check"><input type="checkbox" id="c'+i+'"><span>'+esc(r[0])+'</span><span class="pts">+'+r[1]+'</span></label>').join('')+'<span class="flabel" style="margin-top:10px">High risk whatever the score</span>'; }
+  const feats=ind==='af'?W_AF:ind==='valve'?W_VALVE:W_VTE;
+  h+=feats.map((r,i)=>'<label class="check"><input type="checkbox" id="f'+i+'"><span>'+esc(r)+'</span><span></span></label>').join('');
+  $('#wBox').innerHTML=h; wRender();
+}
+function wRender(){
+  const ind=$('#wInd').value, n=ind==='af'?W_AF.length:ind==='valve'?W_VALVE.length:W_VTE.length;
+  const score=ind==='af'?chadsScore(ticked('c',CHADS.length)):null, b=bridge(ind,score,ticked('f',n)), out=$('#wOut');
+  out.className='card answer '+(b.bridge?'caution':'ok');
+  out.innerHTML=(score!=null?'<div class="stats"><div class="stat"><small>CHA₂DS₂-VASc</small><b>'+score+'</b></div></div>':'')+
+   '<p class="verdict">'+(b.bridge?'High thrombotic risk: consider bridging':'No bridge')+'</p>'+
+   '<p class="why">Stop warfarin 5 days before surgery (last dose on day −6) and check an INR the day before. '+(b.bridge?'Start treatment-dose LMWH as the INR falls below range, about 3 days before; give the last dose 24 hours before surgery (half the daily dose if dosed once a day). Restart warfarin within 24 hours after surgery, and LMWH at 24 hours after low-risk or 48 to 72 hours after high bleeding-risk surgery.':'Restart it within 24 hours after surgery, at the usual dose, once bleeding is controlled.')+'</p>'+
+   '<p class="why"><b>Why:</b> '+(b.bridge?'this patient is in the small group whose clot risk off warfarin may outweigh the extra bleeding that heparin brings. It is a judgment to make with the surgeon'+(ind==='valve'?' and cardiology.':'.'):(ind==='af'?'in BRIDGE, bridging did not prevent strokes and more than doubled major bleeding.':ind==='valve'?'a bileaflet aortic valve with no risk factors has a low clot risk over a few days off warfarin.':'more than 3 months out, the short-term clot risk off warfarin is low, and heparin adds bleeding.'))+'</p>'+
+   '<details><summary>More</summary><p class="why">If the INR is still above 1.5 the day before surgery, low-dose oral vitamin K (1 to 2.5 mg) is an option; CHEST 2022 suggests against giving it routinely.</p>'+(ind==='vte'&&b.bridge?'<p class="why">A clot within the past month is the highest-risk window: postpone elective surgery if possible.</p>':'')+(ind==='af'&&b.bridge&&$('#f0')&&$('#f0').checked?'<p class="why">A stroke or TIA in the past 3 months is itself a reason to postpone elective surgery (see Timing).</p>':'')+(ind==='af'?'<p class="why">BRIDGE excluded mechanical valves, a stroke within 12 weeks, and cardiac, intracranial and spinal surgery, and enrolled few patients at the highest stroke scores, so it does not settle those cases.</p>':'')+'<span class="tier">'+(ind==='valve'?'ACC/AHA valve guideline 2020: bridging reasonable (2a) for these valves; none for a bileaflet aortic valve without risk factors (1)':'CHEST 2022 (conditional); BRIDGE 2015')+'</span></details>';
+}
+$('#wInd').addEventListener('change',wBuild);
+$('#wBox').addEventListener('input',e=>{ if(e.target.id==='c2'&&e.target.checked&&$('#c6')) $('#c6').checked=false; if(e.target.id==='c6'&&e.target.checked&&$('#c2')) $('#c2').checked=false; wRender(); });
+
+/* ---------- Timing ---------- */
+$('#waitBox').innerHTML=WAITS.map(w=>'<div class="wait"><h3>'+esc(w[0])+'</h3><p class="why">'+esc(w[1])+'</p><div class="track" aria-hidden="true">'+(w[3]>w[2]?'<i class="soft" style="width:'+(w[3]/12*100)+'%"></i>':'')+'<i class="hard" style="width:'+(w[2]/12*100)+'%"></i></div><span class="tier">'+esc(w[4])+'</span></div>').join('');
+
+/* ---------- Practice ---------- */
+$('#caseBox').innerHTML=CASE.map((c,i)=>'<details><summary>'+(i+1)+'. '+esc(c[0])+'</summary><p class="why">'+esc(c[1])+'</p></details>').join('');
+let qState=QUIZ.map(()=>null);
+function quizRender(){
+  const score=qState.reduce((s,v,i)=>s+(v===QUIZ[i].a?1:0),0), done=qState.filter(v=>v!==null).length;
+  $('#quizBox').innerHTML='<p class="score">'+score+' correct of '+done+' answered</p>'+QUIZ.map((it,qi)=>{
+    const st=qState[qi];
+    return '<div class="med"><p class="q">'+(qi+1)+'. '+esc(it.q)+'</p><div class="opts">'+it.o.map((o,oi)=>'<button type="button" class="opt'+(st!==null?(oi===it.a?' right':oi===st?' wrong':''):'')+'" data-q="'+qi+'" data-o="'+oi+'"'+(st!==null?' disabled':'')+'>'+esc(o)+'</button>').join('')+'</div>'+(st!==null?'<p class="why"><b>'+(st===it.a?'Correct.':'Not quite.')+'</b> '+esc(it.e)+'</p>':'')+'</div>'; }).join('')+
+    '<button type="button" class="btn ghost" id="qReset">Start again</button>';
+}
+$('#quizBox').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; if(b.id==='qReset'){ qState=QUIZ.map(()=>null); quizRender(); return; } const qi=+b.dataset.q; if(qState[qi]===null){ qState[qi]=+b.dataset.o; quizRender(); } });
+
+/* ---------- tabs ---------- */
+function showView(v){ $$('section.view').forEach(s=>s.classList.toggle('on',s.id==='v-'+v)); $$('nav.tabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.v===v)); window.scrollTo({top:0}); }
+$$('nav.tabs button').forEach(b=>b.addEventListener('click',()=>showView(b.dataset.v)));
+function goHash(){ const id=decodeURIComponent(location.hash.slice(1)); if(!id) return; const el=document.getElementById(id); if(!el) return; const sec=el.closest('section.view'); if(sec){ showView(sec.id.slice(2)); requestAnimationFrame(()=>el.scrollIntoView({block:'start'})); } }
+window.addEventListener('hashchange',goHash);
+riskRender(); medsRender(); doacRender(); wBuild(); quizRender(); goHash();
+</script>
+</body>
+</html>
