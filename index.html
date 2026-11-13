@@ -200,7 +200,7 @@
   <label class="search">
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
     <span class="sr">Search tools</span>
-    <input id="q" type="search" placeholder="Search" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search">
+    <input id="q" type="search" placeholder="Ask a question or search" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search">
     <button class="clear" id="clear" type="button" aria-label="Clear search" hidden>
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
     </button>
@@ -252,30 +252,32 @@
 <script>
   /* ── Tool list ────────────────────────────────────────────────────────────
      To publish a tool: put it at /<slug>/index.html and set live: true here.
-     sections: places inside the tool that search can jump to ([label, anchor id]).
-     keys: extra words search should match. */
+     sections: places inside the tool that search can jump to ([label, anchor id, question words]).
+       Question words are how people ask for that section: synonyms, drug names, the problem in plain words.
+       Only list what the section really covers.
+     keys: extra words search should match for the tool as a whole. */
   const TOOLS = [
     { slug:'electrolytes', name:'Electrolyte repletion', desc:'K, Mg, Phos, Ca dosing and rechecks', spec:'Nephrology', live:true,
-      sections:[['Potassium repletion','k'],['Magnesium repletion','mg'],['Phosphorus repletion','phos'],['Calcium and albumin correction','ca']], keys:'potassium magnesium phosphorus phosphate calcium hypokalemia hypomagnesemia hypophosphatemia hypocalcemia lytes' },
+      sections:[['Potassium repletion','k','K low potassium hypokalemia KCl potassium chloride replace replete supplement dose rate IV oral recheck'],['Magnesium repletion','mg','Mg low magnesium hypomagnesemia mag sulfate oxide replace replete dose'],['Phosphorus repletion','phos','Phos low phosphate hypophosphatemia replace replete dose'],['Calcium and albumin correction','ca','Ca low calcium hypocalcemia corrected calcium ionized gluconate replace dose']], keys:'potassium magnesium phosphorus phosphate calcium hypokalemia hypomagnesemia hypophosphatemia hypocalcemia lytes' },
     { slug:'calcium', name:'Calcium: high and low', desc:'Act now, when each drug works, PTH workup', spec:'Nephrology', live:true,
-      sections:[['Labs and calcium scale','labs'],['Treatment timeline: saline, calcitonin, zoledronic acid, denosumab','treatment'],['Workup: PTH fork','workup'],['When each hypercalcemia treatment works','timecourse'],['Primary hyperparathyroidism: surgery criteria','phpt'],['FHH calcium/creatinine clearance ratio','fhh'],['Causes of high calcium','causes-high'],['Causes of low calcium','causes-low'],['Practice cases','practice']], keys:'hypercalcemia hypocalcemia malignancy PTHrP PTH parathyroid hyperparathyroidism hypoparathyroidism calcitonin bisphosphonate zoledronate denosumab calcium gluconate tetany oncology' },
+      sections:[['Labs and calcium scale','labs','Ca calcium albumin corrected adjusted ionized high low hypercalcemia hypocalcemia severity mild moderate severe'],['Treatment timeline: saline, calcitonin, zoledronic acid, denosumab','treatment','treat hypercalcemia of malignancy fluids saline calcitonin zoledronic acid zoledronate Zometa pamidronate bisphosphonate denosumab Xgeva steroid prednisone dose kidney eGFR calcium gluconate IV calcium tetany long QT hypocalcemia treatment'],['Workup: PTH fork','workup','why is calcium high low cause differential PTH PTHrP parathyroid vitamin D calcitriol phosphate magnesium myeloma lymphoma sarcoid hypoparathyroidism workup'],['When each hypercalcemia treatment works','timecourse','onset duration how long how fast calcitonin tachyphylaxis bisphosphonate denosumab cinacalcet furosemide time course'],['Primary hyperparathyroidism: surgery criteria','phpt','primary hyperparathyroidism parathyroidectomy surgery indications criteria asymptomatic T-score stones age 50 monitoring clinic'],['FHH calcium/creatinine clearance ratio','fhh','familial hypocalciuric hypercalcemia FHH urine calcium creatinine clearance ratio 24 hour calculator'],['Causes of high calcium','causes-high','hypercalcemia causes differential thiazide lithium milk-alkali vitamin D malignancy granuloma'],['Causes of low calcium','causes-low','hypocalcemia causes differential hypoparathyroidism vitamin D deficiency CKD pancreatitis hungry bone denosumab citrate'],['Practice cases','practice','practice cases quiz calcium']], keys:'hypercalcemia hypocalcemia malignancy PTHrP PTH parathyroid hyperparathyroidism hypoparathyroidism calcitonin bisphosphonate zoledronate denosumab calcium gluconate tetany oncology' },
     { slug:'hyponatremia', name:'Hyponatremia', desc:'Workup and correction limit', spec:'Nephrology', keys:'sodium SIADH ODS' },
     { slug:'aki', name:'AKI workup', desc:'Staging, FENa or FEUrea, drugs to hold', spec:'Nephrology', keys:'creatinine kidney renal' },
 
     { slug:'gdmt', name:'GDMT for heart failure', desc:'Start, titrate, monitor', spec:'Cardiology', keys:'HFrEF ARNI SGLT2 beta blocker MRA' },
     { slug:'afib', name:'Atrial fibrillation', desc:'Anticoagulation, rapid AF, cardioversion', spec:'Cardiology', live:true,
-      sections:[['CHA₂DS₂-VASc and anticoagulation decision','chadsvasc'],['Valve check: warfarin instead of a DOAC','valve'],['DOAC dose by kidney function','doses'],['HAS-BLED bleeding risk','hasbled'],['Practice cases','practice'],['Rapid AF rate control','rvr'],['IV rate-control doses','rate-doses'],['Cardioversion timing and anticoagulation','cardioversion'],['Rate or rhythm control, ablation','rhythm'],['Left atrial appendage occlusion','laao'],['Device-detected AF','device']], keys:'AF AFib CHA2DS2-VASc apixaban rivaroxaban dabigatran edoxaban warfarin RVR diltiazem metoprolol digoxin amiodarone WPW Watchman' },
+      sections:[['CHA₂DS₂-VASc and anticoagulation decision','chadsvasc','stroke risk score start anticoagulate anticoagulation blood thinner new afib CHADS'],['Valve check: warfarin instead of a DOAC','valve','mechanical valve mitral stenosis warfarin INR valvular'],['DOAC dose by kidney function','doses','apixaban rivaroxaban dabigatran edoxaban dose reduce reduction renal creatinine dialysis Eliquis Xarelto'],['HAS-BLED bleeding risk','hasbled','bleeding risk score bleed'],['Practice cases','practice','cases quiz'],['Rapid AF rate control','rvr','RVR rapid ventricular response fast heart rate control unstable hypotension which drug beta blocker diltiazem low EF'],['IV rate-control doses','rate-doses','metoprolol diltiazem esmolol verapamil digoxin amiodarone IV dose push drip'],['Cardioversion timing and anticoagulation','cardioversion','cardiovert shock TEE 48 hours anticoagulate before after'],['Rate or rhythm control, ablation','rhythm','rhythm control strategy ablation antiarrhythmic early'],['Left atrial appendage occlusion','laao','Watchman LAAO appendage closure cannot anticoagulate contraindication'],['Device-detected AF','device','pacemaker detected subclinical atrial high rate episodes AHRE duration']], keys:'AF AFib CHA2DS2-VASc apixaban rivaroxaban dabigatran edoxaban warfarin RVR diltiazem metoprolol digoxin amiodarone WPW Watchman' },
     { slug:'rhythm', name:'Arrhythmias', desc:'Read the strip, likely rhythm, first action', spec:'Cardiology', live:true, keys:'tachycardia bradycardia SVT VT heart block pacemaker ICD QT antiarrhythmic telemetry',
-      sections:[['Read the strip in four steps','read'],['Unstable: cardioversion or pacing now','unstable'],['Jump to a known rhythm','jump'],['AV block on the strip','blocks'],['Who needs a permanent pacemaker','pacing'],['Bundle branch and fascicular blocks','bundle'],['Pre-excitation (WPW)','preexcitation'],['QT interval and long QT','qt'],['Channelopathies: Brugada, CPVT','channelopathies'],['Electrolytes and drugs on the ECG','ecg-drugs'],['Pacemakers and ICDs on the ward','devices'],['Who gets an ICD or CRT','icd-crt'],['Antiarrhythmic drugs','antiarrhythmics'],['Practice cases','practice']] },
+      sections:[['Read the strip in four steps','read','interpret rhythm strip telemetry narrow wide regular irregular tachycardia bradycardia P waves identify'],['Unstable: cardioversion or pacing now','unstable','unstable shock synchronized cardioversion joules transcutaneous pacing atropine energy'],['Jump to a known rhythm','jump','SVT VT sinus tachycardia flutter AVNRT torsades junctional adenosine ventricular tachycardia'],['AV block on the strip','blocks','heart block first degree Mobitz Wenckebach second third complete'],['Who needs a permanent pacemaker','pacing','pacemaker indication permanent pacing sinus node dysfunction sick sinus'],['Bundle branch and fascicular blocks','bundle','RBBB LBBB bundle branch block fascicular hemiblock bifascicular'],['Pre-excitation (WPW)','preexcitation','WPW delta wave accessory pathway AVRT'],['QT interval and long QT','qt','QTc prolonged long QT torsades measure correct drugs'],['Channelopathies: Brugada, CPVT','channelopathies','Brugada CPVT inherited long QT syndrome'],['Electrolytes and drugs on the ECG','ecg-drugs','hyperkalemia hypokalemia hypocalcemia peaked T ECG changes digoxin toxicity'],['Pacemakers and ICDs on the ward','devices','pacemaker mode VVI DDD magnet ICD shock failure capture'],['Who gets an ICD or CRT','icd-crt','ICD indication primary prevention EF CRT resynchronization defibrillator'],['Antiarrhythmic drugs','antiarrhythmics','amiodarone flecainide sotalol lidocaine procainamide class'],['Practice cases','practice','cases quiz']] },
     { slug:'chest-pain', name:'Chest pain', desc:'hs-troponin pathways and HEART', spec:'Cardiology', keys:'ACS troponin' },
     { slug:'ekg-cath', name:'EKG emergencies', desc:'When to call cath', spec:'Cardiology', live:true,
-      sections:[['60-second occlusion read','read'],['ST-elevation thresholds','thresholds'],['Leads to territory and culprit','territories'],['Pattern library','patterns'],['Coronary anatomy by occlusion site','anatomy-heart'],['Post-MI complications timeline','anatomy-timeline'],['Cath timing tier','call'],['Call script','script-h'],['Smith-modified Sgarbossa calculator','sgarbossa'],['ST-elevation threshold lookup','ste-lookup'],['Practice cases','practice']], keys:'ECG STEMI OMI occlusion posterior de Winter Wellens hyperacute LBBB paced pericarditis hyperkalemia VT heart block aVR cath lab activation coronary anatomy LAD RCA circumflex papillary rupture septal rupture aneurysm thrombus Dressler' },
+      sections:[['60-second occlusion read','read','read ECG MI occlusion systematic STEMI heart attack chest pain look'],['ST-elevation thresholds','thresholds','ST elevation criteria mm millimetres J point STEMI'],['Leads to territory and culprit','territories','which artery culprit anterior inferior lateral leads territory'],['Pattern library','patterns','de Winter Wellens posterior MI hyperacute T aVR pericarditis mimic early repolarization'],['Coronary anatomy by occlusion site','anatomy-heart','coronary anatomy LAD RCA circumflex occlusion site heart artery'],['Post-MI complications timeline','anatomy-timeline','complications after MI post-MI murmur papillary muscle rupture septal rupture free wall aneurysm thrombus Dressler'],['Cath timing tier','call','call cardiology cath lab activate immediate NSTEMI timing urgent emergent'],['Call script','script-h','what to say calling cardiology script phone'],['Smith-modified Sgarbossa calculator','sgarbossa','LBBB paced STEMI MI chest pain Sgarbossa criteria'],['ST-elevation threshold lookup','ste-lookup','ST elevation cutoff age sex V2 V3'],['Practice cases','practice','cases quiz']], keys:'ECG STEMI OMI occlusion posterior de Winter Wellens hyperacute LBBB paced pericarditis hyperkalemia VT heart block aVR cath lab activation coronary anatomy LAD RCA circumflex papillary rupture septal rupture aneurysm thrombus Dressler' },
     { slug:'qtc', name:'QT risk checker', desc:'QTc and drug list', spec:'Cardiology', keys:'torsades' },
     { slug:'cardio-onc', name:'Cardio-oncology', desc:'Surveillance by regimen', spec:'Cardiology', keys:'anthracycline trastuzumab myocarditis' },
 
     { slug:'insulin', name:'Insulin management', desc:'Inpatient dosing and adjustment', spec:'Endocrine', keys:'glucose diabetes basal bolus' },
     { slug:'dka', name:'DKA & HHS', desc:'Fluids, potassium gate, drip to subQ', spec:'Endocrine', live:true,
-      sections:[['Labs: diagnosis, potassium gate, fluids, insulin','labs'],['Patient flags: SGLT2 inhibitor, dialysis, pregnancy','patient'],['Follow-up: repeat labs, resolution, switch to subcutaneous','repeat'],['Practice cases','practice']], keys:'ketoacidosis hyperglycemia euglycemic hyperosmolar insulin drip' },
+      sections:[['Labs: diagnosis, potassium gate, fluids, insulin','labs','DKA HHS diagnosis criteria anion gap fluids saline insulin drip rate start potassium before insulin bicarbonate euglycemic ketoacidosis glucose osm mental status hyperosmolar'],['Patient flags: SGLT2 inhibitor, dialysis, pregnancy','patient','SGLT2 euglycemic dialysis ESRD pregnancy heart failure'],['Follow-up: repeat labs, resolution, switch to subcutaneous','repeat','stop insulin drip transition subcutaneous subQ basal overlap resolved gap closed dextrose recheck'],['Practice cases','practice','cases quiz']], keys:'ketoacidosis hyperglycemia euglycemic hyperosmolar insulin drip' },
     { slug:'steroids', name:'Steroid conversion', desc:'Equivalents and stress dosing', spec:'Endocrine', keys:'prednisone hydrocortisone dexamethasone' },
 
     { slug:'vte-ppx', name:'VTE prophylaxis', desc:'Risk scores to a recommendation', spec:'Hematology', keys:'DVT Padua IMPROVE enoxaparin' },
@@ -286,9 +288,9 @@
     { slug:'transfusion', name:'Transfusion thresholds', desc:'By situation, with the trial', spec:'Hematology', keys:'blood platelets hemoglobin' },
 
     { slug:'abx-empiric', name:'Empiric antibiotics', desc:'By syndrome: pathogens, coverage, kidney doses, oral step-down', spec:'Infectious disease', live:true,
-      sections:[['Patient: kidney function, allergy, resistance risks','patient'],['Body map and usual pathogens by syndrome','syndromes'],['Orders: first dose, coverage, narrowing, oral step-down, stop date','syndromes'],['Dose table by kidney function','doses'],['Practice cases','practice']], keys:'pneumonia UTI cellulitis sepsis meningitis SBP cholangitis diabetic foot neutropenic fever C diff line infection vancomycin pathogens organisms coverage spectrum mechanism of action oral step-down IV to PO severity criteria Tokyo grade' },
+      sections:[['Patient: kidney function, allergy, resistance risks','patient','penicillin allergy cephalosporin renal MRSA risk pseudomonas risk ESBL'],['Body map and usual pathogens by syndrome','syndromes','which antibiotic pneumonia CAP HAP UTI pyelonephritis cellulitis diabetic foot intra-abdominal cholangitis SBP meningitis sepsis neutropenic fever cdiff line infection empiric bugs organisms'],['Orders: first dose, coverage, narrowing, oral step-down, stop date','syndromes','which antibiotic start empiric regimen first dose duration days narrow deescalate oral stepdown IV to PO stop pneumonia UTI cellulitis sepsis meningitis'],['Dose table by kidney function','doses','renal dose adjustment CrCl cefepime vancomycin loading piperacillin meropenem kidney'],['Practice cases','practice','cases quiz']], keys:'pneumonia UTI cellulitis sepsis meningitis SBP cholangitis diabetic foot neutropenic fever C diff line infection vancomycin pathogens organisms coverage spectrum mechanism of action oral step-down IV to PO severity criteria Tokyo grade' },
     { slug:'abx-spectrum', name:'Antibiotic spectrum map', desc:'What each drug covers and misses', spec:'Infectious disease', live:true,
-      sections:[['By drug: what it covers and misses','drug'],['By organism: which drugs cover it','bug'],['Full grid of drugs against organisms','grid'],['Practice questions','practice']], keys:'coverage MRSA pseudomonas ESBL AmpC VRE anaerobes enterococcus atypicals C diff cefepime ceftriaxone vancomycin' },
+      sections:[['Search an antibiotic: what it covers and misses','lookup','does cover cefepime ceftriaxone piperacillin tazobactam Zosyn meropenem vancomycin miss'],['Search a pathogen: which drugs cover it','lookup','what covers MRSA pseudomonas ESBL VRE anaerobes enterococcus atypicals which antibiotic'],['Mechanism and resistance diagrams','lookup','how does it work mechanism of action why resistant PBP2a AmpC beta-lactamase'],['Full grid of drugs against organisms','grid','spectrum chart table all antibiotics'],['Practice questions','practice','quiz']], keys:'coverage MRSA pseudomonas ESBL AmpC VRE anaerobes enterococcus atypicals C diff cefepime ceftriaxone vancomycin' },
 
     { slug:'pressors', name:'Pressors & inotropes', desc:'Chooser, doses, weaning', spec:'Critical care', keys:'shock norepinephrine vasopressin' },
     { slug:'vent', name:'Ventilator basics', desc:'Set up, assess, troubleshoot, liberate', spec:'Critical care', keys:'ARDS PEEP tidal volume' },
@@ -298,7 +300,7 @@
     { slug:'onc-emergencies', name:'Neutropenic fever & TLS', desc:'First-hour actions', spec:'Oncology', keys:'tumor lysis febrile neutropenia' },
     { slug:'opioids', name:'Opioid conversion', desc:'With cross-tolerance reduction', spec:'Palliative care', keys:'morphine MME pain' },
     { slug:'preop', name:'Pre-op evaluation', desc:'Cardiac risk, medications, anticoagulant planning', spec:'Perioperative', live:true,
-      sections:[['Stepwise cardiac risk pathway','pathway'],['RCRI score','rcri'],['Functional capacity and DASI','capacity'],['Which cardiac test, and which labs','tests'],['Medications: continue, hold or adjust','meds'],['DOAC hold planner','doac'],['Warfarin: bridge or not','warfarin'],['How long to wait after a stent, MI or stroke','wait'],['Aortic stenosis, heart failure, devices','conditions'],['Postoperative troponin','mins'],['Worked case','case'],['Practice questions','quiz']], keys:'surgery RCRI clearance DASI METs bridging apixaban warfarin SGLT2 GLP-1 stent perioperative consult' },
+      sections:[['Stepwise cardiac risk pathway','pathway','preop clearance cardiac risk surgery proceed operation stepwise'],['RCRI score','rcri','RCRI revised cardiac risk index score'],['Functional capacity and DASI','capacity','METs functional capacity DASI stairs BNP'],['Which cardiac test, and which labs','tests','stress test echo ECG before surgery labs preoperative testing'],['Medications: continue, hold or adjust','meds','hold before surgery beta blocker ACE inhibitor SGLT2 GLP-1 aspirin statin metformin insulin continue morning of surgery'],['DOAC hold planner','doac','stop apixaban rivaroxaban dabigatran edoxaban before surgery procedure hold days restart Eliquis Xarelto'],['Warfarin: bridge or not','warfarin','bridge heparin enoxaparin warfarin before surgery mechanical valve INR'],['How long to wait after a stent, MI or stroke','wait','recent stent MI stroke delay elective surgery DAPT wait'],['Aortic stenosis, heart failure, devices','conditions','aortic stenosis heart failure pacemaker ICD pulmonary hypertension before surgery'],['Postoperative troponin','mins','postoperative troponin MINS myocardial injury after surgery'],['Worked case','case','example case'],['Practice questions','quiz','quiz questions']], keys:'surgery RCRI clearance DASI METs bridging apixaban warfarin SGLT2 GLP-1 stent perioperative consult' },
     { slug:'birth-control', name:'Birth control', desc:'Eligibility, quick guide, cases', spec:"Women's health", keys:'contraception MEC' },
 
     { slug:'cross-cover', name:'Cross-cover', desc:'What to check and order for each overnight page', spec:'Ward workflow', keys:'pager night call' },
@@ -369,6 +371,133 @@
     const i = term ? text.toLowerCase().indexOf(term) : -1;
     return i < 0 ? esc(text) : esc(text.slice(0, i)) + '<mark>' + esc(text.slice(i, i + term.length)) + '</mark>' + esc(text.slice(i + term.length));
   };
+  /* ── Question search ─────────────────────────────────────────────────────
+     Runs on the device: no request is made and nothing typed is saved.
+     A question is cut down to its meaningful words, abbreviations are expanded (ALIAS), and every tool and
+     every section of a live tool is scored by the words it shares with the question, rarer words counting more.
+     To teach it a new phrasing, add words to a section's question words above, or an abbreviation to ALIAS. */
+  const STOP = new Set(('a an the is are was were be been am i im my me we our you your he she they his her their it its this that these those there here ' +
+    'do does did done doing can could should would will shall may might must to of for in on at by with from into than then as and or but if so ' +
+    'what which who whom when where why how much many often soon now just also any some all more most very too ' +
+    'patient patients pt pts has have had having got get gets getting need needs needed want wants give gives given giving use used using take takes taking ' +
+    'about tell show find found help please know think next best right good vs versus someone something candidate fast run running came come comes back week weeks keeps keep having bad soft onset still currently today tonight already ' +
+    'meq mmol mcg ml kg dl mmhg bpm').split(' '));
+  // Words that say little about the topic; they count for less.
+  const GENERIC = new Set('treatment treat treating manage management workup approach dose dosing doses duration evaluate evaluation guideline guidelines check start starting switch order orders ordered days hours level levels high low score scores calculator calculate'.split(' '));
+  const ALIAS = {
+    k:'potassium', mg:'magnesium', mag:'magnesium', phos:'phosphorus phosphate', ca:'calcium', na:'sodium', lytes:'electrolyte',
+    hypokalemia:'potassium', hypomagnesemia:'magnesium', hypophosphatemia:'phosphate', hypocalcemia:'calcium', hyponatremia:'sodium',
+    af:'atrial fibrillation afib', afib:'atrial fibrillation af', fib:'atrial fibrillation afib', rvr:'rapid ventricular response',
+    chads:'cha2ds2', chads2:'cha2ds2', chadsvasc:'cha2ds2 vasc', chadvasc:'cha2ds2 vasc', ac:'anticoagulation', oac:'anticoagulation', anticoag:'anticoagulation',
+    doac:'anticoagulant apixaban rivaroxaban', noac:'doac anticoagulant', thinner:'anticoagulation', thinners:'anticoagulation',
+    eliquis:'apixaban', xarelto:'rivaroxaban', pradaxa:'dabigatran', savaysa:'edoxaban', coumadin:'warfarin', lovenox:'enoxaparin',
+    cardizem:'diltiazem', dilt:'diltiazem', lopressor:'metoprolol', metop:'metoprolol', amio:'amiodarone', dig:'digoxin',
+    abx:'antibiotic', antibiotics:'antibiotic', pna:'pneumonia', cap:'pneumonia community', hap:'pneumonia hospital', vap:'pneumonia ventilator',
+    uti:'urinary', pyelo:'pyelonephritis urinary', ssti:'skin cellulitis', zosyn:'piperacillin tazobactam', pip:'piperacillin', vanc:'vancomycin', vanco:'vancomycin',
+    mero:'meropenem', ctx:'ceftriaxone', cdiff:'difficile', bug:'organism', bugs:'organism pathogens', kidney:'renal crcl', renal:'kidney crcl', crcl:'kidney renal', egfr:'kidney renal', gfr:'kidney renal', ckd:'kidney renal',
+    aki:'kidney creatinine', colonoscopy:'surgery procedure', endoscopy:'surgery procedure', egd:'surgery procedure', biopsy:'surgery procedure', anesthesia:'surgery', operate:'surgery',
+    monitor:'telemetry', vessel:'artery', glucose:'hyperglycemia', confused:'mental', altered:'mental', bicarb:'bicarbonate', d5:'dextrose', d10:'dextrose', d5w:'dextrose', hco3:'bicarbonate',
+    ekg:'ecg', ecg:'ekg', mi:'stemi infarct', stemi:'mi', omi:'occlusion mi', nstemi:'nste acs', cath:'catheterization', tele:'telemetry',
+    vt:'ventricular tachycardia', vtach:'ventricular tachycardia vt', vf:'ventricular fibrillation', vfib:'ventricular fibrillation vf', svt:'supraventricular tachycardia',
+    tachy:'tachycardia', brady:'bradycardia', ppm:'pacemaker', pacer:'pacemaker', aicd:'icd', defibrillator:'icd', wpw:'preexcitation', qtc:'qt', tdp:'torsades',
+    chf:'heart failure', hf:'heart failure', hfref:'heart failure gdmt', ef:'ejection', dm:'diabetes', sugar:'glucose', gtt:'drip', subq:'subcutaneous', sq:'subcutaneous', sc:'subcutaneous',
+    preop:'surgery perioperative', periop:'perioperative preop surgery', perioperative:'preop surgery', operation:'surgery', procedure:'surgery', surgical:'surgery', clearance:'preop risk',
+    dose:'dosing', doses:'dose dosing', dosing:'dose', replete:'repletion replace', repletion:'replete replace', replace:'repletion', hold:'stop', stop:'hold',
+    deescalate:'narrowing narrow', stepdown:'oral', po:'oral', bleed:'bleeding', bleeding:'bleed', shock:'cardioversion', quiz:'practice', cases:'practice', case:'practice'
+  };
+  const words = text => String(text).toLowerCase().replace(/[₀-₉]/g, c => String(c.charCodeAt(0) - 8320))
+    .replace(/\bhow long\b/g, 'duration').replace(/\bacute kidney injury\b/g, 'aki').replace(/\bheart attack\b/g, 'mi').replace(/\bblood thinners?\b/g, 'anticoagulant').replace(/\bwide[- ]complex\b/g, 'wide').replace(/\bnarrow[- ]complex\b/g, 'narrow')
+    .replace(/\bdrug[- ]eluting\b/g, '').replace(/\bblood pressure\b/g, 'bp').replace(/\bkidney (function|disease|failure)\b/g, 'kidney')
+    .replace(/\bpre[- ]?op(erative)?\b/g, 'preop').replace(/\bperi[- ]?op\b/g, 'periop').replace(/\ba[- ]?fib\b/g, 'afib').replace(/\bc[. ]{0,2}diff(icile)?\b/g, 'cdiff')
+    .replace(/\bsub[- ]?q\b/g, 'subq').replace(/\bde[- ]escalat\w*/g, 'deescalate').replace(/\bstep[- ]down\b/g, 'stepdown').replace(/\bpre[- ]excit/g, 'preexcit')
+    .replace(/\bv[- ]?(tach|fib)\b/g, 'v$1').replace(/k\+/g, 'k ').replace(/'s\b/g, '')
+    .split(/[^a-z0-9.]+/).map(w => w.replace(/^\.+|\.+$/g, '')).filter(Boolean);
+  const isNum = w => /^\d+(\.\d+)?$/.test(w);
+  // The words of a tool or section, each with a weight for where it appears.
+  function bag(parts){
+    const m = new Map();
+    parts.forEach(([text, w]) => words(text || '').forEach(t => { if (!isNum(t) && !STOP.has(t) && (m.get(t) || 0) < w) m.set(t, w); }));
+    return m;
+  }
+  const DOCS = [];
+  TOOLS.forEach(t => {
+    DOCS.push({ t, own: [t.name, t.desc, t.keys], bag: bag([[t.name, 3], [t.desc, 2], [t.keys, 2], [t.spec, 1]]), n: words(t.name).length });
+    if (t.live) (t.sections || []).forEach(sec => DOCS.push({ t, sec, own: [sec[0], sec[2]], bag: bag([[sec[0], 3], [sec[2], 2.2], [t.name, 1.2], [t.keys, 0.4], [t.desc, 0.4]]), n: words(sec[0]).length }));
+  });
+  // How common each word is, counted from a tool's or section's own words (not the ones a section borrows from its tool).
+  const DF = new Map();
+  DOCS.forEach(d => bag(d.own.map(x => [x, 1])).forEach((w, tok) => DF.set(tok, (DF.get(tok) || 0) + 1)));
+  const VOCAB = [...DF.keys()];
+  const idf = tok => Math.log(1 + DOCS.length / (DF.get(tok) || 0.5));
+  // Same word, or the same word with a different ending ("anticoagulate" and "anticoagulation").
+  function near(a, b){
+    if (a === b) return 1;
+    const short = Math.min(a.length, b.length);
+    if (short < 4) return 0;
+    let i = 0; while (i < short && a[i] === b[i]) i++;
+    return i >= (short <= 5 ? short : Math.ceil(short * 0.75)) ? 0.6 : 0;
+  }
+  // The question as a list of ideas; each idea is a word plus what it stands for.
+  function ideas(question){
+    const raw = words(question), out = [];
+    raw.forEach((w, i) => {
+      if (isNum(w) || (w === 'mg' && i && isNum(raw[i - 1])) || (STOP.has(w) && !ALIAS[w])) return;
+      const forms = [[w, 1]];
+      (ALIAS[w] || '').split(' ').filter(Boolean).forEach(a => forms.push([a, 0.7]));
+      out.push({ w, forms, typing: i === raw.length - 1 });
+    });
+    return out;
+  }
+  function ask(question){
+    const qs = ideas(question);
+    if (!qs.length) return { best: null, rest: [], hit: new Set() };
+    // How much each idea is worth: the rarest of its forms that the site knows.
+    qs.forEach(q => {
+      q.known = q.forms.map(([f]) => VOCAB.includes(f) ? f : VOCAB.find(v => near(f, v) || (q.typing && f === q.w && f.length >= 2 && v.startsWith(f)))).filter(Boolean);
+      // A word the site has never seen counts a little against the match, not a lot.
+      q.worth = q.known.length ? Math.max(...q.known.map(idf)) : 0.25 * Math.log(1 + DOCS.length / 0.5);
+      if (GENERIC.has(q.w)) q.worth *= 0.35;
+    });
+    const total = qs.reduce((a, q) => a + q.worth, 0);
+    const scored = DOCS.map(d => {
+      let score = 0, got = 0, label = 0, real = false; const hit = new Set();
+      qs.forEach(q => {
+        let bestM = 0;
+        q.forms.forEach(([f, fw]) => d.bag.forEach((w, tok) => {
+          const m = (near(f, tok) || (q.typing && f === q.w && f.length >= 2 && tok.startsWith(f) ? 0.6 : 0)) * fw * w;   // a half-typed last word matches what it begins
+          if (m > 0) hit.add(tok);
+          if (m > bestM) bestM = m;
+        }));
+        if (bestM > 0){ score += q.worth * bestM; got += q.worth; if (bestM >= 1.8) label++; if (!GENERIC.has(q.w)) real = true; }
+      });
+      if (!real) return { d, score: 0 };   // matched only on filler such as "dose" or "treatment"
+      const cover = got / total;
+      return { d, cover, hit, score: score * (0.35 + 0.65 * cover) * (1 + 0.3 * label / Math.max(d.n, 1)) * (d.t.live ? 1 : 0.8) };
+    }).filter(r => r.score > 0).sort((a, b) => b.score - a.score);
+    if (!scored.length) return { best: null, rest: [], hit: new Set() };
+    let top = scored[0];
+    // A tool that is not built yet does not take the top spot from a live one that fits reasonably well.
+    if (!top.d.t.live){ const liveOne = scored.find(r => r.d.t.live && r.score >= top.score * 0.6); if (liveOne) top = liveOne; }
+    // When a whole tool comes first but one of its sections answers the question about as well, lead with the section.
+    if (!top.d.sec && qs.length > 1){ const part = scored.find(r => r.d.sec && r.d.t === top.d.t && r.cover >= top.cover && r.score >= top.score * 0.65); if (part) top = part; }
+    // Confident enough for a "best match": most of the question is accounted for, by words that carry weight.
+    const sure = top.cover >= 0.5 && top.score >= 4;
+    const perTool = new Map(), rest = [];
+    const seen = new Set(sure && top.d.sec ? [top.d.t.slug + '#' + top.d.sec[1]] : []);
+    for (const r of scored){
+      if (rest.length >= 7) break;
+      if (r.score < scored[0].score * 0.45) break;
+      if (sure && r === top) continue;
+      if (r.d.sec){ const key = r.d.t.slug + '#' + r.d.sec[1]; if (seen.has(key)) continue; seen.add(key); }
+      if (sure && r.d.t === top.d.t && !r.d.sec) continue;                 // the tool itself, when one of its sections is the best match
+      if (!r.d.sec && rest.some(x => x.d.t === r.d.t)) continue;           // a tool already listed through a section
+      const n = perTool.get(r.d.t) || 0;
+      if (n >= 3) continue;
+      perTool.set(r.d.t, n + 1); rest.push(r);
+    }
+    return { best: sure ? top : null, rest };
+  }
+
   const chevron = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg>';
   const arrow = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
   const soon = '<span class="soon">Soon</span>';
@@ -449,26 +578,37 @@
       }).join('')}`;
   }
 
-  function renderSearch(term){
-    const hay = t => (t.name + ' ' + t.desc + ' ' + t.spec + ' ' + (t.keys || '')).toLowerCase();
-    const score = t => (t.name.toLowerCase().startsWith(term) ? 0 : t.name.toLowerCase().includes(term) ? 1 : 2) + (t.live ? 0 : 0.5);
-    const tools = TOOLS.filter(t => hay(t).includes(term)).sort((a, b) => score(a) - score(b));
-    const sections = [];
-    TOOLS.forEach(t => (t.sections || []).forEach(([label, id]) => { if (label.toLowerCase().includes(term)) sections.push({ t, label, id }); }));
-    if (!tools.length && !sections.length){
-      main.innerHTML = `<div class="empty">Nothing matches “${esc(term)}”.</div>`;
+  // Bold the words of a label that matched the question.
+  const mark = (text, hit) => String(text).split(/([^A-Za-z0-9₀-₉.]+)/).map(p => { const w = words(p)[0]; return w && hit.has(w) ? '<mark>' + esc(p) + '</mark>' : esc(p); }).join('');
+  function resultRow(r){
+    const t = r.d.t, sec = r.d.sec;
+    return sec
+      ? `${open(t, 'row', sec[1])}<span class="txt"><span class="name"><span>${mark(sec[0], r.hit)}</span></span><span class="desc">in ${esc(t.name)}</span></span>${chevron}${close(t)}`
+      : `${open(t, 'row')}<span class="txt"><span class="name"><span>${mark(t.name, r.hit)}</span></span><span class="desc">${esc(t.desc)}</span></span>${t.live ? `<span class="tag">${esc(t.spec)}</span>` : soon}${close(t)}`;
+  }
+  function renderSearch(question){
+    const { best, rest } = ask(question);
+    if (!best && !rest.length){
+      main.innerHTML = `<div class="empty">No tool covers that yet.<br><a href="#all" data-clear>See all ${TOOLS.length} tools</a></div>`;
       return;
     }
+    let card = '';
+    if (best){
+      const t = best.d.t, sec = best.d.sec;
+      card = `<div class="cont">${open(t, 'cont-main', sec && sec[1])}
+          <span class="txt"><span class="eyebrow">${t.live ? 'Best match' : 'Not built yet'}${sec ? ' · ' + esc(t.name) : ''}</span><span class="name">${esc(sec ? sec[0] : t.name)}</span><span class="desc">${esc(sec ? t.desc : t.desc)}</span></span>
+          ${t.live ? `<span class="go">${arrow}</span>` : ''}
+        ${close(t)}</div>`;
+    }
     main.innerHTML = `<div class="stack">
-      ${tools.length ? `<section><h2 class="eyebrow" style="padding-bottom:8px">Tools</h2><div class="rows">${tools.map(t => row(t, term, `<span class="tag">${esc(t.spec)}</span>`)).join('')}</div></section>` : ''}
-      ${sections.length ? `<section><h2 class="eyebrow" style="padding-bottom:8px">Jump to a section</h2><div class="rows">${sections.map(s =>
-        `${open(s.t, 'row', s.id)}<span class="txt"><span class="name"><span>${hl(s.label, term)}</span></span><span class="desc">in ${esc(s.t.name)}</span></span>${s.t.live ? chevron : soon}${close(s.t)}`).join('')}</div></section>` : ''}
-      <p class="hint">Search matches tool names, what they cover, and sections inside each tool.</p>
+      ${card}
+      ${rest.length ? `<section><h2 class="eyebrow" style="padding-bottom:8px">${best ? 'Also relevant' : 'Closest matches'}</h2><div class="rows">${rest.map(resultRow).join('')}</div></section>` : ''}
+      <p class="hint">Matching happens on this device. Nothing you type is sent or saved.</p>
     </div>`;
   }
 
   function render(){
-    const term = q.value.trim().toLowerCase();
+    const term = q.value.trim();
     clearBtn.hidden = !q.value;
     const all = location.hash === '#all';
     document.getElementById('navHome').toggleAttribute('aria-current', !all && !term);
@@ -492,6 +632,9 @@
     if (e.key === '/' && document.activeElement !== q){ e.preventDefault(); q.focus(); }
     else if (e.key === 'Escape' && document.activeElement === q){ q.value = ''; render(); q.blur(); }
   });
+
+  // "See all tools" under an empty search result: clear the question so the list shows.
+  document.addEventListener('click', e => { if (e.target.closest('[data-clear]')) q.value = ''; }, true);
 
   // Coming back from a tool with the Back button can restore this page without reloading it: redraw the banner.
   window.addEventListener('pageshow', e => { if (e.persisted) render(); });
