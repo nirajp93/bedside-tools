@@ -290,7 +290,7 @@ footer strong{color:var(--ink)}
     <p class="why">Most perioperative heart injury is painless under analgesia. In high-risk patients, a troponin on postoperative days 1 and 2 can be considered to find it.</p>
     <p class="why"><b>Why:</b> injury is usually a supply and demand mismatch from hypotension, tachycardia and anemia, and it predicts 30-day mortality even without symptoms (VISION).</p>
     <details><summary>More</summary>
-      <p class="why">If troponin rises: look for and treat the cause, get an ECG, and arrange follow-up for risk-factor control (ACC/AHA: reasonable, 2a). ACC/AHA says antithrombotic therapy may be considered (2b); the Canadian guideline recommends starting aspirin and a statin. Write the consult as a risk estimate ("elevated risk, RCRI 1; no testing indicated"), not as "cleared".</p>
+      <p class="why">If troponin rises: look for and treat the cause, get an ECG, and arrange follow-up for risk-factor control (ACC/AHA: reasonable, 2a). ACC/AHA says antithrombotic therapy may be considered (2b); the Canadian guideline recommends starting aspirin and a statin. Write the consult as a risk estimate ("elevated risk, RCRI 2; no testing indicated"), not as "cleared".</p>
       <span class="tier">ACC/AHA 2024 (2b for surveillance) · CCS 2017 · VISION</span>
     </details>
   </div>
@@ -402,7 +402,7 @@ const W_VALVE = ['Mechanical mitral valve','Older-generation aortic valve (caged
 const W_VTE = ['Clot within the past 3 months','Severe thrombophilia: antiphospholipid syndrome, or protein C, protein S or antithrombin deficiency'];
 
 const CASE = [
- ['What is her RCRI and estimated risk?','RCRI 1, for heart failure. Spine surgery is not RCRI high-risk surgery, metformin is not insulin, and creatinine is 0.85. That is about 6% by modern recalibrated estimates, which this tool treats as elevated (ACC/AHA draws its line at RCRI 2), so continue down the pathway.'],
+ ['What is her RCRI and estimated risk?','RCRI 1, for heart failure. Spine surgery is not RCRI high-risk surgery, metformin is not insulin, and creatinine is 0.85. ACC/AHA draws its elevated line at RCRI 2, so by the score she is on the low side of it, though modern recalibrated estimates put RCRI 1 near 6%. Her capacity (next question) points the same way.'],
  ['Does she need a stress test or an echo?','No. Before the myelopathy she climbed two flights without stopping, which is 4 METs. Her lungs are clear and she has no orthopnea, so her heart failure is compensated: the 1+ pedal edema is isolated, without orthopnea, rales or weight gain, and does not signal decompensation. An echo is for a change in status, or none within a year; hers was 8 months ago.'],
  ['Should surgery wait for anything?','Only for the INR. Her deficit is progressing, so delay risks permanent loss of hand function, and no test would change management.'],
  ['What happens to each home medication?','Continue metoprolol. Hold lisinopril for 24 hours before surgery (an EF of 45% is not reduced-EF heart failure, so the hypertension rule applies; continuing it is also acceptable), and furosemide and metformin on the morning. A statin is indicated and can be started. Cefazolin is acceptable with a rash-only amoxicillin history.'],
@@ -429,7 +429,7 @@ function rcriRisk(points){ const k=Math.min(points,3); return {lee:RCRI_LEE[k], 
 function dasiScore(ticks){ let s=0; ticks.forEach((t,i)=>{ if(t) s+=DASI[i][1]; }); const vo2=0.43*s+9.6; return {score:Math.round(s*100)/100, mets:vo2/3.5, good:s>DASI_CUT}; }
 /* inp: {urgency, active(bool), lowProc(bool), rcri(points), other(% or null), cap('none'|'good'|'poor'), dasi(score or null), bnp, ntp, change(bool)} */
 function pathway(inp){
-  const elevatedByScore = inp.other!=null ? inp.other>=1 : inp.rcri>=1;
+  const elevatedByScore = inp.other!=null ? inp.other>=1 : inp.rcri>=2;   /* ACC/AHA 2024: RCRI above 1 is elevated */
   const basis = inp.other!=null ? 'calculator' : 'rcri';
   const cap = inp.dasi!=null ? (inp.dasi>DASI_CUT?'good':'poor') : inp.cap;
   const bm = (inp.bnp!=null||inp.ntp!=null) ? (((inp.bnp!=null&&inp.bnp>=BNP_CUT)||(inp.ntp!=null&&inp.ntp>=NTP_CUT))?'high':'normal') : null;
@@ -503,14 +503,14 @@ function riskRender(){
   const p=pathway(inp), o=OUT[p.key], box=$('#riskOut');
   box.className='card answer '+p.tone;
   const stats='<div class="stats"><div class="stat"><small>RCRI</small><b>'+pts+'</b></div><div class="stat"><small>Lee 1999</small><b>'+pct(rr.lee)+'</b></div><div class="stat"><small>Recalibrated</small><b>'+pct(rr.recal)+'</b></div>'+(dAny?'<div class="stat"><small>DASI</small><b>'+ds.score.toFixed(1)+'</b></div><div class="stat"><small>Est. METs</small><b>'+ds.mets.toFixed(1)+'</b></div>':'')+'</div>';
-  const guard=(inp.rcri===0&&inp.other==null&&!inp.lowProc&&p.key==='low')?'<p class="guard"><b>RCRI 0 is not zero risk.</b> Modern cohorts put it near 4%, and RCRI misses valve disease, pulmonary hypertension, frailty and the specific operation. Use NSQIP for a procedure-specific number.</p>':'';
+  const guard=(inp.rcri<=1&&inp.other==null&&!inp.lowProc&&p.key==='low')?'<p class="guard"><b>A low RCRI is not zero risk.</b> Modern cohorts put RCRI 0 near 4% and RCRI 1 near 6%, and RCRI misses valve disease, pulmonary hypertension, frailty and the specific operation. Use NSQIP for a procedure-specific number.</p>':'';
   box.innerHTML='<p class="label">Step '+p.step+' of 5</p><p class="verdict">'+esc(o[0])+'</p><p class="why">'+esc(o[1])+'</p>'+guard+stats+
    '<p class="why"><b>Why:</b> '+esc(o[2])+'</p>'+
    '<details><summary>More</summary><ol class="steps">'+STEPS.map((s,i)=>'<li class="'+(i+1===p.step?'here':i+1<p.step?'past':'')+'"><i>'+(i+1)+'</i><span>'+s+'</span></li>').join('')+'</ol>'+
-   '<p class="why">Risk here is '+(p.basis==='calculator'?'taken from the calculator value you entered (1% or more counts as elevated).':'taken from RCRI: 0 points is treated as low, 1 or more as elevated. That is this tool\'s choice, following the Canadian recalibration (RCRI 1 is about 6%); ACC/AHA defines low risk as under 1% by a validated calculator and lists RCRI above 1 as elevated. Lee\'s 1999 figures undercount events found by troponin testing.')+'</p>'+
+   '<p class="why">Risk here is '+(p.basis==='calculator'?'taken from the calculator value you entered (1% or more counts as elevated).':'taken from RCRI: 0 or 1 point is treated as low and 2 or more as elevated, the line ACC/AHA lists (RCRI above 1). The Canadian guideline is stricter and acts at RCRI 1, because modern cohorts put RCRI 1 near 6%. Lee\'s 1999 figures undercount events found by troponin testing.')+'</p>'+
    (dAny?'<p class="why">DASI above 34 is the validated lower-risk cut-off. On the oxygen-uptake equation a score of 34 is about 7 METs, so it is stricter than the bedside 4-MET rule.</p>':'')+
    '<p class="why">Natriuretic peptide counts as raised at BNP 92 or NT-proBNP 300 pg/mL or more. Risk modifiers that no score captures: severe valve disease, pulmonary hypertension, congenital heart disease, a recent stent or stroke, an implanted device, frailty.</p>'+
-   '<span class="tier">ACC/AHA 2024, reaffirmed 2026: stepwise approach · peptide cut-offs, RCRI recalibration and the RCRI 1 threshold: CCS 2017 · DASI cut-off: METS (Wijeysundera 2020)</span></details>';
+   '<span class="tier">ACC/AHA 2024, reaffirmed 2026: stepwise approach · peptide cut-offs and RCRI recalibration: CCS 2017 · DASI cut-off: METS (Wijeysundera 2020)</span></details>';
 }
 $('#urg').addEventListener('click',e=>{ const b=e.target.closest('.chip'); if(!b) return; urgency=b.dataset.v; $$('#urg .chip').forEach(c=>c.setAttribute('aria-pressed',c===b)); riskRender(); });
 $('#cap').addEventListener('click',e=>{ const b=e.target.closest('.chip'); if(!b) return; capSel=b.dataset.v; $$('#cap .chip').forEach(c=>c.setAttribute('aria-pressed',c===b)); riskRender(); });
