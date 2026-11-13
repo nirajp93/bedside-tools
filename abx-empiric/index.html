@@ -67,6 +67,45 @@ details p{margin:0 0 8px;color:var(--ink);font-size:15px}
 .vig{margin:0 0 10px}
 footer{margin-top:28px;border-top:1px solid var(--line);padding-top:16px;font-size:13.5px;color:var(--muted)}
 footer p{margin:0 0 8px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.mapgrid{display:grid;grid-template-columns:96px minmax(0,1fr);gap:14px;align-items:start}
+.bodyfig{width:96px;height:auto;display:block;position:sticky;top:150px}
+.bf{fill:var(--body)}.bs path{fill:none;stroke:var(--body);stroke-linecap:round}.bs .arm{stroke-width:12}.bs .leg{stroke-width:16}
+.bs .hot{stroke:var(--accent)}.bf.all{fill:var(--accent);opacity:.5}.bs.all path{stroke:var(--accent);opacity:.5}
+.of{fill:var(--accent)}.os{fill:none;stroke:var(--accent);stroke-linecap:round;stroke-linejoin:round}
+.synh{font-size:18px;line-height:1.25;margin:2px 0 0}
+.chip{display:inline-flex;align-items:center;min-height:28px;padding:2px 10px;border:1px solid var(--line);border-radius:14px;font-size:13px;margin:0 6px 6px 0}
+.lnk{min-height:44px;border:0;background:none;color:var(--accent);font:inherit;font-weight:600;padding:0;cursor:pointer;text-align:left}
+.dn{font:inherit;color:inherit;background:none;border:0;padding:0;margin:0;cursor:pointer;min-height:44px;display:inline-flex;align-items:center;text-decoration:underline;text-decoration-color:var(--muted);text-underline-offset:4px}
+.tellbtn{display:flex;justify-content:space-between;align-items:center;gap:10px;width:100%;min-height:44px;margin:0 0 10px;padding:6px 12px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);font:inherit;font-size:14px;text-align:left;cursor:pointer}
+.tellbtn .go{color:var(--accent);font-weight:600;flex:none}
+.cov{margin-top:10px;border-top:1px solid var(--line);padding-top:10px}
+.covrow{display:grid;gap:5px;align-items:center;margin-top:5px}
+.covh{font-size:10.5px;line-height:1.15;color:var(--muted);text-align:center;overflow-wrap:anywhere}
+.covn{font-size:12.5px;line-height:1.2;overflow-wrap:anywhere}
+.cell{height:16px;border-radius:5px;background:var(--fill);overflow:hidden;position:relative}
+.cell.on{background:var(--accent)}.cell i{display:block;width:50%;height:100%;background:var(--accent)}
+.cell.gap{background:none;border:1.5px dashed var(--warn)}
+.tl{list-style:none;margin:12px 0 0;padding:12px 0 0;border-top:1px solid var(--line)}
+.tl li{display:grid;grid-template-columns:72px minmax(0,1fr);gap:0 10px;position:relative;padding:0 0 12px;font-size:15px}
+.tl li:last-child{padding-bottom:0}
+.tk{font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);padding:3px 0 0 16px;position:relative}
+.tk::before{content:"";position:absolute;left:0;top:8px;width:8px;height:8px;border-radius:50%;background:var(--muted)}
+.tl li::before{content:"";position:absolute;left:3.5px;top:18px;bottom:-6px;width:1px;background:var(--line)}
+.tl li:last-child::before{display:none}
+.tl li:first-child .tk::before{background:var(--accent)}
+.scrim{position:fixed;inset:0;background:var(--scrim);z-index:20;display:flex;align-items:flex-end;justify-content:center}
+.sheet{background:var(--card);color:var(--ink);width:100%;max-width:560px;max-height:86vh;overflow:auto;border-radius:20px 20px 0 0;padding:16px 16px 28px;border:1px solid var(--line)}
+.sheet:focus{outline:none}
+.sheet h2{font-size:19px;margin:6px 0 0}
+.sheet p{margin:0 0 8px}
+@media (min-width:700px){.scrim{align-items:center}.sheet{border-radius:20px}}
+.x{float:right;min-width:64px;min-height:44px;margin:0 0 8px 12px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);font:inherit;cursor:pointer}
+.tick{display:flex;align-items:center;gap:10px;min-height:44px;border-top:1px solid var(--line);font-size:14.5px;cursor:pointer;padding:6px 0}
+.tick input{width:20px;height:20px;flex:none;accent-color:var(--accent)}
+.resbox{margin-top:10px;padding:10px 12px;border-radius:10px;background:var(--fill);font-size:14.5px;position:sticky;bottom:-28px}
+.strip{display:grid;grid-template-columns:repeat(9,minmax(0,1fr));gap:4px;margin-top:8px}
+.strip span{display:block;font-size:10px;color:var(--muted);text-align:center;margin-top:3px}
 [hidden]{display:none!important}
 @media (max-width:420px){.pgrid{grid-template-columns:0.8fr 0.8fr 1.5fr}}
 </style>
@@ -75,7 +114,7 @@ footer p{margin:0 0 8px}
 <div class="wrap">
 <a class="back" href="/">← bedside.tools</a>
 <h1>Empiric Antibiotics</h1>
-<p class="purpose">First regimen by syndrome, adjusted for kidney function and allergy, with what to send first, when to narrow, and when to stop.</p>
+<p class="purpose">First regimen by syndrome, with the usual pathogens, what covers them, how each drug works, when to switch to oral, and when to stop.</p>
 
 <div class="pbar" id="patient">
   <div class="pgrid">
@@ -100,7 +139,7 @@ footer p{margin:0 0 8px}
 
 <section class="view" id="p-order" role="tabpanel" aria-labelledby="t-order">
   <div class="guard" style="margin:0 0 14px">National-guideline defaults. Check your antibiogram and formulary before ordering.</div>
-  <div class="card" id="syndromes"><p class="label">Syndrome</p><div id="synlist"></div></div>
+  <div class="card" id="syndromes"><p class="label">Syndrome · where is the infection?</p><div id="synlist"></div></div>
   <div id="out" aria-live="polite"></div>
 </section>
 
@@ -117,8 +156,8 @@ footer p{margin:0 0 8px}
 <footer>
   <p><strong>For education only. Not a substitute for clinical judgment.</strong> Regimens are national-guideline defaults; local resistance, formulary, and infectious-disease advice take priority. Kidney and hemodialysis doses are from FDA prescribing information unless marked "expert practice"; items so marked are not in a label or guideline. Vancomycin maintenance dosing is left to pharmacy.</p>
   <p>Privacy: everything runs in your browser. Nothing you enter is sent anywhere or stored, and there are no analytics. Do not enter names, record numbers, or dates of birth.</p>
-  <p class="mono">Last reviewed: 2026-11-12</p>
-  <p><strong>Sources:</strong> Surviving Sepsis Campaign 2026 (Prescott, Crit Care Med) · ATS community-acquired pneumonia guideline 2025 (Jones, AJRCCM; not endorsed by IDSA) and ATS/IDSA 2019 (Metlay) · IDSA/ATS hospital-acquired and ventilator-associated pneumonia 2016 (Kalil) · IDSA complicated urinary tract infection 2025 and IDSA uncomplicated cystitis 2010 · IDSA skin and soft tissue infection 2014 (Stevens) · IWGDF/IDSA diabetes-related foot infection 2023 (Senneville) · Surgical Infection Society intra-abdominal infection 2024 (Huston) · Tokyo Guidelines 2018 antimicrobial therapy (Gomi) · AASLD ascites and spontaneous bacterial peritonitis 2021 (Biggins) · IDSA bacterial meningitis 2004 (Tunkel) · IDSA catheter-related infection 2009 (Mermel) · IDSA/SHEA C. difficile 2021 and 2017 · IDSA antimicrobial-resistant gram-negative guidance 2024 and 2026 · Drug allergy practice parameter 2022 (Khan) · Parente 2018 (MRSA nasal screening) · ASHP/IDSA vancomycin guideline 2020 · FDA prescribing information for each drug (DailyMed, read November 2026).</p>
+  <p class="mono">Last reviewed: 2026-11-13</p>
+  <p><strong>Sources:</strong> Surviving Sepsis Campaign 2026 (Prescott, Crit Care Med) · ATS community-acquired pneumonia guideline 2025 (Jones, AJRCCM; not endorsed by IDSA) and ATS/IDSA 2019 (Metlay) · IDSA/ATS hospital-acquired and ventilator-associated pneumonia 2016 (Kalil) · IDSA complicated urinary tract infection 2025 and IDSA uncomplicated cystitis 2010 · IDSA skin and soft tissue infection 2014 (Stevens) · IWGDF/IDSA diabetes-related foot infection 2023 (Senneville) · Surgical Infection Society intra-abdominal infection 2024 (Huston) · Tokyo Guidelines 2018 antimicrobial therapy (Gomi) · AASLD ascites and spontaneous bacterial peritonitis 2021 (Biggins) · IDSA bacterial meningitis 2004 (Tunkel) · IDSA catheter-related infection 2009 (Mermel) · IDSA/SHEA C. difficile 2021 and 2017 · IDSA antimicrobial-resistant gram-negative guidance 2024 and 2026 · Drug allergy practice parameter 2022 (Khan) · Parente 2018 (MRSA nasal screening) · ASHP/IDSA vancomycin guideline 2020 · Tokyo Guidelines 2018 severity grading (Kiriyama) · Halm 2002 (clinical stability in pneumonia) · IDSA candidiasis 2016 (Pappas) · SABATO trial 2024 (Kaasch, Lancet Infect Dis) · Sepsis-3 definitions 2016 (Singer) · FDA prescribing information for each drug (DailyMed, read November 2026). Pathogen lists are from the microbiology sections of the guidelines above; the coverage pictures are this tool's own summary of usual activity from FDA labels and those guidelines.</p>
 </footer>
 </div>
 
@@ -430,7 +469,7 @@ function order(synId, varId, p){
   var S = SYN.filter(function(s){ return s.id === synId; })[0]; if (!S) return null;
   var V = S.vars.filter(function(v){ return v.id === varId; })[0] || S.vars[0];
   var o = S.build(V.id, p);
-  o.syn = S.name; o.variant = V.label;
+  o.syn = S.name; o.variant = V.label; o.id = S.id; o.vid = V.id; o.p = p;
   o.lines = o.rx.map(function(k){
     if (k === 'VANCO') return vancoLoad(p);
     if (k === 'DEX'){ var d = perKg('Dexamethasone', 0.15, 'IV q6h for 2–4 days', p, function(x){ return Math.round(x); }); d.why = 'first dose 10–20 minutes before, or with, the first antibiotic'; return d; }
@@ -450,31 +489,359 @@ function order(synId, varId, p){
 }
 </script>
 
+<script id="learn">
+/* Teaching layer: pathogens, coverage, mechanism, bucket criteria, oral step-down. Data and pure functions; no DOM access.
+   Coverage digits: 2 = reliable, 1 = partial or variable, 0 = none. Order: st ms mr en gn ps es an at. */
+var COLS = [['st', 'Strep'], ['ms', 'MSSA'], ['mr', 'MRSA'], ['en', 'Entero'], ['gn', 'GNR'], ['ps', 'Pseudo'], ['es', 'ESBL'], ['an', 'Anaer'], ['at', 'Atyp']];
+var COLFULL = {st: 'streptococci', ms: 'MSSA', mr: 'MRSA', en: 'Enterococcus', gn: 'enteric gram-negative rods', ps: 'Pseudomonas', es: 'ESBL producers', an: 'anaerobes', at: 'atypical organisms'};
+
+var MOA = {
+  bl: ['Binds penicillin-binding proteins and stops cell-wall cross-linking, so the wall fails and the cell bursts.', 'Killing depends on time above the MIC, which is why a loading dose and prolonged infusion are used in sepsis. MRSA makes an altered binding protein (PBP2a) that beta-lactams cannot bind, except ceftaroline.'],
+  bli: ['A beta-lactam that stops cell-wall cross-linking, paired with an inhibitor that acts as a sacrificial target for the enzymes that would destroy it.', 'The inhibitor restores activity against MSSA, anaerobes and many enteric rods. ESBL enzymes are not reliably blocked; carbapenems resist them on their own.'],
+  van: ['Binds the D-Ala–D-Ala end of cell-wall building blocks so they cannot be added to the wall.', 'Too large to cross the gram-negative outer membrane. Taken by mouth it is not absorbed, which is the point in C. difficile. Killing tracks AUC over MIC, so maintenance is dosed by AUC.'],
+  lzd: ['Binds the 50S ribosome and blocks the start of protein synthesis.', 'Stops toxin production. Weak MAO inhibition (serotonin syndrome with serotonergic drugs); marrow suppression after about two weeks. The tablet reaches the same level as the infusion.'],
+  mac: ['Binds the 50S ribosome and blocks the growing protein chain.', 'Concentrates inside cells, where the atypical organisms live. Prolongs the QT interval.'],
+  tet: ['Binds the 30S ribosome and blocks tRNA docking.', 'Enters cells (atypical organisms). Absorption is blocked by calcium, iron and antacids.'],
+  cli: ['Binds the 50S ribosome and stops protein synthesis.', 'Toxin production stops even when bacteria are not dividing, which is why it is added in necrotizing streptococcal infection. High C. difficile risk.'],
+  fq: ['Blocks DNA gyrase and topoisomerase IV, so bacterial DNA cannot be unwound and copied.', 'Levofloxacin and moxifloxacin tablets reach the same level as the infusion; ciprofloxacin tablets reach somewhat less. Absorption is blocked by calcium, iron and tube feeds. QT prolongation, tendon rupture, aortic aneurysm, glucose swings, C. difficile.'],
+  sxt: ['Two drugs that block two consecutive steps in bacterial folate synthesis.', 'Trimethoprim blocks creatinine secretion (creatinine rises without a fall in GFR) and sodium channels in the collecting duct (potassium rises).'],
+  mtz: ['Reduced inside anaerobes to radicals that break DNA.', 'Only anaerobes (and some protozoa) can activate it, which is why it has no activity against aerobic bacteria. The tablet reaches the same level as the infusion.'],
+  nit: ['Reduced by bacterial enzymes to reactive products that damage ribosomes and DNA.', 'Reaches useful levels only in urine, so it treats the bladder and nothing else.'],
+  fos: ['Blocks the first step of cell-wall synthesis (the enzyme MurA).', 'A single oral dose; by mouth it treats the bladder only.'],
+  fdx: ['Blocks bacterial RNA polymerase and is barely absorbed from the gut.', 'Narrow: it spares more of the gut flora than vancomycin, so recurrences are fewer.'],
+  ech: ['Blocks glucan synthesis in the fungal cell wall.', 'Kills Candida. Poor urine and CSF levels.'],
+  azo: ['Blocks ergosterol synthesis in the fungal cell membrane.', 'Inhibits CYP enzymes (warfarin, tacrolimus) and prolongs the QT interval.'],
+  osel: ['Blocks viral neuraminidase, so new influenza virus cannot leave the infected cell.', '']
+};
+
+/* class: n = label on sheet, c = class name, m = MOA key, cov = digits, x = named-pathogen overrides, note */
+var CLS = {
+  amp: {c: 'Aminopenicillin · beta-lactam', m: 'bl', cov: '200210000', x: {hf: 1, li: 2, nm: 2}, note: 'Covers Listeria. Many E. coli are resistant. Mouth anaerobes yes, Bacteroides fragilis no.'},
+  pcv: {c: 'Penicillin · beta-lactam', m: 'bl', cov: '200000000', x: {}, note: 'Streptococci only.'},
+  sam: {c: 'Aminopenicillin with beta-lactamase inhibitor', m: 'bli', cov: '220210020', x: {hf: 2}, note: 'E. coli resistance is common.'},
+  tzp: {c: 'Antipseudomonal penicillin with beta-lactamase inhibitor', m: 'bli', cov: '220222120', x: {hf: 2}, note: 'ESBL producers: an option in urinary infection only; not relied on elsewhere.'},
+  cfz: {c: 'First-generation cephalosporin · beta-lactam', m: 'bl', cov: '220010000', x: {}, note: 'First choice for MSSA.'},
+  ctx: {c: 'Third-generation cephalosporin · beta-lactam', m: 'bl', cov: '210020000', x: {hf: 2, nm: 2}, note: 'Not preferred for serious MSSA infection. No Enterococcus, Pseudomonas, anaerobes or atypical organisms.'},
+  cpd: {c: 'Oral third-generation cephalosporin · beta-lactam', m: 'bl', cov: '210020000', x: {hf: 2}, note: 'Oral levels are lower than IV ceftriaxone.'},
+  fep: {c: 'Fourth-generation cephalosporin · beta-lactam', m: 'bl', cov: '220022000', x: {hf: 2, nm: 2}, note: 'No anaerobes: paired with metronidazole below the diaphragm.'},
+  caz: {c: 'Antipseudomonal third-generation cephalosporin · beta-lactam', m: 'bl', cov: '100022000', x: {hf: 2, nm: 2}, note: 'Weak against gram-positive organisms.'},
+  etp: {c: 'Carbapenem · beta-lactam', m: 'bl', cov: '220020220', x: {hf: 2}, note: 'No Pseudomonas and no Enterococcus.'},
+  mem: {c: 'Carbapenem · beta-lactam', m: 'bl', cov: '220022220', x: {hf: 2, li: 1, nm: 2}, note: 'Does not reliably cover Enterococcus.'},
+  van: {c: 'Glycopeptide', m: 'van', cov: '222200000', x: {}, note: 'Slower than a beta-lactam against MSSA. Not VRE.'},
+  vpo: {c: 'Glycopeptide, oral (not absorbed)', m: 'van', cov: '000000000', x: {cd: 2}, note: 'C. difficile only; it stays in the gut.'},
+  lzd: {c: 'Oxazolidinone', m: 'lzd', cov: '222200000', x: {}, note: 'Includes VRE.'},
+  azm: {c: 'Macrolide', m: 'mac', cov: '100000002', x: {hf: 2}, note: 'Pneumococcal resistance is common, so it is paired with a beta-lactam.'},
+  dox: {c: 'Tetracycline', m: 'tet', cov: '111000002', x: {hf: 2}, note: 'MRSA activity is used for skin infection, not bloodstream infection.'},
+  lvx: {c: 'Respiratory fluoroquinolone', m: 'fq', cov: '210011102', x: {hf: 2}, note: 'Fluoroquinolones are the only oral class with Pseudomonas activity, but resistance among Pseudomonas and enteric rods is common: check susceptibility.'},
+  mox: {c: 'Respiratory fluoroquinolone', m: 'fq', cov: '210010012', x: {hf: 2}, note: 'No Pseudomonas; poor urine levels.'},
+  cip: {c: 'Fluoroquinolone', m: 'fq', cov: '000011101', x: {hf: 2}, note: 'Resistance among enteric rods and Pseudomonas is common: check susceptibility. Weak against pneumococcus. Covers Legionella among the atypical organisms.'},
+  sxt: {c: 'Folate-pathway inhibitor', m: 'sxt', cov: '111010100', x: {hf: 1, li: 2}, note: 'Staphylococcal susceptibility varies by region; streptococcal activity is debated; E. coli resistance is common.'},
+  cli: {c: 'Lincosamide', m: 'cli', cov: '111000010', x: {}, note: 'Resistance among streptococci, MRSA and Bacteroides fragilis has risen: check susceptibility.'},
+  mtz: {c: 'Nitroimidazole', m: 'mtz', cov: '000000020', x: {cd: 1}, note: 'Anaerobes and C. difficile only.'},
+  nit: {c: 'Nitrofuran, urinary', m: 'nit', cov: '000110100', x: {ec: 2}, note: 'Bladder only: no tissue or blood levels.'},
+  fos: {c: 'Phosphonic acid, urinary', m: 'fos', cov: '000110100', x: {ec: 2}, note: 'Bladder only by mouth.'},
+  fdx: {c: 'Macrocyclic, oral (barely absorbed)', m: 'fdx', cov: '000000000', x: {cd: 2}, note: 'C. difficile only.'},
+  mica: {c: 'Echinocandin antifungal', m: 'ech', cov: '000000000', x: {ca: 2}, note: 'Candida.'},
+  flu: {c: 'Azole antifungal', m: 'azo', cov: '000000000', x: {ca: 1}, note: 'Candida: not C. krusei, variable C. glabrata.'},
+  osel: {c: 'Neuraminidase inhibitor', m: 'osel', cov: '000000000', x: {}, note: 'Influenza A and B.'}
+};
+var DCLASS = {ceftriaxone: 'ctx', ceftriaxone1: 'ctx', ceftriaxoneMen: 'ctx', cefepime: 'fep', piptazoHi: 'tzp', piptazo: 'tzp', meropenem: 'mem', ertapenem: 'etp', ceftazidime: 'caz', ampsulb: 'sam', cefazolin: 'cfz', levofloxacin: 'lvx', ciproIV: 'cip', ciproPO: 'cip', azithromycin: 'azm', doxycycline: 'dox', metronidazole: 'mtz', metronidazoleIV: 'mtz', clindamycin: 'cli', clindamycinPO: 'cli', linezolid: 'lzd', tmpsmx: 'sxt', cephalexin: 'cfz', amoxclav: 'sam', nitrofurantoin: 'nit', fosfomycin: 'fos', ampicillin: 'amp', micafungin: 'mica', fidaxomicin: 'fdx', vancoPO: 'vpo', vancoPOhi: 'vpo', oseltamivir: 'osel', VANCO: 'van', vanco: 'van', amoxicillin: 'amp', cefpodoxime: 'cpd', moxifloxacin: 'mox', fluconazole: 'flu', penvk: 'pcv'};
+
+/* Oral step-down drugs new in this version. */
+DRUGS.amoxicillin = {n: 'Amoxicillin', d: '1 g oral q8h', pcn: 1, f: function(c){ return c > 30 ? null : c >= 10 ? '500 mg oral q12h' : '500 mg oral q24h'; }, h: '500 mg oral q24h, with an extra dose during and after dialysis'};
+DRUGS.cefpodoxime = {n: 'Cefpodoxime', d: '200 mg oral q12h', f: function(c){ return c >= 30 ? null : '200 mg oral q24h'; }, h: '200 mg oral three times a week, after dialysis'};
+DRUGS.moxifloxacin = {n: 'Moxifloxacin', d: '400 mg IV or oral daily', fq: 1};
+DRUGS.fluconazole = {n: 'Fluconazole', d: '400 mg IV or oral daily', f: function(c){ return c > 50 ? null : '200 mg daily, after a full first dose'; }, h: '400 mg after each dialysis session', azole: 1};
+DRUGS.penvk = {n: 'Penicillin VK', d: '500 mg oral q6h', pcn: 1};
+BETA.amoxicillin = 1; BETA.cefpodoxime = 1; BETA.penvk = 1;
+
+function cover(key, bug){
+  var C = CLS[DCLASS[key]]; if (!C) return 0;
+  var col = BUGS[bug][1], i;
+  if (C.x[col] != null) return C.x[col];
+  if (col === 'ec') col = 'gn';
+  for (i = 0; i < COLS.length; i++) if (COLS[i][0] === col) return +C.cov.charAt(i);
+  return 0;
+}
+
+/* pathogen: [label for the grid, coverage column, full name] */
+var BUGS = {
+  pneumo: ['Pneumo', 'st', 'Pneumococcus'], hflu: ['H. flu', 'hf', 'H. influenzae'], atyp: ['Atypical', 'at', 'Atypical organisms'],
+  strep: ['Strep', 'st', 'Streptococci'], mssa: ['MSSA', 'ms', 'MSSA'], mrsa: ['MRSA', 'mr', 'MRSA'], staph: ['Staph incl. MRSA', 'mr', 'Staphylococci, including MRSA'],
+  ent: ['Entero', 'en', 'Enterococcus'], gnr: ['Enteric rods', 'gn', 'E. coli, Klebsiella, Proteus'], ecoli: ['E. coli', 'ec', 'E. coli'],
+  pseudo: ['Pseudo', 'ps', 'Pseudomonas'], esbl: ['ESBL', 'es', 'ESBL producers'], anaer: ['Anaer', 'an', 'Anaerobes'],
+  list: ['Listeria', 'li', 'Listeria'], mening: ['Meningo', 'nm', 'Meningococcus'], candida: ['Candida', 'ca', 'Candida'], cdiff: ['C. diff', 'cd', 'C. difficile']
+};
+
+/* Usual pathogens by syndrome. site = body-map region; chips = shown beside the figure; bugs = grid columns; gap = when an uncovered pathogen gets cover; changes = what alters the list. */
+function siteInfo(id, v){
+  switch (id){
+  case 'cap': return {site: 'lungs', organ: 'Lungs', chips: ['Pneumococcus', 'H. influenzae', 'Atypicals (Mycoplasma, Chlamydia, Legionella)', 'Respiratory viruses', 'S. aureus'], bugs: ['pneumo', 'hflu', 'atyp', 'mrsa', 'pseudo'], gap: {mrsa: 'MRSA: covered with a prior respiratory isolate (MRSA risk flag)', pseudo: 'Pseudomonas: covered with a prior respiratory isolate (flag)'}, changes: 'S. aureus follows influenza. Often no pathogen is found.'};
+  case 'hap': return {site: 'lungs', organ: 'Lungs', chips: ['Pseudomonas', 'S. aureus (MSSA, MRSA)', 'Klebsiella, Enterobacter, E. coli', 'Acinetobacter'], bugs: ['mssa', 'mrsa', 'gnr', 'pseudo', 'esbl'], gap: {mrsa: 'MRSA: covered with a risk factor or high local prevalence', esbl: 'ESBL: covered with a history (flag)'}, changes: 'Prior IV antibiotics and a long stay raise the chance of resistance.'};
+  case 'uti': return v === 'cyst' ? {site: 'urinary', organ: 'Bladder', chips: ['E. coli (most cases)', 'Klebsiella', 'Proteus', 'Enterococcus'], bugs: ['ecoli', 'ent', 'esbl'], gap: {}, changes: 'Proteus goes with stones.'}
+    : {site: 'urinary', organ: 'Kidneys and bladder', chips: ['E. coli (most cases)', 'Klebsiella', 'Proteus', 'Enterococcus', 'Pseudomonas'], bugs: ['gnr', 'ent', 'pseudo', 'esbl'], gap: {ent: 'Enterococcus: treated when it grows', pseudo: 'Pseudomonas: covered in shock or with a prior isolate (flag)', esbl: 'ESBL: covered with a history (flag)'}, changes: 'Catheters, urologic procedures and prior antibiotics bring Pseudomonas, Enterococcus and ESBL producers.'};
+  case 'ssti':
+    if (v === 'cell') return {site: 'skin', organ: 'Skin', chips: ['Beta-haemolytic streptococci (group A; also B, C, G)', 'S. aureus (less often)'], bugs: ['strep', 'mssa', 'mrsa'], gap: {mrsa: 'MRSA: covered for penetrating trauma, known colonisation or injection drug use (flag)'}, changes: 'Purulence, penetrating trauma and injection drug use point to S. aureus.'};
+    if (v === 'abs' || v === 'abssev') return {site: 'skin', organ: 'Skin', chips: ['S. aureus, including MRSA', 'Streptococci (less often)'], bugs: ['mssa', 'mrsa', 'strep'], gap: {}, changes: 'Drainage is the treatment.'};
+    return {site: 'skin', organ: 'Skin and fascia', chips: ['Mixed: anaerobes, gram-negative rods, streptococci', 'Group A streptococcus alone', 'S. aureus, including MRSA', 'Clostridium'], bugs: ['strep', 'mrsa', 'gnr', 'anaer'], gap: {}, changes: 'Seawater exposure: Vibrio vulnificus. Fresh water: Aeromonas.'};
+  case 'dfi': return v === 'mild' ? {site: 'foot', organ: 'Foot', chips: ['S. aureus', 'Streptococci'], bugs: ['strep', 'mssa', 'mrsa'], gap: {mrsa: 'MRSA: covered with prior MRSA infection or colonisation (flag)'}, changes: 'Chronic or previously treated wounds add enteric rods.'}
+    : {site: 'foot', organ: 'Foot', chips: ['S. aureus', 'Streptococci', 'Enteric gram-negative rods', 'Anaerobes (ischaemia, necrosis)'], bugs: ['strep', 'mssa', 'mrsa', 'gnr', 'anaer', 'pseudo'], gap: {mrsa: 'MRSA: covered with a risk factor (flag)', pseudo: 'Pseudomonas: covered only if it grew from the site recently (flag), or with a macerated wound in a warm climate', anaer: 'Anaerobes: covered when the limb is ischaemic or necrotic'}, changes: 'Wet wounds and warm climates bring Pseudomonas.'};
+  case 'iai': return {site: 'gut', organ: 'Abdomen', chips: ['E. coli and other enteric rods', 'Bacteroides fragilis', 'Streptococci (anginosus group)', 'Enterococcus'], bugs: ['gnr', 'anaer', 'strep', 'ent', 'pseudo'], gap: {ent: v === 'low' ? 'Enterococcus: not covered on purpose in lower-risk infection' : 'Enterococcus: cover is suggested in higher-risk infection', pseudo: v === 'low' ? 'Pseudomonas: not covered on purpose in lower-risk infection' : 'Pseudomonas: covered by the higher-risk regimens'}, changes: 'Health-care-associated infection adds Enterococcus, Pseudomonas and Candida.'};
+  case 'bil': return {site: 'bile', organ: 'Liver and bile ducts', chips: ['E. coli', 'Klebsiella', 'Enterococcus', 'Enterobacter'], bugs: ['gnr', 'ent', 'anaer', 'pseudo', 'esbl'], gap: {ent: 'Enterococcus: vancomycin is added in grade III and in health-care-associated infection', anaer: 'Anaerobes: covered when bowel has been joined to the bile duct', pseudo: 'Pseudomonas: covered in grade III and health-care-associated infection', esbl: 'ESBL: covered with a history (flag)'}, changes: 'A biliary-enteric anastomosis adds anaerobes.'};
+  case 'sbp': return {site: 'gut', organ: 'Peritoneum', chips: ['E. coli', 'Klebsiella', 'Streptococci, including pneumococcus'], bugs: ['gnr', 'strep', 'ent', 'mrsa', 'esbl'], gap: {ent: 'Enterococcus: a nosocomial concern', mrsa: 'MRSA: covered only with prior MRSA infection or a positive swab (flag)', esbl: 'ESBL: covered with a history (flag) or after recent piperacillin-tazobactam'}, changes: 'One organism is the rule; more than one suggests a perforation. Nosocomial infection and prophylaxis shift toward gram-positive and resistant organisms.'};
+  case 'men':
+    if (v === 'nsg') return {site: 'brain', organ: 'Brain and meninges', chips: ['Staphylococci (coagulase-negative, S. aureus)', 'Gram-negative rods, including Pseudomonas'], bugs: ['staph', 'gnr', 'pseudo'], gap: {}, changes: 'Hardware and skin flora drive the list after surgery.'};
+    return {site: 'brain', organ: 'Brain and meninges', chips: v === 'old' ? ['Pneumococcus', 'Meningococcus', 'Listeria', 'Aerobic gram-negative rods', 'H. influenzae'] : ['Pneumococcus', 'Meningococcus', 'H. influenzae'], bugs: v === 'old' ? ['pneumo', 'mening', 'list', 'gnr', 'hflu'] : ['pneumo', 'mening', 'hflu'], gap: {list: 'Listeria: needs ampicillin (or TMP-SMX with a penicillin allergy)'}, changes: 'Age over 50, immunocompromise and alcohol use disorder add Listeria. Confusion, seizure or focal signs: think HSV encephalitis.'};
+  case 'sepsis': return {site: 'body', organ: 'Source unknown', chips: ['Staphylococci, including MRSA', 'Streptococci', 'Enteric gram-negative rods', 'Pseudomonas'], bugs: ['mrsa', 'strep', 'gnr', 'pseudo', 'anaer', 'esbl'], gap: {anaer: 'Anaerobes: add metronidazole if an abdominal source is possible', esbl: 'ESBL: covered with a history (flag)'}, changes: 'The list is set by the most likely source; keep looking for it.'};
+  case 'line': return {site: 'blood', organ: 'Blood and line', chips: ['Coagulase-negative staphylococci', 'S. aureus', 'Enterococcus', 'Gram-negative rods', 'Candida'], bugs: ['staph', 'ent', 'gnr', 'pseudo', 'candida'], gap: {gnr: 'Gram-negative rods: covered when critically ill, neutropenic or with a femoral line', pseudo: 'Pseudomonas: as for gram-negative rods', candida: 'Candida: covered when septic with a risk factor'}, changes: 'Femoral lines, TPN and neutropenia bring gram-negative rods and Candida.'};
+  case 'cdi': return {site: 'colon', organ: 'Colon', chips: ['Toxin-producing C. difficile'], bugs: ['cdiff'], gap: {}, changes: 'Spores survive alcohol hand gel: wash with soap and water.'};
+  case 'nf': return {site: 'body', organ: 'Blood', chips: ['Enteric gram-negative rods', 'Pseudomonas', 'Streptococci', 'Staphylococci'], bugs: ['gnr', 'pseudo', 'strep', 'mrsa'], gap: {mrsa: 'MRSA: added for line infection, skin infection, pneumonia or shock'}, changes: 'Gut translocation and lines are the usual sources.'};
+  }
+  return null;
+}
+
+/* Bucket criteria. items: [id, label]; heads: section labels keyed by the item they precede; pick(t) -> {v: variant id or null, text}; tips = bedside technique (expert practice). */
+function cnt(t, ids){ return ids.filter(function(i){ return t[i]; }).length; }
+var TELL = {
+  cap: {title: 'Severe pneumonia?', rule: 'Severe = 1 major or 3 or more minor criteria.', src: 'ATS/IDSA 2019 Table 1 (2007 criteria)',
+    heads: {pressor: 'Major', rr: 'Minor'},
+    items: [['pressor', 'Septic shock needing vasopressors'], ['vent', 'Respiratory failure needing mechanical ventilation'], ['rr', 'Respiratory rate 30 or more'], ['pf', 'PaO2/FiO2 250 or less'], ['multi', 'Multilobar infiltrates'], ['conf', 'Confusion or disorientation'], ['bun', 'BUN 20 mg/dL or more'], ['wbc', 'WBC under 4,000 (from the infection, not chemotherapy)'], ['plt', 'Platelets under 100,000'], ['temp', 'Core temperature under 36 °C'], ['hypo', 'Hypotension needing aggressive fluid resuscitation']],
+    pick: function(t){ var M = cnt(t, ['pressor', 'vent']), m = cnt(t, ['rr', 'pf', 'multi', 'conf', 'bun', 'wbc', 'plt', 'temp', 'hypo']); return {v: M || m >= 3 ? 'severe' : 'ward', text: (M || m >= 3 ? 'Severe' : 'Not severe') + ' · ' + (M ? M + ' major, ' : '') + m + ' of 9 minor criteria'}; },
+    tips: ['Count the respiratory rate yourself for 30 to 60 seconds; charted rates cluster at 16 to 20.', 'Confusion means new disorientation to person, place or time.', 'Multilobar means more than one lobe on the film or CT, on either side.', 'The guideline does not define "aggressive" fluid resuscitation; a bolus given for hypotension is counted here.']},
+  hap: {title: 'Which hospital pneumonia?', rule: 'Hospital-acquired: onset 48 hours or more after admission. Ventilator-associated: onset more than 48 hours after intubation.', src: 'IDSA/ATS 2016',
+    heads: {vap: 'Type', shock: 'Risk, either type', support: 'Counts for hospital-acquired only', ards: 'Counts for ventilator-associated only'},
+    items: [['vap', 'Arose more than 48 hours after intubation (ventilator-associated)'], ['shock', 'Septic shock'], ['abx', 'IV antibiotics in the past 90 days'], ['support', 'Needs ventilatory support because of the pneumonia'], ['lung', 'Structural lung disease (bronchiectasis, cystic fibrosis)'], ['ards', 'ARDS before onset'], ['rrt', 'Acute renal replacement before onset'], ['los', '5 or more days in hospital before onset']],
+    pick: function(t){ var hi; if (t.vap){ hi = cnt(t, ['shock', 'abx', 'ards', 'rrt', 'los']); return {v: hi ? 'vaphi' : 'vap', text: 'Ventilator-associated · ' + (hi ? hi + ' resistance risk factor' + (hi > 1 ? 's' : '') : 'no resistance risk factor')}; }
+      hi = cnt(t, ['support', 'shock', 'abx', 'lung']); return {v: hi ? 'haphi' : 'hap', text: 'Hospital-acquired · ' + (hi ? 'high risk (' + hi + ' ticked)' : 'not high risk')}; },
+    tips: ['Open the medication record for the last 90 days; do not rely on recall.', 'Check the unit antibiogram for the share of S. aureus that is MRSA and for gram-negative resistance.']},
+  uti: {title: 'Which urinary infection?', rule: 'Uncomplicated = confined to the bladder. Complicated = beyond the bladder, or with a catheter, stent, nephrostomy or obstruction. Then: sepsis or not.', src: 'IDSA 2025; sepsis and shock by the Sepsis-3 definitions',
+    heads: {sys: 'Beyond the bladder', sepsis: 'Severity', oral: 'Route'},
+    items: [['sys', 'Fever, rigors, flank pain or costovertebral angle tenderness'], ['dev', 'Indwelling catheter, stent or nephrostomy, or obstruction'], ['sepsis', 'Sepsis: new organ dysfunction from the infection'], ['shock', 'Shock: vasopressors for MAP 65 and lactate above 2 after fluids'], ['oral', 'Can take and absorb oral medication']],
+    pick: function(t){ if (t.shock) return {v: 'shock', text: 'Complicated with septic shock'}; if (t.sepsis) return {v: 'sepsis', text: 'Complicated with sepsis'}; if (t.sys || t.dev) return {v: t.oral ? 'cpo' : 'civ', text: 'Complicated, no sepsis · ' + (t.oral ? 'oral' : 'IV')}; return {v: 'cyst', text: 'Uncomplicated cystitis · nothing beyond the bladder ticked'}; },
+    tips: ['Percuss both costovertebral angles.', 'In men, pelvic or perineal pain suggests prostatitis and a longer course.', 'Fever with a catheter and no other source counts as complicated.', 'Pyuria or a positive culture without symptoms is not a urinary infection.', 'Organ dysfunction screen: new confusion, low blood pressure, respiratory rate 22 or more, urine output, creatinine, bilirubin, platelets, lactate.']},
+  ssti: {title: 'Which skin infection?', rule: 'Purulent or not, then severity. Mild infection (nothing ticked) needs oral therapy for cellulitis, or drainage alone for an abscess.', src: 'IDSA 2014 Figure 1',
+    heads: {pus: 'Type', sirs: 'Severity', nec: 'Necrotizing red flags'},
+    items: [['pus', 'Drainable pus: abscess, furuncle or carbuncle'], ['sirs', 'Systemic signs: temperature above 38 or under 36 °C, heart rate above 90, respiratory rate above 24, or WBC above 12,000 or under 4,000'], ['fail', 'Failed oral antibiotics (for an abscess: failed drainage plus oral antibiotics)'], ['immuno', 'Immunocompromised'], ['deep', 'Bullae, skin sloughing, hypotension or organ dysfunction'], ['nec', 'Pain out of proportion, hard "wooden" tissue beyond the redness, crepitus or gas, skin necrosis, or rapid spread']],
+    pick: function(t){ if (t.nec) return {v: 'nec', text: 'Necrotizing infection suspected · call surgery now'}; var sev = t.fail || t.immuno || t.deep;
+      if (t.pus) return sev ? {v: 'abssev', text: 'Abscess, severe'} : t.sirs ? {v: 'abs', text: 'Abscess with systemic signs (moderate)'} : {v: null, text: 'Mild abscess: incision and drainage alone'};
+      return sev ? {v: 'cellsev', text: 'Cellulitis, severe'} : t.sirs ? {v: 'cell', text: 'Cellulitis with systemic signs (moderate)'} : {v: null, text: 'Mild cellulitis: oral streptococcal agent'}; },
+    tips: ['Mark the border with a pen and write the time.', 'Press beyond the red edge: tenderness or woody firmness outside the redness is the warning sign.', 'Use ultrasound for a collection when fluctuance is uncertain.', 'Both legs red at once is usually venous stasis, not cellulitis.', 'A LRINEC score does not rule out necrotizing infection, and imaging must not delay surgery.', 'The guideline lists systemic signs under both moderate and severe infection; this tool sends hypotension or organ dysfunction to severe.', 'The guideline prints the low white-count limit as "<400"; 4,000 is shown here as the evident intent.']},
+  dfi: {title: 'How severe is the foot infection?', rule: 'Infected = 2 or more local signs (swelling, redness beyond 0.5 cm, tenderness, warmth, pus). Mild: skin and subcutaneous tissue only, redness under 2 cm. Moderate: redness 2 cm or more, or deeper tissue. Severe: 2 or more systemic signs.', src: 'IWGDF/IDSA 2023 classification',
+    heads: {ery: 'Local extent', t38: 'Systemic signs (2 or more = severe)', recent: 'Modifiers'},
+    items: [['ery', 'Redness 2 cm or more from the wound edge'], ['deep', 'Deeper than subcutaneous tissue: tendon, muscle, joint or bone'], ['t38', 'Temperature above 38 or under 36 °C'], ['hr', 'Heart rate above 90'], ['rr', 'Respiratory rate above 20, or PaCO2 under 32'], ['wbc', 'WBC above 12,000 or under 4,000, or more than 10% bands'], ['recent', 'Antibiotics recently'], ['isch', 'Ischaemic limb, necrosis or gas']],
+    pick: function(t){ var s = cnt(t, ['t38', 'hr', 'rr', 'wbc']), g = s >= 2 ? 'Severe' : (t.ery || t.deep) ? 'Moderate' : 'Mild'; if (t.isch) return {v: 'isch', text: (g === 'Mild' ? 'Moderate or severe' : g) + ' · ischaemia, necrosis or gas'}; if (g === 'Mild') return {v: 'mild', text: t.recent ? 'Mild · after recent antibiotics the guideline uses amoxicillin-clavulanate (see More)' : 'Mild'}; return {v: t.recent ? 'recent' : 'mod', text: g + (t.recent ? ' · recent antibiotics' : '')}; },
+    tips: ['Measure the redness from the wound edge with a ruler.', 'Probe the ulcer base with a sterile blunt metal probe: hard, gritty contact is a positive probe-to-bone test.', 'Fever and a raised white count are absent in many limb-threatening infections; normal values do not make it mild.', 'Take the dressing down yourself. Feel the pulses.']},
+  iai: {title: 'Lower or higher risk?', rule: 'Higher risk = sepsis or septic shock, or APACHE II 10 or more; health-care-associated infection is handled as higher risk.', src: 'Surgical Infection Society 2024',
+    heads: {},
+    items: [['sepsis', 'Sepsis or septic shock'], ['apache', 'APACHE II 10 or more (if calculated)'], ['hca', 'Health-care-associated: recent operation or admission, or onset more than 48 hours into a hospital stay']],
+    pick: function(t){ var k = cnt(t, ['sepsis', 'apache', 'hca']); return {v: k ? 'high' : 'low', text: k ? 'Higher risk' : 'Community-acquired, lower risk'}; },
+    tips: ['APACHE II needs 12 physiological values and is rarely calculated on the ward; any organ dysfunction or need for vasopressors places the patient in the higher-risk group without it.', 'Also weigh: extremes of age, serious comorbidity, diffuse peritonitis, delayed or incomplete source control, and risk of resistant organisms.']},
+  bil: {title: 'Which Tokyo grade (cholangitis)?', rule: 'Grade III = any organ dysfunction. Grade II = any 2 of the five items. Grade I = neither.', src: 'Tokyo Guidelines 2018 severity grading',
+    heads: {cv: 'Grade III: organ dysfunction', wbc: 'Grade II: any two', hca: 'Setting'},
+    items: [['cv', 'Hypotension needing dopamine 5 µg/kg/min or more, or any norepinephrine'], ['neuro', 'Disturbed consciousness'], ['resp', 'PaO2/FiO2 under 300'], ['renal', 'Oliguria, or creatinine above 2.0 mg/dL'], ['inr', 'INR above 1.5'], ['plt', 'Platelets under 100,000'], ['wbc', 'WBC above 12,000 or under 4,000'], ['fever', 'Fever 39 °C or higher'], ['age', 'Age 75 or older'], ['bili', 'Total bilirubin 5 mg/dL or more'], ['alb', 'Albumin under 0.7 times the lower limit of normal'], ['hca', 'Health-care-associated infection']],
+    pick: function(t){ var o3 = cnt(t, ['cv', 'neuro', 'resp', 'renal', 'inr', 'plt']), o2 = cnt(t, ['wbc', 'fever', 'age', 'bili', 'alb']); if (o3 || t.hca) return {v: 'g3', text: (o3 ? 'Grade III · ' + o3 + ' organ system' + (o3 > 1 ? 's' : '') : 'Health-care-associated') + (o3 && t.hca ? ', health-care-associated' : '')}; return o2 >= 2 ? {v: 'g2', text: 'Grade II · ' + o2 + ' of 5'} : {v: 'g1', text: 'Grade I · ' + o2 + ' of 5 grade II items'}; },
+    tips: ['Grade II and III cholangitis need biliary drainage, not only antibiotics.', 'Cholecystitis is graded differently: grade III uses the same organ-dysfunction list; grade II is any of WBC above 18,000, a palpable tender right-upper-quadrant mass, symptoms for more than 72 hours, or marked local inflammation.']},
+  sbp: {title: 'Community or nosocomial?', rule: 'Any tick moves the patient to the broader regimen.', src: 'AASLD 2021',
+    heads: {},
+    items: [['noso', 'Diagnosed more than 48 hours after admission'], ['exp', 'Recent hospitalisation or broad-spectrum antibiotics, or on SBP prophylaxis'], ['mdr', 'A resistant organism grown before'], ['icu', 'Critically ill']],
+    pick: function(t){ var k = cnt(t, ['noso', 'exp', 'mdr', 'icu']); return {v: k ? 'noso' : 'ca', text: k ? 'Nosocomial or resistant-organism risk' : 'Community-acquired, low risk of resistance'}; },
+    tips: ['Tap before the first dose whenever that does not delay it.', 'Suspect a perforation (secondary peritonitis) with more than one organism, or ascitic fluid with two of: protein above 1 g/dL, glucose under 50 mg/dL, LDH above the serum upper limit.']},
+  men: {title: 'Which meningitis group?', rule: 'The group sets whether Listeria or hospital organisms need cover.', src: 'IDSA 2004',
+    heads: {},
+    items: [['age', 'Age over 50'], ['immuno', 'Immunocompromised (HIV, transplant, steroids, chemotherapy) or alcohol use disorder'], ['nsg', 'Recent neurosurgery, penetrating head trauma, or a CSF shunt']],
+    pick: function(t){ if (t.nsg) return {v: 'nsg', text: 'After neurosurgery, trauma or shunt'}; return (t.age || t.immuno) ? {v: 'old', text: 'Listeria risk · age over 50 or immunocompromised'} : {v: 'young', text: 'Age under 50, immunocompetent'}; },
+    tips: ['Never wait for CT or lumbar puncture to give the first dose.']},
+  line: {title: 'How sick, and is Candida likely?', rule: 'Gram-negative cover is added for the unstable patient; Candida cover when septic with a risk factor.', src: 'IDSA 2009',
+    heads: {septic: 'Unstable', tpn: 'Candida risk'},
+    items: [['septic', 'Sepsis or shock'], ['anc', 'Neutropenia'], ['fem', 'Femoral line'], ['gnf', 'A known gram-negative focus'], ['tpn', 'Parenteral nutrition'], ['abx', 'Prolonged broad-spectrum antibiotics'], ['heme', 'Hematologic malignancy or transplant'], ['multi', 'Candida growing at more than one site']],
+    pick: function(t){ var c = cnt(t, ['tpn', 'abx', 'heme', 'multi', 'fem']); if (t.septic && c) return {v: 'cand', text: 'Septic with ' + c + ' Candida risk factor' + (c > 1 ? 's' : '')}; return cnt(t, ['septic', 'anc', 'fem', 'gnf']) ? {v: 'ill', text: 'Unstable or high risk: gram-negative cover added'} : {v: 'std', text: 'Stable'}; },
+    tips: ['Look for pus at the exit site and tenderness along the tunnel.', 'Draw one culture from the line and one from a peripheral vein at the same time; the line bottle turning positive 2 hours or more before the peripheral one points to the line.']},
+  cdi: {title: 'Which episode?', rule: 'Severe (WBC 15,000 or more, or creatinine above 1.5) is treated with the same drugs as non-severe. Fulminant disease is not.', src: 'IDSA/SHEA 2021',
+    heads: {hypo: 'Fulminant'},
+    items: [['hypo', 'Hypotension or shock'], ['ileus', 'Ileus'], ['mega', 'Megacolon'], ['rec', 'A previous episode (this is a recurrence)']],
+    pick: function(t){ if (cnt(t, ['hypo', 'ileus', 'mega'])) return {v: 'fulm', text: 'Fulminant'}; return t.rec ? {v: 'rec', text: 'Recurrence · first-recurrence regimen shown; later recurrences are in More'} : {v: 'init', text: 'Initial episode'}; },
+    tips: ['Examine the abdomen for distension and absent bowel sounds; diarrhea can stop when ileus sets in.', 'Do not test or treat without diarrhea.']}
+};
+
+/* Oral step-down. Returns null (no card), {none: text}, or {gate, rx: drug keys, notes, tier, why}. */
+var EQUAL = {lvx: 1, mox: 1, cip: 0, lzd: 1, mtz: 1, sxt: 1, dox: 1, flu: 1};
+function stepdown(id, v, p, o){
+  var G = ['Clinically improving', 'Taking and absorbing oral medication (no vomiting, ileus or high-dose vasopressors)', 'An effective oral drug exists for the organism grown or expected', 'No reason to stay IV: S. aureus in the blood, endocarditis, CNS infection, or an undrained collection'];
+  var s = {gate: G, rx: [], notes: [], tier: '', why: ''}, fqRx = o.rx.indexOf('levofloxacin') >= 0 || o.rx.indexOf('ciproIV') >= 0;
+  function done(){
+    var cut = [];
+    s.rx = s.rx.filter(function(k){ var D = DRUGS[k]; if (p.allergy === 'severe' && BETA[k]){ cut.push(D.n); return false; } if (p.allergy !== 'none' && D.pcn){ cut.push(D.n); return false; } if (k === 'tmpsmx' && NOTMP(p)){ cut.push(D.n); return false; } if (p.preg && (D.fq || D.tet || D.sulfa || D.azole)){ cut.push(D.n); return false; } return true; });
+    if (cut.length) s.notes.unshift('Left out for this patient (allergy, kidney function or pregnancy): ' + cut.filter(function(x, i){ return cut.indexOf(x) === i; }).join(', ') + '.');
+    if ((p.allergy === 'low' || p.allergy === 'ana') && s.rx.indexOf('cephalexin') >= 0) s.notes.unshift('Cephalexin shares a side chain with ampicillin and amoxicillin: avoid it if either caused the reaction' + (p.allergy === 'ana' ? ', and give an oral cephalosporin after penicillin anaphylaxis only after allergy review.' : '.'));
+    function hasK(k){ return s.rx.indexOf(k) >= 0; }
+    if (s.need && !s.need.some(hasK)) s.rx = [];
+    if (s.partner && hasK('metronidazole') && !s.partner.some(hasK)) s.rx = s.rx.filter(function(k){ return k !== 'metronidazole'; });
+    s.notes = s.notes.map(function(x){ return typeof x === 'function' ? x(hasK) : x; }).filter(Boolean);
+    if (!s.rx.length){ s.notes = s.notes.filter(function(x){ return /^Left out/.test(x); }); s.notes.push('No listed oral regimen fits this patient; stay IV and choose with pharmacy and infectious diseases.'); }
+    var eq = s.rx.some(function(k){ return EQUAL[DCLASS[k]]; }), bl = s.rx.some(function(k){ return BETA[k]; });
+    if (!s.why) s.why = bl && !eq ? 'Oral beta-lactams reach lower levels than IV, which is why they wait until the patient is improving and why full doses are used.' : 'Several of these tablets reach the same blood level as the infusion, so the switch changes the route and not the treatment.';
+    if (!s.rx.length) s.why = ''; else s.notes.push('The oral drug finishes the same course; it does not add days.');
+    return s;
+  }
+  switch (id){
+  case 'cap':
+    s.gate = ['Temperature 37.8 °C or less', 'Heart rate 100 or less and respiratory rate 24 or less', 'Systolic pressure 90 or more', 'Oxygen saturation 90% or more (or back to baseline)', 'Eating, and thinking normally'];
+    if (fqRx || p.allergy === 'severe') s.rx = ['levofloxacin']; else if (pcn(p)) s.rx = ['cefpodoxime', 'azithromycin']; else s.rx = ['amoxclav', 'azithromycin', 'levofloxacin'];
+    s.notes = [function(h){ return (h('amoxclav') || h('cefpodoxime')) ? 'Pair the oral beta-lactam with azithromycin to finish its course' + (h('levofloxacin') ? ', or use levofloxacin alone.' : '.') : ''; },
+      p.allergy === 'none' ? 'Pneumococcus grown and susceptible: amoxicillin ' + dose('amoxicillin', p).text + '.' : '',
+      function(h){ return 'MRSA grown: linezolid ' + dose('linezolid', p).text + '. Pseudomonas grown: ' + (h('levofloxacin') ? 'levofloxacin, only if susceptible.' : 'no oral option is listed for this patient.'); }];
+    s.need = ['amoxclav', 'cefpodoxime', 'levofloxacin'];
+    s.tier = 'ATS/IDSA 2019: switch to the same agent or the same drug class; the guideline gives no step-down list. Doses are its oral regimens. It names the stability components; the numbers are from Halm 2002.';
+    s.why = 'Once vital signs settle, deterioration is uncommon, and the day of stability sets the rest of the course.';
+    return done();
+  case 'hap':
+    s.rx = ['levofloxacin', 'linezolid', 'amoxclav']; s.byOrg = true;
+    s.notes = [function(h){ return 'Choose by culture: ' + [h('levofloxacin') ? 'levofloxacin for susceptible gram-negative rods' : '', h('linezolid') ? 'linezolid for MRSA' : '', h('amoxclav') ? 'amoxicillin-clavulanate for susceptible enteric rods or MSSA' : ''].filter(Boolean).join(', ') + '.' + (h('levofloxacin') || h('amoxclav') ? '' : ' Gram-negative rods: no oral option is listed for this patient; stay IV.'); }];
+    s.tier = 'The IDSA/ATS 2016 guideline names no oral step-down. Expert practice.';
+    return done();
+  case 'uti':
+    if (v === 'cyst' || v === 'cpo') return null;
+    s.rx = ['ciproPO', 'levofloxacin', 'tmpsmx', 'amoxclav', 'cefpodoxime'];
+    s.notes = [function(h){ var pref = [(h('ciproPO') || h('levofloxacin')) ? 'a fluoroquinolone' : '', h('tmpsmx') ? 'TMP-SMX' : ''].filter(Boolean), alt = h('amoxclav') || h('cefpodoxime');
+        return (pref.length ? 'The guideline lists ' + pref.join(' or ') + ' for oral treatment when the isolate is susceptible' : 'Fluoroquinolones and TMP-SMX are left out for this patient') + (alt ? '; oral beta-lactams are alternatives, to be used cautiously and at optimised doses.' : '.'); },
+      function(h){ var d = [h('tmpsmx') ? 'TMP-SMX one double-strength tablet q12h' : '', h('cefpodoxime') ? 'cefpodoxime 200–400 mg q12h' : '', h('amoxclav') ? 'amoxicillin-clavulanate 875 mg q8–12h' : ''].filter(Boolean); return d.length ? 'Doses the guideline lists for urinary infection (normal kidney function): ' + d.join('; ') + '.' : ''; },
+      'This applies with gram-negative bacteremia from the urinary tract too.', 'Not nitrofurantoin or oral fosfomycin.'];
+    if (p.esbl) s.notes.unshift('ESBL history: oral options are limited to what the isolate is susceptible to; otherwise finish IV.');
+    s.gate = G.slice(0, 3);
+    s.tier = 'IDSA 2025 (conditional recommendation)';
+    return done();
+  case 'ssti':
+    if (v === 'abs') return null;
+    if (v === 'nec') return {none: 'No oral step-down until debridement is complete and the patient is stable; then by operative cultures.'};
+    if (v === 'cell'){ s.rx = p.allergy === 'severe' ? ['clindamycinPO', 'linezolid'] : p.mrsa ? ['cephalexin', 'tmpsmx', 'doxycycline', 'clindamycinPO', 'linezolid'] : ['cephalexin', 'penvk', 'clindamycinPO', 'linezolid'];
+      s.notes = ['Switch when afebrile and the marked border is receding, usually at 24 to 48 hours.', function(h){ return p.mrsa ? (function(){ var m = [h('tmpsmx') ? 'TMP-SMX' : '', h('doxycycline') ? 'doxycycline' : ''].filter(Boolean), solo = [h('clindamycinPO') ? 'clindamycin' : '', 'linezolid'].filter(Boolean).join(' or '); return 'To cover both streptococci and MRSA by mouth: ' + solo + ' alone' + (m.length && h('cephalexin') ? ', or ' + m.join(' or ') + ' together with cephalexin. ' + (m[0] === 'doxycycline' ? 'Doxycycline' : m.join(' and ')) + (m.length > 1 ? ' are' : ' is') + ' not reliable against streptococci alone.' : '.'); })() : (h('linezolid') && !h('cephalexin') ? 'Without a beta-lactam: clindamycin or linezolid, by susceptibility.' : ''); }]; }
+    else { s.rx = ['tmpsmx', 'doxycycline', 'clindamycinPO', 'linezolid', 'cephalexin']; s.notes = [v === 'cellsev' ? 'Only after necrotizing infection is excluded. Choose by culture.' : 'After drainage. Choose by culture: an MRSA-active drug from the list for MRSA; cephalexin for MSSA when a beta-lactam can be given.']; }
+    s.tier = 'Oral agents and doses: IDSA 2014 Table 2. Timing is expert practice.';
+    return done();
+  case 'dfi':
+    if (v === 'mild') return null;
+    s.rx = ['amoxclav', 'tmpsmx', 'doxycycline', 'linezolid', 'ciproPO', 'metronidazole'];
+    s.gate = ['Systemic signs have resolved', 'Source controlled: drained or debrided as needed', 'Taking and absorbing oral medication', 'A deep culture is available to guide the choice'];
+    s.need = ['amoxclav']; s.partner = ['ciproPO'];
+    s.notes = [function(h){ var m = [h('tmpsmx') ? 'TMP-SMX' : '', h('doxycycline') ? 'doxycycline' : ''].filter(Boolean); return ['Base: amoxicillin-clavulanate.', m.length ? 'MRSA: add ' + m.join(' or ') + ', or linezolid.' : 'MRSA: add linezolid.', h('ciproPO') ? 'Pseudomonas grown: ciprofloxacin' + (h('metronidazole') ? '; metronidazole adds anaerobic cover to it.' : '.') : ''].filter(Boolean).join(' '); }];
+    s.tier = 'Drug classes: IWGDF/IDSA 2023 Table 4 (the guideline gives no doses). The specific oral choices are expert practice.';
+    return done();
+  case 'iai':
+    s.rx = ['ciproPO', 'metronidazole', 'amoxclav'];
+    s.gate = ['The gut works', 'Source control is adequate', 'Clinically improving'];
+    s.need = ['ciproPO', 'amoxclav']; s.partner = ['ciproPO'];
+    s.notes = [p.esbl ? 'ESBL history: fluoroquinolones and amoxicillin-clavulanate are unreliable; finish IV unless the isolate is proven susceptible.' : '', function(h){ return [h('ciproPO') ? 'Ciprofloxacin plus metronidazole, given together, is the regimen the guideline names.' : '', h('amoxclav') ? 'Amoxicillin-clavulanate alone is an expert-practice alternative; the guideline does not name it.' : ''].filter(Boolean).join(' '); }, 'Finish the 4-day course; the switch does not extend it.'];
+    s.tier = 'Ciprofloxacin plus metronidazole: Surgical Infection Society 2024 (Grade 1-B). Amoxicillin-clavulanate: expert practice.';
+    return done();
+  case 'bil':
+    s.rx = ['amoxclav', 'cephalexin', 'ciproPO', 'levofloxacin', 'metronidazole'];
+    s.gate = ['Can tolerate oral feeding', 'Source controlled (drained)', 'Isolate susceptible to the oral drug'];
+    s.need = ['amoxclav', 'cephalexin', 'ciproPO', 'levofloxacin'];
+    s.partner = ['cephalexin', 'ciproPO', 'levofloxacin'];
+    s.notes = [function(h){ var w = [h('cephalexin') ? 'cephalexin' : '', (h('ciproPO') || h('levofloxacin')) ? 'a fluoroquinolone' : ''].filter(Boolean); return h('metronidazole') && w.length ? 'Metronidazole is only an addition: add it to ' + w.join(' or ') + ' when bowel has been joined to the bile duct.' : ''; }];
+    s.tier = 'Tokyo Guidelines 2018 Table 6 (agents; the guideline gives no doses)';
+    return done();
+  case 'sbp':
+    s.rx = ['ciproPO', 'amoxclav'];
+    s.gate = ['Improving, and the 48-hour tap shows a neutrophil fall of 25% or more', 'Taking and absorbing oral medication', 'The organism grown is susceptible to the oral drug (or nothing grew in community-acquired infection)', 'Not on fluoroquinolone prophylaxis (for ciprofloxacin)'];
+    s.need = ['ciproPO', 'amoxclav'];
+    if (v === 'noso' || p.esbl) s.notes.unshift((p.esbl ? 'ESBL history' : 'Nosocomial or resistant-organism risk') + ': these oral drugs are used only if the isolate is proven susceptible; otherwise finish IV.');
+    s.tier = 'The AASLD 2021 guidance names no oral step-down. Expert practice.';
+    return done();
+  case 'men': return {none: 'No oral step-down: IV for the whole course.'};
+  case 'sepsis': return {none: 'Step-down follows the source once it is found.'};
+  case 'line':
+    s.rx = ['levofloxacin', 'tmpsmx', 'linezolid', 'fluconazole']; s.byOrg = true;
+    s.gate = ['Organism and susceptibilities known', 'Line removed or dealt with, and no metastatic infection', 'Clinically improving, and repeat cultures negative where they are needed', 'Taking and absorbing oral medication'];
+    s.notes = [function(h){ var g = [h('levofloxacin') ? 'a fluoroquinolone' : '', h('tmpsmx') ? 'TMP-SMX' : ''].filter(Boolean); return g.length ? 'Gram-negative rods, uncomplicated: ' + g.join(' or ') + ' if susceptible; 7 days from the first active dose (expert practice outside a urinary source).' : 'Gram-negative rods: the usual oral agents are left out for this patient; stay IV or choose by susceptibility with pharmacy.'; },
+      'S. aureus: IV is the standard. In the SABATO trial (2024), low-risk patients switched to oral therapy after 5 to 7 days of IV for 14 days in total, with similar outcomes; only about 4% of screened patients qualified. Decide with infectious diseases.',
+      'Coagulase-negative staphylococci with the line out: linezolid can finish 5 to 7 days (expert practice).',
+      p.preg ? 'Candida in pregnancy: fluconazole is avoided, especially in the first trimester; choose with infectious diseases and obstetrics (IDSA 2016).' : 'Candida: fluconazole once the patient is stable, the isolate is fluconazole-susceptible, and repeat blood cultures are negative, usually at day 5 to 7 (IDSA 2016).'];
+    s.tier = 'IDSA 2016 candidiasis; SABATO trial 2024; otherwise expert practice';
+    s.why = 'S. aureus seeds valves, bone and joints, so oral switch has trial support only in a small low-risk group' + (p.preg ? '.' : '; for Candida the echinocandin is started because it kills faster and fluconazole finishes once the yeast is proven susceptible.');
+    return done();
+  }
+  return null;
+}
+</script>
+
 <script id="ui">
 function $(id){ return document.getElementById(id); }
 function num(id){ var v = $(id).value.trim().replace(',', '.'); if (v === '') return null; var n = parseFloat(v); return isNaN(n) ? null : n; }
 function esc(s){ return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;'); }
 function patient(){ return {crcl: num('crcl'), wt: num('wt'), allergy: $('allergy').value, hd: $('hd').checked, mrsa: $('mrsa').checked, pseudo: $('pseudo').checked, esbl: $('esbl').checked, preg: $('preg').checked}; }
-var cur = {syn: null, v: {}};
+var cur = {syn: null, v: {}, t: {}, sum: {}, pick: true};
+
+var REG = [];
+function synById(id){ return SYN.filter(function(s){ return s.id === id; })[0]; }
+var SITENAME = {brain: 'brain', lungs: 'lungs', blood: 'bloodstream', bile: 'liver and bile ducts', gut: 'abdomen', colon: 'colon', urinary: 'kidneys and bladder', skin: 'skin', foot: 'foot', body: 'whole body'};
+var ORGAN = {
+  brain: '<ellipse class="of" cx="60" cy="18" rx="11" ry="8"/>',
+  lungs: '<ellipse class="of" cx="48" cy="80" rx="10" ry="17"/><ellipse class="of" cx="72" cy="80" rx="10" ry="17"/>',
+  blood: '<path class="os" stroke-width="3" d="M70 50 Q70 68 62 80"/><circle class="of" cx="60" cy="86" r="7"/>',
+  bile: '<ellipse class="of" cx="50" cy="106" rx="13" ry="8"/>',
+  gut: '<rect class="of" x="45" y="112" width="30" height="30" rx="9"/>',
+  colon: '<path class="os" stroke-width="6" d="M47 142 L47 116 L73 116 L73 142"/>',
+  urinary: '<ellipse class="of" cx="47" cy="112" rx="5" ry="8"/><ellipse class="of" cx="73" cy="112" rx="5" ry="8"/><circle class="of" cx="60" cy="144" r="6"/>',
+  foot: '<circle class="of" cx="46" cy="238" r="10"/>', skin: '', body: ''
+};
+function bodySvg(site){
+  var all = site === 'body' ? ' all' : '';
+  return '<svg class="bodyfig" viewBox="0 0 120 250" role="img" aria-label="' + (site ? 'Body figure with the ' + SITENAME[site] + ' highlighted' : 'Body figure') + '">' +
+    '<g class="bf' + all + '"><circle cx="60" cy="22" r="17"/><path d="M36 48 Q60 40 84 48 L88 62 L82 150 Q60 158 38 150 L32 62 Z"/></g>' +
+    '<g class="bs' + all + '"><path class="arm' + (site === 'skin' ? ' hot' : '') + '" d="M32 58 Q18 70 16 112 L15 140"/><path class="arm" d="M88 58 Q102 70 104 112 L105 140"/><path class="leg' + (site === 'skin' ? ' hot' : '') + '" d="M48 152 L46 236"/><path class="leg" d="M72 152 L74 236"/></g>' +
+    (site ? ORGAN[site] : '') + '</svg>';
+}
+
+function covGrid(o, withId){
+  var info = siteInfo(o.id, o.vid); if (!info) return '';
+  var keys = o.rx.filter(function(k){ return DCLASS[k]; }), cols = info.bugs; if (!keys.length) return '';
+  var tpl = 'grid-template-columns:84px repeat(' + cols.length + ',minmax(0,1fr))';
+  var M = keys.map(function(k){ return cols.map(function(b){ return cover(k, b); }); });
+  var best = cols.map(function(b, i){ return Math.max.apply(null, M.map(function(r){ return r[i]; })); });
+  function cell(v, gap){ return '<div class="cell' + (v === 2 ? ' on' : gap ? ' gap' : '') + '">' + (v === 1 ? '<i></i>' : '') + '<span class="sr">' + (v === 2 ? 'covered' : v === 1 ? 'partly covered' : 'not covered') + '</span></div>'; }
+  function row(name, vals, gap){ return '<div class="covrow" style="' + tpl + '"><span class="covn">' + name + '</span>' + vals.map(function(v){ return cell(v, gap && v === 0); }).join('') + '</div>'; }
+  var h = '<div class="cov"' + (withId ? ' id="coverage"' : '') + '><p class="label" style="margin:0 0 4px">Who is covered</p><div class="covrow" style="' + tpl + '"><span></span>' + cols.map(function(b){ return '<span class="covh">' + esc(BUGS[b][0]) + '</span>'; }).join('') + '</div>';
+  keys.forEach(function(k, i){ h += row(esc(k === 'VANCO' ? 'Vancomycin' : DRUGS[k].n), M[i], keys.length === 1); });
+  if (keys.length > 1) h += row('<b>Together</b>', best, true);
+  var gaps = cols.filter(function(b, i){ return best[i] === 0; }), part = cols.filter(function(b, i){ return best[i] === 1; });
+  var cap = [];
+  if (gaps.length) cap.push('Not covered: ' + gaps.map(function(b){ return info.gap[b] || BUGS[b][2]; }).join('; ') + '.');
+  if (part.length) cap.push('Partly covered: ' + part.map(function(b){ return BUGS[b][2]; }).join(', ') + '.');
+  cap.push('Filled = covers, half = partial or variable, dashed = not covered. Usual activity, not your antibiogram.');
+  return h + '<p class="note" style="margin:8px 0 0">' + esc(cap.join(' ')) + '</p></div>';
+}
 
 function orderCard(o, withSelect, S){
   var h = '<div class="card res order" id="order"><p class="label">Order · ' + esc(o.syn) + '</p>';
-  if (withSelect && S.vars.length > 1){ h += '<div class="field" style="margin-bottom:10px"><label for="variant">Setting and severity</label><select id="variant">' + S.vars.map(function(v){ return '<option value="' + v.id + '"' + (v.label === o.variant ? ' selected' : '') + '>' + esc(v.label) + '</option>'; }).join('') + '</select></div>'; }
+  if (withSelect && S.vars.length > 1){ h += '<div class="field" style="margin-bottom:8px"><label for="variant">Setting and severity</label><select id="variant">' + S.vars.map(function(v){ return '<option value="' + v.id + '"' + (v.label === o.variant ? ' selected' : '') + '>' + esc(v.label) + '</option>'; }).join('') + '</select></div>';
+    if (TELL[S.id]) h += '<button class="tellbtn" type="button" data-tell="1" id="howtotell"><span><b>How to tell</b> · ' + esc(cur.sum[S.id] || 'tick the criteria and the bucket is set for you') + '</span><span class="go">Check</span></button>'; }
   else h += '<p class="note" style="margin:0 0 8px">' + esc(o.variant) + '</p>';
   o.alerts.forEach(function(a){ h += '<div class="stopbox"><b>Stop.</b> ' + esc(a) + '</div>'; });
-  o.lines.forEach(function(l){ h += '<div class="rx"><b>' + esc(l.name) + ' ' + esc(l.text) + '</b>' + (l.why || l.x ? '<span>' + esc([l.why, l.x].filter(Boolean).join(' · ')) + '</span>' : '') + '</div>'; });
+  o.lines.forEach(function(l){ h += '<div class="rx"><b>' + (DCLASS[l.key] ? '<button class="dn" type="button" data-drug="' + l.key + '"' + (withSelect ? ' data-live="1"' : '') + '>' + esc(l.name) + '</button>' : esc(l.name)) + ' ' + esc(l.text) + '</b>' + (l.why || l.x ? '<span>' + esc([l.why, l.x].filter(Boolean).join(' · ')) + '</span>' : '') + '</div>'; });
   if (o.crclMissing) h += '<div class="guard">CrCl not entered: doses shown are for normal kidney function.</div>';
   o.guards.forEach(function(g){ h += '<div class="guard">' + esc(g) + '</div>'; });
-  h += '<dl class="kv"><dt>First</dt><dd>' + esc(o.first) + '</dd><dt>Narrow</dt><dd>' + esc(o.narrow) + '</dd><dt>Stop</dt><dd>' + esc(o.stop) + '</dd>';
-  if (o.also.length) h += '<dt>Also</dt><dd>' + o.also.map(esc).join('<br>') + '</dd>';
-  h += '</dl><p class="whyline"><b>Why:</b> ' + esc(o.why) + '</p>';
+  h += covGrid(o, withSelect);
+  h += '<p class="whyline"><b>Why:</b> ' + esc(o.why) + '</p>';
+  var sd = stepdown(o.id, o.vid, o.p, o), oral = '';
+  if (sd && sd.none) oral = esc(sd.none);
+  else if (sd){ sd.p = o.p; sd.syn = o.syn; REG.push(sd);
+    oral = (sd.rx.length ? (sd.byOrg ? 'Chosen by organism once it is known: ' : 'When the switch criteria are met: ') + esc(sd.rx.map(function(k){ var d = dose(k, o.p); return d.name + ' ' + d.text; }).join('; ')) + '.' : 'No listed oral regimen fits this patient: stay IV and choose with pharmacy and infectious diseases.') + '<br><button class="lnk" type="button" data-sd="' + (REG.length - 1) + '">Switch criteria and choices</button>'; }
+  else if (o.lines.length && o.lines.every(function(l){ return /oral/.test(l.text) && !/IV/.test(l.text); })) oral = 'Oral from the start.';
+  h += '<ol class="tl"' + (withSelect ? ' id="course"' : '') + '><li><span class="tk">First</span><div>' + esc(o.first) + '</div></li><li><span class="tk">Narrow</span><div>' + esc(o.narrow) + '</div></li>' + (oral ? '<li><span class="tk">Oral</span><div>' + oral + '</div></li>' : '') + '<li><span class="tk">Stop</span><div>' + esc(o.stop) + '</div></li></ol>';
+  if (o.also.length) h += '<dl class="kv"><dt>Also</dt><dd>' + o.also.map(esc).join('<br>') + '</dd></dl>';
   var more = o.more.slice(); if (o.allergyNote) more.unshift(o.allergyNote);
-  h += '<details><summary>More</summary>' + more.map(function(m){ return '<p>' + esc(m) + '</p>'; }).join('') + '<span class="tier">' + esc(o.tier) + '</span></details></div>';
+  h += '<details><summary>More</summary>' + more.map(function(m){ return '<p>' + esc(m) + '</p>'; }).join('') + '<p>Tap a drug name for how it works and what it covers.</p><span class="tier">' + esc(o.tier) + '</span></details></div>';
   return h;
 }
 
 function renderList(){
-  $('synlist').innerHTML = SYN.map(function(s){ return '<button class="syn" type="button" id="syn-' + s.id + '" data-syn="' + s.id + '" aria-pressed="' + (cur.syn === s.id) + '">' + esc(s.name) + '</button>'; }).join('');
+  var S = cur.syn && synById(cur.syn), info = S && siteInfo(S.id, cur.v[S.id] || S.vars[0].id);
+  var h = '<div class="mapgrid">' + bodySvg(info ? info.site : null) + '<div>';
+  if (S && !cur.pick){
+    h += '<p class="label" style="margin:0">' + esc(info.organ) + '</p><h2 class="synh" id="syn-' + S.id + '">' + esc(S.name) + '</h2><p class="label" style="margin:10px 0 6px">Usual pathogens</p><div>' + info.chips.map(function(c){ return '<span class="chip">' + esc(c) + '</span>'; }).join('') + '</div><p class="note" style="margin:2px 0 0">' + esc(info.changes) + '</p><button class="lnk" type="button" id="chg">Change syndrome</button>';
+  } else h += SYN.map(function(s){ return '<button class="syn" type="button" id="syn-' + s.id + '" data-syn="' + s.id + '" aria-pressed="' + (cur.syn === s.id) + '">' + esc(s.name) + '</button>'; }).join('');
+  $('synlist').innerHTML = h + '</div></div>';
 }
 function renderOrder(){
   if (!cur.syn){ $('out').innerHTML = '<p class="note">Choose a syndrome to see the order.</p>'; return; }
@@ -511,17 +878,87 @@ $('cases').addEventListener('click', function(e){
   box.innerHTML = orderCard(order(c.s, c.var, p), false).replace(' id="order"', ''); box.hidden = false; b.hidden = true;
 });
 
-$('synlist').addEventListener('click', function(e){ var b = e.target.closest('button[data-syn]'); if (!b) return; cur.syn = b.getAttribute('data-syn'); renderList(); renderOrder(); var el = $('order'); if (el) el.scrollIntoView({block: 'nearest'}); });
-$('out').addEventListener('change', function(e){ if (e.target.id === 'variant'){ cur.v[cur.syn] = e.target.value; renderOrder(); } });
+$('synlist').addEventListener('click', function(e){ if (e.target.closest('#chg')){ cur.pick = true; renderList(); return; } var b = e.target.closest('button[data-syn]'); if (!b) return; cur.syn = b.getAttribute('data-syn'); cur.pick = false; renderList(); renderOrder(); });
+$('out').addEventListener('change', function(e){ if (e.target.id === 'variant'){ cur.v[cur.syn] = e.target.value; delete cur.sum[cur.syn]; renderList(); renderOrder(); } });
 function all(){ renderOrder(); renderDoses(); }
 $('patient').addEventListener('input', all); $('patient').addEventListener('change', all);
 
 var VIEWS = ['order', 'doses', 'prac'];
 function showView(v){ VIEWS.forEach(function(x){ var on = x === v; $('p-' + x).hidden = !on; $('t-' + x).setAttribute('aria-selected', String(on)); }); }
 VIEWS.forEach(function(v){ $('t-' + v).addEventListener('click', function(){ showView(v); }); });
-function goHash(){ var id = decodeURIComponent(location.hash.slice(1)); if (!id) return; if (id.indexOf('syn-') === 0){ var s = id.slice(4); if (SYN.some(function(x){ return x.id === s; })){ showView('order'); cur.syn = s; renderList(); renderOrder(); } }
-  var el = $(id); if (!el) return; var sec = el.closest('section.view'); if (sec) showView(sec.id.slice(2)); requestAnimationFrame(function(){ el.scrollIntoView({block: 'start'}); }); }
+function goHash(){ var id = decodeURIComponent(location.hash.slice(1)); if (!id) return; if (id.indexOf('syn-') === 0){ var s = id.slice(4); if (SYN.some(function(x){ return x.id === s; })){ showView('order'); cur.syn = s; cur.pick = false; renderList(); renderOrder(); } }
+  var el = $(id) || (id.indexOf('syn-') === 0 ? $('syndromes') : null); if (!el) return; var sec = el.closest('section.view'); if (sec) showView(sec.id.slice(2)); requestAnimationFrame(function(){ el.scrollIntoView({block: 'start'}); }); }
 window.addEventListener('hashchange', goHash);
+/* Sheets: drug, bucket criteria, oral switch. */
+var lastFocus = null;
+function closeSheet(){ var d = $('scrim'); if (!d) return; d.parentNode.removeChild(d); if (lastFocus && document.contains(lastFocus)) lastFocus.focus(); }
+function openSheet(html, label){
+  closeSheet(); lastFocus = document.activeElement;
+  var d = document.createElement('div'); d.className = 'scrim'; d.id = 'scrim';
+  d.innerHTML = '<div class="sheet" role="dialog" aria-modal="true" aria-label="' + esc(label) + '" tabindex="-1"><button class="x" type="button" data-close="1">Close</button>' + html + '</div>';
+  document.body.appendChild(d); d.firstChild.focus();
+}
+var XNAME = {hf: 'H. influenzae', li: 'Listeria', nm: 'meningococcus', cd: 'C. difficile', ca: 'Candida', ec: 'E. coli in the bladder'};
+function drugSheet(key, live){
+  var C = CLS[DCLASS[key]], M = MOA[C.m], p = patient(), nm, txt = '';
+  if (key === 'VANCO' || key === 'vanco'){ nm = 'Vancomycin'; txt = vancoLoad(p).text + ' · maintenance by pharmacy'; }
+  else { var d = dose(key, p); nm = d.name; txt = d.text + (d.adj && d.why ? ' · ' + d.why : ''); }
+  var h = '<h2>' + esc(nm) + '</h2><p class="note" style="margin:2px 0 10px">' + esc(C.c) + '</p><p><b>How it works:</b> ' + esc(M[0]) + '</p>';
+  if (C.cov !== '000000000'){
+    h += '<p class="label" style="margin:12px 0 0">Covers</p><div class="strip">' + COLS.map(function(c, i){ var v = +C.cov.charAt(i); return '<div><div class="cell' + (v === 2 ? ' on' : '') + '">' + (v === 1 ? '<i></i>' : '') + '</div><span>' + c[1] + '<span class="sr">: ' + (v === 2 ? 'covered' : v === 1 ? 'partly covered' : 'not covered') + '</span></span></div>'; }).join('') + '</div>';
+    var miss = COLS.filter(function(c, i){ return C.cov.charAt(i) === '0'; }).map(function(c){ return COLFULL[c[0]]; });
+    if (miss.length) h += '<p class="note" style="margin:8px 0 0">Misses: ' + esc(miss.join(', ')) + '.</p>';
+  }
+  var also = Object.keys(C.x).filter(function(k){ return C.x[k] === 2; }).map(function(k){ return XNAME[k]; }), partly = Object.keys(C.x).filter(function(k){ return C.x[k] === 1; }).map(function(k){ return XNAME[k]; });
+  if (also.length || partly.length) h += '<p class="note" style="margin:6px 0 0">' + (also.length ? 'Also covers ' + esc(also.join(', ')) + '. ' : '') + (partly.length ? 'Partly: ' + esc(partly.join(', ')) + '.' : '') + '</p>';
+  h += '<p class="note" style="margin:6px 0 0">' + esc(C.note) + '</p>';
+  if (live) h += '<p style="margin:12px 0 0"><b>Dose for this patient:</b> <span class="mono">' + esc(txt) + '</span></p>';
+  if (M[1]) h += '<p style="margin:10px 0 0"><b>At the bedside:</b> ' + esc(M[1]) + '</p>';
+  h += '<span class="tier">Mechanism: FDA prescribing information · coverage is usual activity, not your antibiogram</span>';
+  openSheet(h, nm);
+}
+function tellBody(id){
+  var T = TELL[id], t = cur.t[id] || {}, r = T.pick(t);
+  return {res: '<b>' + esc(r.text) + '</b>' + (r.v ? '' : ' · no change to the order shown'), r: r};
+}
+function tellSheet(id){
+  var T = TELL[id], t = cur.t[id] || (cur.t[id] = {});
+  var h = '<h2>' + esc(T.title) + '</h2><p class="note" style="margin:4px 0 8px">' + esc(T.rule) + '</p>';
+  T.items.forEach(function(it){ if (T.heads[it[0]]) h += '<p class="label" style="margin:12px 0 4px">' + esc(T.heads[it[0]]) + '</p>'; h += '<label class="tick"><input type="checkbox" data-t="' + it[0] + '"' + (t[it[0]] ? ' checked' : '') + '>' + esc(it[1]) + '</label>'; });
+  h += '<div class="resbox" id="tellres" aria-live="polite">' + tellBody(id).res + '</div>';
+  h += '<p class="label" style="margin:14px 0 4px">At the bedside</p>' + T.tips.map(function(x){ return '<p style="margin:0 0 6px;font-size:14.5px">' + esc(x) + '</p>'; }).join('');
+  h += '<span class="tier">Criteria: ' + esc(T.src) + ' · bedside notes are expert practice</span>';
+  openSheet(h, T.title);
+}
+function stepSheet(i){
+  var s = REG[i]; if (!s) return;
+  var h = '<h2>Oral step-down</h2><p class="note" style="margin:2px 0 8px">' + esc(s.syn) + '</p><p class="label" style="margin:8px 0 4px">Switch when all are true</p>';
+  s.gate.forEach(function(g, n){ h += '<label class="tick"><input type="checkbox" data-g="' + n + '">' + esc(g) + '</label>'; });
+  h += '<div class="resbox" id="gateres" aria-live="polite" data-n="' + s.gate.length + '"><b>Not yet:</b> 0 of ' + s.gate.length + ' met.</div>';
+  h += (s.rx.length ? '<p class="label" style="margin:14px 0 4px">Oral choices</p>' : '') + s.rx.map(function(k){ var d = dose(k, s.p); return '<div class="rx"><b>' + esc(d.name + ' ' + d.text) + '</b>' + (d.adj && d.why ? '<span>' + esc(d.why) + '</span>' : '') + '</div>'; }).join('');
+  h += s.notes.map(function(x){ return '<p style="margin:8px 0 0;font-size:14.5px">' + esc(x) + '</p>'; }).join('');
+  h += (s.why ? '<p class="whyline"><b>Why:</b> ' + esc(s.why) + '</p>' : '') + '<span class="tier">' + esc(s.tier) + '</span>';
+  openSheet(h, 'Oral step-down');
+}
+document.addEventListener('click', function(e){
+  var b;
+  if (e.target.id === 'scrim' || e.target.closest('[data-close]')){ closeSheet(); return; }
+  if ((b = e.target.closest('[data-drug]'))){ drugSheet(b.getAttribute('data-drug'), !!b.getAttribute('data-live')); return; }
+  if (e.target.closest('[data-tell]')){ tellSheet(cur.syn); return; }
+  if ((b = e.target.closest('[data-sd]'))){ stepSheet(+b.getAttribute('data-sd')); return; }
+});
+document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeSheet(); });
+document.addEventListener('change', function(e){
+  var sc = $('scrim'); if (!sc || !sc.contains(e.target)) return;
+  if (e.target.hasAttribute('data-t')){
+    var id = cur.syn; cur.t[id][e.target.getAttribute('data-t')] = e.target.checked;
+    var b = tellBody(id); $('tellres').innerHTML = b.res; cur.sum[id] = b.r.text; if (b.r.v) cur.v[id] = b.r.v;
+    renderList(); renderOrder();
+  } else if (e.target.hasAttribute('data-g')){
+    var box = $('gateres'), n = +box.getAttribute('data-n'), k = sc.querySelectorAll('input[data-g]:checked').length;
+    box.innerHTML = k === n ? '<b>Criteria met:</b> switch to an oral choice below.' : '<b>Not yet:</b> ' + k + ' of ' + n + ' met.';
+  }
+});
 renderList(); renderOrder(); renderDoses(); renderCases(); goHash();
 </script>
 </body>
