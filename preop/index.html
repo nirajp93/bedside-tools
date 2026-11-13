@@ -363,7 +363,7 @@ const MEDS = [
  ['Statin','continue','Continue. Start one before surgery if the patient has an indication.','Stabilizes plaque through a period of inflammation and clotting.','','ACC/AHA 2024: continue (1)'],
  ['ACE inhibitor or ARB','adjust','For hypertension: holding it for 24 hours before surgery may reduce low blood pressure in the operating room. For heart failure with reduced EF: continuing is reasonable. Restart when the patient is stable.','With angiotensin blocked, anesthesia leaves little to defend blood pressure.','','ACC/AHA 2024: hold in hypertension (2b); continue in HFrEF (2a)'],
  ['Clonidine','continue','Continue if already taking it. Do not start it before surgery.','Stopping abruptly causes rebound hypertension; starting it lowered pressure without preventing events (POISE-2).','','ACC/AHA 2024: starting it (3: no benefit)'],
- ['Aspirin','adjust','Continue with a coronary stent if at all possible. For other secondary prevention, continuing may be reasonable when cardiac risk outweighs bleeding. Stop when taken for primary prevention. Do not start it for surgery.','POISE-2: starting or continuing aspirin raised bleeding without preventing heart attacks, outside the stent population.','When it is stopped, the interval is 4 to 7 days before surgery: platelet function recovers in about 4 days.','ACC/AHA 2024'],
+ ['Aspirin','adjust','Continue with a coronary stent if at all possible. For other secondary prevention, continuing may be reasonable when cardiac risk outweighs bleeding. Stop when taken for primary prevention. Do not start it for surgery.','POISE-2: starting or continuing aspirin raised bleeding without preventing heart attacks, outside the stent population.','When it is stopped, the interval is 4 to 7 days before surgery: platelet function recovers in about 4 days.','ACC/AHA 2024; CHEST 2022'],
  ['Clopidogrel','hold','Stop 5 days before, with cardiology input if there is a stent.','Irreversible platelet inhibition; early interruption risks stent thrombosis. See Timing.','','ACC/AHA 2024'],
  ['Ticagrelor','hold','Stop 3 to 5 days before, with cardiology input if there is a stent.','Reversible, so platelet function returns sooner than with clopidogrel.','','ACC/AHA 2024'],
  ['Prasugrel','hold','Stop 7 days before, with cardiology input if there is a stent.','The longest platelet effect of the three.','','ACC/AHA 2024'],
@@ -393,7 +393,7 @@ const WAITS = [
  ['Drug-eluting stent, stable coronary disease','No elective surgery in the first 30 days. Ideally 6 months.',1,6,'ACC/AHA 2024 (2a)'],
  ['Drug-eluting stent after an acute coronary syndrome','Ideally 12 months',1,12,'ACC/AHA 2024 (1)'],
  ['Heart attack without a stent','At least 60 days',2,0,'ACC/AHA 2014'],
- ['Ischemic stroke','At least 3 months; risk keeps falling to about 9 months',3,9,'ACC/AHA 2024 (2a); Jørgensen 2014']
+ ['Stroke or TIA','At least 3 months after the most recent event; risk keeps falling to about 9 months',3,9,'ACC/AHA 2024 (2a); Jørgensen 2014']
 ];
 
 const CHADS = [['Heart failure or LV dysfunction',1],['Hypertension',1],['Age 75 or older',2],['Diabetes',1],['Prior stroke, TIA or thromboembolism',2],['Vascular disease (MI, peripheral arterial disease, aortic plaque)',1],['Age 65 to 74',1],['Female sex',1]];
@@ -403,9 +403,9 @@ const W_VTE = ['Clot within the past 3 months','Severe thrombophilia: antiphosph
 
 const CASE = [
  ['What is her RCRI and estimated risk?','RCRI 1, for heart failure. Spine surgery is not RCRI high-risk surgery, metformin is not insulin, and creatinine is 0.85. That is about 6% by modern recalibrated estimates, which this tool treats as elevated (ACC/AHA draws its line at RCRI 2), so continue down the pathway.'],
- ['Does she need a stress test or an echo?','No. Before the myelopathy she climbed two flights without stopping, which is 4 METs. Her lungs are clear and she has no orthopnea, so her heart failure is compensated (name the 1+ edema and explain why it does not change that). An echo is for a change in status, or none within a year; hers was 8 months ago.'],
+ ['Does she need a stress test or an echo?','No. Before the myelopathy she climbed two flights without stopping, which is 4 METs. Her lungs are clear and she has no orthopnea, so her heart failure is compensated: the 1+ pedal edema is isolated, without orthopnea, rales or weight gain, and does not signal decompensation. An echo is for a change in status, or none within a year; hers was 8 months ago.'],
  ['Should surgery wait for anything?','Only for the INR. Her deficit is progressing, so delay risks permanent loss of hand function, and no test would change management.'],
- ['What happens to each home medication?','Continue metoprolol. Hold lisinopril for 24 hours before surgery, and furosemide and metformin on the morning. A statin is indicated and can be started. Cefazolin is acceptable with a rash-only amoxicillin history.'],
+ ['What happens to each home medication?','Continue metoprolol. Hold lisinopril for 24 hours before surgery (an EF of 45% is not reduced-EF heart failure, so the hypertension rule applies; continuing it is also acceptable), and furosemide and metformin on the morning. A statin is indicated and can be started. Cefazolin is acceptable with a rash-only amoxicillin history.'],
  ['Bridge her warfarin?','No. CHA₂DS₂-VASc is 5 with no high-risk feature. Bridging would add bleeding next to the spinal cord without preventing stroke.'],
  ['How do you get the INR down in time?','With under 5 days to surgery, stopping warfarin alone will not do it: give low-dose oral vitamin K and recheck. Agree the INR target with neurosurgery. Keep 4-factor PCC for an emergency.'],
  ['If she were on apixaban instead?','CrCl is about 70 and spine surgery is high bleeding risk: at least 2 full days off, and many spine and neuraxial protocols ask for 72 hours. No bridge; resume 48 to 72 hours after surgery when neurosurgery agrees.']
@@ -440,9 +440,9 @@ function pathway(inp){
   if(cap==='good') return {step:4, key:'capGood', tone:'ok', basis, cap, bm};
   if(bm==='normal') return {step:5, key:'bmNormal', tone:'ok', basis, cap, bm};
   if(cap==='none'&&bm==null) return {step:4, key:'assess', tone:'caution', basis, cap, bm};
-  if(!inp.change) return {step:6, key:'noTest', tone:'ok', basis, cap, bm};
+  if(!inp.change) return {step:5, key:'noTest', tone:'ok', basis, cap, bm};
   if(bm==null) return {step:5, key:'peptide', tone:'caution', basis, cap, bm};
-  return {step:6, key:'test', tone:'caution', basis, cap, bm};
+  return {step:5, key:'test', tone:'caution', basis, cap, bm};
 }
 /* PAUSE protocol (apixaban, rivaroxaban, dabigatran; edoxaban by extrapolation), lengthened to the ASRA interval when a spinal or epidural is planned. Returns days fully off before surgery, and resume day(s) after. */
 function doacPlan(drug, crcl, high, neuraxial){
@@ -482,7 +482,7 @@ checks('#rcriBox','r',RCRI,r=>esc(r[0])+'<small>'+esc(r[1])+'</small>');
 $$('#rcriBox .pts').forEach(p=>p.textContent='+1');
 checks('#dasiBox','d',DASI,r=>esc(r[0]));
 let urgency='elective', capSel='none';
-const STEPS=['Emergency?','Active cardiac condition?','Low risk?','Capacity 4 METs or more?','Natriuretic peptide normal?','Would a test change care?'];
+const STEPS=['Emergency?','Active cardiac condition?','Low risk?','Capacity 4 METs or more?','Peptide normal, or would a test change nothing?'];
 const OUT={
  emergency:['Proceed to surgery','Manage risk during and after the operation: monitoring, heart-rate control, avoid hypotension, and a postoperative troponin in a high-risk patient. If a cardiac condition is active, involve cardiology at the same time.','there is no time for testing to change anything, so the work shifts to the operating room and recovery.'],
  active:['Delay elective surgery and treat the cardiac condition','Evaluate and treat it as you would without surgery, then reassess.','an unstable heart is the strongest predictor of a perioperative event, and it is the one thing that can be fixed first.'],
@@ -504,7 +504,7 @@ function riskRender(){
   box.className='card answer '+p.tone;
   const stats='<div class="stats"><div class="stat"><small>RCRI</small><b>'+pts+'</b></div><div class="stat"><small>Lee 1999</small><b>'+pct(rr.lee)+'</b></div><div class="stat"><small>Recalibrated</small><b>'+pct(rr.recal)+'</b></div>'+(dAny?'<div class="stat"><small>DASI</small><b>'+ds.score.toFixed(1)+'</b></div><div class="stat"><small>Est. METs</small><b>'+ds.mets.toFixed(1)+'</b></div>':'')+'</div>';
   const guard=(inp.rcri===0&&inp.other==null&&!inp.lowProc&&p.key==='low')?'<p class="guard"><b>RCRI 0 is not zero risk.</b> Modern cohorts put it near 4%, and RCRI misses valve disease, pulmonary hypertension, frailty and the specific operation. Use NSQIP for a procedure-specific number.</p>':'';
-  box.innerHTML='<p class="label">Step '+p.step+' of 6</p><p class="verdict">'+esc(o[0])+'</p><p class="why">'+esc(o[1])+'</p>'+guard+stats+
+  box.innerHTML='<p class="label">Step '+p.step+' of 5</p><p class="verdict">'+esc(o[0])+'</p><p class="why">'+esc(o[1])+'</p>'+guard+stats+
    '<p class="why"><b>Why:</b> '+esc(o[2])+'</p>'+
    '<details><summary>More</summary><ol class="steps">'+STEPS.map((s,i)=>'<li class="'+(i+1===p.step?'here':i+1<p.step?'past':'')+'"><i>'+(i+1)+'</i><span>'+s+'</span></li>').join('')+'</ol>'+
    '<p class="why">Risk here is '+(p.basis==='calculator'?'taken from the calculator value you entered (1% or more counts as elevated).':'taken from RCRI: 0 points is treated as low, 1 or more as elevated. That is this tool\'s choice, following the Canadian recalibration (RCRI 1 is about 6%); ACC/AHA defines low risk as under 1% by a validated calculator and lists RCRI above 1 as elevated. Lee\'s 1999 figures undercount events found by troponin testing.')+'</p>'+
@@ -535,16 +535,16 @@ function doacRender(){
   const out=$('#doacOut'), crcl=num('#dCrcl'), drug=$('#dDrug').value, parts=$('#dDate').value.split('-').map(Number);
   if(crcl==null){ out.className='card answer'; out.innerHTML='<p class="muted">Enter the creatinine clearance to build the schedule. Applies to treatment doses.</p>'; return; }
   const p=doacPlan(drug,crcl,$('#dRisk').value==='high',$('#dNeur').checked);
-  if(p.outside){ out.className='card answer stop'; out.innerHTML='<p class="verdict">Outside the tested protocol</p><p class="why">Kidney function this low was excluded from the trial (CrCl under 25 for apixaban, under 30 for the others), and the drug lingers. Plan a longer hold with pharmacy or hematology.</p><span class="tier">PAUSE exclusions</span>'; return; }
+  if(p.outside){ out.className='card answer stop'; out.innerHTML='<p class="verdict">Outside the tested protocol</p><p class="why">Kidney function this low is below the limits studied (PAUSE excluded CrCl under 25 for apixaban and under 30 for rivaroxaban and dabigatran), and the drug lingers. Plan a longer hold with pharmacy or hematology.</p><span class="tier">PAUSE exclusions</span>'; return; }
   const hasDate=parts.length===3&&parts[0]>1900, surg=hasDate?new Date(parts[0],parts[1]-1,parts[2]):null;
   out.className='card answer '+(p.high?'caution':'ok');
   let h='<p class="verdict">'+p.off+' full day'+(p.off>1?'s':'')+' off before surgery</p>'+
    '<p class="why">Last dose '+(surg?fmt(addDays(surg,p.lastDoseDay)):(-p.lastDoseDay)+' days before surgery')+'. Resume '+(p.high?'2 to 3 days':'the day')+' after surgery'+(surg?' ('+fmt(addDays(surg,p.resumeFrom))+(p.resumeTo>p.resumeFrom?' to '+fmt(addDays(surg,p.resumeTo)):'')+')':'')+' once bleeding is controlled. No bridging and no drug level.</p>';
-  if(p.flags.includes('neuraxial')) h+='<p class="guard"><b>Spinal or epidural planned.</b> '+(p.flags.includes('asra')?'The hold is lengthened to the anesthesia guideline interval (ASRA 2025): at least 72 hours for a treatment-dose factor Xa inhibitor or for dabigatran with CrCl 50 or above, and 120 hours for dabigatran with CrCl 30 to 49.':'This hold already meets the anesthesia guideline interval (ASRA 2025).')+' Confirm with anesthesia; a drug level is an option if the gap is shorter.</p>';
+  if(p.flags.includes('neuraxial')) h+='<p class="guard"><b>Spinal or epidural planned.</b> '+'The hold is lengthened to the anesthesia guideline interval (ASRA 2025): at least 72 hours for a treatment-dose factor Xa inhibitor or for dabigatran with CrCl 50 or above, and 120 hours for dabigatran with CrCl 30 to 49. Confirm with anesthesia; a drug level is an option if the gap is shorter.</p>';
   if(drug==='edoxaban') h+='<p class="muted">Edoxaban was not in the PAUSE trial; the same schedule is applied by extrapolation (CHEST 2022).</p>';
   if(p.high) h+='<p class="muted">A preventive dose of heparin against leg clots can be given during the gap after surgery.</p>';
   if(surg){ h+='<div class="cal">'; for(let k=p.lastDoseDay;k<=p.resumeTo;k++){ const cls=k===0?'surg':(k===p.lastDoseDay||k>=p.resumeFrom)?'dose':'off', tag=k===0?'Surgery':k===p.lastDoseDay?'Last dose':k>=p.resumeFrom?(k===p.resumeFrom?'Resume':'Dose'):'No dose'; h+='<div class="day '+cls+'"><b>Day '+(k>0?'+':'')+k+'</b><span>'+fmt(addDays(surg,k))+'</span><span class="tag">'+tag+'</span></div>'; } h+='</div>'; }
-  h+='<p class="why"><b>Why:</b> '+(drug==='dabigatran'?'dabigatran leaves through the kidney, so the gap stretches as clearance falls.':'with a half-life of about half a day, each day off removes most of the remaining drug; a high-risk operation gets a second day so almost none is left.')+'</p><span class="tier">'+(p.flags.includes('asra')?'ASRA 2025; ':'')+(drug==='edoxaban'?'CHEST 2022 (extrapolated)':'PAUSE 2019; CHEST 2022')+'</span>';
+  h+='<p class="why"><b>Why:</b> '+(drug==='dabigatran'&&!p.flags.includes('asra')?'dabigatran leaves through the kidney, so the gap stretches as clearance falls.':(p.flags.includes('asra')?'a bleed around the spinal cord is rare but catastrophic, so the gap before a spinal or epidural is longer than for the operation alone.':'with a half-life of about half a day, each day off removes most of the remaining drug; a high-risk operation gets a second day so almost none is left.'))+'</p><span class="tier">'+(p.flags.includes('asra')?'ASRA 2025; ':'')+(drug==='edoxaban'?'CHEST 2022 (extrapolated)':'PAUSE 2019; CHEST 2022')+'</span>';
   out.innerHTML=h;
 }
 $('#doac').addEventListener('input',doacRender);
