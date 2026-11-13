@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Empiric Antibiotics · bedside.tools</title>
+<meta name="description" content="First antibiotic regimen by syndrome, adjusted for kidney function and allergy, with what to send first, when to narrow, and when to stop.">
+<script src="/theme.js"></script>
+<style>
+:root{--bg:#FBFBFA;--card:#FFFFFF;--ink:#111113;--muted:#55555D;--line:#ECECEE;--accent:#2B4BDB;--warn:#9A3B00;--warnbg:#FFF6EC}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5}
+.mono{font-family:var(--mono)}
+.wrap{max-width:720px;margin:0 auto;padding:20px 16px 48px}
+a{color:var(--accent)}
+.back{font-size:14px;text-decoration:none;display:inline-block;min-height:44px;line-height:44px}
+h1{font-size:26px;margin:4px 0 4px;letter-spacing:-.01em}
+.purpose{color:var(--muted);margin:0 0 16px}
+.tabs{display:flex;gap:8px;margin-bottom:12px}
+.tab{flex:1;min-height:44px;border:1px solid var(--line);background:var(--card);border-radius:14px;font:inherit;font-weight:600;color:var(--muted);cursor:pointer}
+.tab[aria-selected="true"]{border-color:var(--accent);color:var(--accent)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
+.label{font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+.pbar{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--line);margin:0 -16px 14px;padding:8px 16px 10px}
+.pgrid{display:grid;grid-template-columns:1fr 1fr 1.6fr;gap:8px}
+.field label{display:block;font-size:12.5px;color:var(--muted);margin-bottom:3px}
+.field input,.field select{width:100%;min-height:44px;border:1px solid var(--line);border-radius:10px;padding:8px 10px;font:inherit;font-family:var(--mono);background:var(--card);color:var(--ink)}
+.field select{font-family:inherit;font-size:14px;padding-right:4px;text-overflow:ellipsis}
+.field{min-width:0}
+.flags{display:flex;gap:6px;flex-wrap:nowrap;overflow-x:auto;margin-top:8px;padding-bottom:2px;scrollbar-width:none}
+.flags::-webkit-scrollbar{display:none}
+.flag{flex:none}
+@media (min-width:700px){.flags{flex-wrap:wrap;overflow:visible}}
+.flag{min-height:44px;display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:999px;padding:0 12px;font-size:13.5px;color:var(--muted);background:var(--card);cursor:pointer}
+.flag input{width:18px;height:18px;accent-color:var(--accent);flex:none}
+.flag:has(input:checked){border-color:var(--accent);color:var(--accent)}
+.field input:focus,.field select:focus,.tab:focus-visible,.flag:focus-within,button:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.syn{display:block;width:100%;text-align:left;min-height:44px;border:0;border-bottom:1px solid var(--line);background:none;font:inherit;color:var(--ink);padding:10px 2px;cursor:pointer}
+.syn:last-child{border-bottom:0}
+.syn[aria-pressed="true"]{color:var(--accent);font-weight:600}
+.order{border-color:var(--accent)}
+.card,.note,.syn{scroll-margin-top:156px}
+.res h2{font-size:18px;margin:0 0 6px}
+.rx{border-top:1px solid var(--line);padding:9px 0}
+.rx:first-of-type{border-top:0}
+.rx b{display:block;font-family:var(--mono);font-size:16px;overflow-wrap:anywhere}
+.rx span{color:var(--muted);font-size:13.5px}
+.kv{display:grid;grid-template-columns:76px 1fr;gap:8px 12px;font-size:15px;margin-top:10px;border-top:1px solid var(--line);padding-top:10px}
+.kv dt{font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);padding-top:3px}
+.kv dd{margin:0}
+.guard{border-left:3px solid var(--warn);background:var(--warnbg);padding:8px 10px;border-radius:0 10px 10px 0;margin-top:8px;font-size:14.5px}
+.stopbox{border:1px solid var(--bad);background:var(--badbg);border-radius:10px;padding:10px 12px;margin-top:8px;font-size:14.5px}
+.stopbox b{color:var(--bad)}
+.tier{display:inline-block;font-family:var(--mono);font-size:11px;border:1px solid var(--line);border-radius:999px;padding:2px 8px;color:var(--muted);margin-top:6px}
+details{margin-top:10px;border-top:1px solid var(--line);padding-top:8px}
+.whyline{margin:10px 0 0;font-size:14.5px;color:var(--muted)}
+.whyline b{color:var(--ink);font-weight:600}
+summary{cursor:pointer;color:var(--accent);font-weight:600;min-height:44px;line-height:44px}
+details p{margin:0 0 8px;color:var(--ink);font-size:15px}
+.note{font-size:14px;color:var(--muted)}
+.btn{min-height:44px;border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);border-radius:10px;padding:8px 14px;font:inherit;font-weight:600;cursor:pointer}
+.dl{width:100%;border-collapse:collapse;font-size:14.5px}
+.dl td{border-top:1px solid var(--line);padding:8px 4px;vertical-align:top}
+.dl td:first-child{color:var(--muted);width:42%}
+.dl td:last-child{font-family:var(--mono)}
+.vig{margin:0 0 10px}
+footer{margin-top:28px;border-top:1px solid var(--line);padding-top:16px;font-size:13.5px;color:var(--muted)}
+footer p{margin:0 0 8px}
+[hidden]{display:none!important}
+@media (max-width:420px){.pgrid{grid-template-columns:0.8fr 0.8fr 1.5fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="/">← bedside.tools</a>
+<h1>Empiric Antibiotics</h1>
+<p class="purpose">First regimen by syndrome, adjusted for kidney function and allergy, with what to send first, when to narrow, and when to stop.</p>
+
+<div class="pbar" id="patient">
+  <div class="pgrid">
+    <div class="field"><label for="crcl">CrCl mL/min</label><input id="crcl" inputmode="decimal" autocomplete="off"></div>
+    <div class="field"><label for="wt">Weight kg</label><input id="wt" inputmode="decimal" autocomplete="off"></div>
+    <div class="field wide"><label for="allergy">Beta-lactam allergy</label><select id="allergy"><option value="none">None</option><option value="low">Penicillin: rash, non-severe</option><option value="ana">Penicillin: anaphylaxis</option><option value="severe">Severe delayed (SJS, DRESS)</option></select></div>
+  </div>
+  <div class="flags">
+    <label class="flag"><input type="checkbox" id="hd">Hemodialysis</label>
+    <label class="flag"><input type="checkbox" id="mrsa">MRSA risk</label>
+    <label class="flag"><input type="checkbox" id="pseudo">Prior Pseudomonas</label>
+    <label class="flag"><input type="checkbox" id="esbl">ESBL history</label>
+    <label class="flag"><input type="checkbox" id="preg">Pregnant</label>
+  </div>
+</div>
+
+<div class="tabs" role="tablist">
+  <button class="tab" role="tab" id="t-order" aria-selected="true" aria-controls="p-order">Orders</button>
+  <button class="tab" role="tab" id="t-doses" aria-selected="false" aria-controls="p-doses">Doses</button>
+  <button class="tab" role="tab" id="t-prac" aria-selected="false" aria-controls="p-prac">Practice</button>
+</div>
+
+<section class="view" id="p-order" role="tabpanel" aria-labelledby="t-order">
+  <div class="guard" style="margin:0 0 14px">National-guideline defaults. Check your antibiogram and formulary before ordering.</div>
+  <div class="card" id="syndromes"><p class="label">Syndrome</p><div id="synlist"></div></div>
+  <div id="out" aria-live="polite"></div>
+</section>
+
+<section class="view" id="p-doses" role="tabpanel" aria-labelledby="t-doses" hidden>
+  <p class="note" id="doses">Every drug the tool uses, at the dose for the kidney function entered above. Bands are creatinine clearance by Cockcroft-Gault, as the FDA labels specify.</p>
+  <div class="card"><table class="dl" id="dosetable"></table></div>
+</section>
+
+<section class="view" id="p-prac" role="tabpanel" aria-labelledby="t-prac" hidden>
+  <p class="note" id="practice">Decide what you would order, then reveal. Each answer is produced by the same engine as the Orders tab.</p>
+  <div id="cases"></div>
+</section>
+
+<footer>
+  <p><strong>For education only. Not a substitute for clinical judgment.</strong> Regimens are national-guideline defaults; local resistance, formulary, and infectious-disease advice take priority. Kidney and hemodialysis doses are from FDA prescribing information unless marked "expert practice"; items so marked are not in a label or guideline. Vancomycin maintenance dosing is left to pharmacy.</p>
+  <p>Privacy: everything runs in your browser. Nothing you enter is sent anywhere or stored, and there are no analytics. Do not enter names, record numbers, or dates of birth.</p>
+  <p class="mono">Last reviewed: 2026-11-12</p>
+  <p><strong>Sources:</strong> Surviving Sepsis Campaign 2026 (Prescott, Crit Care Med) · ATS community-acquired pneumonia guideline 2025 (Jones, AJRCCM; not endorsed by IDSA) and ATS/IDSA 2019 (Metlay) · IDSA/ATS hospital-acquired and ventilator-associated pneumonia 2016 (Kalil) · IDSA complicated urinary tract infection 2025 and IDSA uncomplicated cystitis 2010 · IDSA skin and soft tissue infection 2014 (Stevens) · IWGDF/IDSA diabetes-related foot infection 2023 (Senneville) · Surgical Infection Society intra-abdominal infection 2024 (Huston) · Tokyo Guidelines 2018 antimicrobial therapy (Gomi) · AASLD ascites and spontaneous bacterial peritonitis 2021 (Biggins) · IDSA bacterial meningitis 2004 (Tunkel) · IDSA catheter-related infection 2009 (Mermel) · IDSA/SHEA C. difficile 2021 and 2017 · IDSA antimicrobial-resistant gram-negative guidance 2024 and 2026 · Drug allergy practice parameter 2022 (Khan) · Parente 2018 (MRSA nasal screening) · ASHP/IDSA vancomycin guideline 2020 · FDA prescribing information for each drug (DailyMed, read November 2026).</p>
+</footer>
+</div>
+
+<script id="engine">
+/* Pure decision engine. No DOM access. p = {crcl, hd, wt, allergy:'none'|'low'|'ana'|'severe', mrsa, pseudo, esbl, preg} */
+function has(x){ return x != null && !isNaN(x); }
+function r250(x){ return Math.round(x / 250) * 250; }
+function r5(x){ return Math.round(x / 5) * 5; }
+
+/* Each drug: n = name, d = normal dose, f(c) = adjusted dose text for CrCl c (null if unchanged), h = hemodialysis dose, hx = true when h is not from the label, x = note */
+var DRUGS = {
+  ceftriaxone: {n: 'Ceftriaxone', d: '2 g IV daily'},
+  ceftriaxone1: {n: 'Ceftriaxone', d: '1–2 g IV daily'},
+  ceftriaxoneMen: {n: 'Ceftriaxone', d: '2 g IV q12h', x: 'Do not exceed 2 g/day if both kidney and liver function are severely impaired.'},
+  cefepime: {n: 'Cefepime', d: '2 g IV q8h', f: function(c){ return c > 60 ? null : c >= 30 ? '2 g IV q12h' : c >= 11 ? '2 g IV q24h' : '1 g IV q24h'; }, h: '1 g IV q24h'},
+  piptazoHi: {n: 'Piperacillin-tazobactam', d: '4.5 g IV q6h', pcn: 1, f: function(c){ return c > 40 ? null : c >= 20 ? '3.375 g IV q6h' : '2.25 g IV q6h'; }, h: '2.25 g IV q8h, plus 0.75 g after each session'},
+  piptazo: {n: 'Piperacillin-tazobactam', d: '3.375 g IV q6h', pcn: 1, f: function(c){ return c > 40 ? null : c >= 20 ? '2.25 g IV q6h' : '2.25 g IV q8h'; }, h: '2.25 g IV q12h, plus 0.75 g after each session'},
+  meropenem: {n: 'Meropenem', d: '1 g IV q8h', f: function(c){ return c > 50 ? null : c > 25 ? '1 g IV q12h' : c >= 10 ? '500 mg IV q12h' : '500 mg IV q24h'; }, h: '500 mg IV q24h', hx: 1},
+  ertapenem: {n: 'Ertapenem', d: '1 g IV daily', f: function(c){ return c > 30 ? null : '500 mg IV daily'; }, h: '500 mg IV daily (add 150 mg after dialysis if dosed within 6 h before it)'},
+  ceftazidime: {n: 'Ceftazidime', d: '2 g IV q8h', f: function(c){ return c > 50 ? null : c > 30 ? '1 g IV q12h' : c > 15 ? '1 g IV q24h' : c > 5 ? '500 mg IV q24h' : '500 mg IV q48h'; }, h: '1 g load, then 1 g after each session', x: 'For severe infection the label allows raising the kidney-adjusted dose by 50%.'},
+  ampsulb: {n: 'Ampicillin-sulbactam', d: '3 g IV q6h', pcn: 1, f: function(c){ return c >= 30 ? null : c >= 15 ? '3 g IV q12h' : c >= 5 ? '3 g IV q24h' : '3 g IV q24h (below the label range; ask pharmacy)'; }, h: '3 g IV q24h', hx: 1},
+  cefazolin: {n: 'Cefazolin', d: '1 g IV q8h', f: function(c){ return c >= 35 ? null : c >= 11 ? '500 mg IV q12h' : '500 mg IV q18–24h'; }, h: '500 mg IV q24h', hx: 1, x: 'Guideline dose; many hospitals use 2 g q8h.'},
+  levofloxacin: {n: 'Levofloxacin', d: '750 mg IV or oral daily', fq: 1, f: function(c){ return c >= 50 ? null : c >= 20 ? '750 mg q48h' : c >= 10 ? '750 mg once, then 500 mg q48h' : '750 mg once, then 500 mg q48h (label band is 10–19; ask pharmacy)'; }, h: '750 mg once, then 500 mg q48h'},
+  ciproIV: {n: 'Ciprofloxacin', d: '400 mg IV q12h', fq: 1, f: function(c){ return c >= 30 ? null : c >= 5 ? '200–400 mg IV q18–24h' : '200–400 mg IV q18–24h (below the label range; ask pharmacy)'; }, h: '200–400 mg IV q24h', hx: 1},
+  ciproPO: {n: 'Ciprofloxacin', d: '500 mg oral q12h', fq: 1, f: function(c){ return c > 50 ? null : c >= 30 ? '250–500 mg oral q12h' : '250–500 mg oral q18h'; }, h: '250–500 mg oral q24h, after dialysis'},
+  azithromycin: {n: 'Azithromycin', d: '500 mg IV or oral daily'},
+  doxycycline: {n: 'Doxycycline', d: '100 mg oral q12h', tet: 1},
+  metronidazole: {n: 'Metronidazole', d: '500 mg IV or oral q8h'},
+  clindamycin: {n: 'Clindamycin', d: '900 mg IV q8h'},
+  clindamycinPO: {n: 'Clindamycin', d: '300–450 mg oral q6h'},
+  metronidazoleIV: {n: 'Metronidazole', d: '500 mg IV q8h'},
+  linezolid: {n: 'Linezolid', d: '600 mg IV or oral q12h', h: '600 mg q12h, after dialysis'},
+  tmpsmx: {n: 'TMP-SMX', d: '1–2 double-strength tablets oral q12h', sulfa: 1, f: function(c){ return c > 30 ? null : c >= 15 ? '1 double-strength tablet oral q12h (half the usual regimen)' : 'not recommended (CrCl under 15)'; }, h: 'not recommended', hx: 1},
+  cephalexin: {n: 'Cephalexin', d: '500 mg oral q6h', f: function(c){ return c >= 60 ? null : c >= 30 ? '500 mg oral q12h (no more than 1 g/day)' : c >= 15 ? '250 mg oral q8–12h' : c >= 5 ? '250 mg oral q24h' : '250 mg oral q48–60h'; }, h: '250 mg oral q12–24h, after dialysis', hx: 1},
+  amoxclav: {n: 'Amoxicillin-clavulanate', d: '875 mg oral q12h', pcn: 1, f: function(c){ return c > 30 ? null : c >= 10 ? '500 mg oral q12h (not the 875 mg tablet)' : '500 mg oral q24h'; }, h: '500 mg oral q24h, with an extra dose during and after dialysis'},
+  nitrofurantoin: {n: 'Nitrofurantoin', d: '100 mg oral q12h', f: function(c){ return c >= 60 ? null : c >= 30 ? '100 mg oral q12h (label: contraindicated under 60; Beers criteria allow a short course at 30 or more)' : 'avoid (CrCl under 30)'; }, h: 'avoid'},
+  fosfomycin: {n: 'Fosfomycin', d: '3 g oral once'},
+  ampicillin: {n: 'Ampicillin', d: '2 g IV q4h', pcn: 1, f: function(c){ return c > 50 ? null : c >= 10 ? '2 g IV q6–8h (expert practice; the label gives no kidney dose)' : '2 g IV q12h (expert practice; the label gives no kidney dose)'; }, h: '2 g IV q12h, after dialysis', hx: 1},
+  micafungin: {n: 'Micafungin', d: '100 mg IV daily'},
+  fidaxomicin: {n: 'Fidaxomicin', d: '200 mg oral q12h'},
+  vancoPO: {n: 'Vancomycin, oral', d: '125 mg oral q6h'},
+  vancoPOhi: {n: 'Vancomycin, oral or by tube', d: '500 mg q6h'},
+  oseltamivir: {n: 'Oseltamivir', d: '75 mg oral q12h', f: function(c){ return c > 60 ? null : c > 30 ? '30 mg oral q12h' : c > 10 ? '30 mg oral daily' : 'not recommended unless on dialysis'; }, h: '30 mg now, then 30 mg after each session'}
+};
+var NOTMP = function(p){ return p.hd || (has(p.crcl) && p.crcl < 15); };
+var BETA = {ceftriaxone:1, ceftriaxone1:1, ceftriaxoneMen:1, cefepime:1, piptazoHi:1, piptazo:1, meropenem:1, ertapenem:1, ceftazidime:1, ampsulb:1, cefazolin:1, cephalexin:1, amoxclav:1, ampicillin:1};
+
+function dose(key, p){
+  var D = DRUGS[key], o = {key: key, name: D.n, text: D.d, adj: false, x: D.x || ''};
+  if (p.hd && D.h){ o.text = D.h; o.adj = true; o.why = 'hemodialysis' + (D.hx ? ' (expert practice, not in the label)' : ''); }
+  else if (p.hd && D.f){ o.adj = true; o.why = 'hemodialysis: the label gives no dose; ask pharmacy'; }
+  else if (has(p.crcl) && D.f){ var t = D.f(p.crcl); if (t){ o.text = t; o.adj = true; o.why = 'adjusted for CrCl ' + p.crcl + ' (normal ' + D.d + ')'; } }
+  return o;
+}
+function vancoLoad(p){
+  var t = '20–25 mg/kg IV once';
+  if (has(p.wt)){ var lo = Math.min(3000, Math.ceil(20 * p.wt / 250) * 250), hi = Math.min(3000, Math.floor(25 * p.wt / 250) * 250); if (hi < lo) hi = lo; t = (lo === hi ? lo : lo + '–' + hi) + ' mg IV once (20–25 mg/kg)'; }
+  return {key: 'vanco', name: 'Vancomycin', text: t, adj: false, why: 'loading dose; pharmacy doses the maintenance by AUC', x: ''};
+}
+function perKg(name, mgkg, tail, p, round){ var t = mgkg + ' mg/kg ' + tail; if (has(p.wt)) t = (round || r5)(mgkg * p.wt) + ' mg ' + tail + ' (' + mgkg + ' mg/kg)'; return {key: name, name: name, text: t, adj: false, x: ''}; }
+function acyclovir(p){
+  var half = p.hd || (has(p.crcl) && p.crcl <= 10), iv = 'q8h', o;
+  if (p.hd) iv = 'q24h, with an extra dose after each dialysis session';
+  else if (has(p.crcl)) iv = p.crcl > 50 ? 'q8h' : p.crcl > 25 ? 'q12h' : 'q24h';
+  o = perKg('Acyclovir', half ? 5 : 10, 'IV ' + iv, p); o.x = 'Use ideal body weight in obesity.';
+  if (iv !== 'q8h'){ o.adj = true; o.why = (p.hd ? 'hemodialysis' : 'adjusted for CrCl ' + p.crcl) + ' (normal 10 mg/kg q8h)'; }
+  return o;
+}
+function dapto(p){ var o = perKg('Daptomycin', 4, 'IV daily', p, function(x){ return Math.round(x / 10) * 10; }); if (p.hd || (has(p.crcl) && p.crcl < 30)){ o.text = o.text.replace('daily', 'q48h'); o.adj = true; o.why = 'CrCl under 30 or dialysis'; } return o; }
+
+var pcn = function(p){ return p.allergy !== 'none'; };
+var T = {
+  ssc: 'Surviving Sepsis Campaign 2026', cap: 'ATS 2025 and ATS/IDSA 2019', hap: 'IDSA/ATS 2016', uti: 'IDSA 2025', ssti: 'IDSA 2014', dfi: 'IWGDF/IDSA 2023', iai: 'Surgical Infection Society 2024 (grades shown in More)',
+  tg: 'Tokyo Guidelines 2018', sbp: 'AASLD 2021', men: 'IDSA 2004; doses from FDA labels', line: 'IDSA 2009', cdi: 'IDSA/SHEA 2021'
+};
+
+var SYN = [
+{id: 'cap', name: 'Pneumonia, community-acquired', vars: [
+  {id: 'ward', label: 'Not severe (ward)'}, {id: 'severe', label: 'Severe (ventilator or pressors, or 3+ minor criteria)'}],
+ build: function(v, p){
+  var sev = v === 'severe', o = {rx: [], also: [], guards: [], more: [], tier: T.cap};
+  var sevAl = p.allergy === 'severe';
+  if (sevAl){ o.rx.push('levofloxacin'); o.noBL = true; }
+  else { o.rx.push(p.pseudo ? 'cefepime' : 'ceftriaxone1'); o.rx.push('azithromycin'); }
+  if (p.mrsa) o.rx.push('VANCO');
+  if (p.allergy === 'severe' && (sev || p.pseudo)) o.guards.push('A fluoroquinolone alone is not a guideline regimen for severe CAP or for Pseudomonas risk. Involve infectious diseases and allergy; aztreonam is the usual partner (expert practice).');
+  o.first = 'Blood and sputum cultures and MRSA nares PCR when severe or when MRSA or Pseudomonas cover is given; influenza and COVID testing.';
+  o.narrow = (p.mrsa ? 'Negative nares PCR and cultures → stop vancomycin. ' : '') + (p.pseudo && !sevAl ? 'No Pseudomonas in cultures at 48 hours → ceftriaxone. ' : '') + 'Step down to oral when stable and eating.';
+  o.stop = sev ? '5 days or more, once clinically stable.' + (p.mrsa || p.pseudo ? ' 7 days if MRSA or Pseudomonas is the cause.' : '') : 'Fewer than 5 days (minimum 3) once clinically stable.' + (p.mrsa || p.pseudo ? ' 7 days if MRSA or Pseudomonas is the cause.' : '');
+  o.also.push('Influenza positive: add oseltamivir ' + dose('oseltamivir', p).text + ', whatever the duration of illness.');
+  if (sev) o.also.push('Systemic corticosteroid is suggested in severe CAP, not in influenza pneumonia. The guideline names no agent or dose.');
+  o.why = (sevAl && (sev || p.pseudo)) ? 'No guideline regimen for severe pneumonia or Pseudomonas risk avoids beta-lactams; the fluoroquinolone is a base while infectious diseases and allergy choose a partner.' : sevAl ? 'A respiratory fluoroquinolone covers pneumococcus and atypical organisms on its own, which is why it is the option when no beta-lactam can be given.' : (p.pseudo && p.mrsa) ? 'Prior Pseudomonas changes the beta-lactam and MRSA risk adds vancomycin; negative cultures and a negative nares PCR let both be narrowed.' : p.pseudo ? 'A prior respiratory Pseudomonas isolate is the history that changes the beta-lactam; the macrolide still covers atypical organisms.' : p.mrsa ? 'Vancomycin is added for a specific risk, and a negative nares PCR makes MRSA pneumonia unlikely enough to stop it.' : 'Pneumococcus and atypical organisms cause most cases; the beta-lactam covers the first and the macrolide the second.';
+  o.more = ['Alternatives: ampicillin-sulbactam or ceftaroline as the beta-lactam; ' + (sev ? 'levofloxacin 750 mg daily in place of the macrolide (never a fluoroquinolone alone in severe CAP).' : 'levofloxacin 750 mg or moxifloxacin 400 mg daily alone; doxycycline 100 mg q12h with the beta-lactam if neither a macrolide nor a fluoroquinolone can be used.'),
+    'MRSA or Pseudomonas cover is added for a prior respiratory isolate of that organism. With recent hospitalisation plus IV antibiotics and locally validated risk factors: ' + (sev ? 'add the cover and de-escalate on cultures.' : 'send cultures and PCR, and add the cover only if positive.') + ' In a 2018 meta-analysis (Parente), MRSA nares PCR had a negative predictive value of about 96% for community-onset pneumonia at 10% prevalence.',
+    'Suspected aspiration: same regimen; no added anaerobic cover unless lung abscess or empyema is suspected.',
+    'Respiratory virus test positive: the ATS 2025 guideline still suggests antibacterials for inpatients because of possible co-infection (very low-quality evidence). IDSA did not endorse the guideline over this recommendation; stop early if there is no evidence of bacterial infection.'];
+  return o; }},
+{id: 'hap', name: 'Pneumonia, hospital or ventilator', vars: [
+  {id: 'hap', label: 'Hospital-acquired, not high risk'}, {id: 'haphi', label: 'Hospital-acquired: ventilatory support, shock, IV antibiotics in 90 days, or structural lung disease'},
+  {id: 'vap', label: 'Ventilator-associated, no resistance risk'}, {id: 'vaphi', label: 'Ventilator-associated with a resistance risk factor'}],
+ build: function(v, p){
+  var hi = v === 'haphi' || v === 'vaphi', o = {rx: [], also: [], guards: [], more: [], tier: T.hap};
+  var sevAl = p.allergy === 'severe';
+  if (sevAl && !hi){ o.rx.push('levofloxacin'); o.noBL = true; }
+  else { o.rx.push(p.esbl ? 'meropenem' : 'cefepime'); if (hi) o.rx.push('levofloxacin'); }
+  if (hi || p.mrsa) o.rx.push('VANCO');
+  o.first = 'Lower respiratory culture (sputum, or endotracheal aspirate if ventilated), blood cultures, MRSA nares PCR.';
+  o.narrow = 'Narrow to culture results at 48–72 h.' + (o.rx.indexOf('VANCO') >= 0 ? ' Negative nares PCR and no MRSA in cultures → stop vancomycin.' : '') + (hi ? ' Drop the second antipseudomonal agent once susceptibilities are known.' : '');
+  o.stop = '7 days. Procalcitonin with clinical criteria can support stopping.';
+  o.why = hi ? 'With a resistance risk, two antipseudomonal drugs from different classes raise the chance that at least one is active until cultures return.' : 'The regimen must cover S. aureus, Pseudomonas and other gram-negative rods; MRSA cover is added only for a risk factor.';
+  o.more = ['Single-agent options: piperacillin-tazobactam 4.5 g q6h, cefepime 2 g q8h, levofloxacin 750 mg daily, meropenem 1 g q8h, imipenem 500 mg q6h.',
+    'MRSA cover (vancomycin or linezolid 600 mg q12h). Hospital-acquired: IV antibiotics in the past 90 days, a unit where more than 20% of S. aureus is MRSA or prevalence is unknown, or high mortality risk. Ventilator-associated: a resistance risk factor, or a unit with more than 10–20% MRSA or unknown prevalence.',
+    'Resistance risk factors in ventilator-associated pneumonia: IV antibiotics in the past 90 days, septic shock, ARDS before onset, 5 or more days in hospital before onset, acute renal replacement. A second antipseudomonal agent is also used where more than 10% of gram-negative isolates resist the single agent. An aminoglycoside is not used as the only antipseudomonal agent.'];
+  return o; }},
+{id: 'uti', name: 'Urinary tract', vars: [
+  {id: 'cyst', label: 'Uncomplicated cystitis (bladder only)'}, {id: 'civ', label: 'Complicated, no sepsis, IV'}, {id: 'cpo', label: 'Complicated, no sepsis, oral'},
+  {id: 'sepsis', label: 'Complicated with sepsis'}, {id: 'shock', label: 'Complicated with septic shock'}],
+ build: function(v, p){
+  var o = {rx: [], also: [], guards: [], more: [], tier: v === 'cyst' ? 'IDSA 2010 (uncomplicated cystitis)' : T.uti};
+  if (v === 'cyst'){
+    o.rx.push(has(p.crcl) && p.crcl < 30 || p.hd ? 'fosfomycin' : 'nitrofurantoin');
+    o.first = 'Urinalysis; culture if recurrent, recently treated, or male.'; o.narrow = 'Adjust to culture if symptoms persist.';
+    o.stop = o.rx[0] === 'fosfomycin' ? 'Single dose.' : '5 days (the label course is 7).';
+    if (p.preg && o.rx[0] === 'nitrofurantoin') o.guards.push('Nitrofurantoin is contraindicated at 38–42 weeks of gestation and during labour (label).');
+    o.why = 'Bladder-only infection is treated with drugs that concentrate in urine and spare the gut flora; fluoroquinolones are kept in reserve.';
+    o.more = ['Alternatives: TMP-SMX one double-strength tablet q12h for 3 days where local E. coli resistance is under 20%; fosfomycin 3 g once.', 'Asymptomatic bacteriuria is not treated, except in pregnancy or before urologic procedures with mucosal bleeding.'];
+    return o;
+  }
+  if (v === 'cpo'){
+    o.rx.push(p.preg ? 'cephalexin' : 'ciproPO');
+    if (p.preg) o.guards.push('Pregnancy: an oral cephalosporin (a guideline alternative) is shown in place of ciprofloxacin.');
+    if (p.esbl) o.guards.push('ESBL history: oral options are limited to what the last isolate was susceptible to; otherwise treat IV with ertapenem.');
+  } else if (p.esbl){ o.rx.push(v === 'civ' ? 'ertapenem' : 'meropenem'); }
+  else if (p.allergy === 'severe'){ o.rx.push('ciproIV'); o.noBL = true; }
+  else if (v === 'shock' || p.pseudo){ o.rx.push('cefepime'); }
+  else { o.rx.push('ceftriaxone1'); }
+  o.guards.push('Avoid a fluoroquinolone if one was taken in the past 12 months, and avoid any drug a previous urine isolate resisted.');
+  o.first = 'Urine culture before the first dose; blood cultures with sepsis. Remove an indwelling catheter, or replace it if it has been in for 2 weeks or more and is still needed, and culture from the new one (IDSA 2009 catheter-associated UTI guideline).';
+  o.narrow = 'Switch to a targeted agent as soon as the culture and susceptibilities return. Change to oral when improving and able to take it, including with gram-negative bacteremia.';
+  o.stop = '7 days from the first day of active therapy (5–7 with a fluoroquinolone). Gram-negative bacteremia: 7 days. Men with suspected prostatitis may need 10–14.';
+  if (v === 'sepsis' || v === 'shock') o.guards.push('Check the local antibiogram: choose a drug with at least ' + (v === 'shock' ? '90%' : '80%') + ' susceptibility among likely organisms.');
+  o.why = (v === 'sepsis' || v === 'shock') ? 'Severity sets how wrong the first choice can afford to be, so the antibiogram threshold rises from 80% in sepsis to 90% in shock.' : (p.esbl && v === 'civ') ? 'A recent ESBL-producing isolate predicts the next one, and cephalosporins and piperacillin-tazobactam are unreliable against it, so a carbapenem is used despite the absence of sepsis.' : 'Without sepsis, carbapenems and newer agents are kept in reserve; a cephalosporin or fluoroquinolone covers the usual enteric organisms.';
+  o.more = ['Complicated means systemic signs (fever, flank pain, rigors), obstruction, kidney involvement, or an indwelling catheter, nephrostomy or stent. Diabetes or a urologic abnormality alone does not make a UTI complicated, and men can have uncomplicated infection.',
+    'Options without sepsis: third- or fourth-generation cephalosporin, piperacillin-tazobactam, or a fluoroquinolone. With sepsis a carbapenem is also a first-line option. Oral alternatives: levofloxacin 750 mg daily, TMP-SMX, amoxicillin-clavulanate, oral cephalosporins. Nitrofurantoin and oral fosfomycin are not used for complicated infection.',
+    'Catheter-associated infection is treated as complicated UTI.'];
+  return o; }},
+{id: 'ssti', name: 'Skin and soft tissue', vars: [
+  {id: 'cell', label: 'Cellulitis with systemic signs'}, {id: 'cellsev', label: 'Cellulitis, severe (failed oral therapy, immunocompromise, bullae, hypotension)'},
+  {id: 'abs', label: 'Abscess with systemic signs'}, {id: 'abssev', label: 'Abscess, severe'}, {id: 'nec', label: 'Necrotizing infection'}],
+ build: function(v, p){
+  var o = {rx: [], also: [], guards: [], more: [], tier: T.ssti};
+  if (v === 'cell'){ if (p.allergy === 'severe'){ o.rx.push('VANCO'); o.noBL = true; } else { o.rx.push('cefazolin'); if (p.mrsa) o.rx.push('VANCO'); }
+    o.first = 'Blood cultures only with severe systemic illness or immunocompromise. Mark the border.'; o.narrow = p.allergy === 'severe' ? 'Oral step-down to a non-beta-lactam with streptococcal activity (clindamycin or linezolid) when improving.' : 'Oral step-down to cephalexin when improving.'; o.stop = '5 days; extend if not improved.';
+    o.why = p.mrsa ? 'Non-purulent cellulitis is streptococcal in most cases; MRSA cover is added for a specific risk such as penetrating trauma, known colonisation or injection drug use.' : 'Non-purulent cellulitis is streptococcal in most cases; purulence is what points to staphylococci.';
+    o.more = ['Add MRSA cover to cellulitis for penetrating trauma, MRSA infection elsewhere, nasal MRSA colonisation, injection drug use, or SIRS.', p.allergy === 'severe' ? 'Alternative without a beta-lactam: clindamycin 600 mg IV q8h.' : 'Alternatives: penicillin G 2–4 million units q4–6h, ceftriaxone, or clindamycin 600 mg IV q8h. The guideline places systemic signs (SIRS) among the reasons to add MRSA cover and also treats typical cellulitis with systemic signs with a streptococcal agent alone; use the MRSA flag when a specific risk is present.']; }
+  else if (v === 'cellsev'){ o.rx.push('VANCO'); o.rx.push(p.esbl ? 'meropenem' : pcn(p) ? 'cefepime' : 'piptazo'); if (pcn(p) && !p.esbl) o.rx.push('metronidazole');
+    if (p.esbl || pcn(p)) o.guards.push('The guideline names vancomycin plus piperacillin-tazobactam here; this substitute for ' + (p.esbl ? 'an ESBL history' : 'a penicillin allergy') + ' is expert practice.');
+    o.guards.push('Get a surgical assessment for necrotizing infection.'); o.first = 'Blood cultures; imaging must not delay surgical review.'; o.narrow = 'Narrow to a streptococcal or staphylococcal agent once necrotizing infection is excluded and cultures return.'; o.stop = '5 days if improved; longer for deep infection.';
+    o.why = 'Severe non-purulent infection can be polymicrobial or necrotizing, so the first regimen covers MRSA, streptococci, gram-negatives and anaerobes until surgery has looked.';
+    o.more = ['Severe means failed oral therapy, systemic signs, immunocompromise, or signs of deeper infection such as bullae, skin sloughing, hypotension or organ dysfunction.']; }
+  else if (v === 'abs'){ o.rx.push(p.preg ? 'clindamycinPO' : NOTMP(p) ? 'doxycycline' : 'tmpsmx'); if (p.preg) o.guards.push('Pregnancy: clindamycin (a guideline MRSA-active option) is shown in place of TMP-SMX or doxycycline.'); o.guards.push('Incision and drainage is the treatment; the antibiotic is an addition.'); o.first = 'Culture the pus.'; o.narrow = 'Adjust to the culture.'; o.stop = '5 days; extend if not improved.';
+    o.why = 'Purulent infection is usually S. aureus, so the added drug is chosen for MRSA activity.'; o.more = ['Alternative: doxycycline 100 mg q12h. Mild abscess needs drainage only.']; }
+  else if (v === 'abssev'){ o.rx.push('VANCO'); o.guards.push('Incision and drainage is the treatment; the antibiotic is an addition.'); o.first = 'Culture the pus; blood cultures.'; o.narrow = p.allergy === 'severe' ? 'Narrow to the culture; involve allergy before any beta-lactam.' : 'MSSA → cefazolin.'; o.stop = '5 days; extend if not improved.';
+    o.why = 'Purulent infection is usually S. aureus, so the added drug is chosen for MRSA activity.'; o.more = ['Alternatives: daptomycin ' + dapto(p).text + ', linezolid 600 mg q12h, ceftaroline 600 mg q12h. Severe means failed drainage plus oral therapy, systemic signs, or immunocompromise.']; }
+  else { o.rx.push('VANCO'); o.rx.push(pcn(p) || p.esbl ? 'meropenem' : 'piptazo'); o.rx.push('clindamycin');
+    if (pcn(p) || p.esbl) o.guards.push('Meropenem in place of piperacillin-tazobactam for ' + (p.esbl && !pcn(p) ? 'an ESBL history' : 'a penicillin allergy') + ' is within the guideline (a carbapenem is a listed option).');
+    o.guards.push('Surgical emergency: call surgery now. Antibiotics do not replace debridement.'); o.first = 'Blood cultures; operative tissue cultures. Do not wait for imaging.'; o.narrow = p.allergy !== 'none' ? 'Group A streptococcus → clindamycin plus an agent chosen with allergy and infectious diseases (the guideline regimen is penicillin plus clindamycin). Otherwise narrow to operative cultures.' : 'Group A streptococcus → penicillin plus clindamycin. Otherwise narrow to operative cultures.'; o.stop = 'Until no further debridement is needed, the patient has improved, and fever has been gone 48–72 h.';
+    o.why = 'Antibiotics do not reach dead tissue; clindamycin is added to shut down toxin production.';
+    o.more = ['The guideline recommends penicillin plus clindamycin for documented group A streptococcal infection; adding clindamycin empirically until cultures return is common practice (expert practice).', 'Alternative gram-negative and anaerobic arm: ceftriaxone plus metronidazole.'];
+    o.tier = T.ssti + '; empiric clindamycin is expert practice'; }
+  return o; }},
+{id: 'dfi', name: 'Diabetic foot infection', vars: [
+  {id: 'mild', label: 'Mild'}, {id: 'mod', label: 'Moderate or severe'}, {id: 'recent', label: 'Moderate or severe, recent antibiotics'}, {id: 'isch', label: 'Ischaemic limb, necrosis or gas'}],
+ build: function(v, p){
+  var o = {rx: [], also: [], guards: [], more: [], tier: T.dfi};
+  if (v === 'mild'){ o.rx.push(p.mrsa || pcn(p) ? (p.preg ? 'clindamycinPO' : NOTMP(p) ? 'doxycycline' : 'tmpsmx') : 'cephalexin'); o.stop = '1–2 weeks, oral.'; if (p.preg && (p.mrsa || pcn(p))) o.guards.push('Pregnancy: clindamycin (listed in the guideline) is shown in place of TMP-SMX or doxycycline.'); }
+  else {
+    if (p.esbl) o.rx.push(v === 'mod' ? 'ertapenem' : 'meropenem');
+    else if (p.pseudo) o.rx.push(pcn(p) ? 'meropenem' : 'piptazoHi');
+    else if (v === 'mod'){ if (pcn(p)) o.rx.push('ceftriaxone'); else o.rx.push('ampsulb'); }
+    else if (v === 'recent') o.rx.push(pcn(p) ? 'ertapenem' : 'piptazo');
+    else { if (pcn(p)){ o.rx.push('ceftriaxone'); o.rx.push('metronidazole'); } else o.rx.push('piptazo'); }
+    if (p.mrsa) o.rx.push('VANCO');
+    if (v === 'recent') o.guards.push('After recent antibiotics the choice depends on what was given; seek infectious-diseases advice.');
+    o.stop = 'Soft tissue: 2–4 weeks, or 10 days after surgical debridement. Bone: 2–5 days if all infected bone was removed, 3 weeks with a positive bone margin, 6 weeks without surgery.';
+    o.guards.push('Urgent surgical consult for severe infection, extensive gangrene, necrotising infection, deep abscess, compartment syndrome or severe limb ischaemia.');
+  }
+  o.first = 'Deep tissue culture after cleansing and debridement (not a surface swab); probe to bone, plain X-ray, and ESR or CRP for osteomyelitis.';
+  o.narrow = 'Narrow to the deep culture. Change to oral once improving.';
+  o.why = v === 'mild' ? 'Mild infection in someone not recently treated is caused by streptococci and S. aureus, so gram-positive cover is enough.' : p.pseudo ? 'Pseudomonas is covered only when it has grown from the site in recent weeks; it is uncommon in temperate climates.' : 'Deeper infection is often mixed, so gram-negatives are added, and anaerobes when the limb is ischaemic or necrotic.';
+  o.more = ['The guideline lists drug classes with examples at usual doses, not doses. Mild alternatives: clindamycin, doxycycline; amoxicillin-clavulanate after recent antibiotics.', 'MRSA risk: previous MRSA infection or colonisation, prolonged or recent hospitalisation, ICU stay, recent antibiotics, invasive procedures, HIV infection, hemodialysis, nursing-home residence, open wounds, long-term central line.', 'Uninfected ulcers are not cultured or treated. Antibiotics alone are reasonable for forefoot osteomyelitis with no need for urgent drainage, no peripheral artery disease and no exposed bone.'];
+  return o; }},
+{id: 'iai', name: 'Intra-abdominal', vars: [
+  {id: 'low', label: 'Community-acquired, lower risk'}, {id: 'high', label: 'Higher risk: sepsis or shock, APACHE II 10+, or health-care-associated'}],
+ build: function(v, p){
+  var o = {rx: [], also: [], guards: [], more: [], tier: T.iai};
+  if (p.allergy === 'severe'){ o.rx.push('ciproIV'); o.rx.push('metronidazole'); o.noBL = true;
+    if (v === 'high') o.guards.push('The guideline names ciprofloxacin plus metronidazole only for lower-risk patients with a serious beta-lactam allergy; its use in higher-risk infection is expert practice. Involve infectious diseases.');
+    if (p.esbl) o.guards.push('ESBL history: fluoroquinolone-based regimens are unreliable against ESBL producers. Involve infectious diseases and allergy now.'); }
+  else if (v === 'low'){ if (p.esbl) o.rx.push('ertapenem'); else { o.rx.push('ceftriaxone'); o.rx.push('metronidazole'); } }
+  else { if (p.esbl) o.rx.push('meropenem'); else if (pcn(p)){ o.rx.push('cefepime'); o.rx.push('metronidazole'); } else o.rx.push('piptazo'); }
+  o.guards.push('Source control ' + (v === 'low' ? 'within 12 hours.' : 'early: within 6 hours with septic shock. Antibiotics within 1 hour.'));
+  if (v === 'high' && !o.noBL) o.guards.push('Do not add an aminoglycoside, a fluoroquinolone or vancomycin to the beta-lactam empirically.');
+  if (pcn(p) && p.allergy !== 'severe' && !p.esbl) o.guards.push('Penicillin allergy: a cephalosporin with an unlike side chain is shown, following the 2022 drug allergy practice parameter. The surgical guideline\'s own regimen for serious beta-lactam allergy is ciprofloxacin plus metronidazole (lower-risk patients).');
+  o.first = 'Blood cultures if septic; intra-operative cultures in higher-risk patients (not routinely in lower-risk community-acquired infection).';
+  o.narrow = v === 'low' ? 'If improving after source control, do not change therapy for culture results. Oral ciprofloxacin plus metronidazole can finish the course.' : 'De-escalate to the narrowest agent active against the cultured organisms.';
+  o.stop = '4 days (96 hours) after adequate source control' + (v === 'high' ? '; no more than 8 days in the critically ill.' : '.') + ' 24 hours only for appendicitis or cholecystitis without perforation.';
+  o.why = 'After source control, four days performed as well as longer courses; the operation, not the antibiotic, cures the infection.';
+  o.more = ['Lower risk (Grade 1-A): ceftriaxone or cefotaxime plus metronidazole, or ertapenem; with a serious beta-lactam allergy, ciprofloxacin plus metronidazole or moxifloxacin. No antipseudomonal, enterococcal or antifungal cover.',
+    'Higher risk (Grade 1-A): piperacillin-tazobactam, cefepime plus metronidazole, or meropenem or imipenem. Enterococcal cover is suggested (2-B) and comes with piperacillin-tazobactam or imipenem. Empiric antifungal is not recommended in community-acquired infection (1-B); an echinocandin is used for the severely ill with suspected Candida.',
+    'ESBL risk or high local prevalence: avoid cephalosporin-, aztreonam- and fluoroquinolone-based regimens (1-B).'];
+  return o; }},
+{id: 'bil', name: 'Cholangitis or cholecystitis', vars: [
+  {id: 'g1', label: 'Community-acquired, grade I'}, {id: 'g2', label: 'Grade II'}, {id: 'g3', label: 'Grade III, or health-care-associated'}],
+ build: function(v, p){
+  var o = {rx: [], also: [], guards: [], more: [], tier: T.tg};
+  if (p.allergy === 'severe' && v !== 'g3' && !p.esbl){ o.rx.push('ciproIV'); o.rx.push('metronidazole'); o.noBL = true; o.guards.push('Fluoroquinolone regimen for beta-lactam allergy (Tokyo Guidelines); use only if local susceptibility allows.'); }
+  else if (p.esbl) o.rx.push(v === 'g1' ? 'ertapenem' : 'meropenem');
+  else if (v === 'g1') o.rx.push('ceftriaxone');
+  else if (pcn(p)) o.rx.push(v === 'g2' ? 'ceftriaxone' : 'cefepime');
+  else o.rx.push('piptazo');
+  if (v === 'g3') o.rx.push('VANCO');
+  o.guards.push('Biliary drainage is the definitive treatment for cholangitis; arrange it early in grade II and urgently in grade III.');
+  if (o.rx.indexOf('metronidazole') < 0) o.also.push('Biliary-enteric anastomosis: add metronidazole ' + dose('metronidazole', p).text + ' to a cephalosporin for anaerobic cover.');
+  o.first = 'Blood cultures (grade II and III); bile culture at drainage.';
+  o.narrow = 'Narrow to bile and blood cultures. Oral step-down when improving.';
+  o.stop = 'Cholangitis: 4–7 days once the source is controlled; at least 2 weeks with Enterococcus or Streptococcus bacteremia. Grade I–II cholecystitis: stop within 24 hours of cholecystectomy; grade III cholecystitis: 4–7 days after source control.';
+  o.why = v === 'g3' ? 'In grade III and health-care-associated infection Enterococcus becomes likely enough that vancomycin is added until cultures return.' : 'Biliary infection is mostly enteric gram-negative rods; anaerobic cover matters mainly when bowel has been joined to the bile duct.';
+  o.more = ['Grade I options also include cefazolin or cefotaxime, ertapenem, or a fluoroquinolone (only if the isolate is susceptible or for beta-lactam allergy). Ampicillin-sulbactam is not recommended where resistance exceeds 20%.', 'Grade III and health-care-associated options: piperacillin-tazobactam; cefepime or ceftazidime with or without metronidazole; a carbapenem; aztreonam with or without metronidazole. Linezolid or daptomycin replaces vancomycin where VRE is known or common.', 'Continue beyond the usual course while stones or obstruction remain.'];
+  return o; }},
+{id: 'sbp', name: 'Spontaneous bacterial peritonitis', vars: [
+  {id: 'ca', label: 'Community-acquired, low local resistance'}, {id: 'noso', label: 'Nosocomial, risk for a resistant organism, or critically ill'}],
+ build: function(v, p){
+  var o = {rx: [], also: [], guards: [], more: [], tier: T.sbp};
+  if (v === 'ca') o.rx.push(p.esbl ? 'meropenem' : 'ceftriaxone'); else { o.rx.push(p.esbl || pcn(p) ? 'meropenem' : 'piptazo'); if (p.mrsa) o.rx.push('VANCO'); else o.guards.push('Add vancomycin only with a prior MRSA infection or a positive MRSA surveillance swab (tick MRSA risk).'); }
+  if (v === 'noso' && pcn(p) && !p.esbl) o.guards.push('Meropenem in place of piperacillin-tazobactam for a penicillin allergy is expert practice.');
+  var a1 = has(p.wt) ? r5(1.5 * p.wt) + ' g (1.5 g/kg)' : '1.5 g/kg', a3 = has(p.wt) ? r5(p.wt) + ' g (1 g/kg)' : '1 g/kg';
+  o.guards.push('Albumin ' + a1 + ' on day 1 and ' + a3 + ' on day 3.');
+  o.first = 'Diagnostic paracentesis with cell count and culture in blood-culture bottles, and blood cultures, before the first dose. Treat when ascitic neutrophils exceed 250 per mm³.';
+  o.narrow = 'Repeat paracentesis 48 hours after starting: a neutrophil fall of less than 25% from baseline means broaden cover and image for secondary peritonitis. Narrow to the culture as soon as it returns.';
+  o.stop = '5–7 days.';
+  o.why = 'Albumin supports circulating volume and lowers the rate of kidney failure and death, most clearly with kidney injury or jaundice.';
+  o.more = ['A positive culture with fewer than 250 neutrophils (bacterascites) is not treated; repeat the tap.', 'Add daptomycin with a prior VRE infection or a positive VRE surveillance swab. With current or recent piperacillin-tazobactam exposure, or known multidrug-resistant gram-negatives, use meropenem, with or without vancomycin.', 'The guidance gives cefotaxime 2 g IV q12h as its example third-generation cephalosporin; ceftriaxone is the usual equivalent. The repeat tap may be skipped if an organism is isolated, it is susceptible to the antibiotic in use, and the patient is improving.', 'Hold non-selective beta-blockers if mean arterial pressure falls below 65 mm Hg or kidney injury develops.'];
+  return o; }},
+{id: 'men', name: 'Meningitis', vars: [
+  {id: 'young', label: 'Age under 50, immunocompetent'}, {id: 'old', label: 'Age over 50, immunocompromised, or alcohol use disorder'}, {id: 'nsg', label: 'After neurosurgery, penetrating trauma, or shunt'}],
+ build: function(v, p){
+  var o = {rx: [], also: [], guards: [], more: [], tier: T.men};
+  o.rx.push('VANCO');
+  if (v === 'nsg') o.rx.push('ceftazidime'); else o.rx.push('ceftriaxoneMen');
+  if (v === 'old'){ if (pcn(p)) o.guards.push('Listeria cover: ampicillin is a penicillin. With this allergy use TMP-SMX for Listeria and involve infectious diseases (expert practice).'); else o.rx.push('ampicillin'); }
+  if (v !== 'nsg') o.rx.push('DEX');
+  o.guards.push('Give the first dose now. Blood cultures, then ' + (v === 'nsg' ? '' : 'dexamethasone and ') + 'antibiotics; CT and LP follow. Never wait for CT or LP.');
+  o.also.push('Encephalitis possible (confusion, seizure, focal signs): add acyclovir ' + acyclovir(p).text + ' until HSV PCR is negative. Use ideal body weight in obesity.');
+  o.first = 'Blood cultures. CT before LP for age 60 or older, immunocompromise, prior CNS disease, seizure within a week, altered consciousness, or a focal deficit.';
+  o.narrow = 'Narrow to CSF culture and susceptibilities. Continue dexamethasone only if the Gram stain shows gram-positive diplococci or cultures grow pneumococcus.';
+  o.stop = 'By organism: meningococcus 7 days, pneumococcus 10–14, Listeria at least 21.';
+  o.why = v === 'nsg' ? 'After neurosurgery or a shunt the likely organisms are staphylococci and hospital gram-negative rods including Pseudomonas, so vancomycin is paired with an antipseudomonal beta-lactam.' : (v === 'old' && pcn(p)) ? 'Listeria is not covered by cephalosporins, and the usual drug for it is a penicillin, so the allergy has to be dealt with in the first hour, not later.' : v === 'old' ? 'Listeria is not covered by cephalosporins; ampicillin is. Dexamethasone has to arrive with or before the first antibiotic dose to blunt the inflammation from bacterial lysis.' : 'Vancomycin covers cephalosporin-resistant pneumococcus until susceptibilities return. Dexamethasone has to arrive with or before the first antibiotic dose.';
+  o.more = ['Vancomycin trough target is 15–20 in meningitis; it is never used alone. Do not start dexamethasone after antibiotics have already been given.', 'After neurosurgery, cefepime 2 g q8h or meropenem 2 g q8h are standard alternatives to ceftazidime; neither label carries an adult meningitis dose (expert practice).', 'Ceftriaxone meningitis dose from the label: 100 mg/kg/day, once daily or q12h, maximum 4 g/day. Ampicillin: 150–200 mg/kg/day in divided doses every 3–4 hours.'];
+  return o; }},
+{id: 'sepsis', name: 'Sepsis, source unknown', vars: [{id: 'u', label: 'Sepsis or septic shock, no clear source'}],
+ build: function(v, p){
+  var o = {rx: ['VANCO', p.esbl ? 'meropenem' : 'cefepime'], also: [], guards: [], more: [], tier: T.ssc + ' (principles); the named regimen is expert practice'};
+  if (!p.esbl) o.also.push('Abdominal source possible: add metronidazole ' + dose('metronidazole', p).text + '.');
+  o.guards.push('Septic shock, or probable sepsis: antimicrobials immediately, ideally within 1 hour. Possible sepsis without shock: rapid work-up, and start within 3 hours if concern persists.');
+  o.first = 'Blood cultures as soon as possible, ideally before the first dose, without delaying it in shock. Lactate; look for a source needing control within 6 hours.';
+  o.narrow = 'At 48–72 hours: narrow to a pathogen, de-escalate if final cultures are negative, and stop if another diagnosis explains the illness.';
+  o.stop = 'Shorter courses when source control is adequate; procalcitonin with clinical judgment can support stopping, not starting.';
+  o.why = 'The campaign gives principles, not a named regimen: cover the likely organisms fast, cover a resistant organism only when the patient is at high risk for it, and narrow early.';
+  o.more = ['Give beta-lactams as a loading dose followed by prolonged infusion (strong recommendation).', 'No empiric antifungal by default; consider case by case with fungal risk factors.', 'Piperacillin-tazobactam 4.5 g q6h is an alternative to cefepime and covers anaerobes without metronidazole.'];
+  return o; }},
+{id: 'line', name: 'Central line infection', vars: [
+  {id: 'std', label: 'Stable'}, {id: 'ill', label: 'Critically ill, septic, neutropenic, or femoral line'}, {id: 'cand', label: 'Septic with Candida risk (TPN, femoral line, transplant, hematologic malignancy)'}],
+ build: function(v, p){
+  var o = {rx: ['VANCO'], also: [], guards: [], more: [], tier: T.line};
+  if (v !== 'std') o.rx.push(p.esbl ? 'meropenem' : 'cefepime');
+  if (v === 'cand') o.rx.push('micafungin');
+  o.guards.push('Remove a short-term line for S. aureus, gram-negative bacilli, enterococci, fungi or mycobacteria. Remove a long-term line for S. aureus, Pseudomonas, fungi or mycobacteria, and for severe sepsis, suppurative thrombophlebitis, endocarditis, or bacteremia beyond 72 hours of active therapy.');
+  o.first = 'Paired blood cultures, one from the line and one peripheral, before the first dose.';
+  o.narrow = (p.allergy === 'severe' ? 'MSSA: involve allergy before any beta-lactam. ' : 'MSSA → cefazolin. ') + 'Stop gram-negative and Candida cover if cultures are negative at 48–72 hours.';
+  o.stop = 'From the first negative culture. Coagulase-negative staphylococci: 5–7 days with the line out. S. aureus: 4–6 weeks; 14 days only if not diabetic or immunosuppressed, line removed, no prosthetic intravascular device, TEE negative, fever and bacteremia gone within 72 hours, and no metastatic infection. Enterococci and gram-negatives: 7–14 days. Candida: 14 days after the first negative culture.';
+  o.why = v === 'std' ? 'Staphylococci cause most line infections, so vancomycin alone is the starting point unless the patient is unstable.' : 'In an unstable patient the cost of missing a gram-negative or Candida infection is high, so cover is widened until cultures return.';
+  o.more = ['Daptomycin replaces vancomycin where MRSA isolates commonly have a vancomycin MIC of 2 or more. Linezolid is not used empirically.', 'Two gram-negative agents of different classes are used for neutropenic or severely septic patients, or those colonised with a resistant gram-negative, then de-escalated.', 'Fluconazole can replace the echinocandin only with no azole exposure in the past 3 months and very low risk of C. krusei or C. glabrata.'];
+  return o; }},
+{id: 'cdi', name: 'C. difficile', vars: [
+  {id: 'init', label: 'Initial episode'}, {id: 'fulm', label: 'Fulminant: hypotension or shock, ileus, megacolon'}, {id: 'rec', label: 'First recurrence'}],
+ build: function(v, p){
+  var o = {rx: [], also: [], guards: [], more: [], tier: T.cdi};
+  if (v === 'fulm'){ o.rx.push('vancoPOhi'); o.rx.push('metronidazoleIV'); o.guards.push('Surgical consult now. With ileus add rectal vancomycin 500 mg in 100 mL saline q6h.'); o.stop = 'Until clinical recovery; at least 10 days.';
+    o.why = 'With ileus the oral drug may not reach the colon, so IV metronidazole and rectal vancomycin are added. Fidaxomicin has not been studied in fulminant disease.'; }
+  else { o.rx.push('fidaxomicin'); o.stop = '10 days.';
+    o.why = 'Fidaxomicin cures as often as vancomycin with fewer recurrences, because it spares more of the gut flora.'; }
+  o.guards.push('Stop the inciting antibiotic if possible. Do not test or treat without diarrhea.');
+  o.first = 'Stool C. difficile testing only with unexplained new diarrhea (3 or more unformed stools in 24 hours).';
+  o.narrow = 'No test of cure.';
+  o.more = v === 'rec' ? ['Fidaxomicin can also be given as 200 mg q12h for 5 days, then every other day for 20 days. Alternative: vancomycin taper (125 mg q6h for 10–14 days, q12h for 7 days, daily for 7 days, then every 2–3 days for 2–8 weeks).', 'Later recurrences: as above, or vancomycin followed by rifaximin 400 mg q8h for 20 days; fecal microbiota therapy after at least two recurrences. Bezlotoxumab was discontinued in 2025.']
+    : ['Alternative: vancomycin 125 mg oral q6h for 10 days. Metronidazole 500 mg q8h for 10–14 days only for non-severe disease when neither is available. Non-severe means white count below 15,000 and creatinine below 1.5.', 'The rectal vancomycin dose is from the 2017 guideline and institutional protocols.'];
+  return o; }},
+{id: 'nf', name: 'Neutropenic fever', vars: [{id: 'u', label: 'Fever with ANC under 500'}],
+ build: function(v, p){
+  var o = {rx: [p.esbl ? 'meropenem' : 'cefepime'], also: [], guards: ['First dose within 60 minutes of triage.'], more: ['Add vancomycin for hemodynamic instability, pneumonia, skin or line infection, or known MRSA colonisation. A full tool for oncologic emergencies is planned.'], tier: 'IDSA 2010 and ASCO/IDSA 2018 (summary card; full tool planned)'};
+  if (p.mrsa) o.rx.push('VANCO');
+  o.first = 'Two sets of blood cultures (each lumen of a central line and one peripheral) before the first dose.'; o.narrow = 'Narrow to cultures; reassess at 48–72 hours.'; o.stop = 'By source and count recovery.';
+  o.why = 'Without neutrophils, Pseudomonas and other gram-negative rods can kill within hours, so an antipseudomonal beta-lactam is given before any work-up is complete.';
+  return o; }}
+];
+
+function order(synId, varId, p){
+  var S = SYN.filter(function(s){ return s.id === synId; })[0]; if (!S) return null;
+  var V = S.vars.filter(function(v){ return v.id === varId; })[0] || S.vars[0];
+  var o = S.build(V.id, p);
+  o.syn = S.name; o.variant = V.label;
+  o.lines = o.rx.map(function(k){
+    if (k === 'VANCO') return vancoLoad(p);
+    if (k === 'DEX'){ var d = perKg('Dexamethasone', 0.15, 'IV q6h for 2–4 days', p, function(x){ return Math.round(x); }); d.why = 'first dose 10–20 minutes before, or with, the first antibiotic'; return d; }
+    return dose(k, p);
+  });
+  o.alerts = [];
+  var keys = o.rx;
+  if (p.allergy !== 'none' && keys.some(function(k){ return DRUGS[k] && DRUGS[k].pcn; })) o.alerts.push('This regimen contains a penicillin and a penicillin allergy is recorded. Do not give it without allergy review.');
+  if (p.allergy === 'severe' && keys.some(function(k){ return BETA[k]; })) o.alerts.push('Severe delayed reaction recorded: this regimen contains a beta-lactam. Involve infectious diseases and allergy before giving it; this tool has no verified regimen without a beta-lactam for this setting.');
+  if (p.allergy === 'severe' && o.noBL && !keys.some(function(k){ return BETA[k]; })) o.guards.unshift('Regimen without a beta-lactam, chosen for the recorded severe reaction.');
+  if ((p.allergy === 'low' || p.allergy === 'ana') && keys.some(function(k){ return BETA[k]; })) o.allergyNote = keys.indexOf('cephalexin') >= 0 ? 'Cephalexin shares a side chain with ampicillin and amoxicillin: avoid it if either caused the reaction.' + (p.allergy === 'ana' ? ' After penicillin anaphylaxis, give an oral cephalosporin only after allergy review.' : '') : 'Cephalosporins with a side chain unlike penicillin (cefazolin, ceftriaxone, cefepime, ceftazidime) and carbapenems can be given after a penicillin reaction' + (p.allergy === 'ana' ? ', including anaphylaxis' : '') + ' (2022 drug allergy practice parameter, as applied in hospital allergy pathways).';
+  if (p.preg){ var bad = keys.filter(function(k){ return DRUGS[k] && (DRUGS[k].fq || DRUGS[k].tet || DRUGS[k].sulfa); }).map(function(k){ return DRUGS[k].n; });
+    o.guards.push('Pregnancy: discuss with obstetrics and pharmacy.' + (bad.length ? ' ' + bad.join(' and ') + ' is generally avoided in pregnancy; this tool does not choose a substitute here, so pick one with obstetrics, pharmacy and infectious diseases.' : '') + ' (Expert practice.)'); }
+  if (p.allergy === 'severe') o.more.unshift('Severe delayed reaction recorded: any beta-lactam named as an alternative below does not apply.');
+  if (!has(p.crcl) && !p.hd) o.crclMissing = o.lines.some(function(l){ return DRUGS[l.key] && DRUGS[l.key].f; });
+  return o;
+}
+</script>
+
+<script id="ui">
+function $(id){ return document.getElementById(id); }
+function num(id){ var v = $(id).value.trim().replace(',', '.'); if (v === '') return null; var n = parseFloat(v); return isNaN(n) ? null : n; }
+function esc(s){ return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;'); }
+function patient(){ return {crcl: num('crcl'), wt: num('wt'), allergy: $('allergy').value, hd: $('hd').checked, mrsa: $('mrsa').checked, pseudo: $('pseudo').checked, esbl: $('esbl').checked, preg: $('preg').checked}; }
+var cur = {syn: null, v: {}};
+
+function orderCard(o, withSelect, S){
+  var h = '<div class="card res order" id="order"><p class="label">Order · ' + esc(o.syn) + '</p>';
+  if (withSelect && S.vars.length > 1){ h += '<div class="field" style="margin-bottom:10px"><label for="variant">Setting and severity</label><select id="variant">' + S.vars.map(function(v){ return '<option value="' + v.id + '"' + (v.label === o.variant ? ' selected' : '') + '>' + esc(v.label) + '</option>'; }).join('') + '</select></div>'; }
+  else h += '<p class="note" style="margin:0 0 8px">' + esc(o.variant) + '</p>';
+  o.alerts.forEach(function(a){ h += '<div class="stopbox"><b>Stop.</b> ' + esc(a) + '</div>'; });
+  o.lines.forEach(function(l){ h += '<div class="rx"><b>' + esc(l.name) + ' ' + esc(l.text) + '</b>' + (l.why || l.x ? '<span>' + esc([l.why, l.x].filter(Boolean).join(' · ')) + '</span>' : '') + '</div>'; });
+  if (o.crclMissing) h += '<div class="guard">CrCl not entered: doses shown are for normal kidney function.</div>';
+  o.guards.forEach(function(g){ h += '<div class="guard">' + esc(g) + '</div>'; });
+  h += '<dl class="kv"><dt>First</dt><dd>' + esc(o.first) + '</dd><dt>Narrow</dt><dd>' + esc(o.narrow) + '</dd><dt>Stop</dt><dd>' + esc(o.stop) + '</dd>';
+  if (o.also.length) h += '<dt>Also</dt><dd>' + o.also.map(esc).join('<br>') + '</dd>';
+  h += '</dl><p class="whyline"><b>Why:</b> ' + esc(o.why) + '</p>';
+  var more = o.more.slice(); if (o.allergyNote) more.unshift(o.allergyNote);
+  h += '<details><summary>More</summary>' + more.map(function(m){ return '<p>' + esc(m) + '</p>'; }).join('') + '<span class="tier">' + esc(o.tier) + '</span></details></div>';
+  return h;
+}
+
+function renderList(){
+  $('synlist').innerHTML = SYN.map(function(s){ return '<button class="syn" type="button" id="syn-' + s.id + '" data-syn="' + s.id + '" aria-pressed="' + (cur.syn === s.id) + '">' + esc(s.name) + '</button>'; }).join('');
+}
+function renderOrder(){
+  if (!cur.syn){ $('out').innerHTML = '<p class="note">Choose a syndrome to see the order.</p>'; return; }
+  var S = SYN.filter(function(s){ return s.id === cur.syn; })[0];
+  $('out').innerHTML = orderCard(order(cur.syn, cur.v[cur.syn] || S.vars[0].id, patient()), true, S);
+}
+function renderDoses(){
+  var p = patient(), rows = Object.keys(DRUGS).map(function(k){ var d = dose(k, p); return '<tr><td>' + esc(d.name) + '<br><span class="note">normal ' + esc(DRUGS[k].d) + '</span></td><td>' + esc(d.text) + (d.adj ? '' : (DRUGS[k].f ? '' : ' · no adjustment')) + '</td></tr>'; });
+  rows.push('<tr><td>Vancomycin<br><span class="note">loading dose</span></td><td>' + esc(vancoLoad(p).text) + ' · maintenance by pharmacy</td></tr>');
+  rows.push('<tr><td>Acyclovir<br><span class="note">normal 10 mg/kg IV q8h</span></td><td>' + esc(acyclovir(p).text) + '</td></tr>');
+  rows.push('<tr><td>Daptomycin<br><span class="note">normal 4 mg/kg IV daily (6 mg/kg for S. aureus bacteremia)</span></td><td>' + esc(dapto(p).text) + '</td></tr>');
+  $('dosetable').innerHTML = rows.join('');
+}
+
+var CASES = [
+  {t: 'Pneumonia on the ward', v: '67-year-old admitted with lobar pneumonia, on 2 L oxygen, no recent admissions or antibiotics. CrCl 70.', q: 'What do you order, and for how long?', p: {crcl: 70, wt: 80}, s: 'cap', var: 'ward'},
+  {t: 'Pneumonia in the ICU', v: '58-year-old with bronchiectasis, intubated for pneumonia. Sputum grew Pseudomonas last year. CrCl 25, 70 kg.', q: 'Which beta-lactam, at what dose?', p: {crcl: 25, wt: 70, pseudo: true}, s: 'cap', var: 'severe'},
+  {t: 'Pyelonephritis with shock', v: '72-year-old with flank pain, on norepinephrine. Took ciprofloxacin last month. CrCl 40.', q: 'What changes because of the shock and the recent fluoroquinolone?', p: {crcl: 40, wt: 65}, s: 'uti', var: 'shock'},
+  {t: 'Catheter and a positive urine', v: '80-year-old with a chronic indwelling catheter, fever and suprapubic pain, stable. CrCl 55.', q: 'Is this complicated? What happens to the catheter?', p: {crcl: 55, wt: 70}, s: 'uti', var: 'civ'},
+  {t: 'Cellulitis and a penicillin "allergy"', v: '45-year-old with leg cellulitis and fever. Chart lists penicillin allergy: a rash as a child. CrCl 90.', q: 'Can a cephalosporin be used?', p: {crcl: 90, wt: 85, allergy: 'low'}, s: 'ssti', var: 'cell'},
+  {t: 'Pain out of proportion', v: '52-year-old with diabetes, rapidly spreading thigh erythema, bullae, hypotension. 90 kg.', q: 'First call, and first three drugs?', p: {crcl: 60, wt: 90}, s: 'ssti', var: 'nec'},
+  {t: 'Ascites and confusion', v: '60-year-old with cirrhosis admitted from home; ascitic fluid neutrophils 620. 70 kg, CrCl 45.', q: 'Antibiotic, and what else on day 1 and day 3?', p: {crcl: 45, wt: 70}, s: 'sbp', var: 'ca'},
+  {t: 'Headache, fever, neck stiffness', v: '68-year-old, drowsy, febrile. 75 kg, CrCl 60.', q: 'Order of events, and the full first set of orders?', p: {crcl: 60, wt: 75}, s: 'men', var: 'old'},
+  {t: 'Distended and hypotensive', v: '74-year-old on day 6 of ceftriaxone: profuse diarrhea, ileus, lactate 4, on pressors. C. difficile toxin positive.', q: 'Regimen and who to call?', p: {crcl: 30, wt: 60}, s: 'cdi', var: 'fulm'},
+  {t: 'Perforated appendicitis, dialysis', v: '49-year-old on hemodialysis, perforated appendicitis, stable after laparoscopic appendectomy. Penicillin anaphylaxis.', q: 'Regimen, dose, and stop date?', p: {hd: true, wt: 78, allergy: 'ana'}, s: 'iai', var: 'low'}
+];
+function renderCases(){
+  $('cases').innerHTML = CASES.map(function(c, n){ return '<div class="card res" id="case-' + (n + 1) + '"><p class="label">Case ' + (n + 1) + '</p><h2>' + esc(c.t) + '</h2><p class="vig">' + esc(c.v) + '</p><p class="vig"><b>' + esc(c.q) + '</b></p><button class="btn" type="button" data-case="' + n + '">Reveal</button><div class="ans" hidden></div></div>'; }).join('');
+}
+$('cases').addEventListener('click', function(e){
+  var b = e.target.closest('button[data-case]'); if (!b) return;
+  var c = CASES[+b.getAttribute('data-case')], box = b.parentNode.querySelector('.ans');
+  var p = Object.assign({crcl: null, wt: null, allergy: 'none', hd: false, mrsa: false, pseudo: false, esbl: false, preg: false}, c.p);
+  box.innerHTML = orderCard(order(c.s, c.var, p), false).replace(' id="order"', ''); box.hidden = false; b.hidden = true;
+});
+
+$('synlist').addEventListener('click', function(e){ var b = e.target.closest('button[data-syn]'); if (!b) return; cur.syn = b.getAttribute('data-syn'); renderList(); renderOrder(); var el = $('order'); if (el) el.scrollIntoView({block: 'nearest'}); });
+$('out').addEventListener('change', function(e){ if (e.target.id === 'variant'){ cur.v[cur.syn] = e.target.value; renderOrder(); } });
+function all(){ renderOrder(); renderDoses(); }
+$('patient').addEventListener('input', all); $('patient').addEventListener('change', all);
+
+var VIEWS = ['order', 'doses', 'prac'];
+function showView(v){ VIEWS.forEach(function(x){ var on = x === v; $('p-' + x).hidden = !on; $('t-' + x).setAttribute('aria-selected', String(on)); }); }
+VIEWS.forEach(function(v){ $('t-' + v).addEventListener('click', function(){ showView(v); }); });
+function goHash(){ var id = decodeURIComponent(location.hash.slice(1)); if (!id) return; if (id.indexOf('syn-') === 0){ var s = id.slice(4); if (SYN.some(function(x){ return x.id === s; })){ showView('order'); cur.syn = s; renderList(); renderOrder(); } }
+  var el = $(id); if (!el) return; var sec = el.closest('section.view'); if (sec) showView(sec.id.slice(2)); requestAnimationFrame(function(){ el.scrollIntoView({block: 'start'}); }); }
+window.addEventListener('hashchange', goHash);
+renderList(); renderOrder(); renderDoses(); renderCases(); goHash();
+</script>
+</body>
+</html>
