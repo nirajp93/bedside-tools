@@ -464,7 +464,7 @@ function low(i, o){
   if (i.mg != null && i.mg < REF.mgLo) o.guards.unshift('Magnesium is low (' + i.mg + '). Replace it first or together; calcium will not hold until it is corrected.');
   else if (i.mg == null) o.guards.push('Magnesium not entered. Check it: low magnesium is a common reason calcium will not correct.');
   if (i.phos != null && i.phos > REF.phHi && o.iv) o.guards.push('Phosphate is high (' + i.phos + '): calcium and phosphate can precipitate in tissue. ' + (i.sympt ? 'Give calcium for the symptoms, and lower the phosphate.' : 'With no symptoms or ECG change, lowering phosphate comes first.') + ' (expert practice)');
-  if (i.mg != null && i.mg < REF.mgLo) o.why = 'Magnesium is needed both to release PTH and for PTH to act. Low magnesium behaves like hypoparathyroidism until it is replaced.';
+  if (i.mg != null && i.mg < REF.mgLo) o.why = pthClass(i.pth) === 'high' ? 'Magnesium is needed for PTH to act on bone and kidney. Even with a high PTH, calcium will not hold until magnesium is replaced.' : 'Magnesium is needed both to release PTH and for PTH to act. Low magnesium behaves like hypoparathyroidism until it is replaced.';
   else if (o.iv && i.sympt) o.why = 'Low ionized calcium lowers the firing threshold of nerve and muscle, causing tetany and seizures, and lengthens the ST segment, which shows as a long QT.';
   else if (o.iv && hold) o.why = 'Calcium given into a high phosphate can deposit in vessels and soft tissue, so without symptoms the phosphate is brought down first.';
   else if (o.iv) o.why = 'At this level calcium is given before symptoms appear, because the first sign can be a seizure or an arrhythmia.';
@@ -629,6 +629,7 @@ function drugsSVG(k, p){
 }
 
 var CANCER = {
+  all: {n: 'Overview', from: 'Tumor', prod: 'four routes', to: 'Blood calcium', labs: ['—','—','—','—'], line: 'Four routes: PTHrP (the most common), bone destruction, calcitriol from lymphoma, and rarely PTH itself. Tap each one for its lab pattern.'},
   pthrp: {n: 'PTHrP', from: 'Solid tumor', prod: 'PTHrP', to: 'Bone + kidney', labs: ['↓','↑','↓ or ↔','↓'], line: 'The most common route. A hormone from the tumor acts like PTH on bone and kidney; no bone metastases are needed.'},
   lytic: {n: 'Bone destruction', from: 'Metastases, myeloma', prod: 'local signals', to: 'Bone', labs: ['↓','↔','↓ or ↔','↔ or ↑'], line: 'Tumor in the marrow drives osteoclasts locally through RANKL. Bone releases calcium and phosphate together.'},
   calc: {n: 'Calcitriol', from: 'Lymphoma', prod: 'calcitriol', to: 'Gut + bone', labs: ['↓','↔','↑','↔ or ↑'], line: 'Less common and almost exclusively lymphoma. The tumor makes active vitamin D; steroids treat it.'},
@@ -642,7 +643,7 @@ function cancerSVG(k, p){
   h += box(128, 34, 86, 52, c.prod, 'signal', false) + box(238, 34, 98, 52, c.to, 'Ca ↑', false);
   return h + '</svg>';
 }
-function cancerLabs(k){ return '<div class="labs6 l4">' + ['PTH','PTHrP','1,25-D','Phos'].map(function(n, i){ var v = CANCER[k].labs[i]; return '<div class="lab' + (v !== '↔' ? ' ch' : '') + '"><span>' + n + '</span><b>' + v + '</b></div>'; }).join('') + '</div>'; }
+function cancerLabs(k){ return '<div class="labs6 l4">' + ['PTH','PTHrP','1,25-D','Phos'].map(function(n, i){ var v = CANCER[k].labs[i]; return '<div class="lab' + (v !== '↔' && v !== '—' ? ' ch' : '') + '"><span>' + n + '</span><b>' + v + '</b></div>'; }).join('') + '</div>'; }
 
 var BOUND = {
   normal: {n: 'Normal', w: [150, 124, 34], tot: '↔', ion: '↔', line: 'Only the ionized part is active. The lab\'s total calcium counts all three parts.'},
@@ -688,7 +689,7 @@ var FIGS = {
   loop: {t: 'The calcium loop', states: ['normal','phpt','fhh','pthrp','calc','dtox','ddef','hypo','ckd','mg'], data: LOOP, svg: loopSVG, extra: labStrip},
   vitd: {t: 'Vitamin D pathway', states: ['normal','gran','steroid','def','ckd'], data: VITD, svg: vitdSVG},
   setp: {t: 'The gland\'s set point', states: ['normal','phpt','fhh','tumor'], data: SETP, svg: setpSVG},
-  cancer: {t: 'How cancer raises calcium', states: ['pthrp','lytic','calc','ectopic'], data: CANCER, svg: cancerSVG, extra: cancerLabs},
+  cancer: {t: 'How cancer raises calcium', states: ['all','pthrp','lytic','calc','ectopic'], data: CANCER, svg: cancerSVG, extra: cancerLabs},
   spiral: {t: 'Why calcium keeps rising', states: ['cycle','saline'], data: SPIRAL, svg: spiralSVG},
   ecg: {t: 'Calcium on the ECG', states: ['normal','high','low'], data: ECG, svg: ecgSVG},
   drugs: {t: 'How each drug works', states: ['saline','calcitonin','bisph','dmab','steroid','cina'], data: DRUGS, svg: drugsSVG},
@@ -710,7 +711,21 @@ var NARROW = {
       ['Milk-alkali, immobilization, thyrotoxicosis, vitamin A', {pthHi: ['unl','PTH would be suppressed'], phLo: ['less','phosphate is usually not low']}],
       ['Thiazide (can unmask primary hyperparathyroidism)', {}]
     ],
-    next: function(s){ if (!s.pthHi && !s.pthLo) return 'PTH, with phosphate, magnesium, creatinine and 25-OH D.'; if (s.pthHi && (s.pthrp || s.d125 || s.spep || s.d25)) return 'Two causes may coexist: follow the positive test as well as the parathyroid workup (24-hour urine calcium and creatinine).'; if (s.pthHi) return s.rLo ? 'Genetic testing for FHH before any surgery.' : s.rHi ? 'DXA and kidney imaging; check the surgery criteria.' : '24-hour urine calcium and creatinine; review lithium and thiazide.'; if (s.pthrp) return 'Find the tumor if it is not already known; involve oncology.'; if (s.d125) return 'Chest imaging for lymphoma or granulomatous disease.'; if (s.spep) return 'Hematology, for a myeloma workup.'; if (s.d25) return 'Supplement history; stop vitamin D and calcium.'; return 'PTHrP, 1,25-(OH)2 D, SPEP and free light chains, TSH; imaging if no tumor is known.'; }
+    next: function(s){
+      if (!s.pthHi && !s.pthLo) return 'PTH, with phosphate, magnesium, creatinine and 25-OH D.';
+      var out = [], pos = [];
+      if (s.pthrp) pos.push('find the tumor if it is not already known and involve oncology');
+      if (s.d125) pos.push('chest imaging for lymphoma or granulomatous disease');
+      if (s.spep) pos.push('hematology for a myeloma workup');
+      if (s.d25) pos.push('supplement history; stop vitamin D and calcium');
+      if (s.pthHi){
+        if (s.rLo) out.push('Genetic testing for FHH before any surgery'); else if (s.rHi) out.push('DXA and kidney imaging; check the surgery criteria'); else out.push('24-hour urine calcium and creatinine; review lithium and thiazide');
+        if (pos.length) out.push('Two causes may coexist, so also: ' + pos.join('; '));
+      } else if (pos.length) out.push(pos.join('; ').replace(/^./, function(c){ return c.toUpperCase(); }));
+      else out.push('PTHrP, 1,25-(OH)2 D, SPEP and free light chains, TSH; imaging if no tumor is known');
+      if (s.pthLo && (s.rLo || s.rHi)) out.push('The urine ratio only separates parathyroid causes; with a suppressed PTH it does not help');
+      return out.join('. ') + '.';
+    }
   },
   low: {
     results: [['ion','Ionized calcium normal'],['mg','Magnesium low'],['pthLo','PTH low or normal','pth'],['pthHi','PTH high','pth'],['phLo','Phosphate low or normal','ph'],['phHi','Phosphate high','ph'],['d25','25-OH D low'],['drug','Recent denosumab, bisphosphonate, cinacalcet, foscarnet or large transfusion']],
@@ -725,14 +740,25 @@ var NARROW = {
       ['Pseudohypoparathyroidism (rare)', {ion: ['out','ionized calcium is normal'], pthLo: ['unl','PTH would be high'], phLo: ['less','phosphate is usually high']}],
       ['Drug or citrate', {ion: ['out','ionized calcium is normal'], drug: ['fav','recent exposure']}]
     ],
-    next: function(s){ if (s.ion) return s.mg ? 'Replace the magnesium. The calcium itself needs nothing more.' : 'Nothing more for calcium: the ionized value is normal.'; if (!s.pthHi && !s.pthLo) return 'PTH, magnesium, phosphate, creatinine and 25-OH D.'; if (s.pthLo) return s.mg ? 'Replace magnesium, then repeat PTH.' : 'Magnesium if not done; ask about neck surgery.'; return s.phHi ? 'Creatinine, uric acid and CK.' : s.phLo ? '25-OH D; lipase if there is abdominal pain.' : 'Phosphate: it splits the high-PTH causes.'; }
+    next: function(s){
+      if (s.ion) return (s.mg ? 'Replace the magnesium. The calcium itself needs nothing more.' : 'Nothing more for calcium: the ionized value is normal.') + (s.pthHi ? (s.d25 ? ' A high PTH still needs explaining: the low 25-OH D may be why. Replace it and check kidney function.' : ' A high PTH still needs explaining: check 25-OH D and kidney function.') : s.d25 ? ' Replace the low vitamin D.' : '');
+      var out = [];
+      if (s.mg) out.push('Replace magnesium first or together' + (s.pthLo ? ', then repeat PTH' : ''));
+      if (!s.pthHi && !s.pthLo){ var need = ['PTH']; if (!s.mg) need.push('magnesium'); if (!s.phLo && !s.phHi) need.push('phosphate'); need.push('creatinine'); if (!s.d25) need.push('25-OH D'); out.push('Send ' + need.join(', ')); }
+      else if (s.pthLo){ if (!s.mg) out.push('Magnesium if not done; ask about neck surgery'); }
+      else if (s.phHi) out.push('Creatinine, uric acid and CK');
+      else if (s.phLo) out.push((s.d25 ? 'Replace vitamin D' : '25-OH D') + '; lipase if there is abdominal pain');
+      else out.push('Phosphate: it splits the high-PTH causes');
+      if (s.d25 && out.join(' ').indexOf('Replace vitamin D') < 0) out.push('Replace vitamin D: the 25-OH D is low whatever else is found');
+      return out.join('. ') + '.';
+    }
   }
 };
 function narrow(side, sel){
   var N = NARROW[side];
   return N.causes.map(function(c){
     var rules = c[1], rank = {fav: 5, out: 4, unl: 3, less: 2, 'in': 1}, st = 'in', why = '';
-    Object.keys(rules).forEach(function(r){ if (!sel[r]) return; var x = rules[r]; if (rank[x[0]] > rank[st]){ st = x[0]; why = x[1]; } });
+    Object.keys(rules).forEach(function(r){ if (!sel[r]) return; if ((r === 'rLo' || r === 'rHi') && !sel.pthHi) return; var x = rules[r]; if (rank[x[0]] > rank[st]){ st = x[0]; why = x[1]; } });
     return {name: c[0], st: st, why: why};
   });
 }
@@ -923,7 +949,7 @@ function workChips(o){
   }
   c += chip('loop', st);
   if (hi && sel.pthHi) c += chip('setp', 'phpt');
-  if (hi && pc === 'low' && (i.cancer || i.calcitriol)) c += chip('cancer', i.calcitriol ? 'calc' : 'pthrp');
+  if (hi && pc === 'low' && (i.cancer || i.calcitriol)) c += chip('cancer', i.calcitriol ? 'calc' : i.phos != null && i.phos < REF.phLo ? 'pthrp' : 'all');
   if (i.calcitriol && hi) c += chip('vitd', 'gran'); else if (!hi && pc === 'high') c += chip('vitd', 'normal');
   return '<div class="chips">' + c + '</div><div class="row"><button class="btn ghost" data-narrow="' + esc(JSON.stringify({side: o.side, sel: sel})) + '">Narrow the differential</button></div>';
 }
