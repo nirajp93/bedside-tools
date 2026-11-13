@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Calcium · bedside.tools</title>
-<meta name="description" content="High or low calcium: what to do now, when each treatment starts to work, and a PTH-led workup, with the reasoning shown.">
+<meta name="description" content="High or low calcium: what to do now, when each treatment starts to work, a PTH-led workup that narrows the differential, and the physiology in diagrams.">
 <script src="/theme.js"></script>
 <style>
 :root{--bg:#FBFBFA;--card:#FFFFFF;--ink:#111113;--muted:#55555D;--line:#ECECEE;--accent:#2B4BDB;--warn:#9A3B00;--warnbg:#FFF6EC}
@@ -17,8 +17,8 @@ a{color:var(--accent)}
 .back{font-size:14px;text-decoration:none;display:inline-block;min-height:44px;line-height:44px}
 h1{font-size:26px;margin:4px 0 4px;letter-spacing:-.01em}
 .purpose{color:var(--muted);margin:0 0 20px}
-.tabs{display:flex;gap:8px;margin-bottom:16px}
-.tab{flex:1;min-height:44px;border:1px solid var(--line);background:var(--card);border-radius:14px;font:inherit;font-weight:600;color:var(--muted);cursor:pointer}
+.tabs{display:flex;gap:6px;margin-bottom:16px}
+.tab{flex:1;min-width:0;min-height:44px;border:1px solid var(--line);background:var(--card);border-radius:14px;padding:0 4px;font:inherit;font-size:15px;font-weight:600;color:var(--muted);cursor:pointer}
 .tab[aria-selected="true"]{border-color:var(--accent);color:var(--accent)}
 .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
 .label{font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
@@ -84,12 +84,50 @@ footer{margin-top:28px;font-size:13.5px;color:var(--muted)}
 footer p{margin:0 0 8px}
 @media (min-width:900px){
   .wrap{max-width:1040px}
-  #p-tool.on{display:grid;grid-template-columns:360px 1fr;gap:20px;align-items:start}
+  #p-tool.on{display:grid;grid-template-columns:360px minmax(0,1fr);gap:20px;align-items:start}
   #inputs{position:sticky;top:16px}
-  .refgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start}
+  .refgrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;align-items:start}
+  #narrow{grid-column:1 / -1}
+  #p-learn{max-width:720px;margin:0 auto}
   .refgrid .card{margin-bottom:0}
 }
 .panel{display:none}.panel.on{display:block}
+.fig{display:block;width:100%;max-width:460px;height:auto;margin:0 auto}
+.states{display:flex;gap:6px;overflow-x:auto;margin:10px -16px;padding:2px 16px 6px;scrollbar-width:none}
+.states::-webkit-scrollbar{display:none}
+.sbtn{flex:none;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--ink);font:inherit;font-size:14px;cursor:pointer;white-space:nowrap}
+.sbtn[aria-pressed="true"]{border-color:var(--accent);color:var(--accent);font-weight:600}
+.labs6{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:10px}
+.labs6.l4{grid-template-columns:repeat(4,1fr)}
+.lab{background:var(--fill);border-radius:10px;padding:6px 8px}
+.lab span{display:block;font-size:12px;color:var(--muted)}
+.lab b{font-family:var(--mono);font-size:13.5px}
+.lab.ch{box-shadow:inset 0 0 0 1.5px var(--warn)}
+.line1{font-size:15px;margin:10px 0 0}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.chip{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--fill);color:var(--ink);font:inherit;font-size:14px;cursor:pointer}
+.chip svg{flex:none;color:var(--accent)}
+.scrim{position:fixed;inset:0;background:var(--scrim);z-index:20}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:21;max-height:90vh;overflow-y:auto;background:var(--card);border:1px solid var(--line);border-bottom:0;border-radius:20px 20px 0 0;padding:8px 16px 24px;max-width:560px;margin:0 auto}
+.sheethead{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.sheethead h2{font-size:18px;margin:0}
+.xbtn{min-height:44px;min-width:44px;border:0;background:transparent;color:var(--accent);font:inherit;font-weight:600;cursor:pointer}
+.pills{position:sticky;top:0;z-index:5;background:var(--bg);display:flex;gap:6px;overflow-x:auto;margin:0 -16px 12px;padding:8px 16px;border-bottom:1px solid var(--line);scrollbar-width:none}
+.pills::-webkit-scrollbar{display:none}
+.pill{flex:none;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--muted);font:inherit;font-size:14px;cursor:pointer;white-space:nowrap}
+.pill[aria-current="true"]{border-color:var(--accent);color:var(--accent);font-weight:600}
+.chap{scroll-margin-top:70px}
+.cause{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:8px 0;border-top:1px solid var(--line);font-size:15px}
+.cause small{color:var(--muted);font-size:13px;text-align:right;flex:0 1 46%}
+.cause.out span{color:var(--muted);text-decoration:line-through}
+.cause.out,.cause.less,.cause.unl{opacity:.6}
+.cause.fav span{font-weight:700}
+.cause.fav span:before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--accent);margin-right:8px}
+.seg{display:flex;gap:8px;margin:10px 0 0}
+.trial{border-left:3px solid var(--accent);padding-left:12px}
+.trial p{margin:0 0 6px;font-size:15px}
+.trial .k{font-family:var(--mono);font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);display:block}
+@media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
 </style>
 </head>
 <body>
@@ -100,6 +138,7 @@ footer p{margin:0 0 8px}
 
 <div class="tabs" role="tablist">
   <button class="tab" role="tab" id="t-tool" aria-selected="true" aria-controls="p-tool">Calcium</button>
+  <button class="tab" role="tab" id="t-learn" aria-selected="false" aria-controls="p-learn">Learn</button>
   <button class="tab" role="tab" id="t-ref" aria-selected="false" aria-controls="p-ref">Reference</button>
   <button class="tab" role="tab" id="t-prac" aria-selected="false" aria-controls="p-prac">Practice</button>
 </div>
@@ -122,6 +161,19 @@ footer p{margin:0 0 8px}
   </div>
   </div>
   <div id="out"><div class="card empty">Enter a calcium to start. Total calcium with albumin, or an ionized calcium.</div></div>
+</div>
+
+<div class="panel" id="p-learn" role="tabpanel" aria-labelledby="t-learn">
+  <div class="pills" id="pills"></div>
+  <div class="card chap" id="learn-bound" data-pill="Bound vs free"><p class="label">1 · What counts</p><h2>Only the free calcium is active</h2><div data-figure="bound"></div></div>
+  <div class="card chap" id="learn-loop" data-pill="The loop"><p class="label">2 · The loop</p><h2>Four organs, two hormones</h2><p class="sub">Pick a disorder to see which arrows change and what the labs show.</p><div data-figure="loop"></div></div>
+  <div class="card chap" id="learn-vitd" data-pill="Vitamin D"><p class="label">3 · Vitamin D</p><h2>Stored in one form, active in another</h2><div data-figure="vitd"></div></div>
+  <div class="card chap" id="learn-setpoint" data-pill="Set point"><p class="label">4 · The thermostat</p><h2>How the gland reads calcium</h2><div data-figure="setp"></div></div>
+  <div class="card chap" id="learn-cancer" data-pill="Cancer"><p class="label">5 · Too high</p><h2>Four ways cancer raises calcium</h2><div data-figure="cancer"></div></div>
+  <div class="card chap" id="learn-effects" data-pill="Effects"><p class="label">6 · What high calcium does</p><h2>It feeds itself</h2><div data-figure="spiral"></div><h2 style="margin-top:18px">And it shows on the ECG</h2><div data-figure="ecg" data-state="high"></div></div>
+  <div class="card chap" id="learn-drugs" data-pill="Treatment"><p class="label">7 · Treatment</p><h2>Where each drug acts</h2><div data-figure="drugs"></div><p class="note" style="margin-top:10px">When each one starts and how long it lasts is under <a href="#timecourse">Reference</a>.</p></div>
+  <div class="card chap" id="learn-low" data-pill="Too low"><p class="label">8 · Too low</p><h2>Why magnesium comes first</h2><div data-figure="mg"></div><p class="note" style="margin-top:10px">For the other causes of a low calcium, pick vitamin D deficiency, hypoparathyroidism or kidney disease in <a href="#learn-loop">the loop</a>.</p></div>
+  <div class="card chap" id="trials" data-pill="Trials"><p class="label">9 · Trials</p><h2>Three trials behind the practice</h2><div id="trialbox"></div><div class="row"><button class="btn" id="go-prac">Try the practice cases</button></div></div>
 </div>
 
 <div class="panel" id="p-ref" role="tabpanel" aria-labelledby="t-ref">
@@ -189,37 +241,20 @@ footer p{margin:0 0 8px}
     </details>
   </div>
 
-  <div class="card" id="causes-high">
-    <p class="label">Causes</p>
-    <h2>High calcium by PTH</h2>
-    <ul>
-      <li><b>PTH high or normal:</b> primary hyperparathyroidism, FHH, lithium, tertiary hyperparathyroidism (long CKD or after transplant).</li>
-      <li><b>PTH low, PTHrP high:</b> humoral hypercalcemia of malignancy (squamous, kidney, breast, bladder, ovary).</li>
-      <li><b>PTH low, 1,25-(OH)2 D high:</b> lymphoma; granulomas (sarcoid, TB, fungal).</li>
-      <li><b>PTH low, 25-OH D high:</b> vitamin D excess.</li>
-      <li><b>PTH low, neither:</b> bone metastases, myeloma, milk-alkali, thiazide, immobilization, thyrotoxicosis, vitamin A.</li>
-    </ul>
-    <p class="whyline"><b>Why:</b> PTH is the fork. A gland that is still secreting at a high calcium is the cause; a silent gland means the calcium is coming from somewhere else.</p>
+  <div class="card" id="narrow"><span id="causes-high"></span><span id="causes-low"></span>
+    <p class="label">Workup · tap each result you have</p>
+    <h2>Narrow the differential</h2>
+    <div class="seg" role="group" aria-label="Side"><button class="sbtn" id="nw-high" aria-pressed="true">High calcium</button><button class="sbtn" id="nw-low" aria-pressed="false">Low calcium</button></div>
+    <div class="states" id="nw-results" role="group" aria-label="Results"></div>
+    <div id="nw-causes"></div>
+    <p class="line1" id="nw-next"></p>
+    <p class="whyline"><b>Why:</b> PTH splits every calcium problem in two: either the gland is the cause or it is responding. Phosphate and the vitamin D levels then sort what is left.</p>
     <details><summary>More</summary>
-      <p>Phosphate helps: PTH and PTHrP both waste phosphate, so it runs low; vitamin D raises gut absorption of phosphate too, so it runs normal or high.</p>
-      <p>PTHrP acts on the PTH receptor but does not switch on calcitriol production well, so calcitriol is low or normal in humoral hypercalcemia of malignancy.</p>
-      <span class="tier">expert practice</span>
-    </details>
-  </div>
-
-  <div class="card" id="causes-low">
-    <p class="label">Causes</p>
-    <h2>Low calcium by PTH and phosphate</h2>
-    <ul>
-      <li><b>PTH low or normal:</b> hypoparathyroidism (after neck surgery, autoimmune, infiltrative), low magnesium.</li>
-      <li><b>PTH high, phosphate low or normal:</b> vitamin D deficiency or malabsorption, hungry bone after parathyroidectomy, pancreatitis.</li>
-      <li><b>PTH high, phosphate high:</b> CKD, tumor lysis, rhabdomyolysis, pseudohypoparathyroidism.</li>
-      <li><b>Drugs and others:</b> denosumab, IV bisphosphonates, cinacalcet, foscarnet, citrate from large transfusions or apheresis.</li>
-    </ul>
-    <p class="whyline"><b>Why:</b> PTH should be high when calcium is low. If it is, phosphate separates the causes, because working PTH wastes phosphate and a failing kidney retains it.</p>
-    <details><summary>More</summary>
-      <p>Acute alkalosis (hyperventilation) lowers the ionized fraction without changing the total. Routine repletion doses are in <a href="/electrolytes/">Electrolyte repletion</a>.</p>
-      <span class="tier">expert practice</span>
+      <p><b>Send with the first draw:</b> repeat calcium with albumin or an ionized calcium, PTH, phosphate, magnesium, creatinine, 25-OH vitamin D.</p>
+      <p><b>Send only after the PTH is back:</b> if suppressed, PTHrP, 1,25-(OH)2 vitamin D, SPEP and free light chains, TSH. If high or normal, a 24-hour urine calcium and creatinine.</p>
+      <p>Faded means unlikely or less likely, never excluded: two causes can coexist, a positive test always outranks a PTH that points the other way, and phosphate is a soft clue that rises with kidney injury. Only a normal ionized calcium crosses causes out. Acute alkalosis lowers ionized calcium alone and is not on the list.</p>
+      <p>Routine repletion doses are in <a href="/electrolytes/">Electrolyte repletion</a>.</p>
+      <span class="tier">PTH split and urine ratio: Fifth International Workshop 2022</span><span class="tier">the rest: expert practice</span>
     </details>
   </div>
  </div>
@@ -229,11 +264,17 @@ footer p{margin:0 0 8px}
   <div id="practice"></div>
 </div>
 
+<div class="scrim" id="scrim" hidden></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-t" hidden>
+  <div class="sheethead"><h2 id="sheet-t"></h2><button class="xbtn" id="sheet-x">Close</button></div>
+  <div id="sheet-b"></div>
+</div>
+
 <footer>
   <p><strong>For education only. Not a substitute for clinical judgment.</strong> Built to national guidance and FDA labels; formulary, calcitonin availability, lab reference ranges and infusion protocols vary, so adjust to your institution. Rows marked expert practice are not from a graded guideline.</p>
   <p>Privacy: everything runs in your browser. Nothing you enter is sent anywhere or stored, and there are no analytics. Do not enter names, record numbers, or dates of birth.</p>
   <p class="mono">Last reviewed: 2026-11-13</p>
-  <p><strong>Sources:</strong> El-Hajj Fuleihan G et al., Treatment of Hypercalcemia of Malignancy in Adults: An Endocrine Society Clinical Practice Guideline, J Clin Endocrinol Metab 2023;108:507 (recommendations graded strong or conditional; all on very low certainty evidence) · Bilezikian JP et al., Evaluation and Management of Primary Hyperparathyroidism: Summary Statement and Guidelines from the Fifth International Workshop, J Bone Miner Res 2022;37:2293 · FDA prescribing information: zoledronic acid injection, denosumab (Xgeva), calcitonin salmon injection, calcium gluconate injection.</p>
+  <p><strong>Sources:</strong> El-Hajj Fuleihan G et al., Treatment of Hypercalcemia of Malignancy in Adults: An Endocrine Society Clinical Practice Guideline, J Clin Endocrinol Metab 2023;108:507 (recommendations graded strong or conditional; all on very low certainty evidence) · Bilezikian JP et al., Evaluation and Management of Primary Hyperparathyroidism: Summary Statement and Guidelines from the Fifth International Workshop, J Bone Miner Res 2022;37:2293 · FDA prescribing information: zoledronic acid injection, denosumab (Xgeva), calcitonin salmon injection, calcium gluconate injection · Trials: Major P et al., J Clin Oncol 2001;19:558 · Hu MI et al., J Clin Endocrinol Metab 2014;99:3144 · Pretorius M et al., Ann Intern Med 2022;175:812 · Diagrams are schematic and drawn for this site; physiology not tied to a named source is marked expert practice in the tool's record.</p>
 </footer>
 </div>
 
@@ -452,6 +493,255 @@ function low(i, o){
     o.wuWhy = 'PTH should rise when calcium falls. A gland that stays quiet is either damaged or short of the magnesium it needs to secrete.';
   }
 }
+/* Figures. Pure data and SVG string builders; no DOM access. Every label is listed in calcium-v2-content-table.md. */
+var LOOP = {
+  normal: {n: 'Normal', a: {}, labs: ['n','n','n','n','n','n'], line: 'The gland senses calcium and sets PTH. PTH pulls calcium from bone, saves it in the kidney, and has the kidney make calcitriol, which absorbs more from the gut.'},
+  phpt: {n: 'Primary hyperparathyroidism', a: {fb: 'x', pthBone: 'u', pthKid: 'u', boneCa: 'u', kidCa: 'u', cal: 'u', gutCa: 'u'}, labs: ['u','dn','un','n','nu','nu'], line: 'The gland ignores the calcium it should sense. Every PTH action runs high, and phosphate is wasted in the urine.'},
+  fhh: {n: 'FHH', a: {fb: 'x', kidCa: 'u'}, labs: ['u','n','un','n','n','d'], line: 'The calcium sensor is set too high in both gland and kidney. PTH stays normal or slightly high and the kidney holds on to calcium, so urine calcium is low.'},
+  pthrp: {n: 'PTHrP from a tumor', x: 'tumor', a: {pthBone: 'd', pthKid: 'd', boneCa: 'u', kidCa: 'u', cal: 'd', gutCa: 'd'}, labs: ['u','d','d','n','dn','u'], line: 'The tumor makes a PTH look-alike that acts on bone and kidney. The gland shuts off. Calcitriol does not rise, unlike true PTH excess.'},
+  calc: {n: 'Lymphoma or granuloma', x: 'mac', a: {pthBone: 'd', pthKid: 'd', gutCa: 'u', boneCa: 'u', cal: 'd'}, labs: ['u','nu','d','n','u','u'], line: 'Macrophages or tumor cells make calcitriol outside the kidney, with no off switch. The gut absorbs more calcium and phosphate; the gland shuts off.'},
+  dtox: {n: 'Vitamin D excess', a: {pthBone: 'd', pthKid: 'd', gutCa: 'u', boneCa: 'u'}, labs: ['u','nu','d','uu','nu','u'], line: 'Too much vitamin D drives gut absorption and bone resorption directly. The gland shuts off; 25-OH D is very high.'},
+  ddef: {n: 'Vitamin D deficiency', a: {gutCa: 'd', pthBone: 'u', pthKid: 'u', boneCa: 'u', kidCa: 'u'}, labs: ['dn','d','u','d','v','d'], line: 'The gut absorbs too little. PTH rises to compensate, holding calcium near normal at the cost of bone and of phosphate lost in the urine.'},
+  hypo: {n: 'Hypoparathyroidism', a: {pthBone: 'd', pthKid: 'd', boneCa: 'd', kidCa: 'd', cal: 'd', gutCa: 'd'}, labs: ['d','u','dn','n','d','r'], line: 'No PTH: bone releases less, the kidney loses calcium and keeps phosphate, and little calcitriol is made.'},
+  ckd: {n: 'Chronic kidney disease', a: {cal: 'd', gutCa: 'd', pthBone: 'u', pthKid: 'u', boneCa: 'u'}, labs: ['dn','u','u','n','d','d'], line: 'The kidney cannot excrete phosphate or make calcitriol. Calcium drifts down and PTH climbs to hold it.'},
+  mg: {n: 'Low magnesium', a: {pthBone: 'x', pthKid: 'x', boneCa: 'd', kidCa: 'd'}, labs: ['d','n','dn','n','n','-'], line: 'Without magnesium the gland cannot release PTH and tissues respond poorly to it. Calcium will not correct until magnesium is replaced.'},
+  mgfix: {n: 'Magnesium replaced', a: {}, labs: ['n','n','n','n','n','n'], line: 'With magnesium back, the gland can release PTH and bone and kidney respond to it again. Now calcium holds.'}
+};
+var LABNAMES = ['Calcium', 'Phos', 'PTH', '25-OH D', '1,25-D', 'Urine Ca'];
+var LABTXT = {n: '↔', u: '↑', d: '↓', uu: '↑↑', dn: '↓ or ↔', un: '↑ or ↔', nu: '↔ or ↑', v: 'varies', r: 'high for the Ca', '-': '—'};
+var FS = 'font-family:var(--sans)', FM = 'font-family:var(--mono)';
+function vcol(v){ return v === 'u' ? 'var(--warn)' : v === 'd' ? 'var(--accent)' : v === 'x' ? 'var(--bad)' : 'var(--muted)'; }
+function markers(p){ return '<defs>' + ['n','u','d','x'].map(function(k){ return '<marker id="' + p + k + '" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="' + vcol(k) + '"/></marker>'; }).join('') + '</defs>'; }
+function box(x, y, w, h, t1, t2, hot, dim){
+  return '<g' + (dim ? ' opacity=".45"' : '') + '><rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="10" fill="' + (hot ? 'var(--warnbg)' : 'var(--fill)') + '" stroke="' + (hot ? 'var(--warn)' : 'var(--line)') + '"' + (hot ? ' stroke-width="2"' : '') + '/>' +
+    '<text x="' + (x + w / 2) + '" y="' + (y + (t2 ? h / 2 - 2 : h / 2 + 4)) + '" text-anchor="middle" style="' + FS + ';font-size:12px;font-weight:600;fill:var(--ink)">' + t1 + '</text>' +
+    (t2 ? '<text x="' + (x + w / 2) + '" y="' + (y + h / 2 + 12) + '" text-anchor="middle" style="' + FM + ';font-size:10px;fill:var(--muted)">' + t2 + '</text>' : '') + '</g>';
+}
+function svgOpen(vb, label){ return '<svg viewBox="' + vb + '" role="img" aria-label="' + label + '" class="fig">'; }
+function line(d, v, w, p){ return '<path d="' + d + '" fill="none" stroke="' + vcol(v) + '" stroke-width="' + (w || (v === 'u' ? 4 : v === 'd' ? 1.5 : 2)) + '"' + (v === 'd' || v === 'x' ? ' stroke-dasharray="5 4"' : '') + ' marker-end="url(#' + p + (v || 'n') + ')"/>'; }
+function lab(x, y, t, v, anchor){ var m = v === 'u' ? ' ↑' : v === 'd' ? ' ↓' : v === 'x' ? ' ✕' : ''; return '<text x="' + x + '" y="' + y + '" text-anchor="' + (anchor || 'middle') + '" style="' + FM + ';font-size:10.5px;fill:' + vcol(v) + ';font-weight:' + (v ? 700 : 400) + '">' + t + m + '</text>'; }
+
+function loopSVG(key, p){
+  var s = LOOP[key], a = s.a; p = p || 'lp';
+  var h = svgOpen('0 0 340 300', 'Calcium loop: ' + s.n) + markers(p);
+  h += line('M132 46 L62 120', a.pthBone, 0, p) + lab(84, 76, 'PTH', a.pthBone, 'end');
+  h += line('M208 46 L278 120', a.pthKid, 0, p) + lab(260, 80, 'PTH', a.pthKid, 'start');
+  h += line('M94 150 L118 150', a.boneCa, 0, p) + line('M246 150 L222 150', a.kidCa, 0, p);
+  h += line('M290 180 L224 262', a.cal, 0, p) + lab(296, 222, 'calcitriol', a.cal);
+  h += line('M170 248 L170 178', a.gutCa, 0, p);
+  h += '<path d="M170 126 L170 52" fill="none" stroke="' + vcol(a.fb) + '" stroke-width="2"' + (a.fb ? ' stroke-dasharray="5 4"' : '') + '/><path d="M160 50 H180" stroke="' + vcol(a.fb) + '" stroke-width="3"/><text x="177" y="112" style="' + FM + ';font-size:10px;fill:' + vcol(a.fb) + '">' + (a.fb ? 'ignored ✕' : 'off switch') + '</text>';
+  h += box(120, 6, 100, 40, 'Parathyroid', null, key === 'phpt' || key === 'fhh');
+  h += box(120, 126, 100, 50, 'Blood calcium', LABTXT[s.labs[0]], false);
+  h += box(8, 122, 84, 56, 'Bone', 'releases', false) + box(248, 122, 84, 56, 'Kidney', 'saves Ca', key === 'ckd') + box(120, 250, 100, 42, 'Gut', 'absorbs', false);
+  if (s.x === 'tumor') h += '<path d="M26 62 L26 118" fill="none" stroke="var(--warn)" stroke-width="4" marker-end="url(#' + p + 'u)"/>' + box(4, 24, 80, 36, 'Tumor', 'PTHrP', true);
+  if (s.x === 'mac') h += '<path d="M248 264 L224 270" fill="none" stroke="var(--warn)" stroke-width="4" marker-end="url(#' + p + 'u)"/>' + box(250, 246, 84, 40, 'Macrophage', 'calcitriol', true);
+  return h + '</svg>';
+}
+function labStrip(key){
+  var s = LOOP[key];
+  return '<div class="labs6">' + LABNAMES.map(function(n, i){ var v = s.labs[i]; return '<div class="lab' + (v !== 'n' && v !== '-' ? ' ch' : '') + '"><span>' + n + '</span><b>' + LABTXT[v] + '</b></div>'; }).join('') + '</div>';
+}
+
+var VITD = {
+  normal: {n: 'Normal', line: 'Liver makes 25-OH D, the storage form and the one you measure. The kidney activates it to 1,25-(OH)2 D when PTH asks.'},
+  gran: {n: 'Granuloma or lymphoma', line: 'Macrophages do the last step outside the kidney, with no off switch. 1,25-(OH)2 D is high while 25-OH D can be normal.'},
+  steroid: {n: 'Add a steroid', line: 'Glucocorticoids inhibit the macrophage enzyme and cut gut absorption. This is why steroids, not bisphosphonates, treat the mechanism.'},
+  def: {n: 'Deficiency', line: 'Too little coming in: 25-OH D is low. PTH rises and drives the kidney harder, so 1,25-(OH)2 D can look normal. Measure 25-OH D.'},
+  ckd: {n: 'Kidney failure', line: 'The kidney cannot do the last step. 25-OH D may be normal; the active form is low.'}
+};
+function vitdSVG(k, p){
+  p = p || 'vd';
+  var lowIn = k === 'def', kidOff = k === 'ckd', mac = k === 'gran' || k === 'steroid', st = k === 'steroid';
+  var h = svgOpen('0 0 340 300', 'Vitamin D pathway: ' + VITD[k].n) + markers(p);
+  h += line('M120 44 L120 76', lowIn ? 'd' : null, 0, p) + line('M120 124 L120 156', kidOff ? 'x' : lowIn ? 'd' : null, 0, p) + line('M120 206 L120 238', kidOff || lowIn ? 'd' : null, 0, p);
+  h += box(40, 6, 160, 38, 'Skin and diet', 'vitamin D', false, lowIn);
+  h += box(40, 78, 160, 46, 'Liver', '25-OH D · measured', false);
+  h += box(40, 158, 160, 48, 'Kidney', kidOff ? 'cannot activate ✕' : '1,25-(OH)2 D · active', kidOff);
+  h += box(40, 240, 160, 46, 'Gut', 'absorbs Ca and phosphate', false);
+  if (!mac) h += lab(214, 176, 'PTH turns', null, 'start') + lab(214, 190, 'this step up', null, 'start');
+  if (mac){
+    h += line('M200 104 C262 104 286 120 286 146', st ? 'x' : 'u', 0, p) + line('M286 196 C286 236 250 262 204 264', st ? 'x' : 'u', 0, p);
+    h += box(240, 148, 92, 48, 'Macrophage', st ? 'blocked ✕' : 'no off switch', true);
+  }
+  return h + '</svg>';
+}
+
+var SETP = {
+  normal: {n: 'Normal', line: 'PTH falls steeply as calcium rises. A normal gland is nearly silent once calcium is high.'},
+  phpt: {n: 'Primary hyperparathyroidism', line: 'The curve is shifted right and never reaches the floor. At a high calcium the gland is still secreting: a "normal" PTH here is abnormal.'},
+  fhh: {n: 'FHH', line: 'The sensor reads calcium as lower than it is, so the same curve sits further right. Calcium settles mildly high with a mid-range PTH, for life.'},
+  tumor: {n: 'Tumor calcium', line: 'The gland is healthy. The patient sits far out on the normal curve, where PTH is suppressed.'}
+};
+function setpSVG(k){
+  function curve(x0, floor){ var d = ''; for (var x = 0; x <= 100; x += 2){ var y = floor + (1 - floor) / (1 + Math.exp((x - x0) / 6)); d += (x ? 'L' : 'M') + (40 + x * 2.8).toFixed(1) + ' ' + (190 - y * 160).toFixed(1); } return d; }
+  function pt(x, x0, floor){ var y = floor + (1 - floor) / (1 + Math.exp((x - x0) / 6)); return [40 + x * 2.8, 190 - y * 160]; }
+  var h = svgOpen('0 0 340 240', 'PTH against calcium: ' + SETP[k].n);
+  h += '<path d="M40 20V190H324" fill="none" stroke="var(--muted)" stroke-width="1.5"/><text x="182" y="226" text-anchor="middle" style="' + FM + ';font-size:11px;fill:var(--muted)">blood calcium →</text><text x="14" y="110" text-anchor="middle" transform="rotate(-90 14 110)" style="' + FM + ';font-size:11px;fill:var(--muted)">PTH →</text>';
+  h += '<rect x="138" y="20" width="56" height="170" fill="var(--fill)"/><text x="166" y="206" text-anchor="middle" style="' + FM + ';font-size:10px;fill:var(--muted)">normal range</text>';
+  h += '<path d="' + curve(42, 0.04) + '" fill="none" stroke="var(--muted)" stroke-width="2"' + (k === 'phpt' || k === 'fhh' ? ' stroke-dasharray="4 4"' : '') + '/>';
+  var P;
+  if (k === 'phpt'){ h += '<path d="' + curve(62, 0.28) + '" fill="none" stroke="var(--warn)" stroke-width="3"/>'; P = pt(72, 62, 0.28); }
+  else if (k === 'fhh'){ h += '<path d="' + curve(60, 0.04) + '" fill="none" stroke="var(--warn)" stroke-width="3"/>'; P = pt(62, 60, 0.04); }
+  else if (k === 'tumor') P = pt(88, 42, 0.04);
+  else P = pt(42, 42, 0.04);
+  h += '<circle cx="' + P[0].toFixed(1) + '" cy="' + P[1].toFixed(1) + '" r="7" fill="var(--accent)" stroke="var(--card)" stroke-width="2"/><text x="' + (P[0] + (P[0] > 250 ? -12 : 12)).toFixed(1) + '" y="' + (P[1] - 10).toFixed(1) + '" text-anchor="' + (P[0] > 250 ? 'end' : 'start') + '" style="' + FM + ';font-size:11px;font-weight:700;fill:var(--ink)">patient</text>';
+  return h + '</svg>';
+}
+
+var SPIRAL = {
+  cycle: {n: 'The cycle', line: 'High calcium stops the kidney concentrating urine and causes nausea. The patient dries out, the kidney filters less and reabsorbs more calcium, and the level climbs again.'},
+  saline: {n: 'Give saline', line: 'Refilling the circulation restores filtration, and the kidney excretes calcium again. Fluids break the loop but do not stop the source.'}
+};
+function spiralSVG(k, p){
+  p = p || 'sp'; var s = k === 'saline';
+  var h = svgOpen('0 0 340 290', 'Volume-loss cycle: ' + SPIRAL[k].n) + markers(p);
+  h += line('M226 44 C262 54 276 76 278 104', 'u', 3, p) + line('M262 158 C254 196 240 214 226 224', 'u', 3, p);
+  h += line('M114 232 C92 222 74 196 68 160', s ? 'x' : 'u', 3, p) + line('M68 104 C72 72 90 52 114 42', s ? 'x' : 'u', 3, p);
+  h += box(114, 10, 112, 50, 'High calcium', null, true);
+  h += box(206, 106, 126, 52, 'Polyuria, nausea', 'water is lost', false);
+  h += box(114, 220, 112, 50, 'Volume depletion', null, false, false);
+  h += box(8, 106, 126, 52, 'Kidney', s ? 'excretes Ca again' : 'keeps more Ca', false);
+  if (s) h += '<path d="M170 196 L170 216" fill="none" stroke="var(--accent)" stroke-width="3" marker-end="url(#' + p + 'd)"/><rect x="128" y="168" width="84" height="28" rx="8" fill="var(--card)" stroke="var(--accent)" stroke-width="2"/><text x="170" y="186" text-anchor="middle" style="' + FS + ';font-size:12px;font-weight:600;fill:var(--accent)">0.9% saline</text>';
+  return h + '</svg>';
+}
+
+var DRUGS = {
+  saline: {n: 'Saline', t: 'kid', line: 'Restores filtration so the kidney excretes more calcium. Works at once; lowers calcium 1–1.5 mg/dL over 24 h.'},
+  calcitonin: {n: 'Calcitonin', t: 'oc', line: 'Interferes with osteoclast function. Starts in 4–6 h; tolerance after 48–72 h.'},
+  bisph: {n: 'Bisphosphonate', t: 'oc', line: 'Taken up by mature osteoclasts; blocks farnesyl pyrophosphate synthase and triggers their death. Starts in 48–72 h; zoledronic acid lasts 4–6 weeks.'},
+  dmab: {n: 'Denosumab', t: 'rankl', line: 'An antibody to RANKL: precursors never become osteoclasts. Starts in 3–10 days; not cleared by the kidney.'},
+  steroid: {n: 'Glucocorticoid', t: 'mac', line: 'Inhibits the 1-alpha-hydroxylase that makes calcitriol in lymphoma and granulomas, and cuts gut absorption. Starts in 2–5 days.'},
+  cina: {n: 'Cinacalcet', t: 'pt', line: 'Activates the calcium-sensing receptor so the gland secretes less PTH. Used mainly for parathyroid carcinoma. Starts in 2–3 days.'}
+};
+function drugsSVG(k, p){
+  p = p || 'dg'; var t = DRUGS[k].t;
+  var h = svgOpen('0 0 340 250', 'Drug target: ' + DRUGS[k].n) + markers(p);
+  h += line('M112 46 L164 46', t === 'rankl' ? 'x' : null, 0, p) + lab(138, 36, 'RANKL', t === 'rankl' ? 'x' : null);
+  h += box(8, 22, 104, 48, 'Precursor', 'pre-osteoclast', false);
+  h += box(166, 22, 112, 48, 'Osteoclast', t === 'oc' ? (k === 'bisph' ? 'dies' : 'stunned') : 'dissolves bone', t === 'oc');
+  h += '<rect x="150" y="78" width="182" height="20" rx="6" fill="var(--line)" stroke="var(--muted)"/><text x="241" y="92" text-anchor="middle" style="' + FM + ';font-size:10.5px;fill:var(--ink)">bone</text>';
+  h += line('M300 70 C320 60 326 44 318 28', t === 'oc' || t === 'rankl' ? 'd' : null, 0, p) + lab(322, 18, t === 'oc' || t === 'rankl' ? 'Ca released' : 'Ca', t === 'oc' || t === 'rankl' ? 'd' : null, 'end');
+  h += box(8, 130, 98, 50, 'Parathyroid', t === 'pt' ? 'PTH ↓' : 'Ca sensor', t === 'pt');
+  h += box(121, 130, 98, 50, 'Macrophage', t === 'mac' ? 'calcitriol ↓' : 'calcitriol', t === 'mac');
+  h += box(234, 130, 98, 50, 'Kidney', t === 'kid' ? 'excretes Ca ↑' : 'excretes Ca', t === 'kid');
+  h += '<text x="170" y="214" text-anchor="middle" style="' + FM + ';font-size:11px;fill:var(--muted)">highlighted = where ' + DRUGS[k].n.toLowerCase() + ' acts</text>';
+  return h + '</svg>';
+}
+
+var CANCER = {
+  pthrp: {n: 'PTHrP', from: 'Solid tumor', prod: 'PTHrP', to: 'Bone + kidney', labs: ['↓','↑','↓ or ↔','↓'], line: 'The most common route. A hormone from the tumor acts like PTH on bone and kidney; no bone metastases are needed.'},
+  lytic: {n: 'Bone destruction', from: 'Metastases, myeloma', prod: 'local signals', to: 'Bone', labs: ['↓','↔','↓ or ↔','↔ or ↑'], line: 'Tumor in the marrow drives osteoclasts locally through RANKL. Bone releases calcium and phosphate together.'},
+  calc: {n: 'Calcitriol', from: 'Lymphoma', prod: 'calcitriol', to: 'Gut + bone', labs: ['↓','↔','↑','↔ or ↑'], line: 'Less common and almost exclusively lymphoma. The tumor makes active vitamin D; steroids treat it.'},
+  ectopic: {n: 'Ectopic PTH', from: 'Tumor (rare)', prod: 'PTH itself', to: 'Bone + kidney', labs: ['↑','↔','↔ or ↑','↓'], line: 'Rare. The tumor makes real PTH, so the labs imitate primary hyperparathyroidism.'}
+};
+function cancerSVG(k, p){
+  p = p || 'cn'; var c = CANCER[k];
+  var h = svgOpen('0 0 340 120', 'How cancer raises calcium: ' + c.n) + markers(p);
+  h += line('M104 60 L126 60', 'u', 0, p) + line('M214 60 L236 60', 'u', 0, p);
+  h += box(4, 34, 100, 52, c.from.split(',')[0], c.from.indexOf(',') > 0 ? c.from.split(', ')[1] : null, true);
+  h += box(128, 34, 86, 52, c.prod, 'signal', false) + box(238, 34, 98, 52, c.to, 'Ca ↑', false);
+  return h + '</svg>';
+}
+function cancerLabs(k){ return '<div class="labs6 l4">' + ['PTH','PTHrP','1,25-D','Phos'].map(function(n, i){ var v = CANCER[k].labs[i]; return '<div class="lab' + (v !== '↔' ? ' ch' : '') + '"><span>' + n + '</span><b>' + v + '</b></div>'; }).join('') + '</div>'; }
+
+var BOUND = {
+  normal: {n: 'Normal', w: [150, 124, 34], tot: '↔', ion: '↔', line: 'Only the ionized part is active. The lab\'s total calcium counts all three parts.'},
+  lowalb: {n: 'Low albumin', w: [150, 62, 34], tot: '↓', ion: '↔', line: 'Less albumin carries less calcium, so the total falls. The active part is unchanged: this is why you adjust for albumin, or measure ionized calcium.'},
+  alk: {n: 'Alkalosis', w: [118, 156, 34], tot: '↔', ion: '↓', line: 'A higher pH frees binding sites on albumin and calcium moves onto them. The total is unchanged but the active part falls: tingling and spasm with a normal total.'}
+};
+function boundSVG(k){
+  var b = BOUND[k], x = 16, names = ['ionized (active)', 'on albumin', 'complexed'], fills = ['var(--accent)', 'var(--muted)', 'var(--line)'];
+  var h = svgOpen('0 0 340 134', 'Calcium fractions: ' + b.n);
+  h += '<rect x="16" y="34" width="308" height="40" rx="8" fill="none" stroke="var(--line)" stroke-dasharray="3 3"/>';
+  b.w.forEach(function(w, i){ h += '<rect x="' + x + '" y="34" width="' + w + '" height="40" ' + (i === 0 ? 'rx="8"' : '') + ' fill="' + fills[i] + '"/>' + (i === 0 ? '<text x="' + (x + w / 2) + '" y="59" text-anchor="middle" style="' + FM + ';font-size:10.5px;fill:var(--accent-ink)">' + names[0] + '</text>' : '<text x="' + (i === 1 ? x + w / 2 : 324) + '" y="' + (i === 1 ? 90 : 104) + '" text-anchor="' + (i === 1 ? 'middle' : 'end') + '" style="' + FM + ';font-size:10.5px;fill:var(--muted)">' + names[i] + '</text>'); x += w; });
+  h += '<text x="16" y="22" style="' + FM + ';font-size:11px;fill:var(--muted)">total calcium = all three</text>';
+  h += '<text x="16" y="124" style="' + FM + ';font-size:12px;font-weight:700;fill:var(--ink)">Total ' + b.tot + '   ·   Ionized ' + b.ion + '</text>';
+  return h + '</svg>';
+}
+
+var ECG = {
+  normal: {n: 'Normal', st: 16, line: 'The ST segment is the plateau of the action potential, and calcium sets its length.'},
+  high: {n: 'High calcium', st: 3, line: 'The plateau shortens: the T wave starts almost straight off the QRS and the QT is short.'},
+  low: {n: 'Low calcium', st: 44, line: 'The plateau lengthens: a long, flat ST segment. The long QT comes from the ST segment; the T wave may change as well.'}
+};
+function ecgSVG(k){
+  var st = ECG[k].st, h = svgOpen('0 0 340 130', 'Lead II: ' + ECG[k].n), g = '';
+  h += '<rect x="0" y="0" width="340" height="130" rx="10" fill="var(--ecg-paper)"/>';
+  for (var gx = 0; gx <= 340; gx += 10) g += '<path d="M' + gx + ' 0V130" stroke="' + (gx % 50 ? 'var(--ecg-grid)' : 'var(--ecg-grid5)') + '" stroke-width="' + (gx % 50 ? .5 : 1) + '"/>';
+  for (var gy = 0; gy <= 130; gy += 10) g += '<path d="M0 ' + gy + 'H340" stroke="' + (gy % 50 ? 'var(--ecg-grid)' : 'var(--ecg-grid5)') + '" stroke-width="' + (gy % 50 ? .5 : 1) + '"/>';
+  h += g;
+  var d = 'M0 80', seg = '';
+  for (var b = 0; b < 3; b++){
+    var x = 8 + b * 112;
+    d += ' L' + x + ' 80 q7 -10 14 0 l10 0 l3 4 l5 -52 l5 60 l3 -12';
+    var s0 = x + 40, s1 = s0 + st;
+    d += ' L' + s1 + ' 80 q11 -22 22 0';
+    seg += '<path d="M' + s0 + ' 80 L' + s1 + ' 80" stroke="var(--accent)" stroke-width="4" stroke-linecap="round"/>';
+    if (b === 1) seg += '<path d="M' + (x + 24) + ' 102 H' + (s1 + 22) + '" stroke="var(--ecg-ink)" stroke-width="1"/><text x="' + (x + 24 + (s1 + 22 - x - 24) / 2) + '" y="116" text-anchor="middle" style="' + FM + ';font-size:10.5px;fill:var(--ecg-ink)">QT</text>';
+  }
+  d += ' L340 80';
+  return h + '<path d="' + d + '" fill="none" stroke="var(--ecg-ink)" stroke-width="1.6" stroke-linejoin="round"/>' + seg + '</svg>';
+}
+
+var FIGS = {
+  bound: {t: 'Bound and free calcium', states: ['normal','lowalb','alk'], data: BOUND, svg: boundSVG},
+  loop: {t: 'The calcium loop', states: ['normal','phpt','fhh','pthrp','calc','dtox','ddef','hypo','ckd','mg'], data: LOOP, svg: loopSVG, extra: labStrip},
+  vitd: {t: 'Vitamin D pathway', states: ['normal','gran','steroid','def','ckd'], data: VITD, svg: vitdSVG},
+  setp: {t: 'The gland\'s set point', states: ['normal','phpt','fhh','tumor'], data: SETP, svg: setpSVG},
+  cancer: {t: 'How cancer raises calcium', states: ['pthrp','lytic','calc','ectopic'], data: CANCER, svg: cancerSVG, extra: cancerLabs},
+  spiral: {t: 'Why calcium keeps rising', states: ['cycle','saline'], data: SPIRAL, svg: spiralSVG},
+  ecg: {t: 'Calcium on the ECG', states: ['normal','high','low'], data: ECG, svg: ecgSVG},
+  drugs: {t: 'How each drug works', states: ['saline','calcitonin','bisph','dmab','steroid','cina'], data: DRUGS, svg: drugsSVG},
+  mg: {t: 'The magnesium block', states: ['mg','mgfix'], data: LOOP, svg: loopSVG, extra: labStrip}
+};
+
+/* Narrowing workup. Each cause has rules: result id -> [status, reason]. Status: out, less, fav. */
+var NARROW = {
+  high: {
+    results: [['pthHi','PTH high or normal','pth'],['pthLo','PTH suppressed','pth'],['phLo','Phosphate low','ph'],['phHi','Phosphate normal or high','ph'],['rLo','Urine ratio below 0.01','r'],['rHi','Urine ratio above 0.02','r'],['pthrp','PTHrP high'],['d125','1,25-D high'],['d25','25-OH D very high'],['spep','SPEP or light chains abnormal']],
+    causes: [
+      ['Primary hyperparathyroidism', {pthLo: ['unl','PTH would not be suppressed'], rHi: ['fav','ratio above 0.02 favors it'], rLo: ['less','up to 20% are this low']}],
+      ['FHH', {pthLo: ['unl','PTH would not be suppressed'], rLo: ['fav','ratio below 0.01 favors it'], rHi: ['less','up to 10% are this high']}],
+      ['Lithium, tertiary hyperparathyroidism', {pthLo: ['unl','PTH would not be suppressed']}],
+      ['PTHrP from a tumor', {pthHi: ['unl','PTH would be suppressed'], pthrp: ['fav','PTHrP is high'], phHi: ['less','PTHrP wastes phosphate'], d125: ['less','calcitriol is usually not raised']}],
+      ['Bone metastases, myeloma', {pthHi: ['unl','PTH would be suppressed'], spep: ['fav','points to myeloma'], d125: ['less','calcitriol is not the mechanism']}],
+      ['Lymphoma, granuloma', {pthHi: ['unl','PTH would be suppressed'], d125: ['fav','calcitriol is high'], phLo: ['less','phosphate is usually normal or high']}],
+      ['Vitamin D excess', {pthHi: ['unl','PTH would be suppressed'], d25: ['fav','25-OH D is very high'], phLo: ['less','phosphate is usually normal or high']}],
+      ['Milk-alkali, immobilization, thyrotoxicosis, vitamin A', {pthHi: ['unl','PTH would be suppressed'], phLo: ['less','phosphate is usually not low']}],
+      ['Thiazide (can unmask primary hyperparathyroidism)', {}]
+    ],
+    next: function(s){ if (!s.pthHi && !s.pthLo) return 'PTH, with phosphate, magnesium, creatinine and 25-OH D.'; if (s.pthHi && (s.pthrp || s.d125 || s.spep || s.d25)) return 'Two causes may coexist: follow the positive test as well as the parathyroid workup (24-hour urine calcium and creatinine).'; if (s.pthHi) return s.rLo ? 'Genetic testing for FHH before any surgery.' : s.rHi ? 'DXA and kidney imaging; check the surgery criteria.' : '24-hour urine calcium and creatinine; review lithium and thiazide.'; if (s.pthrp) return 'Find the tumor if it is not already known; involve oncology.'; if (s.d125) return 'Chest imaging for lymphoma or granulomatous disease.'; if (s.spep) return 'Hematology, for a myeloma workup.'; if (s.d25) return 'Supplement history; stop vitamin D and calcium.'; return 'PTHrP, 1,25-(OH)2 D, SPEP and free light chains, TSH; imaging if no tumor is known.'; }
+  },
+  low: {
+    results: [['ion','Ionized calcium normal'],['mg','Magnesium low'],['pthLo','PTH low or normal','pth'],['pthHi','PTH high','pth'],['phLo','Phosphate low or normal','ph'],['phHi','Phosphate high','ph'],['d25','25-OH D low'],['drug','Recent denosumab, bisphosphonate, cinacalcet, foscarnet or large transfusion']],
+    causes: [
+      ['Low albumin only (not true hypocalcemia)', {ion: ['fav','ionized calcium is normal']}],
+      ['Low magnesium', {ion: ['out','ionized calcium is normal'], mg: ['fav','magnesium is low'], pthHi: ['less','it usually blunts PTH']}],
+      ['Hypoparathyroidism', {ion: ['out','ionized calcium is normal'], pthHi: ['unl','PTH would be low or normal'], phLo: ['less','phosphate is usually high']}],
+      ['Vitamin D deficiency, malabsorption', {ion: ['out','ionized calcium is normal'], pthLo: ['unl','PTH is usually high'], d25: ['fav','25-OH D is low'], phHi: ['less','phosphate is usually low']}],
+      ['Hungry bone, pancreatitis', {ion: ['out','ionized calcium is normal'], pthLo: ['unl','PTH is usually high'], phHi: ['less','phosphate is usually not high']}],
+      ['Chronic kidney disease', {ion: ['out','ionized calcium is normal'], pthLo: ['unl','PTH is usually high'], phLo: ['less','phosphate is usually high']}],
+      ['Tumor lysis, rhabdomyolysis', {ion: ['out','ionized calcium is normal'], pthLo: ['unl','PTH is usually high'], phLo: ['less','phosphate would be high']}],
+      ['Pseudohypoparathyroidism (rare)', {ion: ['out','ionized calcium is normal'], pthLo: ['unl','PTH would be high'], phLo: ['less','phosphate is usually high']}],
+      ['Drug or citrate', {ion: ['out','ionized calcium is normal'], drug: ['fav','recent exposure']}]
+    ],
+    next: function(s){ if (s.ion) return s.mg ? 'Replace the magnesium. The calcium itself needs nothing more.' : 'Nothing more for calcium: the ionized value is normal.'; if (!s.pthHi && !s.pthLo) return 'PTH, magnesium, phosphate, creatinine and 25-OH D.'; if (s.pthLo) return s.mg ? 'Replace magnesium, then repeat PTH.' : 'Magnesium if not done; ask about neck surgery.'; return s.phHi ? 'Creatinine, uric acid and CK.' : s.phLo ? '25-OH D; lipase if there is abdominal pain.' : 'Phosphate: it splits the high-PTH causes.'; }
+  }
+};
+function narrow(side, sel){
+  var N = NARROW[side];
+  return N.causes.map(function(c){
+    var rules = c[1], rank = {fav: 5, out: 4, unl: 3, less: 2, 'in': 1}, st = 'in', why = '';
+    Object.keys(rules).forEach(function(r){ if (!sel[r]) return; var x = rules[r]; if (rank[x[0]] > rank[st]){ st = x[0]; why = x[1]; } });
+    return {name: c[0], st: st, why: why};
+  });
+}
+var TRIALS = [
+  {q: 'Is zoledronic acid better than pamidronate for hypercalcemia of malignancy?', d: 'Pooled analysis of two identical double-blind randomized trials; 275 evaluable patients with corrected calcium 12 mg/dL or more; one dose.', r: 'Complete response by day 10: 88.4% with zoledronic acid 4 mg, 86.7% with 8 mg, 69.7% with pamidronate 90 mg. Median duration of complete response 32, 43 and 18 days.', c: 'Made zoledronic acid 4 mg the standard bisphosphonate. The trials infused it over 5 minutes; the label now requires at least 15, because of kidney toxicity.', cite: 'Major P et al. J Clin Oncol 2001;19:558', doi: '10.1200/JCO.2001.19.2.558'},
+  {q: 'Does denosumab work when a bisphosphonate has failed?', d: 'Single-arm phase 2 study; 33 patients with corrected calcium above 12.5 mg/dL despite a bisphosphonate 7 to 30 days earlier; 120 mg on days 1, 8, 15 and 29, then every 4 weeks.', r: '64% reached 11.5 mg/dL or less by day 10 and 70% during the study. Estimated median response duration 104 days.', c: 'Basis of the FDA indication and of the guideline\'s advice for refractory cases. There was no comparison group, so first-line use rests on weaker evidence.', cite: 'Hu MI et al. J Clin Endocrinol Metab 2014;99:3144', doi: '10.1210/jc.2014-1001'},
+  {q: 'Does surgery for mild primary hyperparathyroidism prevent death or complications?', d: 'Randomized trial at 8 Scandinavian centers; 191 patients assigned to parathyroidectomy or observation; 10 years and beyond.', r: 'Deaths at 10 years: 8 with surgery, 7 with observation. Cardiovascular and cerebrovascular events, cancer, peripheral fractures and kidney stones combined: 52 vs 49. Vertebral fractures: 7 patients in each group.', c: 'Supports watching mild disease that meets no surgery criterion, and fits the workshop position that surgery is not advised for cardiovascular benefit.', cite: 'Pretorius M et al. Ann Intern Med 2022;175:812', doi: '10.7326/M21-4416'}
+];
+
 function fhhRatio(uca, ucr, sca, scr){ if (!(uca > 0 && ucr > 0 && sca > 0 && scr > 0)) return null; return (uca * scr) / (sca * ucr); }
 </script>
 
@@ -502,6 +792,7 @@ function whereCard(o){
   if (o.lowAlb && o.used === 'total') h += '<div class="guard">Albumin below 2: the adjustment is unreliable. Check an ionized calcium before treating.</div>';
   if (o.discord) h += '<div class="guard">The ionized calcium (' + o.ica + ') and the adjusted total (' + o.adj + ') disagree. Going by the ionized value; the total is not used for grading.</div>';
   
+  h += whereChips(o);
   if (o.side === 'high') h += '<details><summary>More</summary><p>Mild is below 12, moderate 12–14, severe above 14 mg/dL. Symptoms track the rate of rise as much as the number: thirst and polyuria, constipation, nausea, confusion, a short QT.</p><p>This tool calls calcium high above 10.5 mg/dL, a common lab limit; the guideline\'s own grading table uses 10.8. Use your lab\'s range.</p><span class="tier">severity bands: Endocrine Society 2023</span><span class="tier">10.5 limit: lab convention</span></details>';
   if (o.side === 'low') h += '<details><summary>More</summary><p>Look for perioral tingling, cramps, carpopedal spasm, Chvostek and Trousseau signs, seizures, and a long QT. This tool treats symptoms, ECG change, or an adjusted calcium below 7.5 mg/dL as needing IV calcium.</p><span class="tier">expert practice</span></details>';
   return h + '</div>';
@@ -518,6 +809,7 @@ function treatCard(o){
   var more = o.more.map(function(m){ return '<p>' + esc(m) + '</p>'; }).join('');
   if (o.recheck && o.recheck.length) more += '<p><b>Follow-up:</b></p><ul>' + o.recheck.map(function(r){ return '<li>' + esc(r) + '</li>'; }).join('') + '</ul>';
   var tiers = o.tiers.map(function(t){ return '<span class="tier">' + esc(t) + '</span>'; }).join('');
+  h += treatChips(o);
   if (more || tiers) h += '<details><summary>More</summary>' + more + tiers + '</details>';
   return h + '</div>';
 }
@@ -539,11 +831,12 @@ function fork(o){
 function workCard(o){
   var h = '<div class="card" id="workup"><p class="label">Workup · follow the PTH</p><h2>' + esc(o.wuHead) + '</h2>' + fork(o) + '<ul>' + o.wu.map(function(w){ return '<li>' + esc(w) + '</li>'; }).join('') + '</ul>';
   if (o.wuWhy) h += '<p class="whyline"><b>Why:</b> ' + esc(o.wuWhy) + '</p>';
-  h += '<details><summary>More</summary><p>PTH is read against a typical intact PTH range of 15–65 pg/mL; use your lab\'s range. Phosphate is read against 2.5–4.5 mg/dL.</p><p>The full cause lists' + (o.side === 'high' ? ', surgery criteria for primary hyperparathyroidism and the FHH calculator' : '') + ' are under Reference.</p><span class="tier">expert practice</span></details>';
+  h += workChips(o);
+  h += '<details><summary>More</summary><p>PTH is read against a typical intact PTH range of 15–65 pg/mL; use your lab\'s range. Phosphate is read against 2.5–4.5 mg/dL.</p><p>' + (o.side === 'high' ? 'Surgery criteria for primary hyperparathyroidism and the FHH calculator are under Reference.' : 'Routine repletion doses are in Electrolyte repletion.') + '</p><span class="tier">expert practice</span></details>';
   return h + '</div>';
 }
 function build(i){
-  var o = decide(i);
+  var o = decide(i); o.i = i;
   if (o.side == null) return {o: o, html: '<div class="card empty">Enter a calcium to start. Total calcium with albumin, or an ionized calcium.</div>'};
   var h = whereCard(o);
   if (o.side === 'normal') h += '<div class="card"><p class="sub">Nothing to treat. If symptoms suggest a calcium problem, check an ionized calcium.</p></div>';
@@ -564,11 +857,111 @@ function render(){
 }); });
 
 /* Tabs */
-var tabs = [['t-tool','p-tool'],['t-ref','p-ref'],['t-prac','p-prac']];
+var tabs = [['t-tool','p-tool'],['t-learn','p-learn'],['t-ref','p-ref'],['t-prac','p-prac']];
 function show(t){ tabs.forEach(function(p){ var on = p[0] === t; $(p[0]).setAttribute('aria-selected', String(on)); $(p[1]).classList.toggle('on', on); }); }
 tabs.forEach(function(p){ $(p[0]).addEventListener('click', function(){ show(p[0]); }); });
 function fromHash(){ var id = location.hash.slice(1); if (!id) return; var el = $(id); if (!el) return; var pan = el.closest('.panel'); if (pan) tabs.forEach(function(p){ if (p[1] === pan.id) show(p[0]); }); el.scrollIntoView(); }
 window.addEventListener('hashchange', fromHash);
+
+
+/* Figures, sheet, chips */
+var ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M7 15l3-4 3 3 2-2 2 3"/></svg>';
+var figN = 0;
+function mountFig(host, id, state){
+  var F = FIGS[id], pre = 'f' + (++figN) + '-';
+  function draw(k){
+    var d = F.data[k];
+    host.innerHTML = '<div class="states" role="group" aria-label="' + esc(F.t) + '">' + F.states.map(function(x){ return '<button class="sbtn" data-k="' + x + '" aria-pressed="' + (x === k) + '">' + esc(F.data[x].n) + '</button>'; }).join('') + '</div>' + F.svg(k, pre) + (F.extra ? F.extra(k) : '') + '<p class="line1">' + esc(d.line) + '</p>';
+    var on = host.querySelector('[aria-pressed="true"]'), row = host.querySelector('.states');
+    if (on && row) row.scrollLeft = Math.max(0, on.offsetLeft - 60);
+  }
+  host.onclick = function(e){ var k = e.target.getAttribute && e.target.getAttribute('data-k'); if (k) draw(k); };
+  draw(state && F.data[state] ? state : F.states[0]);
+}
+function chip(fig, state, label){ return '<button class="chip" data-fig="' + fig + '" data-state="' + (state || '') + '">' + ICON + esc(label || FIGS[fig].t) + '</button>'; }
+var lastFocus = null;
+function openSheet(fig, state){
+  lastFocus = document.activeElement;
+  $('sheet-t').textContent = FIGS[fig].t;
+  mountFig($('sheet-b'), fig, state);
+  $('scrim').hidden = false; $('sheet').hidden = false; $('sheet').scrollTop = 0; $('sheet-x').focus();
+}
+function closeSheet(){ if ($('sheet').hidden) return; $('scrim').hidden = true; $('sheet').hidden = true; if (lastFocus && lastFocus.focus) lastFocus.focus(); }
+$('sheet-x').addEventListener('click', closeSheet); $('scrim').addEventListener('click', closeSheet);
+document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeSheet(); });
+document.addEventListener('click', function(e){
+  var c = e.target.closest && e.target.closest('[data-fig]'); if (c){ openSheet(c.getAttribute('data-fig'), c.getAttribute('data-state')); return; }
+  var n = e.target.closest && e.target.closest('[data-narrow]'); if (n){ var o = JSON.parse(n.getAttribute('data-narrow')); nwSide = o.side; nwSel = o.sel; drawNarrow(); show('t-ref'); $('narrow').scrollIntoView(); }
+});
+document.querySelectorAll('[data-figure]').forEach(function(h){ mountFig(h, h.getAttribute('data-figure'), h.getAttribute('data-state')); });
+function whereChips(o){
+  var i = o.i || {}, c = '';
+  if (o.adj != null) c += chip('bound', i.alb != null && i.alb < 3.5 ? 'lowalb' : 'normal');
+  if (i.sympt && o.side !== 'normal') c += chip('ecg', o.side);
+  return c ? '<div class="chips">' + c + '</div>' : '';
+}
+function treatChips(o){
+  var i = o.i || {}, c = '';
+  if (o.side === 'high'){
+    if (o.treat){ c += chip('drugs', o.anti === 'steroid' ? 'steroid' : o.calcitonin ? 'calcitonin' : o.anti === 'dmab' ? 'dmab' : o.anti === 'either' || o.anti === 'either-slow' ? 'bisph' : 'saline'); c += chip('spiral', 'cycle'); }
+    else if (o.anti) c += chip('drugs', o.anti === 'dmab' ? 'dmab' : 'bisph');
+  } else if (i.mg != null && i.mg < REF.mgLo && o.pc !== 'high') c += chip('mg', 'mg');
+  return c ? '<div class="chips">' + c + '</div>' : '';
+}
+function workChips(o){
+  var i = o.i || {}, hi = o.side === 'high', pc = o.pc, c = '', st = 'normal', sel = {}, mgLow = i.mg != null && i.mg < REF.mgLo;
+  if (hi){
+    if (pc === 'low'){ st = i.calcitriol ? 'calc' : i.cancer && i.phos != null && i.phos < REF.phLo ? 'pthrp' : 'normal'; sel.pthLo = 1; }
+    else if (pc === 'high' || (pc === 'normal' && i.pth >= 25)){ st = 'phpt'; sel.pthHi = 1; }
+    if (i.phos != null){ if (i.phos < REF.phLo) sel.phLo = 1; else sel.phHi = 1; }
+  } else {
+    if (pc === 'high'){ st = i.phos != null && i.phos > REF.phHi && i.egfr != null && i.egfr < 60 ? 'ckd' : 'normal'; sel.pthHi = 1; }
+    else if (pc){ st = mgLow ? 'mg' : i.mg != null ? 'hypo' : 'normal'; sel.pthLo = 1; }
+    if (i.phos != null){ if (i.phos > REF.phHi) sel.phHi = 1; else sel.phLo = 1; }
+    if (mgLow) sel.mg = 1;
+    if (i.recentAnti) sel.drug = 1;
+  }
+  c += chip('loop', st);
+  if (hi && sel.pthHi) c += chip('setp', 'phpt');
+  if (hi && pc === 'low' && (i.cancer || i.calcitriol)) c += chip('cancer', i.calcitriol ? 'calc' : 'pthrp');
+  if (i.calcitriol && hi) c += chip('vitd', 'gran'); else if (!hi && pc === 'high') c += chip('vitd', 'normal');
+  return '<div class="chips">' + c + '</div><div class="row"><button class="btn ghost" data-narrow="' + esc(JSON.stringify({side: o.side, sel: sel})) + '">Narrow the differential</button></div>';
+}
+
+/* Narrowing workup */
+var nwSide = 'high', nwSel = {};
+function drawNarrow(){
+  var N = NARROW[nwSide];
+  $('nw-high').setAttribute('aria-pressed', String(nwSide === 'high')); $('nw-low').setAttribute('aria-pressed', String(nwSide === 'low'));
+  $('nw-results').innerHTML = N.results.map(function(r){ return '<button class="sbtn" data-r="' + r[0] + '" data-g="' + (r[2] || '') + '" aria-pressed="' + !!nwSel[r[0]] + '">' + esc(r[1]) + '</button>'; }).join('');
+  var rows = narrow(nwSide, nwSel), ord = {fav: 0, 'in': 1, less: 2, unl: 3, out: 4};
+  rows.sort(function(a, b){ return ord[a.st] - ord[b.st]; });
+  $('nw-causes').innerHTML = rows.map(function(c){ return '<div class="cause ' + c.st + '"><span>' + esc(c.name) + '</span><small>' + esc(c.st === 'in' ? 'still possible' : (c.st === 'less' ? 'less likely: ' : c.st === 'unl' ? 'unlikely: ' : c.st === 'fav' ? 'favored: ' : '') + c.why) + '</small></div>'; }).join('');
+  $('nw-next').innerHTML = '<b>Send next:</b> ' + esc(N.next(nwSel));
+}
+$('nw-results').addEventListener('click', function(e){
+  var r = e.target.getAttribute('data-r'); if (!r) return; var g = e.target.getAttribute('data-g'), was = !!nwSel[r];
+  if (g) NARROW[nwSide].results.forEach(function(x){ if (x[2] === g) delete nwSel[x[0]]; });
+  if (was) delete nwSel[r]; else nwSel[r] = 1;
+  var left = $('nw-results').scrollLeft; drawNarrow(); $('nw-results').scrollLeft = left;
+});
+$('nw-high').addEventListener('click', function(){ nwSide = 'high'; nwSel = {}; drawNarrow(); });
+$('nw-low').addEventListener('click', function(){ nwSide = 'low'; nwSel = {}; drawNarrow(); });
+drawNarrow();
+
+/* Learn tab: chapter pills and trials */
+(function(){
+  var chaps = [].slice.call(document.querySelectorAll('.chap'));
+  $('pills').innerHTML = chaps.map(function(c, n){ return '<button class="pill" data-go="' + c.id + '" aria-current="' + (n === 0) + '">' + (n + 1) + ' ' + esc(c.getAttribute('data-pill')) + '</button>'; }).join('');
+  $('pills').addEventListener('click', function(e){ var g = e.target.getAttribute('data-go'); if (g) $(g).scrollIntoView(); });
+  function mark(id){ [].forEach.call($('pills').children, function(b){ var on = b.getAttribute('data-go') === id; b.setAttribute('aria-current', String(on)); if (on) $('pills').scrollLeft = Math.max(0, b.offsetLeft - 60); }); }
+  if ('IntersectionObserver' in window){
+    var io = new IntersectionObserver(function(es){ es.forEach(function(en){ if (en.isIntersecting) mark(en.target.id); }); }, {rootMargin: '-30% 0px -60% 0px'});
+    chaps.forEach(function(c){ io.observe(c); });
+  }
+  $('trialbox').innerHTML = TRIALS.map(function(t){ return '<div class="trial" style="margin-top:14px"><p><b>' + esc(t.q) + '</b></p><p><span class="k">Design</span>' + esc(t.d) + '</p><p><span class="k">Result</span>' + esc(t.r) + '</p><p><span class="k">What it changed</span>' + esc(t.c) + '</p><p class="mono" style="font-size:13px"><a href="https://doi.org/' + t.doi + '" rel="noopener">' + esc(t.cite) + '</a></p></div>'; }).join('');
+  $('go-prac').addEventListener('click', function(){ show('t-prac'); window.scrollTo(0, 0); });
+})();
 
 /* Practice: cases run through the same engine */
 var CASES = [
