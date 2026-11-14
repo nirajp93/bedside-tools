@@ -143,6 +143,48 @@ input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
   table.map thead th{top:0}
   table.map td button{width:100%}
 }
+.states{display:flex;gap:6px;overflow-x:auto;margin:10px -16px;padding:2px 16px 6px;scrollbar-width:none}
+.states::-webkit-scrollbar{display:none}
+.sbtn{flex:none;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--ink);font:inherit;font-size:14px;cursor:pointer;white-space:nowrap}
+.sbtn[aria-pressed="true"]{border-color:var(--accent);color:var(--accent);font-weight:600}
+.line1{font-size:15px;margin:10px 0 0}
+.fscrim{position:fixed;inset:0;background:var(--scrim);z-index:30}
+.fsheet{position:fixed;left:0;right:0;bottom:0;z-index:31;max-height:90vh;overflow-y:auto;background:var(--card);border:1px solid var(--line);border-bottom:0;border-radius:20px 20px 0 0;padding:8px 16px 24px;max-width:560px;margin:0 auto}
+.fsheethead{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.fsheethead h2{font-size:18px;margin:0}
+.fxbtn{min-height:44px;min-width:44px;border:0;background:transparent;color:var(--accent);font:inherit;font-weight:600;cursor:pointer}
+.lpills{position:sticky;top:0;z-index:5;background:var(--bg);display:flex;gap:6px;overflow-x:auto;margin:0 -16px 12px;padding:8px 16px;border-bottom:1px solid var(--line);scrollbar-width:none}
+.lpills::-webkit-scrollbar{display:none}
+.lpill{flex:none;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--muted);font:inherit;font-size:14px;cursor:pointer;white-space:nowrap}
+.lpill[aria-current="true"]{border-color:var(--accent);color:var(--accent);font-weight:600}
+.chap{scroll-margin-top:70px}
+.cause{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:8px 0;border-top:1px solid var(--line);font-size:15px}
+.cause small{color:var(--muted);font-size:13px;text-align:right;flex:0 1 46%}
+.cause.out span{color:var(--muted);text-decoration:line-through}
+.cause.out,.cause.less,.cause.unl{opacity:.6}
+.cause.fav span{font-weight:700}
+.cause.fav span:before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--accent);margin-right:8px}
+.trial{border-left:3px solid var(--accent);padding-left:12px}
+.trial p{margin:0 0 6px;font-size:15px}
+.trial .k{font-family:var(--mono);font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);display:block}
+.fchips{display:flex;flex-wrap:wrap;gap:6px}
+.fchip{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--fill);color:var(--ink);font:inherit;font-size:14px;cursor:pointer;text-align:left}
+.fchip svg{flex:none;color:var(--accent)}
+.lead{font-size:14px;color:var(--muted);margin:0}
+.card.chap{display:block}
+.card.chap>*+*{margin-top:10px}
+.card.chap h2{font-size:18px;margin:0 0 2px}
+.rowb{display:flex;gap:8px;margin:0 0 14px}
+.rowb button{min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--ink);font:inherit;font-size:14px;cursor:pointer}
+#fscrim[hidden],#fsheet[hidden]{display:none}
+#v-learn summary{min-height:44px;line-height:44px;cursor:pointer}
+.vstrip{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-top:10px}
+@media (min-width:700px){.vstrip{grid-template-columns:repeat(4,1fr)}}
+#v-learn{overflow-x:clip}
+.vstrip div{display:flex;align-items:center;gap:6px;background:var(--fill);border-radius:8px;padding:6px 8px;font-size:12.5px;min-width:0}
+.vstrip div.v0{opacity:.55}
+.vstrip span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#v-learn a{display:inline-flex;align-items:center;min-height:44px}
 </style>
 </head>
 <body>
@@ -177,6 +219,23 @@ input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
   <div class="card" id="gridPair" aria-live="polite" hidden></div>
 </section>
 
+<section class="view" id="v-learn">
+  <div class="lpills" id="lpills"></div>
+  <div class="card chap" id="learn-reach" data-pill="Why it misses"><p class="label">1 · Resistance</p><h2>Four ways a drug misses</h2><p class="lead">Pick a reason. The diagrams are the same ones the Look up tab uses.</p><div data-figure="reach"></div></div>
+  <div class="card chap" id="learn-ladder" data-pill="Beta-lactams"><p class="label">2 · Beta-lactams</p><h2>What each one covers</h2><p class="lead">Step along the row and watch which dots fill and which empty. Filled = reliable, half = variable, empty = not covered.</p><div data-figure="ladder"></div></div>
+  <div class="card chap" id="learn-others" data-pill="Other classes"><p class="label">3 · The other classes</p><h2>What each leaves uncovered</h2><div data-figure="others"></div></div>
+  <div class="card chap" id="learn-anaer" data-pill="Anaerobes"><p class="label">4 · Anaerobes</p><h2>Above and below the diaphragm</h2><div data-figure="anaer"></div></div>
+  <div class="card chap" id="learn-aty" data-pill="Atypicals"><p class="label">5 · Atypical organisms</p><h2>Nothing to hit, or out of reach</h2><div data-figure="aty"></div></div>
+  <div class="card chap" id="narrow" data-pill="Gram stain"><p class="label">6 · From the lab</p><h2>What does the Gram stain say?</h2><p class="lead">Tap what the lab has reported. Organisms are marked, and the drugs that reliably cover every favored one are listed.</p>
+    <div class="states" id="nw-results" role="group" aria-label="Lab results"></div>
+    <div id="nw-causes"></div>
+    <p class="line1" id="nw-next"></p>
+    <details><summary>More</summary><p id="nw-more"></p><span id="nw-tiers"></span></details>
+  </div>
+  <div class="card chap" id="trials" data-pill="Trials"><p class="label">7 · Evidence</p><h2>Trials</h2><p class="lead">The trials behind carbapenems for ESBL, short courses and oral step-down are on cards in Empiric antibiotics.</p><p><a href="/abx-empiric/#trials">Open the trial cards in Empiric antibiotics</a></p></div>
+  <div class="rowb"><button id="go-prac" type="button">Practice</button></div>
+</section>
+
 <section class="view" id="v-practice">
   <div class="card" id="practice">
     <p class="label">Practice · 30 questions drawn from the map</p>
@@ -186,11 +245,16 @@ input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 
 <div class="note" id="local"><b>Adjust to your institution.</b> This map shows national patterns. Your hospital's antibiogram and the patient's own culture results override it.</div>
 
+<div class="fscrim" id="fscrim" hidden></div>
+<div class="fsheet" id="fsheet" role="dialog" aria-modal="true" aria-labelledby="fsheet-t" hidden>
+  <div class="fsheethead"><h2 id="fsheet-t"></h2><button class="fxbtn" id="fsheet-x" type="button">Close</button></div>
+  <div id="fsheet-b"></div>
+</div>
 <footer>
   <p><strong>For education only. Not a substitute for clinical judgment.</strong> "Reliable" means active against typical isolates and a standard choice in guidelines or labelling; "variable" means only some isolates, or one setting such as urine or skin. Neither replaces susceptibility testing. Local resistance, formulary and infectious-disease advice take priority.</p>
   <p>Privacy: everything runs in your browser. Nothing you enter is sent anywhere or stored, and there are no analytics. Do not enter names, record numbers, or dates of birth.</p>
   <p>Diagrams are schematic and not to scale. Brand names are listed only to help find a drug.</p>
-  <p class="mono">Last reviewed: 2026-11-13</p>
+  <p class="mono">Last reviewed: 2026-11-14</p>
   <p><strong>Sources:</strong> FDA prescribing information for each drug · EUCAST Expected Resistant Phenotypes v1.2 (2023) · IDSA guidance on antimicrobial-resistant gram-negative infections 2026 (Tamma, Clin Infect Dis) · IDSA MRSA guideline 2011 (Liu) · IDSA/SHEA C. difficile focused update 2021 (Johnson) · ATS/IDSA community-acquired pneumonia 2019 (Metlay) · MERINO trial 2018 (Harris, JAMA) · Silverman 2005 (daptomycin and surfactant, J Infect Dis) · C. difficile risk by class: Slimings and Riley 2014 (J Antimicrob Chemother), Brown 2013 (Antimicrob Agents Chemother). Each cell shows its basis: expected resistance (EUCAST), guideline, prescribing information, label and standard references, or expert practice. Activity is summarised from these sources; no proprietary table is reproduced.</p>
 </footer>
 </main>
@@ -198,6 +262,7 @@ input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 <nav class="tabs" role="tablist"><div class="wrap">
   <button role="tab" aria-selected="true" data-v="look">Look up</button>
   <button role="tab" aria-selected="false" data-v="grid">Grid</button>
+  <button role="tab" aria-selected="false" data-v="learn">Learn</button>
   <button role="tab" aria-selected="false" data-v="practice">Practice</button>
 </div></nav>
 
@@ -595,6 +660,92 @@ const CAP = {
 const ALT = {M1:'A bacterial cell with the cell wall highlighted; the zoom shows the cross-linking enzyme blocked by the drug', M2:'Without an inhibitor the enzyme cuts the drug; with an inhibitor the enzyme is occupied and the drug reaches its target', M3:'The cell wall highlighted; the zoom shows vancomycin capping the end of a wall building block', M4:'The cell wall highlighted; the zoom shows the first step of building-block synthesis blocked', M5:'The cell membrane highlighted; the zoom shows daptomycin in the membrane and ions leaking out', M6a:'The ribosome highlighted; the zoom shows the drug on the small 30S subunit', M6b:'The ribosome highlighted; the zoom shows the drug on the small 30S subunit blocking tRNA', M7a:'The ribosome highlighted; the zoom shows the drug on the large 50S subunit stopping the protein chain', M7b:'The ribosome highlighted; the zoom shows the drug keeping the two subunits apart', M8:'DNA highlighted; the zoom shows the drug trapping an enzyme on coiled DNA', M9a:'DNA highlighted; the zoom shows an inactive drug being reduced to a reactive form that breaks DNA', M9b:'DNA highlighted; the zoom shows an inactive drug being reduced to a reactive form that breaks DNA', M10:'The folate pathway highlighted; the zoom shows sulfamethoxazole and trimethoprim blocking two steps in a row', M11:'DNA highlighted; the zoom shows RNA polymerase blocked so no RNA is made', R1:'A normal PBP binds the beta-lactam; PBP2a does not, except ceftaroline', R2:'A usual PBP binds the drug tightly; an altered PBP binds loosely and needs a higher dose', R4:'Before treatment the ampC gene is off and little enzyme is made; on ceftriaxone it is switched on and enzyme rises', R5:'A large drug reaches the gram-positive wall but is stopped by the gram-negative outer membrane', R6:'A Pseudomonas cell with few porins, efflux pumps and an AmpC enzyme', R7:'A low-affinity PBP that cephalosporins do not bind; and a building block ending in D-Ala–D-Lac that vancomycin cannot cap', R7v:'PBP5 of E. faecium binds no beta-lactam; and a building block ending in D-Ala–D-Lac that vancomycin cannot cap', R8:'Mycoplasma with no cell wall; Chlamydia and Legionella inside a host cell', R9:'Without oxygen metronidazole is switched on; with oxygen it stays inactive', R10:'The Bacteroides enzyme cuts the drug; with an inhibitor the drug reaches its target', R11:'Four steps: flora holds spores back, an antibiotic kills flora, spores grow, toxin hits the lining', R13:'A usual ribosome binds the drug; a methylated site binds neither macrolide nor clindamycin'};
 const MEMBER = {AMPC:['Enterobacter cloacae','Klebsiella aerogenes','Citrobacter freundii'], ENT:['Escherichia coli','E. coli','Klebsiella pneumoniae','Proteus mirabilis'], OAN:['Peptostreptococcus','Prevotella','Fusobacterium'], ATY:['Mycoplasma','Chlamydia','Chlamydophila','Legionella'], BHS:['Streptococcus pyogenes','Streptococcus agalactiae'], HFLU:['Haemophilus influenzae','Moraxella catarrhalis'], BFR:['Bacteroides']};
 </script>
+<script id="teach">
+/* Learn tab: figures assembled from this page's own diagrams (figure), reasons (why, ORGS[].w) and coverage table (cov, lists, drugsFor);
+   plus the Gram-stain card. No DOM access. The only new statements are the Gram-stain rules, which are standard microbiology. */
+var VT = (function(){
+function nm(o){ return ORGS[OI[o]].n; }
+function dn(d){ return DI[d].n; }
+function strip(d){ return '<div class="vstrip" role="img" aria-label="Coverage of ' + esc(dn(d)) + '">' + ORGS.map(function(o){ var v = cov(d, o.id); return '<div class="v' + v + '">' + dot(v) + '<span>' + esc(o.s) + '<span class="sr">: ' + WORD[v] + '</span></span></div>'; }).join('') + '</div>'; }
+function drugState(d){ var D = DI[d]; return {n: D.n.split(' / ')[0], html: function(){ return strip(d); }, line: 'Gap to remember: ' + nm(D.hole) + '. ' + why(d, D.hole).t}; }
+function mk(ids){ var o = {}; ids.forEach(function(d){ o[d] = drugState(d); }); return o; }
+function rel(o){ return drugsFor(o)[2].map(dn).join(', '); }
+var REACH = {
+  om: {n: 'Cannot get in', html: function(){ return strip('van'); }, line: why('van', 'ENT').t},
+  target: {n: 'Changed target', html: function(){ return figure('R1'); }, line: ORGS[OI.MRSA].w},
+  enzyme: {n: 'Destroyed by an enzyme', html: function(){ return figure('R3', 'ESBL'); }, line: ORGS[OI.ESBL].w},
+  psa: {n: 'Pseudomonas', html: function(){ return figure('R6'); }, line: ORGS[OI.PSA].w},
+  aty: {n: 'No wall, or inside cells', html: function(){ return figure('R8'); }, line: ORGS[OI.ATY].w}
+};
+var LADDER = mk(['penG', 'amp', 'naf', 'cfz', 'cro', 'fep', 'tzp', 'mem', 'cpt']);
+var OTHERS = mk(['van', 'lzd', 'dap', 'cip', 'lvx', 'mxf', 'azm', 'dox', 'cli', 'sxt', 'mtz', 'ag']);
+var ANAER = {
+  OAN: {n: 'Above the diaphragm', html: function(){ return figure('R9'); }, line: ORGS[OI.OAN].w + ' Reliable in this table: ' + rel('OAN') + '.'},
+  BFR: {n: 'Below the diaphragm', html: function(){ return figure('R10'); }, line: ORGS[OI.BFR].w + ' Reliable in this table: ' + rel('BFR') + '.'}
+};
+var ATY = {
+  why: {n: 'Why beta-lactams miss', html: function(){ return figure('R8'); }, line: ORGS[OI.ATY].w},
+  drugs: {n: 'What covers them', html: function(){ return strip('azm') + strip('dox') + strip('lvx'); }, line: 'Reliable in this table: ' + rel('ATY') + '. The three strips are azithromycin, doxycycline and levofloxacin.'}
+};
+function F(t, data){ return {t: t, states: Object.keys(data), data: data, svg: function(k){ return data[k].html(); }}; }
+var FIGS = {
+  reach: F('Four ways a drug misses', REACH),
+  ladder: F('Beta-lactams: what each one covers', LADDER),
+  others: F('The other classes: what each leaves uncovered', OTHERS),
+  anaer: F('Anaerobes: above and below the diaphragm', ANAER),
+  aty: F('Atypical organisms', ATY)
+};
+
+var ORGFIG = {MRSA: ['reach', 'target'], ESBL: ['reach', 'enzyme'], AMPC: ['reach', 'enzyme'], CRE: ['reach', 'enzyme'], PSA: ['reach', 'psa'], ATY: ['aty', 'why'], OAN: ['anaer', 'OAN'], BFR: ['anaer', 'BFR']};
+var GSEL = {MSSA: {gpcl: 1}, MRSA: {gpcl: 1}, BHS: {gpch: 1}, PNE: {gpch: 1}, EFS: {gpch: 1}, VRE: {gpch: 1}, ENT: {gnr: 1}, ESBL: {gnr: 1}, AMPC: {gnr: 1}, CRE: {gnr: 1}, PSA: {gnr: 1}, HFLU: {gnr: 1}};
+function chipsLook(kind, drug, org){
+  var out = [];
+  if (kind === 'd'){ if (LADDER[drug]) out.push(['ladder', drug, 'Compare along the beta-lactams']); else if (OTHERS[drug]) out.push(['others', drug, 'Compare with the other classes']); }
+  if (kind === 'o'){ if (ORGFIG[org]) out.push(ORGFIG[org]); if (GSEL[org]) out.push(['why', {sel: GSEL[org]}, 'What does the Gram stain say?']); }
+  return out;
+}
+
+/* Gram-stain card. Rows are organism groups in this tool's table; each returns [status, reason] from the whole selection. */
+var GROUPS = {mssa: ['MSSA'], mrsa: ['MRSA'], strep: ['BHS', 'PNE'], ent: ['EFS'], gnr: ['ENT'], psa: ['PSA'], an: ['OAN', 'BFR'], aty: ['ATY']};
+function shape(s){ return s.gpcl || s.gpch || s.gnr || s.none; }
+var NARROW = {
+  dx: {
+    labels: {fav: 'favored: ', 'in': 'still possible', less: 'less likely: ', unl: 'unlikely: '},
+    results: [['gpcl','Gram-positive cocci in clusters'],['gpch','Gram-positive cocci in chains or pairs'],['gnr','Gram-negative rods'],['mpos','MRSA PCR positive'],['mneg','MRSA PCR negative'],['lf','Lactose fermenter'],['ox','Oxidase-positive, does not ferment lactose'],['ana','Grows only without oxygen'],['none','Nothing on the stain, atypical pneumonia picture']],
+    causes: [
+      ['Staph. aureus, methicillin-susceptible', function(s){ return s.gpcl ? (s.mpos ? ['unl','the MRSA test is positive'] : s.mneg ? ['fav','clusters with a negative MRSA test'] : ['fav','staphylococci grow in clusters; coagulase or PCR separates S. aureus from skin staphylococci']) : shape(s) ? ['unl','staphylococci are gram-positive cocci in clusters'] : null; }, 'mssa'],
+      ['MRSA', function(s){ return s.gpcl ? (s.mneg ? ['unl','the MRSA test is negative'] : s.mpos ? ['fav','clusters with a positive MRSA test'] : ['fav','cover it until the susceptibility or PCR is back']) : shape(s) ? ['unl','staphylococci are gram-positive cocci in clusters'] : null; }, 'mrsa'],
+      ['Streptococci and pneumococcus', function(s){ return s.gpch ? ['fav','streptococci grow in chains and pairs'] : shape(s) ? ['unl','these are gram-positive cocci in chains or pairs'] : null; }, 'strep'],
+      ['Enterococcus', function(s){ return s.gpch ? ['fav','also in pairs and short chains; every cephalosporin misses it'] : shape(s) ? ['unl','these are gram-positive cocci in chains or pairs'] : null; }, 'ent'],
+      ['E. coli, Klebsiella and other enteric rods', function(s){ return s.gnr ? (s.ox ? ['less','E. coli and Klebsiella ferment lactose and are oxidase-negative'] : s.ana ? ['less','enteric rods grow in air'] : ['fav', s.lf ? 'lactose-fermenting gram-negative rods' : 'the most common gram-negative rods']) : shape(s) ? ['unl','these are gram-negative rods'] : null; }, 'gnr'],
+      ['Pseudomonas', function(s){ return s.gnr ? (s.lf ? ['unl','Pseudomonas does not ferment lactose'] : s.ana ? ['unl','Pseudomonas needs oxygen'] : s.ox ? ['fav','oxidase-positive non-fermenter'] : ['in','cover it when the patient has risk factors']) : shape(s) ? ['unl','it is a gram-negative rod'] : null; }, 'psa'],
+      ['Anaerobes', function(s){ return s.ana ? ['fav','grows only without oxygen'] : s.none ? ['unl','anaerobes are seen on the stain'] : null; }, 'an'],
+      ['Atypical organisms', function(s){ return s.none ? ['fav','they do not show on a Gram stain'] : shape(s) ? ['unl','an organism is visible on the stain'] : null; }, 'aty']
+    ],
+    next: function(s){
+      var fav = NARROW.dx.causes.filter(function(c){ var x = c[1](s); return x && x[0] === 'fav'; }), orgs = [];
+      fav.forEach(function(c){ GROUPS[c[2]].forEach(function(o){ orgs.push(o); }); });
+      if (!orgs.length) return 'Tap what the lab has reported. The stain narrows the organism hours to days before the culture names it.';
+      var ok = DRUGS.filter(function(d){ return orgs.every(function(o){ return cov(d.id, o) === 2; }); }).map(function(d){ return d.n; });
+      return (ok.length ? 'Reliable against every favored organism in this tool\'s table: ' + ok.join('; ') + '.' : 'No single drug in this tool\'s table is reliable against every favored organism: more than one agent is needed.') + ' This is a coverage list, not a regimen: choose with the syndrome, and narrow when the culture names the organism.';
+    },
+    more: 'A Gram stain shows shape and colour, not species or resistance. Resistance tests (MRSA PCR, ESBL and carbapenemase reports) change the list as they arrive. For regimens by syndrome, use Empiric antibiotics.',
+    tiers: ['Gram-stain rules: standard microbiology', 'drug lists: this tool\'s coverage table']
+  }
+};
+function narrow(side, sel){
+  return NARROW[side].causes.map(function(c){ var x = c[1](sel) || ['in', '']; return {name: c[0], st: x[0], why: x[1]}; });
+}
+var ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M7 15l3-4 3 3 2-2 2 3"/></svg>';
+function escq(s){ return String(s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+function chipHTML(c){
+  if (c[0] === 'why') return '<button class="fchip" type="button" data-narrow="' + escq(JSON.stringify(c[1])) + '">' + escq(c[2]) + '</button>';
+  return '<button class="fchip" type="button" data-fig="' + c[0] + '" data-state="' + (c[1] || '') + '">' + ICON + escq(c[2] || FIGS[c[0]].t) + '</button>';
+}
+function chipRow(list){ return list.length ? '<div class="fchips">' + list.map(chipHTML).join('') + '</div>' : ''; }
+return {FIGS: FIGS, chipsLook: chipsLook, NARROW: NARROW, narrow: narrow, TRIALS: [], chipRow: chipRow, escq: escq};
+})();
+</script>
 <script id="ui">
 const $=s=>document.querySelector(s), $$=s=>Array.from(document.querySelectorAll(s));
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -744,7 +895,63 @@ function showView(v){ $$('section.view').forEach(s=>s.classList.toggle('on',s.id
 $$('nav.tabs button').forEach(b=>b.addEventListener('click',()=>showView(b.dataset.v)));
 function goHash(){ const id=decodeURIComponent(location.hash.slice(1)); if(!id) return; const el=document.getElementById(id); if(!el) return; const sec=el.closest('section.view'); if(sec){ showView(sec.id.slice(2)); requestAnimationFrame(()=>el.scrollIntoView({block:'start'})); } }
 window.addEventListener('hashchange',goHash);
-renderLook(); renderGrid(); renderQuiz(); goHash();
+renderLook(); renderGrid(); renderQuiz();
+
+/* Learn tab: figures, figure sheet, "What came back?" card, trials. */
+(function(){
+var G = function(id){ return document.getElementById(id); }, escq = VT.escq, FIGS = VT.FIGS, figN = 0;
+function mountFig(host, id, state){
+  var F = FIGS[id], pre = 'f' + (++figN) + '-';
+  function draw(k){
+    host.innerHTML = '<div class="states" role="group" aria-label="' + escq(F.t) + '">' + F.states.map(function(x){ return '<button class="sbtn" type="button" data-k="' + x + '" aria-pressed="' + (x === k) + '">' + escq(F.data[x].n) + '</button>'; }).join('') + '</div>' + F.svg(k, pre) + '<p class="line1">' + escq(F.data[k].line) + '</p>';
+    var on = host.querySelector('[aria-pressed="true"]'), row = host.querySelector('.states');
+    if (on && row) row.scrollLeft = Math.max(0, on.offsetLeft - 60);
+  }
+  host.onclick = function(e){ var k = e.target.getAttribute && e.target.getAttribute('data-k'); if (k) draw(k); };
+  draw(state && F.data[state] ? state : F.states[0]);
+}
+var lastFocus = null;
+function closeSheet(){ if (G('fsheet').hidden) return; G('fscrim').hidden = true; G('fsheet').hidden = true; if (lastFocus && lastFocus.focus) lastFocus.focus(); }
+G('fsheet-x').addEventListener('click', closeSheet); G('fscrim').addEventListener('click', closeSheet);
+document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeSheet(); });
+var nwSel = {};
+function drawNarrow(){
+  var N = VT.NARROW.dx;
+  G('nw-results').innerHTML = N.results.map(function(r){ return '<button class="sbtn" type="button" data-r="' + r[0] + '" aria-pressed="' + !!nwSel[r[0]] + '">' + escq(r[1]) + '</button>'; }).join('');
+  var rows = VT.narrow('dx', nwSel), ord = {fav: 0, unl: 1, less: 2, 'in': 3};
+  rows.sort(function(a, b){ return ord[a.st] - ord[b.st]; });
+  G('nw-causes').innerHTML = rows.map(function(c){ return '<div class="cause ' + (c.st === 'fav' ? 'fav' : c.st === 'in' && !c.why ? 'less' : '') + '"><span>' + escq(c.name) + '</span><small>' + escq(c.st === 'in' ? (c.why ? c.why : 'no change') : N.labels[c.st] + c.why) + '</small></div>'; }).join('');
+  G('nw-next').innerHTML = '<b>Do next:</b> ' + escq(N.next(nwSel));
+}
+G('nw-results').addEventListener('click', function(e){
+  var r = e.target.getAttribute('data-r'); if (!r) return;
+  if (nwSel[r]) delete nwSel[r]; else nwSel[r] = 1;
+  var left = G('nw-results').scrollLeft; drawNarrow(); G('nw-results').scrollLeft = left;
+});
+G('nw-more').textContent = VT.NARROW.dx.more;
+G('nw-tiers').innerHTML = VT.NARROW.dx.tiers.map(function(t){ return '<span class="tier" style="margin-right:6px">' + escq(t) + '</span>'; }).join('');
+drawNarrow();
+document.addEventListener('click', function(e){
+  var c = e.target.closest && e.target.closest('[data-fig]');
+  if (c){ var id = c.getAttribute('data-fig'); lastFocus = document.activeElement; G('fsheet-t').textContent = FIGS[id].t; mountFig(G('fsheet-b'), id, c.getAttribute('data-state')); G('fscrim').hidden = false; G('fsheet').hidden = false; G('fsheet').scrollTop = 0; G('fsheet-x').focus(); return; }
+  var n = e.target.closest && e.target.closest('[data-narrow]');
+  if (n){ nwSel = JSON.parse(n.getAttribute('data-narrow')).sel; drawNarrow(); showView('learn'); requestAnimationFrame(function(){ G('narrow').scrollIntoView({block: 'start'}); }); return; }
+  var t = e.target.closest && e.target.closest('[data-trial]');
+  if (t){ showView('learn'); requestAnimationFrame(function(){ G('trial-' + t.getAttribute('data-trial')).scrollIntoView({block: 'center'}); }); }
+});
+document.querySelectorAll('[data-figure]').forEach(function(h){ mountFig(h, h.getAttribute('data-figure'), h.getAttribute('data-state')); });
+var chaps = [].slice.call(document.querySelectorAll('.chap'));
+G('lpills').innerHTML = chaps.map(function(c, n){ return '<button class="lpill" type="button" data-go="' + c.id + '" aria-current="' + (n === 0) + '">' + (n + 1) + ' ' + escq(c.getAttribute('data-pill')) + '</button>'; }).join('');
+G('lpills').addEventListener('click', function(e){ var g = e.target.getAttribute('data-go'); if (g) G(g).scrollIntoView(); });
+function mark(id){ [].forEach.call(G('lpills').children, function(b){ var on = b.getAttribute('data-go') === id; b.setAttribute('aria-current', String(on)); if (on) G('lpills').scrollLeft = Math.max(0, b.offsetLeft - 60); }); }
+if ('IntersectionObserver' in window){
+  var io = new IntersectionObserver(function(es){ es.forEach(function(en){ if (en.isIntersecting) mark(en.target.id); }); }, {rootMargin: '-30% 0px -60% 0px'});
+  chaps.forEach(function(c){ io.observe(c); });
+}
+G('go-prac').addEventListener('click', function(){ showView('practice'); window.scrollTo(0, 0); });
+var r0 = renderLook; renderLook = function(){ r0(); if (kind) G('lookCard').insertAdjacentHTML('beforeend', VT.chipRow(VT.chipsLook(kind, curDrug, curOrg))); }; renderLook();
+goHash();
+})();
 </script>
 </body>
 </html>
