@@ -402,7 +402,7 @@ function duration(i, rows){
   var st = {}; (rows || []).forEach(function(r){ st[r.a] = r.st; });
   var noDoac = DOACS.every(function(a){ return st[a] === 'out'; });
   var red = [st.apix !== 'out' && !i.inh ? 'apixaban 2.5 mg twice daily' : null, st.riva !== 'out' ? 'rivaroxaban 10 mg daily' : null].filter(Boolean);
-  var extDose = red.length ? 'After at least 6 months, a reduced dose is recommended for those who continue: ' + red.join(' or ') + ' (AHA/ACC 1, A; CHEST weak).' : 'Continue the drug chosen above at full dose. The reduced-dose option exists only for apixaban and rivaroxaban, which do not fit this patient as things stand.';
+  var extDose = red.length ? 'After at least 6 months, a reduced dose is recommended for those who continue: ' + red.join(' or ') + ' (AHA/ACC 1, A; CHEST weak).' : 'Continue the drug and dose chosen above. The reduced-dose option exists only for apixaban and rivaroxaban, which do not fit this patient as things stand.';
   var contWith = noDoac ? 'offer to continue' : 'offer to continue with a DOAC';
   var contAfter = !noDoac ? '' : i.cpC ? ' In Child-Pugh C that means staying on LMWH (expert practice).' : ' When a DOAC cannot be used, warfarin is the extended-phase drug (CHEST rec 25, weak).';
   if (i.preg){ d.head = 'Through pregnancy and after delivery'; d.steps = ['LMWH for the rest of the pregnancy.', 'Plan delivery and the postpartum course with obstetrics and hematology.']; d.why = 'Pregnancy is the provoking factor and it has not ended, so treatment cannot stop on a 3-month clock.'; d.tiers = ['expert practice']; d.fig = 'minor'; return d; }
@@ -439,8 +439,8 @@ function decide(i){
   var f = o.feats, g = [];
   if (o.pe && !cat) g.push('PE severity is not classed yet: enter ' + o.pe.need.join(', ') + ' before settling on an oral start.');
   if (f.unstable && cat === 'E2') g.push('Start with an injectable. The recommendation for LMWH over a heparin infusion covers categories C1 to E1, not E2; on VA-ECMO, parenteral anticoagulation continues (1, B-NR). Leading with heparin here is expert practice.');
-  else if (f.unstable && o.picks[0].a === 'ufh') g.push('Start with an injectable. LMWH is recommended over a heparin infusion in categories C1 to E1 (1, B-R), but it needs caution here (' + o.rows.filter(function(r){ return r.a === 'lmwh'; })[0].why + '), so a heparin infusion leads (expert practice). Move to an oral drug once stable.');
-  else if (f.unstable) g.push('Start with an injectable: LMWH is recommended over a heparin infusion (1, B-R), and stays reasonable even if a catheter procedure is likely (2a, C-LD). Move to an oral drug once stable.');
+  else if (f.unstable && o.picks[0].a === 'ufh') g.push('Start with an injectable. LMWH is recommended over a heparin infusion in categories C1 to E1 (1, B-R), but it needs caution here (' + o.rows.filter(function(r){ return r.a === 'lmwh'; })[0].why + '), so a heparin infusion leads (expert practice). Move to the long-term drug once stable.');
+  else if (f.unstable) g.push('Start with an injectable: LMWH is recommended over a heparin infusion (1, B-R), and stays reasonable even if a catheter procedure is likely (2a, C-LD). Move to the long-term drug once stable.');
   if (f.preg) g.push('No DOAC and no warfarin in pregnancy (3: Harm).');
   if (f.aps) g.push('No DOAC in antiphospholipid syndrome: more arterial clots than with warfarin. All four DOAC labels warn against use in triple-positive disease.');
   if (f.ckd5 || f.ckd4) g.push('CrCl below 30: no dabigatran or fondaparinux; enoxaparin drops to once daily. The apixaban trials enrolled no one with CrCl below 15 or on dialysis, and rivaroxaban has limited data below 30.');
