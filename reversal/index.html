@@ -246,9 +246,10 @@ var HLTEXT = {
 function elapsed(a, hrs, crcl){
   var h = halfLife(a, crcl); if (!h || !has(hrs)) return null;
   var lo = h[1] ? hrs / h[1] : 0, hi = hrs / h[0];
+  function f(v){ return r1(v) < 0.1 ? 'less than 0.1' : String(r1(v)); }
   var n = r1(hi) < 0.1 ? '0.1' : r1(hi);
-  var txt = h[1] == null ? (a === 'dabi' && !has(crcl) ? 'At most ' + n + ' half-lives have passed, and fewer if the kidneys are poor (half-life 12 to 17 h, but 27 h or longer with CrCl under 30). Enter the CrCl.' : 'Fewer than ' + n + ' half-lives have passed (half-life over 27 h at this kidney function).')
-    : r1(lo) === r1(hi) ? 'About ' + r1(hi) + ' half-lives have passed since the last dose.' : 'About ' + r1(lo) + ' to ' + r1(hi) + ' half-lives have passed since the last dose.';
+  var txt = h[1] == null ? (a === 'dabi' && !has(crcl) ? 'At most ' + n + ' half-lives have passed, and fewer if the kidneys are poor (half-life 12 to 17 h, but 27 h or longer with CrCl under 30). Enter the CrCl.' : 'Fewer than ' + n + ' half-lives have passed: the half-life is 27 h at CrCl 15 to 30, and the label gives none below 15.')
+    : r1(lo) === r1(hi) ? (r1(hi) < 0.1 ? 'Less than 0.1 half-lives have passed since the last dose.' : 'About ' + f(hi) + ' half-lives have passed since the last dose.') : 'About ' + f(lo) + ' to ' + f(hi) + ' half-lives have passed since the last dose.';
   return {lo: lo, hi: hi, text: txt, gone: h[1] != null && lo >= 5};
 }
 
@@ -280,6 +281,8 @@ var WHY = {
   enox: 'Protamine never fully neutralises enoxaparin: at most about 60% of its anti-Xa activity. Expect partial reversal, and less the longer ago the dose was.',
   fonda: 'Fondaparinux does not bind protamine and has no antidote. With a half-life of 17 to 21 hours it is still active the next day.',
   hold: 'For a bleed that is not dangerous, holding the anticoagulant until things are stable is the treatment; a reversal agent would add a clot risk without a matching benefit.',
+  warfMajor: 'The bleed is major but controlled. IV vitamin K starts lowering the INR within hours; PCC, which carries a clot risk, is kept for a bleed that is not controlled.',
+  warfLow: 'Below INR 2 the PCC label gives no dose. Vitamin K lowers the INR over hours; a fixed dose of PCC is an off-label option when the bleed cannot wait for it.',
   cont: 'The bleed has stopped and needed nothing done. Stopping the anticoagulant now would swap a small bleed for the clot it is there to prevent.',
   major: 'Reversal agents carry a clot risk of their own. They are kept for bleeds at a critical site, bleeds that threaten life, and major bleeds that the first measures do not control.',
   crit: 'In a closed space a small volume of blood does lasting harm, so a critical-site bleed is reversed at once, whatever the hemoglobin.',
@@ -292,6 +295,7 @@ function sevCard(i, s){
     c.head = i.ich ? 'Major bleed: intracranial. Reverse now.' : i.crit ? 'Major bleed at a critical site. Reverse now.' : 'Major bleed, not controlled. Reverse now.'; c.cls = 'bad';
     c.sub = 'Do not let reversal delay resuscitation or control of the source.';
     c.why = i.ich || i.crit ? WHY.crit : WHY.major;
+    if (i.agent === 'warf' && has(i.inr) && i.inr < 1.3){ c.head = (i.ich ? 'Major bleed: intracranial.' : i.crit ? 'Major bleed at a critical site.' : 'Major bleed, not controlled.') + ' At this INR there is no warfarin effect to reverse.'; c.sub = 'Resuscitate, control the source and look for another cause.'; c.why = null; }
   } else if (s.major){
     c.head = 'Major bleed. Stop the drug and control the source first.';
     c.sub = 'Give a reversal agent if these measures do not control it, or if it becomes life-threatening.';
@@ -334,7 +338,7 @@ function warfCard(i, mode){
     return c;
   }
   var low = has(i.inr) && i.inr < 2;
-  var vk = {when: 'With it', name: 'Vitamin K 5 to 10 mg IV', dose: 'In 25 to 50 mL saline over 15 to 30 minutes', small: 'Never faster than 1 mg per minute. Give it even though PCC has corrected the INR.'};
+  var vk = {when: 'With it', name: 'Vitamin K 5 to 10 mg IV', dose: 'In 25 to 50 mL saline over 15 to 30 minutes', small: 'Never faster than 1 mg per minute. Give it even when PCC has corrected the INR.'};
   if (mode === 'minor'){
     c.head = i.adm ? 'Hold warfarin. Consider vitamin K 2 to 5 mg by mouth or IV.' : 'Continue warfarin if the bleeding has stopped. Check the INR.';
     c.sub = 'No PCC and no plasma for a non-major bleed.'; c.why = i.adm ? WHY.warfK : WHY.cont; c.tiers = [T.acc];
@@ -345,7 +349,7 @@ function warfCard(i, mode){
     c.head = 'Hold warfarin. Vitamin K 5 to 10 mg IV.'; c.sub = 'Have 4-factor PCC ready; give it if the bleed is not controlled.';
     c.steps = [{when: 'Now', name: vk.name, dose: vk.dose, small: 'Never faster than 1 mg per minute.', now: 1}, {when: 'If not controlled', name: '4-factor PCC', dose: p ? pccLine(p, i) : low ? 'INR below 2: no label dose. Fixed-dose option 1,000 units' : 'By INR and weight: 25, 35 or 50 units/kg', small: 'Tick "not controlled" to see the full dose card.'}];
     c.guards = ['Vitamin K by vein: fatal hypersensitivity reactions, including anaphylaxis, have occurred. Dilute and infuse slowly.'];
-    c.why = WHY.warfK; c.tiers = [T.acc]; c.more = giMore(i);
+    c.why = WHY.warfMajor; c.tiers = [T.acc]; c.more = giMore(i);
     return c;
   }
   var proc = mode === 'proc';
@@ -361,8 +365,9 @@ function warfCard(i, mode){
       pccStep = {when: 'Now', name: '4-factor PCC, lower dose', dose: '10 to 20 units/kg' + (has(lo) ? ' = ' + fmt(lo) + ' to ' + fmt(hi) + ' units for ' + i.wt + ' kg' : ''), small: 'INR 1.3 to 1.9 with intracranial bleeding: may be reasonable. Off-label: the label table starts at INR 2. Weight counted up to 100 kg.', now: 1};
     } else {
       c.head = 'Vitamin K 5 to 10 mg IV. PCC: the label table starts at INR 2.';
-      pccStep = {when: 'Option', name: '4-factor PCC, fixed dose', dose: proc ? 'Not covered by the label at this INR' : '1,000 units (ACC fixed-dose option for a major bleed outside the skull)', small: 'The label trials enrolled only patients with INR 2.0 or above.'};
-      vk.when = 'Now'; vk.now = 1;
+      pccStep = proc ? {when: 'Option', name: '4-factor PCC: off-label at this INR', dose: 'No source read for this tool gives a dose: a decision for the surgeon and hematology', small: 'The label trials enrolled only patients with INR 2.0 or above.'}
+        : {when: 'Option', name: '4-factor PCC, fixed dose', dose: '1,000 units (ACC fixed-dose option for a major bleed outside the skull)', small: 'The label trials enrolled only patients with INR 2.0 or above.'};
+      vk.when = 'Now'; vk.now = 1; vk.small = 'Never faster than 1 mg per minute.';
     }
   } else {
     c.head = '4-factor PCC ' + (has(p.units) ? fmt(p.units) + ' units' : p.per + ' units/kg') + ' plus vitamin K 5 to 10 mg IV';
@@ -372,8 +377,8 @@ function warfCard(i, mode){
   c.steps = low && !ichLow ? [vk, pccStep] : [pccStep, vk, plasma];
   c.guards = ['PCC: arterial and venous clots, some fatal, have followed its use. Both US products contain heparin and are contraindicated in heparin-induced thrombocytopenia; Kcentra also in DIC, Balfaxar also in IgA deficiency with anti-IgA antibodies.', 'Vitamin K by vein: fatal hypersensitivity reactions, including anaphylaxis, have occurred. Dilute and infuse slowly.'];
   if (has(i.wt) && i.wt > 100 && p) c.guards.push('Weight above 100 kg: the label doses on 100 kg, so the dose shown is the maximum.');
-  c.why = WHY.warfRev;
-  c.tiers = ichLow ? [T.ich2bw, T.ichk, T.ep] : low ? (proc ? [T.ep] : [T.acc, T.ep]) : proc ? [T.label, T.ep] : i.ich ? [T.ich1, T.ichk, T.acc, T.label] : [T.acc, T.label];
+  c.why = low && !ichLow ? WHY.warfLow : WHY.warfRev;
+  c.tiers = !has(i.inr) && !proc ? (i.ich ? [T.ich1, T.ichk, T.acc] : [T.acc]) : ichLow ? [T.ich2bw, T.ichk, T.ep] : low ? (proc ? [T.ep] : [T.acc, T.ep]) : proc ? [T.label, T.ep] : i.ich ? [T.ich1, T.ichk, T.acc, T.label] : [T.acc, T.label];
   c.more = ['Label dose of 4-factor PCC by INR before treatment: 2 to under 4, 25 units/kg (maximum 2,500 units); 4 to 6, 35 units/kg (maximum 3,500); above 6, 50 units/kg (maximum 5,000). Units are factor IX units; weight counts up to 100 kg. Measure the INR close to the time of dosing.',
     'Fixed-dose option in the ACC pathway: 1,000 units for a major bleed outside the skull, 1,500 units for intracranial hemorrhage.',
     'Intracranial hemorrhage guideline: INR 2.0 or above, 4-factor PCC rather than plasma (1, B-R), 25 to 50 units/kg by INR and weight; INR 1.3 to 1.9, PCC 10 to 20 units/kg may be reasonable (2b, C-LD); IV vitamin K straight after the factor replacement (1, C-LD).'];
@@ -384,19 +389,19 @@ function warfCard(i, mode){
   return c;
 }
 function pccLine(p, i){ return p.band + ': ' + p.per + ' units/kg' + (has(p.units) ? ' = ' + fmt(p.units) + ' units for ' + i.wt + ' kg' : '') + ' (maximum ' + fmt(p.max) + ')'; }
-function giMore(i){ return i.gi ? ['Gut bleeding: the ACG-CAG 2022 guideline is more restrained than the ACC pathway. It suggests against plasma and against vitamin K, makes no recommendation for or against PCC, and suggests PCC rather than plasma when one is given; PCC could be considered for a life-threatening bleed (all conditional, very low certainty). This tool follows the ACC pathway.'] : []; }
+function giMore(i){ return i.gi ? ['Gut bleeding: the ACG-CAG 2022 guideline is more restrained than the ACC pathway. It suggests against plasma and against vitamin K, makes no recommendation for or against PCC, and suggests PCC rather than plasma when one is given; PCC could be considered for a life-threatening bleed (conditional, very low certainty, where graded). This tool follows the ACC pathway.'] : []; }
 
 function charcoal(i){
   if (has(i.hrs) && i.hrs > 4) return null;
   return {when: has(i.hrs) ? 'Also' : 'If recent', name: 'Activated charcoal 50 g', dose: has(i.hrs) ? 'Last dose ' + i.hrs + ' h ago: within the 2 to 4 hours when charcoal may help' : 'If the last dose was within 2 to 4 hours', small: 'Only with a safe airway.'};
 }
-function goneSub(i, lab){ var e = elapsed(i.agent, i.hrs, i.crcl); return e && e.gone ? 'More than 5 half-lives since the last dose: little drug is likely left. If time allows, confirm with ' + lab + ' before giving a clot-promoting agent (expert practice).' : null; }
+function goneSub(i, lab){ var e = elapsed(i.agent, i.hrs, i.crcl); return e && e.gone ? '5 or more half-lives since the last dose: little drug is likely left, unless kidney function is poor. If time allows, confirm with ' + lab + ' before giving a reversal agent (expert practice).' : null; }
 function leftGuard(i){
   var e = elapsed(i.agent, i.hrs, i.crcl); if (!e) return [];
   return [e.text + (e.gone ? ' Little drug should be left, though it lasts longer with poor kidney or liver function (rule of thumb, not a guideline).' : '')];
 }
 function dabiCard(i, mode){
-  var c = {id: 'reverse', label: 'Dabigatran · what to give', chips: [['where','dabi'],['left', !has(i.crcl) || i.crcl >= 80 ? 'dabi13' : i.crcl >= 50 ? 'dabi15' : i.crcl >= 30 ? 'dabi18' : 'dabi27']]};
+  var c = {id: 'reverse', label: 'Dabigatran · what to give', chips: [['where','dabi']].concat(has(i.crcl) && i.crcl >= 15 ? [['left', i.crcl >= 80 ? 'dabi13' : i.crcl >= 50 ? 'dabi15' : i.crcl >= 30 ? 'dabi18' : 'dabi27']] : [])};
   if (mode === 'minor' || mode === 'major'){ return holdDoac(c, i, mode, 'idarucizumab 5 g'); }
   var alt = perKg(50, i.wt, null, 4000);
   c.label = mode === 'proc' ? 'Dabigatran · surgery that cannot wait' : c.label;
@@ -452,17 +457,17 @@ function xaCard(i, mode){
   return c;
 }
 function ufhCard(i, mode){
-  var c = {id: 'reverse', label: 'Heparin infusion · what to give', chips: [['where','hep'],['prot','ufh']]}, p = protUFH(i.rate);
+  var odd = has(i.rate) && (i.rate < 200 || i.rate > 4000), c = {id: 'reverse', label: 'Heparin infusion · what to give', chips: [['where','hep'],['prot','ufh']]}, p = odd ? null : protUFH(i.rate);
   if (mode === 'minor' || mode === 'major'){
     c.head = mode === 'minor' && !i.adm ? 'Check the aPTT or anti-Xa; lower or pause the infusion if it is high.' : 'Stop the infusion. Protamine only if the bleed is not controlled.';
     c.sub = 'Heparin clears within hours once the infusion stops.'; c.why = mode === 'major' ? WHY.major : i.adm ? WHY.hold : WHY.cont; c.tiers = [T.ep, T.label]; return c;
   }
   c.label = mode === 'proc' ? 'Heparin infusion · surgery that cannot wait' : c.label;
   c.head = 'Stop the infusion. Protamine ' + (p ? (p.lo === p.hi ? p.hi : p.lo + ' to ' + p.hi) + ' mg IV' : '1 mg per 100 units given in the last 2 to 3 hours');
-  c.steps = [{when: 'Now', name: 'Protamine sulfate', dose: p ? fmt(i.rate) + ' units/h × 2 to 3 h = ' + fmt(r0(i.rate * 2)) + ' to ' + fmt(r0(i.rate * 3)) + ' units → ' + (p.lo === p.hi ? p.hi : p.lo + ' to ' + p.hi) + ' mg' + (p.capped ? ' (capped at 50 mg)' : '') : '1 mg per 100 units of heparin given in the last 2 to 3 hours; maximum 50 mg in one dose', small: 'Very slowly: no more than 50 mg in any 10 minutes. Add 1 mg per 100 units for any bolus given in that time.', now: 1},
+  c.steps = [{when: 'Now', name: 'Protamine sulfate', dose: p ? fmt(i.rate) + ' units/h × 2 to 3 h = ' + fmt(r0(i.rate * 2)) + ' to ' + fmt(r0(i.rate * 3)) + ' units → ' + (p.lo === p.hi ? p.hi : p.lo + ' to ' + p.hi) + ' mg' + (p.capped ? ' (capped at 50 mg)' : '') : '1 mg per 100 units of heparin given in the last 2 to 3 hours; maximum 50 mg in one dose', small: 'Very slowly: no more than 50 mg in any 10 minutes. Add for a recent bolus (1 mg per 100 units if just given, half that at 30 minutes); the total is still no more than 50 mg.', now: 1},
     {when: 'Then', name: 'Recheck the aPTT', dose: 'If still raised: repeat 0.5 mg per 100 units', small: 'Anticoagulation can rebound 30 minutes to 18 hours later.'}];
   c.guards = ['Protamine can cause severe hypotension, cardiovascular collapse and pulmonary edema. Risk is higher with fast or repeated doses, earlier protamine or protamine-containing insulin (NPH), and possibly fish allergy, vasectomy or severe left ventricular dysfunction. Have resuscitation ready.', 'Too much protamine is itself a weak anticoagulant: do not exceed the dose.'];
-  if (has(i.rate) && (i.rate < 200 || i.rate > 4000)) c.guards.unshift('Check the rate entered: it should be in units per hour (not units/kg/h). ' + fmt(i.rate) + ' units/h is outside the usual range.');
+  if (odd) c.guards.unshift('Check the rate entered: it should be in units per hour (not units/kg/h). ' + fmt(i.rate) + ' units/h is outside the usual range, so no dose is calculated.');
   if (mode === 'proc') c.guards.unshift('If surgery can wait a few hours, stopping the infusion may be enough (half-life 0.5 to 2 hours).');
   c.why = mode === 'proc' ? WHY.procWait : WHY.ufh;
   c.tiers = i.ich ? [T.ncsS, 'AHA/ASA 2022: 2a, C-LD', T.label] : mode === 'proc' ? [T.ncsS, T.label, T.ep] : [T.ncsS, T.label];
@@ -486,16 +491,16 @@ function enoxCard(i, mode){
   } else if (p.none){
     var half = has(i.dose) && i.dose > 0 ? r1(Math.min(i.dose * 0.5, 50)) : null;
     c.head = '12 hours or more since the dose: protamine is often not needed';
-    step = {when: 'Consider', name: 'Protamine 0.5 mg per 1 mg' + (has(half) ? ' = ' + half + ' mg' : ''), dose: 'If bleeding continues, kidney function is poor, or the anti-Xa level is still raised', small: 'The label says protamine may not be required once 12 hours have passed. Maximum 50 mg in one dose.', now: 1};
+    step = {when: 'Consider', name: 'Protamine 0.5 mg per 1 mg' + (has(half) ? ' = ' + half + ' mg' : ''), dose: 'If bleeding continues or kidney function is poor', small: 'The label says protamine may not be required once 12 hours have passed. Maximum 50 mg in one dose.', now: 1};
   } else {
     c.head = 'Protamine ' + (has(p.mg) ? p.mg + ' mg IV' : p.ratio + ' mg per 1 mg of enoxaparin');
     step = {when: 'Now', name: 'Protamine sulfate', dose: (p.ratio === 1 ? 'Dose within 8 h: 1 mg per 1 mg' : 'Dose 8 to 12 h ago: 0.5 mg per 1 mg') + (has(p.mg) ? ' = ' + p.mg + ' mg for ' + i.dose + ' mg' + (p.capped ? ' (capped at 50 mg)' : '') : '; maximum 50 mg'), small: 'Very slowly: no more than 50 mg in any 10 minutes.', now: 1};
   }
   c.steps = [step];
   if (!p.none) c.steps.push({when: '2 to 4 h later', name: 'Recheck the aPTT', dose: 'If still prolonged: a second dose of 0.5 mg per 1 mg', small: 'The aPTT may stay longer than after heparin even so.'});
-  c.guards = p.none ? leftGuard(i) : ['Reversal is partial: at most about 60% of the anti-Xa activity is neutralised.', 'Protamine can cause severe hypotension, cardiovascular collapse and pulmonary edema. Have resuscitation ready.'];
+  c.guards = (p.none ? leftGuard(i) : []).concat(['Reversal is partial: at most about 60% of the anti-Xa activity is neutralised.', 'Protamine can cause severe hypotension, cardiovascular collapse and pulmonary edema. Have resuscitation ready.']);
   c.why = mode === 'proc' ? WHY.procWait : WHY.enox;
-  c.tiers = i.ich ? [T.label, T.ncsS, 'AHA/ASA 2022: 2b, C-LD'] : mode === 'proc' ? [T.label, T.ncsS, T.ep] : [T.label, T.ncsS];
+  c.tiers = p.none ? [T.label, T.ep] : i.ich ? [T.label, T.ncsS, 'AHA/ASA 2022: 2b, C-LD'] : mode === 'proc' ? [T.label, T.ncsS, T.ep] : [T.label, T.ncsS];
   c.more = ['The ratios and the 12-hour statement are from the Lovenox label. The 50 mg cap is from the NCS/SCCM 2016 and ACCP 2012 guidelines, not the label.',
     'Dalteparin: 1 mg of protamine per 100 anti-Xa units; a second 0.5 mg per 100 units if the aPTT is still prolonged 2 to 4 hours later; about 60% to 75% of anti-Xa activity is neutralised at most (Fragmin label).',
     'Prophylactic doses: NCS/SCCM 2016 recommends against reversal in intracranial hemorrhage (good practice statement). It also suggests against plasma or PCC to reverse low-molecular-weight heparin.',
@@ -504,6 +509,7 @@ function enoxCard(i, mode){
 }
 function fondaCard(i, mode){
   var c = {id: 'reverse', label: 'Fondaparinux · what to give', chips: [['where','hep']]}, u = perKg(20, i.wt);
+  if (mode === 'minor' && !i.adm){ c.head = 'Continue fondaparinux if the bleeding has stopped.'; c.sub = 'There is no antidote if it worsens: hold the next dose if in doubt.'; c.why = WHY.cont; c.guards = leftGuard(i); c.tiers = [T.ep, T.label]; return c; }
   if (mode === 'minor' || mode === 'major'){ c.head = 'Hold fondaparinux. There is no antidote.'; c.sub = 'Supportive care; it lasts into the next day.'; c.why = WHY.fonda; c.guards = leftGuard(i); c.tiers = [T.label]; return c; }
   if (mode === 'proc') c.label = 'Fondaparinux · surgery that cannot wait';
   c.head = 'No antidote. Activated PCC 20 units/kg is the suggested option.';
@@ -517,7 +523,8 @@ var CARD = {warf: warfCard, apix: xaCard, riva: xaCard, edox: xaCard, dabi: dabi
 
 function confirmCard(i, mode){
   var a = i.agent, c = {id: 'confirm', label: 'Check that it worked'}, proc = mode === 'proc';
-  if (a === 'warf'){ c.head = 'Repeat the INR after treatment, and again later'; c.list = ['In the trials the target was INR 1.3 or below 30 minutes after the infusion ended.', 'After vitamin K, the label says to check the INR at 6 to 8 hours and repeat the dose if it is still raised.', 'When PCC was given without vitamin K, the INR rose again 12 to 24 hours later (intracranial hemorrhage guideline).']; c.tiers = [T.label, 'AHA/ASA 2022 text']; }
+  if (a === 'warf' && has(i.inr) && i.inr < 2 && !i.ich){ c.head = 'Repeat the INR 6 to 8 hours after vitamin K'; c.list = ['The label says to repeat the dose if the INR is still raised then.']; c.tiers = [T.label]; }
+  else if (a === 'warf'){ c.head = 'Repeat the INR after treatment, and again later'; c.list = ['In the trials the target was INR 1.3 or below 30 minutes after the infusion ended.', 'After vitamin K, the label says to check the INR at 6 to 8 hours and repeat the dose if it is still raised.', 'In case reports of PCC given without vitamin K, the INR rose again 12 to 24 hours later (intracranial hemorrhage guideline).']; c.tiers = [T.label, 'AHA/ASA 2022 text']; }
   else if (a === 'dabi'){ c.head = 'Thrombin time or aPTT'; c.list = ['A normal thrombin time rules out a clinically relevant dabigatran level.', 'A normal aPTT usually does too, if the lab uses a sensitive reagent.', 'Repeat at 12 to 24 hours: levels can rise again as drug returns from the tissues.']; c.tiers = [T.acc, T.label]; }
   else if (XA[a]){ c.head = proc ? 'No lab confirms PCC. Judge by hemostasis at surgery.' : 'No lab confirms PCC. Follow the bleeding.'; c.list = ['Before treating: a heparin-calibrated anti-Xa below the limit of quantitation probably rules out a relevant drug level.', 'A normal PT does not rule the drug out, least of all apixaban.', 'After PCC the clotting tests are not useful for judging the effect.']; c.tiers = [T.acc, T.label]; }
   else if (a === 'ufh'){ c.head = 'aPTT after protamine'; c.list = ['Protamine works within 5 minutes.', 'If the aPTT is still raised, repeat 0.5 mg per 100 units.', 'Recheck over the next hours: rebound can occur from 30 minutes to 18 hours.']; c.tiers = [T.label, T.ncsC]; }
@@ -529,10 +536,11 @@ function confirmCard(i, mode){
 
 var HIGHRISK = 'High clot risk (ACC list): mechanical valve, especially mitral or with AF, heart failure or earlier stroke; AF with CHA₂DS₂-VASc of 4 or more, or stroke or TIA in the last 3 months; VTE in the last 3 months, or unprovoked or recurrent VTE; active cancer with VTE; left ventricular or left atrial thrombus; left ventricular assist device.';
 function restartCard(i, mode){
-  var c = {id: 'restart', label: 'When to restart', chips: [['restart', i.ich ? 'ich' : i.gi ? 'gi' : 'other']]};
+  var c = {id: 'restart', label: 'When to restart', chips: i.ich ? [['restart','ich']] : i.crit ? [] : [['restart', i.gi ? 'gi' : 'other']]};
   if (mode === 'proc'){
+    c.chips = [];
     c.head = 'After the procedure: 24 hours if bleeding risk is low, 48 to 72 hours if it is higher';
-    c.list = ['Restart once the surgical site is dry and no further procedure is planned.', 'Do not bridge a DOAC with heparin.'];
+    c.list = ['Restart once the surgical site is dry and no further procedure is planned.'].concat(XA[i.agent] || i.agent === 'dabi' ? ['Do not bridge a DOAC with heparin.'] : []);
     c.more = [HIGHRISK, 'With a high clot risk, bridging with a parenteral anticoagulant may be considered once hemostasis is secure; in non-valvular AF it adds bleeding without fewer clots.'];
     c.tiers = [T.acc]; return c;
   }
@@ -541,7 +549,7 @@ function restartCard(i, mode){
     c.list = ['ACC pathway: delay at least 4 weeks in patients without high clot risk.', 'AHA/ASA guideline, AF: restarting may be considered (2b, B-NR); about 7 to 8 weeks after the bleed may be considered (2b, C-LD).', 'Mechanical valve or LVAD: early restart is reasonable (2a, C-LD); the recommendation names no day.', 'If anticoagulation is ruled out for good in AF: left atrial appendage closure may be considered (2b, C-LD).'];
     c.guards = ['Lobar bleed, cortical siderosis or many microbleeds (amyloid pattern): the risk of another bleed is high. Decide with neurology.'];
     c.why = 'After a brain bleed both risks are large. In PRESTIGE-AF, restarting a DOAC cut ischemic stroke sharply and raised recurrent brain bleeding sharply, which fits the guidelines\' "may be considered" rather than "should".';
-    c.more = [HIGHRISK, 'If restarting, a DOAC may be favored over warfarin where either is an option (guideline text; data are lacking). Mechanical valves, LV thrombus and LVAD need warfarin (ACC list).', 'ENRICH-AF (edoxaban against no anticoagulation after intracranial hemorrhage) was reported in 2026 as showing no fewer strokes and more major bleeding; no published paper was found, so it is not shown as a trial card.'];
+    c.more = [HIGHRISK, 'If restarting, a DOAC may be favored over warfarin where either is an option (guideline text; data are lacking). Mechanical valves, valvular AF, LV thrombus and LVAD need warfarin (ACC list).', 'ENRICH-AF (edoxaban against no anticoagulation after intracranial hemorrhage) was reported in 2026 as showing no fewer strokes and more major bleeding; no published paper was found, so it is not shown as a trial card.'];
     c.tiers = [T.acc, 'AHA/ASA 2022: 2b'];
     return c;
   }
@@ -565,12 +573,13 @@ function restartCard(i, mode){
 }
 
 function inrCards(i){
-  var c = {id: 'reverse', label: 'Warfarin · high INR, no bleeding', chips: [['speed','vitk']]};
+  var c = {id: 'reverse', label: 'Warfarin · high INR, no bleeding'};
   if (!has(i.inr)){ c.head = 'Enter the INR'; c.sub = 'The advice changes at 4.5 and at 10.'; return [c]; }
+  if (i.inr >= 4.5) c.chips = [['speed','vitk']];
   if (i.inr > 10){ c.head = 'INR above 10: hold warfarin and give oral vitamin K'; c.list = ['Oral, not IV: it works within about a day and avoids the reaction risk of the IV route.', 'The guideline names no dose; the series it cites used 2.5 mg.', 'Recheck the INR the next day.']; c.tiers = [T.accp2c]; c.why = 'Above 10 the guideline leans toward a small oral dose to bring the INR down sooner. It is a weak recommendation on low-quality evidence.'; }
   else if (i.inr >= 4.5){ c.head = 'INR 4.5 to 10: hold warfarin; no routine vitamin K'; c.list = ['Stop warfarin for now and recheck the INR.', 'Look for the cause: a new drug, antibiotics, poor intake, liver or heart failure, a dosing error.']; c.tiers = i.inr > 4.5 && i.inr < 10 ? [T.accp2b, T.ash] : [T.accp2b]; c.why = WHY.warfInr; }
   else if (i.inr <= 3){ c.head = 'INR ' + i.inr + ' is not high for most patients on warfarin'; c.sub = 'Nothing to reverse.'; return [c]; }
-  else { c.head = 'INR below 4.5: no vitamin K'; c.list = ['Adjust the dose and recheck; how is left to the anticoagulation clinic (expert practice).']; c.tiers = [T.ep]; c.why = null; }
+  else { c.head = 'INR below 4.5: no vitamin K'; c.list = ['If this is above the patient\'s target range: adjust the dose and recheck; how is left to the anticoagulation clinic (expert practice).']; c.tiers = [T.ep]; c.why = null; }
   c.more = ['ACCP 2012: for INR 4.5 to 10 without bleeding, against routine vitamin K (2B); for INR above 10 without bleeding, oral vitamin K (2C). ASH 2018, for INR above 4.5 and below 10: temporary cessation of warfarin alone (conditional).', 'Any bleeding changes this: switch the situation to "Bleeding".'];
   return [c];
 }
@@ -657,7 +666,7 @@ function whereSVG(k, p){
 var SPEED = {
   inr: {n: 'INR at 30 min', bars: [['4-factor PCC', 62.2, '62.2%'], ['Plasma', 9.6, '9.6%']], cap: 'INR 1.3 or below 30 minutes after the infusion', line: 'In the trial that compared them, six in ten patients given PCC had a corrected INR within half an hour, against one in ten given plasma.'},
   vol: {n: 'Volume', bars: [['4-factor PCC', 12.2, '99 mL'], ['Plasma', 100, '814 mL']], cap: 'Median volume infused', line: 'PCC is about 25 times as concentrated as plasma. Less volume means fewer patients tipped into fluid overload: 4.9% against 12.8%.'},
-  vitk: {n: 'Vitamin K', bars: [['IV: 4 to 6 h', 25, ''], ['Oral: 18 to 24 h', 100, '']], cap: 'Hours for the INR to fall (bar = 24 hours)', line: 'Vitamin K fixes nothing in the first hour. Its job is to keep the INR down once the PCC, whose factor VII lasts 4 to 6 hours, has worn off.'}
+  vitk: {n: 'Vitamin K', bars: [['IV: 4 to 6 h', 25, ''], ['Oral: 18 to 24 h', 100, '']], cap: 'Hours for the INR to fall (bar = 24 hours)', line: 'Vitamin K fixes nothing in the first hour: by vein the INR falls in 4 to 6 hours, by mouth in 18 to 24. After PCC, whose factor VII lasts 4 to 6 hours, it is what keeps the INR down.'}
 };
 function speedSVG(k){
   var d = SPEED[k], s = svgOpen('0 0 340 150', d.cap);
@@ -751,6 +760,7 @@ var NUMS = ['wt','inr','hrs','crcl','rate','dose'];
 function read(){
   var i = {agent: st.agent, sit: st.sit};
   NUMS.forEach(function(k){ var el = $(k), v = parseFloat(el.value); i[k] = el.closest('.field').hidden ? null : (isFinite(v) && v >= 0 ? v : null); });
+  if (i.inr != null && i.inr < 0.5) i.inr = null;
   if (i.sit === 'bleed' || (i.sit === 'inr' && i.agent !== 'warf')) BT.forEach(function(t){ if (st.t[t[0]]) i[t[0]] = true; });
   return i;
 }
@@ -861,7 +871,7 @@ var CASES = [
   {t: 'Subdural on dabigatran', s: 'Age 74, 82 kg, CrCl 38. Fell this morning; last dose 5 hours ago. CT: 9 mm subdural hematoma.', q: 'Which agent, what dose, and what will tell you it worked?', i: {agent:'dabi', sit:'bleed', ich:true, wt:82, hrs:5, crcl:38}, p: 'Idarucizumab 5 g as two 2.5 g vials. A normal thrombin time afterwards rules out a relevant dabigatran level; repeat at 12 to 24 hours because levels can rebound.'},
   {t: 'Retroperitoneal bleed on apixaban', s: 'Age 69, 95 kg. Last dose 3 hours ago. BP 84/50 despite fluid. CT: large retroperitoneal hematoma.', q: 'There is no andexanet. What now?', i: {agent:'apix', sit:'bleed', crit:true, unst:true, unc:true, wt:95, hrs:3}, p: 'Critical site and unstable: reverse. In the US that means off-label 4-factor PCC, 2,000 units fixed or 50 units/kg, with charcoal if the airway is safe, while resuscitating.'},
   {t: 'Nosebleed on rivaroxaban', s: 'Age 58, 80 kg. Anterior epistaxis stopped with pressure in triage. Vitals normal, hemoglobin unchanged. Last dose 10 hours ago.', q: 'Does this need a reversal agent?', i: {agent:'riva', sit:'bleed', wt:80, hrs:10}, p: 'Non-major: no reversal agent. It needed no admission, procedure or transfusion and has stopped, so the anticoagulant can continue.'},
-  {t: 'Thigh hematoma on a heparin infusion', s: 'Age 63, 90 kg, heparin at 1,500 units/h after a catheterisation. Expanding thigh hematoma, pressure falling despite compression.', q: 'How much protamine?', i: {agent:'ufh', sit:'bleed', unst:true, unc:true, wt:90, rate:1500}, p: 'Stop the infusion. Count the last 2 to 3 hours: 3,000 to 4,500 units, so 30 to 45 mg of protamine, given slowly.'},
+  {t: 'Thigh hematoma on a heparin infusion', s: 'Age 63, 90 kg, heparin at 1,500 units/h after a catheterisation. Expanding thigh hematoma, pressure falling despite compression.', q: 'How much protamine?', i: {agent:'ufh', sit:'bleed', crit:true, unst:true, unc:true, wt:90, rate:1500}, p: 'Stop the infusion. Count the last 2 to 3 hours: 3,000 to 4,500 units, so 30 to 45 mg of protamine, given slowly.'},
   {t: 'Spinal hematoma after enoxaparin', s: 'Age 55, 100 kg, enoxaparin 100 mg given 6 hours ago. New leg weakness; MRI shows an epidural hematoma.', q: 'How well will protamine work?', i: {agent:'enox', sit:'bleed', crit:true, wt:100, hrs:6, dose:100}, p: 'Within 8 hours the ratio is 1 mg per 1 mg, capped at 50 mg in one dose. Expect partial reversal: about 60% of the anti-Xa activity at most.'}
 ];
 function rng(seed){ var a = seed >>> 0; return function(){ a |= 0; a = a + 0x6D2B79F5 | 0; var t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
