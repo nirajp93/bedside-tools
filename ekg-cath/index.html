@@ -284,6 +284,33 @@ footer{margin-top:32px;padding:16px 0 8px;border-top:1px solid var(--line);font-
 footer b{color:var(--ink);font-weight:600}
 a:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.states{display:flex;gap:6px;overflow-x:auto;margin:10px -16px;padding:2px 16px 6px;scrollbar-width:none}
+.states::-webkit-scrollbar{display:none}
+.sbtn{flex:none;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--ink);font:inherit;font-size:14px;cursor:pointer;white-space:nowrap}
+.sbtn[aria-pressed="true"]{border-color:var(--accent);color:var(--accent);font-weight:600}
+.line1{font-size:15px;margin:10px 0 0}
+.lpills{position:sticky;top:0;z-index:5;background:var(--bg);display:flex;gap:6px;overflow-x:auto;margin:0 -16px 12px;padding:8px 16px;border-bottom:1px solid var(--line);scrollbar-width:none}
+.lpills::-webkit-scrollbar{display:none}
+.lpill{flex:none;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--muted);font:inherit;font-size:14px;cursor:pointer;white-space:nowrap}
+.lpill[aria-current="true"]{border-color:var(--accent);color:var(--accent);font-weight:600}
+.chap{scroll-margin-top:70px}
+.cause{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:8px 0;border-top:1px solid var(--line);font-size:15px}
+.cause small{color:var(--muted);font-size:13px;text-align:right;flex:0 1 46%}
+.cause.out span{color:var(--muted);text-decoration:line-through}
+.cause.out,.cause.less,.cause.unl{opacity:.6}
+.cause.fav span{font-weight:700}
+.cause.fav span:before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--accent);margin-right:8px}
+.trial{border-left:3px solid var(--accent);padding-left:12px}
+.trial p{margin:0 0 6px;font-size:15px}
+.trial .k{font-family:var(--mono);font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);display:block}
+.fchips{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.fchip{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--fill);color:var(--ink);font:inherit;font-size:14px;cursor:pointer;text-align:left}
+.lead2{font-size:14px;color:var(--muted);margin:4px 0 0}
+.card.chap h2{font-size:18px;margin:2px 0}
+#v-learn summary{min-height:44px;line-height:44px;cursor:pointer;color:var(--accent);font-weight:600;font-size:14px}
+#v-learn .tier2{display:inline-block;font-family:var(--mono);font-size:11px;border:1px solid var(--line);border-radius:999px;padding:3px 9px;color:var(--muted);margin:6px 6px 0 0}
+.rowb{display:flex;gap:8px;margin:0 0 14px}
+.rowb button{min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--ink);font:inherit;font-size:14px;cursor:pointer}
 </style>
 </head>
 <body>
@@ -459,6 +486,18 @@ a:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible,s
 </section>
 
 <!-- ================= PRACTICE ================= -->
+<section class="view" id="v-learn">
+  <div class="lpills" id="lpills"></div>
+  <div class="card chap" id="narrow" data-pill="Occlusion or mimic?"><p class="kicker">1 · ST elevation</p><h2>Occlusion or mimic?</h2><p class="lead2">Tap what the tracing shows. Each cause is marked as the findings come in.</p>
+    <div class="states" id="nw-results" role="group" aria-label="Findings"></div>
+    <div id="nw-causes"></div>
+    <p class="line1" id="nw-next"></p>
+    <details><summary>More</summary><p id="nw-more"></p><span id="nw-tiers"></span></details>
+  </div>
+  <div class="card chap" id="trials" data-pill="Trials"><p class="kicker">2 · Evidence</p><h2>Six trials behind the call</h2><p class="lead2">Each card: the question, the design, the result, and what it changed.</p><div id="trialbox"></div></div>
+  <div class="rowb"><button id="go-prac" type="button">Practice cases</button></div>
+</section>
+
 <section class="view" id="v-practice">
   <span id="practice"></span>
   <div class="score"><span>Practice · unannotated, randomised</span><span id="score">0 / 0</span></div>
@@ -489,7 +528,7 @@ a:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible,s
 <footer>
   <p><b>For education only. Not a substitute for clinical judgment.</b> Activation criteria and call pathways are institution-specific: adjust to your cath lab's protocol. All tracings are synthetic, generated in the browser from parametric waveforms; no patient data were used.</p>
   <p style="margin-top:6px">Privacy: everything runs in your browser. Nothing you enter is sent anywhere or stored, and there are no analytics. Do not enter names, record numbers, or dates of birth.</p>
-  <p style="margin-top:6px"><b>Last reviewed:</b> 2026-11-12. <b>Sources:</b> Rao SV et al., 2025 ACC/AHA/ACEP/NAEMSP/SCAI Guideline for ACS, Circulation 2025;151:e771 (timing tiers, shock, arrest, fibrinolysis; class of recommendation shown); Thygesen K et al., Fourth Universal Definition of MI, Circulation 2018 (thresholds); Kontos MC et al., 2022 ACC ECDP on acute chest pain in the ED, JACC 2022 (named STEMI equivalents); Smith SW et al., Ann Emerg Med 2012 (modified Sgarbossa); de Winter RJ et al., NEJM 2008; de Zwaan C et al., Am Heart J 1982 (Wellens); Lee DH, Walsh B, Smith SW, Am J Emerg Med 2016 (terminal QRS distortion); Dodd KW et al., Ann Emerg Med 2021 (modified Sgarbossa in paced rhythm); Surawicz B et al., AHA/ACCF/HRS recommendations for the standardization and interpretation of the ECG, part III, 2009 (QRS duration); Wagner GS et al., part VI, 2009, and Birnbaum Y et al., Am Heart J 1996 (culprit artery from the ECG); Birnbaum Y et al., Eur Heart J 1993 (aVL in inferior infarction); Third Universal Definition of MI, 2012 (lead group names); Meyers HP et al., JACC Adv 2025 (hyperacute T); COACT 2019, TOMAHAWK 2021, CULPRIT-SHOCK 2017, IABP-SHOCK II 2012, DanGer Shock 2024, OAT 2006; AHA ACLS 2020 / 2023 update. Mimic "tells" and hyperacute-T activation thresholds are expert practice. Anatomy tab: Damluji AA et al., Mechanical Complications of Acute Myocardial Infarction, AHA scientific statement, Circulation 2021;144:e16 (papillary muscle supply, septal and papillary rupture, aneurysm, pseudoaneurysm); 2025 ACS guideline, Table 6 and section 9 (nitrates in right ventricular infarction, pericarditis, LV thrombus, timing of mechanical complications); Nikus K et al., Conduction Disorders in the Setting of Acute STEMI, Curr Cardiol Rev 2021;17:41 (node and bundle branch supply, block above and below the node); Engelen DJ et al., J Am Coll Cardiol 1999;34:389 (LAD occlusion site); Birnbaum Y et al., Am Heart J 1996;131:38 (first diagonal); Fourth Universal Definition of MI, 2018 (right-sided and posterior leads, aVR with diffuse depression, re-elevation); Wagner GS et al., part VI, Circulation 2009;119:e262; Ondrus T et al., Exp Clin Cardiol 2013;18:27 (right ventricular infarction: fluid, diuretics); Seshadri N et al., Cleve Clin J Med 2002;69:789 (range of rupture timing). Heart drawings are schematic. Tissue timing, ECG evolution after the first day, scar VT and the complication-to-artery links not named above are standard teaching (expert practice).</p>
+  <p style="margin-top:6px"><b>Last reviewed:</b> 2026-11-14. <b>Sources:</b> Rao SV et al., 2025 ACC/AHA/ACEP/NAEMSP/SCAI Guideline for ACS, Circulation 2025;151:e771 (timing tiers, shock, arrest, fibrinolysis; class of recommendation shown); Thygesen K et al., Fourth Universal Definition of MI, Circulation 2018 (thresholds); Kontos MC et al., 2022 ACC ECDP on acute chest pain in the ED, JACC 2022 (named STEMI equivalents); Smith SW et al., Ann Emerg Med 2012 (modified Sgarbossa); de Winter RJ et al., NEJM 2008; de Zwaan C et al., Am Heart J 1982 (Wellens); Lee DH, Walsh B, Smith SW, Am J Emerg Med 2016 (terminal QRS distortion); Dodd KW et al., Ann Emerg Med 2021 (modified Sgarbossa in paced rhythm); Surawicz B et al., AHA/ACCF/HRS recommendations for the standardization and interpretation of the ECG, part III, 2009 (QRS duration); Wagner GS et al., part VI, 2009, and Birnbaum Y et al., Am Heart J 1996 (culprit artery from the ECG); Birnbaum Y et al., Eur Heart J 1993 (aVL in inferior infarction); Third Universal Definition of MI, 2012 (lead group names); Meyers HP et al., JACC Adv 2025 (hyperacute T); COACT 2019, TOMAHAWK 2021, CULPRIT-SHOCK 2017, IABP-SHOCK II 2012, DanGer Shock 2024, OAT 2006; AHA ACLS 2020 / 2023 update. Mimic "tells" and hyperacute-T activation thresholds are expert practice. Anatomy tab: Damluji AA et al., Mechanical Complications of Acute Myocardial Infarction, AHA scientific statement, Circulation 2021;144:e16 (papillary muscle supply, septal and papillary rupture, aneurysm, pseudoaneurysm); 2025 ACS guideline, Table 6 and section 9 (nitrates in right ventricular infarction, pericarditis, LV thrombus, timing of mechanical complications); Nikus K et al., Conduction Disorders in the Setting of Acute STEMI, Curr Cardiol Rev 2021;17:41 (node and bundle branch supply, block above and below the node); Engelen DJ et al., J Am Coll Cardiol 1999;34:389 (LAD occlusion site); Birnbaum Y et al., Am Heart J 1996;131:38 (first diagonal); Fourth Universal Definition of MI, 2018 (right-sided and posterior leads, aVR with diffuse depression, re-elevation); Wagner GS et al., part VI, Circulation 2009;119:e262; Ondrus T et al., Exp Clin Cardiol 2013;18:27 (right ventricular infarction: fluid, diuretics); Seshadri N et al., Cleve Clin J Med 2002;69:789 (range of rupture timing). Heart drawings are schematic. Tissue timing, ECG evolution after the first day, scar VT and the complication-to-artery links not named above are standard teaching (expert practice). Trials (DANAMI-2, STREAM, TIMACS, COMPLETE, CULPRIT-SHOCK, COACT) are cited on their cards under Learn.</p>
 </footer>
 </main>
 
@@ -498,9 +537,73 @@ a:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible,s
   <button role="tab" aria-selected="false" data-v="patterns"><span class="n">2</span>Patterns</button>
   <button role="tab" aria-selected="false" data-v="anat"><span class="n">3</span>Anatomy</button>
   <button role="tab" aria-selected="false" data-v="call"><span class="n">4</span>Call</button>
-  <button role="tab" aria-selected="false" data-v="practice"><span class="n">5</span>Practice</button>
+  <button role="tab" aria-selected="false" data-v="learn"><span class="n">5</span>Learn</button>
+  <button role="tab" aria-selected="false" data-v="practice"><span class="n">6</span>Practice</button>
 </div></nav>
 
+<script id="teach">
+/* Learn tab data: the "Occlusion or mimic?" card and trial cards. Pure data; no DOM access.
+   Card rules restate the Patterns library (LIB tell and call text); trial numbers are from the abstracts cited on each card. */
+var VT = (function(){
+var NARROW = {
+  dx: {
+    labels: {fav: 'favored: ', 'in': 'still possible', less: 'less likely: ', unl: 'unlikely: '},
+    results: [['recip','Reciprocal ST depression'],['convex','Convex STE in one territory'],['diffuse','Diffuse concave STE, no territory'],['pr','PR depression, PR elevation in aVR'],['jnotch','Notched J point, STE in proportion to a tall T'],['volt','Large voltages, STE in V1–V3 in proportion to a deep S'],['tent','Tented T waves, wide QRS, flat P'],['sgar','LBBB or paced: a Sgarbossa criterion is met'],['tqd','Terminal QRS distortion or Q waves in V2–V3'],['change','New compared with the old ECG']],
+    causes: [
+      ['Acute coronary occlusion', function(s){ return s.sgar ? ['fav','Smith-modified Sgarbossa positive: treat as a STEMI equivalent'] : s.recip ? ['fav','reciprocal depression confirms an injury current from one territory'] : s.convex ? ['fav','convex elevation confined to a territory'] : s.tqd ? ['fav','terminal QRS distortion and Q waves are not part of a benign pattern'] : s.change ? ['fav','new compared with the old tracing'] : ['in','a mimic is a diagnosis of exclusion']; }],
+      ['Acute pericarditis', function(s){ return (s.recip || s.convex) ? ['unl','pericarditis has no reciprocal depression and no convex elevation'] : (s.diffuse || s.pr) ? ['fav', s.pr ? 'PR elevation in aVR is the most specific sign' : 'elevation that respects no territory'] : null; }],
+      ['Benign early repolarization', function(s){ return (s.tqd || s.recip) ? ['unl','terminal QRS distortion, Q waves in V2–V3 or inferior ST depression exclude it; it has no reciprocal change'] : !s.jnotch ? null : s.change ? ['less','it is stable on serial ECGs'] : ['fav','fish-hook J point with elevation in proportion to the T wave']; }],
+      ['LVH with strain', function(s){ return !s.volt ? null : s.change ? ['less','elevation that is new compared with old tracings breaks the mimic'] : s.sgar ? ['less','elevation out of proportion to the S wave breaks the mimic'] : ['fav','discordant elevation under about 25% of the S-wave depth is expected']; }],
+      ['Hyperkalemia', function(s){ return s.tent ? ['fav','narrow-based tented T waves with a widening QRS; pseudo-STE in V1–V2 occurs'] : null; }]
+    ],
+    next: function(s){
+      var k = s.tent ? ' Treat the hyperkalemia at the same time: calcium now.' : '';
+      if (s.sgar) return 'Call: a positive Sgarbossa criterion is a STEMI equivalent.' + k;
+      if (s.recip || s.convex) return 'Call. Any lead with reciprocal depression or convex elevation is an activation until proven otherwise, whatever else the tracing suggests.' + k;
+      if (s.tqd) return 'Repeat the ECG and call: terminal QRS distortion or Q waves in V2–V3 are not benign early repolarization.' + k;
+      if (s.change) return 'Repeat the ECG and call: a pattern that is new compared with baseline is not a mimic yet.' + k;
+      if (s.tent) return 'Treat on the ECG, not the lab value: calcium now, then shift and remove potassium. Not an activation.';
+      if (s.diffuse || s.pr || s.jnotch || s.volt) return 'Not an activation if the patient is stable and the pattern fits. Compare with an old ECG and repeat it; when in doubt, call.';
+      return 'Tap what the tracing shows. Open any pattern under Patterns to see it drawn.';
+    },
+    more: 'A normal or mimic ECG does not exclude occlusion: repeat it while the patient is symptomatic, and use posterior leads if the story fits. The Sgarbossa calculator is under Call.',
+    tiers: ['patterns: Fourth Universal Definition of MI and the sources listed in the footer', 'what each finding favors: restates the Patterns library']
+  }
+};
+function narrow(side, sel){
+  return NARROW[side].causes.map(function(c){ var x = c[1](sel) || ['in', '']; return {name: c[0], st: x[0], why: x[1]}; });
+}
+var PRE = {pericarditis: {diffuse: 1, pr: 1}, early_repol: {jnotch: 1}, lvh_strain: {volt: 1}, hyperkalemia: {tent: 1}, lbbb_sgarbossa: {sgar: 1}};
+function chipsPattern(p){
+  var out = [];
+  if (PRE[p.id]) out.push(['why', {sel: PRE[p.id]}, 'Occlusion or mimic?']);
+  else if (p.tier === 'emergent') out.push(['trial', 'danami', 'PCI or fibrinolysis: DANAMI-2']);
+  return out;
+}
+function chipsTier(t, shock, ecg, onset, high){
+  var st = ecg === 'stemi' || ecg === 'equiv';
+  if (shock) return [['trial', 'culprit', 'Culprit only in shock: CULPRIT-SHOCK']];
+  if (st && onset === 'lt12') return [['trial', 'danami', 'PCI or fibrinolysis: DANAMI-2'], ['trial', 'stream', 'When PCI is delayed: STREAM']];
+  if (!st && t === 'early' && high) return [['trial', 'timacs', 'How early: TIMACS']];
+  return [];
+}
+var TRIALS = [
+  {id: 'danami', q: 'Transfer for angioplasty, or give fibrinolysis where the patient is?', d: 'DANAMI-2. Randomized; 1572 patients with acute myocardial infarction, 1129 of them at 24 referral hospitals without a cath lab; primary angioplasty (with transfer) or accelerated alteplase.', r: 'Death, reinfarction or disabling stroke at 30 days at referral hospitals: 8.5% with angioplasty against 14.2% with fibrinolysis. Driven by reinfarction (1.6% against 6.3% overall). 96% were transferred within two hours.', c: 'Transfer for primary PCI beats on-site fibrinolysis when the transfer takes two hours or less.', cite: 'Andersen HR et al. N Engl J Med 2003;349:733', doi: '10.1056/NEJMoa025142'},
+  {id: 'stream', q: 'What if PCI cannot happen within an hour?', d: 'STREAM. Randomized; 1892 patients with STEMI within 3 hours of symptom onset who could not have primary PCI within 1 hour; tenecteplase with clopidogrel and enoxaparin before transport, with angiography 6 to 24 hours later (emergency angiography if it failed), or primary PCI.', r: 'Death, shock, heart failure or reinfarction at 30 days in 12.4% against 14.3% (relative risk 0.86, 95% CI 0.68 to 1.09). Emergency angiography needed in 36.3% after fibrinolysis. Intracranial hemorrhage 1.0% against 0.2%.', c: 'Supports fibrinolysis followed by transfer when timely PCI is not possible. Intracranial bleeding was slightly more common; after the tenecteplase dose was halved in patients 75 or older it was 0.5% against 0.3%. The trial used a 1-hour threshold; the tier on this page uses 120 minutes from first medical contact.', cite: 'Armstrong PW et al. N Engl J Med 2013;368:1379', doi: '10.1056/NEJMoa1301092'},
+  {id: 'timacs', q: 'How early should NSTE-ACS go to the lab?', d: 'TIMACS. Randomized; 3031 patients with acute coronary syndromes; angiography within 24 hours (median 14 hours) or at 36 hours or later (median 50 hours).', r: 'Death, MI or stroke at 6 months 9.6% against 11.3% (hazard ratio 0.85, 95% CI 0.68 to 1.06). In the highest-risk third, hazard ratio 0.65 (95% CI 0.48 to 0.89); no difference in the rest.', c: 'Why the early (within 24 hours) tier is for high-risk patients, such as a GRACE score above 140, and not for everyone.', cite: 'Mehta SR et al. N Engl J Med 2009;360:2165', doi: '10.1056/NEJMoa0807986'},
+  {id: 'complete', q: 'After the culprit is opened, should the other lesions be fixed?', d: 'COMPLETE. Randomized; 4041 patients with STEMI and multivessel disease after successful culprit PCI; staged PCI of significant nonculprit lesions or no further revascularization; median follow-up 3 years.', r: 'Cardiovascular death or MI in 7.8% against 10.5% (hazard ratio 0.74, 95% CI 0.60 to 0.91). With ischemia-driven revascularization added: 8.9% against 16.7%.', c: 'Complete revascularization in stable STEMI patients with multivessel disease. The opposite of the rule in shock.', cite: 'Mehta SR et al. N Engl J Med 2019;381:1411', doi: '10.1056/NEJMoa1907775'},
+  {id: 'culprit', q: 'In cardiogenic shock, fix everything at once?', d: 'CULPRIT-SHOCK. Randomized; 706 patients with acute MI, multivessel disease and cardiogenic shock; PCI of the culprit lesion only (staged revascularization optional) or immediate multivessel PCI.', r: 'Death or renal-replacement therapy at 30 days in 45.9% against 55.4% (relative risk 0.83, 95% CI 0.71 to 0.96). Death alone: relative risk 0.84 (95% CI 0.72 to 0.98).', c: 'Culprit-only PCI in shock; routine immediate nonculprit PCI is Class 3: Harm.', cite: 'Thiele H et al. N Engl J Med 2017;377:2419', doi: '10.1056/NEJMoa1710261'},
+  {id: 'coact', q: 'After cardiac arrest without ST elevation, go straight to the lab?', d: 'COACT. Randomized; 552 patients resuscitated from out-of-hospital cardiac arrest with no signs of STEMI; immediate coronary angiography or angiography delayed until after neurologic recovery.', r: 'Survival at 90 days 64.5% against 67.2% (odds ratio 0.89, 95% CI 0.62 to 1.27). Time to target temperature was longer with immediate angiography (5.4 against 4.7 hours).', c: 'Without ST elevation, immediate angiography after arrest did not improve survival. With ST elevation, the lab is still activated.', cite: 'Lemkes JS et al. N Engl J Med 2019;380:1397', doi: '10.1056/NEJMoa1816897'}
+];
+function escq(s){ return String(s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+function chipHTML(c){
+  if (c[0] === 'why') return '<button class="fchip" type="button" data-narrow="' + escq(JSON.stringify(c[1])) + '">' + escq(c[2]) + '</button>';
+  return '<button class="fchip" type="button" data-trial="' + c[1] + '">' + escq(c[2]) + '</button>';
+}
+function chipRow(list){ return list.length ? '<div class="fchips">' + list.map(chipHTML).join('') + '</div>' : ''; }
+return {chipsPattern: chipsPattern, chipsTier: chipsTier, NARROW: NARROW, narrow: narrow, TRIALS: TRIALS, chipRow: chipRow, escq: escq};
+})();
+</script>
 <script>
 /* ===================== waveform engine (port of gen.py) ===================== */
 const LEADS=["I","II","III","aVR","aVL","aVF","V1","V2","V3","V4","V5","V6"];
@@ -808,7 +911,7 @@ function openPattern(id){const p=LIB.find(x=>x.id===id); const pat=PAT[id]; cons
   <ul class="tell">${p.tell.map(t=>`<li>${t}</li>`).join("")}</ul>
   <div class="callbox"><p class="kicker">Call</p><p>${p.call}</p></div>
   ${A_OF[id]?`<div class="toolbar"><button id="pheart">Artery and anatomy →</button><button id="pwatch">${/^wellens/.test(id)?"If it occludes: what to watch for":"What to watch for"} →</button></div>`:""}
-  <details class="why"><summary>Why</summary><p>${p.why}</p></details>`;
+  <details class="why"><summary>Why</summary><p>${p.why}</p></details>${VT.chipRow(VT.chipsPattern(p))}`;
   $("#pdetail").innerHTML=html; $("#pdetail").hidden=false; $("#plib").hidden=true; window.scrollTo({top:0});
   let seed=3; const draw=()=>{const d=build(pat,{seed,hrScale:1+((seed*7)%9-4)/40,ampScale:1+((seed*13)%7-3)/30}); $("#ptr").innerHTML=render12(d,{highlight:hl?pat.ann:[]})+`<span class="cap">25 mm/s · 10 mm/mV · synthetic</span>`; attachLeadTaps($("#ptr"),d);};
   draw(); $("#hlbtn").addEventListener("click",e=>{hl=!hl;e.currentTarget.setAttribute("aria-pressed",hl);draw()}); $("#relook").addEventListener("click",()=>{seed++;draw()});
@@ -830,7 +933,7 @@ function tier(){const f=$("#tierform"); const v=n=>f.querySelector(`[name=${n}]:
     else if(high){t="early";cls="Class 2a · early invasive strategy (≤ 24 h) for stabilised high-risk NSTE-ACS";why.push("Dynamic ST changes, rising troponin, GRACE > 140, or Wellens pattern. No stress testing for Wellens.");act.push("Page cardiology tonight; DAPT and anticoagulation per lab; serial ECGs.")}
     else if(ecg==="isch"){t="early";cls="Class 1 · invasive strategy during hospitalisation for intermediate or high ischemic risk";act.push("Routine consult; serial troponin and ECG; reassess for high-risk features.")}
     else {t="delayed";cls="Class 1 · low-risk NSTE-ACS: routine invasive or selective invasive approach with further risk stratification; serial ECG and troponin";why.push("A normal ECG does not exclude occlusion: repeat in 15–30 min while symptomatic; posterior leads if the story fits.");act.push("Observe, risk stratify (HEART, GRACE), consult if features change.")}}
-  $("#verdict").innerHTML=`<div class="verdict t-${t}"><p class="kicker">Tier</p><p class="big">${TIER[t]}</p><p class="cls">${cls}</p><ul>${act.concat(why).map(x=>`<li>${x}</li>`).join("")}</ul></div>`;}
+  $("#verdict").innerHTML=`<div class="verdict t-${t}"><p class="kicker">Tier</p><p class="big">${TIER[t]}</p><p class="cls">${cls}</p><ul>${act.concat(why).map(x=>`<li>${x}</li>`).join("")}</ul>${VT.chipRow(VT.chipsTier(t,shock,ecg,onset,high&&!unstable))}</div>`;}
 $("#tierform").addEventListener("change",tier); tier(); $("#script").innerHTML=SCRIPT;
 
 /* Sgarbossa */
@@ -999,7 +1102,46 @@ document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!$("#figwrap").hidd
 function figLayout(){ if(wide.matches){closeFig(); openFig(FIGS[figCur<0?figIx("jpoint"):figCur].id);} }
 wide.addEventListener("change",figLayout); figLayout();
 
-$("#pnext").addEventListener("click",newCase); newCase(); goHash();
+$("#pnext").addEventListener("click",newCase); newCase();
+
+/* Learn tab: mimics card, trials, chips. */
+(function(){
+var G = function(id){ return document.getElementById(id); }, escq = VT.escq;
+var nwSel = {};
+function drawNarrow(){
+  var N = VT.NARROW.dx;
+  G('nw-results').innerHTML = N.results.map(function(r){ return '<button class="sbtn" type="button" data-r="' + r[0] + '" aria-pressed="' + !!nwSel[r[0]] + '">' + escq(r[1]) + '</button>'; }).join('');
+  var rows = VT.narrow('dx', nwSel), ord = {fav: 0, unl: 1, less: 2, 'in': 3};
+  rows.sort(function(a, b){ return ord[a.st] - ord[b.st]; });
+  G('nw-causes').innerHTML = rows.map(function(c){ return '<div class="cause ' + (c.st === 'fav' ? 'fav' : c.st === 'in' && !c.why ? 'less' : '') + '"><span>' + escq(c.name) + '</span><small>' + escq(c.st === 'in' ? (c.why ? c.why : 'no change') : N.labels[c.st] + c.why) + '</small></div>'; }).join('');
+  G('nw-next').innerHTML = '<b>Do next:</b> ' + escq(N.next(nwSel));
+}
+G('nw-results').addEventListener('click', function(e){
+  var r = e.target.getAttribute('data-r'); if (!r) return;
+  if (nwSel[r]) delete nwSel[r]; else nwSel[r] = 1;
+  var left = G('nw-results').scrollLeft; drawNarrow(); G('nw-results').scrollLeft = left;
+});
+G('nw-more').textContent = VT.NARROW.dx.more;
+G('nw-tiers').innerHTML = VT.NARROW.dx.tiers.map(function(t){ return '<span class="tier2">' + escq(t) + '</span>'; }).join('');
+drawNarrow();
+document.addEventListener('click', function(e){
+  var n = e.target.closest && e.target.closest('[data-narrow]');
+  if (n){ nwSel = JSON.parse(n.getAttribute('data-narrow')).sel; drawNarrow(); showView('learn'); requestAnimationFrame(function(){ G('narrow').scrollIntoView({block: 'start'}); }); return; }
+  var t = e.target.closest && e.target.closest('[data-trial]');
+  if (t){ showView('learn'); requestAnimationFrame(function(){ G('trial-' + t.getAttribute('data-trial')).scrollIntoView({block: 'center'}); }); }
+});
+var chaps = [].slice.call(document.querySelectorAll('.chap'));
+G('lpills').innerHTML = chaps.map(function(c, n){ return '<button class="lpill" type="button" data-go="' + c.id + '" aria-current="' + (n === 0) + '">' + (n + 1) + ' ' + escq(c.getAttribute('data-pill')) + '</button>'; }).join('');
+G('lpills').addEventListener('click', function(e){ var g = e.target.getAttribute('data-go'); if (g) G(g).scrollIntoView(); });
+function mark(id){ [].forEach.call(G('lpills').children, function(b){ var on = b.getAttribute('data-go') === id; b.setAttribute('aria-current', String(on)); if (on) G('lpills').scrollLeft = Math.max(0, b.offsetLeft - 60); }); }
+if ('IntersectionObserver' in window){
+  var io = new IntersectionObserver(function(es){ es.forEach(function(en){ if (en.isIntersecting) mark(en.target.id); }); }, {rootMargin: '-30% 0px -60% 0px'});
+  chaps.forEach(function(c){ io.observe(c); });
+}
+G('trialbox').innerHTML = VT.TRIALS.map(function(t){ return '<div class="trial" id="trial-' + t.id + '" style="margin-top:14px;scroll-margin-top:80px"><p><b>' + escq(t.q) + '</b></p><p><span class="k">Design</span>' + escq(t.d) + '</p><p><span class="k">Result</span>' + escq(t.r) + '</p><p><span class="k">What it changed</span>' + escq(t.c) + '</p><p class="mono" style="font-size:13px"><a href="https://doi.org/' + t.doi + '" rel="noopener">' + escq(t.cite) + '</a></p></div>'; }).join('');
+G('go-prac').addEventListener('click', function(){ showView('practice'); window.scrollTo(0, 0); });
+goHash();
+})();
 </script>
 </body>
 </html>
