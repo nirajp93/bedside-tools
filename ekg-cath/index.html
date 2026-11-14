@@ -488,7 +488,7 @@ a:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible,s
 <!-- ================= PRACTICE ================= -->
 <section class="view" id="v-learn">
   <div class="lpills" id="lpills"></div>
-  <div class="card chap" id="narrow" data-pill="Occlusion or mimic?"><p class="kicker">1 · ST elevation</p><h2>Occlusion or mimic?</h2><p class="lead2">Tap what the tracing shows. Each cause is marked as the findings come in; none is excluded by one finding.</p>
+  <div class="card chap" id="narrow" data-pill="Occlusion or mimic?"><p class="kicker">1 · ST elevation</p><h2>Occlusion or mimic?</h2><p class="lead2">Tap what the tracing shows. Each cause is marked as the findings come in.</p>
     <div class="states" id="nw-results" role="group" aria-label="Findings"></div>
     <div id="nw-causes"></div>
     <p class="line1" id="nw-next"></p>
@@ -548,19 +548,22 @@ var VT = (function(){
 var NARROW = {
   dx: {
     labels: {fav: 'favored: ', 'in': 'still possible', less: 'less likely: ', unl: 'unlikely: '},
-    results: [['recip','Reciprocal ST depression'],['convex','Convex STE in one territory'],['diffuse','Diffuse concave STE, no territory'],['pr','PR depression, PR elevation in aVR'],['jnotch','Notched J point, STE in proportion to a tall T'],['volt','Large voltages, STE in V1–V3 in proportion to a deep S'],['tent','Tented T waves, wide QRS, flat P'],['sgar','LBBB or paced: concordant STE, or discordant STE 25% of S or more'],['tqd','Terminal QRS distortion or Q waves in V2–V3'],['change','Changed from the old ECG, or ongoing symptoms']],
+    results: [['recip','Reciprocal ST depression'],['convex','Convex STE in one territory'],['diffuse','Diffuse concave STE, no territory'],['pr','PR depression, PR elevation in aVR'],['jnotch','Notched J point, STE in proportion to a tall T'],['volt','Large voltages, STE in V1–V3 in proportion to a deep S'],['tent','Tented T waves, wide QRS, flat P'],['sgar','LBBB or paced: a Sgarbossa criterion is met'],['tqd','Terminal QRS distortion or Q waves in V2–V3'],['change','New compared with the old ECG']],
     causes: [
-      ['Acute coronary occlusion', function(s){ return (s.recip || s.convex || s.sgar || s.tqd) ? ['fav', s.sgar ? 'Smith-modified Sgarbossa positive: treat as a STEMI equivalent' : s.recip ? 'reciprocal depression confirms an injury current from one territory' : s.convex ? 'convex elevation confined to a territory' : 'these exclude benign early repolarization'] : s.change ? ['fav','new compared with the old tracing, or still symptomatic'] : ['in','a mimic is a diagnosis of exclusion']; }],
+      ['Acute coronary occlusion', function(s){ return s.sgar ? ['fav','Smith-modified Sgarbossa positive: treat as a STEMI equivalent'] : s.recip ? ['fav','reciprocal depression confirms an injury current from one territory'] : s.convex ? ['fav','convex elevation confined to a territory'] : s.tqd ? ['fav','terminal QRS distortion and Q waves are not part of a benign pattern'] : s.change ? ['fav','new compared with the old tracing'] : ['in','a mimic is a diagnosis of exclusion']; }],
       ['Acute pericarditis', function(s){ return (s.recip || s.convex) ? ['unl','pericarditis has no reciprocal depression and no convex elevation'] : (s.diffuse || s.pr) ? ['fav', s.pr ? 'PR elevation in aVR is the most specific sign' : 'elevation that respects no territory'] : null; }],
-      ['Benign early repolarization', function(s){ return (s.tqd || s.recip) ? ['unl','terminal QRS distortion, Q waves in V2–V3 or any inferior ST depression exclude it'] : s.change ? ['less','it is stable on serial ECGs'] : s.jnotch ? ['fav','fish-hook J point with elevation in proportion to the T wave'] : null; }],
-      ['LVH with strain', function(s){ return s.change ? ['less','elevation that is new compared with old tracings breaks the mimic'] : s.volt ? ['fav','discordant elevation under about 25% of the S-wave depth is expected'] : null; }],
+      ['Benign early repolarization', function(s){ return (s.tqd || s.recip) ? ['unl','terminal QRS distortion, Q waves in V2–V3 or inferior ST depression exclude it; it has no reciprocal change'] : !s.jnotch ? null : s.change ? ['less','it is stable on serial ECGs'] : ['fav','fish-hook J point with elevation in proportion to the T wave']; }],
+      ['LVH with strain', function(s){ return !s.volt ? null : s.change ? ['less','elevation that is new compared with old tracings breaks the mimic'] : s.sgar ? ['less','elevation out of proportion to the S wave breaks the mimic'] : ['fav','discordant elevation under about 25% of the S-wave depth is expected']; }],
       ['Hyperkalemia', function(s){ return s.tent ? ['fav','narrow-based tented T waves with a widening QRS; pseudo-STE in V1–V2 occurs'] : null; }]
     ],
     next: function(s){
-      if (s.recip || s.convex || s.sgar || s.tqd) return 'Call. Any lead with reciprocal depression or convex elevation is an activation until proven otherwise, whatever else the tracing suggests.';
+      var k = s.tent ? ' Treat the hyperkalemia at the same time: calcium now.' : '';
+      if (s.sgar) return 'Call: a positive Sgarbossa criterion is a STEMI equivalent.' + k;
+      if (s.recip || s.convex) return 'Call. Any lead with reciprocal depression or convex elevation is an activation until proven otherwise, whatever else the tracing suggests.' + k;
+      if (s.tqd) return 'Repeat the ECG and call: terminal QRS distortion or Q waves in V2–V3 are not benign early repolarization.' + k;
+      if (s.change) return 'Repeat the ECG and call: a pattern that is new compared with baseline is not a mimic yet.' + k;
       if (s.tent) return 'Treat on the ECG, not the lab value: calcium now, then shift and remove potassium. Not an activation.';
-      if (s.change) return 'Repeat the ECG and call: a mimic that has changed from baseline, or with ongoing symptoms, is not a mimic yet.';
-      if (s.diffuse || s.pr || s.jnotch || s.volt) return 'Not an activation if it is stable and fits. Compare with an old ECG and repeat it; when in doubt, call.';
+      if (s.diffuse || s.pr || s.jnotch || s.volt) return 'Not an activation if the patient is stable and the pattern fits. Compare with an old ECG and repeat it; when in doubt, call.';
       return 'Tap what the tracing shows. Open any pattern under Patterns to see it drawn.';
     },
     more: 'A normal or mimic ECG does not exclude occlusion: repeat it while the patient is symptomatic, and use posterior leads if the story fits. The Sgarbossa calculator is under Call.',
@@ -574,18 +577,19 @@ var PRE = {pericarditis: {diffuse: 1, pr: 1}, early_repol: {jnotch: 1}, lvh_stra
 function chipsPattern(p){
   var out = [];
   if (PRE[p.id]) out.push(['why', {sel: PRE[p.id]}, 'Occlusion or mimic?']);
-  if (p.id === 'anterior_stemi' || p.id === 'inferior_stemi' || p.id === 'lateral_stemi') out.push(['trial', 'danami', 'PCI or fibrinolysis: DANAMI-2']);
+  else if (p.tier === 'emergent') out.push(['trial', 'danami', 'PCI or fibrinolysis: DANAMI-2']);
   return out;
 }
-function chipsTier(t, shock, ecg){
+function chipsTier(t, shock, ecg, onset, high){
+  var st = ecg === 'stemi' || ecg === 'equiv';
   if (shock) return [['trial', 'culprit', 'Culprit only in shock: CULPRIT-SHOCK']];
-  if ((ecg === 'stemi' || ecg === 'equiv') && t === 'emergent') return [['trial', 'danami', 'PCI or fibrinolysis: DANAMI-2'], ['trial', 'stream', 'When PCI is delayed: STREAM']];
-  if (ecg !== 'stemi' && ecg !== 'equiv' && (t === 'early' || t === 'immediate')) return [['trial', 'timacs', 'How early: TIMACS']];
+  if (st && onset === 'lt12') return [['trial', 'danami', 'PCI or fibrinolysis: DANAMI-2'], ['trial', 'stream', 'When PCI is delayed: STREAM']];
+  if (!st && t === 'early' && high) return [['trial', 'timacs', 'How early: TIMACS']];
   return [];
 }
 var TRIALS = [
   {id: 'danami', q: 'Transfer for angioplasty, or give fibrinolysis where the patient is?', d: 'DANAMI-2. Randomized; 1572 patients with acute myocardial infarction, 1129 of them at 24 referral hospitals without a cath lab; primary angioplasty (with transfer) or accelerated alteplase.', r: 'Death, reinfarction or disabling stroke at 30 days at referral hospitals: 8.5% with angioplasty against 14.2% with fibrinolysis. Driven by reinfarction (1.6% against 6.3% overall). 96% were transferred within two hours.', c: 'Transfer for primary PCI beats on-site fibrinolysis when the transfer takes two hours or less.', cite: 'Andersen HR et al. N Engl J Med 2003;349:733', doi: '10.1056/NEJMoa025142'},
-  {id: 'stream', q: 'What if PCI cannot happen within an hour?', d: 'STREAM. Randomized; 1892 patients with STEMI within 3 hours of symptom onset who could not have primary PCI within 1 hour; tenecteplase with clopidogrel and enoxaparin before transport, with angiography 6 to 24 hours later (emergency angiography if it failed), or primary PCI.', r: 'Death, shock, heart failure or reinfarction at 30 days in 12.4% against 14.3% (relative risk 0.86, 95% CI 0.68 to 1.09). Emergency angiography needed in 36.3% after fibrinolysis. Intracranial hemorrhage 1.0% against 0.2%.', c: 'Supports fibrinolysis followed by transfer when timely PCI is not possible, at the cost of more intracranial bleeding.', cite: 'Armstrong PW et al. N Engl J Med 2013;368:1379', doi: '10.1056/NEJMoa1301092'},
+  {id: 'stream', q: 'What if PCI cannot happen within an hour?', d: 'STREAM. Randomized; 1892 patients with STEMI within 3 hours of symptom onset who could not have primary PCI within 1 hour; tenecteplase with clopidogrel and enoxaparin before transport, with angiography 6 to 24 hours later (emergency angiography if it failed), or primary PCI.', r: 'Death, shock, heart failure or reinfarction at 30 days in 12.4% against 14.3% (relative risk 0.86, 95% CI 0.68 to 1.09). Emergency angiography needed in 36.3% after fibrinolysis. Intracranial hemorrhage 1.0% against 0.2%.', c: 'Supports fibrinolysis followed by transfer when timely PCI is not possible. Intracranial bleeding was slightly more common; after the tenecteplase dose was halved in patients 75 or older it was 0.5% against 0.3%. The trial used a 1-hour threshold; the tier on this page uses 120 minutes from first medical contact.', cite: 'Armstrong PW et al. N Engl J Med 2013;368:1379', doi: '10.1056/NEJMoa1301092'},
   {id: 'timacs', q: 'How early should NSTE-ACS go to the lab?', d: 'TIMACS. Randomized; 3031 patients with acute coronary syndromes; angiography within 24 hours (median 14 hours) or at 36 hours or later (median 50 hours).', r: 'Death, MI or stroke at 6 months 9.6% against 11.3% (hazard ratio 0.85, 95% CI 0.68 to 1.06). In the highest-risk third, hazard ratio 0.65 (95% CI 0.48 to 0.89); no difference in the rest.', c: 'Why the early (within 24 hours) tier is for high-risk patients, such as a GRACE score above 140, and not for everyone.', cite: 'Mehta SR et al. N Engl J Med 2009;360:2165', doi: '10.1056/NEJMoa0807986'},
   {id: 'complete', q: 'After the culprit is opened, should the other lesions be fixed?', d: 'COMPLETE. Randomized; 4041 patients with STEMI and multivessel disease after successful culprit PCI; staged PCI of significant nonculprit lesions or no further revascularization; median follow-up 3 years.', r: 'Cardiovascular death or MI in 7.8% against 10.5% (hazard ratio 0.74, 95% CI 0.60 to 0.91). With ischemia-driven revascularization added: 8.9% against 16.7%.', c: 'Complete revascularization in stable STEMI patients with multivessel disease. The opposite of the rule in shock.', cite: 'Mehta SR et al. N Engl J Med 2019;381:1411', doi: '10.1056/NEJMoa1907775'},
   {id: 'culprit', q: 'In cardiogenic shock, fix everything at once?', d: 'CULPRIT-SHOCK. Randomized; 706 patients with acute MI, multivessel disease and cardiogenic shock; PCI of the culprit lesion only (staged revascularization optional) or immediate multivessel PCI.', r: 'Death or renal-replacement therapy at 30 days in 45.9% against 55.4% (relative risk 0.83, 95% CI 0.71 to 0.96). Death alone: relative risk 0.84 (95% CI 0.72 to 0.98).', c: 'Culprit-only PCI in shock; routine immediate nonculprit PCI is Class 3: Harm.', cite: 'Thiele H et al. N Engl J Med 2017;377:2419', doi: '10.1056/NEJMoa1710261'},
@@ -929,7 +933,7 @@ function tier(){const f=$("#tierform"); const v=n=>f.querySelector(`[name=${n}]:
     else if(high){t="early";cls="Class 2a · early invasive strategy (≤ 24 h) for stabilised high-risk NSTE-ACS";why.push("Dynamic ST changes, rising troponin, GRACE > 140, or Wellens pattern. No stress testing for Wellens.");act.push("Page cardiology tonight; DAPT and anticoagulation per lab; serial ECGs.")}
     else if(ecg==="isch"){t="early";cls="Class 1 · invasive strategy during hospitalisation for intermediate or high ischemic risk";act.push("Routine consult; serial troponin and ECG; reassess for high-risk features.")}
     else {t="delayed";cls="Class 1 · low-risk NSTE-ACS: routine invasive or selective invasive approach with further risk stratification; serial ECG and troponin";why.push("A normal ECG does not exclude occlusion: repeat in 15–30 min while symptomatic; posterior leads if the story fits.");act.push("Observe, risk stratify (HEART, GRACE), consult if features change.")}}
-  $("#verdict").innerHTML=`<div class="verdict t-${t}"><p class="kicker">Tier</p><p class="big">${TIER[t]}</p><p class="cls">${cls}</p><ul>${act.concat(why).map(x=>`<li>${x}</li>`).join("")}</ul>${VT.chipRow(VT.chipsTier(t,shock,ecg))}</div>`;}
+  $("#verdict").innerHTML=`<div class="verdict t-${t}"><p class="kicker">Tier</p><p class="big">${TIER[t]}</p><p class="cls">${cls}</p><ul>${act.concat(why).map(x=>`<li>${x}</li>`).join("")}</ul>${VT.chipRow(VT.chipsTier(t,shock,ecg,onset,high&&!unstable))}</div>`;}
 $("#tierform").addEventListener("change",tier); tier(); $("#script").innerHTML=SCRIPT;
 
 /* Sgarbossa */
