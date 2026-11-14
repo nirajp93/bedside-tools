@@ -124,6 +124,23 @@ details.tr{margin:0;border-top:1px solid var(--line);padding:0}
 details.tr:first-child{border-top:0}
 details .trial{margin:8px 0 12px}
 .card>.tier{margin-top:10px}
+.lh{font-size:19px;margin:26px 0 4px;scroll-margin-top:12px}
+.lh:first-of-type{margin-top:6px}
+.lead{color:var(--muted);margin:0 0 12px;font-size:15px}
+.jump{margin:0 0 6px}
+.jump .chip{text-decoration:none}
+.inl .states{flex-wrap:wrap;overflow:visible}
+.inl svg{display:block;width:100%;max-width:440px;height:auto;margin:0 auto}
+.tlist{border-top:1px solid var(--line);margin-top:12px;padding-top:10px}
+.tl summary{display:list-item;min-height:44px;line-height:1.35;padding:8px 0}
+.tl .take{display:block;color:var(--muted);font-size:14px}
+.use{margin:12px 0 0;font-size:14.5px}
+.use a{display:inline-flex;align-items:center;min-height:44px;color:var(--accent);text-decoration:none;font-weight:600}
+.fnav{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center;border-top:1px solid var(--line);margin-top:14px;padding-top:12px}
+.navb{min-height:48px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);font:inherit;font-size:13.5px;padding:6px 10px;cursor:pointer;text-align:left}
+.navb.nx{text-align:right;border-color:var(--accent);color:var(--accent);font-weight:600}
+.navb:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.fcount{font-size:12px;color:var(--muted)}
 .guard a,.card a{overflow-wrap:anywhere}
 @media (min-width:900px){
   .wrap{max-width:1040px}
@@ -170,8 +187,12 @@ details .trial{margin:8px 0 12px}
 </div>
 
 <div class="panel" id="p-learn" role="tabpanel" aria-labelledby="t-learn">
-  <div class="tiles" id="learn-grid"></div>
-  <div class="card" id="trials"><p class="label">Trials</p><div id="trial-list"></div></div>
+  <div class="steps" id="learn"><button class="stepb" type="button" data-group="ln" data-step="walkthrough" aria-pressed="true">Walkthrough</button><button class="stepb" type="button" data-group="ln" data-step="reference" aria-pressed="false">Reference</button></div>
+  <div class="stp on" id="walkthrough"><div id="walk"></div></div>
+  <div class="stp" id="reference">
+    <div class="tiles" id="learn-grid"></div>
+    <div class="card" id="trials"><p class="label">Trials</p><div id="trial-list"></div></div>
+  </div>
 </div>
 
 <div class="panel" id="p-practice" role="tabpanel" aria-labelledby="t-practice">
@@ -187,7 +208,7 @@ details .trial{margin:8px 0 12px}
 <footer>
   <p><strong>For education only. Not a substitute for clinical judgment.</strong> Built to US guidance, with European differences labelled; formulary, infusion protocols, shock team and LVAD arrangements vary, so adjust to your institution. Rows marked expert consensus or expert practice are not from a graded guideline. Diagrams are schematic.</p>
   <p>Privacy: everything runs in your browser. Nothing you enter is sent anywhere or stored, and there are no analytics. Do not enter names, record numbers, or dates of birth.</p>
-  <p class="mono">Last reviewed: 2026-11-13</p>
+  <p class="mono">Last reviewed: 2026-11-14</p>
   <p><strong>Sources:</strong> Heidenreich PA et al., 2022 AHA/ACC/HFSA Guideline for the Management of Heart Failure, Circulation 2022;145:e895 · Hollenberg SM et al., 2024 ACC Expert Consensus Decision Pathway on patients hospitalized with heart failure, focused update, J Am Coll Cardiol 2024;84:1241 · Maddox TM et al., 2024 ACC Expert Consensus Decision Pathway for treatment of HFrEF, J Am Coll Cardiol 2024;83:1444 · Kittleson MM et al., 2026 ACC Expert Consensus Decision Pathway on management of HFpEF, J Am Coll Cardiol 2026;88:1817 · Sinha SS et al., 2025 ACC Concise Clinical Guidance on cardiogenic shock, J Am Coll Cardiol 2025;85:1618 · Baran DA et al., 2026 SCAI SHOCK Classification Expert Consensus Update, JSCAI 2026 · Mullens W et al., The use of diuretics in heart failure with congestion, Eur J Heart Fail 2019;21:137 · 2026 ESC Guidelines for the management of heart failure, Eur Heart J 2026;47:5346 (for labelled European notes) · Gustafsson F et al., HFA position paper on LVAD-supported patients for the non-LVAD specialist, Part 3, ESC Heart Fail 2021 · Burkhoff D et al., Hemodynamics of Mechanical Circulatory Support, J Am Coll Cardiol 2015;66:2663 · FDA prescribing information: nitroglycerin in dextrose injection, sodium nitroprusside, finerenone (Kerendia, 2025) · Trials are cited on their cards.</p>
 </footer>
 </div>
@@ -707,7 +728,30 @@ var LVAD_STATIC =
  card({id: 'inotrope', label: 'Inotropes outside shock, and palliative care', head: 'Bridge or palliation only', body: ul(['<b>Bridge</b> (2a): stage D, awaiting LVAD or transplant', '<b>Palliation</b> (2b): stage D, not a candidate; for symptoms. Discuss arrhythmia risk and ICD status', '<b>Otherwise</b>: long-term IV inotropes are potentially harmful (class 3)', '<b>Palliative care</b> (class 1, C-LD): for all patients with HF. Specialist palliative consultation (2a, B-R): stage D, on inotropes or temporary support, or with uncontrolled symptoms']), guard: 'Maintenance doses (2022 guideline): dobutamine 2.5 to 20 mcg/kg/min; milrinone 0.125 to 0.75 mcg/kg/min, no bolus, accumulates in renal failure.', why: 'Inotropes improve symptoms without improving survival.', tiers: ['2022 AHA/ACC/HFSA guideline 8.3']});
 
 /* ================= LEARN ================= */
-function openFig(id, s){ var f = FIG[id]; s = s || 0; $('sheet-t').textContent = f.title; $('sheet-b').innerHTML = f.draw(s) + '<div class="states">' + f.states.map(function(t, k){ return '<button class="sbtn" type="button" aria-pressed="' + (k === s) + '" data-s="' + k + '">' + t + '</button>'; }).join('') + '</div><p class="line1">' + f.cap[s] + '</p><p class="note">' + f.src + '</p>'; $('sheet-b').dataset.fig = id; $('sheet').hidden = false; $('scrim').hidden = false; $('sheet-x').focus(); }
+function figBody(f, s){ return f.draw(s) + '<div class="states">' + f.states.map(function(t, k){ return '<button class="sbtn" type="button" aria-pressed="' + (k === s) + '" data-s="' + k + '">' + t + '</button>'; }).join('') + '</div><p class="line1">' + f.cap[s] + '</p><p class="note">' + f.src + '</p>'; }
+function openFig(id, s){ var f = FIG[id], k = FIGS.indexOf(f); s = s || 0; $('sheet-t').textContent = f.title;
+  var prev = FIGS[k - 1], next = FIGS[k + 1];
+  $('sheet-b').innerHTML = figBody(f, s) + '<div class="fnav">' + (prev ? '<button class="navb" type="button" data-nav="' + prev.id + '"><span aria-hidden="true">←</span> ' + esc(prev.title) + '</button>' : '<span></span>') + '<span class="mono fcount">' + (k + 1) + ' of ' + FIGS.length + '</span>' + (next ? '<button class="navb nx" type="button" data-nav="' + next.id + '">' + esc(next.title) + ' <span aria-hidden="true">→</span></button>' : '<span></span>') + '</div>';
+  $('sheet-b').dataset.fig = id; $('sheet').hidden = false; $('scrim').hidden = false; $('sheet').scrollTop = 0; var fb = $('sheet-b').querySelector('.navb.nx') || $('sheet-x'); fb.focus({preventScroll: true}); }
+/* Walkthrough: every figure inline, trials where they matter. [figure id, trials under it, link into the tool] */
+var WALK = [
+ ['learn-fails', 'What fails', 'Heart failure is a problem of emptying, filling, or both. These two pictures are the basis for everything after.', [['loop'], ['starling']]],
+ ['learn-patient', 'Reading the patient', 'At the bedside, two questions sort every patient: congested or not, perfusing or not.', [['profiles', [], ['admit', 'First IV dose']], ['congestion'], ['labs']]],
+ ['learn-diuresis', 'Decongesting', 'Decongestion is a dose-response problem: give enough, check early, and block a second site at the loop ceiling.', [['drugs'], ['nephron', ['DOSE', 'ADVOR', 'CLOROTIC'], ['admit', 'First IV dose']], ['response', ['PUSH-AHF'], ['daily', 'Daily check']], ['creat', [], ['daily', 'Daily check']], [null, ['TRANSFORM-HF'], ['discharge', 'Discharge'], 'Which loop diuretic to go home on']]],
+ ['learn-gdmt', 'The four pillars and what follows', 'Four drug classes improve outcomes in HFrEF. Three block an arm of the loop below; SGLT inhibitors act outside it.', [['neuro', ['MERIT-HF', 'PARADIGM-HF', 'RALES', 'DAPA-HF', 'EMPEROR-Reduced', 'TRED-HF'], ['pillars', 'GDMT next step']], ['fast', ['STRONG-HF', 'PIONEER-HF', 'EMPULSE'], ['pillars', 'GDMT next step']], [null, ['A-HeFT', 'SHIFT', 'VICTORIA', 'DIG', 'AFFIRM-AHF'], ['addons', 'Add-ons'], 'After the four pillars'], [null, ['SCD-HeFT', 'MADIT-CRT', 'COAPT'], ['devices', 'ICD and CRT'], 'Devices']]],
+ ['learn-hfpef', 'Preserved EF and finding the cause', 'With a new cardiomyopathy or a preserved EF, first look for a cause with its own treatment.', [['workup', [], ['hfpef', 'HFpEF scores and mimics']], [null, ['DELIVER', 'EMPEROR-Preserved', 'FINEARTS-HF', 'STEP-HFpEF', 'SUMMIT'], ['pillars', 'GDMT next step'], 'Treating HFpEF']]],
+ ['learn-advanced', 'When it gets worse', 'Know the stage, and know when drugs are no longer enough.', [['course', [], ['refer', 'Refer?']], ['mcs', ['DOREMI', 'DanGer Shock', 'ECLS-SHOCK'], ['shock', 'Shock staging']], ['lvadfig', [], ['lvad', 'LVAD ward card']]]]
+];
+function trialLine(k){ var t = TR[k]; return '<details class="tr tl"><summary><b>' + t[0] + '</b> <span class="mono">' + t[1] + '</span><span class="take">' + t[4] + '</span></summary>' + trialHtml(k) + '</details>'; }
+function walkHtml(){ var n = 0;
+  return '<div class="chips jump">' + WALK.map(function(w){ return '<a class="chip" href="#' + w[0] + '">' + w[1] + '</a>'; }).join('') + '</div>' + WALK.map(function(w){
+    return '<h2 class="lh" id="' + w[0] + '">' + w[1] + '</h2><p class="lead">' + w[2] + '</p>' + w[3].map(function(b){
+      var f = b[0] ? FIG[b[0]] : null, h = '<div class="card">';
+      if (f){ n++; h += '<p class="label">' + n + ' of ' + FIGS.length + '</p><p class="head">' + esc(f.title) + '</p><div class="inl" data-inl="' + f.id + '">' + figBody(f, 0) + '</div>'; }
+      else h += '<p class="label">Trials</p><p class="head">' + b[3] + '</p>';
+      if (b[1] && b[1].length) h += '<div class="tlist">' + (f ? '<p class="label">The trials behind it</p>' : '') + b[1].map(trialLine).join('') + '</div>';
+      if (b[2]) h += '<p class="use"><a href="#' + b[2][0] + '">Use it: ' + b[2][1] + ' <span aria-hidden="true">→</span></a></p>';
+      return h + '</div>'; }).join(''); }).join(''); }
 function closeFig(){ $('sheet').hidden = true; $('scrim').hidden = true; }
 
 /* ================= PRACTICE ================= */
@@ -739,6 +783,8 @@ function build(){
   $('cath-in').innerHTML = '<p class="label">Right heart cath numbers</p><div class="grid">' + fld('h-rap', 'RA pressure') + fld('h-pas', 'PA systolic') + fld('h-pad', 'PA diastolic') + fld('h-pcwp', 'Wedge') + fld('h-map', 'Mean BP') + fld('h-co', 'Output L/min') + fld('h-ci', 'Cardiac index') + '</div><div id="cath-out"></div><details><summary>More</summary><p>Reference: cardiac index 2.5 or over, CVP under 10, wedge under 15, PA saturation 65% or over.</p><div class="tw"><table><tr><th>Device</th><th>Flow</th><th>Effect</th></tr>' + MCS.map(function(m){ return '<tr><td>' + m[0] + '</td><td class="mono">' + m[1] + '</td><td>' + m[2] + '</td></tr>'; }).join('') + '</table></div><span class="tier">2025 ACC shock guidance 4.4, Figure 6; 2026 SCAI update</span><span class="tier">PA line may be considered: class 2b, B-NR</span></details>';
   $('lvad-out').innerHTML = LVAD_STATIC;
   $('admit-static').innerHTML = ADMIT_STATIC; $('daily-static').innerHTML = DAILY_STATIC;
+  var ord = []; WALK.forEach(function(w){ w[3].forEach(function(b){ if (b[0]) ord.push(b[0]); }); }); FIGS.sort(function(x, y){ return ord.indexOf(x.id) - ord.indexOf(y.id); });   /* reference index follows the walkthrough order */
+  $('walk').innerHTML = walkHtml();
   $('learn-grid').innerHTML = FIGS.map(function(f, k){ return '<button class="tile" type="button" data-fig="' + f.id + '"><span class="mono">' + (k + 1) + '</span>' + esc(f.title) + '</button>'; }).join('');
   $('trial-list').innerHTML = TRIALS.map(function(t){ return '<details class="tr"><summary>' + t[0] + ' <span class="mono">' + t[1] + '</span></summary>' + trialHtml(t[0]) + '</details>'; }).join('');
   $('practice').innerHTML = CASES.map(function(cs, k){ return '<div class="card case"><p class="label">Case ' + (k + 1) + ' · ' + cs[0] + '</p><p>' + cs[1] + '</p><button class="btn ghost" type="button" data-case="' + k + '">Show the answer</button><div class="ans" id="ans' + k + '" hidden></div></div>'; }).join('');
@@ -757,17 +803,18 @@ function step(group, id){ [].forEach.call(document.querySelectorAll('[data-group
 function fromHash(){ var id = location.hash.slice(1); if (!id) return; if (TABS.indexOf(id) >= 0){ show(id); return; } var el = $(id); if (!el) return; var sp = el.closest('.stp'); if (sp){ var b = document.querySelector('[data-step="' + sp.id + '"]'); if (b) step(b.dataset.group, sp.id); } var pan = el.closest('.panel'); if (pan) show(pan.id.slice(2)); el.scrollIntoView(); }
 document.addEventListener('DOMContentLoaded', function(){
   build(); render();
-  document.addEventListener('input', render); document.addEventListener('change', render);
+  document.addEventListener('input', render);   /* not 'change': it fires on blur and would redraw a card under the tap */
   TABS.forEach(function(t){ $('t-' + t).addEventListener('click', function(){ show(t); }); });
   document.addEventListener('click', function(e){
     var b = e.target.closest('[data-step]'); if (b){ step(b.dataset.group, b.dataset.step); return; }
-    var s = e.target.closest('.sbtn'); if (s){ openFig($('sheet-b').dataset.fig, +s.dataset.s); return; }
+    var nv = e.target.closest('[data-nav]'); if (nv){ openFig(nv.dataset.nav, 0); return; }
+    var s = e.target.closest('.sbtn'); if (s){ var inl = s.closest('[data-inl]'); if (inl){ inl.innerHTML = figBody(FIG[inl.dataset.inl], +s.dataset.s); var nb = inl.querySelector('.sbtn[data-s="' + s.dataset.s + '"]'); if (nb) nb.focus({preventScroll: true}); } else openFig($('sheet-b').dataset.fig, +s.dataset.s); return; }
     var f = e.target.closest('button[data-fig]'); if (f){ openFig(f.dataset.fig, 0); return; }
     var k = e.target.closest('[data-case]'); if (k){ var a = $('ans' + k.dataset.case); a.innerHTML = CASES[+k.dataset.case][2](); a.hidden = false; k.hidden = true; return; }
     var l = e.target.closest('a[href^="#"]'); if (l){ setTimeout(fromHash, 0); }
   });
   $('sheet-x').addEventListener('click', closeFig); $('scrim').addEventListener('click', closeFig);
-  document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeFig(); });
+  document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeFig(); if (!$('sheet').hidden && (e.key === 'ArrowRight' || e.key === 'ArrowLeft')){ var k = FIGS.indexOf(FIG[$('sheet-b').dataset.fig]) + (e.key === 'ArrowRight' ? 1 : -1); if (FIGS[k]) openFig(FIGS[k].id, 0); } });
   window.addEventListener('hashchange', fromHash); fromHash();
 });
 </script>
