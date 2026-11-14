@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VTE treatment · bedside.tools</title>
+<meta name="description" content="DVT and PE: how sick, which anticoagulant and dose, how long, and how to switch between anticoagulants, with the reasoning in diagrams.">
+<script src="/theme.js"></script>
+<style>
+:root{--bg:#FBFBFA;--card:#FFFFFF;--ink:#111113;--muted:#55555D;--line:#ECECEE;--accent:#2B4BDB;--warn:#9A3B00;--warnbg:#FFF6EC}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5}
+.mono{font-family:var(--mono)}
+.wrap{max-width:720px;margin:0 auto;padding:20px 16px 48px}
+a{color:var(--accent)}
+.back{font-size:14px;text-decoration:none;display:inline-block;min-height:44px;line-height:44px}
+h1{font-size:26px;margin:4px 0 4px;letter-spacing:-.01em}
+.purpose{color:var(--muted);margin:0 0 20px}
+.tabs{display:flex;gap:6px;margin-bottom:16px}
+.tab{flex:1;min-width:0;min-height:44px;border:1px solid var(--line);background:var(--card);border-radius:14px;padding:0 4px;font:inherit;font-size:15px;font-weight:600;color:var(--muted);cursor:pointer}
+.tab[aria-selected="true"]{border-color:var(--accent);color:var(--accent)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
+.label{font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+.grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.grid2{grid-template-columns:1fr 1fr}
+.field{display:flex;flex-direction:column;justify-content:flex-end}
+.field label{display:block;font-size:13px;color:var(--muted);margin-bottom:4px}
+.field input,.field select{width:100%;min-height:44px;border:1px solid var(--line);border-radius:10px;padding:8px 10px;font:inherit;font-family:var(--mono);background:var(--card);color:var(--ink)}
+.field input:focus,.field select:focus,.tab:focus-visible,.chk:focus-within,button:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.checks{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.chk{display:flex;align-items:center;gap:10px;min-height:44px;border:1px solid var(--line);border-radius:10px;padding:6px 10px;font-size:14px;cursor:pointer}
+.chk input{width:20px;height:20px;accent-color:var(--accent);flex:none}
+.card h2{font-size:18px;margin:0 0 2px}
+.head{font-family:var(--mono);font-size:17px;font-weight:600;margin:6px 0 4px;overflow-wrap:anywhere}
+.head.bad{color:var(--bad)}.head.okc{color:var(--ok)}
+.sub{font-size:14px;color:var(--muted);margin:0}
+.card ul{margin:6px 0 0;padding-left:20px}
+.card li{margin-bottom:4px}
+.guard{border-left:3px solid var(--warn);background:var(--warnbg);padding:8px 10px;border-radius:0 10px 10px 0;margin-top:8px;font-size:14.5px}
+.tier{display:inline-block;font-family:var(--mono);font-size:11px;border:1px solid var(--line);border-radius:999px;padding:2px 8px;color:var(--muted);margin:6px 6px 0 0}
+details{margin-top:10px;border-top:1px solid var(--line);padding-top:8px}
+.whyline{margin:10px 0 0;font-size:14.5px;color:var(--muted)}
+.whyline b{color:var(--ink);font-weight:600}
+summary{cursor:pointer;color:var(--accent);font-weight:600;min-height:44px;line-height:44px}
+details p{margin:0 0 8px;font-size:15px}
+.empty{color:var(--muted)}
+.btn{min-height:44px;border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);border-radius:10px;padding:8px 14px;font:inherit;font-weight:600;cursor:pointer}
+.btn.ghost{background:var(--card);color:var(--accent)}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.note{font-size:14px;color:var(--muted)}
+.tl{position:relative;padding-left:26px}
+.tl:before{content:"";position:absolute;left:8px;top:8px;bottom:8px;width:2px;background:var(--line)}
+.st{position:relative;padding:6px 0 10px}
+.st:before{content:"";position:absolute;left:-24px;top:11px;width:12px;height:12px;border-radius:50%;background:var(--card);border:2px solid var(--muted)}
+.st.now:before{background:var(--accent);border-color:var(--accent)}
+.st .when{font-family:var(--mono);font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+.st b{display:block}
+.st .dose{font-family:var(--mono);font-size:14.5px;display:block;overflow-wrap:anywhere}
+.st small{color:var(--muted);font-size:13.5px;display:block}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:6px 6px 6px 0;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:var(--mono);font-size:11.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);font-weight:500}
+td.mono{font-size:13px}
+.tw{overflow-x:auto}
+.case h2{font-size:17px}
+.ans{margin-top:10px;border-top:1px solid var(--line);padding-top:10px}
+footer{margin-top:28px;font-size:13.5px;color:var(--muted)}
+footer p{margin:0 0 8px}
+.panel{display:none}.panel.on{display:block}
+.fig{display:block;width:100%;max-width:460px;height:auto;margin:0 auto}
+.states{display:flex;gap:6px;overflow-x:auto;margin:10px -16px;padding:2px 16px 6px;scrollbar-width:none}
+.states::-webkit-scrollbar{display:none}
+.states.wrapit{flex-wrap:wrap;overflow:visible;margin:10px 0;padding:0}
+.sbtn{flex:none;min-height:44px;min-width:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--ink);font:inherit;font-size:14px;cursor:pointer;white-space:nowrap}
+.sbtn[aria-pressed="true"]{border-color:var(--accent);color:var(--accent);font-weight:600}
+.line1{font-size:15px;margin:10px 0 0}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.chip{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--fill);color:var(--ink);font:inherit;font-size:14px;cursor:pointer}
+.chip svg{flex:none;color:var(--accent)}
+.scrim{position:fixed;inset:0;background:var(--scrim);z-index:20}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:21;max-height:90vh;overflow-y:auto;background:var(--card);border:1px solid var(--line);border-bottom:0;border-radius:20px 20px 0 0;padding:8px 16px 24px;max-width:560px;margin:0 auto}
+.sheethead{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.sheethead h2{font-size:18px;margin:0}
+.xbtn{min-height:44px;min-width:44px;border:0;background:transparent;color:var(--accent);font:inherit;font-weight:600;cursor:pointer}
+.pills{position:sticky;top:0;z-index:5;background:var(--bg);display:flex;gap:6px;overflow-x:auto;margin:0 -16px 12px;padding:8px 16px;border-bottom:1px solid var(--line);scrollbar-width:none}
+.pills::-webkit-scrollbar{display:none}
+.pill{flex:none;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--muted);font:inherit;font-size:14px;cursor:pointer;white-space:nowrap}
+.pill[aria-current="true"]{border-color:var(--accent);color:var(--accent);font-weight:600}
+.chap{scroll-margin-top:70px}
+.cause{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:8px 0;border-top:1px solid var(--line);font-size:15px}
+.cause small{color:var(--muted);font-size:13px;text-align:right;flex:0 1 58%}
+.cause.out span{color:var(--muted);text-decoration:line-through}
+.cause.out,.cause.less{opacity:.6}
+.cause.fav span{font-weight:700}
+.cause.fav span:before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--accent);margin-right:8px}
+.trial{border-left:3px solid var(--accent);padding-left:12px}
+.trial p{margin:0 0 6px;font-size:15px}
+.trial .k{font-family:var(--mono);font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);display:block}
+.pe-only{display:none}.is-pe .pe-only{display:flex}
+@media (min-width:900px){
+  .wrap{max-width:1040px}
+  #p-tool.on{display:grid;grid-template-columns:380px minmax(0,1fr);gap:20px;align-items:start}
+  .refgrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;align-items:start}
+  .refgrid .card{margin-bottom:0}
+  #p-learn{max-width:720px;margin:0 auto}
+}
+@media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="/">← bedside.tools</a>
+<h1>VTE treatment</h1>
+<p class="purpose">DVT and PE: how sick, which anticoagulant and dose, how long, and how to switch.</p>
+
+<div class="tabs" role="tablist">
+  <button class="tab" role="tab" id="t-tool" aria-selected="true" aria-controls="p-tool">Treat</button>
+  <button class="tab" role="tab" id="t-ag" aria-selected="false" aria-controls="p-ag">Agents</button>
+  <button class="tab" role="tab" id="t-learn" aria-selected="false" aria-controls="p-learn">Learn</button>
+  <button class="tab" role="tab" id="t-prac" aria-selected="false" aria-controls="p-prac">Practice</button>
+</div>
+
+<div class="panel on" id="p-tool" role="tabpanel" aria-labelledby="t-tool">
+  <div id="inputs">
+  <div class="card" id="clot">
+    <p class="label">The clot</p>
+    <div class="states wrapit" id="clotseg" role="group" aria-label="Clot type"></div>
+    <div class="grid" id="nums">
+      <div class="field"><label for="wt">Weight (kg)</label><input id="wt" inputmode="decimal" autocomplete="off"></div>
+      <div class="field"><label for="crcl">CrCl (mL/min)</label><input id="crcl" inputmode="decimal" autocomplete="off"></div>
+      <div class="field"><label for="age">Age</label><input id="age" inputmode="numeric" autocomplete="off"></div>
+      <div class="field pe-only"><label for="hr">Heart rate</label><input id="hr" inputmode="numeric" autocomplete="off"></div>
+      <div class="field pe-only"><label for="sbp">Systolic BP</label><input id="sbp" inputmode="numeric" autocomplete="off"></div>
+      <div class="field pe-only"><label for="spo2">SpO2 (%)</label><input id="spo2" inputmode="numeric" autocomplete="off"></div>
+    </div>
+    <div class="checks" id="clotticks"></div>
+  </div>
+  <div class="card" id="patient">
+    <p class="label">The patient · tick what applies</p>
+    <div class="checks" id="ptticks" style="margin-top:0"></div>
+  </div>
+  <div class="card" id="provoked">
+    <p class="label">What provoked it</p>
+    <div class="states wrapit" id="provseg" role="group" aria-label="Provoking factor"></div>
+    <p class="note" id="provnote" style="margin:0"></p>
+  </div>
+  </div>
+  <div id="out"></div>
+</div>
+
+<div class="panel" id="p-ag" role="tabpanel" aria-labelledby="t-ag">
+ <div class="refgrid">
+  <div class="card" id="switch">
+    <p class="label">Switching</p>
+    <h2>From one anticoagulant to another</h2>
+    <div class="grid grid2" style="margin-top:10px">
+      <div class="field"><label for="sw-from">From</label><select id="sw-from"></select></div>
+      <div class="field"><label for="sw-to">To</label><select id="sw-to"></select></div>
+      <div class="field"><label for="sw-inr">INR (if on warfarin)</label><input id="sw-inr" inputmode="decimal" autocomplete="off"></div>
+      <div class="field"><label for="sw-crcl">CrCl (for dabigatran)</label><input id="sw-crcl" inputmode="decimal" autocomplete="off"></div>
+    </div>
+    <div id="sw-out"></div>
+  </div>
+
+  <div class="card" id="fit">
+    <p class="label">Which agent fits · tap what applies</p>
+    <h2>Narrow the choice</h2>
+    <div class="states" id="fit-feats" role="group" aria-label="Patient features"></div>
+    <div id="fit-agents"></div>
+    <p class="line1" id="fit-next"></p>
+    <p class="whyline"><b>Why:</b> A DOAC is the default, so the useful question is what rules one out: pregnancy, antiphospholipid syndrome, a failing liver or kidney, a drug interaction, or a gut that will not absorb it.</p>
+    <details><summary>More</summary>
+      <p>Faded means caution or a changed dose; struck through means avoid. Reasons come from each drug's US label and from the 2026 AHA/ACC pulmonary embolism guideline, CHEST 2021, ASCO 2023 and ASH 2018.</p>
+      <p>Not encoded: body weight above 120 kg or BMI above 40. The AHA/ACC guideline says a DOAC over warfarin is reasonable at BMI above 30 (2a, B-NR); drug-specific limits at extreme weight are not in this tool.</p>
+      <p>Local formulary and insurance coverage often decide between apixaban and rivaroxaban; adjust to your institution.</p>
+      <span class="tier">labels: Eliquis, Xarelto, Pradaxa, Savaysa, Arixtra</span><span class="tier">AHA/ACC 2026</span><span class="tier">UFH and LMWH choices in organ failure: expert practice</span>
+    </details>
+  </div>
+
+  <div class="card" id="heparin">
+    <p class="label">Calculator</p>
+    <h2>Starting a heparin infusion</h2>
+    <div class="grid grid2" style="margin-top:10px">
+      <div class="field"><label for="hep-wt">Weight (kg)</label><input id="hep-wt" inputmode="decimal" autocomplete="off"></div>
+    </div>
+    <div id="hep-out"><p class="head">80 units/kg bolus, then 18 units/kg/h</p></div>
+    <p class="whyline"><b>Why:</b> Weight-based dosing reaches a therapeutic aPTT sooner than a fixed 5,000-unit bolus and 1,000 units/h.</p>
+    <details><summary>More</summary>
+      <p>In the trial behind this nomogram, 97% of weight-dosed patients passed the therapeutic threshold within 24 hours against 77% with standard dosing, and recurrent clots were fewer.</p>
+      <p>Then titrate to your hospital's aPTT or anti-Xa nomogram; bolus and rate caps vary, so adjust to your institution. The heparin label itself gives fixed doses (5,000 units, then 20,000 to 40,000 units per 24 hours) and an aPTT of 1.5 to 2 times normal.</p>
+      <p>For pulmonary embolism that needs a parenteral start, the 2026 AHA/ACC guideline recommends LMWH over heparin (1, B-R), and finds LMWH reasonable even when a catheter procedure is likely (2a, C-LD).</p>
+      <span class="tier">Raschke 1993, randomized trial, 115 patients</span><span class="tier">heparin label 2.2, 2.3</span>
+    </details>
+  </div>
+
+  <div class="card" id="doses">
+    <p class="label">Reference</p>
+    <h2>Treatment doses</h2>
+    <div class="tw"><table>
+      <tr><th>Agent</th><th>Start</th><th>Then</th></tr>
+      <tr><td>Apixaban</td><td class="mono">10 mg twice daily × 7 days</td><td class="mono">5 mg twice daily; 2.5 mg twice daily after at least 6 months</td></tr>
+      <tr><td>Rivaroxaban</td><td class="mono">15 mg twice daily with food × 21 days</td><td class="mono">20 mg daily with food; 10 mg daily after at least 6 months</td></tr>
+      <tr><td>Dabigatran</td><td class="mono">parenteral 5–10 days first</td><td class="mono">150 mg twice daily (CrCl above 30)</td></tr>
+      <tr><td>Edoxaban</td><td class="mono">parenteral 5–10 days first</td><td class="mono">60 mg daily; 30 mg if CrCl 15–50, weight 60 kg or less, or certain P-gp inhibitors</td></tr>
+      <tr><td>Warfarin</td><td class="mono">usually 2–5 mg daily, with heparin or LMWH</td><td class="mono">INR target 2.5 (2.0–3.0)</td></tr>
+      <tr><td>Enoxaparin</td><td class="mono">1 mg/kg SC every 12 h</td><td class="mono">or 1.5 mg/kg daily (inpatient); 1 mg/kg daily if CrCl below 30</td></tr>
+      <tr><td>Dalteparin (cancer)</td><td class="mono">200 units/kg SC daily × 30 days, max 18,000</td><td class="mono">about 150 units/kg daily, months 2–6</td></tr>
+      <tr><td>Fondaparinux</td><td class="mono">5 mg (under 50 kg), 7.5 mg (50–100 kg), 10 mg (over 100 kg) SC daily</td><td class="mono">contraindicated if CrCl below 30</td></tr>
+    </table></div>
+    <p class="whyline"><b>Why:</b> Apixaban and rivaroxaban were tested as single drugs with a higher starting dose; dabigatran and edoxaban were tested only after a heparin lead-in, so that is how they are licensed.</p>
+    <details><summary>More</summary>
+      <p>With warfarin, continue the injectable for at least 5 days and until the INR is in range (enoxaparin and fondaparinux labels; the warfarin label says 4 to 5 days of overlap).</p>
+      <p>Enoxaparin's labelled outpatient regimen is 1 mg/kg every 12 hours, for DVT without PE. The 1.5 mg/kg daily regimen is labelled for inpatients.</p>
+      <p>Reduced doses after 6 months are for preventing recurrence in patients who continue; see the duration card on the Treat tab.</p>
+      <span class="tier">FDA prescribing information, section 2 of each label</span>
+    </details>
+  </div>
+ </div>
+</div>
+
+<div class="panel" id="p-learn" role="tabpanel" aria-labelledby="t-learn">
+  <div class="pills" id="pills"></div>
+  <div class="card chap" id="learn-phases" data-pill="Phases"><p class="label">1 · The plan</p><h2>Three phases, one drug or two</h2><p class="sub">Pick a drug to see what each phase looks like.</p><div data-figure="phases"></div></div>
+  <div class="card chap" id="learn-cascade" data-pill="Where drugs act"><p class="label">2 · Mechanism</p><h2>Where each anticoagulant acts</h2><div data-figure="cascade"></div></div>
+  <div class="card chap" id="learn-bridge" data-pill="Warfarin bridge"><p class="label">3 · Warfarin</p><h2>Why warfarin needs a bridge</h2><div data-figure="bridge"></div></div>
+  <div class="card chap" id="learn-rv" data-pill="The RV"><p class="label">4 · Pulmonary embolism</p><h2>The right ventricle decides</h2><div data-figure="rv"></div></div>
+  <div class="card chap" id="learn-cats" data-pill="PE categories"><p class="label">5 · How sick</p><h2>Categories A to E</h2><p class="sub">The 2026 AHA/ACC guideline replaced low, intermediate and high risk with five categories.</p><div data-figure="cats"></div></div>
+  <div class="card chap" id="learn-recur" data-pill="How long"><p class="label">6 · Duration</p><h2>What provoked it predicts the next one</h2><div data-figure="recur"></div></div>
+  <div class="card chap" id="learn-wrong" data-pill="Wrong DOAC"><p class="label">7 · Exceptions</p><h2>When a DOAC is the wrong drug</h2><p>Antiphospholipid syndrome, pregnancy and breastfeeding, Child-Pugh C liver disease, a strong enzyme inducer, and the first weeks after bariatric surgery. Kidney failure and a few interactions change the dose or the choice among them.</p><div class="row"><button class="btn ghost" id="go-fit">Open the agent chooser</button></div></div>
+  <div class="card chap" id="trials" data-pill="Trials"><p class="label">8 · Trials</p><h2>The trials behind the practice</h2><div id="trialbox"></div><div class="row"><button class="btn" id="go-prac">Try the practice cases</button></div></div>
+</div>
+
+<div class="panel" id="p-prac" role="tabpanel" aria-labelledby="t-prac">
+  <div id="practice"></div>
+</div>
+
+<div class="scrim" id="scrim" hidden></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-t" hidden>
+  <div class="sheethead"><h2 id="sheet-t"></h2><button class="xbtn" id="sheet-x">Close</button></div>
+  <div id="sheet-b"></div>
+</div>
+
+<footer>
+  <p><strong>For education only. Not a substitute for clinical judgment.</strong> Built to national guidance and FDA labels; formulary, heparin nomograms, dose rounding and response-team pathways vary, so adjust to your institution. Rows marked expert practice are not from a graded guideline. Evidence tiers are shown as class of recommendation and level of evidence (AHA/ACC) or strength (CHEST, ASH, ASCO).</p>
+  <p>Privacy: everything runs in your browser. Nothing you enter is sent anywhere or stored, and there are no analytics; only your light/dark choice is saved on this device. Do not enter names, record numbers, or dates of birth.</p>
+  <p class="mono">Last reviewed: 2026-11-14</p>
+  <p><strong>Sources:</strong> Creager MA et al., 2026 AHA/ACC Guideline for the Evaluation and Management of Acute Pulmonary Embolism in Adults, Circulation 2026;153:e977 (a correction, Circulation 2026;154:e24, was not reviewed) · Stevens SM et al., Antithrombotic Therapy for VTE Disease: Second Update of the CHEST Guideline, Chest 2021;160:e545 · Ortel TL et al., ASH 2020 guidelines: treatment of DVT and PE, Blood Adv 2020;4:4693 · Key NS et al., VTE Prophylaxis and Treatment in Patients With Cancer: ASCO Guideline Update, J Clin Oncol 2023;41:3063 · Bates SM et al., ASH 2018 guidelines: VTE in the context of pregnancy, Blood Adv 2018;2:3317 · Middeldorp S et al., ASH 2023 guidelines: thrombophilia testing, Blood Adv 2023;7:7101 · Konstantinides SV et al., 2019 ESC Guidelines on acute pulmonary embolism, Eur Heart J 2020;41:543 · Jiménez D et al., Arch Intern Med 2010;170:1383 (sPESI) · Raschke RA et al., Ann Intern Med 1993;119:874 · FDA prescribing information: Eliquis (2025), Xarelto (2026), Pradaxa (2025), Savaysa (2023), warfarin sodium, enoxaparin, Fragmin (2024), Arixtra (2024), heparin sodium (2025), Activase (2022) · Trials: Agnelli G et al., N Engl J Med 2013;369:799 · EINSTEIN-PE Investigators, N Engl J Med 2012;366:1287 · Agnelli G et al., N Engl J Med 2013;368:699 · Couturaud F et al., Lancet 2025;405:725 · Agnelli G et al., N Engl J Med 2020;382:1599 · Mahé I et al., N Engl J Med 2025;392:1363 · Pengo V et al., Blood 2018;132:1365 · Meyer G et al., N Engl J Med 2014;370:1402 · Rosenfield K et al., N Engl J Med 2026;394:1979 · Diagrams are schematic and drawn for this site.</p>
+</footer>
+</div>
+
+<script id="engine">
+/* Pure decision engine. No DOM access. Units: weight kg; CrCl mL/min; SBP mm Hg; SpO2 %. */
+var AGENTS = ['apix','riva','lmwh','warf','edox','dabi','ufh','fonda'];
+var ANAME = {apix: 'Apixaban', riva: 'Rivaroxaban', lmwh: 'LMWH (enoxaparin)', warf: 'Warfarin', edox: 'Edoxaban', dabi: 'Dabigatran', ufh: 'Heparin infusion', fonda: 'Fondaparinux'};
+var DOACS = ['apix','riva','edox','dabi'];
+function all(list, st, why){ var o = {}; list.forEach(function(a){ o[a] = [st, why]; }); return o; }
+function mix(){ var o = {}; for (var n = 0; n < arguments.length; n++){ var s = arguments[n]; Object.keys(s).forEach(function(k){ o[k] = s[k]; }); } return o; }
+/* Each feature: agent -> [status, reason]. Status: out (avoid), less (caution or changed dose), fav (preferred). Unlisted = still fits. */
+var FIT = {
+  preg: {n: 'Pregnant', r: mix(all(DOACS.concat('warf'), 'out', 'potentially harmful in pregnancy'), {lmwh: ['fav','the recommended drug in pregnancy'], fonda: ['less','not a listed option; LMWH or heparin']})},
+  bf: {n: 'Breastfeeding', r: mix(all(DOACS, 'out', 'avoid a DOAC while breastfeeding'), {lmwh: ['fav','listed as safe in breastfeeding'], warf: ['fav','listed as safe in breastfeeding']})},
+  aps: {n: 'Antiphospholipid syndrome', r: mix(all(DOACS, 'out', 'DOACs not recommended in triple-positive APS'), {warf: ['fav','warfarin over a DOAC in thrombotic APS']})},
+  ckd4: {n: 'CrCl 15–29', r: {dabi: ['out','no dosing recommendation at CrCl 30 or below'], fonda: ['out','contraindicated below CrCl 30'], riva: ['less','allowed to CrCl 15, but not studied below 30'], edox: ['less','30 mg daily at CrCl 15–50'], lmwh: ['less','enoxaparin drops to 1 mg/kg once daily']}},
+  ckd5: {n: 'CrCl below 15 or dialysis', r: {dabi: ['out','no dosing recommendation at CrCl 30 or below'], fonda: ['out','contraindicated below CrCl 30'], riva: ['out','avoid below CrCl 15'], edox: ['out','not recommended below CrCl 15'], apix: ['less','label allows it unchanged, but no trial patients this low'], lmwh: ['less','enoxaparin 1 mg/kg once daily; accumulates']}},
+  cpB: {n: 'Child-Pugh B', r: {riva: ['out','avoid in Child-Pugh B'], edox: ['out','not recommended in Child-Pugh B'], apix: ['less','label gives no dosing advice; a DOAC may be reasonable only'], dabi: ['less','a DOAC may be reasonable only']}},
+  cpC: {n: 'Child-Pugh C', r: mix(all(DOACS, 'out', 'DOACs not recommended in Child-Pugh C'), {warf: ['less','baseline INR is already raised'], lmwh: ['fav','the usual choice when DOACs and INR are both out']})},
+  cancer: {n: 'Active cancer', r: {apix: ['fav','a recommended option in cancer'], riva: ['fav','a recommended option in cancer'], edox: ['fav','a recommended option in cancer'], lmwh: ['fav','a recommended option in cancer'], warf: ['less','LMWH or a factor Xa inhibitor is preferred'], dabi: ['less','not in any cancer recommendation']}},
+  gi: {n: 'Luminal GI cancer', r: {apix: ['fav','apixaban or LMWH may be preferred in luminal GI cancer'], lmwh: ['fav','apixaban or LMWH may be preferred in luminal GI cancer'], riva: ['less','apixaban or LMWH may be preferred in luminal GI cancer'], edox: ['less','apixaban or LMWH may be preferred in luminal GI cancer'], warf: ['less','LMWH or a factor Xa inhibitor is preferred'], dabi: ['less','not in any cancer recommendation']}},
+  inh: {n: 'Strong CYP3A4 and P-gp inhibitor', r: {riva: ['out','avoid with combined P-gp and strong CYP3A inhibitors'], apix: ['less','halve the dose'], edox: ['less','30 mg daily with certain P-gp inhibitors'], dabi: ['less','avoid P-gp inhibitors if CrCl is below 50']}},
+  ind: {n: 'Strong inducer (rifampin, phenytoin)', r: mix(all(['apix','riva'], 'out', 'avoid with combined P-gp and strong CYP3A inducers'), {edox: ['out','avoid with rifampin'], dabi: ['out','P-gp inducers should generally be avoided'], warf: ['less','inducers lower the INR; close monitoring'], lmwh: ['fav','no enzyme interaction']})},
+  bari: {n: 'Bariatric surgery in the last 4 weeks', r: mix(all(DOACS, 'out', 'avoid DOACs for at least 4 weeks after bariatric surgery'), {lmwh: ['fav','does not depend on absorption']})},
+  unstable: {n: 'May need lysis or a procedure', r: mix(all(DOACS.concat('warf'), 'less', 'start with an injectable; switch once stable'), {lmwh: ['fav','LMWH over heparin for the injectable start']})}
+};
+var FITORDER = ['preg','bf','aps','ckd4','ckd5','cpB','cpC','cancer','gi','inh','ind','bari','unstable'];
+function fit(sel){
+  var rank = {out: 3, less: 2, fav: 1, 'in': 0};
+  return AGENTS.map(function(a){
+    var st = 'in', why = '', fav = false, favWhy = '';
+    Object.keys(sel).forEach(function(f){ if (!sel[f] || !FIT[f]) return; var x = FIT[f].r[a]; if (!x) return;
+      if (x[0] === 'fav'){ fav = true; if (!favWhy) favWhy = x[1]; }
+      else if (rank[x[0]] > rank[st]){ st = x[0]; why = x[1]; } });
+    if (st === 'in' && fav){ st = 'fav'; why = favWhy; }
+    return {a: a, name: ANAME[a], st: st, why: why};
+  });
+}
+function pick(rows, sel, cat){
+  var by = {}; rows.forEach(function(r){ by[r.a] = r; });
+  if (sel && sel.unstable){
+    /* Injectable start. LMWH over heparin is graded for C1 to E1; in E2 or when LMWH needs caution, a heparin infusion leads. */
+    if (cat !== 'E2' && by.lmwh.st === 'fav') return [by.lmwh];
+    return [by.ufh].concat(by.lmwh.st !== 'out' ? [by.lmwh] : []);
+  }
+  var favs = rows.filter(function(r){ return r.st === 'fav'; });
+  if (favs.length) return favs;
+  var main = function(r){ return r.a !== 'ufh' && r.a !== 'fonda'; };
+  var out = rows.filter(function(r){ return r.st === 'in' && main(r); }).slice(0, 2);
+  rows.forEach(function(r){ if (out.length < 2 && r.st === 'less' && main(r) && !(r.a === 'warf' && sel && sel.cpC)) out.push(r); });
+  if (!out.length) out = rows.filter(function(r){ return r.a === 'ufh' && r.st !== 'out'; });
+  return out;
+}
+function featuresOf(i, cat){
+  var s = {};
+  ['preg','bf','aps','cpB','cpC','inh','ind','bari'].forEach(function(k){ if (i[k]) s[k] = 1; });
+  if (i.gi) s.gi = 1; else if (i.cancer) s.cancer = 1;
+  if (i.crcl != null){ if (i.crcl < 15) s.ckd5 = 1; else if (i.crcl < 30) s.ckd4 = 1; }
+  if (cat && (cat === 'C3' || cat.charAt(0) === 'D' || cat.charAt(0) === 'E')) s.unstable = 1;
+  if (i.clot === 'pe' && !cat && (i.rv || i.bio)) s.unstable = 1;
+  return s;
+}
+function r0(x){ return Math.round(x); }
+function dalteBand(w){ return w <= 56 ? [10000, 7500] : w <= 68 ? [12500, 10000] : w <= 82 ? [15000, 12500] : w <= 98 ? [18000, 15000] : [18000, 18000]; }
+function hepDose(w){ return w > 0 ? {bolus: r0(80 * w), rate: r0(18 * w)} : null; }
+function fmt(n){ return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
+function doseOf(a, i, f){
+  var w = i.wt, low = i.crcl != null && i.crcl < 30;
+  if (a === 'apix') return f.inh ? {d: '5 mg twice daily for 7 days, then 2.5 mg twice daily', s: 'Half the usual dose because of the combined P-gp and strong CYP3A4 inhibitor (label 2.6).'} : {d: '10 mg twice daily for 7 days, then 5 mg twice daily', s: 'No heparin lead-in. No dose change for kidney function in the label.'};
+  if (a === 'riva') return {d: '15 mg twice daily with food for 21 days, then 20 mg once daily with food', s: 'No heparin lead-in. The 15 and 20 mg tablets must be taken with food.'};
+  if (a === 'edox'){ var red = (i.crcl != null && i.crcl >= 15 && i.crcl <= 50) || (w != null && w <= 60) || f.inh; return {d: 'After 5–10 days of LMWH or heparin: ' + (red ? '30' : '60') + ' mg once daily', s: red ? 'Reduced to 30 mg for CrCl 15–50, weight 60 kg or less, or certain P-gp inhibitors.' : 'Needs an injectable first; that is how it was tested.'}; }
+  if (a === 'dabi') return {d: 'After 5–10 days of LMWH or heparin: 150 mg twice daily', s: 'Needs an injectable first. Only if CrCl is above 30.'};
+  if (a === 'warf'){ var br = (f.ckd4 || f.ckd5) ? 'a heparin infusion' : 'LMWH'; return {d: 'Usually 2–5 mg daily, started with ' + br + '; INR target 2.5 (2.0–3.0)', s: 'Continue the injectable at least 5 days and until the INR is 2.0 or above.'}; }
+  if (a === 'lmwh'){
+    var d = low ? 'Enoxaparin 1 mg/kg SC once daily' : 'Enoxaparin 1 mg/kg SC every 12 hours';
+    if (w) d += ' = ' + r0(w) + ' mg ' + (low ? 'once daily' : 'every 12 hours');
+    var s = low ? 'Once daily because CrCl is below 30 (label).' : 'Inpatients may use 1.5 mg/kg once daily instead (label).';
+    if ((f.cancer || f.gi) && !low){ s += ' Or dalteparin 200 units/kg daily for 30 days, then about 150 units/kg daily (max 18,000 units)'; if (w){ var b = dalteBand(w); s += ': at this weight ' + fmt(b[0]) + ' units daily, then ' + fmt(b[1]) + ' units daily'; } s += '.'; }
+    return {d: d, s: s};
+  }
+  if (a === 'ufh'){ var h = hepDose(w); return {d: '80 units/kg bolus, then 18 units/kg/h' + (h ? ' = ' + fmt(h.bolus) + ' units, then ' + fmt(h.rate) + ' units/h' : ''), s: 'Then titrate to your hospital\'s aPTT or anti-Xa nomogram.'}; }
+  if (a === 'fonda') return {d: (w == null ? '5 mg (under 50 kg), 7.5 mg (50–100 kg) or 10 mg (over 100 kg)' : w < 50 ? '5 mg' : w <= 100 ? '7.5 mg' : '10 mg') + ' SC once daily', s: 'With warfarin: at least 5 days and until the INR is 2 to 3.'};
+}
+
+/* PE severity: 2026 AHA/ACC Acute PE Clinical Categories. */
+var CATS = {
+  A: {t: 'Subclinical', def: 'Found by chance, no symptoms.', disp: 'Can go home from the emergency department on an anticoagulant if nothing else needs admission.', adv: 'Anticoagulation alone. Systemic thrombolysis is harmful here (3: Harm, B-R); catheter therapy and surgery add nothing (3: No Benefit).'},
+  B: {t: 'Symptomatic, low score', def: 'Symptoms with sPESI 0 (or PESI 85 or below, or Bova 4 or below).', disp: 'Early discharge is generally recommended; home treatment is reasonable (2a, B-R) with the drug in hand and reliable follow-up.', adv: 'Anticoagulation alone. Systemic thrombolysis is harmful here (3: Harm, B-R); catheter therapy and surgery add nothing (3: No Benefit).'},
+  C1: {t: 'Raised score, normal RV and biomarkers', def: 'sPESI 1 or more with a normal right ventricle and normal troponin and BNP.', disp: 'Admit. Response team (PERT) review and a lactate are recommended (1, B-NR).', adv: 'Anticoagulation alone. Systemic thrombolysis is harmful here (3: Harm, B-R); catheter therapy and surgery add nothing (3: No Benefit).'},
+  C2: {t: 'Raised score, RV or a biomarker abnormal', def: 'sPESI 1 or more with either an abnormal right ventricle or a raised troponin or BNP.', disp: 'Admit with monitoring. PERT review and a lactate are recommended (1, B-NR).', adv: 'Anticoagulation alone for most. Systemic thrombolysis is harmful here (3: Harm, B-R). Catheter-directed lysis or thrombectomy: benefit unclear (2b).'},
+  C3: {t: 'Raised score, RV and a biomarker abnormal', def: 'sPESI 1 or more with both an abnormal right ventricle and a raised troponin or BNP.', disp: 'Admit with close monitoring. PERT review and a lactate are recommended (1, B-NR). Watch for a falling blood pressure or rising lactate.', adv: 'Anticoagulation first. Systemic thrombolysis and catheter therapy: benefit uncertain (2b, C-LD). A mean arterial pressure below 80 may flag the need to escalate (2a).'},
+  D1: {t: 'Transient hypotension', def: 'Systolic below 90, or a fall of more than 40, lasting under 15 minutes or responding to fluid, with no sign of poor perfusion.', disp: 'Admit to a monitored bed with PERT review (1, B-NR). Repeat lactate.', adv: 'Advanced therapy may be considered (2b): systemic thrombolysis, catheter-directed lysis, mechanical thrombectomy or surgical embolectomy. Catheter options may be considered over systemic lysis to reduce bleeding (2b).'},
+  D2: {t: 'Poor perfusion without sustained hypotension', def: 'A marker of poor perfusion (lactate above 2 mmol/L, acute kidney injury, urine output below 0.5 mL/kg/h, mental status change) while blood pressure holds.', disp: 'Admit to a monitored bed with PERT review (1, B-NR). This is shock with a normal blood pressure.', adv: 'Advanced therapy may be considered (2b): systemic thrombolysis, catheter-directed lysis, mechanical thrombectomy or surgical embolectomy. Catheter options may be considered over systemic lysis to reduce bleeding (2b).'},
+  E1: {t: 'Persistent hypotension, cardiogenic shock', def: 'Recurrent or persistent hypotension with cardiogenic shock.', disp: 'Call PERT now (1, B-NR). Stabilize before any transfer (transfer while unstable: 3: Harm).', adv: 'Reperfusion is reasonable (2a): systemic thrombolysis, catheter-directed lysis, mechanical thrombectomy or surgical embolectomy, whichever is fastest and safest where you are.'},
+  E2: {t: 'Refractory shock or cardiac arrest', def: 'Refractory cardiogenic shock, or cardiac arrest without return of circulation after 30 minutes.', disp: 'Call PERT now (1, B-NR).', adv: 'Systemic thrombolysis is reasonable (2a, C-LD). VA-ECMO is reasonable for refractory shock where available (2a, B-NR). Surgical embolectomy adds nothing unless on mechanical support (3: No Benefit).'}
+};
+var CATORDER = ['A','B','C1','C2','C3','D1','D2','E1','E2'];
+function spesi(i){
+  var items = [], miss = [];
+  if (i.age == null) miss.push('age'); else if (i.age > 80) items.push('age over 80');
+  if (i.cancer || i.gi) items.push('cancer');
+  if (i.cardio) items.push('chronic heart or lung disease');
+  if (i.hr == null) miss.push('heart rate'); else if (i.hr >= 110) items.push('heart rate 110 or more');
+  if (i.sbp == null) miss.push('systolic BP'); else if (i.sbp < 100) items.push('systolic BP below 100');
+  if (i.spo2 == null) miss.push('SpO2'); else if (i.spo2 < 90) items.push('SpO2 below 90%');
+  return {score: items.length, items: items, miss: miss};
+}
+function peClass(i){
+  var s = spesi(i), o = {s: s, guards: [], cat: null};
+  var hypo = i.thypo || (i.sbp != null && i.sbp < 90 && !i.shock && !i.arrest);
+  if (i.arrest) o.cat = 'E2';
+  else if (i.shock) o.cat = 'E1';
+  else if (i.perf) o.cat = 'D2';
+  else if (hypo){ o.cat = 'D1'; if (!i.thypo) o.guards.push('Systolic BP below 90: read as transient hypotension. If it persists or needs a vasopressor, tick shock.'); }
+  else if (i.incidental && !i.rv && !i.bio && !((i.hr != null && i.hr >= 110) || (i.sbp != null && i.sbp < 100) || (i.spo2 != null && i.spo2 < 90) || i.o2)) o.cat = 'A';
+  else if (s.score >= 1) o.cat = i.rv && i.bio ? 'C3' : (i.rv || i.bio) ? 'C2' : 'C1';
+  else if (!s.miss.length){ o.cat = 'B'; if (i.rv || i.bio) o.guards.push('sPESI is 0 but the right ventricle or a biomarker is abnormal. The categories key on the score; do not send home without senior review.'); }
+  if (!o.cat){ o.need = s.miss; return o; }
+  if (i.incidental && o.cat !== 'A') o.guards.push('Ticked as found by chance, but the vital signs, oxygen need, right ventricle or biomarkers are abnormal, so it is classed by those. Look again for symptoms.');
+  if (o.cat === 'A' && s.miss.length) o.guards.push('Not entered: ' + s.miss.join(', ') + '. Check the vital signs before discharge.');
+  if (s.miss.length && o.cat.charAt(0) === 'C') o.guards.push('Not entered: ' + s.miss.join(', ') + '. The category could be higher.');
+  o.letter = o.cat.charAt(0);
+  o.r = !!i.o2 && o.letter === 'C';
+  o.label = (o.cat === 'B' ? (i.subseg ? 'B1' : 'B2') : o.cat === 'A' && i.subseg ? 'A1' : o.cat) + (o.r ? 'R' : '');
+  var c = CATS[o.cat];
+  o.title = c.t; o.def = c.def; o.disp = c.disp; o.adv = c.adv;
+  if (o.letter === 'A' || o.letter === 'B'){
+    var h = [];
+    if (i.crcl != null && i.crcl < 30) h.push('CrCl below 30');
+    if (i.preg) h.push('pregnancy');
+    if (i.cpC) h.push('severe liver impairment');
+    if (i.nobleed) h.push('active bleeding or high bleeding risk');
+    if (i.o2) h.push('needing oxygen');
+    if (h.length){ o.hestia = h; o.guards.push('Hestia rule positive (' + h.join(', ') + '): consider admission rather than home treatment.'); }
+  }
+  if ('CDE'.indexOf(o.letter) >= 0) o.guards.push('Avoid intubation and deep sedation unless clearly needed (3: Harm). If you must, have vasopressors ready first.');
+  if (o.letter === 'D' || o.letter === 'E') o.guards.push('Fluids: small boluses only (500 mL or less). Large volumes over-distend the right ventricle. Norepinephrine is the usual first vasopressor.');
+  o.lysis = o.letter === 'D' || o.letter === 'E';
+  o.why = o.letter === 'E' ? 'The right ventricle has failed against the clot and blood pressure is gone with it. Only removing the obstruction breaks the cycle.'
+    : o.cat === 'D2' ? 'Blood pressure can hold while cardiac output is already too low; lactate, urine output and mentation show it first.'
+    : o.cat === 'D1' ? 'A brief drop in pressure means the right ventricle is near its limit, even if it has recovered for now.'
+    : o.cat === 'C3' ? 'A strained right ventricle with a troponin leak can still decompensate. Lysis up front prevents that but causes more major bleeding than it saves, so watch closely and escalate on decline.'
+    : o.cat === 'C2' ? 'One sign of right ventricular stress, not two. The risk of early collapse is lower than in C3, so anticoagulation and monitoring are the treatment.'
+    : o.cat === 'C1' ? 'The score is raised by age, comorbidity or vital signs, but the right ventricle is coping. The score, not the heart, is the reason for admission.'
+    : o.cat === 'B' ? 'With sPESI 0, 30-day mortality was about 1%, so treatment at home is as safe as a hospital bed.'
+    : 'No symptoms and no sign of strain on the heart: the risk is recurrence, not collapse, so an anticoagulant and follow-up are the treatment.';
+  if (i.nobleed){ if ('ABC'.indexOf(o.letter) >= 0) o.adv = 'No anticoagulant can be given for now: see the next card.'; if (o.letter === 'A' || o.letter === 'B'){ o.disp = 'Admit. A PE that cannot be anticoagulated is not for home treatment.'; o.why = 'The score is low, but with no anticoagulant nothing is preventing the next embolus, so this patient is watched in hospital.'; } }
+  o.fig = o.letter === 'E' ? 'e' : o.letter === 'D' ? 'd' : o.letter === 'C' ? 'c' : 'ok';
+  return o;
+}
+
+function duration(i, rows){
+  var d = {more: [], tiers: [], guards: []};
+  var st = {}; (rows || []).forEach(function(r){ st[r.a] = r.st; });
+  var noDoac = DOACS.every(function(a){ return st[a] === 'out'; });
+  var red = [st.apix !== 'out' && !i.inh ? 'apixaban 2.5 mg twice daily' : null, st.riva !== 'out' ? 'rivaroxaban 10 mg daily' : null].filter(Boolean);
+  var extDose = red.length ? 'After at least 6 months, a reduced dose is recommended for those who continue: ' + red.join(' or ') + ' (AHA/ACC 1, A; CHEST weak).' : 'Continue the drug and dose chosen above. The reduced-dose option exists only for apixaban and rivaroxaban, which do not fit this patient as things stand.';
+  var contWith = noDoac ? 'offer to continue' : 'offer to continue with a DOAC';
+  var contAfter = !noDoac ? '' : i.cpC ? ' In Child-Pugh C that means staying on LMWH (expert practice).' : ' When a DOAC cannot be used, warfarin is the extended-phase drug (CHEST rec 25, weak).';
+  if (i.preg){ d.head = 'Through pregnancy and after delivery'; d.steps = ['LMWH for the rest of the pregnancy.', 'Plan delivery and the postpartum course with obstetrics and hematology.']; d.why = 'Pregnancy is the provoking factor and it has not ended, so treatment cannot stop on a 3-month clock.'; d.tiers = ['expert practice']; d.fig = 'minor'; return d; }
+  if (i.gi || i.cancer){ d.head = 'At least 6 months'; d.steps = ['Treat for at least 6 months (ASCO, strong).', 'Beyond 6 months: offer to selected patients with active cancer, such as metastatic disease or ongoing chemotherapy, and reassess at intervals (ASCO, weak to moderate).']; d.why = 'Active cancer keeps provoking clots, so the risk of recurrence stays high for as long as the cancer does.'; d.more = ['In API-CAT (2025), after 6 months of treatment, apixaban 2.5 mg twice daily was non-inferior to 5 mg for recurrence, with less clinically relevant bleeding. ASCO 2023 predates that trial.', 'Check for interactions between the anticoagulant and cancer drugs.']; d.tiers = ['ASCO 2023 rec 4.2, 4.3']; d.fig = 'unprov'; return d; }
+  if (i.aps){ d.head = i.cpC ? 'Long term' : 'Long term, on warfarin'; d.steps = ['Antiphospholipid syndrome does not resolve: continue without a planned stop date.', i.cpC ? 'Warfarin is the usual drug, but in Child-Pugh C the INR cannot guide it: stay on LMWH and involve hematology (expert practice).' : 'Stay on warfarin, INR 2.0–3.0. The reduced-dose DOAC option does not apply.']; d.why = 'The antibodies do not go away, so neither does the risk.'; d.tiers = ['warfarin over a DOAC: AHA/ACC 2026, 1, A', 'CHEST 2021 rec 17, weak', 'no stop date: expert practice']; d.fig = 'unprov'; return d; }
+  if (i.prov === 'major'){ d.head = 'Stop at 3 months'; d.steps = ['Treat for 3 months, then stop (CHEST rec 22, strong; AHA/ACC: stop at the end of the initial 3 to 6 months, 1, B-NR).']; d.why = 'After a clot provoked by surgery, about 3% recur over 5 years once the trigger is gone, which is less than the bleeding risk of staying on treatment.'; d.more = ['Major transient factors: surgery with general anesthesia over 30 minutes, confined to a hospital bed for 3 days or more with acute illness, cesarean section.']; d.tiers = ['CHEST 2021 rec 21, 22']; d.fig = 'major'; }
+  else if (i.prov === 'minor'){ d.head = '3 months, then a shared decision'; d.steps = ['Treat for at least 3 months.', 'Then decide together: CHEST suggests stopping (rec 23, weak); the 2026 AHA/ACC guideline makes stopping versus continuing a shared decision (2a, B-NR).', extDose]; d.why = 'A minor trigger explains only part of the risk: after nonsurgical triggers recurrence is about 15% over 5 years, between a surgical clot and an unprovoked one.'; d.more = ['Minor transient factors: estrogen therapy, pregnancy or the weeks after delivery, surgery under 30 minutes of anesthesia, a hospital stay under 3 days, bed rest at home for 3 days or more, a leg injury with reduced mobility, prolonged car or air travel.', 'If estrogen was the trigger and it has been stopped, that favors stopping the anticoagulant.']; d.tiers = ['CHEST 2021 rec 23', 'AHA/ACC 2026']; d.fig = 'minor'; }
+  else if (i.prov === 'none' || i.prov === 'pers'){ d.head = 'No planned stop date'; d.steps = ['Treat for the first 3 to 6 months, then ' + contWith + ' (CHEST rec 24, strong; AHA/ACC 1, A' + (i.prov === 'pers' ? '; persistent risk factor 1, C-LD' : '') + ').' + contAfter, extDose, 'Revisit the decision at least once a year and whenever health changes.']; d.why = 'With no trigger to remove, about 30% recur within 5 years of stopping' + (red.length ? '; a reduced-dose DOAC keeps most of the protection.' : ', so treatment continues for as long as its benefit outweighs the bleeding risk.'); d.more = ['Offering is not the same as everyone taking it: preference, bleeding risk and the predicted recurrence risk all count.', 'If anticoagulation is stopped or declined, low-dose aspirin is better than nothing but much less effective (CHEST rec 28, weak; AHA/ACC 2a, B-R).', 'Thrombophilia testing: ASH suggests not testing after an unprovoked clot, because treatment continues either way (conditional, very low certainty). Send antiphospholipid antibodies when the story fits (young, arterial events, pregnancy loss), because a positive result changes the drug (expert practice).', 'Age-appropriate cancer screening is recommended after an unprovoked PE; routine CT or PET is not (AHA/ACC 1, A; 3: No Benefit).']; d.tiers = red.length ? ['CHEST 2021 rec 24, 26', 'AHA/ACC 2026', 'labels: reduced dose after 6 months'] : ['CHEST 2021 rec 24, 25', 'AHA/ACC 2026']; d.fig = 'unprov'; }
+  else { d.head = 'At least 3 months for everyone'; d.steps = ['Treat for 3 months, then the provoking factor decides. Pick one above.']; d.tiers = ['CHEST 2021 rec 21, strong']; d.fig = null; }
+  if (i.clot === 'distal' && d.fig) d.more.push('Isolated calf DVT recurs about half as often as proximal DVT or PE (CHEST 2021).');
+  if (i.clot === 'pe') d.more.push('After PE: contact within a week of discharge (1, C-LD), a visit by 3 months to settle duration (1, C-EO), and ask about breathlessness and function at every visit for at least a year to catch chronic thromboembolic disease.');
+  return d;
+}
+
+function decide(i){
+  var o = {i: i};
+  if (!i.clot) return o;
+  if (i.clot === 'pe') o.pe = peClass(i);
+  var cat = o.pe && o.pe.cat;
+  o.feats = featuresOf(i, cat);
+  o.rows = fit(o.feats);
+  if (i.nobleed){
+    o.filter = i.clot === 'distal' ? {head: 'No filter for a calf DVT', text: 'Follow with serial ultrasound and start an anticoagulant when it is safe.', tier: 'CHEST 2021 rec 1'} :
+      i.clot === 'pe' ? {head: 'An IVC filter can be useful', text: 'For acute PE when anticoagulation cannot be given (2a, B-R). Use a retrievable filter (1, B-R) and remove it once anticoagulation is tolerated (1, C-LD).', tier: 'AHA/ACC 2026'} :
+      {head: 'IVC filter', text: 'Recommended for acute proximal DVT of the leg with a contraindication to anticoagulation (CHEST rec 13, strong). Start an anticoagulant and remove the filter as soon as it is safe.', tier: 'CHEST 2021 rec 13'};
+    return o;
+  }
+  if (i.clot === 'distal' && !i.sev) o.watch = {head: 'Calf DVT: two reasonable options', text: 'Without severe symptoms or risk factors for extension, repeat the ultrasound weekly for 2 weeks instead of anticoagulating (CHEST rec 1, weak). Anticoagulate if the clot extends: suggested if it stays in the calf, recommended if it reaches the popliteal vein or above.'};
+  if (i.clot === 'pe' && i.subseg) o.watch = {head: 'Subsegmental PE: surveillance is an option', text: 'If leg ultrasound shows no proximal DVT and the risk of recurrence is low, CHEST suggests clinical surveillance over anticoagulation (rec 3, weak). Favor treating if hospitalized or immobile, active cancer, no reversible trigger, pregnancy, little cardiopulmonary reserve or marked symptoms. The 2026 AHA/ACC guideline makes no separate recommendation.'};
+  o.picks = pick(o.rows, o.feats, cat);
+  o.steps = o.picks.map(function(r, n){ var x = doseOf(r.a, i, o.feats); return {when: n === 0 ? (o.picks.length === 1 && r.st === 'fav' ? 'First choice' : o.picks.length === 1 ? 'Start' : 'Option') : 'Or', now: n === 0, name: r.name, dose: x.d, small: x.s + (r.st === 'less' && r.why ? ' Caution: ' + r.why + '.' : '')}; });
+  o.avoid = o.rows.filter(function(r){ return r.st === 'out'; });
+  o.caution = o.rows.filter(function(r){ return r.st === 'less' && o.picks.indexOf(r) < 0; });
+  var f = o.feats, g = [];
+  if (o.pe && !cat) g.push('PE severity is not classed yet: enter ' + o.pe.need.join(', ') + ' before settling on an oral start.');
+  if (f.unstable && cat === 'E2') g.push('Start with an injectable. The recommendation for LMWH over a heparin infusion covers categories C1 to E1, not E2; on VA-ECMO, parenteral anticoagulation continues (1, B-NR). Leading with heparin here is expert practice.');
+  else if (f.unstable && o.picks[0].a === 'ufh') g.push('Start with an injectable. LMWH is recommended over a heparin infusion in categories C1 to E1 (1, B-R), but it needs caution here (' + o.rows.filter(function(r){ return r.a === 'lmwh'; })[0].why + '), so a heparin infusion leads (expert practice). Move to the long-term drug once stable.');
+  else if (f.unstable) g.push('Start with an injectable: LMWH is recommended over a heparin infusion (1, B-R), and stays reasonable even if a catheter procedure is likely (2a, C-LD). Move to the long-term drug once stable.');
+  if (f.preg) g.push('No DOAC and no warfarin in pregnancy (3: Harm).');
+  if (f.aps) g.push('No DOAC in antiphospholipid syndrome: more arterial clots than with warfarin. All four DOAC labels warn against use in triple-positive disease.');
+  if (f.ckd5 || f.ckd4) g.push('CrCl below 30: no dabigatran or fondaparinux; enoxaparin drops to once daily. The apixaban trials enrolled no one with CrCl below 15 or on dialysis, and rivaroxaban has limited data below 30.');
+  if (f.cpC) g.push('Child-Pugh C: no DOAC (3: Harm). The INR is already raised, so it cannot guide warfarin either.');
+  if (f.ind) g.push('Rifampin, carbamazepine, phenytoin and St John\'s wort cut DOAC levels: avoid all four.');
+  if (f.bari) g.push('Avoid DOACs for at least 4 weeks after bariatric surgery; absorption is unreliable.');
+  if (i.wt == null && o.picks.some(function(r){ return r.a === 'lmwh' || r.a === 'ufh' || r.a === 'fonda'; })) g.push('Enter weight to calculate the dose.');
+  o.guards = g;
+  o.agWhy = f.preg ? 'LMWH does not cross the placenta; warfarin does, and the DOACs probably do.'
+    : f.unstable ? 'If thrombolysis or a procedure may be needed in the next hours, an injectable keeps the options open; the oral drug can wait a day or two.'
+    : f.aps && o.picks.some(function(r){ return r.a === 'warf'; }) ? 'In the one trial of triple-positive patients, rivaroxaban led to strokes and heart attacks that warfarin prevented.'
+    : f.cpC ? 'DOACs were not tested in liver failure and the guideline advises against them; a raised baseline INR leaves warfarin without a usable target.'
+    : f.bf ? 'DOACs have not been studied in breastfeeding; warfarin and LMWH have a long record of safety.'
+    : f.ind ? 'Enzyme inducers lower DOAC levels unpredictably, and there is no level to follow. LMWH has no such interaction.'
+    : f.bari ? 'Early after bariatric surgery a tablet may not be absorbed, and an injected drug does not depend on the gut.'
+    : (f.gi || f.cancer) && o.rows.every(function(r){ return DOACS.indexOf(r.a) < 0 || r.st === 'out'; }) ? 'With the DOACs ruled out, LMWH is the remaining recommended drug in cancer; warfarin is less preferred there.'
+    : (f.gi || f.cancer) && o.picks.some(function(r){ return r.a === 'apix' || r.a === 'riva' || r.a === 'edox'; }) ? 'Factor Xa inhibitors prevent recurrence in cancer about as well as LMWH, without daily injections; the worry is bleeding from tumors of the gut and urinary tract.'
+    : (f.ckd4 || f.ckd5) ? 'Every DOAC is cleared partly by the kidney, apixaban the least. The trials left these patients out, so the evidence here is thin.'
+    : f.inh ? 'Rivaroxaban levels rise too far with these drugs. Apixaban can be halved; LMWH and warfarin avoid the pathway.'
+    : f.cpB ? 'Moderate liver disease was barely studied with DOACs, and two labels advise against use.'
+    : 'DOACs prevent recurrence as well as warfarin with less major bleeding, and need no INR checks. These two need no heparin first.';
+  o.agMore = ((f.gi || f.cancer) ? ['ASCO advises caution with every factor Xa inhibitor, apixaban included, in gastrointestinal and genitourinary cancers. The CHEST guideline adds that apixaban or LMWH may be preferred in luminal GI cancer.'] : []).concat(['Dabigatran and edoxaban are alternatives after 5 to 10 days of an injectable. Warfarin remains an option when a DOAC cannot be used.',
+    'For acute PE: a DOAC is recommended over warfarin (1, B-R). For kidney disease stage 4 to 5 or dialysis, it is uncertain whether apixaban is better than warfarin (2b, B-NR).',
+    'Stopping any oral anticoagulant early raises the risk of clots (boxed warning on every DOAC).']);
+  if (i.clot === 'dvt') o.agMore.push('Proximal DVT: anticoagulation alone is suggested over catheter-directed or mechanical clot removal (CHEST rec 6, weak). Uncomplicated DVT can be treated at home (ASH 2020, conditional).');
+  o.agTiers = ['FDA labels', 'AHA/ACC 2026', (f.gi || f.cancer) ? 'ASCO 2023 rec 4.2, strong' : 'CHEST 2021'];
+  if (f.cpC || f.ckd4 || f.ckd5) o.agTiers.push('LMWH or heparin in organ failure: expert practice');
+  var later = {}; Object.keys(o.feats).forEach(function(k){ if (k !== 'bari' && k !== 'unstable') later[k] = 1; });
+  o.dur = duration(i, fit(later));
+  return o;
+}
+
+/* Switching. from/to: W A R D E L U. Returns {head, steps, why, src, wait}. */
+var SWN = {W: 'Warfarin', A: 'Apixaban', R: 'Rivaroxaban', D: 'Dabigatran', E: 'Edoxaban', L: 'LMWH (SC)', U: 'Heparin infusion'};
+function switchRule(from, to, x){
+  x = x || {};
+  var inr = x.inr, cr = x.crcl, o = {steps: [], more: []};
+  if (from === to){ o.head = 'Pick two different drugs'; return o; }
+  var WHYINR = 'Warfarin\'s effect fades over days, so the INR tells you when enough has worn off to add the next drug without doubling up.';
+  var WHYNEXT = 'These drugs start working within hours and wear off within a day, so the new one simply takes the place of the next dose.';
+  var WHYBR = 'Warfarin takes several days to work, and a DOAC distorts the INR, so the gap is covered with a drug that does not.';
+  if (from === 'W'){
+    var thr = {A: [2.0, 'below 2.0', 'Eliquis label 2.5'], R: [3.0, 'below 3.0', 'Xarelto label 2.3'], D: [2.0, 'below 2.0', 'Pradaxa label 2.6'], E: [2.5, '2.5 or below', 'Savaysa label 2.4'], L: [2.0, 'below 2.0', 'expert practice'], U: [2.0, 'below 2.0', 'expert practice']}[to];
+    o.head = 'Stop warfarin; start when INR is ' + thr[1];
+    o.steps = ['Stop warfarin.', 'Check the INR daily.', 'Start ' + SWN[to].toLowerCase() + ' when the INR is ' + thr[1] + '.'];
+    if (inr != null){ var ok = to === 'E' ? inr <= thr[0] : inr < thr[0]; o.verdict = 'INR ' + inr + ': ' + (ok ? 'start now.' : 'wait and recheck.'); o.ok = ok; }
+    o.why = WHYINR; o.src = thr[2];
+    if (to === 'R') o.more.push('Rivaroxaban\'s threshold is higher than the others to avoid a gap in anticoagulation.');
+    return o;
+  }
+  if (to === 'W'){
+    if (from === 'A' || from === 'R'){
+      o.head = 'Stop the DOAC; start an injectable and warfarin together';
+      o.steps = ['At the time the next ' + SWN[from].toLowerCase() + ' dose is due, stop it and start both a parenteral anticoagulant and warfarin.', 'Stop the injectable when the INR is in range.'];
+      o.more.push('The label calls this "one approach", not the only one. ' + (from === 'R' ? 'There are no trial data on this switch. The INR is reliable 24 hours after the last rivaroxaban dose.' : 'Apixaban raises the INR, so early INR values during the switch may not be useful.'));
+      o.why = WHYBR; o.src = from === 'A' ? 'Eliquis label 2.5' : 'Xarelto label 2.3';
+    } else if (from === 'D'){
+      var days = cr == null ? null : cr >= 50 ? 3 : cr >= 30 ? 2 : cr >= 15 ? 1 : 0;
+      o.head = days == null ? 'Start warfarin 1 to 3 days before stopping dabigatran, by CrCl' : days ? 'Start warfarin ' + days + ' day' + (days > 1 ? 's' : '') + ' before stopping dabigatran' : 'CrCl below 15: no recommendation';
+      o.steps = ['CrCl 50 or more: start warfarin 3 days before stopping dabigatran.', 'CrCl 30–50: 2 days before.', 'CrCl 15–30: 1 day before.', 'CrCl below 15: the label makes no recommendation.'];
+      o.more.push('Dabigatran raises the INR: it reflects warfarin alone only after dabigatran has been stopped for at least 2 days.');
+      o.why = 'The worse the kidney, the longer dabigatran lingers, so the shorter the overlap needs to be.'; o.src = 'Pradaxa label 2.6';
+    } else if (from === 'E'){
+      o.head = 'Halve the edoxaban and add warfarin, or bridge with an injectable';
+      o.steps = ['Oral option: cut edoxaban from 60 to 30 mg (or 30 to 15 mg) and start warfarin. Check the INR at least weekly, just before the edoxaban dose. Stop edoxaban once the INR is stable at 2.0 or above.', 'Injectable option: stop edoxaban; at the time of its next dose start a parenteral anticoagulant and warfarin. Stop the injectable once the INR is stable at 2.0 or above.'];
+      o.why = 'Warfarin takes days to work. Either keep a half dose of edoxaban on board until the INR is up, or cover the gap with an injectable.'; o.src = 'Savaysa label 2.4';
+    } else {
+      o.head = 'Start warfarin now and overlap';
+      o.steps = ['Start warfarin the same day (the labels allow up to 72 hours).', from === 'L' ? 'Continue LMWH for at least 5 days and until the INR is 2 to 3.' : 'Continue full-dose heparin for 4 to 5 days and until the INR is in range, then stop without tapering.'];
+      o.more.push('Timing the INR: at least 4 hours after stopping a heparin infusion, or 24 hours after the last subcutaneous dose.');
+      o.why = 'Warfarin lowers factor VII and protein C within a day but factors X and II take most of a week, so the INR moves before the patient is protected.'; o.src = from === 'L' ? 'enoxaparin label 2.2; warfarin label 2.8' : 'warfarin label 2.8; heparin label 2.7';
+    }
+    return o;
+  }
+  if (from === 'D' && (to === 'L' || to === 'U')){
+    var h = cr == null ? null : cr >= 30 ? 12 : 24;
+    o.head = h ? 'Wait ' + h + ' hours after the last dabigatran dose' : 'Wait 12 hours (CrCl 30 or more) or 24 hours (below 30)';
+    o.steps = ['Stop dabigatran.', 'Start the injectable 12 hours after the last dose if CrCl is 30 or more, 24 hours if below 30.'];
+    o.why = 'Dabigatran is cleared by the kidney, so a low CrCl doubles the wait.'; o.src = 'Pradaxa label 2.7'; return o;
+  }
+  if (to === 'D' && (from === 'L' || from === 'U')){
+    o.head = from === 'L' ? 'Start dabigatran 0 to 2 hours before the next LMWH dose is due' : 'Start dabigatran when the infusion stops';
+    o.steps = from === 'L' ? ['Give dabigatran 0 to 2 hours before the next LMWH dose would have been due.', 'Do not give that LMWH dose.'] : ['Stop the infusion and give dabigatran at the same time.'];
+    o.why = WHYNEXT; o.src = 'Pradaxa label 2.7'; return o;
+  }
+  if (from === 'U'){
+    if (to === 'E'){ o.head = 'Stop the infusion; start edoxaban 4 hours later'; o.steps = ['Stop the heparin infusion.', 'Give edoxaban 4 hours later.']; o.more.push('This is the only label with a wait. The heparin label says to stop the infusion immediately after the first dose of an oral anticoagulant.'); o.src = 'Savaysa label 2.4'; }
+    else if (to === 'L'){ o.head = 'Give LMWH when the infusion stops'; o.steps = ['Stop the infusion and give the first LMWH dose at the same time.']; o.src = 'expert practice'; }
+    else { o.head = 'Give ' + SWN[to].toLowerCase() + ' and stop the infusion at the same time'; o.steps = ['Give the first dose of ' + SWN[to].toLowerCase() + ' and stop the infusion.']; o.src = to === 'R' ? 'Xarelto label 2.3' : 'heparin label 2.8; Eliquis label 2.5 has no infusion-specific wording'; }
+    o.why = 'Heparin is gone within hours of stopping the infusion and the oral drug peaks in 1 to 4 hours, so there is no gap.'; return o;
+  }
+  if (to === 'U'){
+    o.head = 'Start the infusion when the next dose would be due';
+    o.steps = ['Stop ' + SWN[from].toLowerCase() + '.', 'Start the heparin infusion at the time the next dose would have been due.', 'A bolus is usually left out (expert practice).'];
+    o.more.push('A factor Xa inhibitor still on board raises the anti-Xa level, so early heparin anti-Xa results can read falsely high (expert practice).');
+    o.why = WHYNEXT; o.src = from === 'L' ? 'expert practice' : {A: 'Eliquis label 2.5', R: 'Xarelto label 2.3', E: 'Savaysa label 2.4'}[from]; return o;
+  }
+  /* DOAC or LMWH to DOAC or LMWH */
+  if (to === 'R'){ o.head = 'Start rivaroxaban 0 to 2 hours before the next dose is due'; o.steps = ['Give rivaroxaban 0 to 2 hours before the next ' + SWN[from].toLowerCase() + ' dose would have been due.', 'Do not give that dose.']; o.src = 'Xarelto label 2.3'; }
+  else { o.head = 'Start ' + SWN[to].toLowerCase() + ' when the next dose is due'; o.steps = ['Stop ' + SWN[from].toLowerCase() + '.', 'Give ' + SWN[to].toLowerCase() + ' at the time the next dose would have been due.'];
+    o.src = to === 'A' ? 'Eliquis label 2.5' : to === 'E' ? 'Savaysa label 2.4' : to === 'D' ? {A: 'Eliquis label 2.5', R: 'Xarelto label 2.3', E: 'Savaysa label 2.4'}[from] + '; the Pradaxa label is silent on this pair' : {A: 'Eliquis label 2.5', R: 'Xarelto label 2.3', D: 'expert practice', E: 'Savaysa label 2.4'}[from]; }
+  if (to === 'A' || to === 'R') o.more.push('Mid-course switch: carry on with the dose the patient has reached. The 7-day or 21-day starting dose is for the first days of treatment, not for every switch (expert practice).');
+  o.why = WHYNEXT; return o;
+}
+
+/* Figures. Drawn for this site; data shared with the engine above. */
+var FS = 'font-family:var(--sans)', FM = 'font-family:var(--mono)';
+function svgOpen(vb, label){ return '<svg viewBox="' + vb + '" role="img" aria-label="' + label + '" class="fig">'; }
+function tx(x, y, t, o){ o = o || {}; return '<text x="' + x + '" y="' + y + '" text-anchor="' + (o.a || 'middle') + '" style="' + (o.sans ? FS : FM) + ';font-size:' + (o.s || 11) + 'px;font-weight:' + (o.w || 400) + ';fill:' + (o.c || 'var(--ink)') + '">' + t + '</text>'; }
+function bx(x, y, w, h, t1, t2, st){
+  var fill = st === 'hot' ? 'var(--warnbg)' : st === 'on' ? 'var(--card)' : 'var(--fill)', stroke = st === 'hot' ? 'var(--warn)' : st === 'on' ? 'var(--accent)' : 'var(--line)';
+  return '<g' + (st === 'dim' ? ' opacity=".4"' : '') + '><rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="10" fill="' + fill + '" stroke="' + stroke + '"' + (st === 'hot' || st === 'on' ? ' stroke-width="2"' : '') + '/>' +
+    tx(x + w / 2, y + (t2 ? h / 2 - 2 : h / 2 + 4), t1, {sans: 1, s: 12, w: 600}) + (t2 ? tx(x + w / 2, y + h / 2 + 12, t2, {s: 10, c: 'var(--muted)'}) : '') + '</g>';
+}
+function mk(p){ return '<defs>' + [['n','var(--muted)'],['u','var(--warn)'],['x','var(--bad)'],['a','var(--accent)']].map(function(k){ return '<marker id="' + p + k[0] + '" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="' + k[1] + '"/></marker>'; }).join('') + '</defs>'; }
+function ar(d, k, p, w){ var c = k === 'u' ? 'var(--warn)' : k === 'x' ? 'var(--bad)' : k === 'a' ? 'var(--accent)' : 'var(--muted)'; return '<path d="' + d + '" fill="none" stroke="' + c + '" stroke-width="' + (w || (k === 'n' ? 2 : 3)) + '"' + (k === 'x' ? ' stroke-dasharray="5 4"' : '') + ' marker-end="url(#' + p + k + ')"/>'; }
+function blockMark(x, y){ return '<path d="M' + (x - 7) + ' ' + (y - 7) + 'L' + (x + 7) + ' ' + (y + 7) + 'M' + (x + 7) + ' ' + (y - 7) + 'L' + (x - 7) + ' ' + (y + 7) + '" stroke="var(--bad)" stroke-width="3" stroke-linecap="round"/>'; }
+
+var PHASES = {
+  apix: {n: 'Apixaban', b: [['10 mg','twice daily, 7 d'],['5 mg','twice daily'],['2.5 mg','twice daily']], line: 'One drug from the first dose. The double dose for 7 days stands in for the heparin lead-in. The 2.5 mg dose is for those who continue past 6 months.'},
+  riva: {n: 'Rivaroxaban', b: [['15 mg','twice daily, 21 d'],['20 mg','daily, with food'],['10 mg','once daily']], line: 'One drug from the first dose. The twice-daily start lasts 21 days, three times as long as apixaban\'s. The 10 mg dose is for those who continue past 6 months.'},
+  hep: {n: 'Dabigatran or edoxaban', b: [['Injectable','5–10 days'],['Then the tablet','full dose'],['Same tablet','if continuing']], line: 'Two drugs in sequence: LMWH or heparin, then dabigatran 150 mg twice daily or edoxaban 60 mg daily. Their trials gave heparin first (a median of 9 days before dabigatran, 7 before edoxaban), so that is how they are licensed.'},
+  warf: {n: 'Warfarin', b: [['LMWH + warfarin','5 days or more'],['warfarin','INR 2.0–3.0'],['warfarin','INR 2.0–3.0']], line: 'Two drugs overlapping. The injectable covers the days warfarin needs to take effect.'}
+};
+function phasesSVG(k){
+  var s = PHASES[k], h = svgOpen('0 0 340 150', 'Treatment phases: ' + s.n);
+  var xs = [6, 118, 230], names = ['Start', 'To 3–6 months', 'Extended'];
+  h += '<path d="M10 30H330" stroke="var(--line)" stroke-width="2"/>';
+  xs.forEach(function(x, n){ h += '<circle cx="' + (x + 52) + '" cy="30" r="5" fill="' + (n === 0 ? 'var(--accent)' : 'var(--card)') + '" stroke="var(--accent)" stroke-width="2"/>' + tx(x + 52, 16, names[n], {s: 10.5, c: 'var(--muted)'}) + bx(x, 48, 104, 60, s.b[n][0], s.b[n][1], n === 0 ? 'on' : null); });
+  h += tx(170, 132, 'the first weeks carry the highest risk of recurrence', {s: 10, c: 'var(--muted)'});
+  return h + '</svg>';
+}
+var CASC = {
+  none: {n: 'No drug', line: 'Factor Xa turns prothrombin into thrombin; thrombin turns fibrinogen into fibrin. Antithrombin is the natural brake on both.'},
+  ufh: {n: 'Heparin', at: 1, xa: 1, iia: 1, line: 'Heparin makes antithrombin far more active. It shuts down both factor Xa and thrombin, with an anti-Xa to anti-IIa ratio near 1.'},
+  lmwh: {n: 'LMWH', at: 1, xa: 1, iia: 0.3, line: 'Shorter chains: mostly factor Xa, little thrombin. For enoxaparin the anti-Xa to anti-IIa ratio is about 14.'},
+  fonda: {n: 'Fondaparinux', at: 1, xa: 1, line: 'Works only through antithrombin and only on factor Xa. It does not inactivate thrombin.'},
+  xa: {n: 'Apixaban, rivaroxaban, edoxaban', dxa: 1, line: 'They block factor Xa directly. No antithrombin is needed.'},
+  dabi: {n: 'Dabigatran', diia: 1, line: 'Blocks thrombin directly, both free and clot-bound.'},
+  warf: {n: 'Warfarin', liver: 1, line: 'Works upstream, in the liver: fewer working copies of factors II, VII, IX and X, and of the natural anticoagulants protein C and S.'}
+};
+function cascSVG(k, p){
+  var s = CASC[k], h = svgOpen('0 0 340 270', 'Coagulation cascade: ' + s.n) + mk(p);
+  h += ar('M110 40V74', 'n', p) + ar('M110 118V152', 'n', p) + ar('M110 196V226', 'n', p);
+  h += bx(40, 6, 140, 34, 'Factors VII, IX', 'start the cascade', s.liver ? 'dim' : null);
+  h += bx(40, 78, 140, 40, 'Factor Xa', 'makes thrombin', s.liver ? 'dim' : null) + bx(40, 156, 140, 40, 'Thrombin (IIa)', 'makes fibrin', s.liver ? 'dim' : null) + bx(40, 230, 140, 34, 'Fibrin clot', null, null);
+  h += bx(232, 112, 100, 44, 'Antithrombin', s.at ? 'switched on' : 'natural brake', s.at ? 'hot' : null);
+  h += '<path d="M232 126L186 104" fill="none" stroke="' + (s.xa ? 'var(--bad)' : 'var(--line)') + '" stroke-width="' + (s.xa ? 4 : 1.5) + '"/><path d="M232 142L186 170" fill="none" stroke="' + (s.iia ? 'var(--bad)' : 'var(--line)') + '" stroke-width="' + (s.iia ? (s.iia < 1 ? 1.5 : 4) : 1.5) + '"' + (s.iia && s.iia < 1 ? ' stroke-dasharray="4 4"' : '') + '/>';
+  if (s.xa) h += blockMark(184, 100);
+  if (s.iia === 1) h += blockMark(184, 174);
+  if (s.dxa) h += blockMark(22, 98) + tx(22, 126, 'drug', {s: 10, c: 'var(--bad)', w: 700});
+  if (s.diia) h += blockMark(22, 176) + tx(22, 204, 'drug', {s: 10, c: 'var(--bad)', w: 700});
+  if (s.liver) h += bx(214, 8, 118, 44, 'Liver', 'makes fewer factors', 'hot') + ar('M214 26H186', 'x', p);
+  return h + '</svg>';
+}
+var BRIDGE = {
+  d0: {n: 'Before', t: 0, line: 'Six vitamin K-dependent proteins: four that clot and two, protein C and S, that hold clotting back.'},
+  d1: {n: 'Day 1–2', t: 30, line: 'Factor VII and protein C go first. The INR, which mostly reads factor VII, climbs, but factors X and II are still there: not yet protected, and a natural brake is already down.'},
+  d5: {n: 'Day 5 and on', t: 120, line: 'Now factors X and II are low and the patient is truly anticoagulated. That is why the injectable runs at least 5 days and until the INR is in range.'}
+};
+var HALF = [['Factor VII', 5, '4–6 h', 0], ['Protein C', 8, '8 h', 1], ['Factor IX', 24, '24 h', 0], ['Protein S', 30, '30 h', 1], ['Factor X', 60, '48–72 h', 0], ['Factor II', 60, '60 h', 0]];
+function bridgeSVG(k){
+  var s = BRIDGE[k], h = svgOpen('0 0 340 228', 'Warfarin and clotting factor levels: ' + s.n);
+  HALF.forEach(function(f, n){ var y = 10 + n * 32, frac = Math.pow(0.5, s.t / f[1]), w = Math.max(3, 150 * frac);
+    h += tx(4, y + 15, f[0], {a: 'start', sans: 1, s: 12, w: 600}) + tx(4, y + 27, 'half-life ' + f[2], {a: 'start', s: 9.5, c: 'var(--muted)'});
+    h += '<rect x="110" y="' + (y + 4) + '" width="150" height="16" rx="4" fill="var(--fill)"/><rect x="110" y="' + (y + 4) + '" width="' + w + '" height="16" rx="4" fill="' + (f[3] ? 'var(--ok)' : 'var(--accent)') + '"/>' + tx(268, y + 16, Math.round(frac * 100) + '%', {a: 'start', s: 11}); });
+  h += tx(170, 221, 'schematic: as if synthesis stopped completely', {s: 9.5, c: 'var(--muted)'});
+  return h + '</svg><div class="key" style="display:flex;gap:12px;font-size:12px;color:var(--muted);margin-top:4px"><span><i style="display:inline-block;width:8px;height:8px;border-radius:2px;background:var(--accent);margin-right:4px"></i>clotting factor</span><span><i style="display:inline-block;width:8px;height:8px;border-radius:2px;background:var(--ok);margin-right:4px"></i>natural anticoagulant</span></div>';
+}
+var RV = {
+  ok: {n: 'Categories A–B', hot: [], line: 'The clot is there, but the right ventricle pumps past it without strain. The danger is another clot, not this one.'},
+  c: {n: 'Category C', hot: [0, 1], line: 'Afterload is up and the right ventricle is dilating or leaking troponin, but output and blood pressure hold.'},
+  d: {n: 'Category D', hot: [0, 1, 2, 3], line: 'Output is falling. Pressure dips briefly, or holds while lactate rises: shock with a normal blood pressure.'},
+  e: {n: 'Category E', hot: [0, 1, 2, 3, 4, 5], line: 'Low pressure starves the right ventricle\'s own coronary supply, which weakens it further. The loop feeds itself.'},
+  lysis: {n: 'Reperfusion', hot: [], open: 1, line: 'Dissolving or removing the clot drops afterload, the first box, and every step after it recovers.'}
+};
+var RVBOX = [[120, 4, 'RV afterload ↑', 'clot in the way'], [232, 62, 'RV dilates', 'wall tension ↑'], [232, 150, 'RV output ↓', 'ischemic, weak'], [120, 208, 'LV preload ↓', 'output falls'], [8, 150, 'Blood pressure ↓', ''], [8, 62, 'RV perfusion ↓', 'coronary flow ↓']];
+function rvSVG(k, p){
+  var s = RV[k], h = svgOpen('0 0 340 256', 'Right ventricular failure in pulmonary embolism: ' + s.n) + mk(p);
+  var paths = ['M222 30L258 58', 'M282 108V146', 'M258 196L224 220', 'M118 220L82 196', 'M58 146V108', 'M82 58L118 30'];
+  paths.forEach(function(d, n){ var on = s.hot.indexOf(n) >= 0 && s.hot.indexOf((n + 1) % 6) >= 0; h += ar(d, on ? 'u' : 'n', p, on ? 3 : 1.5); });
+  RVBOX.forEach(function(b, n){ h += bx(b[0], b[1], 100, 44, b[2], b[3], s.hot.indexOf(n) >= 0 ? 'hot' : (n === 0 && s.open ? 'on' : null)); });
+  h += tx(170, 124, s.open ? 'clot removed' : k === 'e' ? 'self-feeding loop' : k === 'ok' ? 'RV coping' : '', {sans: 1, s: 12, w: 700, c: s.open ? 'var(--accent)' : k === 'e' ? 'var(--warn)' : 'var(--muted)'});
+  if (s.open) h += blockMark(170, 26);
+  return h + '</svg>';
+}
+function catsSVG(k){
+  var L = k.charAt(0), rows = [['A','Subclinical'],['B','Symptomatic, low score'],['C','Raised score'],['D','Failure starting'],['E','Cardiopulmonary failure']];
+  var h = svgOpen('0 0 340 190', 'Acute PE clinical category ' + k);
+  rows.forEach(function(r, n){ var y = 150 - n * 36, on = r[0] === L, w = 150 + n * 44;
+    h += '<rect x="6" y="' + y + '" width="' + w + '" height="30" rx="8" fill="' + (on ? 'var(--warnbg)' : 'var(--fill)') + '" stroke="' + (on ? 'var(--warn)' : 'var(--line)') + '"' + (on ? ' stroke-width="2"' : '') + '/>' + tx(20, y + 20, r[0], {a: 'start', s: 14, w: 700}) + tx(40, y + 20, r[1], {a: 'start', sans: 1, s: 12, w: on ? 700 : 400}); });
+  return h + '</svg>';
+}
+function catsExtra(k){ var c = CATS[k]; return '<p class="line1"><b>' + k + ' · ' + c.t + '.</b> ' + c.def + '</p><p class="line1">' + c.disp + '</p>'; }
+var CATFIG = {}; CATORDER.forEach(function(k){ CATFIG[k] = {n: k, line: CATS[k].adv}; });
+var RECUR = {
+  major: {n: 'After surgery', v: 0, line: 'About 3% recur within 5 years of stopping. The trigger is gone, so 3 months is enough.'},
+  minor: {n: 'Nonsurgical trigger', v: 1, line: 'About 15% recur within 5 years: estrogen, a medical admission, a leg injury. The grey zone, hence a shared decision for the minor ones.'},
+  unprov: {n: 'No trigger', v: 2, line: 'About 30% recur within 5 years of stopping. Active cancer is higher still, about 15% each year.'}
+};
+function recurSVG(k){
+  var s = RECUR[k], vals = [['After surgery', 3], ['Nonsurgical trigger', 15], ['Unprovoked', 30]], h = svgOpen('0 0 340 170', 'Recurrence within 5 years of stopping anticoagulation');
+  vals.forEach(function(v, n){ var x = 30 + n * 104, bh = v[1] * 3.6, on = n === s.v;
+    h += '<rect x="' + x + '" y="' + (130 - bh) + '" width="72" height="' + bh + '" rx="6" fill="' + (on ? 'var(--accent)' : 'var(--line)') + '"/>' + tx(x + 36, 122 - bh, v[1] + '%', {s: 14, w: 700}) + tx(x + 36, 148, v[0], {sans: 1, s: 11.5, w: on ? 700 : 400}); });
+  h += '<path d="M20 130H320" stroke="var(--muted)"/>' + tx(170, 166, 'recurrence within 5 years of stopping', {s: 10, c: 'var(--muted)'});
+  return h + '</svg>';
+}
+var FIGS = {
+  phases: {t: 'The three phases', states: ['apix','riva','hep','warf'], data: PHASES, svg: phasesSVG},
+  cascade: {t: 'Where each drug acts', states: ['none','ufh','lmwh','fonda','xa','dabi','warf'], data: CASC, svg: cascSVG},
+  bridge: {t: 'Why warfarin needs a bridge', states: ['d0','d1','d5'], data: BRIDGE, svg: bridgeSVG},
+  rv: {t: 'The right ventricle in PE', states: ['ok','c','d','e','lysis'], data: RV, svg: rvSVG},
+  cats: {t: 'PE categories A to E', states: CATORDER, data: CATFIG, svg: catsSVG, extra: catsExtra},
+  recur: {t: 'Risk after stopping', states: ['major','minor','unprov'], data: RECUR, svg: recurSVG}
+};
+var TRIALS = [
+  {q: 'Can apixaban alone replace enoxaparin and warfarin?', d: 'AMPLIFY: double-blind, 5395 patients with acute VTE; apixaban 10 mg twice daily for 7 days then 5 mg twice daily, against enoxaparin then warfarin, for 6 months.', r: 'Recurrent VTE or VTE death 2.3% vs 2.7% (RR 0.84, 95% CI 0.60–1.18; non-inferior). Major bleeding 0.6% vs 1.8% (RR 0.31, 0.17–0.55).', c: 'Made a single oral drug, with no injections, a standard start.', cite: 'Agnelli G et al. N Engl J Med 2013;369:799', doi: '10.1056/NEJMoa1302507'},
+  {q: 'Does the same hold for rivaroxaban in pulmonary embolism?', d: 'EINSTEIN-PE: open-label, 4832 patients with PE; rivaroxaban 15 mg twice daily for 3 weeks then 20 mg daily, against enoxaparin then a vitamin K antagonist.', r: 'Recurrent VTE 2.1% vs 1.8% (HR 1.12, 0.75–1.68; non-inferior). Major bleeding 1.1% vs 2.2% (HR 0.49, 0.31–0.79); major or clinically relevant bleeding 10.3% vs 11.4%, not different.', c: 'Extended the single-drug approach to PE. Open label.', cite: 'EINSTEIN-PE Investigators. N Engl J Med 2012;366:1287', doi: '10.1056/NEJMoa1113572'},
+  {q: 'After 6 to 12 months, is a lower dose enough?', d: 'AMPLIFY-EXT: double-blind, 2486 patients who had finished 6 to 12 months of treatment and in whom continuing was uncertain; apixaban 2.5 mg or 5 mg twice daily, or placebo, for 12 months.', r: 'Recurrent VTE or VTE death 1.7% and 1.7% vs 8.8% with placebo. Major bleeding 0.2%, 0.1% and 0.5%.', c: 'Basis of the 2.5 mg dose for long-term prevention. Not powered to compare the two doses with each other.', cite: 'Agnelli G et al. N Engl J Med 2013;368:699', doi: '10.1056/NEJMoa1207541'},
+  {q: 'Is the lower dose still enough in high-risk patients?', d: 'RENOVE: open-label with blinded endpoints, 2768 patients needing extended treatment after 6 to 24 months of full dose; apixaban 2.5 mg twice daily or rivaroxaban 10 mg daily against full dose; median 37 months.', r: 'Recurrent VTE at 5 years 2.2% vs 1.8% (HR 1.32, 0.67–2.60): non-inferiority not shown. Major or clinically relevant bleeding 9.9% vs 15.2% (HR 0.61, 0.48–0.79).', c: 'Few recurrences in either arm (34 in total) and clearly less bleeding. The 2026 AHA/ACC guideline cites it in recommending the reduced dose.', cite: 'Couturaud F et al. Lancet 2025;405:725', doi: '10.1016/S0140-6736(24)02842-3'},
+  {q: 'Can a DOAC replace LMWH in cancer?', d: 'Caravaggio: open-label, 1155 patients with cancer and proximal DVT or PE; apixaban against dalteparin for 6 months.', r: 'Recurrent VTE 5.6% vs 7.9% (HR 0.63, 0.37–1.07; non-inferior). Major bleeding 3.8% vs 4.0% (HR 0.82, 0.40–1.69).', c: 'With the edoxaban and rivaroxaban cancer trials, moved cancer-associated clots from injections to tablets.', cite: 'Agnelli G et al. N Engl J Med 2020;382:1599', doi: '10.1056/NEJMoa1915103'},
+  {q: 'In cancer, can the dose come down after 6 months?', d: 'API-CAT: double-blind, 1766 patients with active cancer after at least 6 months of anticoagulation; apixaban 2.5 mg against 5 mg twice daily for 12 months.', r: 'Recurrent VTE 2.1% vs 2.8% (subhazard ratio 0.76, 0.41–1.41; non-inferior). Clinically relevant bleeding 12.1% vs 15.6% (0.75, 0.58–0.97).', c: 'Supports a reduced dose for extended treatment in cancer. Newer than the ASCO 2023 guideline.', cite: 'Mahé I et al. N Engl J Med 2025;392:1363', doi: '10.1056/NEJMoa2416112'},
+  {q: 'Are DOACs safe in antiphospholipid syndrome?', d: 'TRAPS: open-label, 120 patients with triple-positive antiphospholipid syndrome and prior thrombosis; rivaroxaban 20 mg daily against warfarin, INR target 2.5.', r: 'Stopped early. Thrombosis, major bleeding or vascular death: 19% vs 3%. All 7 thromboembolic events were on rivaroxaban and arterial (4 strokes, 3 heart attacks); none on warfarin.', c: 'The reason warfarin remains the drug for antiphospholipid syndrome. Small and open label, but the signal was arterial and one-sided.', cite: 'Pengo V et al. Blood 2018;132:1365', doi: '10.1182/blood-2018-04-848333'},
+  {q: 'Should a strained right ventricle be thrombolysed before it fails?', d: 'PEITHO: double-blind, 1006 normotensive patients with RV dysfunction and a positive troponin; tenecteplase plus heparin against heparin alone.', r: 'Death or hemodynamic decompensation by day 7: 2.6% vs 5.6% (OR 0.44, 0.23–0.87). Extracranial major bleeding 6.3% vs 1.2%; stroke 2.4% vs 0.2%. Death by day 30: 2.4% vs 3.2%, not different.', c: 'Why systemic thrombolysis is not given up front in category C: it prevents collapse, which can be rescued, at the price of bleeding into the brain.', cite: 'Meyer G et al. N Engl J Med 2014;370:1402', doi: '10.1056/NEJMoa1302097'},
+  {q: 'Does catheter-directed lysis do better in the same patients?', d: 'HI-PEITHO: 544 patients with RV strain, a raised troponin and at least two warning vital signs; ultrasound-facilitated catheter-directed alteplase plus anticoagulation against anticoagulation alone. Endpoints adjudicated blind.', r: 'PE death, cardiorespiratory collapse or recurrent PE within 7 days: 4.0% vs 10.3% (RR 0.39, 0.20–0.77). Major bleeding at 7 days 4.1% vs 2.2% (P = 0.32); no intracranial bleeding.', c: 'Published after the 2026 guideline, which still rates catheter therapy as uncertain (2b) in category C3. Driven by less decompensation, not fewer deaths; industry funded.', cite: 'Rosenfield K et al. N Engl J Med 2026;394:1979', doi: '10.1056/NEJMoa2516567'}
+];
+</script>
+
+<script>
+(function(){
+var $ = function(id){ return document.getElementById(id); };
+function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+var CLOTS = [['pe','Pulmonary embolism'],['dvt','Proximal DVT'],['distal','Calf DVT']];
+var PROVS = [['major','Surgery or hospital stay'],['minor','Minor trigger'],['none','Nothing found'],['pers','Ongoing risk factor']];
+var PROVNOTE = {major: 'Surgery over 30 minutes, 3 or more days in a hospital bed, cesarean.', minor: 'Estrogen, pregnancy, short admission, minor surgery, leg injury, long travel.', none: 'No trigger in the last 3 months.', pers: 'For example inflammatory bowel disease or active autoimmune disease. Cancer and antiphospholipid syndrome are ticked above.'};
+var CT = {
+  pe: [['incidental','Found by chance, no symptoms'],['subseg','Subsegmental only'],['cardio','Chronic heart or lung disease'],['rv','RV enlarged or weak (echo or CT)'],['bio','Troponin or BNP raised'],['o2','Low oxygen, fast breathing or on oxygen'],['thypo','Brief hypotension, now resolved'],['perf','Poor perfusion (lactate above 2, AKI, confusion)'],['shock','Persistent hypotension or shock'],['arrest','Refractory shock or arrest']],
+  dvt: [], distal: [['sev','Severe symptoms or risk of extension']]
+};
+var PT = [['cancer','Active cancer'],['gi','Luminal GI cancer'],['preg','Pregnant'],['bf','Breastfeeding'],['aps','Antiphospholipid syndrome'],['cpB','Child-Pugh B'],['cpC','Child-Pugh C'],['inh','Strong CYP3A4 + P-gp inhibitor'],['ind','Rifampin, phenytoin, carbamazepine'],['bari','Bariatric surgery under 4 weeks ago'],['nobleed','Cannot anticoagulate (bleeding)']];
+var st = {clot: null, prov: null, t: {}};
+var NUMS = ['wt','crcl','age','hr','sbp','spo2'];
+function read(){
+  var i = {clot: st.clot, prov: st.prov};
+  NUMS.forEach(function(k){ var v = parseFloat($(k).value); i[k] = isFinite(v) && v >= 0 ? v : null; });
+  if (i.clot !== 'pe'){ i.hr = i.sbp = i.spo2 = null; }
+  var allowed = PT.map(function(t){ return t[0]; }).concat((CT[st.clot] || []).map(function(t){ return t[0]; }));
+  allowed.forEach(function(k){ if (st.t[k]) i[k] = true; });
+  return i;
+}
+function seg(host, list, cur){ host.innerHTML = list.map(function(c){ return '<button class="sbtn" data-v="' + c[0] + '" aria-pressed="' + (c[0] === cur) + '">' + c[1] + '</button>'; }).join(''); }
+function ticks(host, list){ host.innerHTML = list.map(function(t){ return '<label class="chk"><input type="checkbox" data-k="' + t[0] + '"' + (st.t[t[0]] ? ' checked' : '') + '>' + t[1] + '</label>'; }).join(''); host.style.display = list.length ? '' : 'none'; }
+function drawInputs(){
+  seg($('clotseg'), CLOTS, st.clot); seg($('provseg'), PROVS, st.prov);
+  ticks($('clotticks'), CT[st.clot] || []); ticks($('ptticks'), PT);
+  $('clot').classList.toggle('is-pe', st.clot === 'pe');
+  $('provnote').textContent = st.prov ? PROVNOTE[st.prov] : '';
+}
+$('clotseg').addEventListener('click', function(e){ var v = e.target.getAttribute('data-v'); if (v){ st.clot = v; drawInputs(); render(); } });
+$('provseg').addEventListener('click', function(e){ var v = e.target.getAttribute('data-v'); if (v){ st.prov = st.prov === v ? null : v; drawInputs(); render(); } });
+['clotticks','ptticks'].forEach(function(id){ $(id).addEventListener('change', function(e){ var k = e.target.getAttribute('data-k'); if (k){ st.t[k] = e.target.checked; render(); } }); });
+NUMS.forEach(function(k){ $(k).addEventListener('input', render); });
+
+function steps(list){ return '<div class="tl">' + list.map(function(s){ return '<div class="st' + (s.now ? ' now' : '') + '"><span class="when">' + esc(s.when) + '</span><b>' + esc(s.name) + '</b>' + (s.dose ? '<span class="dose">' + esc(s.dose) + '</span>' : '') + (s.small ? '<small>' + esc(s.small) + '</small>' : '') + '</div>'; }).join('') + '</div>'; }
+function guards(list){ return (list || []).map(function(g){ return '<div class="guard">' + esc(g) + '</div>'; }).join(''); }
+function tiers(list){ return (list || []).map(function(t){ return '<span class="tier">' + esc(t) + '</span>'; }).join(''); }
+function paras(list){ return (list || []).map(function(m){ return '<p>' + esc(m) + '</p>'; }).join(''); }
+function peCard(p){
+  if (!p.cat) return '<div class="card" id="severity"><p class="label">How sick</p><p class="head">Enter ' + esc(p.need.join(', ')) + '</p><p class="sub">The sPESI score needs them. Tick any signs of right heart strain or shock as well.</p></div>';
+    var h = '<div class="card" id="severity"><p class="label">How sick · AHA/ACC 2026 category</p><p class="head' + (p.letter === 'E' ? ' bad' : p.letter === 'A' || p.letter === 'B' ? ' okc' : '') + '">Category ' + p.label + ' · ' + esc(p.title) + '</p>';
+  h += '<p class="sub mono">sPESI ' + p.s.score + (p.s.items.length ? ' (' + esc(p.s.items.join(', ')) + ')' : '') + (p.s.miss.length ? ' · not entered: ' + esc(p.s.miss.join(', ')) : '') + '</p>';
+  var list = [{when: 'Where', now: true, name: p.disp}, {when: 'Beyond anticoagulation', name: p.adv}];
+  if (p.lysis) list.push({when: 'If systemic thrombolysis is chosen', name: 'Alteplase 100 mg IV over 2 hours', small: 'Restart the injectable anticoagulant near the end of or after the infusion, once the aPTT is twice normal or less (label). A lower dose may be considered to reduce bleeding (2b, C-LD).'});
+  h += steps(list) + guards(p.guards);
+  h += '<p class="whyline"><b>Why:</b> ' + esc(p.why) + '</p>';
+  h += '<div class="chips">' + chip('rv', p.fig) + chip('cats', p.cat) + '</div>';
+  h += '<details><summary>More</summary><p><b>This category:</b> ' + esc(p.def) + '</p>' +
+    ('CDE'.indexOf(p.letter) >= 0 ? '<p><b>R</b> is added for respiratory compromise: in category C, low oxygen, fast breathing or any need for oxygen; in D, more than 6 L/min by nasal cannula or a non-rebreather; in E, positive-pressure ventilation. This tool adds it only in category C; add it yourself in D or E when those thresholds are met.</p>' : '') +
+    '<p>Unticked boxes are read as normal. In category C a troponin or BNP (1, B-NR) and imaging of the right ventricle (1, A) are recommended, so the subcategory is only as good as those tests. The most severe finding sets the category, and it is reassessed as the patient changes.</p>' +
+    '<p>An abnormal right ventricle on echo includes an RV/LV ratio above 0.9 or TAPSE below 1.6 cm; on CT, an RV/LV ratio of 1.0 or more. Troponin and BNP use your lab\'s cutoffs.</p>' +
+    '<p>sPESI gives one point each for age over 80, cancer, chronic heart or lung disease, heart rate 110 or more, systolic BP below 100, and SpO2 below 90%. A score of 0 carried a 30-day mortality of 1.0%, against 10.9% for 1 or more.</p>' +
+    (p.letter === 'A' || p.letter === 'B' ? '<p>Before sending home, run the Hestia rule: any of hemodynamic instability, need for thrombolysis or embolectomy, active bleeding or high bleeding risk, more than 24 hours of oxygen, PE while already anticoagulated, pain needing IV analgesia, a medical or social reason to stay, CrCl below 30, severe liver impairment, pregnancy, or prior heparin-induced thrombocytopenia favors admission.</p>' : '') +
+    (p.letter === 'E' ? '<p>In cardiac arrest the ESC 2019 guideline lists alteplase 0.6 mg/kg over 15 minutes (maximum 50 mg); this accelerated regimen is not an approved dose.</p>' : '') +
+    (p.lysis ? '<p>Check the contraindications to thrombolysis before giving it. For catheter-directed lysis, less than 5 mg of alteplase per pulmonary artery is not recommended over 5 to 10 mg (3: No Benefit).</p>' : '') +
+    tiers(['AHA/ACC 2026 PE guideline', 'sPESI: Jiménez 2010', 'alteplase: Activase label']) + '</details>';
+  return h + '</div>';
+}
+function agentCard(o){
+  var h = '<div class="card" id="agent"><p class="label">' + (o.watch ? 'If you anticoagulate · agent and dose' : 'Anticoagulant · agent and dose') + '</p><h2>' + esc(o.picks.map(function(r){ return r.name; }).join(' or ')) + '</h2>' + steps(o.steps) + guards(o.guards);
+  h += '<p class="whyline"><b>Why:</b> ' + esc(o.agWhy) + '</p>';
+  var f = o.feats;
+  h += '<div class="chips">' + chip('cascade', f.aps || f.bf ? 'warf' : o.picks[0].a === 'lmwh' ? 'lmwh' : o.picks[0].a === 'ufh' ? 'ufh' : o.picks[0].a === 'warf' ? 'warf' : 'xa') + (PHASES[o.picks[0].a] ? chip('phases', o.picks[0].a) : '') + (o.picks.some(function(r){ return r.a === 'warf'; }) ? chip('bridge', 'd1') : '') + '</div>';
+  var more = '';
+  if (o.avoid.length) more += '<p><b>Avoid:</b></p><ul>' + o.avoid.map(function(r){ return '<li>' + esc(r.name) + ': ' + esc(r.why) + '</li>'; }).join('') + '</ul>';
+  if (o.caution.length) more += '<p><b>Caution or changed dose:</b></p><ul>' + o.caution.map(function(r){ return '<li>' + esc(r.name) + ': ' + esc(r.why) + '</li>'; }).join('') + '</ul>';
+  more += paras(o.agMore);
+  h += '<div class="row"><button class="btn ghost" data-fit="' + esc(JSON.stringify(f)) + '">See every agent</button></div>';
+  return h + '<details><summary>More</summary>' + more + tiers(o.agTiers) + '</details></div>';
+}
+function durCard(d){
+  var h = '<div class="card" id="duration"><p class="label">How long</p><h2>' + esc(d.head) + '</h2><ul>' + d.steps.map(function(s){ return '<li>' + esc(s) + '</li>'; }).join('') + '</ul>';
+  if (d.why) h += '<p class="whyline"><b>Why:</b> ' + esc(d.why) + '</p>';
+  if (d.fig) h += '<div class="chips">' + chip('recur', d.fig) + '</div>';
+  if (d.more.length || d.tiers.length) h += '<details><summary>More</summary>' + paras(d.more) + tiers(d.tiers) + '</details>';
+  return h + '</div>';
+}
+function build(i){
+  var o = decide(i);
+  if (!i.clot) return {o: o, html: '<div class="card empty">Pick the clot to start. Then add weight, kidney function and anything that changes the choice of drug.</div>'};
+  var h = '';
+  if (o.pe){ o.pe.i = i; h += peCard(o.pe); }
+  if (o.filter) return {o: o, html: h + '<div class="card" id="agent"><p class="label">No anticoagulant for now</p><h2>' + esc(o.filter.head) + '</h2><p>' + esc(o.filter.text) + '</p><div class="guard">' + (i.clot === 'pe' ? 'A filter in a patient who can be anticoagulated does harm (3: Harm, A). It is for those who truly cannot.' : 'A filter on top of an anticoagulant is recommended against (CHEST rec 12, strong). It is for those who truly cannot be anticoagulated.') + '</div><p class="whyline"><b>Why:</b> A filter catches clot on its way to the lungs but treats nothing, and is itself a surface for new clot.</p><details><summary>More</summary><p>Recheck every day whether anticoagulation has become safe.</p>' + tiers([o.filter.tier]) + '</details></div>'};
+  if (o.watch) h += '<div class="card" id="watch"><p class="label">Treat or watch</p><h2>' + esc(o.watch.head) + '</h2><p>' + esc(o.watch.text) + '</p><details><summary>More</summary>' + (i.clot === 'distal' ? '<p>Features that favor treating a calf DVT: a positive D-dimer with no other reason, extensive clot (for example over 5 cm, several veins, over 7 mm across), clot close to the proximal veins, no reversible trigger, active cancer, prior VTE, inpatient status, marked symptoms, or a preference to avoid repeat scans.</p><p>If treated, use the same drug and dose as for a proximal DVT; the duration card below applies.</p>' : '<p>Incidental PE is otherwise treated like symptomatic PE (CHEST rec 4, weak).</p>') + tiers(['CHEST 2021', 'weak recommendations']) + '</details></div>';
+  h += agentCard(o) + durCard(o.dur);
+  return {o: o, html: h};
+}
+function render(){ $('out').innerHTML = build(read()).html; }
+
+/* Tabs */
+var tabs = [['t-tool','p-tool'],['t-ag','p-ag'],['t-learn','p-learn'],['t-prac','p-prac']];
+function show(t){ tabs.forEach(function(p){ var on = p[0] === t; $(p[0]).setAttribute('aria-selected', String(on)); $(p[1]).classList.toggle('on', on); }); }
+tabs.forEach(function(p){ $(p[0]).addEventListener('click', function(){ show(p[0]); }); });
+function fromHash(){ var id = location.hash.slice(1); if (!id) return; var el = $(id); if (!el) return; var pan = el.closest('.panel'); if (pan) tabs.forEach(function(p){ if (p[1] === pan.id) show(p[0]); }); el.scrollIntoView(); }
+window.addEventListener('hashchange', fromHash);
+
+/* Figures, sheet, chips */
+var ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M7 15l3-4 3 3 2-2 2 3"/></svg>';
+var figN = 0;
+function mountFig(host, id, state){
+  var F = FIGS[id], pre = 'f' + (++figN) + '-';
+  function draw(k){
+    var d = F.data[k];
+    host.innerHTML = '<div class="states" role="group" aria-label="' + esc(F.t) + '">' + F.states.map(function(x){ return '<button class="sbtn" data-k="' + x + '" aria-pressed="' + (x === k) + '">' + esc(F.data[x].n) + '</button>'; }).join('') + '</div>' + F.svg(k, pre) + (F.extra ? F.extra(k) : '') + '<p class="line1">' + esc(d.line) + '</p>';
+    var on = host.querySelector('[aria-pressed="true"]'), row = host.querySelector('.states');
+    if (on && row) row.scrollLeft = Math.max(0, on.offsetLeft - 60);
+  }
+  host.onclick = function(e){ var k = e.target.getAttribute && e.target.getAttribute('data-k'); if (k) draw(k); };
+  draw(state && F.data[state] ? state : F.states[0]);
+}
+function chip(fig, state, label){ return '<button class="chip" data-fig="' + fig + '" data-state="' + (state || '') + '">' + ICON + esc(label || FIGS[fig].t) + '</button>'; }
+var lastFocus = null;
+function openSheet(fig, state){
+  lastFocus = document.activeElement;
+  $('sheet-t').textContent = FIGS[fig].t;
+  mountFig($('sheet-b'), fig, state);
+  $('scrim').hidden = false; $('sheet').hidden = false; $('sheet').scrollTop = 0; $('sheet-x').focus();
+}
+function closeSheet(){ if ($('sheet').hidden) return; $('scrim').hidden = true; $('sheet').hidden = true; if (lastFocus && lastFocus.focus) lastFocus.focus(); }
+$('sheet-x').addEventListener('click', closeSheet); $('scrim').addEventListener('click', closeSheet);
+document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeSheet(); });
+document.addEventListener('click', function(e){
+  var c = e.target.closest && e.target.closest('[data-fig]'); if (c){ openSheet(c.getAttribute('data-fig'), c.getAttribute('data-state')); return; }
+  var n = e.target.closest && e.target.closest('[data-fit]'); if (n){ fitSel = JSON.parse(n.getAttribute('data-fit')); drawFit(); show('t-ag'); $('fit').scrollIntoView(); }
+});
+document.querySelectorAll('[data-figure]').forEach(function(h){ mountFig(h, h.getAttribute('data-figure'), h.getAttribute('data-state')); });
+
+/* Which agent fits: same table as the engine */
+var fitSel = {};
+function drawFit(){
+  $('fit-feats').innerHTML = FITORDER.map(function(f){ return '<button class="sbtn" data-f="' + f + '" aria-pressed="' + !!fitSel[f] + '">' + esc(FIT[f].n) + '</button>'; }).join('');
+  var rows = fit(fitSel), ord = {fav: 0, 'in': 1, less: 2, out: 3}, best = pick(rows, fitSel);
+  var sorted = rows.slice().sort(function(a, b){ return ord[a.st] - ord[b.st]; });
+  $('fit-agents').innerHTML = sorted.map(function(r){ return '<div class="cause ' + r.st + '"><span>' + esc(r.name) + '</span><small>' + esc(r.st === 'in' ? 'fits' : (r.st === 'fav' ? 'preferred: ' : r.st === 'less' ? 'caution: ' : 'avoid: ') + r.why) + '</small></div>'; }).join('');
+  $('fit-next').innerHTML = '<b>Fits best:</b> ' + esc(best.map(function(r){ return r.name; }).join(' or ')) + '.';
+}
+$('fit-feats').addEventListener('click', function(e){
+  var f = e.target.getAttribute('data-f'); if (!f) return;
+  if (fitSel[f]) delete fitSel[f]; else { fitSel[f] = 1; if (f === 'ckd4') delete fitSel.ckd5; if (f === 'ckd5') delete fitSel.ckd4; if (f === 'cpB') delete fitSel.cpC; if (f === 'cpC') delete fitSel.cpB; if (f === 'gi') delete fitSel.cancer; if (f === 'cancer') delete fitSel.gi; }
+  var left = $('fit-feats').scrollLeft; drawFit(); $('fit-feats').scrollLeft = left;
+});
+drawFit();
+
+/* Switching */
+['sw-from','sw-to'].forEach(function(id, n){ $(id).innerHTML = Object.keys(SWN).map(function(k){ return '<option value="' + k + '">' + SWN[k] + '</option>'; }).join(''); $(id).value = n ? 'A' : 'W'; });
+function num(id){ var v = parseFloat($(id).value); return isFinite(v) && v >= 0 ? v : null; }
+function swHTML(r){
+  if (!r.steps.length) return '<p class="head">' + esc(r.head) + '</p>';
+  return '<p class="head">' + esc(r.head) + '</p>' + (r.verdict ? '<p class="head ' + (r.ok ? 'okc' : '') + '">' + esc(r.verdict) + '</p>' : '') + '<ul>' + r.steps.map(function(s){ return '<li>' + esc(s) + '</li>'; }).join('') + '</ul><div class="guard">' + ('ARDE'.indexOf(r.from) >= 0 ? 'Stopping a DOAC without cover raises the risk of clots (boxed warning). Do not leave a gap.' : 'Do not leave a gap in anticoagulation during the switch.') + '</div><p class="whyline"><b>Why:</b> ' + esc(r.why) + '</p>' + (r.from === 'W' || r.toW ? '<div class="chips">' + chip('bridge', 'd1') + '</div>' : '') + '<details><summary>More</summary>' + paras(r.more) + '<p>Dose the new drug for kidney function, weight and interactions as if starting it fresh.</p>' + tiers([r.src]) + '</details>';
+}
+function drawSwitch(){ var f = $('sw-from').value, t = $('sw-to').value, r = switchRule(f, t, {inr: num('sw-inr'), crcl: num('sw-crcl')}); r.from = f; r.toW = t === 'W'; $('sw-out').innerHTML = swHTML(r); }
+['sw-from','sw-to'].forEach(function(id){ $(id).addEventListener('change', drawSwitch); });
+['sw-inr','sw-crcl'].forEach(function(id){ $(id).addEventListener('input', drawSwitch); });
+drawSwitch();
+
+/* Heparin calculator */
+$('hep-wt').addEventListener('input', function(){ var h = hepDose(num('hep-wt')); $('hep-out').innerHTML = h ? '<p class="head">Bolus ' + fmt(h.bolus) + ' units, then ' + fmt(h.rate) + ' units/h</p><p class="sub mono">80 units/kg, then 18 units/kg/h. Round to your hospital\'s protocol.</p>' : '<p class="head">80 units/kg bolus, then 18 units/kg/h</p>'; });
+
+/* Learn tab */
+(function(){
+  var chaps = [].slice.call(document.querySelectorAll('.chap'));
+  $('pills').innerHTML = chaps.map(function(c, n){ return '<button class="pill" data-go="' + c.id + '" aria-current="' + (n === 0) + '">' + (n + 1) + ' ' + esc(c.getAttribute('data-pill')) + '</button>'; }).join('');
+  $('pills').addEventListener('click', function(e){ var g = e.target.getAttribute('data-go'); if (g) $(g).scrollIntoView(); });
+  function mark(id){ [].forEach.call($('pills').children, function(b){ var on = b.getAttribute('data-go') === id; b.setAttribute('aria-current', String(on)); if (on) $('pills').scrollLeft = Math.max(0, b.offsetLeft - 60); }); }
+  if ('IntersectionObserver' in window){
+    var io = new IntersectionObserver(function(es){ es.forEach(function(en){ if (en.isIntersecting) mark(en.target.id); }); }, {rootMargin: '-30% 0px -60% 0px'});
+    chaps.forEach(function(c){ io.observe(c); });
+  }
+  $('trialbox').innerHTML = TRIALS.map(function(t){ return '<div class="trial" style="margin-top:14px"><p><b>' + esc(t.q) + '</b></p><p><span class="k">Design</span>' + esc(t.d) + '</p><p><span class="k">Result</span>' + esc(t.r) + '</p><p><span class="k">What it changed</span>' + esc(t.c) + '</p><p class="mono" style="font-size:13px"><a href="https://doi.org/' + t.doi + '" rel="noopener">' + esc(t.cite) + '</a></p></div>'; }).join('');
+  $('go-prac').addEventListener('click', function(){ show('t-prac'); window.scrollTo(0, 0); });
+  $('go-fit').addEventListener('click', function(){ show('t-ag'); $('fit').scrollIntoView(); });
+})();
+
+/* Practice: cases run through the same engine */
+var CASES = [
+  {t: 'Breathless two weeks after a hip replacement', s: 'Age 62, 80 kg, CrCl 85. Heart rate 96, BP 128/76, SpO2 95% on air. CT: segmental PE. Troponin normal, RV normal.', q: 'Where is she treated, with what, and for how long?', i: {clot:'pe', prov:'major', age:62, wt:80, crcl:85, hr:96, sbp:128, spo2:95}, p: 'sPESI 0 makes this category B: early discharge on a DOAC. Surgery was the trigger, so treatment stops at 3 months.'},
+  {t: 'Syncope, then a saddle embolus', s: 'Age 71, 90 kg, CrCl 60. Heart rate 118, BP 104/70, SpO2 89% on air. RV/LV ratio 1.3, troponin raised, lactate 1.4. No trigger found.', q: 'Thrombolysis now? Which anticoagulant first?', i: {clot:'pe', prov:'none', age:71, wt:90, crcl:60, hr:118, sbp:104, spo2:89, rv:true, bio:true, o2:true}, p: 'Raised score with both RV strain and a troponin leak: C3R. Systemic lysis is of uncertain benefit here; start LMWH, involve the response team, and watch for a falling pressure or rising lactate.'},
+  {t: 'Pressure 78 systolic and not coming up', s: 'Age 58, 100 kg. Heart rate 130, BP 78/50 on norepinephrine, SpO2 86%. Bedside echo: dilated RV.', q: 'What category, and what breaks the cycle?', i: {clot:'pe', age:58, wt:100, hr:130, sbp:78, spo2:86, rv:true, shock:true, o2:true}, p: 'Persistent hypotension with shock is category E1. Reperfusion is reasonable; alteplase 100 mg over 2 hours is the labelled dose. Keep fluids small and avoid intubation if you can.'},
+  {t: 'Leg swelling at 24 weeks of pregnancy', s: 'Age 31, 76 kg, CrCl 120. Ultrasound: femoral vein DVT.', q: 'Which drug, and why not a tablet?', i: {clot:'dvt', age:31, wt:76, crcl:120, preg:true}, p: 'LMWH. DOACs and warfarin are both avoided in pregnancy; LMWH does not cross the placenta.'},
+  {t: 'Stroke at 34, now a DVT', s: 'Age 36, 70 kg, CrCl 100. Lupus anticoagulant, anticardiolipin and beta-2 glycoprotein antibodies all positive twice. Proximal DVT, no trigger.', q: 'Her friend takes apixaban. Why not her?', i: {clot:'dvt', prov:'none', age:36, wt:70, crcl:100, aps:true}, p: 'Triple-positive antiphospholipid syndrome: warfarin with an LMWH bridge, long term. In TRAPS, rivaroxaban led to arterial events that warfarin prevented.'},
+  {t: 'Gastric cancer on chemotherapy', s: 'Age 66, 62 kg, CrCl 70. Proximal DVT. Unresected gastric adenocarcinoma.', q: 'Tablet or injection?', i: {clot:'dvt', age:66, wt:62, crcl:70, gi:true}, p: 'With a tumor in the gut wall, apixaban or LMWH are the preferred choices; rivaroxaban and edoxaban carry a caution here. Treat for at least 6 months.'},
+  {t: 'Dialysis patient with a popliteal DVT', s: 'Age 59, 84 kg, on hemodialysis. No trigger found.', q: 'What can and cannot be used?', i: {clot:'dvt', prov:'none', age:59, wt:84, crcl:8}, p: 'Dabigatran, rivaroxaban, edoxaban and fondaparinux are out. Warfarin with a heparin bridge is one option; the apixaban label allows it unchanged, but no trial enrolled dialysis patients.'},
+  {t: 'Calf vein clot after a long flight', s: 'Age 44, 78 kg, CrCl 95. One peroneal vein, 3 cm, mild ache. Flew 11 hours last week.', q: 'Does this need an anticoagulant at all?', i: {clot:'distal', prov:'minor', age:44, wt:78, crcl:95}, p: 'Without severe symptoms or risk factors for extension, weekly ultrasound for 2 weeks is a reasonable alternative to treatment. If treated: a DOAC for 3 months, then stop or continue by shared decision.'}
+];
+function rng(seed){ var a = seed >>> 0; return function(){ a |= 0; a = a + 0x6D2B79F5 | 0; var t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+(function(){
+  var d = new Date(); var rnd = rng(d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate());
+  var order = CASES.map(function(c, n){ return n; });
+  for (var k = order.length - 1; k > 0; k--){ var j = Math.floor(rnd() * (k + 1)); var t = order[k]; order[k] = order[j]; order[j] = t; }
+  $('practice').innerHTML = order.map(function(n, pos){ var c = CASES[n];
+    return '<div class="card case"><p class="label">Case ' + (pos + 1) + '</p><h2>' + esc(c.t) + '</h2><p>' + esc(c.s) + '</p><p><b>' + esc(c.q) + '</b></p><div class="row"><button class="btn" data-ans="' + n + '">Show the answer</button><button class="btn ghost" data-load="' + n + '">Open in the tool</button></div><div class="ans" id="ans' + n + '" hidden></div></div>';
+  }).join('');
+})();
+$('practice').addEventListener('click', function(e){
+  var a = e.target.getAttribute('data-ans'), l = e.target.getAttribute('data-load');
+  if (a != null){ var c = CASES[a]; var box = $('ans' + a); var b = build(c.i); box.innerHTML = '<p>' + esc(c.p) + '</p>' + b.html.replace(/ id="[^"]*"/g, ''); box.hidden = false; e.target.hidden = true; }
+  if (l != null){ var c2 = CASES[l]; NUMS.forEach(function(k){ $(k).value = c2.i[k] != null ? c2.i[k] : ''; }); st = {clot: c2.i.clot, prov: c2.i.prov || null, t: {}}; Object.keys(c2.i).forEach(function(k){ if (c2.i[k] === true) st.t[k] = true; }); drawInputs(); render(); show('t-tool'); window.scrollTo(0, 0); }
+});
+drawInputs(); render(); fromHash();
+})();
+</script>
+</body>
+</html>
