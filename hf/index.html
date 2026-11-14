@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Heart failure · bedside.tools</title>
+<meta name="description" content="Heart failure in hospital and clinic: first IV diuretic dose, response check, GDMT next step, HFpEF, devices, cardiogenic shock staging, and the physiology in diagrams.">
+<script src="/theme.js"></script>
+<style>
+
+:root{--bg:#FBFBFA;--card:#FFFFFF;--ink:#111113;--muted:#55555D;--line:#ECECEE;--accent:#2B4BDB;--warn:#9A3B00;--warnbg:#FFF6EC}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5}
+.mono{font-family:var(--mono)}
+.wrap{max-width:720px;margin:0 auto;padding:20px 16px 48px}
+a{color:var(--accent)}
+.back{font-size:14px;text-decoration:none;display:inline-block;min-height:44px;line-height:44px}
+h1{font-size:26px;margin:4px 0 4px;letter-spacing:-.01em}
+.purpose{color:var(--muted);margin:0 0 20px}
+.tabs{display:flex;gap:6px;margin-bottom:16px}
+.tab{flex:1;min-width:0;min-height:44px;border:1px solid var(--line);background:var(--card);border-radius:14px;padding:0 4px;font:inherit;font-size:15px;font-weight:600;color:var(--muted);cursor:pointer}
+.tab[aria-selected="true"]{border-color:var(--accent);color:var(--accent)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
+.label{font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+.grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.grid4{grid-template-columns:1fr 1fr}
+.field{display:flex;flex-direction:column;justify-content:flex-end}
+.field label{display:block;font-size:13px;color:var(--muted);margin-bottom:4px}
+.field input{width:100%;min-height:44px;border:1px solid var(--line);border-radius:10px;padding:8px 10px;font:inherit;font-family:var(--mono);background:var(--card);color:var(--ink)}
+.field input:focus,.tab:focus-visible,.chk:focus-within,button:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.checks{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.chk{display:flex;align-items:center;gap:10px;min-height:44px;border:1px solid var(--line);border-radius:10px;padding:6px 10px;font-size:14px;cursor:pointer}
+.chk input{width:20px;height:20px;accent-color:var(--accent);flex:none}
+.card h2{font-size:18px;margin:0 0 2px}
+.head{font-family:var(--mono);font-size:17px;font-weight:600;margin:6px 0 4px;overflow-wrap:anywhere}
+.head.bad{color:var(--bad)}.head.okc{color:var(--ok)}
+.sub{font-size:14px;color:var(--muted);margin:0}
+.card ul{margin:6px 0 0;padding-left:20px}
+.card li{margin-bottom:4px}
+.guard{border-left:3px solid var(--warn);background:var(--warnbg);padding:8px 10px;border-radius:0 10px 10px 0;margin-top:8px;font-size:14.5px}
+.tier{display:inline-block;font-family:var(--mono);font-size:11px;border:1px solid var(--line);border-radius:999px;padding:2px 8px;color:var(--muted);margin:6px 6px 0 0}
+details{margin-top:10px;border-top:1px solid var(--line);padding-top:8px}
+.whyline{margin:10px 0 0;font-size:14.5px;color:var(--muted)}
+.whyline b{color:var(--ink);font-weight:600}
+summary{cursor:pointer;color:var(--accent);font-weight:600;min-height:44px;line-height:44px}
+details p{margin:0 0 8px;font-size:15px}
+.empty{color:var(--muted)}
+.btn{min-height:44px;border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);border-radius:10px;padding:8px 14px;font:inherit;font-weight:600;cursor:pointer}
+.btn.ghost{background:var(--card);color:var(--accent)}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.note{font-size:14px;color:var(--muted)}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:6px 6px 6px 0;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:var(--mono);font-size:11.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);font-weight:500}
+td.mono{font-size:13px}
+.tw{overflow-x:auto}
+.case h2{font-size:17px}
+.ans{margin-top:10px;border-top:1px solid var(--line);padding-top:10px}
+footer{margin-top:28px;font-size:13.5px;color:var(--muted)}
+footer p{margin:0 0 8px}
+.panel{display:none}.panel.on{display:block}
+.fig{display:block;width:100%;max-width:460px;height:auto;margin:0 auto}
+.states{display:flex;gap:6px;overflow-x:auto;margin:10px -16px;padding:2px 16px 6px;scrollbar-width:none}
+.states::-webkit-scrollbar{display:none}
+.sbtn{flex:none;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--ink);font:inherit;font-size:14px;cursor:pointer;white-space:nowrap}
+.sbtn[aria-pressed="true"]{border-color:var(--accent);color:var(--accent);font-weight:600}
+.labs6{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:10px}
+.labs6.l4{grid-template-columns:repeat(4,1fr)}
+.lab{background:var(--fill);border-radius:10px;padding:6px 8px}
+.lab span{display:block;font-size:12px;color:var(--muted)}
+.lab b{font-family:var(--mono);font-size:13.5px}
+.lab.ch{box-shadow:inset 0 0 0 1.5px var(--warn)}
+.line1{font-size:15px;margin:10px 0 0}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.chip{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--fill);color:var(--ink);font:inherit;font-size:14px;cursor:pointer}
+.chip svg{flex:none;color:var(--accent)}
+.scrim{position:fixed;inset:0;background:var(--scrim);z-index:20}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:21;max-height:90vh;overflow-y:auto;background:var(--card);border:1px solid var(--line);border-bottom:0;border-radius:20px 20px 0 0;padding:8px 16px 24px;max-width:560px;margin:0 auto}
+.sheethead{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.sheethead h2{font-size:18px;margin:0}
+.xbtn{min-height:44px;min-width:44px;border:0;background:transparent;color:var(--accent);font:inherit;font-weight:600;cursor:pointer}
+.pills{position:sticky;top:0;z-index:5;background:var(--bg);display:flex;gap:6px;overflow-x:auto;margin:0 -16px 12px;padding:8px 16px;border-bottom:1px solid var(--line);scrollbar-width:none}
+.pills::-webkit-scrollbar{display:none}
+.pill{flex:none;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--muted);font:inherit;font-size:14px;cursor:pointer;white-space:nowrap}
+.pill[aria-current="true"]{border-color:var(--accent);color:var(--accent);font-weight:600}
+.chap{scroll-margin-top:70px}
+.cause{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:8px 0;border-top:1px solid var(--line);font-size:15px}
+.cause small{color:var(--muted);font-size:13px;text-align:right;flex:0 1 46%}
+.cause.out span{color:var(--muted);text-decoration:line-through}
+.cause.out,.cause.less,.cause.unl{opacity:.6}
+.cause.fav span{font-weight:700}
+.cause.fav span:before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--accent);margin-right:8px}
+.seg{display:flex;gap:8px;margin:10px 0 0}
+.trial{border-left:3px solid var(--accent);padding-left:12px}
+.trial p{margin:0 0 6px;font-size:15px}
+.trial .k{font-family:var(--mono);font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);display:block}
+@media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+
+.field select{width:100%;min-height:44px;border:1px solid var(--line);border-radius:10px;padding:8px 10px;font:inherit;font-size:15px;background:var(--card);color:var(--ink)}
+.field select:focus{outline:2px solid var(--accent);outline-offset:2px}
+.steps{display:flex;gap:6px;margin:0 0 14px}
+.stepb{flex:1;min-width:0;min-height:44px;border:1px solid var(--line);background:var(--card);border-radius:10px;font:inherit;font-family:var(--mono);font-size:13.5px;color:var(--muted);cursor:pointer;padding:0 4px}
+.stepb[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:600}
+.stp{display:none}.stp.on{display:block}
+.tab{font-size:14px}
+.grp{font-size:13px;color:var(--muted);margin:0 0 10px}
+.ans{margin:8px 0 2px;border:0;padding:0;font-weight:700;font-size:16px}
+.case .ans{margin-top:12px;border-top:1px solid var(--line);padding-top:12px;font-weight:400}
+.pl{display:block;font-family:var(--mono);font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);font-weight:400}
+.pillar{padding:8px 0;border-top:1px solid var(--line)}.pillar:first-of-type{border-top:0}
+.pn{display:flex;justify-content:space-between;gap:10px;align-items:baseline}.pn span{font-size:12.5px;color:var(--muted)}
+.pbar{height:8px;background:var(--fill);border-radius:99px;overflow:hidden;margin-top:6px}.pbar i{display:block;height:100%;background:var(--accent);border-radius:99px}
+.stage{display:flex;gap:4px;margin:2px 0 8px}
+.stage span{flex:1;text-align:center;font-family:var(--mono);font-weight:600;padding:9px 0;border-radius:9px;background:var(--fill);color:var(--muted)}
+.stage .on{background:var(--badbg);color:var(--bad)}
+.guard.big{margin:0 0 14px;font-size:15.5px}
+.checks.one{grid-template-columns:1fr}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.tile{min-height:76px;text-align:left;border:1px solid var(--line);border-radius:14px;background:var(--card);color:var(--ink);font:inherit;font-size:14.5px;padding:10px 12px;cursor:pointer}
+.tile span{display:block;font-size:12px;color:var(--accent);margin-bottom:4px}
+.tile:focus-visible,.stepb:focus-visible,.chip:focus-visible,.sbtn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+details.tr{margin:0;border-top:1px solid var(--line);padding:0}
+details.tr:first-child{border-top:0}
+details .trial{margin:8px 0 12px}
+.card>.tier{margin-top:10px}
+.guard a,.card a{overflow-wrap:anywhere}
+@media (min-width:900px){
+  .wrap{max-width:1040px}
+  .two{display:grid;grid-template-columns:360px minmax(0,1fr);gap:20px;align-items:start}
+  .two>.card:first-child{position:sticky;top:16px}
+  .refgrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;align-items:start}
+  .refgrid .card{margin-bottom:0}
+  .tiles{grid-template-columns:repeat(3,1fr)}
+  #p-learn,#p-practice{max-width:760px;margin:0 auto}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="/">← bedside.tools</a>
+<h1>Heart failure</h1>
+<p class="purpose">From the admission dose to the clinic titration: what to do next, why, and when to call for help.</p>
+
+<div class="tabs" role="tablist">
+  <button class="tab" role="tab" id="t-acute" aria-selected="true" aria-controls="p-acute">Acute</button>
+  <button class="tab" role="tab" id="t-clinic" aria-selected="false" aria-controls="p-clinic">Clinic</button>
+  <button class="tab" role="tab" id="t-advanced" aria-selected="false" aria-controls="p-advanced">Advanced</button>
+  <button class="tab" role="tab" id="t-learn" aria-selected="false" aria-controls="p-learn">Learn</button>
+  <button class="tab" role="tab" id="t-practice" aria-selected="false" aria-controls="p-practice">Practice</button>
+</div>
+
+<div class="panel on" id="p-acute" role="tabpanel" aria-labelledby="t-acute">
+  <div class="steps" id="acute"><button class="stepb" type="button" data-group="ac" data-step="admit" aria-pressed="true">Admit</button><button class="stepb" type="button" data-group="ac" data-step="daily" aria-pressed="false">Daily</button><button class="stepb" type="button" data-group="ac" data-step="discharge" aria-pressed="false">Discharge</button></div>
+  <div class="stp on" id="admit"><div class="two"><div class="card" id="admit-in"></div><div><div id="admit-out" aria-live="polite"></div><div id="admit-static"></div></div></div></div>
+  <div class="stp" id="daily"><div class="two"><div class="card" id="daily-in"></div><div><div id="daily-out" aria-live="polite"></div><div id="daily-static"></div></div></div></div>
+  <div class="stp" id="discharge"><div class="two"><div class="card" id="disch-in"></div><div id="disch-out" aria-live="polite"></div></div></div>
+</div>
+
+<div class="panel" id="p-clinic" role="tabpanel" aria-labelledby="t-clinic">
+  <div class="two" id="pillars"><div class="card" id="clinic-in"></div><div id="clinic-out" aria-live="polite"></div></div>
+  <div class="refgrid" id="clinic-ref"></div>
+</div>
+
+<div class="panel" id="p-advanced" role="tabpanel" aria-labelledby="t-advanced">
+  <div class="steps" id="advanced"><button class="stepb" type="button" data-group="ad" data-step="refer" aria-pressed="true">Refer?</button><button class="stepb" type="button" data-group="ad" data-step="shock" aria-pressed="false">Shock</button><button class="stepb" type="button" data-group="ad" data-step="lvadtx" aria-pressed="false">LVAD · transplant</button></div>
+  <div class="stp on" id="refer"><div class="two"><div class="card" id="refer-in"></div><div id="refer-out" aria-live="polite"></div></div></div>
+  <div class="stp" id="shock"><div class="two"><div class="card" id="shock-in"></div><div id="shock-out" aria-live="polite"></div></div><div class="card" id="cath"><div id="cath-in"></div></div></div>
+  <div class="stp" id="lvadtx"><div class="refgrid" id="lvad-out"></div></div>
+</div>
+
+<div class="panel" id="p-learn" role="tabpanel" aria-labelledby="t-learn">
+  <div class="tiles" id="learn-grid"></div>
+  <div class="card" id="trials"><p class="label">Trials</p><div id="trial-list"></div></div>
+</div>
+
+<div class="panel" id="p-practice" role="tabpanel" aria-labelledby="t-practice">
+  <div id="practice"></div>
+</div>
+
+<div class="scrim" id="scrim" hidden></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-t" hidden>
+  <div class="sheethead"><h2 id="sheet-t"></h2><button class="xbtn" id="sheet-x">Close</button></div>
+  <div id="sheet-b"></div>
+</div>
+
+<footer>
+  <p><strong>For education only. Not a substitute for clinical judgment.</strong> Built to US guidance, with European differences labelled; formulary, infusion protocols, shock team and LVAD arrangements vary, so adjust to your institution. Rows marked expert consensus or expert practice are not from a graded guideline. Diagrams are schematic.</p>
+  <p>Privacy: everything runs in your browser. Nothing you enter is sent anywhere or stored, and there are no analytics. Do not enter names, record numbers, or dates of birth.</p>
+  <p class="mono">Last reviewed: 2026-11-13</p>
+  <p><strong>Sources:</strong> Heidenreich PA et al., 2022 AHA/ACC/HFSA Guideline for the Management of Heart Failure, Circulation 2022;145:e895 · Hollenberg SM et al., 2024 ACC Expert Consensus Decision Pathway on patients hospitalized with heart failure, focused update, J Am Coll Cardiol 2024;84:1241 · Maddox TM et al., 2024 ACC Expert Consensus Decision Pathway for treatment of HFrEF, J Am Coll Cardiol 2024;83:1444 · Kittleson MM et al., 2026 ACC Expert Consensus Decision Pathway on management of HFpEF, J Am Coll Cardiol 2026;88:1817 · Sinha SS et al., 2025 ACC Concise Clinical Guidance on cardiogenic shock, J Am Coll Cardiol 2025;85:1618 · Baran DA et al., 2026 SCAI SHOCK Classification Expert Consensus Update, JSCAI 2026 · Mullens W et al., The use of diuretics in heart failure with congestion, Eur J Heart Fail 2019;21:137 · 2026 ESC Guidelines for the management of heart failure, Eur Heart J 2026;47:5346 (for labelled European notes) · Gustafsson F et al., HFA position paper on LVAD-supported patients for the non-LVAD specialist, Part 3, ESC Heart Fail 2021 · Burkhoff D et al., Hemodynamics of Mechanical Circulatory Support, J Am Coll Cardiol 2015;66:2663 · FDA prescribing information: nitroglycerin in dextrose injection, sodium nitroprusside, finerenone (Kerendia, 2025) · Trials are cited on their cards.</p>
+</footer>
+</div>
+<script id="engine">
+/* Pure decision engine. No DOM access. Units: doses mg; eGFR mL/min/1.73 m2; K, Na mEq/L; lactate mmol/L; pressures mm Hg; urine output mL; cardiac output L/min. */
+var LOOP = {furosemide: 1, torsemide: 2, bumetanide: 40};           /* 40 : 20 : 1 */
+function toFuro(drug, mg){ return mg * (LOOP[drug] || 1); }
+function r5(x){ return Math.round(x / 5) * 5; }
+function num(v){ var n = parseFloat(v); return isFinite(n) ? n : null; }
+
+/* ---------- Acute: Admit ---------- */
+function admit(i){
+  var o = {};
+  var hypoSign = !!(i.ment || i.cold || i.uop30 || (i.lactate != null && i.lactate > 2));
+  var hypoBP = !!(i.pressor || (i.sustained && ((i.sbp != null && i.sbp < 90) || (i.map != null && i.map < 60))));
+  o.shock = hypoBP && hypoSign;
+  var lowNow = (i.sbp != null && i.sbp < 90) || (i.map != null && i.map < 60);
+  o.preShock = !o.shock && lowNow && (hypoSign || i.perf > 0);      /* hypotension entered, not yet 30 min: tool safety guard */
+  o.lowOutput = !o.shock && !o.preShock && (hypoSign || i.perf > 0);
+  o.wet = i.cong > 0; o.cold = hypoSign || i.perf > 0;
+  o.profile = (o.cold ? 'Cold' : 'Warm') + ' and ' + (o.wet ? 'wet' : 'dry');
+  if (i.naive){ o.dose = {naive: true}; }
+  else if (i.homeDose != null && i.homeDose > 0){
+    var f = toFuro(i.drug, i.homeDose);
+    var d = {naive: false, feq: f, low: f, high: f * 2.5, perDose: f * 2.5 / 2};
+    d.over = d.perDose > 200;                       /* pathway Table 7: 200 mg per dose */
+    d.bumLow = f / 40; d.bumHigh = f * 2.5 / 40;
+    o.dose = d;
+  }
+  o.kidneyWhy = !!(i.naive && i.egfr != null && i.egfr < 60);
+  o.sglt = (o.shock || o.preShock) ? 'no-shock' : (i.egfr != null && i.egfr < 20) ? 'no-egfr' : (i.egfr == null ? 'need-egfr' : 'yes');
+  o.vaso = !!i.htn && !o.shock && !o.preShock ? ((i.sbp != null && i.sbp < 90) ? 'hypotension' : 'consider') : null;
+  o.oxygen = i.spo2 != null && i.spo2 < 90;
+  o.niv = !!i.respFail;
+  return o;
+}
+
+/* ---------- Acute: Daily ---------- */
+function daily(i){
+  var o = {};
+  var rate = i.uop6 != null ? i.uop6 / 6 : null;
+  o.rate = rate;
+  if (i.una == null && rate == null) o.resp = null;
+  else if ((i.una != null && i.una < 50) || (rate != null && rate < 100)) o.resp = 'poor';
+  else if (i.una != null && i.una < 70 && rate == null) o.resp = 'borderline';
+  else o.resp = 'ok';
+  var dayDose = (i.curDose != null && i.perDay != null) ? i.curDose * i.perDay : null;
+  o.dayDose = dayDose;
+  o.ceiling = dayDose != null && dayDose >= 400;
+  if (o.resp === 'poor' && i.curDose != null && !o.ceiling){
+    o.next = {lo: Math.min(200, r5(i.curDose * 1.5)), hi: Math.min(200, r5(i.curDose * 2)), capped: i.curDose * 2 > 200};
+  }
+  if (i.uop24 != null) o.day2 = i.uop24 < 3 ? (i.congested ? 'low' : 'low-dry') : i.uop24 > 5 ? 'high' : 'ok';
+  if (i.crRise) o.creat = i.lowPerf ? 'lowflow' : i.congested ? 'continue' : 'dry';
+  if (i.k != null) o.k = i.k < 3.5 ? 'low' : i.k > 5 ? 'high' : null;
+  if (i.na != null && i.na < 135) o.na = i.uosm == null ? 'ask' : i.uosm >= 100 ? 'dilution' : (i.unaBase != null && i.unaBase < 50) ? 'depletion' : 'unclear';
+  o.raising = o.resp === 'poor' || o.day2 === 'low';   /* the IV diuretic is being raised now */
+  o.stable = (i.sbp != null && i.sbp >= 100 && !i.inotrope24 && !i.ivUp6 && !o.raising && !i.lowPerf) ? true : (i.sbp == null ? null : false);
+  o.mraOk = (i.k != null && i.k < 5.0);
+  if (o.stable && i.sbp != null) o.arni = i.sbp > 120 ? '49/51' : '24/26';
+  return o;
+}
+
+/* ---------- Acute: Discharge ---------- */
+function discharge(i){ return {ready: i.left === 0, left: i.left, lowOut: !!i.lowOut, rhf: !!i.rhf}; }
+
+/* ---------- Clinic ---------- */
+function efGroup(ef, prevLow){
+  if (ef == null) return null;
+  if (ef <= 40) return 'HFrEF';
+  if (prevLow) return 'HFimpEF';
+  return ef < 50 ? 'HFmrEF' : 'HFpEF';
+}
+function clinic(i){
+  var g = efGroup(i.ef, i.prevLow), o = {group: g, today: [], next: [], wait: [], pillars: []};
+  if (!g) return o;
+  var lowBP = i.sbp != null && i.sbp < 100;
+  function add(list, pillar, text, extra){ list.push({p: pillar, t: text, x: extra || ''}); }
+  if (g === 'HFrEF' || g === 'HFimpEF'){
+    /* SGLT inhibitor */
+    if (!i.sglt){
+      if (i.egfr == null) add(o.wait, 'SGLT inhibitor', 'Enter eGFR to check the kidney floor.');
+      else if (i.egfr >= 25) add(o.today, 'SGLT inhibitor', 'Start dapagliflozin 10 mg daily or empagliflozin 10 mg daily');
+      else if (i.egfr >= 20) add(o.today, 'SGLT inhibitor', 'Start empagliflozin 10 mg daily', 'eGFR 20 to 24: dapagliflozin and sotagliflozin need 25 or over.');
+      else add(o.wait, 'SGLT inhibitor', 'Not started: eGFR under 20.');
+    }
+    /* MRA */
+    if (!i.mra){
+      if (i.k == null || i.egfr == null) add(o.wait, 'MRA', 'Enter potassium and eGFR.');
+      else if (i.k < 5.0 && i.egfr > 30) add(o.today, 'MRA', 'Start spironolactone 12.5 to 25 mg daily (or eplerenone 25 mg daily)', 'Potassium and kidney function in 1 to 2 weeks.');
+      else add(o.wait, 'MRA', 'Not started: ' + (i.k >= 5.0 ? 'potassium 5.0 or over' : 'eGFR 30 or under') + '.');
+    } else if (i.k != null && i.k > 5.5) add(o.today, 'MRA', 'Stop the MRA: potassium over 5.5', 'guard');
+    else if (i.k != null && i.k >= 5.0) add(o.today, 'MRA', 'Do not raise the MRA: potassium 5.0 to 5.5', 'Low-potassium diet, keep the SGLT inhibitor, consider a potassium binder, recheck in 1 to 2 weeks. Stop the MRA if potassium stays over 5.0.');
+    else if (i.mraPct < 100) add(lowBP ? o.next : o.next, 'MRA', 'Raise the MRA toward target (at least 2 weeks between steps)', 'Recheck potassium and kidney function 1 to 2 weeks after each change.');
+    /* RAS inhibitor */
+    var arniStart = (i.rasHigh && !(i.egfr != null && i.egfr < 30) && !(i.age != null && i.age >= 75)) ? '49/51' : '24/26';
+    if (i.ras === 'none'){
+      if (lowBP) add(o.wait, 'ARNI', 'Waits: systolic under 100', 'If not congested, lowering the loop diuretic may make room.');
+      else add(o.today, 'ARNI', 'Start sacubitril/valsartan 24/26 mg twice daily', 'Labs in 1 to 2 weeks.');
+    } else if (i.ras === 'acei' || i.ras === 'arb'){
+      if (lowBP) add(o.wait, 'ARNI', 'Switch to ARNI waits: systolic under 100', 'Continue the current ' + (i.ras === 'acei' ? 'ACE inhibitor' : 'ARB') + '.');
+      else add(i.wet || !i.sglt || !i.mra ? o.today : o.today, 'ARNI', 'Switch to sacubitril/valsartan ' + arniStart + ' mg twice daily', i.ras === 'acei' ? 'Stop the ACE inhibitor 36 hours before the first dose.' : 'From an ARB: no gap needed.');
+    } else if (i.ras === 'arni' && i.rasPct < 100){
+      if (lowBP) add(o.wait, 'ARNI', 'ARNI up-titration waits: systolic under 100');
+      else add(o.next, 'ARNI', 'Raise sacubitril/valsartan one step (target 97/103 mg twice daily)', 'Reassess in 1 to 2 weeks.');
+    }
+    /* Beta-blocker */
+    if (!i.bb){
+      if (i.wet) add(o.wait, 'Beta-blocker', 'Not started while congested', 'Start once dry, with an adequate resting heart rate.');
+      else add(lowBP ? o.next : o.today, 'Beta-blocker', 'Start bisoprolol 1.25 mg daily, carvedilol 3.125 mg twice daily, or metoprolol succinate 12.5 to 25 mg daily');
+    } else if (i.bbPct < 100){
+      if (i.wet) add(o.wait, 'Beta-blocker', 'Beta-blocker up-titration waits until decongested');
+      else if (lowBP) add(o.wait, 'Beta-blocker', 'Beta-blocker up-titration waits: systolic under 100');
+      else add(o.next, 'Beta-blocker', 'Raise the beta-blocker one step (every 2 weeks)', 'Watch heart rate, blood pressure and congestion.');
+    }
+    o.lowBP = lowBP;
+    o.pillars = [
+      {n: 'Beta-blocker', on: !!i.bb, pct: i.bb ? i.bbPct : 0},
+      {n: i.ras === 'arni' ? 'ARNI' : i.ras === 'acei' ? 'ACE inhibitor → ARNI' : i.ras === 'arb' ? 'ARB → ARNI' : 'ARNI', on: i.ras !== 'none', pct: i.ras !== 'none' ? i.rasPct : 0},
+      {n: 'MRA', on: !!i.mra, pct: i.mra ? i.mraPct : 0},
+      {n: 'SGLT inhibitor', on: !!i.sglt, pct: i.sglt ? 100 : 0}
+    ];
+    o.done = o.today.length === 0 && o.next.length === 0 && o.wait.length === 0;
+  }
+  if (g === 'HFmrEF'){
+    if (!i.sglt && i.egfr != null && i.egfr >= 20) add(o.today, 'SGLT2 inhibitor', i.egfr < 25 ? 'Start empagliflozin 10 mg daily' : 'Start dapagliflozin 10 mg daily or empagliflozin 10 mg daily', i.egfr < 25 ? 'eGFR 20 to 24: dapagliflozin needs 25 or over.' : '');
+    else if (!i.sglt) add(o.wait, 'SGLT2 inhibitor', i.egfr == null ? 'Enter eGFR.' : 'Not started: eGFR under 20.');
+  }
+  if (g === 'HFpEF'){
+    if (!i.sglt && i.egfr != null && i.egfr >= 20) add(o.today, 'SGLT2 inhibitor', i.egfr < 25 ? 'Start empagliflozin 10 mg daily' : 'Start dapagliflozin 10 mg daily or empagliflozin 10 mg daily', i.egfr < 25 ? 'eGFR 20 to 24: dapagliflozin needs 25 or over.' : '');
+    else if (!i.sglt) add(o.wait, 'SGLT2 inhibitor', i.egfr == null ? 'Enter eGFR.' : 'Not started: eGFR under 20.');
+    if (!i.mra){
+      if (i.k == null || i.egfr == null) add(o.wait, 'Non-steroidal MRA', 'Enter potassium and eGFR.');
+      else if (i.k < 5.0 && i.egfr >= 25) add(o.today, 'Non-steroidal MRA', 'Start finerenone ' + (i.egfr >= 60 ? '20 mg daily (target 40 mg)' : '10 mg daily (target 20 mg)'), 'Potassium and eGFR at 4 weeks.');
+      else add(o.wait, 'Non-steroidal MRA', 'Finerenone not started: ' + (i.k >= 5.0 ? 'potassium 5.0 or over' : 'eGFR under 25') + '.');
+    }
+    if (i.bmi != null && i.bmi >= 30) add(o.next, 'Incretin therapy', 'Add semaglutide (0.25 mg weekly, up to 2.4 mg) or tirzepatide (2.5 mg weekly, up to 15 mg)', 'Steps every 4 weeks. Pair with exercise and nutrition support.');
+    if (i.female || i.htn || (i.ef != null && i.ef < 60)) add(o.next, 'ARNI', 'Consider sacubitril/valsartan (24/26 mg twice daily, target 97/103)', 'For women at any EF, men with EF under 55% to 60%, or hypertension. ARB if ARNI cannot be used.');
+    if (i.bb && !i.rateInd) add(o.next, 'Beta-blocker', 'Review the beta-blocker: no angina or AF needing rate control entered', 'avoid');
+    if (i.wet) add(o.today, 'Diuretic', 'Titrate the loop diuretic to relieve congestion', 'Recheck in 1 to 2 weeks.');
+  }
+  return o;
+}
+function finerenone(k, cur, egfr0, fall30){
+  if (k == null || !cur) return null;
+  if (k >= 6.0) return 'Withhold. Restart at 10 mg daily when potassium is under 5.5 (under 5.0 if it has repeatedly been 5.5 or over).';
+  if (k >= 5.5) return cur === 10 ? 'Withhold. Restart at 10 mg daily when potassium is under 5.5.' : cur === 20 ? 'Decrease to 10 mg daily.' : 'Decrease to 20 mg daily.';
+  if (k >= 5.0) return 'Keep ' + cur + ' mg daily.';
+  if (fall30) return 'Keep ' + cur + ' mg daily: eGFR has fallen over 30% since the last measurement.';
+  if (cur === 10) return 'Increase to 20 mg daily.';
+  if (cur === 20) return (egfr0 != null && egfr0 >= 60) ? 'Increase to 40 mg daily.' : 'Stay at 20 mg daily (target for a starting eGFR under 60).';
+  return 'Stay at 40 mg daily.';
+}
+function h2fpef(i){ return (i.bmi30 ? 2 : 0) + (i.htn2 ? 1 : 0) + (i.af ? 3 : 0) + (i.pasp ? 1 : 0) + (i.age60 ? 1 : 0) + (i.ee ? 1 : 0); }
+function hfpefAba(age, bmi, af){ if (age == null || bmi == null) return null; var y = -7.79 + 0.063 * age + 0.14 * bmi + 2.04 * (af ? 1 : 0); var z = Math.exp(y); return z / (1 + z) * 100; }
+function devices(i){
+  var o = {icd: null, crt: null};
+  if (i.ef == null) return o;
+  if (!i.gdmt3) o.wait = true;
+  if (i.ef <= 35 && (i.nyha === 2 || i.nyha === 3) && !i.mi40) o.icd = 'Recommended (class 1, A): EF 35% or under, NYHA II to III, on GDMT, expected survival over 1 year.';
+  else if (i.ef <= 30 && i.nyha === 1 && i.ischemic && !i.mi40) o.icd = 'Recommended (class 1, B-R): EF 30% or under, NYHA I, 40 days or more after MI.';
+  else if (i.mi40) o.icd = 'Wait: within 40 days of MI.';
+  else o.icd = 'Primary-prevention criteria not met with the values entered.';
+  if (i.qrs == null) o.crt = 'Enter QRS duration.';
+  else if (i.qrs < 120) o.crt = 'Not recommended (class 3: no benefit): QRS under 120 ms.';
+  else if (i.ef > 35) o.crt = 'EF over 35%: CRT only for high-degree block or a high expected pacing burden (EF 36% to 50%, class 2a).';
+  else if (!i.sinus) o.crt = 'AF with EF 35% or under: can be useful (class 2a) if the patient needs ventricular pacing or otherwise meets CRT criteria, and near-100% pacing can be achieved.';
+  else if (i.lbbb && i.qrs >= 150 && i.nyha >= 2) o.crt = 'Recommended (class 1, B-R): sinus rhythm, LBBB, QRS 150 ms or over, NYHA II to ambulatory IV.';
+  else if (i.lbbb && i.qrs >= 150 && i.nyha === 1) o.crt = 'May be considered (class 2b) if ischaemic and EF 30% or under; otherwise not indicated in NYHA I.';
+  else if (i.lbbb && i.nyha >= 2) o.crt = 'Can be useful (class 2a): LBBB with QRS 120 to 149 ms.';
+  else if (!i.lbbb && i.qrs >= 150 && i.nyha >= 2) o.crt = 'Can be useful (class 2a): non-LBBB with QRS 150 ms or over.';
+  else if (!i.lbbb && i.qrs < 150 && i.nyha >= 3) o.crt = 'May be considered (class 2b): non-LBBB, QRS 120 to 149 ms, NYHA III to ambulatory IV.';
+  else if (!i.lbbb && i.qrs < 150 && i.nyha <= 2) o.crt = 'Not recommended (class 3: no benefit): NYHA I to II with non-LBBB and QRS under 150 ms.';
+  else o.crt = 'No CRT recommendation applies to the values entered.';
+  return o;
+}
+
+/* ---------- Advanced ---------- */
+function stage(i){
+  var hypoBP = (i.sbp != null && i.sbp < 90) || (i.map != null && i.map < 60) || !!i.drop30;
+  var hypoperf = !!(i.ment || i.cold || i.uop30 || i.refill || (i.lactate != null && i.lactate >= 2));
+  var s;
+  if (i.collapse || (i.lactate != null && i.lactate >= 8)) s = 'E';
+  else if (hypoperf && i.worse) s = 'D';
+  else if (hypoperf) s = 'C';
+  else if (hypoBP || (i.hr != null && i.hr >= 100)) s = 'B';
+  else s = 'A';
+  return {stage: s, hypoBP: hypoBP, hypoperf: hypoperf, normotensive: hypoperf && !hypoBP, arrest: !!i.arrest};
+}
+function cath(i){
+  var o = {};
+  if (i.pas != null && i.pad != null && i.rap) o.papi = (i.pas - i.pad) / i.rap;
+  if (i.map != null && i.co != null) o.cpo = i.map * i.co / 451;
+  if (i.rap != null && i.pcwp) o.ratio = i.rap / i.pcwp;
+  o.wetL = i.pcwp != null && i.pcwp > 15; o.wetR = i.rap != null && i.rap > 15;
+  o.lowCI = i.ci != null && i.ci < 2.2;
+  return o;
+}
+</script>
+<script>
+/* Trial cards: [key, year, question and design, result, what it changed, DOI or citation] */
+var TRIALS = [
+['DOSE',2011,'Acute HF, 308 patients: IV bolus vs infusion, and low dose (home oral dose given IV) vs high dose (2.5 times), in a 2×2 design.','No significant difference in symptoms or creatinine change for either comparison. High dose gave more diuresis with transient worsening of renal function.','Source of the "up to 2.5 times" starting dose; bolus and infusion are equivalent.','10.1056/NEJMoa1005419'],
+['ADVOR',2022,'Acetazolamide 500 mg IV daily added to IV loop diuretics in acute HF, 519 patients.','Successful decongestion at 3 days 42.2% vs 30.5% (risk ratio 1.46, 95% CI 1.17 to 1.82). Death or HF readmission 29.7% vs 27.8%.','Acetazolamide as a second agent.','10.1056/NEJMoa2203094'],
+['CLOROTIC',2023,'Hydrochlorothiazide added to IV furosemide in acute HF, 230 patients.','Greater 24-hour diuresis and weight loss. Impaired renal function 46.5% vs 17.2%. No difference in death or readmission.','Thiazide add-on works but costs kidney function.','10.1093/eurheartj/ehac689'],
+['PUSH-AHF',2023,'Natriuresis-guided diuresis (escalate if spot urine sodium under 70) vs usual care.','24-hour natriuresis 409 vs 345 mmol (P = 0.0061). Death or HF readmission at 180 days 31% vs 31%.','Support for the spot urine sodium check; no outcome benefit shown.','10.1038/s41591-023-02532-z'],
+['TRANSFORM-HF',2023,'Torsemide vs furosemide after discharge, 2859 patients.','No significant difference in all-cause mortality over 12 months.','No reason to switch loop diuretic for outcomes.','10.1001/jama.2022.23924'],
+['EMPULSE',2022,'Empagliflozin 10 mg started in hospital for acute HF, any EF.','Clinical benefit at 90 days: win ratio 1.36 (95% CI 1.09 to 1.68).','SGLT2 inhibitor in hospital.','10.1038/s41591-021-01659-1'],
+['PIONEER-HF',2019,'Sacubitril-valsartan vs enalapril started in hospital after stabilisation, 881 patients.','Greater NT-proBNP reduction (ratio of change 0.71, 95% CI 0.63 to 0.81, over weeks 4 and 8). No difference in renal function, potassium, hypotension or angioedema.','ARNI can start in hospital.','10.1056/NEJMoa1812851'],
+['STRONG-HF',2022,'Rapid up-titration with close follow-up after an acute HF admission vs usual care.','180-day death or HF readmission 15.2% vs 23.3% (risk ratio 0.66, 95% CI 0.50 to 0.86).','Fast titration after discharge.','10.1016/S0140-6736(22)02076-1'],
+['PARADIGM-HF',2014,'Sacubitril-valsartan vs enalapril, EF 40% or under, 8442 patients.','CV death or HF hospitalization 21.8% vs 26.5% (HR 0.80, 95% CI 0.73 to 0.87). All-cause death HR 0.84.','ARNI over ACE inhibitor.','10.1056/NEJMoa1409077'],
+['MERIT-HF',1999,'Metoprolol CR/XL vs placebo, 3991 patients.','All-cause mortality 7.2% vs 11.0% per patient-year (relative risk 0.66, 95% CI 0.53 to 0.81).','Beta-blocker pillar.','Lancet 1999;353:2001'],
+['RALES',1999,'Spironolactone 25 mg vs placebo in severe HF, 1663 patients.','Death 35% vs 46% (relative risk 0.70, 95% CI 0.60 to 0.82).','MRA pillar.','10.1056/NEJM199909023411001'],
+['DAPA-HF',2019,'Dapagliflozin vs placebo, EF 40% or under, 4744 patients.','Worsening HF or CV death 16.3% vs 21.2% (HR 0.74). All-cause death HR 0.83.','SGLT2 inhibitor pillar, with or without diabetes.','10.1056/NEJMoa1911303'],
+['EMPEROR-Reduced',2020,'Empagliflozin vs placebo, EF 40% or under, 3730 patients.','CV death or HF hospitalization 19.4% vs 24.7% (HR 0.75). Slower eGFR decline.','SGLT2 inhibitor pillar.','10.1056/NEJMoa2022190'],
+['A-HeFT',2004,'Fixed-dose isosorbide dinitrate plus hydralazine in Black patients with NYHA III to IV HF, 1050 patients.','Stopped early: mortality 6.2% vs 10.2%.','Source of the class 1 recommendation.','10.1056/NEJMoa042934'],
+['SHIFT',2010,'Ivabradine vs placebo, sinus rhythm, heart rate 70 or over, 6558 patients.','CV death or HF admission HR 0.82 (95% CI 0.75 to 0.90), driven by HF admissions.','Ivabradine add-on.','10.1016/S0140-6736(10)61198-1'],
+['VICTORIA',2020,'Vericiguat vs placebo after recent worsening, EF under 45%, 5050 patients.','CV death or HF hospitalization 35.5% vs 38.5% (HR 0.90, 95% CI 0.82 to 0.98).','Vericiguat add-on.','10.1056/NEJMoa1915928'],
+['DIG',1997,'Digoxin vs placebo.','Mortality unchanged (34.8% vs 35.1%). Hospitalization for worsening HF 26.8% vs 34.7%.','Digoxin lowers admissions, not deaths.','10.1056/NEJM199702203360801'],
+['AFFIRM-AHF',2020,'Ferric carboxymaltose at discharge, iron-deficient, EF under 50%.','Total HF hospitalizations and CV death: rate ratio 0.79 (95% CI 0.62 to 1.01, P = 0.059); fewer HF hospitalizations.','IV iron for iron deficiency.','10.1016/S0140-6736(20)32339-4'],
+['TRED-HF',2019,'Withdrawing therapy after recovery from dilated cardiomyopathy, 51 patients.','Relapse within 6 months in 44% vs 0%.','Continue therapy in HFimpEF.','10.1016/S0140-6736(18)32484-X'],
+['SCD-HeFT',2005,'ICD vs amiodarone vs placebo, EF 35% or under, NYHA II to III.','ICD reduced death by 23% (HR 0.77). Amiodarone: no benefit.','Primary-prevention ICD.','10.1056/NEJMoa043399'],
+['MADIT-CRT',2009,'CRT-ICD vs ICD alone, EF 30% or under, QRS 130 ms or over, NYHA I to II.','Death or HF event 17.2% vs 25.3% (HR 0.66), mainly with QRS 150 ms or over.','CRT, and why QRS width matters.','10.1056/NEJMoa0906431'],
+['COAPT',2018,'Transcatheter mitral repair vs medical therapy for secondary MR despite maximal GDMT, 614 patients.','HF hospitalization 35.8% vs 67.9% per patient-year (HR 0.53). Death at 24 months 29.1% vs 46.1%.','Mitral repair after GDMT is optimised.','10.1056/NEJMoa1806640'],
+['DELIVER',2022,'Dapagliflozin vs placebo, EF over 40%, 6263 patients.','Worsening HF or CV death 16.4% vs 19.5% (HR 0.82, 95% CI 0.73 to 0.92).','SGLT2 inhibitor in HFpEF and HFmrEF.','10.1056/NEJMoa2206286'],
+['EMPEROR-Preserved',2021,'Empagliflozin vs placebo, EF over 40%, 5988 patients.','CV death or HF hospitalization 13.8% vs 17.1% (HR 0.79).','SGLT2 inhibitor in HFpEF and HFmrEF.','10.1056/NEJMoa2107038'],
+['FINEARTS-HF',2024,'Finerenone vs placebo, EF 40% or over, 6001 patients.','Total worsening HF events and CV death: rate ratio 0.84 (95% CI 0.74 to 0.95). More hyperkalaemia.','Non-steroidal MRA in HFpEF.','10.1056/NEJMoa2407107'],
+['STEP-HFpEF',2023,'Semaglutide 2.4 mg weekly vs placebo, HFpEF with BMI 30 or over, 529 patients.','KCCQ +16.6 vs +8.7 points. Weight −13.3% vs −2.6%.','Incretin therapy for obesity-related HFpEF.','10.1056/NEJMoa2306963'],
+['SUMMIT',2025,'Tirzepatide vs placebo, HFpEF with BMI 30 or over, 731 patients.','CV death or worsening HF HR 0.62 (95% CI 0.41 to 0.95, as tabulated in the 2026 ACC pathway). KCCQ +19.5 vs +12.7.','Incretin therapy for obesity-related HFpEF.','10.1056/NEJMoa2410027'],
+['DOREMI',2021,'Milrinone vs dobutamine in cardiogenic shock, 192 patients.','Primary composite 49% vs 54% (relative risk 0.90, 95% CI 0.69 to 1.19).','No inotrope is better; choose by the patient.','10.1056/NEJMoa2026845'],
+['DanGer Shock',2024,'Microaxial flow pump plus standard care vs standard care in STEMI shock, 355 patients.','Death at 180 days 45.8% vs 58.5% (HR 0.74, 95% CI 0.55 to 0.99). Safety composite 24.0% vs 6.2%.','First positive device trial; selected infarct shock only.','10.1056/NEJMoa2312572'],
+['ECLS-SHOCK',2023,'Early VA-ECMO vs medical therapy in infarct shock, 417 patients.','Death at 30 days 47.8% vs 49.0%. Moderate or severe bleeding 23.4% vs 9.6%.','No routine ECMO.','10.1056/NEJMoa2307227']
+];
+var TR = {}; TRIALS.forEach(function(t){ TR[t[0]] = t; });
+
+var CONG = ['Peripheral oedema','Rales','Dyspnoea on minimal exertion','Hepatomegaly or congestive GI symptoms','Orthopnoea or bendopnoea','JVP over 6 to 8 mm Hg','Hepatojugular reflux'];
+var PERF = ['Narrow pulse pressure','Intolerance of neurohormonal antagonists'];
+var PRECIP = ['Acute coronary syndrome','Uncontrolled hypertension','AF and other arrhythmias','Additional cardiac disease (e.g. endocarditis)','Acute infection','Non-adherence to medicines or diet','Anaemia','Hyper- or hypothyroidism','Sodium-retaining drugs (NSAIDs)','Negative inotropes (verapamil)'];
+var INEED = ['IV inotropes','NYHA IIIB to IV, or persistently raised natriuretic peptides','End-organ dysfunction','EF 35% or under','Defibrillator shocks','Hospitalizations: more than 1','Edema despite escalating diuretics','Low systolic BP (90 or under) or high heart rate','Prognostic medication: intolerance or down-titration'];
+
+var DOSES = [
+['Bisoprolol','1.25 mg daily','10 mg daily'],['Carvedilol','3.125 mg twice daily','25 mg twice daily (under 85 kg); 50 mg twice daily (85 kg or over)'],['Metoprolol succinate','12.5 to 25 mg daily','200 mg daily'],
+['Sacubitril/valsartan','24/26 to 49/51 mg twice daily','97/103 mg twice daily'],
+['Captopril','6.25 mg three times daily','50 mg three times daily'],['Enalapril','2.5 mg twice daily','10 to 20 mg twice daily'],['Lisinopril','2.5 to 5 mg daily','20 to 40 mg daily'],['Ramipril','1.25 mg daily','10 mg daily'],
+['Candesartan','4 to 8 mg daily','32 mg daily'],['Losartan','25 to 50 mg daily','150 mg daily'],['Valsartan','40 mg twice daily','160 mg twice daily'],
+['Eplerenone','25 mg daily','50 mg daily'],['Spironolactone','12.5 to 25 mg daily','25 to 50 mg daily'],
+['Dapagliflozin','10 mg daily','10 mg daily'],['Empagliflozin','10 mg daily','10 mg daily'],['Sotagliflozin','200 mg daily','400 mg daily'],
+['Hydralazine','25 mg three times daily','75 mg three times daily'],['Isosorbide dinitrate','20 mg three times daily','40 mg three times daily'],['Fixed-dose ISDN/hydralazine','20/37.5 mg, one tablet three times daily','two tablets three times daily'],
+['Ivabradine','2.5 to 5 mg twice daily','by heart rate; maximum 7.5 mg twice daily'],['Vericiguat','2.5 mg daily','10 mg daily'],['Digoxin','0.125 to 0.25 mg daily','no titration; lower dose if over 70, kidney impairment or low lean mass']
+];
+var AGENTS = [
+['Norepinephrine','0.05 to 1 mcg/kg/min','SVR ↑↑ · BP ↑↑ · output ↑ · HR ↑','0.5 to 30 mcg/min'],
+['Epinephrine','0.01 to 0.5 mcg/kg/min','SVR ↑↑ · BP ↑↑ · output ↑↑ · HR ↑↑','5 to 15, 15 to 20 mcg/min'],
+['Dopamine','2 to 5 · 5 to 10 · 10 to 20 mcg/kg/min','SVR ↑↑ · BP ↑↑ · output ↑ · HR ↑↑','5 to 10, 10 to 15 mcg/kg/min'],
+['Dobutamine','2 to 10 mcg/kg/min','SVR ↓ or ↔ · BP ↓ or ↔ · output ↑↑ · HR ↑','2.5 to 20 mcg/kg/min'],
+['Milrinone','0.125 to 0.5 mcg/kg/min','SVR ↓↓ · BP ↓↓ · output ↑↑ · HR ↔ or ↑','0.125 to 0.75 mcg/kg/min; bolus not recommended'],
+['Phenylephrine','0.1 to 10 mcg/kg/min','SVR ↑ · BP ↑↑ · output ↔ or ↓ · HR ↔ or ↓',''],
+['Vasopressin','0.01 to 0.04 U/min','SVR ↑↑ · BP ↑↑ · output ↔ or ↓ · HR ↔ or ↓',''],
+['Nitroprusside','0.3 to 10 mcg/kg/min','SVR ↓ · BP ↓ · output ↑ or ↔ · HR ↑ or ↔',''],
+['Nitroglycerin','25 to 200 mcg/min','SVR ↓ · BP ↓ · output ↑ or ↔ · HR ↑ or ↔','']
+];
+var MCS = [
+['IABP','0.5 to 1.0 L/min','No direct unloading; lowers afterload'],
+['Impella CP','3.0 to 4.3 L/min','Direct LV unloading'],
+['Impella 5.5','5.0 to 6.0 L/min','Direct LV unloading'],
+['VA-ECMO','5.0 to 7.0 L/min','No LV unloading; raises afterload'],
+['Impella RP Flex','3.0 to 4.0 L/min','RV support'],
+['RA-to-PA pump','4.0 to 5.0 L/min','RV support']
+];
+var MIMICS = [
+['Cardiac amyloid','Thick walls with low or discordant ECG voltage; carpal tunnel or spinal stenosis; neuropathy','Monoclonal protein screen, then bone scintigraphy'],
+['Hypertrophic cardiomyopathy','Unexplained hypertrophy; outflow obstruction; family history','Cardiac MRI; genetic testing'],
+['Cardiac sarcoid','Extracardiac disease; high-degree AV block under age 60; ventricular arrhythmia','Cardiac MRI; FDG-PET'],
+['Haemochromatosis','Family history or transfusions; diabetes','Ferritin and transferrin'],
+['Fabry disease','Angiokeratomas; neuropathy; proteinuria; X-linked','Alpha-galactosidase level'],
+['Constriction','Prior cardiac surgery, radiation or pericarditis; Kussmaul sign','Echo with Doppler; catheterisation'],
+['Valve disease','Murmur; symptoms out of proportion to EF','Echo with Doppler'],
+['High-output state','Tachycardia; warm extremities; wide pulse pressure','CBC, TSH, liver tests'],
+['Non-cardiac','Lung disease, kidney disease, obesity, frailty','Lung function, kidney panel, exercise testing']
+];
+</script>
+<script>
+/* Learn figures. Each: id, title, states, draw(stateIndex) -> SVG string, cap[stateIndex], src. Schematic drawings; colours are shared names only. */
+function svg(w, h, inner, label){ return '<svg class="fig" viewBox="0 0 ' + w + ' ' + h + '" role="img" aria-label="' + label + '">' + inner + '</svg>'; }
+function ln(x1, y1, x2, y2, c, extra){ return '<line x1="' + x1 + '" y1="' + y1 + '" x2="' + x2 + '" y2="' + y2 + '" stroke="var(--' + (c || 'line') + ')" stroke-width="1.5" ' + (extra || '') + '/>'; }
+function tx(x, y, s, c, extra){ return '<text x="' + x + '" y="' + y + '" style="font-family:var(--mono);font-size:11px;fill:var(--' + (c || 'muted') + ')" ' + (extra || '') + '>' + s + '</text>'; }
+function axes(xl, yl){ return ln(34, 190, 292, 190) + ln(34, 190, 34, 14) + tx(150, 208, xl) + tx(12, 120, yl, 'muted', 'transform="rotate(-90 12 120)"'); }
+function poly(pts, c, dash){ return '<polygon points="' + pts + '" fill="var(--' + c + ')" fill-opacity="' + (dash ? 0 : .14) + '" stroke="var(--' + c + ')" stroke-width="' + (dash ? 1.5 : 2.5) + '" stroke-linejoin="round"' + (dash ? ' stroke-dasharray="4 3"' : '') + '/>'; }
+function box(x, y, w, h, s, on, c){ return '<rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="8" fill="var(--' + (on ? (c || 'accent') : 'fill') + ')" stroke="var(--line)"/>' + '<text x="' + (x + w / 2) + '" y="' + (y + h / 2 + 4) + '" text-anchor="middle" style="font-family:var(--sans);font-size:12px;font-weight:600;fill:var(--' + (on ? 'accent-ink' : 'ink') + ')">' + s + '</text>'; }
+var ED = 'M40 186 Q150 180 284 150', EDS = 'M40 186 Q140 178 232 70';
+function curve(d, dash){ return '<path d="' + d + '" fill="none" stroke="var(--muted)" stroke-width="1.5"' + (dash === false ? '' : ' stroke-dasharray="3 3"') + '/>'; }
+var LN = '96,178 190,170 190,70 112,82', LR = '178,166 250,150 250,84 196,92', LP = '96,170 186,120 186,56 110,70';
+
+var FIGS = [
+{id:'loop', title:'What fails: the pressure-volume loop', states:['Normal','HFrEF','HFpEF'],
+ draw:function(s){ return svg(300, 216, axes('LV volume →', 'LV pressure →') + curve(s === 2 ? EDS : ED) + ln(46, 186, s === 1 ? 240 : 150, s === 1 ? 40 : 20, 'muted', 'stroke-dasharray="3 3"') + poly([LN, LR, LP][s], 'accent') + (s === 1 ? tx(292, 30, 'contractility line', 'muted', 'text-anchor="end"') : tx(128, 16, 'contractility line')) + (s === 1 ? '' : tx(204, s === 2 ? 66 : 146, 'filling curve')), 'Pressure-volume loop, ' + this.states[s]); },
+ cap:['Each beat traces a loop. Its width is the stroke volume; its lower right corner is the filling pressure. The loop sits between a contractility line and a filling curve.','HFrEF: the contractility line is flatter, so the loop moves right, narrows, and fills at a higher pressure.','HFpEF: the filling curve is steeper. Stroke volume is kept at rest, but the same volume now costs a much higher pressure.'],
+ src:'Burkhoff et al., J Am Coll Cardiol 2015;66:2663. Schematic.'},
+{id:'drugs', title:'What each drug class does to the loop', states:['Diuretic','Vasodilator','Inotrope'],
+ draw:function(s){ var n = ['162,168 236,154 236,86 180,94', '168,166 250,150 250,72 184,80', '150,168 250,150 250,84 168,92'][s]; return svg(300, 216, axes('LV volume →', 'LV pressure →') + curve(ED) + ln(46, 186, s === 2 ? 216 : 240, s === 2 ? 30 : 40, 'muted', 'stroke-dasharray="3 3"') + poly(LR, 'muted', true) + poly(n, 'accent') + tx(40, 28, 'dashed: before'), 'Failing loop after a ' + this.states[s].toLowerCase()); },
+ cap:['Diuretic: less volume. The loop slides left and down the same filling curve: lower filling pressure, little change in stroke volume on the flat part of the curve.','Vasodilator: lower resistance to ejection. The ventricle empties further, so the loop widens and peak pressure falls.','Inotrope: a steeper contractility line. The loop widens, at the cost of more oxygen demand and arrhythmia.'],
+ src:'Burkhoff et al. 2015, Figure 1B (preload, resistance, contractility). Oxygen-demand statement: 2025 ACC shock guidance. Schematic.'},
+{id:'starling', title:'Preload and output', states:['As admitted','After diuresis','With an inotrope'],
+ draw:function(s){ var p = [[236, 122], [176, 128], [236, 88]][s]; return svg(300, 216, axes('Filling pressure →', 'Cardiac output →') + '<path d="M40 186 Q90 60 284 40" fill="none" stroke="var(--muted)" stroke-width="1.5"/>' + '<path d="M40 186 Q110 132 284 120" fill="none" stroke="var(--accent)" stroke-width="2.5"/>' + (s === 2 ? '<path d="M40 186 Q100 100 284 84" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-dasharray="5 3"/>' : '') + ln(200, 14, 200, 190, 'warn', 'stroke-dasharray="4 3"') + ln(34, 150, 292, 150, 'bad', 'stroke-dasharray="4 3"') + tx(204, 24, 'congestion', 'warn') + tx(226, 164, 'low output', 'bad') + tx(228, 36, 'normal') + tx(244, 134, 'failing', 'accent') + '<circle cx="' + p[0] + '" cy="' + p[1] + '" r="6" fill="var(--ink)"/>', 'Starling curves'); },
+ cap:['The failing heart sits on a flat curve, to the right of the congestion line: high filling pressure buys almost no extra output.','Diuresis moves the point left along the flat curve: congestion resolves with little loss of output.','An inotrope or vasodilator lifts the whole curve: more output at the same filling pressure.'],
+ src:'Standard physiology; schematic.'},
+{id:'profiles', title:'The four profiles', states:['Warm and wet','Cold and wet','Cold and dry','Warm and dry'],
+ draw:function(s){ var m = [[1, 0], [1, 1], [0, 1], [0, 0]][s]; function b(c, r, t){ return box(70 + c * 112, 30 + r * 76, 104, 68, t, m[0] === c && m[1] === r); } return svg(300, 216, tx(98, 20, 'DRY') + tx(210, 20, 'WET') + tx(26, 68, 'WARM') + tx(26, 144, 'COLD') + b(0, 0, 'Warm, dry') + b(1, 0, 'Warm, wet') + b(0, 1, 'Cold, dry') + b(1, 1, 'Cold, wet') + tx(70, 196, 'wet: wedge over 15') + tx(70, 210, 'cold: cardiac index under 2.2'), 'Four haemodynamic profiles'); },
+ cap:['Warm and wet: perfusing but congested. IV loop diuretic; keep the beta-blocker; start the pillars.','Cold and wet: congested and under-perfused. Call cardiology; inotrope or support plus diuresis.','Cold and dry: under-perfused without congestion. Reassess volume; call.','Warm and dry: the goal. Optimise oral therapy.'],
+ src:'Haemodynamic values: 2026 SCAI SHOCK update, Table 2. Treatments: this tool\'s Acute tab.'},
+{id:'congestion', title:'Where congestion shows', states:['Left-sided','Right-sided'],
+ draw:function(s){ var L = [['Orthopnoea, bendopnoea', 60], ['Rales', 86], ['Dyspnoea on minimal exertion', 112]], R = [['JVP over 6 to 8 mm Hg', 46], ['Hepatojugular reflux', 72], ['Hepatomegaly, GI symptoms', 132], ['Peripheral oedema', 190]]; var a = s === 0 ? L : R, o = ''; a.forEach(function(x){ o += '<circle cx="66" cy="' + (x[1] - 4) + '" r="5" fill="var(--' + (s === 0 ? 'accent' : 'warn') + ')"/>' + ln(72, x[1] - 4, 112, x[1] - 4, 'line') + '<text x="116" y="' + x[1] + '" style="font-family:var(--sans);font-size:12.5px;fill:var(--ink)">' + x[0] + '</text>'; }); return svg(300, 216, '<circle cx="66" cy="22" r="13" fill="var(--fill)" stroke="var(--muted)"/><rect x="44" y="40" width="44" height="100" rx="14" fill="var(--fill)" stroke="var(--muted)"/><rect x="48" y="142" width="14" height="62" rx="6" fill="var(--fill)" stroke="var(--muted)"/><rect x="70" y="142" width="14" height="62" rx="6" fill="var(--fill)" stroke="var(--muted)"/>' + o, this.states[s] + ' congestion signs'); },
+ cap:['Left-sided signs follow a raised wedge (pulmonary venous) pressure.','Right-sided signs follow a raised right atrial pressure.'],
+ src:'Sign list: 2024 ACC inpatient pathway, Figure 5. Left/right grouping: standard physiology.'},
+{id:'neuro', title:'The neurohormonal loop', states:['Beta-blocker','ARNI','MRA','SGLT inhibitor'],
+ draw:function(s){ return svg(300, 216, ln(130, 36, 80, 62, 'muted') + ln(170, 36, 224, 62, 'muted') + ln(230, 96, 230, 112, 'muted') + ln(70, 96, 90, 170, 'muted') + ln(230, 146, 210, 170, 'muted') + box(98, 6, 104, 30, 'Low output', false) + box(8, 62, 124, 34, 'Sympathetic drive', s === 0) + box(168, 62, 124, 34, 'Renin-angiotensin', s === 1) + box(168, 112, 124, 34, 'Aldosterone', s === 2) + box(8, 112, 124, 34, 'Natriuretic peptides', s === 1, 'ok') + box(60, 170, 180, 34, 'Sodium retention, remodelling', false) + (s === 3 ? tx(150, 162, 'proximal tubule', 'accent', 'text-anchor="middle"') : ''), 'Neurohormonal activation and where ' + this.states[s] + ' acts'); },
+ cap:['Beta-blockers block the sympathetic arm.','ARNI blocks the angiotensin receptor and inhibits neprilysin, which raises natriuretic peptides (and bradykinin, hence no overlap with an ACE inhibitor).','MRAs block aldosterone at its receptor: less sodium retention, more potassium retention.','SGLT inhibitors act in the proximal tubule, outside this loop; they also lower the risk of hyperkalaemia.'],
+ src:'2024 ACC HFrEF pathway, pp. 1452 and 1461. Circuit: standard physiology.'},
+{id:'nephron', title:'How a loop diuretic works and stops working', states:['Normal','HF or CKD','Chronic use','Second site'],
+ draw:function(s){ var c = ['M40 180 C110 180 110 50 284 44', 'M40 180 C170 180 170 76 284 70', 'M40 180 C150 180 150 96 284 92', 'M40 180 C150 180 150 60 284 54'][s]; return svg(300, 216, axes('Loop diuretic dose →', 'Sodium excreted →') + '<path d="M40 180 C110 180 110 50 284 44" fill="none" stroke="var(--muted)" stroke-width="1.5" stroke-dasharray="3 3"/>' + '<path d="' + c + '" fill="none" stroke="var(--accent)" stroke-width="2.5"/>' + tx(40, 200, 'threshold') + tx(232, 36, 'ceiling') + (s === 3 ? tx(204, 124, '+ second site', 'accent') : ''), 'Loop diuretic dose-response, ' + this.states[s]); },
+ cap:['Nothing happens below a threshold dose; above a ceiling, more drug adds nothing. Loop diuretics are over 90% protein-bound and must be secreted into the tubule to act.','HF and kidney disease shift the curve right and down: a bigger dose is needed to cross the threshold. This is why the home dose is multiplied and given IV.','With chronic use the distal tubule enlarges and reclaims the sodium the loop diuretic delivers. The ceiling falls.','Blocking a second site (thiazide in the distal tubule, acetazolamide or an SGLT2 inhibitor proximally, MRA late distal) restores the response.'],
+ src:'Mullens et al., Eur J Heart Fail 2019;21:137, pp. 142 to 146. Schematic.'},
+{id:'response', title:'Is the diuretic working?', states:['Sodium under 50','50 to 70','70 or over'],
+ draw:function(s){ return svg(300, 150, ln(20, 60, 284, 60, 'muted') + [['0 h', 20, 'dose'], ['2 h', 108, 'urine sodium'], ['6 h', 284, 'urine output']].map(function(p){ return '<circle cx="' + p[1] + '" cy="60" r="6" fill="var(--' + (p[0] === '2 h' ? 'accent' : 'muted') + ')"/>' + tx(p[1], 44, p[0], 'ink', 'text-anchor="' + (p[1] > 200 ? 'end' : p[1] < 40 ? 'start' : 'middle') + '"') + tx(p[1], 82, p[2], 'muted', 'text-anchor="' + (p[1] > 200 ? 'end' : p[1] < 40 ? 'start' : 'middle') + '"'); }).join('') + box(20, 104, 264, 34, ['Escalate now: raise the dose 50% to 100%', 'Borderline: urine output decides', 'Adequate: repeat the same dose'][s], true, ['bad', 'warn', 'ok'][s]), 'Six-hour response check'); },
+ cap:['Under 50 mEq/L at 2 hours: the dose did not reach threshold. Raise it now, not tomorrow.','50 to 70: borderline. Under 100 mL/h of urine over the first 6 hours makes it a poor response. (The 2026 ESC guideline calls 70 or over satisfactory.)','70 or over with 100 mL/h or more: the dose works. Repeat it every 12 hours while congestion persists.'],
+ src:'2024 ACC inpatient pathway p. 1247; Mullens 2019 Figure 3A; 2026 ESC guideline section 7.5.'},
+{id:'creat', title:'The creatinine bump', states:['Decongestion','Low flow'],
+ draw:function(s){ var a = [['Still congested or improving', 'Warm, perfusing', 'Haemoconcentrating'], ['Cool extremities', 'Narrow pulse pressure', 'Rising lactate, falling urine']][s], o = ''; a.forEach(function(t, k){ o += '<rect x="30" y="' + (52 + k * 34) + '" width="240" height="28" rx="8" fill="var(--fill)"/><text x="150" y="' + (71 + k * 34) + '" text-anchor="middle" style="font-family:var(--sans);font-size:12.5px;fill:var(--ink)">' + t + '</text>'; }); return svg(300, 206, box(84, 6, 132, 32, 'Creatinine up', false) + o + box(30, 162, 240, 34, s === 0 ? 'Continue diuresis' : 'Low output: escalate, call', true, s === 0 ? 'ok' : 'bad'), 'Creatinine rise: ' + this.states[s]); },
+ cap:['A rise during successful decongestion is not tubular injury and should not by itself stop diuresis. Leaving hospital congested carries the worse prognosis.','The same rise with poor perfusion is a different problem: the kidney is under-perfused because output is low.'],
+ src:'Mullens 2019 p. 141; 2022 AHA/ACC/HFSA guideline 9.2 (class 1).'},
+{id:'labs', title:'Reading the labs', states:['BNP','Urine Na','Creatinine','Sodium','Potassium','Bicarbonate','Liver tests','Lactate','Troponin','Iron'],
+ draw:function(s){ return svg(300, 60, box(20, 12, 260, 36, this.states[s] === 'BNP' ? 'BNP / NT-proBNP' : this.states[s], false), this.states[s]); },
+ cap:['Rises with wall stress; a fall during admission tracks decongestion. Obesity lowers both peptides and reduces their sensitivity. On an ARNI follow NT-proBNP: sacubitril raises BNP, a neprilysin substrate.','A low spot urine sodium 2 hours after a dose means the dose did not reach threshold. Misleading if the bladder was not emptied before the dose.','A small rise is expected during decongestion or after starting a RAS inhibitor. A rise with low-perfusion signs is low output. An eGFR fall over 30% prompts a dose review.','Low sodium in HF is usually dilution (too much water): urine osmolality 100 or over. Depletion from distal diuretics looks the same but the urine is dilute and urine sodium is under 50.','Falls with loop and thiazide diuretics; rises with RAS inhibitors and MRAs. A haemolysed sample misleads.','Rises with loop and thiazide diuresis; falls with acetazolamide. A falling bicarbonate with a rising lactate is hypoperfusion.','Congestion gives a cholestatic pattern; low output raises transaminases. ALT over 200 or 3 times normal is a shock perfusion marker.','2 or over marks hypoperfusion and helps set the shock stage. A normal lactate does not exclude shock.','Often mildly raised in decompensation. A rise and fall with symptoms or ECG change is an infarct until shown otherwise: acute coronary syndrome is a common precipitant.','Iron deficiency is common and treatable: ferritin under 100, or 100 to 300 with transferrin saturation under 20%. Ferritin also rises with inflammation.'],
+ src:'2022 guideline 4.2 and 10.1; Mullens 2019 Table 3; 2024 HFrEF pathway; 2025 ACC shock guidance; 2026 SCAI update. Patterns for bicarbonate and liver tests are standard physiology.'},
+{id:'fast', title:'Why four drugs fast', states:['One at a time','All four in weeks'],
+ draw:function(s){ var n = ['Beta-blocker', 'ARNI', 'MRA', 'SGLT inhibitor'], o = ''; n.forEach(function(t, k){ var x = s === 0 ? 70 + k * 54 : 70 + k * 8; o += tx(4, 44 + k * 34, t, 'ink') + '<rect x="' + (x + 44) + '" y="' + (32 + k * 34) + '" width="' + (250 - x) + '" height="16" rx="8" fill="var(--accent)"/>'; }); return svg(300, 190, o + ln(114, 168, 294, 168, 'muted') + tx(114, 184, 'start') + tx(294, 184, s === 0 ? '6+ months' : '2 to 3 months', 'muted', 'text-anchor="end"'), 'Titration timelines'); },
+ cap:['Started and titrated one at a time, the last drug begins months late, and many patients never get it.','All four can start together at low dose, or in quick sequence, with more than one change per visit. Aim to finish within 2 to 3 months. In STRONG-HF, rapid titration cut 180-day death or readmission from 23.3% to 15.2%.'],
+ src:'2024 ACC HFrEF pathway, p. 1451 and Table 14; STRONG-HF.'},
+{id:'workup', title:'A new cardiomyopathy: the workup that narrows', states:['Start','Thick walls, low voltage','Hypertrophy, family history','AV block under 60','Warm, wide pulse pressure','Prior radiation or surgery'],
+ draw:function(s){ var hit = [-1, 0, 1, 2, 7, 5][s], o = ''; MIMICS.forEach(function(m, k){ var on = s === 0 || k === hit; o += '<text x="12" y="' + (20 + k * 21) + '" style="font-family:var(--sans);font-size:12.5px;font-weight:' + (k === hit ? 700 : 400) + ';fill:var(--' + (on ? 'ink' : 'muted') + ')" opacity="' + (on ? 1 : .45) + '">' + (k === hit ? '● ' : '') + m[0] + '</text>'; }); return svg(300, 200, o, 'Causes that fit: ' + this.states[s]); },
+ cap:['First tests for everyone: natriuretic peptide, CBC, metabolic panel, liver tests, iron studies, thyroid, HbA1c, ECG, chest X-ray, echo; then ischaemia evaluation or cardiac MRI. Tap a clue.','Points to amyloid. Send a monoclonal protein screen, then bone scintigraphy.','Points to hypertrophic cardiomyopathy. Cardiac MRI and genetic testing.','Points to sarcoid, especially with ventricular arrhythmia or disease outside the heart. Cardiac MRI and FDG-PET.','Points to a high-output state: anaemia, thyrotoxicosis, liver disease, a fistula. CBC, TSH, liver tests.','Points to constriction, with a Kussmaul sign and right-sided congestion. Echo with Doppler, then catheterisation.'],
+ src:'2026 ACC HFpEF pathway, Table 2 and Figure 4; 2024 HFrEF pathway, Figure 4.'},
+{id:'course', title:'The course of heart failure', states:['Stage A','Stage B','Stage C','Stage D'],
+ draw:function(s){ var x = [50, 100, 170, 252][s]; return svg(300, 190, ln(34, 170, 292, 170) + ln(34, 170, 34, 14) + tx(12, 110, 'Function →', 'muted', 'transform="rotate(-90 12 110)"') + tx(150, 186, 'Time →') + '<path d="M40 40 H120 V62 H150 V52 H180 V86 H206 V76 H226 V112 H244 V104 H258 V140 H286" fill="none" stroke="var(--accent)" stroke-width="2.5"/>' + '<rect x="212" y="20" width="44" height="146" fill="var(--warn)" fill-opacity=".14"/>' + tx(234, 16, 'refer', 'warn', 'text-anchor="middle"') + '<circle cx="' + x + '" cy="' + [40, 40, 58, 132][s] + '" r="6" fill="var(--ink)"/>', 'Trajectory, ' + this.states[s]); },
+ cap:['Stage A: at risk, no structural disease, no symptoms.','Stage B: structural disease without symptoms.','Stage C: symptomatic HF. Each admission is a step down that is only partly recovered.','Stage D: advanced HF. Refer before this point: candidacy for LVAD or transplant can be lost once organs fail. Median survival is under 2 years without advanced therapy and over 12 years after transplant.'],
+ src:'2022 AHA/ACC/HFSA guideline 8.1 and 8.5. Schematic.'},
+{id:'mcs', title:'Shock and support devices', states:['IABP','Impella','VA-ECMO'],
+ draw:function(s){ if (s === 0) return svg(300, 110, box(20, 10, 260, 36, 'Flow 0.5 to 1.0 L/min', false) + box(20, 58, 260, 36, 'No direct unloading; lowers afterload', false), 'IABP'); var n = s === 1 ? '120,170 196,160 150,96' : '208,150 260,136 260,58 222,66'; return svg(300, 216, axes('LV volume →', 'LV pressure →') + curve(ED) + ln(46, 186, 240, 40, 'muted', 'stroke-dasharray="3 3"') + poly(LR, 'muted', true) + poly(n, 'accent') + tx(40, 28, 'dashed: shock, before support'), this.states[s] + ' effect on the loop'); },
+ cap:['Intra-aortic balloon pump: the least flow. It lowers afterload without directly unloading the ventricle. No loop is drawn: the source read does not give one.','A pump from ventricle to aorta removes blood throughout the cycle: the loop loses its vertical sides, becomes triangular and shifts left. Filling pressure, work and oxygen demand fall. Flow 3.0 to 4.3 L/min (CP) or 5.0 to 6.0 (5.5).','VA-ECMO restores flow (5.0 to 7.0 L/min) but returns blood to the aorta: afterload and filling pressure rise and the loop narrows and moves right. By itself it may not unload the ventricle, hence venting.'],
+ src:'Burkhoff et al. 2015, Figures 4 to 6; flows from the 2025 ACC shock guidance, Figure 6. Schematic.'},
+{id:'lvadfig', title:'The LVAD patient', states:['No pulse','Measuring pressure','Targets'],
+ draw:function(s){ return svg(300, 150, tx(10, 24, 'Normal', 'ink') + '<path d="M10 70 Q24 20 38 70 T66 70 T94 70 T122 70" fill="none" stroke="var(--muted)" stroke-width="2"/>' + tx(160, 24, 'LVAD', 'ink') + '<path d="M160 52 Q174 44 188 52 T216 52 T244 52 T272 52" fill="none" stroke="var(--accent)" stroke-width="2.5"/>' + box(10, 100, 280, 36, ['Pulse pressure under 15: not palpable', 'Doppler + manual cuff ≈ MAP', 'MAP 70 to 90; never under 60'][s], true), 'Arterial trace on an LVAD'); },
+ cap:['Continuous flow leaves a pulse pressure under 15 mm Hg in most patients: not palpable, and not read by an automated cuff.','Doppler probe on the brachial or radial artery with a manual cuff: the pressure at which flow returns is approximately the mean. If there is a palpable pulse, that reading is the systolic.','Optimal mean pressure 70 to 90 mm Hg. High pressure reduces pump flow and is linked to stroke and pump thrombosis; under 60 means hypoperfusion.'],
+ src:'HFA position paper for non-LVAD specialists, Part 3, ESC Heart Fail 2021 (doi:10.1002/ehf2.13590).'}
+];
+var FIG = {}; FIGS.forEach(function(f){ FIG[f.id] = f; });
+</script>
+<script>
+/* UI: reads inputs, calls the engine, renders layered cards (answer, one Why line, one More). */
+function $(id){ return document.getElementById(id); }
+function v(id){ return num($(id).value); }
+function c(id){ return $(id).checked; }
+function esc(s){ return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;'); }
+function fld(id, label, ph){ return '<div class="field"><label for="' + id + '">' + label + '</label><input id="' + id + '" inputmode="decimal" autocomplete="off" placeholder="' + (ph || '') + '"></div>'; }
+function chk(id, label){ return '<label class="chk"><input type="checkbox" id="' + id + '"><span>' + label + '</span></label>'; }
+function sel(id, label, opts){ return '<div class="field"><label for="' + id + '">' + label + '</label><select id="' + id + '">' + opts.map(function(o){ return '<option value="' + o[0] + '">' + o[1] + '</option>'; }).join('') + '</select></div>'; }
+var ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M7 15l3-4 3 3 2-2 2 3"/></svg>';
+function trialHtml(k){ var t = TR[k]; if (!t) return ''; var d = t[5]; return '<div class="trial"><p><b>' + t[0] + '</b> <span class="mono">(' + t[1] + ')</span></p><p><span class="k">Question</span>' + t[2] + '</p><p><span class="k">Result</span>' + t[3] + '</p><p><span class="k">What it changed</span>' + t[4] + '</p><p class="mono" style="font-size:12.5px">' + (d.indexOf('10.') === 0 ? '<a href="https://doi.org/' + d + '" rel="noopener">doi:' + d + '</a>' : d) + '</p></div>'; }
+/* One card. o: label, head, cls, body, guard, why, more, tiers[], esc, trials[], figs[] */
+function card(o){
+  var h = '<div class="card"' + (o.id ? ' id="' + o.id + '"' : '') + '>';
+  if (o.label) h += '<p class="label">' + o.label + '</p>';
+  if (o.head) h += '<p class="head' + (o.cls ? ' ' + o.cls : '') + '">' + o.head + '</p>';
+  if (o.body) h += o.body;
+  if (o.guard) h += '<div class="guard">' + o.guard + '</div>';
+  if (o.why) h += '<p class="whyline"><b>Why:</b> ' + o.why + '</p>';
+  var m = (o.more || '') + (o.esc ? '<p><b>ESC 2026 differs:</b> ' + o.esc + '</p>' : '') + (o.trials || []).map(trialHtml).join('') + (o.tiers || []).map(function(t){ return '<span class="tier">' + t + '</span>'; }).join('');
+  if (m) h += '<details><summary>More</summary>' + m + '</details>';
+  if (o.figs && o.figs.length) h += '<div class="chips">' + o.figs.map(function(f){ return '<button class="chip" type="button" data-fig="' + f + '">' + ICON + esc(FIG[f].title) + '</button>'; }).join('') + '</div>';
+  return h + '</div>';
+}
+function ul(a){ return '<ul>' + a.map(function(x){ return '<li>' + x + '</li>'; }).join('') + '</ul>'; }
+function p(s){ return '<p>' + s + '</p>'; }
+function mg(x){ return (Math.round(x * 10) / 10) + ' mg'; }
+
+/* ================= ACUTE: ADMIT ================= */
+function readAdmit(){ var cong = 0, perf = 0; CONG.forEach(function(_, k){ if (c('c' + k)) cong++; }); PERF.forEach(function(_, k){ if (c('pf' + k)) perf++; });
+  return {cong: cong, perf: perf, sbp: v('a-sbp'), map: v('a-map'), lactate: v('a-lact'), spo2: v('a-spo2'), egfr: v('a-egfr'), sustained: c('a-sus'), pressor: c('a-press'), ment: c('a-ment'), cold: c('a-cold'), uop30: c('a-uop'), htn: c('a-htn'), respFail: c('a-resp'), naive: c('a-naive'), drug: $('a-drug').value, homeDose: v('a-dose')}; }
+function admitHtml(i){
+  var o = admit(i), h = '';
+  if (o.shock) h += card({label: 'Safety guard', head: 'Possible cardiogenic shock', cls: 'bad', body: p('Do not rely on the ward diuretic pathway. Call cardiology / ICU now and open the <a href="#shock">Advanced tab, Shock</a>.'), why: 'Sustained hypotension with a sign of hypoperfusion meets the guideline description of cardiogenic shock.', more: p('Hypotension: systolic under 90 or mean under 60 for more than 30 minutes, or pressors needed. Hypoperfusion: decreased mentation, cold extremities or livedo, urine output under 30 mL/h, lactate over 2 mmol/L. Both are required.'), tiers: ['2022 AHA/ACC/HFSA guideline, Table 22']});
+  else if (o.preShock) h += card({label: 'Safety guard', head: 'Hypotension with a low-perfusion finding: possible cardiogenic shock', cls: 'bad', body: p('Call cardiology / ICU now and open the <a href="#shock">Advanced tab, Shock</a>. The first-dose and SGLT2 cards are hidden until this is reviewed.'), why: 'Low pressure with hypoperfusion becomes the guideline description of cardiogenic shock once it lasts over 30 minutes or needs pressors.', more: p('The guideline description needs hypotension for over 30 minutes or pressors, plus one of: decreased mentation, cold extremities or livedo, urine output under 30 mL/h, lactate over 2. Tick those that apply. Hiding the dose cards before 30 minutes is a safety choice made by this tool, not a guideline rule.'), tiers: ['2022 AHA/ACC/HFSA guideline, Table 22', 'Expert practice']});
+  else if (o.lowOutput) h += card({label: 'Low output suspected', head: 'Call cardiology', cls: 'bad', body: p('A low-perfusion finding is entered without sustained hypotension. Shock can be normotensive. Inotrope doses and staging are on the <a href="#shock">Advanced tab</a>.'), why: 'Hypoperfusion without hypotension is associated with higher mortality, so a normal pressure does not exclude shock.', tiers: ['2025 ACC shock guidance 4.1', '2026 SCAI SHOCK update']});
+  if (i.cong + i.perf > 0 || o.shock || o.preShock || o.lowOutput) h += card({label: 'Profile', head: o.profile, body: p(o.wet && !o.cold ? 'Perfusing but congested: decongest.' : o.wet && o.cold ? 'Congested and under-perfused: decongestion needs support for output.' : o.cold ? 'Under-perfused without congestion: reassess volume; call.' : 'No congestion or low-perfusion finding ticked.'), more: p('The congestion signs are from the 2024 ACC inpatient pathway; narrow pulse pressure and cool extremities are the guideline\'s perfusion signs. "Intolerance of neurohormonal antagonists" as a low-perfusion clue is expert practice.'), tiers: ['Assess congestion and perfusion: class 1, C-LD', 'Expert practice'], figs: ['profiles', 'congestion']});
+  if (!o.shock && !o.preShock && o.dose){
+    var d = o.dose;
+    if (d.naive) h += card({id: 'firstdose', label: 'First IV loop dose · diuretic-naive', head: 'Furosemide 40 to 80 mg IV per day', body: p('Total for the first day, as one dose or split every 8 to 12 hours. Chosen by fluid overload, kidney function and age; higher with reduced kidney function.'), why: o.kidneyWhy ? 'Kidney dysfunction shifts the dose-response curve to the right, so use the higher starting dose.' : 'Loop diuretics need a threshold concentration in the tubule before any sodium is excreted.', more: p('Mullens 2019: at least 20 to 40 mg furosemide equivalent. The "reduced kidney function" Why line shows when eGFR is entered under 60; that number only selects the explanation and is not a dose rule.'), esc: '40 mg IV furosemide if diuretic-naive; higher with CKD.', tiers: ['Start IV loop diuretic promptly: class 1, B-NR', 'Dose: expert consensus (ACC 2024)'], trials: ['DOSE'], figs: ['nephron']});
+    else {
+      var per = Math.min(200, r5(d.perDose));
+      h += card({id: 'firstdose', label: 'First IV loop dose · on a home loop diuretic', head: 'Furosemide ' + r5(d.high) + ' mg IV per day: ' + per + ' mg every 12 hours', body: p('Range ' + r5(d.low) + ' to ' + r5(d.high) + ' mg IV per day (1 to 2.5 times the home dose of ' + r5(d.feq) + ' mg furosemide equivalent). Use the lower end if frail or blood pressure is low.') + p('<span class="mono">As bumetanide IV: ' + mg(d.bumLow) + ' to ' + mg(d.bumHigh) + ' per day.</span>'), guard: (i.sbp != null && i.sbp < 90 ? 'Systolic under 90 entered: check perfusion (mentation, extremities, urine output, lactate) before giving this dose. ' : '') + (d.over ? 'The 2.5 times dose exceeds 200 mg per dose, the pathway maximum. Give 200 mg per dose or use an infusion (furosemide 5 to 20 mg/h, maximum 40 mg/h, after a loading dose).' : ''), why: 'A congested gut absorbs oral furosemide poorly and the dose-response curve is shifted right, so the home dose is given IV and multiplied.', more: p('Conversion used: furosemide 40 mg = torsemide 20 mg = bumetanide 1 mg (source range: 40 mg oral furosemide ≈ 10 to 20 mg torsemide ≈ 0.5 to 1 mg bumetanide). The sources convert the total daily oral dose and multiply it; they do not halve oral furosemide for IV use.') + p('Schedule: IV bolus every 8 to 12 hours, at least 6 hours apart, or a continuous infusion after a loading dose. Inpatient ranges: furosemide 40 to 160 mg IV 1 to 3 times daily (200 mg per dose); bumetanide 0.5 to 4 mg IV 1 to 3 times daily (12 mg/day) or 0.5 to 2 mg/h (4 mg/h).'), esc: 'double the daily oral dose (1 to 2 times in the 2019 HFA statement).', tiers: ['Start IV loop diuretic promptly: class 1, B-NR', 'Dose: expert consensus (ACC 2024)'], trials: ['DOSE'], figs: ['nephron']});
+    }
+  }
+  if (!o.shock && !o.preShock && (o.dose || i.cong > 0)){
+    h += card({label: 'SGLT2 inhibitor in hospital', head: o.sglt === 'yes' ? 'Can be started once stable' : o.sglt === 'no-egfr' ? 'Not started: eGFR under 20' : 'Enter eGFR', body: o.sglt === 'yes' ? p('Dapagliflozin 10 mg or empagliflozin 10 mg daily, any time after admission if haemodynamically stable. Not with hypovolaemia. Not for type 1 diabetes.') : '', more: p('Warn about ketoacidosis with normal glucose, and genital and urinary infection. Reassess the diuretic dose after starting. Confirm the patient can afford it before discharge.'), esc: 'in-hospital start after stabilisation is a recommendation.', tiers: ['Expert consensus (ACC 2024)'], trials: ['EMPULSE']});
+  }
+  if (o.vaso === 'consider') h += card({label: 'Pulmonary oedema with severe hypertension', head: 'Urgent blood pressure reduction: IV nitroglycerin', body: p('<span class="mono">Start 5 mcg/min through non-absorbing tubing. Raise by 5 mcg/min every 3 to 5 minutes. If no response at 20 mcg/min, steps of 10 and then 20 mcg/min.</span> Smaller, less frequent steps once a response appears. The label states no maximum.'), guard: 'Not with PDE-5 inhibitors (sildenafil, tadalafil, vardenafil) or riociguat. Not with hypotension, tamponade, restrictive cardiomyopathy or constriction.', more: p('Nitroprusside is an ICU or cardiology drug: start 0.3 mcg/kg/min, assess for at least 5 minutes before each change, maximum 10 mcg/kg/min, and never at that rate for more than 10 minutes (boxed warning: stop if pressure is not controlled by then); in acute HF the label requires titration by invasive haemodynamic monitoring.') + p('The nitroglycerin label\'s HF indication is congestive failure with acute MI; use here rests on the guideline recommendation.'), tiers: ['IV vasodilator as an adjunct for dyspnoea: class 2b, B-NR', 'Doses: FDA labels']});
+  if (o.vaso === 'hypotension') h += card({label: 'Pulmonary oedema with severe hypertension', head: 'Vasodilator not advised: systolic under 90 entered', tiers: ['Class 2b applies only without hypotension']});
+  if (o.oxygen) h += card({label: 'Oxygen', head: 'Give oxygen: SpO2 under 90%', more: p('Oxygen is for hypoxaemia (SpO2 under 90% or PaO2 under 60 mm Hg). Without hypoxaemia it may be harmful.'), tiers: ['ESC 2026 recommendation (European source)']});
+  if (o.niv) h += card({label: 'Respiratory failure', head: 'Non-invasive ventilation', body: p('Recommended in acute pulmonary oedema or shock with respiratory failure.'), guard: 'Use with caution with low blood pressure or right-sided failure: positive pressure lowers preload and can lower output.', tiers: ['ESC 2026 recommendation (European source)']});
+  return h || '<div class="card"><p class="empty">Tick the findings and enter the home loop diuretic to see the profile and first dose.</p></div>';
+}
+var ADMIT_STATIC = card({label: 'Every admission', head: 'Look for the precipitant', body: ul(PRECIP), tiers: ['Class 1, C-LD']}) + card({label: 'Every admission', head: 'VTE prophylaxis', tiers: ['Class 1, B-R']}) + card({label: 'From the ED', head: 'Admit or not', body: ul(['Critically ill: critical care', 'New diagnosis of HF: admit', 'Marked congestion (marked leg oedema, ascites, scrotal or perineal oedema): admit', 'Medium or high medical risk or complexity: admit', 'Otherwise: home with a recheck in under 7 days, an observation unit, or hospital at home']), tiers: ['Expert consensus (ACC 2024, Figure 2)']});
+
+/* ================= ACUTE: DAILY ================= */
+function readDaily(){ return {curDose: v('d-cur'), perDay: num($('d-per').value), una: v('d-una'), uop6: v('d-uop6'), uop24: v('d-uop24'), congested: c('d-cong'), crRise: c('d-cr'), lowPerf: c('d-low'), k: v('d-k'), na: v('d-na'), uosm: v('d-uosm'), unaBase: v('d-una0'), sbp: v('d-sbp'), inotrope24: c('d-ino'), ivUp6: c('d-ivup')}; }
+function dailyHtml(i){
+  var o = daily(i), h = '', second = false;
+  if (o.resp === 'poor'){
+    var why = (i.una != null && i.una < 50) ? 'A low urine sodium 2 hours after the dose means the dose did not reach the natriuretic threshold. Act now, not tomorrow.' : 'Under 100 mL/h over the first 6 hours is a poor response to that dose.';
+    if (o.ceiling){ second = true; h += card({id: 'response', label: 'Response', head: 'Poor response at the loop ceiling', cls: 'bad', body: p('Daily dose is ' + r5(o.dayDose) + ' mg furosemide equivalent. Stop doubling; add a second agent (below).'), why: 'Past the ceiling, more loop diuretic adds little: the distal nephron is reclaiming the sodium, so block a second site.', figs: ['nephron', 'response'], tiers: ['Expert consensus (ACC 2024; HFA 2019)']}); }
+    else h += card({id: 'response', label: 'Response', head: o.next ? 'Poor response: raise the next dose to ' + (o.next.lo === o.next.hi ? o.next.hi : o.next.lo + ' to ' + o.next.hi) + ' mg IV' : 'Poor response: raise the loop dose by 50% to 100%', cls: 'bad', body: p('Reassess within 6 hours. Repeat until the maximum dose.'), guard: o.next && o.next.capped ? 'Doubling would exceed 200 mg per dose. Give 200 mg per dose or switch to an infusion; a second agent is added at the daily ceiling (400 mg furosemide equivalent).' : '', why: why, more: p('Poor response: spot urine sodium under 50 mEq/L at 2 hours, or urine output under 100 mL/h over the first 6 hours. A sodium of 50 to 70 is borderline and the urine output decides. The HFA statement gives the ranges "under 50 to 70" and "under 100 to 150 mL/h".'), esc: 'a satisfactory response is urine sodium 70 or over at 2 hours or urine output 100 mL/h or over.', trials: ['PUSH-AHF'], figs: ['response', 'nephron'], tiers: ['Expert consensus (ACC 2024; HFA 2019)']});
+  } else if (o.resp === 'borderline') h += card({id: 'response', label: 'Response', head: 'Borderline: urine sodium 50 to 70', body: p('Enter the 6-hour urine output. Under 100 mL/h makes this a poor response.'), figs: ['response']});
+  else if (o.resp === 'ok') h += card({id: 'response', label: 'Response', head: i.congested ? 'Adequate: repeat the same dose every 12 hours' : 'Adequate response', cls: 'okc', body: i.congested ? '' : p('If congestion has cleared, go to <a href="#discharge">Discharge</a>.'), why: i.congested ? 'The dose is effective. Total sodium loss depends on time above the threshold, so repeat it.' : '', more: p('If the response is brisk but short-lived, give the dose 3 to 4 times daily.'), figs: ['response'], tiers: ['Expert consensus (HFA 2019; ACC 2024)']});
+  if (o.day2 === 'low') h += card({label: '24-hour urine output', head: o.ceiling ? 'Under 3 L with congestion at the loop ceiling: add a second agent' : 'Under 3 L with congestion: double the loop dose', body: o.ceiling ? '' : p('Up to 200 mg per dose and 400 mg furosemide equivalent per day; then add a second agent.'), more: p('3 to 4 L: continue the current dose. Over 5 L: consider reducing.'), tiers: ['HFA 2019 (European source)']});
+  else if (o.day2 === 'high') h += card({label: '24-hour urine output', head: 'Over 5 L: consider reducing the dose', tiers: ['HFA 2019 (European source)']});
+  else if (o.day2 === 'ok') h += card({label: '24-hour urine output', head: '3 L or more: continue the current dose', tiers: ['HFA 2019 (European source)']});
+  if (second || (o.day2 === 'low' && o.ceiling)) h += card({id: 'second', label: 'Second agent', head: 'Add a thiazide-type diuretic or acetazolamide', body: ul(['<span class="mono">Metolazone 2.5 to 5 mg orally once or twice daily</span>', '<span class="mono">Chlorothiazide 0.5 to 1 g IV once or twice daily</span>', '<span class="mono">Acetazolamide 500 mg IV or orally once daily</span> (studied for 3 days)']), guard: 'Recheck potassium, magnesium, sodium and creatinine the next morning. With acetazolamide also bicarbonate: it can cause severe acidosis, especially in older patients with renal insufficiency.', why: 'Chronic loop diuretic use makes the distal tubule reclaim sodium; a drug at a second site restores the response.', more: p('Also: hydrochlorothiazide 25 to 50 mg or chlorthalidone 12.5 to 25 mg orally once or twice daily; an MRA; an SGLT2 inhibitor. Loop ceiling: doses are often doubled until 400 to 500 mg furosemide equivalent per day. Refractory: consider haemodynamic monitoring and other strategies; ultrafiltration is a bail-out, not first line.'), esc: 'hydrochlorothiazide by eGFR (over 50: 25 mg; 20 to 50: 50 mg; under 20: 100 mg daily); highest daily IV furosemide generally 600 mg.', trials: ['ADVOR', 'CLOROTIC'], figs: ['nephron'], tiers: ['Higher dose or second diuretic: class 2a, B-NR', 'Doses: expert consensus (ACC 2024, Table 7)']});
+  if (o.creat === 'continue') h += card({id: 'creat', label: 'Creatinine up', head: 'Continue decongestion', cls: 'okc', body: p('Still congested and no low-perfusion finding.'), why: 'A creatinine rise during decongestion is not tubular injury and should not by itself stop diuresis. Leaving hospital congested carries the worse prognosis.', more: p('The sources give no creatinine number at which to stop. With a mild fall in renal function or an asymptomatic fall in blood pressure, diuresis and GDMT should not routinely be stopped.'), figs: ['creat'], tiers: ['Class 1, B-NR']});
+  if (o.creat === 'lowflow') h += card({id: 'creat', label: 'Creatinine up with a low-perfusion finding', head: 'Treat as low output, not as over-diuresis', cls: 'bad', body: p('Consult cardiology. Consider an inotrope, temporary support and haemodynamic monitoring (worsening trajectory).'), why: 'A rising creatinine with poor perfusion is a different problem: low output, not successful decongestion.', figs: ['creat'], tiers: ['Expert consensus (ACC 2024, Figure 7A)']});
+  if (o.creat === 'dry') h += card({id: 'creat', label: 'Creatinine up, no longer congested', head: 'Check for overshooting', body: p('Check postural vital signs. Volume depletion reduces tolerance of ARNI and other RAS inhibitors. With a low albumin, oedema overstates intravascular volume.'), tiers: ['Expert consensus (ACC 2024)']});
+  if (o.k === 'low') h += card({label: 'Potassium under 3.5', head: 'Replace potassium and magnesium', body: p('Consider stopping the thiazide; use an MRA up front. Doses are in <a href="/electrolytes/">Electrolytes</a>.'), tiers: ['HFA 2019 (European source)']});
+  if (o.k === 'high') h += card({label: 'Potassium over 5', head: 'Confirm; ECG; check kidney function and haemolysis', body: p('If chronic: reduce the RAAS inhibitor dose, raise the loop dose, consider a potassium binder.'), tiers: ['HFA 2019 (European source)']});
+  if (o.na) h += card({label: 'Sodium under 135', head: o.na === 'dilution' ? 'Dilution: limit water, promote distal flow' : o.na === 'depletion' ? 'Depletion: stop distal diuretics, replace sodium' : o.na === 'unclear' ? 'Send a urine sodium taken off diuretic' : 'Send urine osmolality', body: p(o.na === 'dilution' ? 'Pause distal-acting diuretics; loop diuretic; correct potassium and magnesium. Hypertonic saline, acetazolamide or an SGLT2 inhibitor are specialist options.' : o.na === 'depletion' ? 'Urine osmolality under 100 with urine sodium under 50 in a volume-depleted patient. Use a urine sodium that is not the 2-hour post-dose sample.' : 'Dilution: urine osmolality 100 or over in an overloaded patient. Depletion: under 100 with urine sodium under 50.'), tiers: ['HFA 2019 (European source)'], figs: ['labs']});
+  if (o.stable === true) h += card({id: 'gdmt', label: 'GDMT in hospital', head: 'Stable enough to start or raise GDMT', cls: 'okc', body: ul(['<b>SGLT2 inhibitor:</b> dapagliflozin or empagliflozin 10 mg daily (eGFR 20 or over)', '<b>MRA:</b> ' + (o.mraOk ? 'spironolactone 12.5 to 25 mg daily if creatinine is under 2.5 mg/dL in men or 2.0 or under in women, potassium stable, labs assured' : 'needs potassium under 5.0 and creatinine under 2.5 (men) or 2.0 or under (women)'), '<b>ARNI:</b> sacubitril/valsartan ' + o.arni + ' mg twice daily (systolic ' + (o.arni === '49/51' ? 'over 120' : '100 to 120') + '). Stop an ACE inhibitor 36 hours before; no gap from an ARB', '<b>Beta-blocker:</b> bisoprolol 1.25 mg daily, carvedilol 3.125 mg twice daily, or metoprolol succinate 12.5 to 25 mg daily; continue a home beta-blocker']), why: 'Drugs started in hospital are far more likely to be on the list a year later; it cannot be assumed they will be started after discharge.', more: p('Stable means: systolic 100 or over, no IV inotrope in the past 24 hours, and no increase in IV diuretic or vasodilator in the past 6 hours. ARNI and beta-blocker are generally not added in a stalled or worsening trajectory. If blood pressure is less robust, a low-dose ARB first.') + p('The inpatient pathway words the beta-blocker start as "usually metoprolol 6.25 mg twice daily or carvedilol 3.125 mg twice daily" (salt not specified); the doses above are from the 2024 HFrEF pathway table.'), tiers: ['Continue GDMT: class 1, B-NR', 'Start GDMT before discharge: class 1, B-NR'], trials: ['PIONEER-HF', 'STRONG-HF'], figs: ['fast']});
+  if (o.stable === false) h += card({id: 'gdmt', label: 'GDMT in hospital', head: 'Not yet stable for new ARNI or beta-blocker', body: p((o.raising ? 'The IV diuretic is being raised today. ' : '') + (i.lowPerf ? 'A low-perfusion finding is ticked. ' : '') + 'Needs systolic 100 or over, no IV inotrope for 24 hours, no IV diuretic or vasodilator increase for 6 hours. An SGLT2 inhibitor has minimal blood-pressure effect and can start once haemodynamically stable (eGFR 20 or over). Continue home GDMT unless contraindicated.'), guard: 'Beta-blocker: consider reducing or withholding with marked volume overload or marginal low output. Hold in cardiogenic shock. Neurohormonal antagonists are usually stopped on IV inotropes or pressors; restart as soon as possible.', why: 'Stopping beta-blockers in hospital is associated with higher mortality, so hold only for a reason.', tiers: ['Continue GDMT: class 1, B-NR']});
+  return h || '<div class="card"><p class="empty">Enter the current IV dose with the 2-hour urine sodium or the 6-hour urine output.</p></div>';
+}
+var DAILY_STATIC = card({label: 'Each day: which trajectory?', head: 'Improving · stalled · worsening', body: ul(['<b>Improving toward target:</b> continue to decongestion, plan the oral dose, raise GDMT', '<b>Initial response, then stalled:</b> higher dose or second agent; review medicines and competing diagnoses; consult cardiology; consider haemodynamic monitoring', '<b>Not improved or worsening:</b> all of the above, plus consider an IV inotrope, temporary support, advanced-therapy evaluation and palliative care input']), tiers: ['Expert consensus (ACC 2024, Figure 7A)']});
+
+/* ================= ACUTE: DISCHARGE ================= */
+function dischargeHtml(){
+  var left = 0; CONG.forEach(function(_, k){ if (c('x' + k)) left++; });
+  var o = discharge({left: left, lowOut: c('x-low'), rhf: c('x-rhf')}), h = '';
+  h += card({label: 'Decongestion', head: o.ready ? 'Free of clinical congestion' : left + ' sign' + (left > 1 ? 's' : '') + ' of congestion remain', cls: o.ready ? 'okc' : 'bad', body: o.ready ? p('Change to the oral maintenance dose and observe.') : p('Continue IV diuretics until decongested. Stopping IV early and restarting was linked to worse outcomes.'), why: o.ready ? '' : 'Residual congestion at discharge predicts readmission and death.', more: p('Also signs it is not done: no improvement in symptoms, no fall in natriuretic peptide, no fall in weight. Why some stay congested: low-output state, dominant right heart failure, advanced kidney disease, symptomatic hypotension, limits on self-care.') + ((o.lowOut || o.rhf) ? p('Low output or dominant right heart failure is ticked: see <a href="#refer">Advanced, Refer</a>.') : ''), tiers: ['Resolve congestion before discharge: class 1, B-NR'], figs: ['congestion']});
+  h += card({label: 'Oral diuretic at discharge', head: 'Choose the dose; the sources give no formula', body: p('Start from the pre-admission dose and the last effective IV dose. A patient who decompensated on a loop diuretic may need more than before.') + p('<span class="mono">Furosemide 20 to 80 mg once or twice daily (max 600 mg/day) · Bumetanide 0.5 to 2 mg once or twice daily (max 10 mg/day) · Torsemide 10 to 40 mg once daily (max 200 mg/day)</span>'), more: p('Observe on oral therapy for at least 24 hours before discharge (HFA 2019, European source).'), trials: ['TRANSFORM-HF'], tiers: ['Expert consensus (ACC 2024, Table 7)']});
+  h += card({label: 'Plan and follow-up', head: 'Visit within 7 days', body: ul(['Diuretic plan: target weight, weight or symptom trigger for a rescue dose, the rescue dose, potassium plan', 'Labs within two weeks; name who draws them and who gets the result', 'Confirm the patient can afford the SGLT2 inhibitor and ARNI']), more: p('<b>Handoff contents:</b> HF type and EF; cause; triggers; discharge blood pressure, heart rate, rhythm; discharge weight and target weight; residual congestion and why; discharge and baseline creatinine; diuretic regimen and rescue plan; each GDMT class with dose and, if absent or reduced, the reason; follow-up date.'), tiers: ['Diuretic plan at discharge: class 1, B-NR', 'Early follow-up within 7 days: class 2a, B-NR']});
+  return h;
+}
+
+/* ================= CLINIC ================= */
+function readClinic(){ var bb = $('k-bb').value, ras = $('k-ras').value, mra = $('k-mra').value;
+  return {ef: v('k-ef'), prevLow: c('k-prev'), sbp: v('k-sbp'), hr: v('k-hr'), k: v('k-k'), egfr: v('k-egfr'), age: v('k-age'), bmi: v('k-bmi'), wet: c('k-wet'), female: c('k-female'), htn: c('k-htn'), rateInd: c('k-rate'), rasHigh: c('k-rashigh'), bb: bb !== 'none', bbPct: num(bb) || 0, ras: ras, rasPct: num($('k-raspct').value) || 0, mra: mra !== 'none', mraPct: num(mra) || 0, sglt: $('k-sglt').value === 'yes'}; }
+function listHtml(a){ return a.map(function(x){ return '<p class="ans"><span class="pl">' + x.p + '</span>' + x.t + '</p>' + (x.x && x.x !== 'guard' && x.x !== 'avoid' ? '<p class="sub">' + x.x + '</p>' : ''); }).join(''); }
+function clinicHtml(i){
+  var o = clinic(i), h = '';
+  if (!o.group) return '<div class="card"><p class="empty">Enter the ejection fraction to begin.</p></div>';
+  var names = {HFrEF: 'HFrEF · EF 40% or under', HFmrEF: 'HFmrEF · EF 41% to 49%', HFpEF: 'HFpEF · EF 50% or over', HFimpEF: 'HFimpEF · EF improved to over 40%'};
+  h += '<p class="grp mono">' + names[o.group] + '</p>';
+  if (o.group === 'HFimpEF') h += card({label: 'Improved EF', head: 'Continue GDMT, even if symptom-free', why: 'This is remission, not cure: in TRED-HF, 44% relapsed within 6 months of withdrawal.', trials: ['TRED-HF'], tiers: ['Class 1, B-R']});
+  var why = '';
+  if (o.group === 'HFrEF' || o.group === 'HFimpEF'){
+    if (o.lowBP && o.today.length) why = 'With systolic under 100, the classes with minimal blood-pressure effect (SGLT inhibitor, MRA) go first.';
+    else if (i.wet && o.today.length) why = 'While congested, an ARNI is better tolerated than a new beta-blocker; the beta-blocker waits until dry.';
+    else if (o.today.length) why = 'Each of the four classes lowers mortality on its own; delay in starting predicts never starting.';
+    else if (o.next.length) why = 'Target doses are the ones that produced the trial benefit; feeling better is not a reason to stop titrating.';
+  }
+  if ((o.group === 'HFrEF' || o.group === 'HFimpEF') && o.today.some(function(x){ return x.p === 'MRA' && /potassium/.test(x.t); })) why = i.k > 5.5 ? 'Above 5.5 the risk of hyperkalaemia outweighs the MRA benefit; the guideline marks continuing as harm.' : 'Mitigate the potassium first so the MRA, which lowers mortality, can be kept.';
+  if (o.group === 'HFmrEF') why = 'In this EF range the SGLT2 inhibitor carries the strongest US recommendation; the other classes may be considered, more so toward the lower end.';
+  if (o.group === 'HFpEF') why = 'An SGLT2 inhibitor and a non-steroidal MRA are the foundation for HFpEF in the 2026 ACC pathway.';
+  var mraGuard = o.today.filter(function(x){ return x.x === 'guard'; }).length ? 'If potassium cannot be kept under 5.5, stop the MRA (class 3: harm).' : '';
+  var more = '';
+  if (o.group === 'HFrEF' || o.group === 'HFimpEF') more = p('All four can start together at low dose or in sequence; more than one drug can change per visit. Titrate as often as every 1 to 2 weeks. Aim to finish within 2 to 3 months. Holding beta-blocker up-titration while systolic is under 100 is this tool\'s reading of the low-pressure sequence, not a stated rule. MRA: start only with eGFR over 30 and potassium under 5.0. ARNI start dose: 49/51 mg twice daily if on more than enalapril 10 mg/day or valsartan 160 mg/day equivalent; otherwise, or with eGFR under 30 or age 75 or over, 24/26 mg. SGLT inhibitor: eGFR 20 or over for empagliflozin, 25 or over for dapagliflozin and sotagliflozin (the pathway\'s text says 30 for dapagliflozin; its figure and table say 25).');
+  if (o.group === 'HFmrEF') more = p('Beta-blocker, ARNI/ACE inhibitor/ARB and MRA: may be considered (class 2b, B-NR). Finerenone is approved for HF with EF 40% or over.');
+  if (o.group === 'HFpEF') more = p('Finerenone is preferred; spironolactone 25 to 50 mg is a reasonable alternative when cost or tolerance prevents it. Finerenone needs potassium under 5.0 and eGFR 25 or over; CYP3A4 (FDA label): strong inhibitors are contraindicated; with moderate or weak inhibitors monitor potassium; avoid strong or moderate inducers. Incretin therapy: not with personal or family history of medullary thyroid cancer or MEN 2. Older US classes: SGLT2 inhibitor 2a; MRA, ARB, ARNI 2b.');
+  var escn = o.group === 'HFmrEF' ? 'this group is treated as HFrEF (EF under 50%), with the full foundational therapy.' : o.group === 'HFpEF' ? 'semaglutide or tirzepatide should be considered for EF 45% or over with BMI 30 or over; an MRA is recommended regardless of EF.' : 'HFrEF is EF under 50%; the four classes are called foundational medical therapy.';
+  var tiers = o.group === 'HFrEF' || o.group === 'HFimpEF' ? ['Each pillar: class 1', 'Titrate to target: class 1, A', 'Titration every 1 to 2 weeks: class 2a, C-EO'] : o.group === 'HFmrEF' ? ['SGLT2 inhibitor: class 2a, B-R', 'Others: class 2b, B-NR'] : ['Expert consensus (ACC 2026)'];
+  var tr = o.group === 'HFpEF' ? ['DELIVER', 'EMPEROR-Preserved', 'FINEARTS-HF', 'STEP-HFpEF', 'SUMMIT'] : o.group === 'HFmrEF' ? ['DELIVER', 'EMPEROR-Preserved'] : ['PARADIGM-HF', 'MERIT-HF', 'RALES', 'DAPA-HF', 'EMPEROR-Reduced', 'STRONG-HF'];
+  if (o.today.length) h += card({id: 'today', label: 'Today', body: listHtml(o.today), guard: mraGuard, why: why, more: more, esc: escn, tiers: tiers, trials: tr, figs: o.group === 'HFpEF' ? ['workup'] : ['neuro', 'fast']});
+  else h += card({id: 'today', label: 'Today', head: o.done ? 'All four pillars at target' : 'No new start today', cls: o.done ? 'okc' : '', why: o.done ? '' : why, more: more, esc: escn, tiers: tiers, trials: tr});
+  if (o.next.length) h += card({label: 'Next visit · 1 to 2 weeks', body: listHtml(o.next), guard: o.next.filter(function(x){ return x.x === 'avoid'; }).length ? 'Beta-blockers are marked "avoid" in HFpEF unless there is angina or AF needing rate control.' : ''});
+  if (o.wait.length) h += card({label: 'Waiting', body: listHtml(o.wait)});
+  if (o.pillars.length) h += card({label: 'Where each pillar stands', body: o.pillars.map(function(x){ return '<div class="pillar"><div class="pn"><b>' + x.n + '</b><span class="mono">' + (x.on ? x.pct + '% of target' : 'not started') + '</span></div><div class="pbar"><i style="width:' + x.pct + '%"></i></div></div>'; }).join('')});
+  return h;
+}
+var CLINIC_REF =
+ '<div class="card" id="doses"><p class="label">Start and target doses</p><div class="tw"><table><tr><th>Drug</th><th>Start</th><th>Target</th></tr>' + DOSES.map(function(d){ return '<tr><td>' + d[0] + '</td><td class="mono">' + d[1] + '</td><td class="mono">' + d[2] + '</td></tr>'; }).join('') + '</table></div><span class="tier">2024 ACC HFrEF pathway, Table 1; 2022 guideline for digoxin</span></div>' +
+ card({id: 'trouble', label: 'When something goes wrong', head: 'Potassium, creatinine, blood pressure', body: ul(['<b>Potassium 5.0 to 5.5 on an MRA:</b> do not raise it; low-potassium diet, keep the SGLT inhibitor, consider patiromer or sodium zirconium cyclosilicate, recheck in 1 to 2 weeks. Stop if it stays over 5.0 or is ever over 5.5', '<b>eGFR falls:</b> a fall over 30% signals a possible dose reduction. Smaller early falls are expected and do not predict long-term loss. Keep the SGLT inhibitor', '<b>Symptomatic hypotension:</b> first look for over-diuresis, other drugs that lower pressure, autonomic dysfunction, and all HF drugs taken at once; only then reduce GDMT. Persistent: refer', '<b>Low potassium:</b> raise the MRA in preference to oral potassium', '<b>SGLT inhibitor:</b> hold at least 3 days before scheduled surgery and during reduced intake or fluid loss']), why: 'Look for the reversible cause before giving up a drug that lowers mortality.', tiers: ['Stop MRA if potassium cannot be kept under 5.5: class 3 (harm), B-NR', 'Expert consensus (ACC 2024)']}) +
+ card({id: 'addons', label: 'Add-ons', head: 'After the four pillars', body: ul(['<b>Hydralazine + isosorbide dinitrate.</b> The guideline recommends it (class 1, A) for self-identified African American patients with NYHA III to IV HFrEF on optimal therapy, and notes concerns about race-based therapy. It may be considered (2b) for anyone who cannot take an ARNI, ACE inhibitor or ARB', '<b>Ivabradine</b> (2a): NYHA II to III, EF 35% or under, sinus rhythm, heart rate 70 or over on maximal beta-blocker. Start 5 mg twice daily (2.5 mg if 75 or over). At 2 to 4 weeks: rate over 60, raise by 2.5 mg twice daily to a maximum of 7.5; 50 to 60, hold; under 50 or symptoms, lower or stop', '<b>Vericiguat</b> (2b): EF under 45% with recent worsening. 2.5 mg daily, doubled every 2 weeks to 10 mg. Not with long-acting nitrates or PDE-5 inhibitors', '<b>Digoxin</b> (2b): 0.125 to 0.25 mg daily; lower if over 70, kidney impairment or low lean mass. Levels of 1.2 ng/mL or more were linked to higher mortality', '<b>IV iron</b> (2a): ferritin under 100, or 100 to 300 with transferrin saturation under 20%', '<b>Avoid in HFrEF:</b> verapamil and diltiazem; class IC antiarrhythmics and dronedarone; thiazolidinediones; saxagliptin and alogliptin; NSAIDs retain sodium']), esc: 'a cardiac glycoside should be considered in symptomatic HFrEF with EF 40% or under despite optimal therapy.', tiers: ['2022 AHA/ACC/HFSA guideline'], trials: ['A-HeFT', 'SHIFT', 'VICTORIA', 'DIG', 'AFFIRM-AHF']});
+
+function finHtml(){ var r = finerenone(v('f-k'), num($('f-cur').value), v('f-egfr'), c('f-fall')); return r ? '<p class="head">' + r + '</p><p class="sub">Recheck potassium and eGFR 4 weeks after any change.</p>' : '<p class="empty">Enter the potassium and the current dose.</p>'; }
+function scoreHtml(){ var s = h2fpef({bmi30: c('h-bmi'), htn2: c('h-htn'), af: c('h-af'), pasp: c('h-pasp'), age60: c('h-age'), ee: c('h-ee')}); var a = hfpefAba(v('ab-age'), v('ab-bmi'), c('h-af')); return '<p class="head">H2FPEF ' + s + ' of 9' + (s >= 6 ? ': highly suggestive of HFpEF' : '') + '</p>' + (a != null ? '<p class="head">HFpEF-ABA ' + a.toFixed(0) + '%' + (a < 25 ? ': low probability' : '') + '</p><p class="sub">Uses age, BMI and the AF tick above. Thresholds are not established; under 25% may be taken as low.</p>' : ''); }
+function devHtml(){ var o = devices({ef: v('v-ef'), nyha: num($('v-nyha').value), qrs: v('v-qrs'), lbbb: c('v-lbbb'), sinus: !c('v-af'), ischemic: c('v-isch'), mi40: c('v-mi40'), gdmt3: c('v-gdmt')}); if (!o.icd) return '<p class="empty">Enter EF, NYHA class and QRS.</p>'; return (o.wait ? '<div class="guard">Reassess EF after at least 3 to 6 months on optimal doses of all GDMT before deciding.</div>' : '') + '<p class="label" style="margin-top:10px">ICD</p><p class="head">' + o.icd + '</p><p class="label" style="margin-top:10px">CRT</p><p class="head">' + o.crt + '</p>' + (o.wait ? '<p class="whyline"><b>Why:</b> EF often rises on therapy; many patients no longer meet criteria after titration.</p>' : ''); }
+
+/* ================= ADVANCED ================= */
+function referHtml(){ var n = 0; INEED.forEach(function(_, k){ if (c('n' + k)) n++; }); return card({label: 'Referral', head: n ? 'Refer to advanced HF: ' + n + ' trigger' + (n > 1 ? 's' : '') + ' present' : 'No trigger ticked', cls: n ? 'bad' : '', body: n ? p('When it fits the patient\'s goals: timely referral to review management and suitability for LVAD, transplant, palliative care and palliative inotropes.') : '', why: n ? 'Each item marks failing compensation, and candidacy for LVAD or transplant can be lost once organs fail.' : '', more: p('<b>Numeric triggers:</b> systolic 90 or under or symptomatic hypotension; creatinine 1.8 mg/dL or over, or BUN 43 or over; 2 or more ED visits or admissions for HF in 12 months; new AF, ventricular arrhythmia or repeated ICD shocks; unable to tolerate optimal beta-blocker, RAS inhibitor or MRA; persistent NYHA III to IV. <b>Also:</b> diuretic need over 160 mg/day furosemide equivalent or added metolazone; persistent sodium under 134; cardiac cachexia; peak VO2 under 14 mL/kg/min or 6-minute walk under 300 m; predicted 1-year mortality over 20%.') + p('<b>INTERMACS profiles:</b> 1 critical cardiogenic shock; 2 progressive decline on inotropes; 3 stable but inotrope-dependent; 4 resting symptoms on oral therapy at home; 5 exertion intolerant; 6 exertion limited; 7 advanced NYHA III.'), esc: 'early consultation with an advanced HF centre is recommended for advanced HF or those at risk of it.', tiers: ['Referral: class 1, C-LD'], figs: ['course']}); }
+function readShock(){ return {sbp: v('s-sbp'), map: v('s-map'), hr: v('s-hr'), lactate: v('s-lact'), drop30: c('s-drop'), ment: c('s-ment'), cold: c('s-cold'), uop30: c('s-uop'), refill: c('s-refill'), worse: c('s-worse'), collapse: c('s-collapse'), arrest: c('s-arrest')}; }
+var STAGE_TXT = {A: ['At risk', 'No signs of shock now. Normal lactate; systolic 100 or over; heart rate under 100.'], B: ['Beginning', 'Haemodynamic instability (hypotension or tachycardia) without hypoperfusion.'], C: ['Classic', 'Hypoperfusion needing drug or device support beyond volume. Hypotension is not required.'], D: ['Deteriorating', 'Stage C and worsening or not improving despite initial therapy: rising lactate, escalating pressors, or a device added.'], E: ['Extremis', 'Actual or impending circulatory collapse: lactate 8 or over, profound hypotension despite maximal support, ongoing CPR.']};
+function shockHtml(i){
+  var any = i.sbp != null || i.map != null || i.hr != null || i.lactate != null || i.drop30 || i.ment || i.cold || i.uop30 || i.refill || i.worse || i.collapse || i.arrest;
+  if (!any) return '<div class="card"><p class="empty">Enter blood pressure, heart rate and lactate, and tick the findings.</p></div>';
+  var o = stage(i), s = o.stage, h = '';
+  if (s !== 'A' && s !== 'B') h += '<div class="guard big"><b>Possible cardiogenic shock.</b> Call cardiology / ICU / the shock team now.</div>';
+  h += card({id: 'stage', label: 'SCAI stage', body: '<div class="stage">' + ['A', 'B', 'C', 'D', 'E'].map(function(x){ return '<span' + (x === s ? ' class="on"' : '') + '>' + x + '</span>'; }).join('') + '</div><p class="head">Stage ' + s + ' · ' + STAGE_TXT[s][0] + (o.arrest ? ' · arrest modifier' : '') + '</p><p class="sub">' + (s === 'A' && i.sbp != null && i.sbp < 100 ? 'No hypoperfusion, sustained hypotension or tachycardia entered. Systolic 90 to 99 is not assigned by the SCAI table.' : STAGE_TXT[s][1]) + '</p>', why: o.normotensive ? 'Hypoperfusion without hypotension (normotensive shock) is associated with higher mortality, so a normal pressure does not exclude shock.' : (i.lactate != null && i.lactate >= 2) ? 'Lactate marks tissue hypoperfusion and sets the stage together with the number of supports needed.' : '', more: p('Hypoperfusion: altered mentation, cold and clammy, delayed capillary refill, urine output under 30 mL/h, lactate 2 or over. Supporting markers for stage C: creatinine up to 1.5 times baseline (or by 0.3 mg/dL) or GFR down over 50%; raised AST and ALT; cardiac index under 2.2 with wedge over 15 and CVP over 10. Stage E may also show pH 7.2 or under and a base deficit over 10.') + p('Systolic 90 to 99 with no other finding is not assigned by the table; this tool shows it as A.') + p('<b>Trajectory:</b> restage over time. Only a catastrophic event arrives directly in E; all others pass through C for a first intervention. Normal perfusion on support is still C; normal after support is removed is B or A.') + p('<b>HF-shock short form (2025 ACC):</b> B lactate under 2, no drugs or devices; C lactate 2 or over, one; D lactate 4 or over, two; E lactate 8 or over, three or more.') + p('<b>Devices sometimes considered by stage (no large trials in HF-shock):</b> B, trial of vasoactive agents, consider IABP. C, LV dominant: IABP or Impella CP or 5.5; RV dominant: an RV device. D: Impella CP (short term), Impella 5.5 or a temporary surgical LVAD; an RV device for RV failure; VA-ECMO with or without an LV vent for RV or biventricular failure. E: VA-ECMO with or without an LV vent.'), esc: 'a microaxial pump should be considered in selected STEMI shock; temporary support is not recommended in unselected infarct shock; a shock team is recommended to guide device choice.', tiers: ['2026 SCAI SHOCK update, Table 2', 'Temporary support when drugs fail: class 2a, B-NR'], trials: ['DanGer Shock', 'ECLS-SHOCK'], figs: ['mcs', 'profiles']});
+  if (o.hypoBP || (s !== 'A' && s !== 'B')) h += card({id: 'agent', label: 'First agent', head: o.hypoBP ? 'Norepinephrine 0.05 to 1 mcg/kg/min' : 'Normotensive: an inodilator may be considered', body: p(o.hypoBP ? 'A reasonable first choice for most hypotensive patients. Lowest dose, shortest time. Mean pressure over 60 to 65 once stabilised.' : 'Dobutamine 2 to 10 mcg/kg/min or milrinone 0.125 to 0.5 mcg/kg/min, especially with high systemic vascular resistance.'), guard: 'Do not use a pure vasopressor (phenylephrine) alone. Milrinone with care when kidney function is worsening.', why: o.hypoBP ? 'Norepinephrine raises pressure and output together; a pure vasopressor can cause reflex bradycardia and reduce output.' : 'Inodilators raise output and lower afterload, which suits a patient whose pressure is held up by vasoconstriction.', more: '<div class="tw"><table><tr><th>Agent</th><th>Dose</th><th>Effect</th></tr>' + AGENTS.map(function(a){ return '<tr><td>' + a[0] + '</td><td class="mono">' + a[1] + '</td><td class="mono">' + a[2] + '</td></tr>'; }).join('') + '</table></div>' + p('<b>2022 guideline ranges:</b> dobutamine 2.5 to 20 mcg/kg/min; milrinone 0.125 to 0.75 mcg/kg/min, bolus not recommended; norepinephrine 0.5 to 30 mcg/min; dopamine 5 to 10 and 10 to 15 mcg/kg/min; epinephrine 5 to 15 and 15 to 20 mcg/min.') + p('Congestion in shock: IV loop diuretic, thiazide augmentation, renal replacement for ultrafiltration if refractory. Consider early palliative care input when temporary support is placed.'), tiers: ['Inotropic support in shock: class 1, B-NR', 'Agent choice and doses: expert consensus (ACC 2025)'], trials: ['DOREMI']});
+  return h;
+}
+function cathHtml(){ var o = cath({rap: v('h-rap'), pas: v('h-pas'), pad: v('h-pad'), pcwp: v('h-pcwp'), co: v('h-co'), ci: v('h-ci'), map: v('h-map')}), a = [];
+  if (o.papi != null) a.push('<b>PAPi ' + o.papi.toFixed(2) + '</b>: (PA systolic − PA diastolic) ÷ right atrial pressure. Low is under 0.9 in MI-shock and under 1.85 in HF patients having an LVAD. Most useful when right atrial pressure is over 10 and PA systolic is not over 50.');
+  if (o.cpo != null) a.push('<b>Cardiac power output ' + o.cpo.toFixed(2) + ' W</b>: mean pressure × cardiac output ÷ 451. The source read gives no cutoff.');
+  if (o.ratio != null) a.push('<b>RAP / wedge ' + o.ratio.toFixed(2) + '</b>' + (o.ratio > 0.6 ? ': over 0.6, associated with worse outcomes.' : ': over 0.6 is associated with worse outcomes.'));
+  if (o.wetL || o.wetR) a.push('<b>Congestion:</b> ' + (o.wetL && o.wetR ? 'biventricular (wedge over 15 and right atrial pressure over 15).' : o.wetL ? 'left-sided (wedge over 15).' : 'right-sided (right atrial pressure over 15).'));
+  if (o.lowCI) a.push('<b>Cardiac index under 2.2</b>: the stage C value.');
+  return a.length ? ul(a) : '<p class="empty">Enter the pressures to calculate PAPi, cardiac power output and the RAP/wedge ratio.</p>'; }
+var LVAD_STATIC =
+ card({id: 'lvad', label: 'LVAD patient on a medicine ward', head: 'Call the implanting centre\'s LVAD team early', guard: 'Do not change pump settings yourself.', body: ul(['<b>No pulse is expected:</b> pulse pressure under 15 mm Hg is not palpable and not read by an automated cuff', '<b>Blood pressure:</b> Doppler probe with a manual cuff; the pressure at which flow returns ≈ mean pressure', '<b>Target:</b> mean 70 to 90 mm Hg; never under 60', '<b>Anticoagulation:</b> INR 2.0 to 3.0 plus aspirin 80 to 325 mg; bridge with IV heparin if INR is under 2.0', '<b>Send:</b> LDH (pump thrombosis), INR, kidney and liver function', '<b>Fever:</b> inspect the driveline exit site']), why: 'High pressure reduces pump flow and is linked to stroke, pump thrombosis, aortic regurgitation and ventricular arrhythmia.', more: p('<b>Hypertension:</b> first ACE inhibitor or ARB, beta-blocker, spironolactone (beta-blocker with care in RV failure); then calcium channel blocker, alpha-blocker, hydralazine, nitrates. No nitrates with PDE-5 inhibitors.') + p('<b>HF symptoms on an LVAD:</b> look for a non-cardiac trigger (NSAIDs, infection, anaemia). Left-sided: treat high pressure to a mean under 80; look for aortic regurgitation; device malfunction or suspected pump thrombosis needs the LVAD specialist and IV heparin; diuretics and vasodilators. Right-sided: exclude pulmonary embolus, severe tricuspid regurgitation, tamponade, RV infarction; then right heart cath, IV diuretics, inotropes if no response.') + p('<b>Ventricular arrhythmia:</b> often tolerated; amiodarone or lidocaine if stable; cardiovert if unstable. Alarms, CPR and bleeding are not covered here: call the LVAD team.') + p('"Do not change pump settings", the LDH prompt and the driveline prompt are expert practice added by this tool.'), tiers: ['HFA of the ESC position paper 2021 (European consensus)', 'Expert practice'], figs: ['lvadfig']}) +
+ card({id: 'durable', label: 'Durable LVAD and transplant', head: 'Who is considered', body: ul(['<b>Durable LVAD</b> (class 1, A): advanced HFrEF, NYHA IV, dependent on continuous IV inotropes or temporary support. NYHA IV despite GDMT: can be beneficial (2a)', '<b>Transplant</b> (class 1, C-LD): selected patients with advanced HF despite GDMT', '<b>Absolute contraindications to durable support:</b> irreversible liver, kidney or neurological disease; medical non-adherence; severe psychosocial limitations']), why: 'Median survival is over 12 years after transplant and under 2 years in stage D without advanced therapy.', more: p('<b>Indications (combination):</b> frequent admissions; NYHA IIIb to IV despite maximal therapy; intolerance of neurohormonal antagonists; rising diuretic need; symptomatic despite CRT; inotrope dependence; peak VO2 under 14 to 16; end-organ dysfunction from low output. <b>Relative contraindications:</b> age over 80 for destination therapy; obesity or malnutrition; musculoskeletal disease limiting rehabilitation; active infection or prolonged intubation; untreated malignancy; severe peripheral vascular disease; active substance abuse; impaired cognition; unmanaged psychiatric disorder; lack of social support.'), tiers: ['2022 AHA/ACC/HFSA guideline 8.4, 8.5, Table 19']}) +
+ card({id: 'inotrope', label: 'Inotropes outside shock, and palliative care', head: 'Bridge or palliation only', body: ul(['<b>Bridge</b> (2a): stage D, awaiting LVAD or transplant', '<b>Palliation</b> (2b): stage D, not a candidate; for symptoms. Discuss arrhythmia risk and ICD status', '<b>Otherwise</b>: long-term IV inotropes are potentially harmful (class 3)', '<b>Palliative care</b> (class 1, C-LD): for all patients with HF. Specialist palliative consultation (2a, B-R): stage D, on inotropes or temporary support, or with uncontrolled symptoms']), guard: 'Maintenance doses (2022 guideline): dobutamine 2.5 to 20 mcg/kg/min; milrinone 0.125 to 0.75 mcg/kg/min, no bolus, accumulates in renal failure.', why: 'Inotropes improve symptoms without improving survival.', tiers: ['2022 AHA/ACC/HFSA guideline 8.3']});
+
+/* ================= LEARN ================= */
+function openFig(id, s){ var f = FIG[id]; s = s || 0; $('sheet-t').textContent = f.title; $('sheet-b').innerHTML = f.draw(s) + '<div class="states">' + f.states.map(function(t, k){ return '<button class="sbtn" type="button" aria-pressed="' + (k === s) + '" data-s="' + k + '">' + t + '</button>'; }).join('') + '</div><p class="line1">' + f.cap[s] + '</p><p class="note">' + f.src + '</p>'; $('sheet-b').dataset.fig = id; $('sheet').hidden = false; $('scrim').hidden = false; $('sheet-x').focus(); }
+function closeFig(){ $('sheet').hidden = true; $('scrim').hidden = true; }
+
+/* ================= PRACTICE ================= */
+var CASES = [
+['Admission night', 'A 68-year-old on furosemide 40 mg twice daily comes in with orthopnoea, rales and leg oedema. Blood pressure 128/76, warm, eGFR 45. What is the first IV dose?', function(){ return admitHtml({cong: 3, perf: 0, sbp: 128, egfr: 45, drug: 'furosemide', homeDose: 80}); }],
+['On torsemide', 'Home torsemide 40 mg daily. Congested, warm, blood pressure 110/70, eGFR 32. First IV dose?', function(){ return admitHtml({cong: 2, perf: 0, sbp: 110, egfr: 32, drug: 'torsemide', homeDose: 40}); }],
+['Stalled diuresis', 'After furosemide 80 mg IV, the 2-hour urine sodium is 42 and 6-hour urine output is 480 mL. Still congested. Systolic 104.', function(){ return dailyHtml({curDose: 80, perDay: 2, una: 42, uop6: 480, congested: true, sbp: 104, k: 4.1}); }],
+['The creatinine bump', 'Day 3: creatinine 1.4 → 1.7. Still has rales and oedema, warm, urine sodium 88, 6-hour output 900 mL on furosemide 120 mg IV twice daily.', function(){ return dailyHtml({curDose: 120, perDay: 2, una: 88, uop6: 900, congested: true, crRise: true, lowPerf: false, sbp: 112, k: 4.0}); }],
+['Cold and wet', 'Systolic 84 for 40 minutes, cold extremities, lactate 3.1, rales and raised JVP.', function(){ return admitHtml({cong: 2, perf: 0, sbp: 84, sustained: true, cold: true, lactate: 3.1, drug: 'furosemide', homeDose: 80, egfr: 38}) + shockHtml({sbp: 84, cold: true, lactate: 3.1}); }],
+['Clinic: low pressure', 'EF 30%, systolic 96, heart rate 78, potassium 4.6, eGFR 42, dry. On carvedilol 6.25 mg twice daily and lisinopril 10 mg; no MRA or SGLT inhibitor.', function(){ return clinicHtml({ef: 30, sbp: 96, hr: 78, k: 4.6, egfr: 42, wet: false, bb: true, bbPct: 25, ras: 'acei', rasPct: 40, mra: false, mraPct: 0, sglt: false}); }],
+['Clinic: potassium 5.3', 'EF 25% on all four pillars; spironolactone 25 mg. Potassium 5.3, eGFR 48, systolic 112.', function(){ return clinicHtml({ef: 25, sbp: 112, hr: 66, k: 5.3, egfr: 48, wet: false, bb: true, bbPct: 100, ras: 'arni', rasPct: 100, mra: true, mraPct: 50, sglt: true}); }],
+['HFpEF with obesity', 'A 72-year-old woman, EF 58%, BMI 36, hypertension, potassium 4.4, eGFR 55, mild oedema. On no HF therapy.', function(){ return clinicHtml({ef: 58, sbp: 138, hr: 74, k: 4.4, egfr: 55, bmi: 36, female: true, htn: true, wet: true, bb: false, ras: 'none', mra: false, sglt: false}); }]
+];
+
+/* ================= WIRING ================= */
+function build(){
+  $('admit-in').innerHTML = '<p class="label">Congestion</p><div class="checks">' + CONG.map(function(t, k){ return chk('c' + k, t); }).join('') + '</div><p class="label" style="margin-top:14px">Perfusion</p><div class="checks">' + PERF.map(function(t, k){ return chk('pf' + k, t); }).join('') + chk('a-ment', 'Decreased mentation') + chk('a-cold', 'Cold extremities or livedo') + chk('a-uop', 'Urine output under 30 mL/h') + '</div><div class="grid" style="margin-top:12px">' + fld('a-sbp', 'Systolic BP') + fld('a-map', 'Mean BP') + fld('a-lact', 'Lactate') + '</div><div class="checks">' + chk('a-sus', 'Hypotension for over 30 min') + chk('a-press', 'Needs vasopressors') + chk('a-htn', 'Pulmonary oedema with severe hypertension') + chk('a-resp', 'Respiratory failure') + '</div><p class="label" style="margin-top:14px">Home loop diuretic</p><div class="grid">' + sel('a-drug', 'Drug', [['furosemide', 'Furosemide'], ['torsemide', 'Torsemide'], ['bumetanide', 'Bumetanide']]) + fld('a-dose', 'Total mg/day') + fld('a-egfr', 'eGFR') + '</div><div class="checks">' + chk('a-naive', 'Not on a loop diuretic') + '</div><div class="grid" style="margin-top:12px">' + fld('a-spo2', 'SpO2 %') + '</div>';
+  $('daily-in').innerHTML = '<p class="label">After the last IV dose</p><div class="grid">' + fld('d-cur', 'IV dose, mg furosemide') + sel('d-per', 'Doses per day', [[2, '2'], [1, '1'], [3, '3'], [4, '4']]) + fld('d-una', 'Urine Na at 2 h') + fld('d-uop6', 'Urine in 6 h, mL') + fld('d-uop24', 'Urine in 24 h, L') + fld('d-sbp', 'Systolic BP') + fld('d-k', 'Potassium') + fld('d-na', 'Sodium') + fld('d-uosm', 'Urine osmolality') + fld('d-una0', 'Urine Na, off diuretic') + '</div><div class="checks">' + chk('d-cong', 'Still congested') + chk('d-cr', 'Creatinine has risen') + chk('d-low', 'Low-perfusion finding') + chk('d-ino', 'IV inotrope in past 24 h') + chk('d-ivup', 'IV diuretic or vasodilator raised in past 6 h') + '</div>';
+  $('disch-in').innerHTML = '<p class="label">Still present today</p><div class="checks">' + CONG.map(function(t, k){ return chk('x' + k, t); }).join('') + chk('x-low', 'Low-output state') + chk('x-rhf', 'Dominant right heart failure') + '</div>';
+  var pct = [['none', 'Not on'], [25, 'On, about 25% of target'], [50, 'On, about 50%'], [75, 'On, about 75%'], [100, 'At target']];
+  $('clinic-in').innerHTML = '<p class="label">Patient</p><div class="grid">' + fld('k-ef', 'EF %') + fld('k-sbp', 'Systolic BP') + fld('k-hr', 'Heart rate') + fld('k-k', 'Potassium') + fld('k-egfr', 'eGFR') + fld('k-age', 'Age') + '</div><div class="checks">' + chk('k-wet', 'Congested') + chk('k-prev', 'EF was 40% or under before') + '</div><p class="label" style="margin-top:14px">Current therapy</p><div class="grid grid4">' + sel('k-bb', 'Beta-blocker', pct) + sel('k-mra', 'MRA', pct) + sel('k-ras', 'RAS inhibitor', [['none', 'None'], ['acei', 'ACE inhibitor'], ['arb', 'ARB'], ['arni', 'ARNI']]) + sel('k-raspct', 'Its dose', pct.slice(1)) + sel('k-sglt', 'SGLT inhibitor', [['no', 'Not on'], ['yes', 'On']]) + '</div><div class="checks">' + chk('k-rashigh', 'ACE inhibitor/ARB above enalapril 10 mg/day or valsartan 160 mg/day') + '</div><details id="k-pef"><summary>EF 50% or over: more inputs</summary><div class="grid">' + fld('k-bmi', 'BMI') + '</div><div class="checks">' + chk('k-female', 'Woman') + chk('k-htn', 'Hypertension') + chk('k-rate', 'Angina or AF needing rate control') + '</div></details>';
+  $('clinic-ref').innerHTML = CLINIC_REF +
+   '<div class="card" id="hfpef"><p class="label">HFpEF: is it HFpEF?</p><div class="checks">' + chk('h-bmi', 'BMI over 30 (2)') + chk('h-htn', '2 or more antihypertensives (1)') + chk('h-af', 'Atrial fibrillation (3)') + chk('h-pasp', 'PA systolic over 35 (1)') + chk('h-age', 'Age over 60 (1)') + chk('h-ee', 'E/e′ over 9 (1)') + '</div><div class="grid" style="margin-top:10px">' + fld('ab-age', 'Age') + fld('ab-bmi', 'BMI') + '</div><div id="score-out"></div><details><summary>More</summary><p>First ask: a non-cardiac cause? a cardiac mimic needing its own work-up? HFA-PEFF (5 points or more) is the third score; it needs a full echo.</p><div class="tw"><table><tr><th>Mimic</th><th>Clue</th><th>Test</th></tr>' + MIMICS.map(function(m){ return '<tr><td>' + m[0] + '</td><td>' + m[1] + '</td><td>' + m[2] + '</td></tr>'; }).join('') + '</table></div><span class="tier">Expert consensus (ACC 2026, Figures 3 and 4, Table 2)</span></details><div class="chips"><button class="chip" type="button" data-fig="workup">' + ICON + 'The workup that narrows</button></div></div>' +
+   '<div class="card" id="finerenone"><p class="label">Finerenone: adjust by potassium</p><div class="grid">' + fld('f-k', 'Potassium') + sel('f-cur', 'Current dose', [['', 'Choose'], [10, '10 mg'], [20, '20 mg'], [40, '40 mg']]) + fld('f-egfr', 'eGFR at start') + '</div><div class="checks">' + chk('f-fall', 'eGFR down over 30% since last check') + '</div><div id="fin-out"></div><span class="tier">FDA label (Kerendia, July 2025)</span></div>' +
+   '<div class="card" id="devices"><p class="label">Devices: ICD and CRT</p><div class="grid">' + fld('v-ef', 'EF %') + sel('v-nyha', 'NYHA class', [[2, 'II'], [1, 'I'], [3, 'III'], [4, 'IV, ambulatory']]) + fld('v-qrs', 'QRS ms') + '</div><div class="checks">' + chk('v-lbbb', 'LBBB') + chk('v-af', 'Atrial fibrillation') + chk('v-isch', 'Ischaemic cause') + chk('v-mi40', 'MI within 40 days') + chk('v-gdmt', '3 months or more on optimal GDMT') + '</div><div id="dev-out"></div><details><summary>More</summary><p>Secondary mitral regurgitation: optimise GDMT before any intervention (class 1, C-LD), then consider transcatheter repair through a structural heart team. Pulmonary artery pressure sensor: usefulness uncertain (class 2b, B-R) in NYHA III with an admission in the past year.</p>' + trialHtml('SCD-HeFT') + trialHtml('MADIT-CRT') + trialHtml('COAPT') + '<span class="tier">2022 AHA/ACC/HFSA guideline 7.4</span></details></div>' +
+   card({id: 'visits', label: 'Visit cards', head: 'First visit after discharge (within 7 days)', body: ul(['<b>History:</b> discharge summary, cause, precipitant, NYHA class, weight log', '<b>Exam:</b> orthostatic blood pressure, JVP, rales, warm/cold and wet/dry, S3', '<b>Tests:</b> metabolic panel, CBC, natriuretic peptide, ECG; review EF', '<b>Medicines:</b> each pillar: dose optimised? eligible to switch to ARNI? diuretic adjustment; ivabradine if heart rate stays high', '<b>Plan:</b> revascularisation, CRT, ICD, valve; cardiac rehab; advanced HF or palliative referral']), more: p('<b>While titrating:</b> back in 1 to 2 weeks with a metabolic panel after each change. <b>After titration:</b> repeat EF after 3 to 6 months on optimal doses (40 days after MI or 3 months in non-ischaemic disease for device decisions); then visits every 3 to 6 months. No routine yearly echo without a change in status.'), tiers: ['Expert consensus (ACC 2024 inpatient pathway, Figure 14; HFrEF pathway, Figure 4)']});
+  $('refer-in').innerHTML = '<p class="label">I NEED HELP</p><div class="checks one">' + INEED.map(function(t, k){ return chk('n' + k, '<b>' + 'INEEDHELP'.charAt(k) + '</b> ' + t); }).join('') + '</div>';
+  $('shock-in').innerHTML = '<p class="label">Now</p><div class="grid">' + fld('s-sbp', 'Systolic BP') + fld('s-map', 'Mean BP') + fld('s-hr', 'Heart rate') + fld('s-lact', 'Lactate') + '</div><div class="checks">' + chk('s-drop', 'Fall over 30 mm Hg from baseline') + chk('s-ment', 'Altered mentation') + chk('s-cold', 'Cold and clammy') + chk('s-refill', 'Delayed capillary refill') + chk('s-uop', 'Urine output under 30 mL/h') + chk('s-worse', 'Worsening despite therapy, or pressors escalating / device added') + chk('s-collapse', 'Collapse: CPR or profound hypotension on maximal support') + chk('s-arrest', 'Cardiac arrest') + '</div>';
+  $('cath-in').innerHTML = '<p class="label">Right heart cath numbers</p><div class="grid">' + fld('h-rap', 'RA pressure') + fld('h-pas', 'PA systolic') + fld('h-pad', 'PA diastolic') + fld('h-pcwp', 'Wedge') + fld('h-map', 'Mean BP') + fld('h-co', 'Output L/min') + fld('h-ci', 'Cardiac index') + '</div><div id="cath-out"></div><details><summary>More</summary><p>Reference: cardiac index 2.5 or over, CVP under 10, wedge under 15, PA saturation 65% or over.</p><div class="tw"><table><tr><th>Device</th><th>Flow</th><th>Effect</th></tr>' + MCS.map(function(m){ return '<tr><td>' + m[0] + '</td><td class="mono">' + m[1] + '</td><td>' + m[2] + '</td></tr>'; }).join('') + '</table></div><span class="tier">2025 ACC shock guidance 4.4, Figure 6; 2026 SCAI update</span><span class="tier">PA line may be considered: class 2b, B-NR</span></details>';
+  $('lvad-out').innerHTML = LVAD_STATIC;
+  $('admit-static').innerHTML = ADMIT_STATIC; $('daily-static').innerHTML = DAILY_STATIC;
+  $('learn-grid').innerHTML = FIGS.map(function(f, k){ return '<button class="tile" type="button" data-fig="' + f.id + '"><span class="mono">' + (k + 1) + '</span>' + esc(f.title) + '</button>'; }).join('');
+  $('trial-list').innerHTML = TRIALS.map(function(t){ return '<details class="tr"><summary>' + t[0] + ' <span class="mono">' + t[1] + '</span></summary>' + trialHtml(t[0]) + '</details>'; }).join('');
+  $('practice').innerHTML = CASES.map(function(cs, k){ return '<div class="card case"><p class="label">Case ' + (k + 1) + ' · ' + cs[0] + '</p><p>' + cs[1] + '</p><button class="btn ghost" type="button" data-case="' + k + '">Show the answer</button><div class="ans" id="ans' + k + '" hidden></div></div>'; }).join('');
+}
+function render(){
+  $('admit-out').innerHTML = admitHtml(readAdmit());
+  $('daily-out').innerHTML = dailyHtml(readDaily());
+  $('disch-out').innerHTML = dischargeHtml();
+  $('clinic-out').innerHTML = clinicHtml(readClinic());
+  $('fin-out').innerHTML = finHtml(); $('score-out').innerHTML = scoreHtml(); $('dev-out').innerHTML = devHtml();
+  $('refer-out').innerHTML = referHtml(); $('shock-out').innerHTML = shockHtml(readShock()); $('cath-out').innerHTML = cathHtml();
+}
+var TABS = ['acute', 'clinic', 'advanced', 'learn', 'practice'];
+function show(t){ TABS.forEach(function(x){ var on = x === t; $('t-' + x).setAttribute('aria-selected', String(on)); $('p-' + x).classList.toggle('on', on); }); }
+function step(group, id){ [].forEach.call(document.querySelectorAll('[data-group="' + group + '"]'), function(b){ var on = b.dataset.step === id; b.setAttribute('aria-pressed', String(on)); $(b.dataset.step).classList.toggle('on', on); }); }
+function fromHash(){ var id = location.hash.slice(1); if (!id) return; if (TABS.indexOf(id) >= 0){ show(id); return; } var el = $(id); if (!el) return; var sp = el.closest('.stp'); if (sp){ var b = document.querySelector('[data-step="' + sp.id + '"]'); if (b) step(b.dataset.group, sp.id); } var pan = el.closest('.panel'); if (pan) show(pan.id.slice(2)); el.scrollIntoView(); }
+document.addEventListener('DOMContentLoaded', function(){
+  build(); render();
+  document.addEventListener('input', render); document.addEventListener('change', render);
+  TABS.forEach(function(t){ $('t-' + t).addEventListener('click', function(){ show(t); }); });
+  document.addEventListener('click', function(e){
+    var b = e.target.closest('[data-step]'); if (b){ step(b.dataset.group, b.dataset.step); return; }
+    var s = e.target.closest('.sbtn'); if (s){ openFig($('sheet-b').dataset.fig, +s.dataset.s); return; }
+    var f = e.target.closest('button[data-fig]'); if (f){ openFig(f.dataset.fig, 0); return; }
+    var k = e.target.closest('[data-case]'); if (k){ var a = $('ans' + k.dataset.case); a.innerHTML = CASES[+k.dataset.case][2](); a.hidden = false; k.hidden = true; return; }
+    var l = e.target.closest('a[href^="#"]'); if (l){ setTimeout(fromHash, 0); }
+  });
+  $('sheet-x').addEventListener('click', closeFig); $('scrim').addEventListener('click', closeFig);
+  document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeFig(); });
+  window.addEventListener('hashchange', fromHash); fromHash();
+});
+</script>
+</body>
+</html>
