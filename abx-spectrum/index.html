@@ -709,7 +709,7 @@ function chipsLook(kind, drug, org){
 
 /* Gram-stain card. Rows are organism groups in this tool's table; each returns [status, reason] from the whole selection. */
 var GROUPS = {mssa: ['MSSA'], mrsa: ['MRSA'], strep: ['BHS', 'PNE'], ent: ['EFS'], gnr: ['ENT'], psa: ['PSA'], an: ['OAN', 'BFR'], aty: ['ATY']};
-function N(s){ return {cl: !!(s.gpcl || s.mpos || s.mneg), ch: !!s.gpch, rod: !!(s.gnr || s.lf || s.ox), none: !!s.none}; }
+function N(s){ return {cl: !!(s.gpcl || s.mpos), ch: !!s.gpch, rod: !!(s.gnr || s.lf || s.ox), none: !!s.none}; }
 function shapes(s){ var n = N(s); return (n.cl ? 1 : 0) + (n.ch ? 1 : 0) + (n.rod ? 1 : 0) + (n.none ? 1 : 0); }
 function clash(s){ return shapes(s) > 1 ? 'More than one stain result is selected. A mixed culture needs cover chosen for each organism, with the syndrome; no single list is shown.' : (s.mpos && s.mneg) ? 'The two MRSA results conflict: check which specimen each came from. Keep MRSA cover until it is settled.' : (s.lf && s.ox) ? 'Lactose fermenter and oxidase-positive do not go together: check the report.' : ''; }
 var NARROW = {
@@ -728,14 +728,14 @@ var NARROW = {
     ],
     next: function(s){
       var c = clash(s); if (c) return c;
-      var fav = NARROW.dx.causes.filter(function(c){ var x = c[1](s); return x && x[0] === 'fav'; }), orgs = [], anOnly = fav.length === 1 && fav[0][2] === 'an';
+      var fav = NARROW.dx.causes.filter(function(c){ var x = c[1](s); return x && x[0] === 'fav'; }), orgs = [], hasAn = fav.some(function(c){ return c[2] === 'an'; }), hasEnt = fav.some(function(c){ return c[2] === 'gnr'; });
       fav.forEach(function(c){ GROUPS[c[2]].forEach(function(o){ orgs.push(o); }); });
       if (!orgs.length) return 'Tap what the lab has reported. The stain narrows the organism hours to days before the culture names it.';
       var ok = DRUGS.filter(function(d){ return orgs.every(function(o){ return cov(d.id, o) === 2; }); }), names = ok.map(function(d){ return d.n; });
       var t = names.length ? 'Reliable against every favored organism in this tool\'s table: ' + names.join('; ') + '.' : 'No single drug in this tool\'s table is reliable against every favored organism: more than one agent is needed.';
-      if (anOnly) t += ' Reliable for B. fragilis but not all oral anaerobes: ' + DRUGS.filter(function(d){ return cov(d.id, 'BFR') === 2 && cov(d.id, 'OAN') < 2; }).map(function(d){ return d.n; }).join('; ') + '. Reliable for oral anaerobes but not B. fragilis: ' + DRUGS.filter(function(d){ return cov(d.id, 'OAN') === 2 && cov(d.id, 'BFR') < 2; }).map(function(d){ return d.n; }).join('; ') + '.';
+      if (hasAn) t += ' Reliable for B. fragilis but not all oral anaerobes: ' + DRUGS.filter(function(d){ return cov(d.id, 'BFR') === 2 && cov(d.id, 'OAN') < 2; }).map(function(d){ return d.n; }).join('; ') + '. Reliable for oral anaerobes but not B. fragilis: ' + DRUGS.filter(function(d){ return cov(d.id, 'OAN') === 2 && cov(d.id, 'BFR') < 2; }).map(function(d){ return d.n; }).join('; ') + '.';
       var n = N(s);
-      if (n.rod && !s.lf && !s.ox){ var noPsa = ok.filter(function(d){ return cov(d.id, 'PSA') === 0; }).map(function(d){ return d.n; }); t += ' This list is for enteric rods without ESBL, AmpC or a carbapenemase; those have their own cards.' + (noPsa.length ? ' Not active against Pseudomonas: ' + noPsa.join('; ') + '.' : ''); }
+      if (hasEnt){ var noPsa = s.lf ? [] : ok.filter(function(d){ return cov(d.id, 'PSA') === 0; }).map(function(d){ return d.n; }); t += ' This list is for enteric rods without ESBL, AmpC or a carbapenemase; those have their own cards.' + (noPsa.length ? ' Not active against Pseudomonas: ' + noPsa.join('; ') + '.' : ''); }
       if (n.ch) t += ' Vancomycin-resistant Enterococcus is not covered by this list.';
       return t + ' This is a coverage list, not a regimen: choose with the syndrome, and narrow when the culture names the organism.';
     },
