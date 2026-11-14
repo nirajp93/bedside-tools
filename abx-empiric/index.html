@@ -106,6 +106,42 @@ footer p{margin:0 0 8px}
 .resbox{margin-top:10px;padding:10px 12px;border-radius:10px;background:var(--fill);font-size:14.5px;position:sticky;bottom:-28px}
 .strip{display:grid;grid-template-columns:repeat(9,minmax(0,1fr));gap:4px;margin-top:8px}
 .strip span{display:block;font-size:10px;color:var(--muted);text-align:center;margin-top:3px}
+.fig{display:block;width:100%;max-width:460px;height:auto;margin:0 auto}
+.states{display:flex;gap:6px;overflow-x:auto;margin:10px -16px;padding:2px 16px 6px;scrollbar-width:none}
+.states::-webkit-scrollbar{display:none}
+.sbtn{flex:none;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--ink);font:inherit;font-size:14px;cursor:pointer;white-space:nowrap}
+.sbtn[aria-pressed="true"]{border-color:var(--accent);color:var(--accent);font-weight:600}
+.labs6{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:10px}
+.labs6.l4{grid-template-columns:repeat(4,1fr)}
+.lab{background:var(--fill);border-radius:10px;padding:6px 8px}
+.lab span{display:block;font-size:12px;color:var(--muted)}
+.lab b{font-family:var(--mono);font-size:13.5px}
+.lab.ch{box-shadow:inset 0 0 0 1.5px var(--warn)}
+.line1{font-size:15px;margin:10px 0 0}
+.pills{position:sticky;top:0;z-index:5;background:var(--bg);display:flex;gap:6px;overflow-x:auto;margin:0 -16px 12px;padding:8px 16px;border-bottom:1px solid var(--line);scrollbar-width:none}
+.pills::-webkit-scrollbar{display:none}
+.pill{flex:none;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--muted);font:inherit;font-size:14px;cursor:pointer;white-space:nowrap}
+.pill[aria-current="true"]{border-color:var(--accent);color:var(--accent);font-weight:600}
+.chap{scroll-margin-top:70px}
+.cause{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:8px 0;border-top:1px solid var(--line);font-size:15px}
+.cause small{color:var(--muted);font-size:13px;text-align:right;flex:0 1 46%}
+.cause.out span{color:var(--muted);text-decoration:line-through}
+.cause.out,.cause.less,.cause.unl{opacity:.6}
+.cause.fav span{font-weight:700}
+.cause.fav span:before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--accent);margin-right:8px}
+.seg{display:flex;gap:8px;margin:10px 0 0}
+.trial{border-left:3px solid var(--accent);padding-left:12px}
+.trial p{margin:0 0 6px;font-size:15px}
+.trial .k{font-family:var(--mono);font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);display:block}
+.fchips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.fchip{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--fill);color:var(--ink);font:inherit;font-size:14px;cursor:pointer}
+.fchip svg{flex:none;color:var(--accent)}
+.lead{font-size:14px;color:var(--muted);margin:0}
+.card.chap>*+*{margin-top:10px}
+.card.chap h2{font-size:18px;margin:0 0 2px}
+.sheet .line1{margin-top:10px}
+.rowb{display:flex;gap:8px;margin:0 0 14px}
+.rowb button{min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--ink);font:inherit;font-size:14px;cursor:pointer}
 [hidden]{display:none!important}
 @media (max-width:420px){.pgrid{grid-template-columns:0.8fr 0.8fr 1.5fr}}
 </style>
@@ -134,6 +170,7 @@ footer p{margin:0 0 8px}
 <div class="tabs" role="tablist">
   <button class="tab" role="tab" id="t-order" aria-selected="true" aria-controls="p-order">Orders</button>
   <button class="tab" role="tab" id="t-doses" aria-selected="false" aria-controls="p-doses">Doses</button>
+  <button class="tab" role="tab" id="t-learn" aria-selected="false" aria-controls="p-learn">Learn</button>
   <button class="tab" role="tab" id="t-prac" aria-selected="false" aria-controls="p-prac">Practice</button>
 </div>
 
@@ -148,6 +185,24 @@ footer p{margin:0 0 8px}
   <div class="card"><table class="dl" id="dosetable"></table></div>
 </section>
 
+<section class="view" id="p-learn" role="tabpanel" aria-labelledby="t-learn" hidden>
+  <div class="pills" id="pills"></div>
+  <div class="card chap" id="learn-target" data-pill="Targets"><p class="label">1 · How they work</p><h2>Where each class hits the bacterium</h2><p class="lead">Pick a target. Tap any drug name on an order for its own sheet.</p><div data-figure="target"></div><span class="tier">mechanism: FDA prescribing information</span></div>
+  <div class="card chap" id="learn-resist" data-pill="Resistance"><p class="label">2 · How they fail</p><h2>How resistance defeats the drug</h2><div data-figure="resist"></div><span class="tier">mechanism: standard microbiology · ESBL outcome: MERINO</span></div>
+  <div class="card chap" id="learn-course" data-pill="The course"><p class="label">3 · The plan</p><h2>Empiric, narrow, oral, stop</h2><div data-figure="course"></div></div>
+  <div class="card chap" id="learn-pkpd" data-pill="Dosing"><p class="label">4 · Why the schedule</p><h2>How the dose kills</h2><div data-figure="pkpd"></div><span class="tier">standard pharmacology</span></div>
+  <div class="card chap" id="learn-source" data-pill="Source"><p class="label">5 · Source control</p><h2>What antibiotics cannot do</h2><div data-figure="source"></div></div>
+  <div class="card chap" id="learn-allergy" data-pill="Allergy"><p class="label">6 · Allergy</p><h2>Penicillin allergy: what can be given</h2><div data-figure="allergy"></div><span class="tier">2022 drug allergy practice parameter</span></div>
+  <div class="card chap" id="narrow" data-pill="What came back?"><p class="label">7 · De-escalation</p><h2>What came back?</h2><p class="lead">Tap the results you have. Each kind of cover is marked keep, narrow or stop.</p>
+    <div class="states" id="nw-results" role="group" aria-label="Results"></div>
+    <div id="nw-causes"></div>
+    <p class="line1" id="nw-next"></p>
+    <details><summary>More</summary><p id="nw-more"></p><span id="nw-tiers"></span></details>
+  </div>
+  <div class="card chap" id="trials" data-pill="Trials"><p class="label">8 · Evidence</p><h2>Seven trials worth knowing</h2><p class="lead">Each card: the question, the design, the result, and what it changed.</p><div id="trialbox"></div></div>
+  <div class="rowb"><button id="go-prac" type="button">Practice cases</button></div>
+</section>
+
 <section class="view" id="p-prac" role="tabpanel" aria-labelledby="t-prac" hidden>
   <p class="note" id="practice">Decide what you would order, then reveal. Each answer is produced by the same engine as the Orders tab.</p>
   <div id="cases"></div>
@@ -157,7 +212,7 @@ footer p{margin:0 0 8px}
   <p><strong>For education only. Not a substitute for clinical judgment.</strong> Regimens are national-guideline defaults; local resistance, formulary, and infectious-disease advice take priority. Kidney and hemodialysis doses are from FDA prescribing information unless marked "expert practice"; items so marked are not in a label or guideline. Vancomycin maintenance dosing is left to pharmacy.</p>
   <p>Privacy: everything runs in your browser. Nothing you enter is sent anywhere or stored, and there are no analytics. Do not enter names, record numbers, or dates of birth.</p>
   <p class="mono">Last reviewed: 2026-11-13</p>
-  <p><strong>Sources:</strong> Surviving Sepsis Campaign 2026 (Prescott, Crit Care Med) · ATS community-acquired pneumonia guideline 2025 (Jones, AJRCCM; not endorsed by IDSA) and ATS/IDSA 2019 (Metlay) · IDSA/ATS hospital-acquired and ventilator-associated pneumonia 2016 (Kalil) · IDSA complicated urinary tract infection 2025 and IDSA uncomplicated cystitis 2010 · IDSA skin and soft tissue infection 2014 (Stevens) · IWGDF/IDSA diabetes-related foot infection 2023 (Senneville) · Surgical Infection Society intra-abdominal infection 2024 (Huston) · Tokyo Guidelines 2018 antimicrobial therapy (Gomi) · AASLD ascites and spontaneous bacterial peritonitis 2021 (Biggins) · IDSA bacterial meningitis 2004 (Tunkel) · IDSA catheter-related infection 2009 (Mermel) · IDSA/SHEA C. difficile 2021 and 2017 · IDSA antimicrobial-resistant gram-negative guidance 2024 and 2026 · Drug allergy practice parameter 2022 (Khan) · Parente 2018 (MRSA nasal screening) · ASHP/IDSA vancomycin guideline 2020 · Tokyo Guidelines 2018 severity grading (Kiriyama) · Halm 2002 (clinical stability in pneumonia) · IDSA candidiasis 2016 (Pappas) · SABATO trial 2024 (Kaasch, Lancet Infect Dis) · Sepsis-3 definitions 2016 (Singer) · FDA prescribing information for each drug (DailyMed, read November 2026). Pathogen lists are from the microbiology sections of the guidelines above; the coverage pictures are this tool's own summary of usual activity from FDA labels and those guidelines.</p>
+  <p><strong>Sources:</strong> Surviving Sepsis Campaign 2026 (Prescott, Crit Care Med) · ATS community-acquired pneumonia guideline 2025 (Jones, AJRCCM; not endorsed by IDSA) and ATS/IDSA 2019 (Metlay) · IDSA/ATS hospital-acquired and ventilator-associated pneumonia 2016 (Kalil) · IDSA complicated urinary tract infection 2025 and IDSA uncomplicated cystitis 2010 · IDSA skin and soft tissue infection 2014 (Stevens) · IWGDF/IDSA diabetes-related foot infection 2023 (Senneville) · Surgical Infection Society intra-abdominal infection 2024 (Huston) · Tokyo Guidelines 2018 antimicrobial therapy (Gomi) · AASLD ascites and spontaneous bacterial peritonitis 2021 (Biggins) · IDSA bacterial meningitis 2004 (Tunkel) · IDSA catheter-related infection 2009 (Mermel) · IDSA/SHEA C. difficile 2021 and 2017 · IDSA antimicrobial-resistant gram-negative guidance 2024 and 2026 · Drug allergy practice parameter 2022 (Khan) · Parente 2018 (MRSA nasal screening) · ASHP/IDSA vancomycin guideline 2020 · Tokyo Guidelines 2018 severity grading (Kiriyama) · Halm 2002 (clinical stability in pneumonia) · IDSA candidiasis 2016 (Pappas) · SABATO trial 2024 (Kaasch, Lancet Infect Dis) · Sepsis-3 definitions 2016 (Singer) · FDA prescribing information for each drug (DailyMed, read November 2026). Pathogen lists are from the microbiology sections of the guidelines above; the coverage pictures are this tool's own summary of usual activity from FDA labels and those guidelines. · Trials (MERINO, STOP-IT, BALANCE, ACORN, CAP-START, POET, SABATO) and Parente 2018 (MRSA nares screening) are cited under Learn.</p>
 </footer>
 </div>
 
@@ -765,6 +820,193 @@ function stepdown(id, v, p, o){
 }
 </script>
 
+<script id="teach">
+/* Visual teaching layer: figures, the "What came back?" card and trial cards. Pure data and SVG string builders; no DOM access.
+   Every label is listed in the project's empiric-antibiotics visual content table. */
+var VT = (function(){
+var FS = 'font-family:var(--sans)', FM = 'font-family:var(--mono)';
+function vcol(v){ return v === 'u' ? 'var(--warn)' : v === 'd' ? 'var(--accent)' : v === 'x' ? 'var(--bad)' : 'var(--muted)'; }
+function markers(p){ return '<defs>' + ['n','u','d','x'].map(function(k){ return '<marker id="' + p + k + '" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="' + vcol(k) + '"/></marker>'; }).join('') + '</defs>'; }
+function box(x, y, w, h, t1, t2, hot, dim){
+  return '<g' + (dim ? ' opacity=".45"' : '') + '><rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="10" fill="' + (hot ? 'var(--warnbg)' : 'var(--fill)') + '" stroke="' + (hot ? 'var(--warn)' : 'var(--line)') + '"' + (hot ? ' stroke-width="2"' : '') + '/>' +
+    '<text x="' + (x + w / 2) + '" y="' + (y + (t2 ? h / 2 - 2 : h / 2 + 4)) + '" text-anchor="middle" style="' + FS + ';font-size:12px;font-weight:600;fill:var(--ink)">' + t1 + '</text>' +
+    (t2 ? '<text x="' + (x + w / 2) + '" y="' + (y + h / 2 + 12) + '" text-anchor="middle" style="' + FM + ';font-size:10px;fill:var(--muted)">' + t2 + '</text>' : '') + '</g>';
+}
+function svgOpen(vb, label){ return '<svg viewBox="' + vb + '" role="img" aria-label="' + label + '" class="fig">'; }
+function line(d, v, w, p){ return '<path d="' + d + '" fill="none" stroke="' + vcol(v) + '" stroke-width="' + (w || (v === 'u' ? 4 : v === 'd' ? 1.5 : 2)) + '"' + (v === 'd' || v === 'x' ? ' stroke-dasharray="5 4"' : '') + ' marker-end="url(#' + p + (v || 'n') + ')"/>'; }
+function lab(x, y, t, v, anchor){ var m = v === 'u' ? ' ↑' : v === 'd' ? ' ↓' : v === 'x' ? ' ✕' : ''; return '<text x="' + x + '" y="' + y + '" text-anchor="' + (anchor || 'middle') + '" style="' + FM + ';font-size:10.5px;fill:' + vcol(v) + ';font-weight:' + (v ? 700 : 400) + '">' + t + m + '</text>'; }
+function tx(x, y, t, size, col, weight, anchor, mono){ return '<text x="' + x + '" y="' + y + '" text-anchor="' + (anchor || 'middle') + '" style="' + (mono ? FM : FS) + ';font-size:' + (size || 11) + 'px;fill:' + (col || 'var(--ink)') + ';font-weight:' + (weight || 400) + '">' + t + '</text>'; }
+function hot(on){ return on ? ' fill="var(--warnbg)" stroke="var(--warn)" stroke-width="2"' : ' fill="var(--fill)" stroke="var(--line)"'; }
+
+var TARGET = {
+  wall: {n: 'Cell wall', line: 'Beta-lactams bind penicillin-binding proteins and stop cell-wall cross-linking, so the wall fails. Vancomycin binds the D-Ala–D-Ala end of the wall\'s building blocks so they cannot be added.'},
+  r30: {n: 'Ribosome 30S', line: 'Doxycycline binds the 30S ribosome and blocks tRNA docking.'},
+  r50: {n: 'Ribosome 50S', line: 'Azithromycin, clindamycin and linezolid bind the 50S ribosome and stop protein synthesis. Clindamycin and linezolid also stop toxin production.'},
+  dna: {n: 'DNA', line: 'Fluoroquinolones block DNA gyrase and topoisomerase IV, so DNA cannot be unwound and copied. Metronidazole is reduced inside anaerobes to radicals that break DNA.'},
+  folate: {n: 'Folate', line: 'Trimethoprim-sulfamethoxazole is two drugs that block two consecutive steps in bacterial folate synthesis.'}
+};
+function targetSVG(k){
+  var h = svgOpen('0 0 340 220', 'Where the antibiotic acts: ' + TARGET[k].n);
+  h += '<rect x="20" y="20" width="300" height="180" rx="80" fill="none" stroke="' + (k === 'wall' ? 'var(--warn)' : 'var(--muted)') + '" stroke-width="' + (k === 'wall' ? 7 : 4) + '"/>' + tx(170, 14, 'cell wall', 10.5, k === 'wall' ? 'var(--warn)' : 'var(--muted)', k === 'wall' ? 700 : 400, 'middle', true);
+  h += '<path d="M70 110 C90 70 110 150 130 110 S170 70 190 110" fill="none" stroke="' + (k === 'dna' ? 'var(--warn)' : 'var(--muted)') + '" stroke-width="' + (k === 'dna' ? 4 : 2) + '"/>' + tx(130, 150, 'DNA', 10.5, k === 'dna' ? 'var(--warn)' : 'var(--muted)', k === 'dna' ? 700 : 400, 'middle', true);
+  h += '<ellipse cx="240" cy="80" rx="26" ry="12"' + hot(k === 'r30') + '/>' + tx(240, 84, '30S', 10, 'var(--ink)', k === 'r30' ? 700 : 400, 'middle', true) + '<ellipse cx="240" cy="104" rx="32" ry="15"' + hot(k === 'r50') + '/>' + tx(240, 108, '50S', 10, 'var(--ink)', k === 'r50' ? 700 : 400, 'middle', true) + tx(240, 134, 'ribosome', 10.5, 'var(--muted)', 400, 'middle', true);
+  h += '<rect x="186" y="150" width="116" height="26" rx="8"' + hot(k === 'folate') + '/>' + tx(244, 167, 'folate synthesis', 10, 'var(--ink)', k === 'folate' ? 700 : 400, 'middle', true);
+  return h + '</svg>';
+}
+
+var RESIST = {
+  mrsa: {n: 'MRSA', works: ['vancomycin', 'linezolid'], fails: 'beta-lactams', line: 'MRSA makes an altered binding protein (PBP2a) that beta-lactams other than ceftaroline cannot bind. Vancomycin and linezolid act on other targets, so they still work.'},
+  esbl: {n: 'ESBL', works: ['meropenem', 'ertapenem'], fails: 'ceftriaxone, cefepime', line: 'ESBL enzymes destroy most penicillins and cephalosporins and are not reliably blocked by tazobactam; carbapenems resist them. In MERINO, 30-day mortality in ceftriaxone-resistant E. coli or Klebsiella bacteremia was 12.3% on piperacillin-tazobactam and 3.7% on meropenem.'},
+  ampc: {n: 'AmpC', works: ['cefepime', 'meropenem'], fails: 'ceftriaxone', line: 'Some enteric rods, such as Enterobacter cloacae, Klebsiella aerogenes and Citrobacter freundii, carry an inducible AmpC enzyme that can switch on during treatment with ceftriaxone. Cefepime or a carbapenem is used instead.'},
+  ps: {n: 'Pseudomonas', works: ['pip-tazo', 'cefepime', 'meropenem'], fails: 'ceftriaxone, ertapenem', line: 'Pseudomonas is intrinsically resistant to ceftriaxone and ertapenem. It needs an antipseudomonal beta-lactam; ciprofloxacin and levofloxacin are less reliable.'}
+};
+function resistSVG(k, p){
+  p = p || 'rs'; var d = RESIST[k];
+  var h = svgOpen('0 0 340 200', 'How resistance works: ' + d.n) + markers(p);
+  h += box(110, 76, 120, 48, d.n, k === 'mrsa' ? 'altered target' : k === 'ps' ? 'intrinsic resistance' : 'enzyme', true);
+  h += box(8, 14, 150, 40, 'Fails', null, false) + tx(10, 68, d.fails, 10, 'var(--bad)', 700, 'start', true) + '<path d="M83 74 C90 90 98 96 108 100" fill="none" stroke="var(--bad)" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#' + p + 'x)"/>';
+  h += box(182, 146, 150, 40, 'Still works', null, false) + tx(330, 140, d.works.join(', '), 10, 'var(--ok)', 700, 'end', true) + '<path d="M256 128 C250 112 242 106 232 102" fill="none" stroke="var(--ok)" stroke-width="2.5"/>';
+  return h + '</svg>';
+}
+
+var COURSE = {
+  h0: {n: 'Hour 0', hot: 0, line: 'Send cultures, then cover the likely pathogens for this syndrome and this patient\'s risks. Broad cover is a starting position, not the plan.'},
+  h48: {n: '48 to 72 hours', hot: 1, line: 'The cultures and the patient now tell you what to drop: MRSA cover when the cultures and the nares screen are negative, pseudomonal cover when it has not grown.'},
+  oral: {n: 'Oral switch', hot: 2, line: 'Switch to tablets when the patient is improving, stable, and able to take and absorb them. The switch criteria for each syndrome are on its order card.'},
+  stop: {n: 'Stop date', hot: 3, line: 'Set the stop date when you start. Courses are short once the source is controlled: about 4 days after an intra-abdominal source is controlled (STOP-IT), and 7 days was noninferior to 14 for bloodstream infection (BALANCE).'}
+};
+function courseSVG(k){
+  var d = COURSE[k], st = [['First', 'broad'], ['Narrow', 'by culture'], ['Oral', 'if stable'], ['Stop', 'on date']];
+  var h = svgOpen('0 0 340 150', 'The antibiotic course: ' + d.n);
+  h += '<path d="M20 60 H320" stroke="var(--line)" stroke-width="3"/>';
+  st.forEach(function(s, i){ var x = 50 + i * 80, on = d.hot === i, wd = [64, 44, 30, 14][i]; h += '<circle cx="' + x + '" cy="60" r="' + (on ? 11 : 7) + '" fill="' + (on ? 'var(--accent)' : 'var(--card)') + '" stroke="var(--accent)" stroke-width="2"/>' + tx(x, 34, s[0], 12, 'var(--ink)', on ? 700 : 600) + tx(x, 88, s[1], 10, 'var(--muted)', 400, 'middle', true) + '<rect x="' + (x - wd / 2) + '" y="104" width="' + wd + '" height="14" rx="7" fill="var(--accent)" opacity="' + (on ? '.6' : '.25') + '"/>'; });
+  return h + tx(170, 140, 'breadth of cover', 10, 'var(--muted)', 400, 'middle', true) + '</svg>';
+}
+
+var PKPD = {
+  time: {n: 'Time above MIC', line: 'Beta-lactams kill for as long as the level stays above the MIC. That is why they are given often, and why a loading dose and prolonged infusion are used in sepsis.'},
+  peak: {n: 'Peak over MIC', line: 'Aminoglycosides kill by how far the peak rises above the MIC, which is why they are given as one large daily dose. This tool\'s regimens do not use them.'},
+  auc: {n: 'Total exposure (AUC)', line: 'Vancomycin killing tracks total exposure, the area under the curve over the MIC, so maintenance is dosed by AUC, by pharmacy.'}
+};
+function pkpdSVG(k){
+  var h = svgOpen('0 0 340 190', 'How the dose kills: ' + PKPD[k].n);
+  h += '<path d="M40 16V150H324" fill="none" stroke="var(--line)" stroke-width="2"/><path d="M40 108H324" stroke="var(--ink)" stroke-width="1.2" stroke-dasharray="4 4"/>' + tx(322, 102, 'MIC', 10.5, 'var(--ink)', 700, 'end', true) + tx(182, 172, 'time', 10.5, 'var(--muted)', 400, 'middle', true) + tx(4, 12, 'level', 10.5, 'var(--muted)', 400, 'start', true);
+  if (k === 'time') h += '<path d="M40 150 C60 60 70 60 110 96 C116 60 150 60 180 96 C186 60 220 60 250 96 C256 60 290 60 320 96" fill="none" stroke="var(--accent)" stroke-width="3"/><path d="M58 112H320" stroke="var(--warn)" stroke-width="5" opacity=".6"/>' + tx(190, 128, 'time spent above the MIC', 10.5, 'var(--warn)', 700, 'middle', true);
+  else if (k === 'peak') h += '<path d="M40 150 C56 10 70 10 90 60 C130 130 200 146 320 148" fill="none" stroke="var(--accent)" stroke-width="3"/><path d="M70 24 V106" stroke="var(--warn)" stroke-width="3"/>' + tx(80, 60, 'peak over MIC', 10.5, 'var(--warn)', 700, 'start', true);
+  else h += '<path d="M40 150 C60 50 80 50 130 80 C136 50 180 52 220 80 C226 52 270 52 320 82 V150 Z" fill="var(--accent)" opacity=".25"/><path d="M40 150 C60 50 80 50 130 80 C136 50 180 52 220 80 C226 52 270 52 320 82" fill="none" stroke="var(--accent)" stroke-width="3"/>' + tx(180, 130, 'area under the curve', 10.5, 'var(--warn)', 700, 'middle', true);
+  return h + '</svg>';
+}
+
+var SOURCE = {
+  und: {n: 'Undrained', line: 'Antibiotics do not replace drainage. Until an abscess, an obstructed duct or dead tissue is dealt with, the infection is not controlled, however broad the cover.'},
+  dr: {n: 'Drained', line: 'After adequate source control, about 4 days of antibiotics did as well as about 8: surgical-site infection, recurrence or death in 21.8% against 22.3% (STOP-IT).'},
+  ln: {n: 'The line', line: 'An infected line is a source too. Remove a short-term line for S. aureus, gram-negative bacilli, enterococci, fungi or mycobacteria. Remove a long-term line for S. aureus, Pseudomonas, fungi or mycobacteria, and for severe sepsis, suppurative thrombophlebitis, endocarditis, or bacteremia beyond 72 hours of active therapy.'}
+};
+function sourceSVG(k, p){
+  p = p || 'sc';
+  var h = svgOpen('0 0 340 180', 'Source control: ' + SOURCE[k].n) + markers(p);
+  if (k === 'ln'){ h += '<path d="M40 30 C120 30 150 60 170 110" fill="none" stroke="var(--warn)" stroke-width="5"/><circle cx="170" cy="112" r="9" fill="var(--bad)" opacity=".7"/>' + tx(60, 22, 'central line', 10.5, 'var(--warn)', 700, 'start', true) + '<path d="M20 120 H320" stroke="var(--muted)" stroke-width="10" opacity=".3"/>' + tx(300, 142, 'vein', 10.5, 'var(--muted)', 400, 'end', true) + tx(186, 100, 'bacteria on the line', 10, 'var(--bad)', 700, 'start', true); return h + '</svg>'; }
+  h += '<circle cx="120" cy="90" r="56" fill="' + (k === 'und' ? 'var(--badbg)' : 'var(--fill)') + '" stroke="' + (k === 'und' ? 'var(--bad)' : 'var(--line)') + '" stroke-width="2"/>' + tx(120, 86, k === 'und' ? 'collection' : 'drained', 12, 'var(--ink)', 600) + tx(120, 104, k === 'und' ? 'not drained' : 'small residual', 10, 'var(--muted)', 400, 'middle', true);
+  h += '<path d="M300 40 C260 44 220 56 ' + (k === 'und' ? '186 70' : '150 84') + '" fill="none" stroke="var(--accent)" stroke-width="2.5"' + (k === 'und' ? ' stroke-dasharray="5 4"' : '') + ' marker-end="url(#' + p + (k === 'und' ? 'x' : 'n') + ')"/>' + tx(300, 30, 'antibiotic', 10.5, 'var(--accent)', 700, 'end', true);
+  if (k === 'dr') h += '<path d="M120 146 V172" stroke="var(--ok)" stroke-width="5"/>' + tx(134, 166, 'drain', 10.5, 'var(--ok)', 700, 'start', true);
+  return h + '</svg>';
+}
+
+var ALLERGY = {
+  low: {n: 'Rash, non-severe', line: 'Penicillins are avoided. Cephalosporins with a side chain unlike penicillin (cefazolin, ceftriaxone, cefepime, ceftazidime) and carbapenems can be given. Cephalexin shares a side chain with ampicillin and amoxicillin.'},
+  ana: {n: 'Anaphylaxis', line: 'The same rule holds after penicillin anaphylaxis: unlike-side-chain cephalosporins and carbapenems can be given. An oral cephalosporin such as cephalexin is given only after allergy review.'},
+  severe: {n: 'SJS or DRESS', line: 'A severe delayed reaction is different: no beta-lactam of any kind until allergy and infectious diseases are involved.'}
+};
+function allergySVG(k){
+  var rows = [['Penicillins', k === 'severe' ? 'x' : 'x'], ['Cephalexin (shared side chain)', k === 'severe' ? 'x' : 'c'], ['Cefazolin, ceftriaxone, cefepime', k === 'severe' ? 'x' : 'ok'], ['Carbapenems', k === 'severe' ? 'x' : 'ok'], ['Non-beta-lactams', 'ok']];
+  var h = svgOpen('0 0 340 190', 'Beta-lactam allergy: ' + ALLERGY[k].n);
+  rows.forEach(function(r, i){ var y = 8 + i * 36, c = r[1] === 'x' ? 'var(--bad)' : r[1] === 'c' ? 'var(--warn)' : 'var(--ok)'; h += '<rect x="8" y="' + y + '" width="324" height="30" rx="9" fill="var(--fill)"/><rect x="8" y="' + y + '" width="6" height="30" rx="3" fill="' + c + '"/>' + tx(24, y + 20, r[0], 12, 'var(--ink)', 400, 'start') + tx(324, y + 20, r[1] === 'x' ? 'avoid' : r[1] === 'c' ? 'caution' : 'can be given', 11, c, 700, 'end', true); });
+  return h + '</svg>';
+}
+
+var FIGS = {
+  target: {t: 'Where each class hits the bacterium', states: ['wall','r30','r50','dna','folate'], data: TARGET, svg: targetSVG},
+  resist: {t: 'How resistance defeats the drug', states: ['mrsa','esbl','ampc','ps'], data: RESIST, svg: resistSVG},
+  course: {t: 'Empiric to narrow to stop', states: ['h0','h48','oral','stop'], data: COURSE, svg: courseSVG},
+  pkpd: {t: 'How the dose kills', states: ['time','peak','auc'], data: PKPD, svg: pkpdSVG},
+  source: {t: 'Source control', states: ['und','dr','ln'], data: SOURCE, svg: sourceSVG},
+  allergy: {t: 'Penicillin allergy: what can be given', states: ['low','ana','severe'], data: ALLERGY, svg: allergySVG}
+};
+
+/* Chips for an order card. o is the engine's order (o.id syndrome, o.p patient, o.lines). A state opens only when the entered values support it. */
+function chipsFor(o){
+  var out = [], p = o.p || {}, keys = (o.lines || []).map(function(l){ return String(l.key); });
+  var has = function(re){ return keys.some(function(k){ return re.test(k); }); };
+  if (p.esbl && has(/meropenem|ertapenem/i)) out.push(['resist', 'esbl'], ['trial', 'merino', 'ESBL: the MERINO trial']);
+  else if (p.pseudo && has(/piptazo|cefepime|meropenem|ceftazidime/i)) out.push(['resist', 'ps']);
+  else if (p.mrsa && has(/^vanco$|linezolid/i)) out.push(['resist', 'mrsa']);
+  var beta = typeof BETA !== 'undefined' && keys.some(function(k){ return BETA[k]; });
+  if (p.allergy && p.allergy !== 'none' && (beta || o.noBL)) out.push(['allergy', p.allergy]);
+  if (o.id === 'iai' || o.id === 'bil') out.push(['source', 'und', 'Source control: why drainage matters']);
+  if (o.id === 'line') out.push(['source', 'ln']);
+  out.push(['why', {sel: {}}, 'What came back?']);
+  return out;
+}
+
+/* "What came back?" Rows are kinds of cover; each returns [status, reason] from the whole selection.
+   keep = favored to continue, stop = favored to stop, narrow = shorten or narrow, same = no change. */
+var NARROW = {
+  dx: {
+    labels: {fav: 'keep: ', 'in': 'no change', less: 'narrow or shorten: ', unl: 'stop: '},
+    results: [['nares','MRSA nares PCR negative'],['resp','Respiratory culture: no MRSA or Pseudomonas'],['cons','Coag-negative staph, 1 of 2 sets'],['sa','S. aureus in blood'],['esbl','Ceftriaxone-resistant E. coli or Klebsiella in blood'],['gnb','Gram-negative bacteremia, source controlled, improving'],['leg','Legionella urine antigen positive'],['pct','Procalcitonin low'],['neg','Cultures negative at 48 to 72 h, improving']],
+    causes: [
+      ['MRSA cover', function(s){ return s.sa ? ['fav','until the susceptibility is known'] : s.nares ? ['unl','in pneumonia a negative screen has a negative predictive value of about 96 to 98%; lower in ventilator-associated pneumonia'] : s.resp ? ['unl','MRSA has not grown'] : s.neg && !s.esbl && !s.gnb ? ['unl','cultures are negative'] : null; }],
+      ['Antipseudomonal cover', function(s){ return s.esbl ? null : s.resp ? ['unl','Pseudomonas has not grown'] : s.neg && !s.gnb ? ['less','narrow to the usual pathogens for the syndrome'] : null; }],
+      ['Atypical cover', function(s){ return s.leg ? ['fav','Legionella is confirmed'] : null; }],
+      ['Carbapenem', function(s){ return s.esbl ? ['fav','meropenem, not piperacillin-tazobactam (MERINO)'] : null; }],
+      ['Treating the culture at all', function(s){ return s.sa ? ['fav','S. aureus in blood is treated as a true infection'] : s.cons ? ['less','usually a contaminant: repeat cultures before committing to a course'] : null; }],
+      ['Length of the course', function(s){ return s.sa ? ['fav','S. aureus needs a long course: 14 days only when every low-risk criterion is met, otherwise 4 to 6 weeks'] : s.gnb ? ['less','7 days in total was noninferior to 14 (BALANCE)'] : null; }],
+      ['Withholding antibiotics', function(s){ return s.pct ? ['in','a low procalcitonin does not by itself justify withholding antibiotics in pneumonia'] : null; }]
+    ],
+    next: function(s){
+      var out = [], neg = s.neg && !s.sa && !s.esbl && !s.gnb;
+      if (s.sa) out.push('Repeat blood cultures, find and remove the source, narrow to cefazolin if MSSA, and involve infectious diseases');
+      if (s.esbl) out.push('Change to meropenem');
+      if (s.cons && !s.sa) out.push('Repeat cultures; treat only if they grow again or the patient has a line or prosthesis and looks infected');
+      if (!s.sa){ if (s.resp || neg) out.push('Stop the MRSA agent'); else if (s.nares) out.push('In pneumonia, stop the MRSA agent'); }
+      if (s.resp && !s.esbl) out.push('Step down from the antipseudomonal drug');
+      if (s.gnb && !s.sa) out.push('Set the stop date at day 7');
+      if (s.leg) out.push('Keep azithromycin or a respiratory fluoroquinolone');
+      if (s.pct) out.push('Do not hold antibiotics for pneumonia on the procalcitonin alone');
+      if (neg) out.push('Set a stop date today');
+      if (s.neg && !neg) out.push('A positive culture outranks "cultures negative": follow the organism');
+      if (!out.length) return 'Tap a result. Reassess every antibiotic at 48 to 72 hours: what grew, what did not, and how the patient is doing.';
+      return out.join('. ') + '.';
+    },
+    more: 'A result here marks cover as favored to stop or keep; it does not replace the bedside. A patient who is getting worse is reassessed before anything is narrowed. BALANCE excluded patients with severe immunosuppression and foci that need prolonged treatment.',
+    tiers: ['MRSA nares: Parente 2018 (meta-analysis)', 'ESBL: MERINO 2018', 'duration: BALANCE 2024', 'the rest: guideline text or expert practice']
+  }
+};
+function narrow(side, sel){
+  return NARROW[side].causes.map(function(c){ var x = c[1](sel) || ['in', '']; return {name: c[0], st: x[0], why: x[1]}; });
+}
+
+var TRIALS = [
+  {id: 'merino', q: 'Can piperacillin-tazobactam replace a carbapenem for ESBL bacteremia?', d: 'MERINO. Randomized noninferiority trial, 26 sites in 9 countries; 379 adults analysed with E. coli or Klebsiella bloodstream infection, ceftriaxone-nonsusceptible but piperacillin-tazobactam-susceptible; piperacillin-tazobactam 4.5 g every 6 hours or meropenem 1 g every 8 hours.', r: '30-day mortality 12.3% with piperacillin-tazobactam and 3.7% with meropenem (risk difference 8.6%). Noninferiority was not shown.', c: 'Why an ESBL history moves the regimen to meropenem.', cite: 'Harris PNA et al. JAMA 2018;320:984', doi: '10.1001/jama.2018.12163'},
+  {id: 'stopit', q: 'How long after the source is controlled?', d: 'STOP-IT. Randomized; 518 patients with complicated intra-abdominal infection and adequate source control; a fixed 4 ± 1 days, or until 2 days after fever, leukocytosis and ileus resolved (maximum 10 days).', r: 'Surgical-site infection, recurrent infection or death in 21.8% against 22.3% (difference −0.5 points, 95% CI −7.0 to 8.0). Median 4.0 against 8.0 days of antibiotics.', c: 'The basis for about 4 days after adequate source control.', cite: 'Sawyer RG et al. N Engl J Med 2015;372:1996', doi: '10.1056/NEJMoa1411162'},
+  {id: 'balance', q: 'Seven days or fourteen for bacteremia?', d: 'BALANCE. Randomized noninferiority trial, 74 hospitals in 7 countries; 3608 hospitalized patients with bloodstream infection, 55% in the ICU; 7 or 14 days. Excluded: severe immunosuppression, foci requiring prolonged treatment, and single cultures with possible contaminants.', r: 'Death by 90 days 14.5% against 16.1% (difference −1.6 points, 95.7% CI −4.0 to 0.8). Noninferior. Most infections came from the urinary tract (42.2%) or abdomen (18.8%).', c: 'Supports 7 days for uncomplicated bloodstream infection once the source is dealt with.', cite: 'BALANCE Investigators. N Engl J Med 2025;392:1065', doi: '10.1056/NEJMoa2404991'},
+  {id: 'acorn', q: 'Cefepime or piperacillin-tazobactam: which is harder on the kidney or the brain?', d: 'ACORN. Randomized, open-label, one US academic center; 2511 adults started on antipseudomonal cover within 12 hours of arrival; 77.2% were also on vancomycin.', r: 'Highest stage of acute kidney injury or death by day 14: no difference (odds ratio 0.95, 95% CI 0.80 to 1.13). Days alive and free of delirium and coma: 11.9 with cefepime against 12.2 (odds ratio 0.79, 95% CI 0.65 to 0.95).', c: 'Piperacillin-tazobactam did not cause more kidney injury; cefepime caused more neurological dysfunction.', cite: 'Qian ET et al. JAMA 2023;330:1557', doi: '10.1001/jama.2023.20583'},
+  {id: 'capstart', q: 'Does ward pneumonia need more than a beta-lactam?', d: 'CAP-START. Cluster-randomized crossover trial of strategies for non-ICU community-acquired pneumonia: beta-lactam alone (656 patients), beta-lactam plus macrolide (739), fluoroquinolone (888).', r: '90-day mortality 9.0%, 11.1% and 8.8%. The beta-lactam strategy was noninferior to both.', c: 'A reason atypical cover on the ward is debated. The guideline regimens in this tool still include it.', cite: 'Postma DF et al. N Engl J Med 2015;372:1312', doi: '10.1056/NEJMoa1406330'},
+  {id: 'poet', q: 'Can endocarditis be finished with tablets?', d: 'POET. Randomized noninferiority trial; 400 stable adults with left-sided endocarditis (streptococci, Enterococcus faecalis, S. aureus or coagulase-negative staphylococci) after at least 10 days of IV antibiotics; continue IV or switch to oral.', r: 'Death, unplanned cardiac surgery, embolism or relapse in 12.1% (IV) against 9.0% (oral); difference 3.1 points (95% CI −3.4 to 9.6). Noninferior.', c: 'Opened the door to oral step-down in selected, stable patients. A specialist decision.', cite: 'Iversen K et al. N Engl J Med 2019;380:415', doi: '10.1056/NEJMoa1808312'},
+  {id: 'sabato', q: 'Can low-risk S. aureus bacteremia switch to oral early?', d: 'SABATO. Randomized, open-label, 31 hospitals; 213 adults with low-risk S. aureus bloodstream infection after 5 to 7 days of IV therapy; oral switch or continued IV. 5063 patients were assessed to find them.', r: 'Complications within 90 days in 13% against 12% (difference 0.7 points, 95% CI −7.8 to 9.1). Noninferior. Stopped early for slow recruitment.', c: 'Possible only in a small, carefully selected group: about 4% of those screened were randomized.', cite: 'Kaasch AJ et al. Lancet Infect Dis 2024;24:523', doi: '10.1016/S1473-3099(23)00756-9'}
+];
+
+var ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M7 15l3-4 3 3 2-2 2 3"/></svg>';
+function escq(s){ return String(s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+function chipHTML(c){
+  if (c[0] === 'why') return '<button class="fchip" type="button" data-narrow="' + escq(JSON.stringify(c[1])) + '">' + escq(c[2]) + '</button>';
+  if (c[0] === 'trial') return '<button class="fchip" type="button" data-trial="' + c[1] + '">' + escq(c[2]) + '</button>';
+  return '<button class="fchip" type="button" data-fig="' + c[0] + '" data-state="' + (c[1] || '') + '">' + ICON + escq(c[2] || FIGS[c[0]].t) + '</button>';
+}
+function chipRow(list){ return list.length ? '<div class="fchips">' + list.map(chipHTML).join('') + '</div>' : ''; }
+return {FIGS: FIGS, chipsFor: chipsFor, NARROW: NARROW, narrow: narrow, TRIALS: TRIALS, chipRow: chipRow, escq: escq};
+})();
+</script>
 <script id="ui">
 function $(id){ return document.getElementById(id); }
 function num(id){ var v = $(id).value.trim().replace(',', '.'); if (v === '') return null; var n = parseFloat(v); return isNaN(n) ? null : n; }
@@ -823,6 +1065,7 @@ function orderCard(o, withSelect, S){
   o.guards.forEach(function(g){ h += '<div class="guard">' + esc(g) + '</div>'; });
   h += covGrid(o, withSelect);
   h += '<p class="whyline"><b>Why:</b> ' + esc(o.why) + '</p>';
+  h += VT.chipRow(VT.chipsFor(o));
   var sd = stepdown(o.id, o.vid, o.p, o), oral = '';
   if (sd && sd.none) oral = esc(sd.none);
   else if (sd){ sd.p = o.p; sd.syn = o.syn; REG.push(sd);
@@ -883,7 +1126,7 @@ $('out').addEventListener('change', function(e){ if (e.target.id === 'variant'){
 function all(){ renderOrder(); renderDoses(); }
 $('patient').addEventListener('input', all); $('patient').addEventListener('change', all);
 
-var VIEWS = ['order', 'doses', 'prac'];
+var VIEWS = ['order', 'doses', 'learn', 'prac'];
 function showView(v){ VIEWS.forEach(function(x){ var on = x === v; $('p-' + x).hidden = !on; $('t-' + x).setAttribute('aria-selected', String(on)); }); }
 VIEWS.forEach(function(v){ $('t-' + v).addEventListener('click', function(){ showView(v); }); });
 function goHash(){ var id = decodeURIComponent(location.hash.slice(1)); if (!id) return; if (id.indexOf('syn-') === 0){ var s = id.slice(4); if (SYN.some(function(x){ return x.id === s; })){ showView('order'); cur.syn = s; cur.pick = false; renderList(); renderOrder(); } }
@@ -959,7 +1202,59 @@ document.addEventListener('change', function(e){
     box.innerHTML = k === n ? '<b>Criteria met:</b> switch to an oral choice below.' : '<b>Not yet:</b> ' + k + ' of ' + n + ' met.';
   }
 });
-renderList(); renderOrder(); renderDoses(); renderCases(); goHash();
+renderList(); renderOrder(); renderDoses(); renderCases();
+
+/* Learn tab: figures, figure sheet, "What came back?" card, trials. */
+(function(){
+var G = function(id){ return document.getElementById(id); }, escq = VT.escq, FIGS = VT.FIGS, figN = 0;
+function mountFig(host, id, state){
+  var F = FIGS[id], pre = 'f' + (++figN) + '-';
+  function draw(k){
+    host.innerHTML = '<div class="states" role="group" aria-label="' + escq(F.t) + '">' + F.states.map(function(x){ return '<button class="sbtn" type="button" data-k="' + x + '" aria-pressed="' + (x === k) + '">' + escq(F.data[x].n) + '</button>'; }).join('') + '</div>' + F.svg(k, pre) + '<p class="line1">' + escq(F.data[k].line) + '</p>';
+    var on = host.querySelector('[aria-pressed="true"]'), row = host.querySelector('.states');
+    if (on && row) row.scrollLeft = Math.max(0, on.offsetLeft - 60);
+  }
+  host.onclick = function(e){ var k = e.target.getAttribute && e.target.getAttribute('data-k'); if (k) draw(k); };
+  draw(state && F.data[state] ? state : F.states[0]);
+}
+var nwSel = {};
+function drawNarrow(){
+  var N = VT.NARROW.dx;
+  G('nw-results').innerHTML = N.results.map(function(r){ return '<button class="sbtn" type="button" data-r="' + r[0] + '" aria-pressed="' + !!nwSel[r[0]] + '">' + escq(r[1]) + '</button>'; }).join('');
+  var rows = VT.narrow('dx', nwSel), ord = {fav: 0, unl: 1, less: 2, 'in': 3};
+  rows.sort(function(a, b){ return ord[a.st] - ord[b.st]; });
+  G('nw-causes').innerHTML = rows.map(function(c){ return '<div class="cause ' + (c.st === 'fav' ? 'fav' : c.st === 'in' && !c.why ? 'less' : '') + '"><span>' + escq(c.name) + '</span><small>' + escq(c.st === 'in' ? (c.why ? c.why : 'no change') : N.labels[c.st] + c.why) + '</small></div>'; }).join('');
+  G('nw-next').innerHTML = '<b>Do next:</b> ' + escq(N.next(nwSel));
+}
+G('nw-results').addEventListener('click', function(e){
+  var r = e.target.getAttribute('data-r'); if (!r) return;
+  if (nwSel[r]) delete nwSel[r]; else nwSel[r] = 1;
+  var left = G('nw-results').scrollLeft; drawNarrow(); G('nw-results').scrollLeft = left;
+});
+G('nw-more').textContent = VT.NARROW.dx.more;
+G('nw-tiers').innerHTML = VT.NARROW.dx.tiers.map(function(t){ return '<span class="tier" style="margin-right:6px">' + escq(t) + '</span>'; }).join('');
+drawNarrow();
+document.addEventListener('click', function(e){
+  var c = e.target.closest && e.target.closest('[data-fig]');
+  if (c){ var id = c.getAttribute('data-fig'); openSheet('<h2>' + escq(FIGS[id].t) + '</h2><div id="figsheet" style="clear:both"></div>', FIGS[id].t); mountFig(G('figsheet'), id, c.getAttribute('data-state')); return; }
+  var n = e.target.closest && e.target.closest('[data-narrow]');
+  if (n){ nwSel = JSON.parse(n.getAttribute('data-narrow')).sel; drawNarrow(); showView('learn'); requestAnimationFrame(function(){ G('narrow').scrollIntoView({block: 'start'}); }); return; }
+  var t = e.target.closest && e.target.closest('[data-trial]');
+  if (t){ showView('learn'); requestAnimationFrame(function(){ G('trial-' + t.getAttribute('data-trial')).scrollIntoView({block: 'center'}); }); }
+});
+document.querySelectorAll('[data-figure]').forEach(function(h){ mountFig(h, h.getAttribute('data-figure'), h.getAttribute('data-state')); });
+var chaps = [].slice.call(document.querySelectorAll('.chap'));
+G('pills').innerHTML = chaps.map(function(c, n){ return '<button class="pill" type="button" data-go="' + c.id + '" aria-current="' + (n === 0) + '">' + (n + 1) + ' ' + escq(c.getAttribute('data-pill')) + '</button>'; }).join('');
+G('pills').addEventListener('click', function(e){ var g = e.target.getAttribute('data-go'); if (g) G(g).scrollIntoView(); });
+function mark(id){ [].forEach.call(G('pills').children, function(b){ var on = b.getAttribute('data-go') === id; b.setAttribute('aria-current', String(on)); if (on) G('pills').scrollLeft = Math.max(0, b.offsetLeft - 60); }); }
+if ('IntersectionObserver' in window){
+  var io = new IntersectionObserver(function(es){ es.forEach(function(en){ if (en.isIntersecting) mark(en.target.id); }); }, {rootMargin: '-30% 0px -60% 0px'});
+  chaps.forEach(function(c){ io.observe(c); });
+}
+G('trialbox').innerHTML = VT.TRIALS.map(function(t){ return '<div class="trial" id="trial-' + t.id + '" style="margin-top:14px;scroll-margin-top:80px"><p><b>' + escq(t.q) + '</b></p><p><span class="k">Design</span>' + escq(t.d) + '</p><p><span class="k">Result</span>' + escq(t.r) + '</p><p><span class="k">What it changed</span>' + escq(t.c) + '</p><p class="mono" style="font-size:13px"><a href="https://doi.org/' + t.doi + '" rel="noopener">' + escq(t.cite) + '</a></p></div>'; }).join('');
+G('go-prac').addEventListener('click', function(){ showView('prac'); window.scrollTo(0, 0); });
+goHash();
+})();
 </script>
 </body>
 </html>
