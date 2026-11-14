@@ -360,11 +360,12 @@ function peClass(i){
   else if (i.shock) o.cat = 'E1';
   else if (i.perf) o.cat = 'D2';
   else if (hypo){ o.cat = 'D1'; if (!i.thypo) o.guards.push('Systolic BP below 90: read as transient hypotension. If it persists or needs a vasopressor, tick shock.'); }
-  else if (i.incidental && !i.rv && !i.bio && !((i.hr != null && i.hr >= 110) || (i.sbp != null && i.sbp < 100) || (i.spo2 != null && i.spo2 < 90))) o.cat = 'A';
+  else if (i.incidental && !i.rv && !i.bio && !((i.hr != null && i.hr >= 110) || (i.sbp != null && i.sbp < 100) || (i.spo2 != null && i.spo2 < 90) || i.o2)) o.cat = 'A';
   else if (s.score >= 1) o.cat = i.rv && i.bio ? 'C3' : (i.rv || i.bio) ? 'C2' : 'C1';
   else if (!s.miss.length){ o.cat = 'B'; if (i.rv || i.bio) o.guards.push('sPESI is 0 but the right ventricle or a biomarker is abnormal. The categories key on the score; do not send home without senior review.'); }
   if (!o.cat){ o.need = s.miss; return o; }
-  if (i.incidental && o.cat !== 'A') o.guards.push('Ticked as found by chance, but the vital signs, right ventricle or biomarkers are abnormal, so it is classed by those. Look again for symptoms.');
+  if (i.incidental && o.cat !== 'A') o.guards.push('Ticked as found by chance, but the vital signs, oxygen need, right ventricle or biomarkers are abnormal, so it is classed by those. Look again for symptoms.');
+  if (o.cat === 'A' && s.miss.length) o.guards.push('Not entered: ' + s.miss.join(', ') + '. Check the vital signs before discharge.');
   if (s.miss.length && o.cat.charAt(0) === 'C') o.guards.push('Not entered: ' + s.miss.join(', ') + '. The category could be higher.');
   o.letter = o.cat.charAt(0);
   o.r = !!i.o2 && o.letter === 'C';
@@ -383,7 +384,6 @@ function peClass(i){
   if ('CDE'.indexOf(o.letter) >= 0) o.guards.push('Avoid intubation and deep sedation unless clearly needed (3: Harm). If you must, have vasopressors ready first.');
   if (o.letter === 'D' || o.letter === 'E') o.guards.push('Fluids: small boluses only (500 mL or less). Large volumes over-distend the right ventricle. Norepinephrine is the usual first vasopressor.');
   o.lysis = o.letter === 'D' || o.letter === 'E';
-  if (i.nobleed){ if ('ABC'.indexOf(o.letter) >= 0) o.adv = 'No anticoagulant can be given for now: see the next card.'; if (o.letter === 'A' || o.letter === 'B') o.disp = 'Admit. A PE that cannot be anticoagulated is not for home treatment.'; }
   o.why = o.letter === 'E' ? 'The right ventricle has failed against the clot and blood pressure is gone with it. Only removing the obstruction breaks the cycle.'
     : o.cat === 'D2' ? 'Blood pressure can hold while cardiac output is already too low; lactate, urine output and mentation show it first.'
     : o.cat === 'D1' ? 'A brief drop in pressure means the right ventricle is near its limit, even if it has recovered for now.'
@@ -391,7 +391,8 @@ function peClass(i){
     : o.cat === 'C2' ? 'One sign of right ventricular stress, not two. The risk of early collapse is lower than in C3, so anticoagulation and monitoring are the treatment.'
     : o.cat === 'C1' ? 'The score is raised by age, comorbidity or vital signs, but the right ventricle is coping. The score, not the heart, is the reason for admission.'
     : o.cat === 'B' ? 'With sPESI 0, 30-day mortality was about 1%, so treatment at home is as safe as a hospital bed.'
-    : 'No symptoms, no abnormal vital sign and no strain on the right ventricle: the risk is recurrence, not collapse, so an anticoagulant and follow-up are the treatment.';
+    : 'No symptoms and no sign of strain on the heart: the risk is recurrence, not collapse, so an anticoagulant and follow-up are the treatment.';
+  if (i.nobleed){ if ('ABC'.indexOf(o.letter) >= 0) o.adv = 'No anticoagulant can be given for now: see the next card.'; if (o.letter === 'A' || o.letter === 'B'){ o.disp = 'Admit. A PE that cannot be anticoagulated is not for home treatment.'; o.why = 'The score is low, but with no anticoagulant nothing is preventing the next embolus, so this patient is watched in hospital.'; } }
   o.fig = o.letter === 'E' ? 'e' : o.letter === 'D' ? 'd' : o.letter === 'C' ? 'c' : 'ok';
   return o;
 }
@@ -402,13 +403,14 @@ function duration(i, rows){
   var noDoac = DOACS.every(function(a){ return st[a] === 'out'; });
   var red = [st.apix !== 'out' ? 'apixaban 2.5 mg twice daily' : null, st.riva !== 'out' ? 'rivaroxaban 10 mg daily' : null].filter(Boolean);
   var extDose = red.length ? 'After at least 6 months, a reduced dose is recommended for those who continue: ' + red.join(' or ') + ' (AHA/ACC 1, A; CHEST weak).' : 'Continue the drug chosen above at full dose. The reduced-dose option exists only for apixaban and rivaroxaban, which do not fit this patient.';
-  var contWith = noDoac ? 'offer to continue; when a DOAC cannot be used, warfarin is the extended-phase drug (CHEST rec 25, weak)' : 'offer to continue with a DOAC';
+  var contWith = noDoac ? 'offer to continue' : 'offer to continue with a DOAC';
+  var contAfter = !noDoac ? '' : i.cpC ? ' In Child-Pugh C that means staying on LMWH (expert practice).' : ' When a DOAC cannot be used, warfarin is the extended-phase drug (CHEST rec 25, weak).';
   if (i.preg){ d.head = 'Through pregnancy and after delivery'; d.steps = ['LMWH for the rest of the pregnancy.', 'Plan delivery and the postpartum course with obstetrics and hematology.']; d.why = 'Pregnancy is the provoking factor and it has not ended, so treatment cannot stop on a 3-month clock.'; d.tiers = ['expert practice']; d.fig = 'minor'; return d; }
   if (i.gi || i.cancer){ d.head = 'At least 6 months'; d.steps = ['Treat for at least 6 months (ASCO, strong).', 'Beyond 6 months: offer to selected patients with active cancer, such as metastatic disease or ongoing chemotherapy, and reassess at intervals (ASCO, weak to moderate).']; d.why = 'Active cancer keeps provoking clots, so the risk of recurrence stays high for as long as the cancer does.'; d.more = ['In API-CAT (2025), after 6 months of treatment, apixaban 2.5 mg twice daily was non-inferior to 5 mg for recurrence, with less clinically relevant bleeding. ASCO 2023 predates that trial.', 'Check for interactions between the anticoagulant and cancer drugs.']; d.tiers = ['ASCO 2023 rec 4.2, 4.3']; d.fig = 'unprov'; return d; }
   if (i.aps){ d.head = 'Long term, on warfarin'; d.steps = ['Antiphospholipid syndrome does not resolve: continue without a planned stop date.', 'Stay on warfarin, INR 2.0–3.0. The reduced-dose DOAC option does not apply.']; d.why = 'The antibodies do not go away, so neither does the risk.'; d.tiers = ['warfarin over a DOAC: AHA/ACC 2026, 1, A', 'CHEST 2021 rec 17, weak', 'no stop date: expert practice']; d.fig = 'unprov'; return d; }
   if (i.prov === 'major'){ d.head = 'Stop at 3 months'; d.steps = ['Treat for 3 months, then stop (CHEST rec 22, strong; AHA/ACC: stop at the end of the initial 3 to 6 months, 1, B-NR).']; d.why = 'After a clot provoked by surgery, about 3% recur over 5 years once the trigger is gone, which is less than the bleeding risk of staying on treatment.'; d.more = ['Major transient factors: surgery with general anesthesia over 30 minutes, confined to a hospital bed for 3 days or more with acute illness, cesarean section.']; d.tiers = ['CHEST 2021 rec 21, 22']; d.fig = 'major'; }
   else if (i.prov === 'minor'){ d.head = '3 months, then a shared decision'; d.steps = ['Treat for at least 3 months.', 'Then decide together: CHEST suggests stopping (rec 23, weak); the 2026 AHA/ACC guideline makes stopping versus continuing a shared decision (2a, B-NR).', extDose]; d.why = 'A minor trigger explains only part of the risk: after nonsurgical triggers recurrence is about 15% over 5 years, between a surgical clot and an unprovoked one.'; d.more = ['Minor transient factors: estrogen therapy, pregnancy or the weeks after delivery, surgery under 30 minutes of anesthesia, a hospital stay under 3 days, bed rest at home for 3 days or more, a leg injury with reduced mobility, prolonged car or air travel.', 'If estrogen was the trigger and it has been stopped, that favors stopping the anticoagulant.']; d.tiers = ['CHEST 2021 rec 23', 'AHA/ACC 2026']; d.fig = 'minor'; }
-  else if (i.prov === 'none' || i.prov === 'pers'){ d.head = 'No planned stop date'; d.steps = ['Treat for the first 3 to 6 months, then ' + contWith + ' (CHEST rec 24, strong; AHA/ACC 1, A' + (i.prov === 'pers' ? '; persistent risk factor 1, C-LD' : '') + ').', extDose, 'Revisit the decision at least once a year and whenever health changes.']; d.why = 'With no trigger to remove, about 30% recur within 5 years of stopping; a reduced-dose DOAC keeps most of the protection.'; d.more = ['Offering is not the same as everyone taking it: preference, bleeding risk and the predicted recurrence risk all count.', 'If anticoagulation is stopped or declined, low-dose aspirin is better than nothing but much less effective (CHEST rec 28, weak; AHA/ACC 2a, B-R).', 'Thrombophilia testing: ASH suggests not testing after an unprovoked clot, because treatment continues either way (conditional, very low certainty). Send antiphospholipid antibodies when the story fits (young, arterial events, pregnancy loss), because a positive result changes the drug (expert practice).', 'Age-appropriate cancer screening is recommended after an unprovoked PE; routine CT or PET is not (AHA/ACC 1, A; 3: No Benefit).']; d.tiers = ['CHEST 2021 rec 24, 26', 'AHA/ACC 2026', 'labels: reduced dose after 6 months']; d.fig = 'unprov'; }
+  else if (i.prov === 'none' || i.prov === 'pers'){ d.head = 'No planned stop date'; d.steps = ['Treat for the first 3 to 6 months, then ' + contWith + ' (CHEST rec 24, strong; AHA/ACC 1, A' + (i.prov === 'pers' ? '; persistent risk factor 1, C-LD' : '') + ').' + contAfter, extDose, 'Revisit the decision at least once a year and whenever health changes.']; d.why = 'With no trigger to remove, about 30% recur within 5 years of stopping' + (red.length ? '; a reduced-dose DOAC keeps most of the protection.' : ', so treatment continues for as long as its benefit outweighs the bleeding risk.'); d.more = ['Offering is not the same as everyone taking it: preference, bleeding risk and the predicted recurrence risk all count.', 'If anticoagulation is stopped or declined, low-dose aspirin is better than nothing but much less effective (CHEST rec 28, weak; AHA/ACC 2a, B-R).', 'Thrombophilia testing: ASH suggests not testing after an unprovoked clot, because treatment continues either way (conditional, very low certainty). Send antiphospholipid antibodies when the story fits (young, arterial events, pregnancy loss), because a positive result changes the drug (expert practice).', 'Age-appropriate cancer screening is recommended after an unprovoked PE; routine CT or PET is not (AHA/ACC 1, A; 3: No Benefit).']; d.tiers = red.length ? ['CHEST 2021 rec 24, 26', 'AHA/ACC 2026', 'labels: reduced dose after 6 months'] : ['CHEST 2021 rec 24, 25', 'AHA/ACC 2026']; d.fig = 'unprov'; }
   else { d.head = 'At least 3 months for everyone'; d.steps = ['Treat for 3 months, then the provoking factor decides. Pick one above.']; d.tiers = ['CHEST 2021 rec 21, strong']; d.fig = null; }
   if (i.clot === 'distal' && d.fig) d.more.push('Isolated calf DVT recurs about half as often as proximal DVT or PE (CHEST 2021).');
   if (i.clot === 'pe') d.more.push('After PE: contact within a week of discharge (1, C-LD), a visit by 3 months to settle duration (1, C-EO), and ask about breathlessness and function at every visit for at least a year to catch chronic thromboembolic disease.');
@@ -454,6 +456,7 @@ function decide(i){
     : f.bf ? 'DOACs have not been studied in breastfeeding; warfarin and LMWH have a long record of safety.'
     : f.ind ? 'Enzyme inducers lower DOAC levels unpredictably, and there is no level to follow. LMWH has no such interaction.'
     : f.bari ? 'Early after bariatric surgery a tablet may not be absorbed, and an injected drug does not depend on the gut.'
+    : (f.gi || f.cancer) && !o.picks.some(function(r){ return r.a === 'apix' || r.a === 'riva' || r.a === 'edox'; }) ? 'With the DOACs ruled out, LMWH is the remaining recommended drug in cancer; warfarin is less preferred there.'
     : (f.gi || f.cancer) ? 'Factor Xa inhibitors prevent recurrence in cancer about as well as LMWH, without daily injections; the worry is bleeding from tumors of the gut and urinary tract.'
     : (f.ckd4 || f.ckd5) ? 'Every DOAC is cleared partly by the kidney, apixaban the least. The trials left these patients out, so the evidence here is thin.'
     : f.inh ? 'Rivaroxaban levels rise too far with these drugs. Apixaban can be halved; LMWH and warfarin avoid the pathway.'
@@ -465,7 +468,8 @@ function decide(i){
   if (i.clot === 'dvt') o.agMore.push('Proximal DVT: anticoagulation alone is suggested over catheter-directed or mechanical clot removal (CHEST rec 6, weak). Uncomplicated DVT can be treated at home (ASH 2020, conditional).');
   o.agTiers = ['FDA labels', 'AHA/ACC 2026', (f.gi || f.cancer) ? 'ASCO 2023 rec 4.2, strong' : 'CHEST 2021'];
   if (f.cpC || f.ckd4 || f.ckd5) o.agTiers.push('LMWH or heparin in organ failure: expert practice');
-  o.dur = duration(i, o.rows);
+  var later = {}; Object.keys(o.feats).forEach(function(k){ if (k !== 'bari' && k !== 'unstable') later[k] = 1; });
+  o.dur = duration(i, fit(later));
   return o;
 }
 
