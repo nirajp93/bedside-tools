@@ -221,7 +221,7 @@ input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 
 <section class="view" id="v-learn">
   <div class="lpills" id="lpills"></div>
-  <div class="card chap" id="learn-reach" data-pill="Why it misses"><p class="label">1 · Resistance</p><h2>Four ways a drug misses</h2><p class="lead">Pick a reason. The diagrams are the same ones the Look up tab uses.</p><div data-figure="reach"></div></div>
+  <div class="card chap" id="learn-reach" data-pill="Why it misses"><p class="label">1 · Resistance</p><h2>Why a drug misses</h2><p class="lead">Pick a reason. The diagrams are the ones the Look up tab uses.</p><div data-figure="reach"></div></div>
   <div class="card chap" id="learn-ladder" data-pill="Beta-lactams"><p class="label">2 · Beta-lactams</p><h2>What each one covers</h2><p class="lead">Step along the row and watch which dots fill and which empty. Filled = reliable, half = variable, empty = not covered.</p><div data-figure="ladder"></div></div>
   <div class="card chap" id="learn-others" data-pill="Other classes"><p class="label">3 · The other classes</p><h2>What each leaves uncovered</h2><div data-figure="others"></div></div>
   <div class="card chap" id="learn-anaer" data-pill="Anaerobes"><p class="label">4 · Anaerobes</p><h2>Above and below the diaphragm</h2><div data-figure="anaer"></div></div>
@@ -671,9 +671,11 @@ function drugState(d){ var D = DI[d]; return {n: D.n.split(' / ')[0], html: func
 function mk(ids){ var o = {}; ids.forEach(function(d){ o[d] = drugState(d); }); return o; }
 function rel(o){ return drugsFor(o)[2].map(dn).join(', '); }
 var REACH = {
-  om: {n: 'Cannot get in', html: function(){ return strip('van'); }, line: why('van', 'ENT').t},
+  om: {n: 'Cannot get in', html: function(){ return figure('R5'); }, line: why('van', 'ENT').t},
   target: {n: 'Changed target', html: function(){ return figure('R1'); }, line: ORGS[OI.MRSA].w},
-  enzyme: {n: 'Destroyed by an enzyme', html: function(){ return figure('R3', 'ESBL'); }, line: ORGS[OI.ESBL].w},
+  enzyme: {n: 'Destroyed: ESBL', html: function(){ return figure('R3', 'ESBL'); }, line: ORGS[OI.ESBL].w},
+  ampc: {n: 'Destroyed: AmpC', html: function(){ return figure('R4'); }, line: ORGS[OI.AMPC].w},
+  kpc: {n: 'Destroyed: KPC', html: function(){ return figure('R3', 'CRE'); }, line: ORGS[OI.CRE].w},
   psa: {n: 'Pseudomonas', html: function(){ return figure('R6'); }, line: ORGS[OI.PSA].w},
   aty: {n: 'No wall, or inside cells', html: function(){ return figure('R8'); }, line: ORGS[OI.ATY].w}
 };
@@ -689,15 +691,15 @@ var ATY = {
 };
 function F(t, data){ return {t: t, states: Object.keys(data), data: data, svg: function(k){ return data[k].html(); }}; }
 var FIGS = {
-  reach: F('Four ways a drug misses', REACH),
+  reach: F('Why a drug misses', REACH),
   ladder: F('Beta-lactams: what each one covers', LADDER),
   others: F('The other classes: what each leaves uncovered', OTHERS),
   anaer: F('Anaerobes: above and below the diaphragm', ANAER),
   aty: F('Atypical organisms', ATY)
 };
 
-var ORGFIG = {MRSA: ['reach', 'target'], ESBL: ['reach', 'enzyme'], AMPC: ['reach', 'enzyme'], CRE: ['reach', 'enzyme'], PSA: ['reach', 'psa'], ATY: ['aty', 'why'], OAN: ['anaer', 'OAN'], BFR: ['anaer', 'BFR']};
-var GSEL = {MSSA: {gpcl: 1}, MRSA: {gpcl: 1}, BHS: {gpch: 1}, PNE: {gpch: 1}, EFS: {gpch: 1}, VRE: {gpch: 1}, ENT: {gnr: 1}, ESBL: {gnr: 1}, AMPC: {gnr: 1}, CRE: {gnr: 1}, PSA: {gnr: 1}, HFLU: {gnr: 1}};
+var ORGFIG = {MRSA: ['reach', 'target'], ESBL: ['reach', 'enzyme'], AMPC: ['reach', 'ampc'], CRE: ['reach', 'kpc'], PSA: ['reach', 'psa'], ATY: ['aty', 'why'], OAN: ['anaer', 'OAN'], BFR: ['anaer', 'BFR']};
+var GSEL = {MSSA: {gpcl: 1}, MRSA: {gpcl: 1}, BHS: {gpch: 1}, PNE: {gpch: 1}, EFS: {gpch: 1}, ENT: {gnr: 1}};
 function chipsLook(kind, drug, org){
   var out = [];
   if (kind === 'd'){ if (LADDER[drug]) out.push(['ladder', drug, 'Compare along the beta-lactams']); else if (OTHERS[drug]) out.push(['others', drug, 'Compare with the other classes']); }
@@ -707,27 +709,35 @@ function chipsLook(kind, drug, org){
 
 /* Gram-stain card. Rows are organism groups in this tool's table; each returns [status, reason] from the whole selection. */
 var GROUPS = {mssa: ['MSSA'], mrsa: ['MRSA'], strep: ['BHS', 'PNE'], ent: ['EFS'], gnr: ['ENT'], psa: ['PSA'], an: ['OAN', 'BFR'], aty: ['ATY']};
-function shape(s){ return s.gpcl || s.gpch || s.gnr || s.none; }
+function N(s){ return {cl: !!(s.gpcl || s.mpos || s.mneg), ch: !!s.gpch, rod: !!(s.gnr || s.lf || s.ox), none: !!s.none}; }
+function shapes(s){ var n = N(s); return (n.cl ? 1 : 0) + (n.ch ? 1 : 0) + (n.rod ? 1 : 0) + (n.none ? 1 : 0); }
+function clash(s){ return shapes(s) > 1 ? 'More than one stain result is selected. A mixed culture needs cover chosen for each organism, with the syndrome; no single list is shown.' : (s.mpos && s.mneg) ? 'The two MRSA results conflict: check which specimen each came from. Keep MRSA cover until it is settled.' : (s.lf && s.ox) ? 'Lactose fermenter and oxidase-positive do not go together: check the report.' : ''; }
 var NARROW = {
   dx: {
     labels: {fav: 'favored: ', 'in': 'still possible', less: 'less likely: ', unl: 'unlikely: '},
     results: [['gpcl','Gram-positive cocci in clusters'],['gpch','Gram-positive cocci in chains or pairs'],['gnr','Gram-negative rods'],['mpos','MRSA PCR positive'],['mneg','MRSA PCR negative'],['lf','Lactose fermenter'],['ox','Oxidase-positive, does not ferment lactose'],['ana','Grows only without oxygen'],['none','Nothing on the stain, atypical pneumonia picture']],
     causes: [
-      ['Staph. aureus, methicillin-susceptible', function(s){ return s.gpcl ? (s.mpos ? ['unl','the MRSA test is positive'] : s.mneg ? ['fav','clusters with a negative MRSA test'] : ['fav','staphylococci grow in clusters; coagulase or PCR separates S. aureus from skin staphylococci']) : shape(s) ? ['unl','staphylococci are gram-positive cocci in clusters'] : null; }, 'mssa'],
-      ['MRSA', function(s){ return s.gpcl ? (s.mneg ? ['unl','the MRSA test is negative'] : s.mpos ? ['fav','clusters with a positive MRSA test'] : ['fav','cover it until the susceptibility or PCR is back']) : shape(s) ? ['unl','staphylococci are gram-positive cocci in clusters'] : null; }, 'mrsa'],
-      ['Streptococci and pneumococcus', function(s){ return s.gpch ? ['fav','streptococci grow in chains and pairs'] : shape(s) ? ['unl','these are gram-positive cocci in chains or pairs'] : null; }, 'strep'],
-      ['Enterococcus', function(s){ return s.gpch ? ['fav','also in pairs and short chains; every cephalosporin misses it'] : shape(s) ? ['unl','these are gram-positive cocci in chains or pairs'] : null; }, 'ent'],
-      ['E. coli, Klebsiella and other enteric rods', function(s){ return s.gnr ? (s.ox ? ['less','E. coli and Klebsiella ferment lactose and are oxidase-negative'] : s.ana ? ['less','enteric rods grow in air'] : ['fav', s.lf ? 'lactose-fermenting gram-negative rods' : 'the most common gram-negative rods']) : shape(s) ? ['unl','these are gram-negative rods'] : null; }, 'gnr'],
-      ['Pseudomonas', function(s){ return s.gnr ? (s.lf ? ['unl','Pseudomonas does not ferment lactose'] : s.ana ? ['unl','Pseudomonas needs oxygen'] : s.ox ? ['fav','oxidase-positive non-fermenter'] : ['in','cover it when the patient has risk factors']) : shape(s) ? ['unl','it is a gram-negative rod'] : null; }, 'psa'],
-      ['Anaerobes', function(s){ return s.ana ? ['fav','grows only without oxygen'] : s.none ? ['unl','anaerobes are seen on the stain'] : null; }, 'an'],
-      ['Atypical organisms', function(s){ return s.none ? ['fav','they do not show on a Gram stain'] : shape(s) ? ['unl','an organism is visible on the stain'] : null; }, 'aty']
+      ['Staph. aureus, methicillin-susceptible', function(s){ var n = N(s); return n.cl ? (s.mpos && s.mneg ? ['in','the MRSA results conflict'] : s.mpos ? ['unl','the MRSA test is positive'] : s.mneg ? ['fav','a negative MRSA test'] : ['fav','staphylococci grow in clusters; coagulase or PCR separates S. aureus from skin staphylococci']) : shapes(s) ? ['unl','staphylococci are gram-positive cocci in clusters'] : null; }, 'mssa'],
+      ['MRSA', function(s){ var n = N(s); return n.cl ? (s.mpos && s.mneg ? ['in','the MRSA results conflict'] : s.mneg ? ['unl','the MRSA test is negative'] : s.mpos ? ['fav','a positive MRSA test'] : ['fav','cover it until the susceptibility or PCR is back']) : shapes(s) ? ['unl','staphylococci are gram-positive cocci in clusters'] : null; }, 'mrsa'],
+      ['Streptococci and pneumococcus', function(s){ var n = N(s); return n.ch ? ['fav','streptococci grow in chains and pairs'] : shapes(s) ? ['unl','these are gram-positive cocci in chains or pairs'] : null; }, 'strep'],
+      ['Enterococcus faecalis', function(s){ var n = N(s); return n.ch ? ['fav','also gram-positive cocci in pairs and chains; every cephalosporin misses it. VRE has its own card'] : shapes(s) ? ['unl','these are gram-positive cocci in chains or pairs'] : null; }, 'ent'],
+      ['E. coli, Klebsiella and other enteric rods (no ESBL)', function(s){ var n = N(s); return n.rod ? ((s.lf && s.ox) ? ['in','the two results conflict'] : s.ox ? ['less','E. coli and Klebsiella ferment lactose and are oxidase-negative'] : ['fav', s.lf ? 'lactose-fermenting gram-negative rods' : 'the most common gram-negative rods']) : shapes(s) ? ['unl','these are gram-negative rods'] : null; }, 'gnr'],
+      ['Pseudomonas', function(s){ var n = N(s); return n.rod ? ((s.lf && s.ox) ? ['in','the two results conflict'] : s.lf ? ['unl','Pseudomonas does not ferment lactose'] : s.ox ? ['fav','oxidase-positive non-fermenter'] : ['in','cover it when the patient has risk factors']) : shapes(s) ? ['unl','it is a gram-negative rod'] : null; }, 'psa'],
+      ['Anaerobes', function(s){ return s.ana ? ['fav','grows only without oxygen'] : null; }, 'an'],
+      ['Atypical organisms', function(s){ var n = N(s); return n.none && shapes(s) === 1 ? ['fav','they stain poorly or not at all'] : shapes(s) ? ['unl','an organism is visible on the stain'] : null; }, 'aty']
     ],
     next: function(s){
-      var fav = NARROW.dx.causes.filter(function(c){ var x = c[1](s); return x && x[0] === 'fav'; }), orgs = [];
+      var c = clash(s); if (c) return c;
+      var fav = NARROW.dx.causes.filter(function(c){ var x = c[1](s); return x && x[0] === 'fav'; }), orgs = [], anOnly = fav.length === 1 && fav[0][2] === 'an';
       fav.forEach(function(c){ GROUPS[c[2]].forEach(function(o){ orgs.push(o); }); });
       if (!orgs.length) return 'Tap what the lab has reported. The stain narrows the organism hours to days before the culture names it.';
-      var ok = DRUGS.filter(function(d){ return orgs.every(function(o){ return cov(d.id, o) === 2; }); }).map(function(d){ return d.n; });
-      return (ok.length ? 'Reliable against every favored organism in this tool\'s table: ' + ok.join('; ') + '.' : 'No single drug in this tool\'s table is reliable against every favored organism: more than one agent is needed.') + ' This is a coverage list, not a regimen: choose with the syndrome, and narrow when the culture names the organism.';
+      var ok = DRUGS.filter(function(d){ return orgs.every(function(o){ return cov(d.id, o) === 2; }); }), names = ok.map(function(d){ return d.n; });
+      var t = names.length ? 'Reliable against every favored organism in this tool\'s table: ' + names.join('; ') + '.' : 'No single drug in this tool\'s table is reliable against every favored organism: more than one agent is needed.';
+      if (anOnly) t += ' Reliable for B. fragilis but not all oral anaerobes: ' + DRUGS.filter(function(d){ return cov(d.id, 'BFR') === 2 && cov(d.id, 'OAN') < 2; }).map(function(d){ return d.n; }).join('; ') + '. Reliable for oral anaerobes but not B. fragilis: ' + DRUGS.filter(function(d){ return cov(d.id, 'OAN') === 2 && cov(d.id, 'BFR') < 2; }).map(function(d){ return d.n; }).join('; ') + '.';
+      var n = N(s);
+      if (n.rod && !s.lf && !s.ox){ var noPsa = ok.filter(function(d){ return cov(d.id, 'PSA') === 0; }).map(function(d){ return d.n; }); t += ' This list is for enteric rods without ESBL, AmpC or a carbapenemase; those have their own cards.' + (noPsa.length ? ' Not active against Pseudomonas: ' + noPsa.join('; ') + '.' : ''); }
+      if (n.ch) t += ' Vancomycin-resistant Enterococcus is not covered by this list.';
+      return t + ' This is a coverage list, not a regimen: choose with the syndrome, and narrow when the culture names the organism.';
     },
     more: 'A Gram stain shows shape and colour, not species or resistance. Resistance tests (MRSA PCR, ESBL and carbapenemase reports) change the list as they arrive. For regimens by syndrome, use Empiric antibiotics.',
     tiers: ['Gram-stain rules: standard microbiology', 'drug lists: this tool\'s coverage table']
