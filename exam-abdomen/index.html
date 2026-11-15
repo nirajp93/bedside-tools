@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Abdominal Exam · bedside.tools</title>
+<meta name="description" content="Abdominal exam: which findings change the answer for cirrhosis, cholecystitis, appendicitis in children, aortic aneurysm and splenomegaly; the exam in order; and a map of abdominal pain by region.">
+<script src="/theme.js"></script>
+<style>
+
+/* Colours: shared site names only. Dark values and extras (--fill --ok --bad --scrim --hrt-*) live in /theme.js. */
+:root{--bg:#FBFBFA; --card:#FFFFFF; --ink:#111113; --muted:#55555D; --line:#ECECEE; --accent:#2B4BDB; --warn:#9A3B00; --warnbg:#FFF6EC}
+:root{--r:14px}
+*{box-sizing:border-box;margin:0;padding:0}
+[hidden]{display:none!important}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.45;padding-bottom:calc(76px + env(safe-area-inset-bottom))}
+a{color:var(--accent);text-decoration:none}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;-webkit-tap-highlight-color:transparent}
+button:focus-visible,a:focus-visible,[tabindex]:focus-visible,summary:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+h1,h2,h3{font-weight:600;letter-spacing:-.01em;line-height:1.15;text-wrap:balance}
+h1{font-size:26px} h2{font-size:21px} h3{font-size:18px}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.kicker{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.muted{color:var(--muted)}
+.wrap{max-width:720px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+
+header{border-bottom:1px solid var(--line)}
+header .wrap{padding-block:8px 14px}
+.back{font-size:14px;color:var(--accent);display:inline-flex;align-items:center;min-height:44px}
+header p{font-size:15px;color:var(--muted);margin-top:4px}
+
+nav.tabs{position:fixed;left:0;right:0;bottom:0;background:var(--bg);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom);z-index:20}
+nav.tabs .wrap{display:flex;padding-block:0}
+nav.tabs button{flex:1;min-height:56px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:var(--muted);font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;border-top:2px solid transparent}
+nav.tabs button[aria-selected=true]{color:var(--accent);border-top-color:var(--accent)}
+section.view{display:none;padding-block:16px 28px}
+section.view.on{display:block}
+.lede{font-size:15px;color:var(--muted);margin-top:4px}
+
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px;margin-top:12px}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--accent);font-size:14px;font-weight:500;text-align:left}
+.chip[aria-pressed=true]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.qchips .chip{color:var(--ink)}
+.qchips .chip[aria-pressed=true]{color:var(--accent-ink)}
+
+/* pre-test */
+.pre{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;margin-top:12px}
+.pre label{font-size:14px}
+.pre input[type=range]{width:100%;height:44px;accent-color:var(--accent);grid-column:1/-1}
+.pre .v{font-family:var(--mono);font-size:15px}
+
+/* result card */
+.result .big{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+.result .big b{font-size:16px;font-weight:600}
+.result .pct{font-family:var(--mono);font-size:30px;line-height:1;font-variant-numeric:tabular-nums}
+.meter{position:relative;height:10px;border-radius:5px;background:var(--fill);margin-top:10px;overflow:hidden}
+.meter i{position:absolute;left:0;top:0;bottom:0;background:var(--accent);border-radius:5px;transition:width .25s}
+.meter s{position:absolute;top:-2px;bottom:-2px;width:2px;background:var(--ink);text-decoration:none}
+.scale{display:flex;justify-content:space-between;font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:4px}
+.why{font-size:15px;margin-top:10px}
+.why b{font-weight:600}
+details.more{margin-top:8px;border-top:1px dashed var(--line);padding-top:2px}
+details.more summary{min-height:44px;display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);cursor:pointer;list-style:none}
+details.more summary::-webkit-details-marker{display:none}
+details.more summary::before{content:"";width:7px;height:7px;border-right:1.5px solid var(--accent);border-bottom:1.5px solid var(--accent);transform:rotate(-45deg);transition:transform .15s}
+details.more[open] summary::before{transform:rotate(45deg)}
+details.more p,details.more li{font-size:14px;margin-bottom:6px}
+details.more ul{padding-left:18px}
+.warnbox{background:var(--warnbg);color:var(--warn);border-radius:10px;padding:10px 12px;font-size:14px;margin-top:10px}
+
+/* findings */
+.frow{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:12px 0;border-top:1px solid var(--line)}
+.frow:first-child{border-top:0}
+.frow .nm{font-size:15px;font-weight:500}
+.frow .sub{margin-top:4px;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.frow .hint{font-size:13px;color:var(--muted);margin-top:4px}
+.lr{font-family:var(--mono);font-size:12px;padding:2px 7px;border-radius:6px;background:var(--fill);white-space:nowrap}
+.lr.up{color:var(--bad);background:var(--badbg)}
+.lr.down{color:var(--ok);background:var(--okbg)}
+.tag{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:2px 6px;border-radius:5px;background:var(--fill);color:var(--muted)}
+.tri{display:inline-grid;grid-auto-flow:column;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--card)}
+.tri button{min-width:46px;min-height:44px;font-size:13px;color:var(--muted);border-left:1px solid var(--line)}
+.tri button:first-child{border-left:0}
+.tri button:disabled{opacity:.35;cursor:not-allowed}
+.tri button[aria-pressed=true][data-v="1"]{background:var(--badbg);color:var(--bad);font-weight:600}
+.tri button[aria-pressed=true][data-v="1"][data-low]{background:var(--okbg);color:var(--ok)}
+.tri button[aria-pressed=true][data-v="-1"]{background:var(--okbg);color:var(--ok);font-weight:600}
+.tri button[aria-pressed=true][data-v="0"]{color:var(--ink);font-weight:600}
+.minis{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.mini{min-height:44px;padding:0 12px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--accent);font-size:13px;font-weight:500}
+.grouplab{margin-top:14px}
+
+/* exam steps */
+.step{display:grid;grid-template-columns:32px 1fr;gap:12px;padding:14px 0;border-top:1px solid var(--line)}
+.step:first-child{border-top:0}
+.step .num{font-family:var(--mono);font-size:24px;line-height:1;color:var(--accent)}
+.step b.t{display:block;font-size:17px;font-weight:600}
+.step p{font-size:15px;margin-top:4px}
+.find{margin-top:10px;font-size:14px}
+.find li{list-style:none;padding:8px 0;border-top:1px dashed var(--line)}
+.find li:first-child{border-top:0}
+.find li b{font-weight:600}
+
+/* sounds */
+.snd{padding:14px 0;border-top:1px solid var(--line)}
+.snd:first-child{border-top:0}
+.snd .hd{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+.snd .hd b{font-size:16px;font-weight:600}
+.snd p{font-size:14px;margin-top:6px}
+.pcg{display:block;width:100%;height:auto;margin-top:8px}
+.ctrl{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:8px}
+.play{min-height:44px;padding:0 16px;border-radius:999px;background:var(--accent);color:var(--accent-ink);font-size:14px;font-weight:600;display:inline-flex;align-items:center;gap:8px}
+.play svg{width:12px;height:12px}
+.seg{display:inline-grid;grid-auto-flow:column;gap:2px;padding:3px;background:var(--fill);border-radius:10px}
+.seg button{min-height:40px;padding:0 12px;border-radius:8px;font-size:13px;color:var(--muted)}
+.seg button[aria-pressed=true]{background:var(--card);color:var(--ink);font-weight:600}
+.note{font-size:12px;color:var(--muted)}
+
+/* practice */
+.case p{font-size:15px;margin-top:6px}
+.opts{display:grid;gap:8px;margin-top:12px}
+.opt{min-height:48px;padding:10px 14px;border:1px solid var(--line);border-radius:12px;background:var(--card);text-align:left;font-size:15px}
+.opt.right{border-color:var(--ok);background:var(--okbg);color:var(--ok);font-weight:600}
+.opt.wrong{border-color:var(--bad);background:var(--badbg);color:var(--bad)}
+.casenav{display:flex;justify-content:space-between;align-items:center;margin-top:14px;gap:10px}
+.btn{min-height:44px;padding:0 16px;border:1px solid var(--line);border-radius:999px;background:var(--card);font-size:14px;font-weight:500}
+
+/* sheet */
+#sheetwrap{position:fixed;inset:0;background:var(--scrim);display:flex;align-items:flex-end;justify-content:center;z-index:40}
+#sheet{background:var(--bg);width:100%;max-width:760px;max-height:92vh;overflow:auto;border-radius:18px 18px 0 0;padding:14px max(16px,env(safe-area-inset-right,0px)) calc(18px + env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left,0px))}
+#sheet .top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+#sheet h3{font-size:19px;margin-top:2px}
+.x{flex:none;min-width:44px;min-height:44px;border-radius:999px;border:1px solid var(--line);background:var(--card);font-size:20px;line-height:1}
+.plate{margin-top:12px;border:1px solid var(--line);border-radius:12px;padding:6px;background:var(--card)}
+.plate img{display:block;width:100%;height:auto;border-radius:8px}
+.credit{font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:6px}
+.fig{display:block;width:100%;height:auto;margin-top:10px}
+.figtext{font-size:14px;margin-top:8px}
+.grid-legend{font-size:13px;color:var(--muted);margin-top:6px}
+
+footer{max-width:720px;margin:20px auto 0;padding:16px max(16px,env(safe-area-inset-right,0px)) 8px max(16px,env(safe-area-inset-left,0px));border-top:1px solid var(--line);font-size:13px;color:var(--muted)}
+footer p{margin-top:8px}
+@media (prefers-reduced-motion:reduce){.meter i{transition:none}details.more summary::before{transition:none}}
+@media (min-width:1000px){
+  .duo{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;align-items:start}
+  .duo>.card{margin-top:12px}
+  .stick{position:sticky;top:12px}
+}
+
+.abdfig{display:block;width:100%;max-width:360px;height:auto;margin:6px auto 0}
+.abdfig .rg{cursor:pointer}
+.abdfig .rg rect{fill:var(--card);stroke:var(--line);stroke-width:2;transition:fill .15s}
+.abdfig .rg:hover rect{fill:var(--fill)}
+.abdfig .rg.on rect{fill:var(--accent);stroke:var(--accent)}
+.abdfig .rg text{font-family:var(--mono);font-size:10px;fill:var(--ink);pointer-events:none}
+.abdfig .rg.on text{fill:var(--accent-ink,#fff)}
+.abdfig .rg:focus-visible rect{stroke:var(--ink);stroke-width:3}
+.dx{margin:8px 0 0;padding-left:18px}
+.dx li{margin:4px 0}
+.miss{border-left:3px solid var(--bad);padding:2px 0 2px 10px;margin-top:10px}
+.sigs{display:grid;grid-template-columns:auto 1fr;gap:6px 12px;margin-top:10px;font-size:15px}
+.sigs dt{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding-top:3px}
+.sigs dd{margin:0}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <a class="back" href="/">← bedside.tools</a>
+  <h1>Abdominal exam</h1>
+  <p>Which findings change the answer, the exam in order, and where abdominal pain points.</p>
+</div></header>
+
+<main class="wrap">
+<section class="view on" id="narrow" aria-labelledby="t-narrow">
+  <span class="kicker">Narrow the differential</span>
+  <p class="lede">Pick the question, set your starting estimate, then mark what you find.</p>
+  <div class="card" id="question">
+    <span class="kicker">The question</span>
+    <div class="chips qchips" id="qchips" style="margin-top:10px"></div>
+    <div class="pre"><label for="pre">Your probability before the exam</label><span class="v" id="prev"></span>
+      <input type="range" id="pre" min="1" max="99" step="1" aria-describedby="prenote"></div>
+    <p class="note" id="prenote"></p>
+  </div>
+  <div class="duo">
+    <div class="card result stick" id="result" aria-live="polite"></div>
+    <div class="card" id="findings"><span class="kicker">Examine for</span><div id="frows"></div><div id="qnote"></div></div>
+  </div>
+</section>
+
+<section class="view" id="exam" aria-labelledby="t-exam">
+  <span class="kicker">The exam, in order</span>
+  <p class="lede">Patient flat with one pillow, knees bent, abdomen exposed from chest to groin. Look and listen before you touch; start palpating away from the pain.</p>
+  <div class="card" id="steps"></div>
+</section>
+
+<section class="view" id="map" aria-labelledby="t-map">
+  <span class="kicker">Where it hurts</span>
+  <p class="lede">Tap a region to see what usually causes pain there, where pain from it can be felt instead, and what not to miss.</p>
+  <div class="duo">
+    <div class="card"><div id="mapsvg"></div><p class="note" style="text-align:center;margin-top:4px">Front view, as you face the patient.</p></div>
+    <div class="card" id="mapcard" aria-live="polite"></div>
+  </div>
+  <div class="card" id="missall"></div>
+</section>
+
+<section class="view" id="practice" aria-labelledby="t-practice">
+  <span class="kicker">Practice</span>
+  <p class="lede">Six cases: move the probability, or name the sign.</p>
+  <div class="card case" id="case"></div>
+</section>
+</main>
+
+<nav class="tabs" role="tablist" aria-label="Sections"><div class="wrap">
+  <button type="button" role="tab" id="t-narrow" aria-controls="narrow" aria-selected="true">Narrow</button>
+  <button type="button" role="tab" id="t-exam" aria-controls="exam" aria-selected="false">Exam</button>
+  <button type="button" role="tab" id="t-map" aria-controls="map" aria-selected="false">Map</button>
+  <button type="button" role="tab" id="t-practice" aria-controls="practice" aria-selected="false">Practice</button>
+</div></nav>
+
+<div id="sheetwrap" hidden><div id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheettitle"></div></div>
+
+<footer>
+  <p>For education only. Not a substitute for clinical judgment.</p>
+  <p>Last reviewed: 15 November 2026.</p>
+  <p>Sources for likelihood ratios: Udell JA et al. Does this patient with liver disease have cirrhosis? JAMA 2012;307:832-42, doi:10.1001/jama.2012.186. Trowbridge RL et al. Does this patient have acute cholecystitis? JAMA 2003;289:80-6, doi:10.1001/jama.289.1.80. Bundy DG et al. Does this child have appendicitis? JAMA 2007;298:438-51, doi:10.1001/jama.298.4.438. Lederle FA, Simel DL. Does this patient have abdominal aortic aneurysm? JAMA 1999;281:77-82, doi:10.1001/jama.281.1.77. Tamayo SG et al. Examiner dependence on physical diagnostic tests for the detection of splenomegaly. J Gen Intern Med 1993;8:69-75, doi:10.1007/BF02599986 (one study, 27 patients). Takada T et al. The role of digital rectal examination for diagnosis of acute appendicitis: a systematic review and meta-analysis. PLoS One 2015;10:e0136996, doi:10.1371/journal.pone.0136996. Ohle R et al. The Alvarado score for predicting acute appendicitis: a systematic review. BMC Med 2011;9:139, doi:10.1186/1741-7015-9-139. Taylor MR, Lalani N. Adult small bowel obstruction. Acad Emerg Med 2013;20:528-44, doi:10.1111/acem.12150.</p>
+  <p>Evidence tier: systematic reviews of diagnostic accuracy studies, except splenomegaly (one small study). Some figures within reviews come from ranges (pain migration in children). Exam technique, ascites manoeuvres, peritoneal and special signs, and the pain map: standard physical diagnosis teaching (expert practice); accuracy figures for these are not shown because they have not been verified against their primary studies. Combining likelihood ratios multiplies them, which assumes the findings are independent; overlapping findings use only the strongest one. Pre-test probabilities are yours to set; starting values are examples or the source's stated prevalence.</p>
+  <p>Privacy: everything runs in your browser. Nothing you enter is sent anywhere or stored, and there are no analytics. Do not enter names, record numbers, or dates of birth.</p>
+</footer>
+
+<script>
+(function(){
+"use strict";
+var $=function(s,r){return (r||document).querySelector(s)},$$=function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))};
+function esc(s){return String(s).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
+
+var SRC={udell:"Udell et al., JAMA 2012 (systematic review, 86 studies, biopsy as reference)",trow:"Trowbridge et al., JAMA 2003 (systematic review, 17 studies)",bundy:"Bundy et al., JAMA 2007 (systematic review; children 18 years or younger)",led:"Lederle and Simel, JAMA 1999 (15 screening studies, ultrasound as reference)",tam:"Tamayo et al., J Gen Intern Med 1993 (one study, 27 inpatients, 8 examiners, ultrasound as reference)"};
+var F={
+ asc:{nm:"Ascites",kind:"exam",step:"ascites",ev:[{dx:"cirr",lrp:7.2,lrn:null,ci:"2.9–12",src:"udell",note:""}],mech:"Portal hypertension raises sinusoidal pressure while low albumin lowers oncotic pressure, so fluid weeps into the peritoneum."},
+ spider:{nm:"Spider nevi",kind:"exam",step:"stigmata",ev:[{dx:"cirr",lrp:4.3,lrn:null,ci:"2.4–6.2",src:"udell",note:"Central arteriole with radiating vessels that blanch when the centre is pressed; upper body."}],mech:"The failing liver clears less estrogen, which dilates skin arterioles."},
+ hepato:{nm:"Hepatomegaly",kind:"exam",step:"liver",ev:[{dx:"cirr",lrp:null,lrn:0.37,ci:"0.24–0.51",src:"udell",note:"Only absence has a verified likelihood ratio."}],mech:"Most cirrhotic livers are palpable (the left lobe enlarges as the right shrinks), so a liver you cannot feel argues against it."},
+ plt:{nm:"Platelets below 160 ×10³/µL",kind:"lab",ev:[{dx:"cirr",lrp:6.3,lrn:0.29,ci:"4.3–8.3 / 0.20–0.39",src:"udell",note:""}],mech:"Portal hypertension enlarges the spleen, which pools platelets, and the liver makes less thrombopoietin."},
+ bon:{nm:"Bonacini score above 7",kind:"lab",ev:[{dx:"cirr",lrp:9.4,lrn:null,ci:"2.6–37",src:"udell",note:"From platelet count, ALT:AST ratio and INR."}],mech:"Combines low platelets, a rising AST relative to ALT and a longer INR: the signatures of fibrosis."},
+ lok:{nm:"Lok index below 0.2",kind:"lab",ev:[{dx:"cirr",lrp:0.09,lrn:null,ci:"0.03–0.31",src:"udell",note:"From platelets, AST, ALT and INR. Here Yes lowers the probability."}],mech:"Normal platelets, AST:ALT and INR together make advanced fibrosis unlikely."},
+ murphy:{nm:"Murphy sign",kind:"exam",step:"special",ev:[{dx:"chole",lrp:2.8,lrn:null,ci:"0.8–8.6",src:"trow",note:"The confidence interval includes 1."}],mech:"Deep inspiration brings the inflamed gallbladder down onto your fingers under the right costal margin, and the patient stops breathing in."},
+ ruq:{nm:"Right upper quadrant tenderness",kind:"exam",step:"palpate",ev:[{dx:"chole",lrp:null,lrn:0.4,ci:"0.2–1.1",src:"trow",note:"Only absence has a likelihood ratio, and its interval includes 1."}],mech:"Inflammation of the gallbladder irritates the overlying parietal peritoneum."},
+ fever:{nm:"Fever",kind:"exam",ev:[{dx:"appy",lrp:3.4,lrn:0.32,ci:"2.4–4.8 / 0.16–0.64",src:"bundy",note:""}],mech:"Inflammation of the appendix wall releases pyrogens; fever is the most useful single sign in children."},
+ rebound:{nm:"Rebound tenderness",kind:"exam",step:"peritoneal",ev:[{dx:"appy",lrp:3.0,lrn:0.28,ci:"2.3–3.9 / 0.14–0.55",src:"bundy",note:"In children in whom appendicitis was suspected."}],mech:"Inflamed parietal peritoneum hurts when it moves; pressing then releasing jolts it."},
+ migr:{nm:"Pain moved from the middle to the right lower quadrant",kind:"history",ev:[{dx:"appy",lrp:1.9,lrn:null,range:"LR 1.9–3.1 across studies; lower value used",src:"bundy",note:"Lower value used."}],mech:"Early pain is visceral, felt at the umbilicus (midgut); once the parietal peritoneum is inflamed it localizes to the right lower quadrant."},
+ rlq:{nm:"Right lower quadrant pain",kind:"history",ev:[{dx:"appy",lrp:1.2,lrn:null,ci:"1.0–1.5",src:"bundy",note:"Common in children without appendicitis too: barely moves the probability."}],mech:"Many causes of pain in children settle in the right lower quadrant (mesenteric adenitis, constipation, gastroenteritis)."},
+ wbc:{nm:"White count below 10,000/µL",kind:"lab",ev:[{dx:"appy",lrp:0.22,lrn:null,ci:"0.17–0.30",src:"bundy",note:"Here Yes lowers the probability."}],mech:"Appendicitis usually provokes a neutrophil leukocytosis."},
+ anc:{nm:"Neutrophils 6,750/µL or lower",kind:"lab",ev:[{dx:"appy",lrp:0.06,lrn:null,ci:"0.03–0.16",src:"bundy",note:"Here Yes lowers the probability."}],mech:"The neutrophil response is the most specific part of the count."},
+ aorta:{nm:"Widened aortic pulsation",kind:"exam",step:"aorta",fig:"aorta",ev:[{dx:"aaa",lrp:12.0,lrn:0.72,ci:"7.4–19.5 / 0.65–0.81",src:"led",note:"Measured with two hands, one each side of the pulsation. For an aneurysm of 4 cm or more: 15.6 / 0.51."}],mech:"An aneurysm widens the pulsation sideways; a normal aorta is about 2 to 2.5 cm across. Fat hides it, so a normal exam cannot exclude one."},
+ palp:{nm:"Spleen palpable (from above)",kind:"exam",step:"spleen",ev:[{dx:"spl",lrp:2.66,lrn:null,ci:"1.52–4.64",src:"tam",note:"Pooled across 8 examiners in one small study."}],mech:"The spleen enlarges down and toward the right lower quadrant, and reaches below the left costal margin once it is about twice normal size."},
+ castell:{nm:"Castell's sign: dull on inspiration",kind:"exam",step:"spleen",fig:"castell",ev:[{dx:"spl",lrp:1.97,lrn:null,ci:"1.22–3.19",src:"tam",note:"Percuss the lowest left intercostal space in the anterior axillary line during a deep breath."}],mech:"An enlarged spleen moves down into that space on inspiration and turns the normally resonant note dull."}
+};
+var Q={
+ cirr:{t:"Liver disease: is it cirrhosis?",dx:"Cirrhosis",pre:24,prenote:"Start 24%: the prevalence of biopsy-proven cirrhosis in the review's patients with known or suspected liver disease.",f:["asc","spider","hepato","plt","bon","lok"],grp:[["plt","bon","lok"]],ctx:"Adults with known or suspected liver disease; liver biopsy as reference.",note:"The overall impression of the clinician was less informative than these findings in the source."},
+ chole:{t:"RUQ pain: cholecystitis?",dx:"Acute cholecystitis",pre:20,prenote:"Example start 20%.",f:["murphy","ruq"],ctx:"Adults with abdominal pain or suspected cholecystitis; surgery, pathology, HIDA scan or ultrasound as reference.",note:"No single finding rules cholecystitis in or out; both intervals include 1. The source infers that experienced clinicians' overall impression is much stronger (LR 25 to 30 from surgical confirmation rates). Get a right upper quadrant ultrasound."},
+ appy:{t:"Child with belly pain: appendicitis?",dx:"Appendicitis (child)",pre:30,prenote:"Example start 30%.",f:["fever","rebound","migr","rlq","wbc","anc"],grp:[["wbc","anc"]],ctx:"Children 18 years or younger in whom appendicitis was considered; surgery, pathology or follow-up as reference.",note:"For adults: no pooled likelihood ratios are shown here. Peritoneal signs, pain migration and raised inflammatory markers carry the most weight, and an Alvarado score below 5 effectively rules it out (sensitivity 99%). A rectal exam does not help (LR+ 1.24, LR− 0.85)."},
+ aaa:{t:"Screening: abdominal aortic aneurysm?",dx:"Aneurysm 3 cm or larger",pre:5,prenote:"Example start 5%, as in older men who have smoked.",f:["aorta"],ctx:"Patients not known to have an aneurysm, screened with palpation and ultrasound.",note:"Sensitivity rises with size: 29% for 3.0–3.9 cm, 50% for 4.0–4.9 cm, 76% for 5 cm or more. Palpation is safe but cannot exclude an aneurysm, least of all a rupture: image a patient with back or abdominal pain and hypotension."},
+ spl:{t:"Is the spleen enlarged?",dx:"Splenomegaly",pre:33,prenote:"Start 33%: the prevalence in the source study.",f:["palp","castell"],grp:[["palp","castell"]],ctx:"Hospitalized men with suspected HIV infection; ultrasound spleen 13 cm or more as reference.",note:"One study of 27 patients; examiners varied widely (sensitivity 0–75%). Neither sign's absence has a likelihood ratio. Percuss first; palpate if percussion is dull."}
+};
+var QORDER=["cirr","chole","appy","aaa","spl"];
+function evFor(f,dx){return F[f].ev.filter(function(e){return e.dx===dx})[0]||null}
+function lrOf(f,v,dx){var e=evFor(f,dx);if(!e)return null;return v===1?e.lrp:v===-1?e.lrn:null}
+function post(p0,lrs){var o=p0/100/(1-p0/100);lrs.forEach(function(l){o*=l});return 100*o/(1+o)}
+function fmt(p){return p<1?"<1":p>99?">99":String(Math.round(p))}
+function badges(f,dx){var e=evFor(f,dx);if(!e)return "";var h="";if(e.lrp!=null)h+='<span class="lr '+(e.lrp>=1.05?"up":e.lrp<=0.95?"down":"")+'">'+(e.lrp>=1?"LR+ ":"LR ")+e.lrp+'</span>';if(e.lrn!=null)h+='<span class="lr down">LR− '+e.lrn+'</span>';if(F[f].kind==="history")h+='<span class="tag">history</span>';if(F[f].kind==="lab")h+='<span class="tag">lab</span>';return h}
+function compute(qk,p0,st){var lrs=[],parts=[],notes=[],q=Q[qk],grouped={};
+ (q.grp||[]).forEach(function(g){var best=null,n=0;g.forEach(function(f){grouped[f]=1;var v=st[f];if(!v)return;var l=lrOf(f,v,qk);if(l==null)return;n++;if(!best||Math.abs(Math.log(l))>Math.abs(Math.log(best.l)))best={f:f,v:v,l:l}});
+  if(best){lrs.push(best.l);parts.push(best)}if(n>1)notes.push("These overlap ("+g.map(function(f){return F[f].nm.toLowerCase()}).join("; ")+"), so only the strongest one you marked is used.")});
+ q.f.forEach(function(f){if(grouped[f])return;var v=st[f];if(!v)return;var l=lrOf(f,v,qk);if(l==null)return;lrs.push(l);parts.push({f:f,v:v,l:l})});
+ return{p:post(p0,lrs),parts:parts,notes:notes}}
+function pname(x){return F[x.f].nm+(x.v===1?": yes":": no")}
+
+/* Narrow */
+var qk="cirr",state={},pre={};QORDER.forEach(function(k){pre[k]=Q[k].pre});
+function triHTML(f){var e=evFor(f,qk),noNeg=!e||e.lrn==null,noPos=!e||e.lrp==null;
+ return '<div class="tri" role="group" aria-label="'+esc(F[f].nm)+'" data-f="'+f+'"><button type="button" data-v="1" aria-pressed="'+(state[f]===1)+'"'+(noPos?' disabled':'')+'>Yes</button><button type="button" data-v="0" aria-pressed="'+(!state[f])+'" aria-label="Not checked">–</button><button type="button" data-v="-1" aria-pressed="'+(state[f]===-1)+'"'+(noNeg?' disabled':'')+'>No</button></div>'}
+function renderQ(){
+ $("#qchips").innerHTML=QORDER.map(function(k){return '<button type="button" class="chip" id="q-'+k+'" data-q="'+k+'" aria-pressed="'+(k===qk)+'">'+esc(Q[k].t)+'</button>'}).join("");
+ $("#pre").value=pre[qk];$("#prev").textContent=pre[qk]+"%";$("#prenote").textContent=Q[qk].prenote;
+ var q=Q[qk],groups=[["exam",""],["history","From the history"],["lab","Labs"]];
+ function row(f){var d=F[f],e=evFor(f,qk),m="";
+  if(d.fig)m='<div class="minis"><button type="button" class="mini" data-fig="'+d.fig+'">How to do it</button></div>';
+  else if(d.step)m='<div class="minis"><button type="button" class="mini" data-goto="step-'+d.step+'">How to elicit</button></div>';
+  var only=(e.lrp==null?"Only No has a likelihood ratio. ":e.lrn==null?"Only Yes has a likelihood ratio. ":"");
+  return '<div class="frow"><div><div class="nm">'+esc(d.nm)+'</div><div class="sub">'+badges(f,qk)+'</div><div class="hint">'+esc(only+(e.note||""))+'</div>'+m+'</div>'+triHTML(f)+'</div>'}
+ $("#frows").innerHTML=groups.map(function(g){var fs=q.f.filter(function(f){return F[f].kind===g[0]});if(!fs.length)return "";return (g[1]?'<div class="kicker grouplab">'+g[1]+'</div>':'')+fs.map(row).join("")}).join("");
+ $("#qnote").innerHTML=q.note?'<div class="warnbox">'+esc(q.note)+'</div>':"";
+ renderResult()}
+function renderResult(){var q=Q[qk],r=compute(qk,pre[qk],state),p=r.p;
+ var h='<span class="kicker">Probability now</span><div class="big" style="margin-top:6px"><b>'+esc(q.dx)+'</b><span class="pct">'+fmt(p)+'%</span></div><div class="meter" role="img" aria-label="Probability '+fmt(p)+' percent, starting from '+pre[qk]+' percent"><i style="width:'+Math.max(1,Math.min(100,p))+'%"></i><s style="left:calc('+pre[qk]+'% - 1px)"></s></div><div class="scale"><span>0</span><span>start '+pre[qk]+'%</span><span>100</span></div>';
+ var notes=r.notes.map(function(n){return '<div class="warnbox">'+esc(n)+'</div>'}).join("");
+ if(r.parts.length){var top=r.parts.slice().sort(function(a,b){return Math.abs(Math.log(b.l))-Math.abs(Math.log(a.l))})[0];
+  h+='<p class="why"><b>Why:</b> '+esc(pname(top))+' (LR '+top.l+') moves this the most. '+esc(F[top.f].mech)+'</p>';
+  if(r.parts.length>1)h+='<div class="warnbox">'+r.parts.length+' findings combined by multiplying their likelihood ratios. That assumes they are independent; related findings overstate the change.</div>';
+  h+=notes+'<details class="more"><summary>More</summary><ul>'+r.parts.map(function(x){var e=evFor(x.f,qk);return '<li>'+esc(pname(x))+': LR '+x.l+(e.ci?" (95% CI "+esc(e.ci)+")":"")+(e.range?" — "+esc(e.range):"")+'. '+esc(SRC[e.src])+'.</li>'}).join("")+'</ul><p>Setting: '+esc(q.ctx)+' Post-test odds = pre-test odds × each likelihood ratio.</p></details>'}
+ else h+=notes+'<p class="note" style="margin-top:10px">Mark a finding Yes or No to see the probability move. A dash means not examined.</p>';
+ $("#result").innerHTML=h}
+$("#qchips").addEventListener("click",function(e){var b=e.target.closest("[data-q]");if(!b)return;qk=b.getAttribute("data-q");state={};renderQ();var nb=$("#q-"+qk);if(nb)nb.focus()});
+$("#pre").addEventListener("input",function(){pre[qk]=+this.value;$("#prev").textContent=pre[qk]+"%";renderResult()});
+$("#frows").addEventListener("click",function(e){var b=e.target.closest(".tri button");if(!b||b.disabled)return;var t=b.parentNode,f=t.getAttribute("data-f"),v=+b.getAttribute("data-v");$$("button",t).forEach(function(x){x.setAttribute("aria-pressed",String(x===b))});if(v)state[f]=v;else delete state[f];renderResult()});
+
+/* Exam */
+var STEPS=[
+ {id:"inspect",t:"Inspect",s:"Stand at the foot of the bed, then the right side.",p:"Distension (fat, fluid, gas, a mass), scars (adhesions cause most small bowel obstruction), visible peristalsis, dilated veins (caput medusae flows away from the umbilicus in portal hypertension), hernias: ask the patient to cough or lift their head.",find:[]},
+ {id:"listen",t:"Listen",s:"Before touching: bowel sounds, then bruits over the aorta and renal arteries.",p:"Bowel sounds are poor at telling obstruction from ileus or normal; high-pitched tinkling with distension supports obstruction. An absent sound needs a full minute of listening. A bruit with a systolic-diastolic component in a hypertensive patient suggests renal artery stenosis.",find:[["Abnormal bowel sounds and distension","Among the best history and exam predictors of small bowel obstruction in a systematic review, which gave no pooled numbers for them; bedside ultrasound did better (LR+ 9.55, LR− 0.04)."]]},
+ {id:"percuss",t:"Percuss",s:"All four quadrants, then the liver span and Traube's space.",p:"Tympany over gas, dullness over solid organs, fluid or a full bladder. Liver span in the mid-clavicular line: from the first dull note below the lung (usually the 5th intercostal space) to the edge below; normal is roughly 6–12 cm.",find:[]},
+ {id:"palpate",t:"Palpate",s:"Light first, then deep; start in the quadrant farthest from the pain; watch the face.",p:"Light palpation finds tenderness and guarding; deep palpation finds masses and organs. Ask the patient to tense the abdominal wall (lift the head): pain that persists or worsens points to the wall itself rather than the abdomen (Carnett's sign).",find:[["Right upper quadrant tenderness","ruq"]]},
+ {id:"liver",t:"Liver",s:"Fingertips in the right lower quadrant, moving up 2 cm with each breath in, until the edge meets them.",p:"Or hook the fingers under the costal margin from above. Note the distance below the margin, the edge (sharp or blunt), surface (smooth or nodular), tenderness and pulsatility (tricuspid regurgitation).",find:[["Hepatomegaly","hepato"]]},
+ {id:"spleen",t:"Spleen",s:"Percuss first (Castell's sign); then palpate from the right lower quadrant toward the left costal margin.",p:"Support the left lower ribs with your left hand. Repeat with the patient turned onto the right side. A spleen has a notch and moves down with inspiration; you cannot get above it.",figs:[["fig","castell","Castell's sign"]],find:[["Spleen palpable","palp"],["Castell's sign","castell"]]},
+ {id:"aorta",t:"Aorta",s:"Press deeply above and slightly left of the umbilicus with two hands, one each side of the pulsation.",p:"Estimate the width between your fingers; above about 3 cm (allowing for the wall) is abnormal. A pulsation that is felt is not itself abnormal in a thin patient: width is what matters.",figs:[["fig","aorta","Measuring the aorta"]],find:[["Widened aortic pulsation","aorta"]]},
+ {id:"ascites",t:"Ascites",s:"Flank dullness, then shifting dullness; fluid wave if the abdomen is tense.",p:"Supine: percuss from the umbilicus outward to where tympany turns dull and mark it. Roll the patient toward you, wait 30 seconds, percuss again: if the dull edge moves up toward the umbilicus, fluid has shifted. Fluid wave: the patient or an assistant presses the edge of a hand down the midline (to stop fat transmitting the impulse) while you tap one flank and feel the other. About 1.5 L is needed before flank dullness appears. Accuracy figures are not shown.",figs:[["fig","shift","Shifting dullness"]],find:[["Ascites","asc"]]},
+ {id:"peritoneal",t:"Peritoneal signs",s:"Gentlest first: ask the patient to cough, or tap the heel or shake the bed.",p:"Guarding is voluntary tensing; rigidity is involuntary, board-like and does not relax when the patient breathes out. Rebound: press slowly, release quickly; pain on release. Cough pain or heel-drop pain gives the same information with less distress, so formal rebound is rarely needed.",find:[["Rebound tenderness (child, appendicitis)","rebound"]]},
+ {id:"special",t:"Special signs",s:"Only when the history points to them.",p:"Murphy: fingers under the right costal margin, patient breathes in deeply and stops with pain (the same on the left is negative). McBurney's point: one-third of the way from the right anterior superior iliac spine to the umbilicus. Rovsing: pressing the left lower quadrant causes right lower quadrant pain. Psoas: pain on extending the right hip (patient on left side). Obturator: pain on internally rotating the flexed right hip. Accuracy figures for these, other than Murphy, are not shown.",find:[["Murphy sign","murphy"]]},
+ {id:"hernia",t:"Hernias",s:"Examine standing if possible; ask the patient to cough.",p:"Inguinal hernias arise above and medial to the pubic tubercle; femoral hernias below and lateral to it, and are more likely to strangulate. A tender, tense, irreducible lump with vomiting needs surgery now. Check old incisions and the umbilicus.",find:[]},
+ {id:"stigmata",t:"Signs of chronic liver disease",s:"Hands, face, chest, then neuro.",p:"Spider nevi, palmar erythema, Dupuytren's contracture, leukonychia, gynecomastia and loss of body hair, jaundice (best seen under the tongue and in the sclera in daylight), parotid enlargement, asterixis (flapping when the wrists are extended: hepatic encephalopathy, also uremia and CO2 retention). Only spider nevi have a verified likelihood ratio here.",find:[["Spider nevi","spider"]]},
+ {id:"rectal",t:"When to do a rectal exam",s:"When the answer changes management, with a chaperone and consent.",p:"Suspected GI bleeding (melena or blood), fecal impaction, prostate or rectal mass, suspected cord or cauda equina compression (tone and perianal sensation). Not routinely for suspected appendicitis: it neither rules in nor out (LR+ 1.24, LR− 0.85).",find:[]}
+];
+function lrLine(fk){return F[fk].ev.map(function(e){return Q[e.dx].dx+": "+(e.lrp!=null?(e.lrp>=1?"LR+ ":"LR ")+e.lrp:"")+(e.lrp!=null&&e.lrn!=null?", ":"")+(e.lrn!=null?"LR− "+e.lrn:"")}).join(" · ")}
+$("#steps").innerHTML=STEPS.map(function(s,i){var figs=s.figs&&s.figs.length?'<div class="minis">'+s.figs.map(function(x){return '<button type="button" class="mini" data-'+x[0]+'="'+x[1]+'">'+esc(x[2])+'</button>'}).join("")+'</div>':"";
+ var find=s.find.length?'<ul class="find">'+s.find.map(function(x){if(F[x[1]])return '<li><b>'+esc(x[0])+'</b><br><span class="mono" style="font-size:12px">'+esc(lrLine(x[1]))+'</span><br><span class="muted">'+esc(F[x[1]].mech)+'</span></li>';return '<li><b>'+esc(x[0])+'</b><br><span class="muted">'+esc(x[1])+'</span></li>'}).join("")+'</ul>':"";
+ return '<div class="step" id="step-'+s.id+'"><span class="num">'+(i+1)+'</span><div><b class="t">'+esc(s.t)+'</b><p><b>Do:</b> '+esc(s.s)+'</p><p class="muted">'+esc(s.p)+'</p>'+figs+find+'</div></div>'}).join("");
+
+/* Map */
+var R={
+ ruq:{t:"Right upper quadrant",dx:["Biliary colic, cholecystitis, cholangitis","Hepatitis, liver abscess, congestive hepatopathy","Right lower lobe pneumonia or pleural effusion","Duodenal ulcer","Right kidney: pyelonephritis, stone"],ref:"Gallbladder pain can be felt at the right shoulder tip or scapula.",miss:"Cholangitis (fever, jaundice, pain); Budd–Chiari in a hypercoagulable patient."},
+ epi:{t:"Epigastric",dx:["Peptic ulcer, gastritis","Pancreatitis (radiates to the back)","Biliary colic","Gastroesophageal reflux"],ref:"Pancreatic pain bores through to the back.",miss:"Inferior myocardial infarction; perforated ulcer; aortic aneurysm or dissection."},
+ luq:{t:"Left upper quadrant",dx:["Splenic enlargement, infarct or rupture","Gastritis","Pancreatitis (tail)","Left lower lobe pneumonia","Left kidney: pyelonephritis, stone"],ref:"Splenic or diaphragmatic irritation can be felt at the left shoulder tip (Kehr's sign).",miss:"Splenic rupture after trauma or in mononucleosis."},
+ rf:{t:"Right flank",dx:["Kidney stone, pyelonephritis","Ascending colon: colitis, diverticulitis","Retrocecal appendicitis"],ref:"Ureteric stone pain moves from flank to groin as the stone descends.",miss:"Obstructed infected kidney (stone with fever): needs drainage."},
+ umb:{t:"Periumbilical",dx:["Early appendicitis","Small bowel obstruction","Gastroenteritis","Umbilical hernia"],ref:"Visceral pain from the midgut (small bowel to mid transverse colon) is felt here.",miss:"Mesenteric ischemia: pain out of proportion to a soft abdomen, often with atrial fibrillation; aortic aneurysm."},
+ lf:{t:"Left flank",dx:["Kidney stone, pyelonephritis","Descending colon: diverticulitis, colitis"],ref:"As on the right, stone pain radiates to the groin.",miss:"Obstructed infected kidney; aortic aneurysm leaking to the left."},
+ rlq:{t:"Right lower quadrant",dx:["Appendicitis","Mesenteric adenitis (children)","Terminal ileitis (Crohn's)","Ovarian torsion or cyst, ectopic pregnancy, pelvic inflammatory disease","Inguinal hernia, ureteric stone"],ref:"Appendicitis starts periumbilically and moves here.",miss:"Ectopic pregnancy: test every person who could be pregnant; ovarian torsion."},
+ sup:{t:"Suprapubic",dx:["Cystitis, urinary retention","Pelvic inflammatory disease, endometriosis","Sigmoid diverticulitis"],ref:"Bladder and uterine pain is felt in the midline low.",miss:"Ectopic pregnancy; urinary retention from cord compression (check the back and legs)."},
+ llq:{t:"Left lower quadrant",dx:["Sigmoid diverticulitis","Constipation","Colitis (infectious, ischemic, inflammatory)","Ovarian torsion or cyst, ectopic pregnancy","Inguinal hernia, ureteric stone"],ref:"Diverticulitis is usually left-sided in Western patients.",miss:"Ischemic colitis after hypotension or in an older patient; ectopic pregnancy."}
+};
+var GRID=[["ruq","epi","luq"],["rf","umb","lf"],["rlq","sup","llq"]],SHORT={ruq:"RUQ",epi:"Epigastric",luq:"LUQ",rf:"R flank",umb:"Umbilical",lf:"L flank",rlq:"RLQ",sup:"Suprapubic",llq:"LLQ"},rk="ruq";
+function mapSVG(){var g='<svg class="abdfig" viewBox="0 0 330 330" role="group" aria-label="Nine abdominal regions">';
+ g+='<path d="M40 10 Q165 -6 290 10 L300 300 Q165 330 30 300 Z" fill="var(--fill)" stroke="var(--muted)" stroke-width="2"/>';
+ GRID.forEach(function(row,ri){row.forEach(function(k,ci){var x=48+ci*80,y=24+ri*92;g+='<g class="rg'+(k===rk?" on":"")+'" data-r="'+k+'" tabindex="0" role="button" aria-pressed="'+(k===rk)+'" aria-label="'+esc(R[k].t)+'"><rect x="'+x+'" y="'+y+'" width="74" height="86" rx="10"/><text x="'+(x+37)+'" y="'+(y+47)+'" text-anchor="middle">'+SHORT[k]+'</text></g>'})});
+ g+='<text x="4" y="326" style="font-family:var(--mono);font-size:9px" fill="var(--muted)">patient right</text><text x="326" y="326" text-anchor="end" style="font-family:var(--mono);font-size:9px" fill="var(--muted)">patient left</text></svg>';return g}
+function renderMap(){$("#mapsvg").innerHTML=mapSVG();var r=R[rk];
+ $("#mapcard").innerHTML='<span class="kicker">Region</span><h3 style="margin-top:4px">'+esc(r.t)+'</h3><p class="muted" style="margin-top:6px">Usual causes</p><ul class="dx">'+r.dx.map(function(d){return '<li>'+esc(d)+'</li>'}).join("")+'</ul><p class="why"><b>Referred:</b> '+esc(r.ref)+'</p><p class="miss"><b>Do not miss:</b> '+esc(r.miss)+'</p>'}
+$("#mapsvg").addEventListener("click",function(e){var g=e.target.closest("[data-r]");if(!g)return;rk=g.getAttribute("data-r");renderMap();var n=$('#mapsvg [data-r="'+rk+'"]');if(n)n.focus()});
+$("#mapsvg").addEventListener("keydown",function(e){if(e.key!=="Enter"&&e.key!==" ")return;var g=e.target.closest("[data-r]");if(!g)return;e.preventDefault();rk=g.getAttribute("data-r");renderMap();var n=$('#mapsvg [data-r="'+rk+'"]');if(n)n.focus()});
+$("#missall").innerHTML='<span class="kicker">Anywhere in the abdomen: think of these first</span><ul class="dx"><li><b>Ruptured aortic aneurysm:</b> pain with back pain, hypotension, a pulsatile mass (often not felt).</li><li><b>Mesenteric ischemia:</b> severe pain with a soft abdomen, lactate may be normal early.</li><li><b>Perforation or peritonitis:</b> rigidity, pain on coughing or moving.</li><li><b>Ectopic pregnancy:</b> pregnancy test in anyone who could be pregnant.</li><li><b>Not the abdomen:</b> myocardial infarction, diabetic ketoacidosis, lower lobe pneumonia, testicular torsion, herpes zoster before the rash.</li><li><b>Older or immunosuppressed patients</b> (and those on steroids) show fewer signs: a benign exam does not exclude surgical disease.</li></ul>';
+renderMap();
+
+/* Figures */
+function figAorta(){return '<svg class="fig" viewBox="0 0 320 160" role="img" aria-label="Two hands measuring the width of the aortic pulsation above the umbilicus"><rect x="20" y="20" width="280" height="120" rx="14" fill="var(--fill)"/><circle cx="160" cy="118" r="4" fill="var(--muted)"/><text x="172" y="122" style="font-family:var(--mono);font-size:10px" fill="var(--muted)">umbilicus</text><rect x="146" y="30" width="28" height="80" rx="12" fill="var(--hrt-art)" opacity=".55"/><path d="M110 70 l30 0 M210 70 l-30 0" stroke="var(--ink)" stroke-width="10" stroke-linecap="round"/><path d="M144 52 L144 88 M176 52 L176 88" stroke="var(--accent)" stroke-dasharray="3 3"/><text x="160" y="24" text-anchor="middle" style="font-family:var(--mono);font-size:10px" fill="var(--accent)">width between fingertips</text></svg><p class="figtext">Press deeply on each side of the pulsation, just above and left of the umbilicus, with the fingertips of both hands. Normal aortic width is about 2 to 2.5 cm; a width above about 3 cm suggests an aneurysm. The aorta divides at the level of the umbilicus, so feel above it.</p>'}
+function figCastell(){return '<svg class="fig" viewBox="0 0 320 170" role="img" aria-label="Castell\'s point on the left lower chest"><path d="M40 20 Q160 0 280 20 L290 160 L30 160 Z" fill="var(--fill)" stroke="var(--muted)" stroke-width="2"/>'+[0,1,2,3].map(function(i){return '<path d="M175 '+(40+i*22)+' Q 230 '+(46+i*22)+' 280 '+(62+i*22)+'" fill="none" stroke="var(--muted)" stroke-width="1.5"/>'}).join("")+'<line x1="235" y1="20" x2="235" y2="160" stroke="var(--accent)" stroke-dasharray="3 3"/><text x="231" y="34" text-anchor="end" style="font-family:var(--mono);font-size:9px" fill="var(--accent)">anterior axillary line</text><circle cx="235" cy="122" r="8" fill="var(--hrt-art)"/><text x="160" y="150" text-anchor="middle" style="font-family:var(--mono);font-size:10px" fill="var(--ink)">lowest intercostal space, patient\'s left</text></svg><p class="figtext">Patient supine. Percuss the lowest left intercostal space in the anterior axillary line, first as they breathe out, then at the end of a deep breath in. Resonant both times is normal; dull on inspiration is a positive sign.</p>'}
+function figShift(){function belly(x,lab,dullL,dullR,side){var g='<g transform="translate('+x+',0)"><text x="70" y="14" text-anchor="middle" style="font-family:var(--mono);font-size:10px" fill="var(--ink)">'+lab+'</text>';
+  if(side){g+='<ellipse cx="70" cy="80" rx="46" ry="58" fill="var(--card)" stroke="var(--muted)" stroke-width="2"/><path d="M70 80 m-46 0 a46 58 0 0 0 92 0 Z" transform="rotate(0)" fill="var(--hrt-vein)" opacity=".45"/><text x="70" y="70" text-anchor="middle" style="font-family:var(--mono);font-size:9px" fill="var(--muted)">gas floats up</text>'}
+  else{g+='<ellipse cx="70" cy="80" rx="58" ry="46" fill="var(--card)" stroke="var(--muted)" stroke-width="2"/><path d="M12 80 Q 14 116 40 122 L40 56 Q 18 62 12 80 Z M128 80 Q 126 116 100 122 L100 56 Q 122 62 128 80 Z" fill="var(--hrt-vein)" opacity=".45"/><line x1="40" y1="40" x2="40" y2="130" stroke="var(--bad)" stroke-dasharray="3 3"/><line x1="100" y1="40" x2="100" y2="130" stroke="var(--bad)" stroke-dasharray="3 3"/><text x="70" y="84" text-anchor="middle" style="font-family:var(--mono);font-size:9px" fill="var(--muted)">tympany</text>'}
+  return g+'</g>'}
+ return '<svg class="fig" viewBox="0 0 320 150" role="img" aria-label="Shifting dullness: fluid in the flanks lying flat, then pooling on the lower side">'+belly(10,"lying flat",1,1,false)+belly(170,"turned on side",0,0,true)+'</svg><p class="figtext">Lying flat, fluid settles in the flanks and gas-filled bowel floats to the middle: dull at the sides, tympanic centrally. Mark where the note changes. Turn the patient onto one side and wait: fluid pools in the lower flank and the bowel floats up, so the dull edge moves toward the umbilicus. Cross-section, viewed from the feet.</p>'}
+var FIGS={aorta:["Measuring the aorta",figAorta],castell:["Castell's sign",figCastell],shift:["Shifting dullness",figShift]};
+var lastFocus=null;
+function openSheet(html){lastFocus=document.activeElement;$("#sheet").innerHTML=html;$("#sheetwrap").hidden=false;var x=$("#sheet .x");if(x)x.focus()}
+function closeSheet(){$("#sheetwrap").hidden=true;$("#sheet").innerHTML="";if(lastFocus&&lastFocus.focus)lastFocus.focus()}
+document.addEventListener("click",function(e){var f=e.target.closest("[data-fig]");if(f){var k=FIGS[f.getAttribute("data-fig")];openSheet('<div class="top"><div><span class="kicker">Figure</span><h3 id="sheettitle">'+esc(k[0])+'</h3></div><button type="button" class="x" aria-label="Close">×</button></div>'+k[1]());return}
+ var g=e.target.closest("[data-goto]");if(g){show("exam");var el=document.getElementById(g.getAttribute("data-goto"));if(el)setTimeout(function(){el.scrollIntoView()},0);return}
+ if(e.target.closest("#sheet .x")||e.target===$("#sheetwrap"))closeSheet()});
+document.addEventListener("keydown",function(e){if(e.key==="Escape"&&!$("#sheetwrap").hidden)closeSheet()});
+
+/* Practice */
+var CASES=[
+ {type:"lr",q:"cirr",pre:24,st:{asc:1,plt:1},t:"A 58-year-old with chronic hepatitis C has ascites; platelets are 110 ×10³/µL.",ask:"Starting from 24%, roughly what is the probability of cirrhosis?"},
+ {type:"lr",q:"appy",pre:30,st:{fever:-1,rebound:-1},t:"A 9-year-old with a day of belly pain is afebrile and has no rebound tenderness.",ask:"Starting from 30%, roughly what is the probability of appendicitis?"},
+ {type:"lr",q:"aaa",pre:5,st:{aorta:1},t:"A 72-year-old ex-smoker at a clinic visit; between your fingertips the aortic pulsation is clearly wide.",ask:"Starting from 5%, roughly what is the probability of an aneurysm of 3 cm or more?"},
+ {type:"pick",t:"Fingers under the right costal margin; on a deep breath in the patient stops suddenly with pain. The same on the left does not hurt.",ask:"Which sign is this?",opts:["Rovsing sign","Carnett's sign","Murphy sign","Castell's sign"],ans:2,why:"Murphy sign: inspiration brings the inflamed gallbladder down onto your fingers. On its own it is weak (LR+ 2.8, interval includes 1); get an ultrasound."},
+ {type:"pick",t:"Supine, the flanks are dull and the centre tympanic. With the patient turned on the side for 30 seconds, the dull edge moves up toward the umbilicus.",ask:"What does this show?",opts:["Distended bladder","Shifting dullness: free fluid","Splenomegaly","Obesity"],ans:1,why:"Free fluid moves with gravity while gas-filled bowel floats; a fixed dull area (bladder, mass, fat) does not move."},
+ {type:"pick",t:"A 70-year-old with atrial fibrillation has severe abdominal pain, but the abdomen is soft and only mildly tender.",ask:"Which diagnosis must you consider first?",opts:["Gastroenteritis","Biliary colic","Constipation","Mesenteric ischemia"],ans:3,why:"Pain out of proportion to the exam is the classic early picture of mesenteric ischemia; an embolus from the left atrium is a common cause. Peritoneal signs appear only once the bowel is dying."}
+];
+var ci=0,done=false;
+function disp(v){return v<1?"<1":v>99?">99":String(v)}
+function pick(arr,right){var out=[right];arr.forEach(function(v){v=Math.max(1,Math.min(99,Math.round(v)));if(out.every(function(o){return Math.abs(o-v)>=8}))out.push(v)});return out.slice(0,4).sort(function(a,b){return a-b})}
+function renderCase(){var c=CASES[ci],opts,right,exp="",head;done=false;
+ if(c.type==="pick"){right=String(c.ans);exp='<p class="why"><b>Why:</b> '+esc(c.why)+'</p>';head='Sign';
+  $("#case").innerHTML='<span class="kicker">Case '+(ci+1)+' of '+CASES.length+' · '+head+'</span><p>'+esc(c.t)+'</p><p><b>'+esc(c.ask)+'</b></p><div class="opts">'+c.opts.map(function(o,i){return '<button type="button" class="opt" data-o="'+i+'">'+esc(o)+'</button>'}).join("")+'</div>'}
+ else{var r=compute(c.q,c.pre,c.st);right=Math.max(1,Math.round(r.p));opts=pick([r.p*0.5,r.p+(100-r.p)*0.5,right-30,right+30,50],right);
+  exp='<p class="why"><b>Why:</b> '+c.pre+'% start × '+r.parts.map(function(x){return esc(pname(x).toLowerCase())+" ×"+x.l}).join(", ")+' → '+disp(right)+'%. '+esc(F[r.parts[0].f].mech)+'</p>';
+  $("#case").innerHTML='<span class="kicker">Case '+(ci+1)+' of '+CASES.length+' · '+esc(Q[c.q].t)+'</span><p>'+esc(c.t)+'</p><p><b>'+esc(c.ask)+'</b></p><div class="opts">'+opts.map(function(o){return '<button type="button" class="opt" data-o="'+o+'">'+disp(o)+'%</button>'}).join("")+'</div>'}
+ $("#case").insertAdjacentHTML("beforeend",'<div id="caseexp" hidden>'+exp+'</div><div class="casenav"><button type="button" class="btn" id="prevc"'+(ci===0?" disabled":"")+'>← Previous</button><button type="button" class="btn" id="nextc"'+(ci===CASES.length-1?" disabled":"")+'>Next →</button></div>');
+ $$("#case .opt").forEach(function(b){b.addEventListener("click",function(){if(done)return;done=true;$$("#case .opt").forEach(function(x){if(String(x.getAttribute("data-o"))===String(right))x.classList.add("right");else if(x===b)x.classList.add("wrong")});$("#caseexp").hidden=false})});
+ $("#prevc").addEventListener("click",function(){ci--;renderCase()});$("#nextc").addEventListener("click",function(){ci++;renderCase()})}
+renderCase();
+
+/* Tabs */
+function show(id){$$("section.view").forEach(function(s){s.classList.toggle("on",s.id===id)});$$("nav.tabs [role=tab]").forEach(function(t){t.setAttribute("aria-selected",String(t.getAttribute("aria-controls")===id))});window.scrollTo(0,0)}
+$$("nav.tabs [role=tab]").forEach(function(t){t.addEventListener("click",function(){show(t.getAttribute("aria-controls"))})});
+function fromHash(){var h=(location.hash||"").slice(1);if(!h)return;var el=document.getElementById(h);if(!el)return;var v=el.closest("section.view");if(v)show(v.id);if(h.indexOf("q-")===0&&Q[h.slice(2)]){qk=h.slice(2);state={};renderQ()}setTimeout(function(){el.scrollIntoView()},0)}
+window.addEventListener("hashchange",fromHash);
+renderQ();fromHash();
+})();
+</script>
+</body>
+</html>
