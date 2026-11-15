@@ -84,10 +84,11 @@ details.more ul{padding-left:18px}
 .tri button:first-child{border-left:0}
 .tri button:disabled{opacity:.35;cursor:not-allowed}
 .tri button[aria-pressed=true][data-v="1"]{background:var(--badbg);color:var(--bad);font-weight:600}
+.tri button[aria-pressed=true][data-v="1"][data-low]{background:var(--okbg);color:var(--ok)}
 .tri button[aria-pressed=true][data-v="-1"]{background:var(--okbg);color:var(--ok);font-weight:600}
 .tri button[aria-pressed=true][data-v="0"]{color:var(--ink);font-weight:600}
 .minis{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
-.mini{min-height:36px;padding:0 12px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--accent);font-size:13px;font-weight:500}
+.mini{min-height:44px;padding:0 12px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--accent);font-size:13px;font-weight:500}
 .grouplab{margin-top:14px}
 
 /* exam steps */
@@ -112,7 +113,7 @@ details.more ul{padding-left:18px}
 .play{min-height:44px;padding:0 16px;border-radius:999px;background:var(--accent);color:var(--accent-ink);font-size:14px;font-weight:600;display:inline-flex;align-items:center;gap:8px}
 .play svg{width:12px;height:12px}
 .seg{display:inline-grid;grid-auto-flow:column;gap:2px;padding:3px;background:var(--fill);border-radius:10px}
-.seg button{min-height:38px;padding:0 12px;border-radius:8px;font-size:13px;color:var(--muted)}
+.seg button{min-height:40px;padding:0 12px;border-radius:8px;font-size:13px;color:var(--muted)}
 .seg button[aria-pressed=true]{background:var(--card);color:var(--ink);font-weight:600}
 .note{font-size:12px;color:var(--muted)}
 
@@ -178,7 +179,7 @@ footer p{margin-top:8px}
 <!-- ───────── EXAM ───────── -->
 <section class="view" id="exam" aria-labelledby="t-exam">
   <span class="kicker">The exam, in order</span>
-  <p class="lede">A complete cardiac exam in seven steps. Tap a plate or figure to see it large.</p>
+  <p class="lede">A complete cardiac exam in eight steps. Tap a plate or figure to see it large.</p>
   <div class="card" id="steps"></div>
 </section>
 
@@ -229,7 +230,7 @@ var SRC={
   wang:"Wang et al., JAMA 2005 (systematic review, 22 studies)",
   choud:"Choudhry and Etchells, JAMA 1999 (systematic review; cardiologist examiners)",
   roy:"Roy et al., JAMA 2007 (systematic review; single study for this finding)",
-  alba:"Albassam et al., JAMA 2019 (systematic review, 11 studies)"
+  alba:"Albassam et al., JAMA 2019 (systematic review of 11 studies)"
 };
 var F={
   jvd:{nm:"JVD more than 3 cm above the sternal angle",kind:"exam",step:"jvp",plate:"jvp",fig:"jvpwave",
@@ -243,7 +244,7 @@ var F={
     mech:"Capillary hydrostatic pressure exceeds oncotic pressure in dependent tissue. Venous disease, calcium-channel blockers and low albumin do the same."},
   s3:{nm:"S3 gallop",kind:"exam",step:"listen",plate:"ausc",snd:"s3",
     ev:[{dx:"hf",lrp:11,lrn:null,ci:"4.9–25",src:"wang",note:"The strongest single exam sign for heart failure in ED dyspnea, but often missed: its absence tells you little."}],
-    mech:"Rapid early filling into a stiff, full ventricle stops abruptly and the ventricular wall vibrates."},
+    mech:"Rapid early filling from a high-pressure atrium into a dilated, volume-loaded ventricle decelerates abruptly."},
   hxhf:{nm:"History of heart failure",kind:"history",
     ev:[{dx:"hf",lrp:5.8,lrn:0.45,ci:"4.1–8.0 / 0.38–0.53",src:"wang",note:"History, not exam, but it moves the answer more than most signs."}],
     mech:"Prior heart failure is the best predictor of heart failure now."},
@@ -257,22 +258,22 @@ var F={
     ev:[{dx:"tamp",lrp:3.3,lrn:0.03,ci:"1.8–6.3 / 0.01–0.24",src:"roy",note:"Measured in patients already known to have an effusion. 10 mmHg or less makes tamponade very unlikely (one study)."}],
     mech:"Inspiration fills the right ventricle, which, inside a tight pericardium, pushes the septum into the left ventricle and drops stroke volume."},
   age35:{nm:"Age 35 or older at first syncope",kind:"history",
-    ev:[{dx:"sync",lrp:3.3,lrn:0.13,ci:"2.6–4.1 / 0.06–0.25",src:"alba",note:"Absent means first episode before age 35."}],
+    ev:[{dx:"sync",lrp:3.3,lrn:0.13,ci:"2.6–4.1 / 0.06–0.25",src:"alba",note:"From one study (n = 323). Absent means first episode before age 35."}],
     mech:"Structural and arrhythmic causes accumulate with age; reflex syncope usually starts young."},
   af:{nm:"Known atrial fibrillation or flutter",kind:"history",
-    ev:[{dx:"sync",lrp:7.3,lrn:null,ci:"2.4–22",src:"alba",note:"Specific but insensitive (13%)."}],
+    ev:[{dx:"sync",lrp:7.3,lrn:null,ci:"2.4–22",src:"alba",note:"From one study (n = 323). Specific but insensitive (13%)."}],
     mech:"Marks an electrically and structurally abnormal heart."},
   shd:{nm:"Known severe structural heart disease",kind:"history",
-    ev:[{dx:"sync",lrp:3.3,lrn:null,range:"LR 3.3–4.8 (2 studies)",src:"alba",note:""}],
+    ev:[{dx:"sync",lrp:3.3,lrn:null,range:"LR 3.3–4.8 (2 studies)",src:"alba",note:"Two studies; the lower value is used."}],
     mech:"Obstruction or scar can drop output or trigger ventricular arrhythmia."},
   cyan:{nm:"Cyanosis witnessed during the episode",kind:"history",
-    ev:[{dx:"sync",lrp:6.2,lrn:null,ci:"1.6–24",src:"alba",note:"Rare (sensitivity 8%) but specific."}],
+    ev:[{dx:"sync",lrp:6.2,lrn:null,ci:"1.6–24",src:"alba",note:"From one study (n = 323). Rare (sensitivity 8%) but specific."}],
     mech:"Circulatory arrest rather than a brief reflex fall in pressure."},
   cold:{nm:"Felt cold before fainting",kind:"history",
-    ev:[{dx:"sync",lrp:0.16,lrn:null,ci:"0.06–0.64",src:"alba",note:"A reflex prodrome. Here \"Yes\" lowers the probability."}],
+    ev:[{dx:"sync",lrp:0.16,lrn:null,ci:"0.06–0.64",src:"alba",note:"From one study (n = 412). A reflex prodrome: here Yes lowers the probability."}],
     mech:"Autonomic prodrome of vasovagal syncope."},
   mood:{nm:"Mood change or preoccupation with details before fainting",kind:"history",
-    ev:[{dx:"sync",lrp:0.09,lrn:null,ci:"0.02–0.38",src:"alba",note:"A reflex prodrome. Here \"Yes\" lowers the probability."}],
+    ev:[{dx:"sync",lrp:0.09,lrn:null,ci:"0.02–0.38",src:"alba",note:"From one study (n = 323). A reflex prodrome: here Yes lowers the probability."}],
     mech:"Prodromal symptoms point to a reflex mechanism."}
 };
 var Q={
@@ -301,9 +302,9 @@ function compute(qk,prePct,state){
 var qk="vol",state={},pre={};QORDER.forEach(function(k){pre[k]=Q[k].pre});
 function triHTML(f){var e=evFor(f,qk);var noNeg=!e||e.lrn==null,noPos=!e||e.lrp==null;
   return '<div class="tri" role="group" aria-label="'+esc(F[f].nm)+'" data-f="'+f+'">'+
-  '<button type="button" data-v="1" aria-pressed="'+(state[f]===1)+'"'+(noPos?' disabled title="No likelihood ratio for presence in the source"':'')+'>Yes</button>'+
+  '<button type="button" data-v="1"'+(e&&e.lrp!=null&&e.lrp<1?' data-low="1"':'')+' aria-pressed="'+(state[f]===1)+'"'+(noPos?' disabled title="No verified likelihood ratio for presence yet"':'')+'>Yes</button>'+
   '<button type="button" data-v="0" aria-pressed="'+(!state[f])+'" aria-label="Not checked">–</button>'+
-  '<button type="button" data-v="-1" aria-pressed="'+(state[f]===-1)+'"'+(noNeg?' disabled title="No likelihood ratio for absence in the source"':'')+'>No</button></div>'}
+  '<button type="button" data-v="-1" aria-pressed="'+(state[f]===-1)+'"'+(noNeg?' disabled title="No verified likelihood ratio for absence yet"':'')+'>No</button></div>'}
 function renderQ(){
   $("#qchips").innerHTML=QORDER.map(function(k){return '<button type="button" class="chip" id="q-'+k+'" data-q="'+k+'" aria-pressed="'+(k===qk)+'">'+esc(Q[k].t)+'</button>'}).join("");
   $("#pre").value=pre[qk];$("#prev").textContent=pre[qk]+"%";$("#prenote").textContent=Q[qk].prenote;
@@ -325,7 +326,7 @@ function renderResult(){
     var e=evFor(top.f,qk);
     h+='<p class="why"><b>Why:</b> '+esc(F[top.f].nm)+(top.v===1?" present":" absent")+' (LR '+top.l+') moves this the most. '+esc(F[top.f].mech)+'</p>';
     if(r.parts.length>1)h+='<div class="warnbox">'+r.parts.length+' findings combined by multiplying their likelihood ratios. That assumes they are independent; related findings overstate the change.</div>';
-    h+='<details class="more"><summary>More</summary><ul>'+r.parts.map(function(x){var e2=evFor(x.f,qk);return '<li>'+esc(F[x.f].nm)+(x.v===1?" present":" absent")+': LR '+x.l+(e2.ci?" (95% CI "+esc(e2.ci)+")":"")+(e2.range?" — "+esc(e2.range):"")+'. '+esc(SRC[e2.src])+'.</li>'}).join("")+'</ul><p>Setting: '+esc(q.ctx)+' Post-test odds = pre-test odds × each likelihood ratio.</p><p>Evidence tier: systematic review of diagnostic accuracy studies.</p></details>';
+    h+='<details class="more"><summary>More</summary><ul>'+r.parts.map(function(x){var e2=evFor(x.f,qk);return '<li>'+esc(F[x.f].nm)+(x.v===1?" present":" absent")+': LR '+x.l+(e2.ci?" (95% CI "+esc(e2.ci)+")":"")+(e2.range?" — "+esc(e2.range):"")+'. '+esc(SRC[e2.src])+'.</li>'}).join("")+'</ul><p>Setting: '+esc(q.ctx)+' Post-test odds = pre-test odds × each likelihood ratio.</p><p>Evidence tier: systematic review of diagnostic accuracy studies; some figures rest on a single study, noted on each finding. Confidence intervals are wide where studies are small.</p></details>';
   } else {
     h+='<p class="note" style="margin-top:10px">Mark a finding Yes or No to see the probability move. A dash means not examined.</p>';
   }
@@ -339,15 +340,15 @@ $("#frows").addEventListener("click",function(e){var b=e.target.closest(".tri bu
 /* ── Exam tab ── */
 var STEPS=[
  {id:"vitals",t:"Position and vital signs",p:"Bed at 30–45°. Note the pulse pressure. If an effusion is known or suspected, measure pulsus paradoxus with a manual cuff.",figs:[["fig","pulsus","How to measure pulsus"]],find:[["Pulsus paradoxus over 10 mmHg","pulsus"],["Wide pulse pressure","In aortic regurgitation the diastolic pressure falls as blood runs back into the ventricle."]]},
- {id:"jvp",t:"Jugular venous pressure",p:"Head turned slightly away. Find the top of the internal jugular pulsation, between the heads of the sternocleidomastoid. Measure its vertical height above the sternal angle. Tell it from the carotid: the venous pulse has two peaks, falls with inspiration, and is not palpable.",figs:[["plate","jvp","Plate: measuring the JVP"],["fig","jvpwave","JVP waveform"]],find:[["JVD more than 3 cm above the sternal angle","jvd"],["Kussmaul sign: JVP rises with inspiration","Seen in constriction and right ventricular infarction. Accuracy not yet verified."]]},
+ {id:"jvp",t:"Jugular venous pressure",p:"Head turned slightly away. Find the top of the internal jugular pulsation, between the heads of the sternocleidomastoid. Measure its vertical height above the sternal angle. Tell it from the carotid: the venous pulse has two peaks, falls with inspiration, and is not palpable.",figs:[["plate","jvp","Plate: measuring the JVP"],["fig","jvpwave","JVP waveform"]],find:[["JVD more than 3 cm above the sternal angle","jvd"],["Kussmaul sign: JVP rises with inspiration","Seen in constriction, restrictive cardiomyopathy, right ventricular infarction and severe tricuspid regurgitation; usually absent in tamponade. Accuracy not yet verified."]]},
  {id:"carotid",t:"Carotid upstroke",p:"One side at a time, at the level of the cricoid. Feel the speed and size of the upstroke.",figs:[],find:[["Slow, small upstroke (parvus et tardus)","Fixed outflow obstruction, as in severe aortic stenosis. Accuracy not yet verified."],["Brisk, collapsing pulse","Large stroke volume running off fast, as in aortic regurgitation."]]},
  {id:"apex",t:"Apex beat",p:"Patient supine, then left lateral. Normal: 5th intercostal space at or inside the midclavicular line, smaller than a coin, brief.",figs:[["plate","ausc","Plate: landmarks"]],find:[["Displaced, diffuse apex","Left ventricular dilation. Accuracy not yet verified."],["Sustained, heaving apex","Pressure overload: aortic stenosis, hypertension, HCM."]]},
  {id:"listen",t:"Listen: four areas, then the apex on the left side",p:"Diaphragm at the aortic, pulmonic, tricuspid and mitral areas. Then roll the patient onto the left side and listen at the apex with the bell, light pressure, for S3 and S4.",figs:[["plate","ausc","Plate: where to listen"]],find:[["S3 gallop","s3"],["S4","Atrial kick into a stiff ventricle (hypertension, ischemia, HCM, aortic stenosis). Absent in atrial fibrillation."],["Split S2 through the breath","Physiologic split widens on inspiration; see the Sounds tab for wide, fixed and paradoxical."]]},
  {id:"forward",t:"Sit forward, breath held out",p:"Patient sitting up and leaning forward, breath held after full expiration. Diaphragm pressed firmly along the left sternal border.",figs:[["plate","ausc","Plate: where to listen"]],find:[["Early diastolic murmur, left sternal border","edm"],["Pericardial rub","Scratchy, often three components; loudest in this position."]]},
- {id:"moves",t:"Manoeuvres for a murmur",p:"When a systolic murmur's cause is unclear, change preload and afterload: Valsalva strain, squat to stand, sustained handgrip, and breathing in.",figs:[["fig","moves","Manoeuvre responses"]],find:[["Murmur louder with Valsalva or standing","Suggests hypertrophic cardiomyopathy: less filling narrows the outflow tract. Accuracy not yet verified."],["Murmur louder with handgrip","Mitral or aortic regurgitation: higher afterload drives more backward flow."]]},
+ {id:"moves",t:"Manoeuvres for a murmur",p:"When a systolic murmur's cause is unclear, change preload and afterload: Valsalva strain, squat to stand, sustained handgrip, and breathing in.",figs:[["fig","moves","Manoeuvre responses"]],find:[["Murmur louder with Valsalva or standing","Suggests hypertrophic cardiomyopathy: less filling narrows the outflow tract. Accuracy not yet verified."],["Systolic murmur louder with handgrip","Mitral regurgitation or a ventricular septal defect: higher afterload drives more backward flow."]]},
  {id:"lungs",t:"Lungs and legs",p:"Posterior bases with deep breaths through an open mouth. Press over the shins for 5 seconds; check the sacrum in a patient in bed.",figs:[],find:[["Crackles at the lung bases","crackles"],["Lower-extremity edema","edema"]]}
 ];
-function lrLine(fk){var out=[];F[fk].ev.forEach(function(e){out.push(Q[e.dx].dx+": "+(e.lrp?"LR+ "+e.lrp:"")+(e.lrp&&e.lrn?", ":"")+(e.lrn?"LR− "+e.lrn:""))});return out.join(" · ")}
+function lrLine(fk){var out=[];F[fk].ev.forEach(function(e){out.push(Q[e.dx].dx+": "+(e.lrp?(e.lrp>=1?"LR+ ":"LR ")+e.lrp:"")+(e.lrp&&e.lrn?", ":"")+(e.lrn?"LR− "+e.lrn:""))});return out.join(" · ")}
 $("#steps").innerHTML=STEPS.map(function(s,i){
   var figs=s.figs.length?'<div class="minis">'+s.figs.map(function(x){return '<button type="button" class="mini" data-'+x[0]+'="'+x[1]+'">'+esc(x[2])+'</button>'}).join("")+'</div>':"";
   var find='<ul class="find">'+s.find.map(function(x){if(F[x[1]])return '<li><b>'+esc(x[0])+'</b><br><span class="mono" style="font-size:12px">'+esc(lrLine(x[1]))+'</span><br><span class="muted">'+esc(F[x[1]].mech)+'</span></li>';return '<li><b>'+esc(x[0])+'</b><br><span class="muted">'+esc(x[1])+'</span></li>'}).join("")+'</ul>';
@@ -359,7 +360,7 @@ var SND={
   wide:{t:"Wide split S2",where:"Pulmonic area.",mech:"Delayed pulmonic closure (right bundle branch block, pulmonary stenosis) or early aortic closure (severe MR). Split present in expiration and wider on inspiration.",split:{exp:50,insp:80}},
   fixed:{t:"Fixed split S2",where:"Pulmonic area.",mech:"Atrial septal defect: left-to-right shunt equalizes right-sided filling through the breath, so the split does not change.",split:{exp:60,insp:60}},
   para:{t:"Paradoxical split S2",where:"Pulmonic area.",mech:"Aortic closure delayed past pulmonic (left bundle branch block, severe aortic stenosis, RV pacing). Split in expiration, closes on inspiration.",split:{exp:45,insp:0,rev:true}},
-  s3:{t:"S3 gallop",where:"Apex, bell, patient on the left side.",mech:"Early rapid filling into a stiff, full ventricle stops abruptly. Normal in the young; in adults over about 40 it means high filling pressure.",split:{exp:0,insp:25},s3:true,ev:"s3"},
+  s3:{t:"S3 gallop",where:"Apex, bell, patient on the left side.",mech:"Rapid early filling from a high-pressure atrium into a dilated, volume-loaded ventricle decelerates abruptly. Normal in the young; in adults over about 40 it means high filling pressure.",split:{exp:0,insp:25},s3:true,ev:"s3"},
   s4:{t:"S4",where:"Apex, bell, left side.",mech:"Atrial contraction into a stiff, non-compliant ventricle. Needs atrial contraction, so it is absent in atrial fibrillation.",split:{exp:0,insp:25},s4:true},
   as:{t:"Aortic stenosis",where:"Aortic area, radiating to the right carotid.",mech:"Crescendo–decrescendo midsystolic murmur; later peak and a soft or single S2 mean more severe stenosis.",split:{exp:0,insp:0},mur:{type:"cres",start:60,end:300,fc:300}},
   mr:{t:"Mitral regurgitation",where:"Apex, radiating to the axilla.",mech:"Holosystolic, plateau murmur from S1 to S2 as blood leaks back into the left atrium all through systole.",split:{exp:0,insp:25},mur:{type:"holo",start:15,end:320,fc:380}},
@@ -429,12 +430,12 @@ document.addEventListener("click",function(e){
 
 /* ── Figures and plates (sheet) ── */
 var PLATES={
-  jvp:{t:"Measuring the JVP",src:"/media/exam-cardiac/jvp-measurement.webp",alt:"Patient reclining at 45 degrees; a vertical ruler stands on the sternal angle and a horizontal line runs from the top of the internal jugular pulsation to the ruler; the right atrium lies about 5 cm below the sternal angle.",txt:"The right atrium sits about 5 cm below the sternal angle at any angle of recline, so the height you measure plus about 5 cm approximates right atrial pressure in centimetres of water."},
+  jvp:{t:"Measuring the JVP",src:"/media/exam-cardiac/jvp-measurement.webp",alt:"Patient reclining at 45 degrees; a vertical ruler stands on the sternal angle and a horizontal line runs from the top of the internal jugular pulsation to the ruler; the right atrium lies about 5 cm below the sternal angle.",txt:"The right atrium sits roughly 5 cm below the sternal angle (the distance varies with position and body habitus, often more when supine), so the height you measure plus about 5 cm approximates right atrial pressure in centimetres of water. Divide by 1.36 for mmHg."},
   ausc:{t:"Where to listen",src:"/media/exam-cardiac/auscultation-sites.webp",alt:"Anterior chest with the sternum, sternal angle and four auscultation sites: aortic at the 2nd right intercostal space by the sternum, pulmonic at the 2nd left, tricuspid at the left lower sternal border, mitral at the 5th intercostal space in the midclavicular line.",txt:"Find the sternal angle first: the 2nd rib attaches there and the 2nd intercostal space is just below it. Count down from there."}
 };
 function jvpWave(state){
   var W=320,H=150,base=110,pts;
-  var S={normal:[[0,0],[30,-38],[45,-30],[60,-34],[100,-8],[150,-42],[185,-6],[240,-14],[300,-2]],
+  var S={normal:[[0,0],[30,-48],[45,-36],[60,-38],[100,-3],[150,-32],[185,-10],[240,-14],[300,-2]],
     cannon:[[0,0],[25,-20],[40,-80],[60,-20],[100,-8],[150,-36],[185,-6],[240,-14],[300,-2]],
     cv:[[0,0],[30,-30],[50,-40],[80,-56],[130,-74],[160,-70],[190,-10],[240,-14],[300,-2]],
     steepy:[[0,0],[30,-40],[50,-36],[90,-14],[145,-46],[170,-2],[195,-36],[240,-38],[300,-36]],
@@ -452,7 +453,7 @@ var JVPST={normal:["Normal","a: atrial contraction. c: tricuspid bulging at syst
   tamp:["Blunted y descent","Tamponade: the heart cannot fill when the valve opens because the pericardium is full."],
   af:["No a wave","Atrial fibrillation: no organized atrial contraction."]};
 function figJVP(st){return '<div class="seg" role="group" aria-label="Waveform" style="margin-top:12px;flex-wrap:wrap;display:flex">'+Object.keys(JVPST).map(function(k){return '<button type="button" data-jvp="'+k+'" aria-pressed="'+(k===st)+'">'+esc(JVPST[k][0])+'</button>'}).join("")+'</div>'+jvpWave(st)+'<p class="figtext">'+esc(JVPST[st][1])+'</p><p class="note">Shapes are schematic, drawn for teaching. Source: standard physical diagnosis teaching (McGee 2025).</p>'}
-var MOVES=[["Breathe in","Raises right-sided return","r"],["Valsalva strain / squat to stand","Less preload","p"],["Squat / passive leg raise","More preload and afterload","s"],["Sustained handgrip","More afterload","h"]];
+var MOVES=[["Breathe in","Raises right-sided return","r"],["Valsalva strain / squat to stand","Less preload","p"],["Squat","More preload and afterload","s"],["Sustained handgrip","More afterload","h"]];
 var MCOLS=[["AS","as"],["HCM","hcm"],["MR","mr"],["AR","ar"],["Right","rt"]];
 var MDIR={r:{as:"0",hcm:"0",mr:"0",ar:"0",rt:"+"},p:{as:"-",hcm:"+",mr:"-",ar:"-",rt:"-"},s:{as:"+",hcm:"-",mr:"+",ar:"+",rt:"+"},h:{as:"-",hcm:"-",mr:"+",ar:"+",rt:"0"}};
 function figMoves(){var cw=50,rw=118,W=rw+cw*MCOLS.length+8,rh=46,H=30+rh*MOVES.length,g="";
@@ -462,8 +463,8 @@ function figMoves(){var cw=50,rw=118,W=rw+cw*MCOLS.length+8,rh=46,H=30+rh*MOVES.
       if(d==="+")g+='<path d="M'+cx+' '+(cy-10)+' L'+(cx+8)+' '+(cy+6)+' L'+(cx-8)+' '+(cy+6)+' Z" fill="var(--bad)"/>';
       else if(d==="-")g+='<path d="M'+cx+' '+(cy+10)+' L'+(cx+8)+' '+(cy-6)+' L'+(cx-8)+' '+(cy-6)+' Z" fill="var(--ok)"/>';
       else g+='<line x1="'+(cx-7)+'" y1="'+cy+'" x2="'+(cx+7)+'" y2="'+cy+'" stroke="var(--muted)" stroke-width="2"/>'})});
-  return '<svg class="fig" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Grid of how each manoeuvre changes each murmur">'+g+'</svg><p class="grid-legend">Red up: louder. Green down: softer. Line: little change. Right: right-sided murmurs such as tricuspid regurgitation. The Valsalva row also covers squat to stand.</p><p class="figtext">The one that breaks the pattern is HCM: anything that shrinks the ventricle (Valsalva, standing) narrows the outflow tract and makes it louder, while every other left-sided murmur gets softer. Handgrip separates regurgitant murmurs (louder) from outflow murmurs (softer).</p><p class="note">Directions follow from preload and afterload physiology (McGee 2025; Lembo et al., NEJM 1988). Their accuracy figures are not shown because they have not yet been verified against the primary study.</p>'}
-function figPulsus(){return '<svg class="fig" viewBox="0 0 320 130" role="img" aria-label="Arterial pressure falling with inspiration by more than 10 mmHg"><line x1="20" y1="30" x2="300" y2="30" stroke="var(--muted)" stroke-dasharray="4 4"/><line x1="20" y1="58" x2="300" y2="58" stroke="var(--muted)" stroke-dasharray="4 4"/><text x="300" y="24" text-anchor="end" style="font-family:var(--mono);font-size:10px" fill="var(--muted)">first sounds, expiration only</text><text x="300" y="74" text-anchor="end" style="font-family:var(--mono);font-size:10px" fill="var(--muted)">sounds in every beat</text>'+[0,1,2,3,4,5,6,7].map(function(i){var insp=i>=3&&i<=5,top=insp?52:30,x=34+i*34;return '<path d="M'+x+' 110 L'+(x+6)+' '+top+' L'+(x+16)+' '+(top+20)+' L'+(x+26)+' 110" fill="none" stroke="var(--hrt-art)" stroke-width="2.5" stroke-linejoin="round"/>'}).join("")+'<rect x="128" y="96" width="104" height="22" rx="6" fill="var(--fill)"/><text x="180" y="111" text-anchor="middle" style="font-family:var(--mono);font-size:10px" fill="var(--ink)">inspiration</text></svg><p class="figtext">Inflate the cuff above systolic, then deflate slowly. Note the pressure where you first hear sounds only in expiration, then where you hear them in every beat. The difference is the pulsus paradoxus. Over 10 mmHg in a patient with a known effusion raises the likelihood of tamponade.</p>'}
+  return '<svg class="fig" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Grid of how each manoeuvre changes each murmur">'+g+'</svg><p class="grid-legend">Red up: louder. Green down: softer. Line: little change. Right: right-sided murmurs such as tricuspid regurgitation. The Valsalva row also covers squat to stand.</p><p class="figtext">The one that breaks the pattern is HCM: anything that shrinks the ventricle (Valsalva, standing) narrows the outflow tract and makes it louder, while every other left-sided murmur gets softer. Handgrip separates regurgitant murmurs (louder) from outflow murmurs (softer). Mitral valve prolapse is the exception in the MR column: less filling moves the click earlier and makes the murmur longer, often louder.</p><p class="note">Directions follow from preload and afterload physiology (McGee 2025; Lembo et al., NEJM 1988). Their accuracy figures are not shown because they have not yet been verified against the primary study.</p>'}
+function figPulsus(){return '<svg class="fig" viewBox="0 0 320 130" role="img" aria-label="Arterial pressure falling with inspiration by more than 10 mmHg"><line x1="20" y1="30" x2="300" y2="30" stroke="var(--muted)" stroke-dasharray="4 4"/><line x1="20" y1="58" x2="300" y2="58" stroke="var(--muted)" stroke-dasharray="4 4"/><text x="300" y="24" text-anchor="end" style="font-family:var(--mono);font-size:10px" fill="var(--muted)">first sounds, expiration only</text><text x="300" y="74" text-anchor="end" style="font-family:var(--mono);font-size:10px" fill="var(--muted)">sounds in every beat</text>'+[0,1,2,3,4,5,6,7].map(function(i){var insp=i>=3&&i<=5,top=insp?52:30,x=34+i*34;return '<path d="M'+x+' 110 L'+(x+6)+' '+top+' L'+(x+16)+' '+(top+20)+' L'+(x+26)+' 110" fill="none" stroke="var(--hrt-art)" stroke-width="2.5" stroke-linejoin="round"/>'}).join("")+'<rect x="128" y="96" width="104" height="22" rx="6" fill="var(--fill)"/><text x="180" y="111" text-anchor="middle" style="font-family:var(--mono);font-size:10px" fill="var(--ink)">inspiration</text></svg><p class="figtext">Inflate the cuff above systolic, then deflate slowly. Note the pressure where you first hear sounds only in expiration, then where you hear them in every beat. The difference is the pulsus paradoxus. Over 10 mmHg in a patient with a known effusion raises the likelihood of tamponade. It can be absent despite tamponade with aortic regurgitation, an atrial septal defect, severe left ventricular dysfunction or positive-pressure ventilation.</p>'}
 var lastFocus=null,sheetKey=null;
 function openSheet(html){lastFocus=document.activeElement;$("#sheet").innerHTML=html;$("#sheetwrap").hidden=false;var x=$("#sheet .x");if(x)x.focus()}
 function closeSheet(){$("#sheetwrap").hidden=true;$("#sheet").innerHTML="";sheetKey=null;if(playing)stop();if(lastFocus&&lastFocus.focus)lastFocus.focus()}
@@ -483,17 +484,18 @@ document.addEventListener("keydown",function(e){if(e.key==="Escape"&&!$("#sheetw
 /* ── Practice ── */
 var CASES=[
  {q:"hf",pre:50,st:{s3:1},t:"A 68-year-old comes to the ED short of breath. You put her on her left side and hear an S3 at the apex.",ask:"Starting from 50%, roughly what is the probability of heart failure now?"},
- {q:"vol",pre:50,st:{jvd:1,edema:1},t:"A 74-year-old with dyspnea. The JVP is 6 cm above the sternal angle and there is pitting edema to the shins.",ask:"Starting from 50%, roughly what is the probability of volume overload, if you combine both findings?"},
- {q:"tamp",pre:40,st:{pulsus:-1},t:"A man with a known moderate effusion after a viral illness is tachycardic. Your manual pulsus is 7 mmHg.",ask:"Starting from 40%, roughly what is the probability of tamponade?"},
+ {q:"vol",pre:50,st:{jvd:1,edema:1},warn:"Two findings multiplied as if independent. JVD and edema both reflect venous pressure, so the true figure is likely lower.",t:"A 74-year-old with dyspnea. The JVP is 6 cm above the sternal angle and there is pitting edema to the shins.",ask:"Starting from 50%, roughly what is the probability of volume overload, if you combine both findings?"},
+ {q:"tamp",pre:40,st:{pulsus:-1},warn:"This LR comes from one study and its 95% interval runs 0.01–0.24, so the answer could lie anywhere from under 1% to about 14%. Still not zero: see the false negatives under How to measure.",t:"A man with a known moderate effusion after a viral illness is tachycardic. Your manual pulsus is 7 mmHg.",ask:"Starting from 40%, roughly what is the probability of tamponade?"},
  {q:"ar",pre:20,st:{edm:1},t:"A 52-year-old with a wide pulse pressure. Sitting forward with breath held out, you hear a soft decrescendo murmur right after S2 along the left sternal border.",ask:"Starting from 20%, roughly what is the probability of aortic regurgitation?"},
- {q:"sync",pre:20,st:{age35:-1,cold:1},t:"A 24-year-old fainted for the first time while standing in a hot line. She felt cold and clammy just before.",ask:"Starting from 20%, roughly what is the probability of cardiac syncope?"},
- {q:"hf",pre:50,st:{crackles:-1,hxhf:-1},t:"A 60-year-old in the ED with dyspnea. No history of heart failure, and the lung bases are clear.",ask:"Starting from 50%, roughly what is the probability of heart failure now?"}
+ {q:"sync",pre:20,st:{age35:-1,cold:1},warn:"Both findings are from single studies and are multiplied as if independent; treat the result as very low rather than a precise figure.",t:"A 24-year-old fainted for the first time while standing in a hot line. She felt cold and clammy just before.",ask:"Starting from 20%, roughly what is the probability of cardiac syncope?"},
+ {q:"hf",pre:50,st:{crackles:-1,hxhf:-1},warn:"Two findings multiplied as if independent. Neither is strong alone; a low BNP is the usual next step to rule out heart failure.",t:"A 60-year-old in the ED with dyspnea. No history of heart failure, and the lung bases are clear.",ask:"Starting from 50%, roughly what is the probability of heart failure now?"}
 ];
 var ci=0,answered=false;
+function disp(v){return v<1?"<1":v>99?">99":String(v)}
 function choices(p){var r=Math.round(p);var cands=[r,Math.round(Math.max(1,Math.min(99,r*0.5))),Math.round(Math.min(99,r+(100-r)*0.5)),Math.round(Math.max(1,r-30)),Math.round(Math.min(99,r+30)),50];var out=[];cands.forEach(function(v){if(out.every(function(o){return Math.abs(o-v)>=8}))out.push(v)});out=out.slice(0,4);return out.sort(function(a,b){return a-b})}
 function renderCase(){var c=CASES[ci],r=compute(c.q,c.pre,c.st),p=r.p,opts=choices(p),right=Math.round(p);answered=false;
   var parts=r.parts.map(function(x){return esc(F[x.f].nm)+(x.v===1?" present":" absent")+" ×"+x.l}).join(", ");
-  $("#case").innerHTML='<span class="kicker">Case '+(ci+1)+' of '+CASES.length+' · '+esc(Q[c.q].t)+'</span><p>'+esc(c.t)+'</p><p><b>'+esc(c.ask)+'</b></p><div class="opts">'+opts.map(function(o){return '<button type="button" class="opt" data-o="'+o+'">'+(o<1?"<1":o)+'%</button>'}).join("")+'</div><div id="caseexp" hidden><p class="why"><b>Why:</b> '+fmt(c.pre)+'% start × '+parts+' → '+fmt(p)+'%. '+esc(F[r.parts[0].f].mech)+'</p>'+(r.parts.length>1?'<div class="warnbox">Two findings multiplied as if independent. JVD and edema both reflect venous pressure, so the true figure is likely lower.</div>':'')+'</div><div class="casenav"><button type="button" class="btn" id="prevc"'+(ci===0?" disabled":"")+'>← Previous</button><button type="button" class="btn" id="tryc">Try it in Narrow</button><button type="button" class="btn" id="nextc"'+(ci===CASES.length-1?" disabled":"")+'>Next →</button></div>';
+  $("#case").innerHTML='<span class="kicker">Case '+(ci+1)+' of '+CASES.length+' · '+esc(Q[c.q].t)+'</span><p>'+esc(c.t)+'</p><p><b>'+esc(c.ask)+'</b></p><div class="opts">'+opts.map(function(o){return '<button type="button" class="opt" data-o="'+o+'">'+disp(o)+'%</button>'}).join("")+'</div><div id="caseexp" hidden><p class="why"><b>Why:</b> '+c.pre+'% start × '+parts+' → '+disp(right)+'%. '+esc(F[r.parts[0].f].mech)+'</p>'+(c.warn?'<div class="warnbox">'+esc(c.warn)+'</div>':'')+'</div><div class="casenav"><button type="button" class="btn" id="prevc"'+(ci===0?" disabled":"")+'>← Previous</button><button type="button" class="btn" id="tryc">Try it in Narrow</button><button type="button" class="btn" id="nextc"'+(ci===CASES.length-1?" disabled":"")+'>Next →</button></div>';
   $$("#case .opt").forEach(function(b){b.addEventListener("click",function(){if(answered)return;answered=true;var v=+b.getAttribute("data-o");$$("#case .opt").forEach(function(x){var xv=+x.getAttribute("data-o");if(xv===right)x.classList.add("right");else if(x===b)x.classList.add("wrong")});$("#caseexp").hidden=false})});
   $("#prevc").addEventListener("click",function(){ci--;renderCase()});$("#nextc").addEventListener("click",function(){ci++;renderCase()});
   $("#tryc").addEventListener("click",function(){qk=c.q;pre[qk]=c.pre;state={};Object.keys(c.st).forEach(function(k){state[k]=c.st[k]});renderQ();show("narrow")});
