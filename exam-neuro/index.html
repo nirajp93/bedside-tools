@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Neuro Exam · bedside.tools</title>
+<meta name="description" content="Neurologic exam: which findings change the answer, a localization engine, the focused stroke exam with NIHSS scoring, and practice cases.">
+<script src="/theme.js"></script>
+<style>
+
+/* Colours: shared site names only. Dark values and extras (--fill --ok --bad --scrim --hrt-*) live in /theme.js. */
+:root{--bg:#FBFBFA; --card:#FFFFFF; --ink:#111113; --muted:#55555D; --line:#ECECEE; --accent:#2B4BDB; --warn:#9A3B00; --warnbg:#FFF6EC}
+:root{--r:14px}
+*{box-sizing:border-box;margin:0;padding:0}
+[hidden]{display:none!important}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.45;padding-bottom:calc(76px + env(safe-area-inset-bottom))}
+a{color:var(--accent);text-decoration:none}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;-webkit-tap-highlight-color:transparent}
+button:focus-visible,a:focus-visible,[tabindex]:focus-visible,summary:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+h1,h2,h3{font-weight:600;letter-spacing:-.01em;line-height:1.15;text-wrap:balance}
+h1{font-size:26px} h2{font-size:21px} h3{font-size:18px}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.kicker{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.muted{color:var(--muted)}
+.wrap{max-width:720px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+
+header{border-bottom:1px solid var(--line)}
+header .wrap{padding-block:8px 14px}
+.back{font-size:14px;color:var(--accent);display:inline-flex;align-items:center;min-height:44px}
+header p{font-size:15px;color:var(--muted);margin-top:4px}
+
+nav.tabs{position:fixed;left:0;right:0;bottom:0;background:var(--bg);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom);z-index:20}
+nav.tabs .wrap{display:flex;padding-block:0}
+nav.tabs button{flex:1;min-height:56px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:var(--muted);font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;border-top:2px solid transparent}
+nav.tabs button[aria-selected=true]{color:var(--accent);border-top-color:var(--accent)}
+section.view{display:none;padding-block:16px 28px}
+section.view.on{display:block}
+.lede{font-size:15px;color:var(--muted);margin-top:4px}
+
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px;margin-top:12px}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--accent);font-size:14px;font-weight:500;text-align:left}
+.chip[aria-pressed=true]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.qchips .chip{color:var(--ink)}
+.qchips .chip[aria-pressed=true]{color:var(--accent-ink)}
+
+/* pre-test */
+.pre{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;margin-top:12px}
+.pre label{font-size:14px}
+.pre input[type=range]{width:100%;height:44px;accent-color:var(--accent);grid-column:1/-1}
+.pre .v{font-family:var(--mono);font-size:15px}
+
+/* result card */
+.result .big{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+.result .big b{font-size:16px;font-weight:600}
+.result .pct{font-family:var(--mono);font-size:30px;line-height:1;font-variant-numeric:tabular-nums}
+.meter{position:relative;height:10px;border-radius:5px;background:var(--fill);margin-top:10px;overflow:hidden}
+.meter i{position:absolute;left:0;top:0;bottom:0;background:var(--accent);border-radius:5px;transition:width .25s}
+.meter s{position:absolute;top:-2px;bottom:-2px;width:2px;background:var(--ink);text-decoration:none}
+.scale{display:flex;justify-content:space-between;font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:4px}
+.why{font-size:15px;margin-top:10px}
+.why b{font-weight:600}
+details.more{margin-top:8px;border-top:1px dashed var(--line);padding-top:2px}
+details.more summary{min-height:44px;display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);cursor:pointer;list-style:none}
+details.more summary::-webkit-details-marker{display:none}
+details.more summary::before{content:"";width:7px;height:7px;border-right:1.5px solid var(--accent);border-bottom:1.5px solid var(--accent);transform:rotate(-45deg);transition:transform .15s}
+details.more[open] summary::before{transform:rotate(45deg)}
+details.more p,details.more li{font-size:14px;margin-bottom:6px}
+details.more ul{padding-left:18px}
+.warnbox{background:var(--warnbg);color:var(--warn);border-radius:10px;padding:10px 12px;font-size:14px;margin-top:10px}
+
+/* findings */
+.frow{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:12px 0;border-top:1px solid var(--line)}
+.frow:first-child{border-top:0}
+.frow .nm{font-size:15px;font-weight:500}
+.frow .sub{margin-top:4px;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.frow .hint{font-size:13px;color:var(--muted);margin-top:4px}
+.lr{font-family:var(--mono);font-size:12px;padding:2px 7px;border-radius:6px;background:var(--fill);white-space:nowrap}
+.lr.up{color:var(--bad);background:var(--badbg)}
+.lr.down{color:var(--ok);background:var(--okbg)}
+.tag{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:2px 6px;border-radius:5px;background:var(--fill);color:var(--muted)}
+.tri{display:inline-grid;grid-auto-flow:column;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--card)}
+.tri button{min-width:46px;min-height:44px;font-size:13px;color:var(--muted);border-left:1px solid var(--line)}
+.tri button:first-child{border-left:0}
+.tri button:disabled{opacity:.35;cursor:not-allowed}
+.tri button[aria-pressed=true][data-v="1"]{background:var(--badbg);color:var(--bad);font-weight:600}
+.tri button[aria-pressed=true][data-v="1"][data-low]{background:var(--okbg);color:var(--ok)}
+.tri button[aria-pressed=true][data-v="-1"]{background:var(--okbg);color:var(--ok);font-weight:600}
+.tri button[aria-pressed=true][data-v="0"]{color:var(--ink);font-weight:600}
+.minis{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.mini{min-height:44px;padding:0 12px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--accent);font-size:13px;font-weight:500}
+.grouplab{margin-top:14px}
+
+/* exam steps */
+.step{display:grid;grid-template-columns:32px 1fr;gap:12px;padding:14px 0;border-top:1px solid var(--line)}
+.step:first-child{border-top:0}
+.step .num{font-family:var(--mono);font-size:24px;line-height:1;color:var(--accent)}
+.step b.t{display:block;font-size:17px;font-weight:600}
+.step p{font-size:15px;margin-top:4px}
+.find{margin-top:10px;font-size:14px}
+.find li{list-style:none;padding:8px 0;border-top:1px dashed var(--line)}
+.find li:first-child{border-top:0}
+.find li b{font-weight:600}
+
+/* sounds */
+.snd{padding:14px 0;border-top:1px solid var(--line)}
+.snd:first-child{border-top:0}
+.snd .hd{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+.snd .hd b{font-size:16px;font-weight:600}
+.snd p{font-size:14px;margin-top:6px}
+.pcg{display:block;width:100%;height:auto;margin-top:8px}
+.ctrl{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:8px}
+.play{min-height:44px;padding:0 16px;border-radius:999px;background:var(--accent);color:var(--accent-ink);font-size:14px;font-weight:600;display:inline-flex;align-items:center;gap:8px}
+.play svg{width:12px;height:12px}
+.seg{display:inline-grid;grid-auto-flow:column;gap:2px;padding:3px;background:var(--fill);border-radius:10px}
+.seg button{min-height:40px;padding:0 12px;border-radius:8px;font-size:13px;color:var(--muted)}
+.seg button[aria-pressed=true]{background:var(--card);color:var(--ink);font-weight:600}
+.note{font-size:12px;color:var(--muted)}
+
+/* practice */
+.case p{font-size:15px;margin-top:6px}
+.opts{display:grid;gap:8px;margin-top:12px}
+.opt{min-height:48px;padding:10px 14px;border:1px solid var(--line);border-radius:12px;background:var(--card);text-align:left;font-size:15px}
+.opt.right{border-color:var(--ok);background:var(--okbg);color:var(--ok);font-weight:600}
+.opt.wrong{border-color:var(--bad);background:var(--badbg);color:var(--bad)}
+.casenav{display:flex;justify-content:space-between;align-items:center;margin-top:14px;gap:10px}
+.btn{min-height:44px;padding:0 16px;border:1px solid var(--line);border-radius:999px;background:var(--card);font-size:14px;font-weight:500}
+
+/* sheet */
+#sheetwrap{position:fixed;inset:0;background:var(--scrim);display:flex;align-items:flex-end;justify-content:center;z-index:40}
+#sheet{background:var(--bg);width:100%;max-width:760px;max-height:92vh;overflow:auto;border-radius:18px 18px 0 0;padding:14px max(16px,env(safe-area-inset-right,0px)) calc(18px + env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left,0px))}
+#sheet .top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+#sheet h3{font-size:19px;margin-top:2px}
+.x{flex:none;min-width:44px;min-height:44px;border-radius:999px;border:1px solid var(--line);background:var(--card);font-size:20px;line-height:1}
+.plate{margin-top:12px;border:1px solid var(--line);border-radius:12px;padding:6px;background:var(--card)}
+.plate img{display:block;width:100%;height:auto;border-radius:8px}
+.credit{font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:6px}
+.fig{display:block;width:100%;height:auto;margin-top:10px}
+.figtext{font-size:14px;margin-top:8px}
+.grid-legend{font-size:13px;color:var(--muted);margin-top:6px}
+
+footer{max-width:720px;margin:20px auto 0;padding:16px max(16px,env(safe-area-inset-right,0px)) 8px max(16px,env(safe-area-inset-left,0px));border-top:1px solid var(--line);font-size:13px;color:var(--muted)}
+footer p{margin-top:8px}
+@media (prefers-reduced-motion:reduce){.meter i{transition:none}details.more summary::before{transition:none}}
+@media (min-width:1000px){
+  .duo{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;align-items:start}
+  .duo>.card{margin-top:12px}
+  .stick{position:sticky;top:12px}
+}
+
+/* neuro additions */
+nav.tabs button{font-size:10px;letter-spacing:.06em}
+.prog{height:6px;border-radius:3px;background:var(--fill);overflow:hidden;margin-top:8px}
+.prog i{display:block;height:100%;background:var(--accent)}
+.q{font-size:17px;font-weight:600;margin-top:4px}
+.stack{display:grid;gap:8px;margin-top:10px}
+.stack button{min-height:48px;padding:10px 14px;border:1px solid var(--line);border-radius:12px;background:var(--card);text-align:left;font-size:15px}
+.lvls{list-style:none;margin-top:8px}
+.lvls li{display:flex;justify-content:space-between;gap:10px;padding:9px 0;border-top:1px solid var(--line);font-size:15px}
+.lvls li:first-child{border-top:0}
+.lvls li.out{opacity:.4}
+.lvls li.out span:first-child{text-decoration:line-through}
+.lvls li.hit{font-weight:600;color:var(--accent)}
+.answers{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.answers .tag{text-transform:none;letter-spacing:0;font-size:12px}
+.ax{display:block;width:100%;height:auto;max-width:360px;margin:6px auto 0}
+.tot{position:sticky;top:max(8px,env(safe-area-inset-top,0px));z-index:5;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:12px}
+.tot .n{font-family:var(--mono);font-size:30px;line-height:1;font-variant-numeric:tabular-nums}
+.grpname{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-top:16px}
+.grpname:first-child{margin-top:0}
+.ni{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
+.ni .nm{font-size:15px;font-weight:500}
+.ni .cur{font-size:13px;color:var(--muted);margin-top:2px}
+.sc{display:flex;gap:4px}
+.sc button{min-width:40px;min-height:44px;border:1px solid var(--line);border-radius:10px;background:var(--card);font-family:var(--mono);font-size:15px}
+.sc button[aria-pressed=true]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:600}
+.terr{padding:12px 0;border-top:1px solid var(--line)}
+.terr:first-child{border-top:0}
+.terr b{font-size:16px;font-weight:600}
+.terr p{font-size:14px;margin-top:4px}
+.fields{display:flex;gap:18px;justify-content:center;margin-top:8px}
+@media (max-width:380px){.sc button{min-width:36px}}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <a class="back" href="/">← bedside.tools</a>
+  <h1>Neuro exam</h1>
+  <p>What each finding does to the differential, where the lesion is, and the focused stroke exam.</p>
+</div></header>
+
+<main class="wrap">
+<section class="view on" id="narrow" aria-labelledby="t-narrow">
+  <span class="kicker">Narrow the differential</span>
+  <p class="lede">Pick the question, set your starting estimate, then mark what you find.</p>
+  <div class="card" id="question">
+    <span class="kicker">The question</span>
+    <div class="chips qchips" id="qchips" style="margin-top:10px"></div>
+    <div class="pre"><label for="pre">Your probability before the exam</label><span class="v" id="prev"></span>
+      <input type="range" id="pre" min="1" max="99" step="1" aria-describedby="prenote"></div>
+    <p class="note" id="prenote"></p>
+  </div>
+  <div class="duo">
+    <div class="card result stick" id="result" aria-live="polite"></div>
+    <div class="card" id="findings"><span class="kicker">Examine for</span><div id="frows"></div><div id="qnote"></div></div>
+  </div>
+</section>
+
+<section class="view" id="exam" aria-labelledby="t-exam">
+  <span class="kicker">The exam, in order</span>
+  <p class="lede">A screening exam takes about five minutes: the first line of each step. The rest is the full exam. Tap a figure to see it large.</p>
+  <div class="card" id="steps"></div>
+</section>
+
+<section class="view" id="localize" aria-labelledby="t-localize">
+  <span class="kicker">Localize</span>
+  <p class="lede">Four questions, in the order a neurologist asks them. Levels that no longer fit drop out.</p>
+  <div class="card" id="lq"></div>
+  <div class="card" id="llv"></div>
+</section>
+
+<section class="view" id="stroke" aria-labelledby="t-stroke">
+  <span class="kicker">Focused stroke exam</span>
+  <p class="lede">Score the NIH Stroke Scale by what you are doing: look, talk, move, feel. Treatment decisions (thrombolysis, thrombectomy) belong to the stroke team; a Neuro emergencies tool covering them is in progress.</p>
+  <div class="tot" id="nitot"></div>
+  <div class="card" id="nihss"></div>
+  <div class="card" id="niint" aria-live="polite"></div>
+  <div class="card" id="territories"><span class="kicker">Which territory?</span><div id="terr"></div></div>
+  <div class="card" id="posterior"><span class="kicker">Posterior circulation: easy to miss</span>
+    <ul class="find" style="margin-top:8px">
+      <li><b>Dizziness with nystagmus and unsteadiness (acute vestibular syndrome)</b><br><span class="muted">Do HINTS. Any central sign makes stroke likely; see Narrow.</span> <button type="button" class="mini" data-fig="hit" style="margin-top:6px">Head impulse test</button></li>
+      <li><b>Can he walk?</b><br><span class="muted">Truncal ataxia is not scored on the NIHSS. A patient who cannot sit or stand unaided with a near-normal NIHSS may have a cerebellar stroke.</span></li>
+      <li><b>A low NIHSS does not exclude stroke</b><br><span class="muted">The scale weights anterior-circulation deficits (language, neglect, limb weakness); posterior strokes can score 0–2 and still be disabling.</span></li>
+    </ul>
+  </div>
+</section>
+
+<section class="view" id="practice" aria-labelledby="t-practice">
+  <span class="kicker">Practice</span>
+  <p class="lede">Eight cases: localize the lesion, move the probability, score the NIHSS.</p>
+  <div class="card case" id="case"></div>
+</section>
+</main>
+
+<nav class="tabs" role="tablist" aria-label="Sections"><div class="wrap">
+  <button type="button" role="tab" id="t-narrow" aria-controls="narrow" aria-selected="true">Narrow</button>
+  <button type="button" role="tab" id="t-exam" aria-controls="exam" aria-selected="false">Exam</button>
+  <button type="button" role="tab" id="t-localize" aria-controls="localize" aria-selected="false">Localize</button>
+  <button type="button" role="tab" id="t-stroke" aria-controls="stroke" aria-selected="false">Stroke</button>
+  <button type="button" role="tab" id="t-practice" aria-controls="practice" aria-selected="false">Practice</button>
+</div></nav>
+
+<div id="sheetwrap" hidden><div id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheettitle"></div></div>
+
+<footer>
+  <p>For education only. Not a substitute for clinical judgment.</p>
+  <p>Last reviewed: 14 November 2026.</p>
+  <p>Sources for likelihood ratios: Goldstein LB, Simel DL. Is this patient having a stroke? JAMA 2005;293:2391-402, doi:10.1001/jama.293.19.2391. Kattah JC et al. HINTS to diagnose stroke in the acute vestibular syndrome. Stroke 2009;40:3504-10, doi:10.1161/STROKEAHA.109.551234 (single study; likelihood ratios calculated from its sensitivity and specificity). Attia J et al. Does this adult patient have acute meningitis? JAMA 1999;282:175-81, doi:10.1001/jama.282.2.175. Thomas KE et al. The diagnostic accuracy of Kernig's sign, Brudzinski's sign, and nuchal rigidity in adults with suspected meningitis. Clin Infect Dis 2002;35:46-52, doi:10.1086/340979. Kanji JN et al. Does this patient with diabetes have large-fiber peripheral neuropathy? JAMA 2010;303:1526-32, doi:10.1001/jama.2010.428. Rao G et al. Does this patient have Parkinson disease? JAMA 2003;289:347-53, doi:10.1001/jama.289.3.347. D'Arcy CA, McGee S. Does this patient have carpal tunnel syndrome? JAMA 2000;283:3110-7, doi:10.1001/jama.283.23.3110. Wong CL et al. Does this patient have delirium? JAMA 2010;304:779-86, doi:10.1001/jama.2010.1182. Evidence tier for likelihood ratios: systematic reviews of diagnostic accuracy studies, except HINTS (one prospective study).</p>
+  <p>NIH Stroke Scale items and scoring: National Institute of Neurological Disorders and Stroke, NIH Stroke Scale. Localization rules, reflex roots, field defects, cord syndromes and territory syndromes: standard neurologic examination teaching (expert practice). Combining likelihood ratios multiplies them, which assumes the findings are independent. Pre-test probabilities are yours to set; starting values are examples or the source's stated prevalence. Babinski plate created with BioRender.com.</p>
+  <p>Privacy: everything runs in your browser. Nothing you enter is sent anywhere or stored, and there are no analytics. Do not enter names, record numbers, or dates of birth.</p>
+</footer>
+
+<script>
+(function(){
+"use strict";
+var $=function(s,r){return (r||document).querySelector(s)},$$=function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))};
+function esc(s){return String(s).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
+
+/* ── Findings with verified likelihood ratios ── */
+var SRC={gold:"Goldstein and Simel, JAMA 2005 (systematic review)",kat:"Kattah et al., Stroke 2009 (one prospective study, n = 101, trained examiners, patients with at least one vascular risk factor)",attia:"Attia et al., JAMA 1999 (systematic review)",thomas:"Thomas et al., Clin Infect Dis 2002 (one prospective study, n = 297)",kanji:"Kanji et al., JAMA 2010 (systematic review)",rao:"Rao et al., JAMA 2003 (systematic review; selection bias in all included studies)",darcy:"D'Arcy and McGee, JAMA 2000 (systematic review; nerve conduction as reference)",wong:"Wong et al., JAMA 2010 (systematic review)"};
+var F={
+ triad:{nm:"Acute facial paresis, arm drift or abnormal speech (any one)",kind:"exam",step:"motor",fig:"drift",ev:[{dx:"stroke",lrp:5.5,lrn:0.39,ci:"3.3–9.1 / 0.25–0.61",src:"gold",note:"No means all three are absent."}],mech:"Each tests a long tract that most anterior-circulation strokes cut: corticobulbar to the lower face, corticospinal to the arm, and the language network."},
+ hints:{nm:"Any central HINTS sign: normal head impulse, direction-changing nystagmus, or skew",kind:"exam",step:"cn",fig:"hit",ev:[{dx:"avs",lrp:25,lrn:0.01,calc:true,src:"kat",note:"Calculated from sensitivity 100% and specificity 96%; LR for absence shown as 0.01 because a true 0 cannot be multiplied. No means all three signs are peripheral."}],mech:"A normal head impulse in a patient with constant vertigo means the vestibular nerve works, so the lesion is central; direction-changing nystagmus and skew point to the brainstem or cerebellum."},
+ jolt:{nm:"Jolt accentuation of headache",kind:"exam",step:"mening",ev:[{dx:"men",lrp:2.2,lrn:0.01,ci:"sensitivity 100%, specificity 54%",src:"attia",note:"Patients with fever and headache. Source LR for absence is 0; shown as 0.01. Turn the head side to side 2–3 times per second; worse headache is positive."}],mech:"Inflamed meninges are stretched by rapid head movement."},
+ kernig:{nm:"Kernig sign",kind:"exam",step:"mening",ev:[{dx:"men",lrp:0.97,lrn:null,src:"thomas",note:"Sensitivity 5%. A classic sign that does not help: its presence barely changes the probability."}],mech:"Extending the knee with the hip flexed stretches inflamed lumbosacral roots."},
+ neck:{nm:"Nuchal rigidity",kind:"exam",step:"mening",ev:[{dx:"men",lrp:0.94,lrn:null,src:"thomas",note:"Sensitivity 30% in this study. Does not discriminate on its own."}],mech:"Reflex spasm of neck extensors protecting inflamed meninges."},
+ vib:{nm:"Abnormal vibration sense, 128-Hz tuning fork at the great toe",kind:"exam",step:"sens",ev:[{dx:"dpn",lrp:16,lrn:0.51,range:"LR+ 16–35; LR− 0.33–0.51",src:"kanji",note:"Lower LR+ and higher LR− used."}],mech:"Large myelinated fibres are the longest and fail first at the toes."},
+ mono:{nm:"Abnormal 5.07 (10 g) monofilament",kind:"exam",step:"sens",ev:[{dx:"dpn",lrp:11,lrn:0.54,range:"LR+ 11–16; LR− 0.09–0.54",src:"kanji",note:"Lower LR+ and higher LR− used."}],mech:"Loss of protective pressure sensation, the threshold that predicts ulceration."},
+ glab:{nm:"Glabellar tap: blinking does not stop",kind:"exam",step:"motor",ev:[{dx:"pd",lrp:4.5,lrn:0.13,src:"rao",note:"Tap between the eyebrows about once a second; normal people stop blinking after a few taps."}],mech:"Loss of normal habituation of the blink reflex in basal ganglia disease."},
+ tandem:{nm:"Difficulty walking heel to toe",kind:"exam",step:"gait",ev:[{dx:"pd",lrp:2.9,lrn:0.32,src:"rao",note:""}],mech:"Impaired postural reflexes and balance."},
+ tremor:{nm:"Tremor on exam",kind:"exam",step:"motor",ev:[{dx:"pd",lrp:1.3,lrn:0.61,range:"LR+ 1.3–1.5; LR− 0.47–0.61",src:"rao",note:"Tremor alone barely helps; essential tremor and drug-induced tremor are common mimics."}],mech:"Rest tremor reflects basal ganglia dysfunction, but many tremors are not Parkinson's."},
+ rigbrady:{nm:"Symptoms of both rigidity and slowness",kind:"history",ev:[{dx:"pd",lrp:4.5,lrn:0.12,src:"rao",note:""}],mech:"Bradykinesia with rigidity is the core of parkinsonism."},
+ hypalg:{nm:"Reduced pinprick in the median-nerve territory",kind:"exam",step:"sens",ev:[{dx:"cts",lrp:3.1,lrn:null,ci:"2.0–5.1",src:"darcy",note:"Thumb, index, middle and radial half of the ring finger."}],mech:"Compressed median-nerve sensory fibres distal to the wrist."},
+ katz:{nm:"Hand diagram classic or probable for carpal tunnel",kind:"history",ev:[{dx:"cts",lrp:2.4,lrn:0.2,ci:"1.6–3.5 / 0.0–0.7",src:"darcy",note:"No means the diagram is 'unlikely'."}],mech:"Symptoms drawn in at least two of the first three digits, sparing the palm."},
+ abd:{nm:"Weak thumb abduction",kind:"exam",step:"motor",ev:[{dx:"cts",lrp:1.8,lrn:0.5,ci:"1.4–2.3 / 0.4–0.7",src:"darcy",note:"Resist the thumb lifting straight up from the palm."}],mech:"Abductor pollicis brevis is supplied by the recurrent branch of the median nerve."},
+ cam:{nm:"CAM positive",kind:"exam",step:"mental",ev:[{dx:"del",lrp:9.6,lrn:0.16,ci:"5.8–16.0 / 0.09–0.29",src:"wong",note:"Acute onset or fluctuating course, and inattention, plus either disorganized thinking or altered level of consciousness."}],mech:"Inattention is the core of delirium; the CAM forces you to test it."},
+ mmse:{nm:"MMSE under 24",kind:"exam",step:"mental",ev:[{dx:"del",lrp:1.6,lrn:null,ci:"1.2–2.0",src:"wong",note:"The least useful instrument for delirium; it measures cognition, not attention."}],mech:"Low scores occur with dementia, low education and language barriers, not just delirium."}
+};
+var Q={
+ stroke:{t:"Neuro symptoms: stroke?",dx:"Stroke or TIA",pre:10,prenote:"Start 10%: the prior probability the source gives for patients with neurologically relevant symptoms.",f:["triad"],ctx:"Patients with symptoms prompting consideration of stroke, with final diagnosis after neuroimaging."},
+ avs:{t:"Constant vertigo: central cause?",dx:"Stroke (central) in acute vestibular syndrome",pre:25,prenote:"Example start 25%. The source enrolled a high-risk sample in which most were central; in an ED population it is far lower.",f:["hints"],ctx:"Acute vestibular syndrome (continuous vertigo, nystagmus, nausea, head-motion intolerance, unsteady gait) and at least one stroke risk factor."},
+ men:{t:"Fever and headache: meningitis?",dx:"Meningitis",pre:20,prenote:"Example start 20%.",f:["jolt","kernig","neck"],ctx:"Adults evaluated for suspected meningitis.",note:"If fever, neck stiffness and altered mental status are all absent, meningitis is very unlikely: in the source review 99–100% of patients had at least one."},
+ dpn:{t:"Diabetes: large-fiber neuropathy?",dx:"Large-fiber peripheral neuropathy",pre:50,prenote:"Example start 50%. Prevalence ranged 23–79% across the source studies.",f:["vib","mono"],ctx:"Adults with diabetes, nerve conduction as the reference."},
+ pd:{t:"Slowness or tremor: Parkinson disease?",dx:"Parkinson disease",pre:30,prenote:"Example start 30%.",f:["glab","tandem","tremor","rigbrady"],ctx:"Patients with one or more typical features of Parkinson disease."},
+ cts:{t:"Hand numbness: carpal tunnel?",dx:"Carpal tunnel syndrome (on nerve conduction)",pre:50,prenote:"Example start 50%.",f:["hypalg","abd","katz"],ctx:"Patients presenting with hand dysesthesias.",note:"Phalen and Tinel signs, thenar atrophy and nocturnal paresthesias have little or no diagnostic value and are not used here."},
+ del:{t:"Confused in hospital: delirium?",dx:"Delirium",pre:30,prenote:"Example start 30%.",f:["cam","mmse"],ctx:"Hospitalized adults, DSM diagnosis by a geriatrician, psychiatrist or neurologist as reference."}
+};
+var QORDER=["stroke","avs","men","dpn","pd","cts","del"];
+function evFor(f,dx){return F[f].ev.filter(function(e){return e.dx===dx})[0]||null}
+function lrOf(f,v,dx){var e=evFor(f,dx);if(!e)return null;return v===1?e.lrp:v===-1?e.lrn:null}
+function post(p0,lrs){var o=p0/100/(1-p0/100);lrs.forEach(function(l){o*=l});return 100*o/(1+o)}
+function fmt(p){return p<1?"<1":p>99?">99":String(Math.round(p))}
+function badges(f,dx){var e=evFor(f,dx);if(!e)return "";var h="";if(e.lrp!=null)h+='<span class="lr '+(e.lrp>=1.05?"up":e.lrp<=0.95?"down":"")+'">'+(e.lrp>=1?"LR+ ":"LR ")+e.lrp+'</span>';if(e.lrn!=null)h+='<span class="lr down">LR− '+(e.lrn===0.01?"≈0":e.lrn)+'</span>';if(e.calc)h+='<span class="tag">calculated</span>';if(F[f].kind==="history")h+='<span class="tag">history</span>';return h}
+function compute(qk,p0,st){var lrs=[],parts=[];Q[qk].f.forEach(function(f){var v=st[f];if(!v)return;var l=lrOf(f,v,qk);if(l==null)return;lrs.push(l);parts.push({f:f,v:v,l:l})});return{p:post(p0,lrs),parts:parts}}
+function lrTxt(l){return l===0.01?"≈0":l}
+
+/* ── Narrow ── */
+var qk="stroke",state={},pre={};QORDER.forEach(function(k){pre[k]=Q[k].pre});
+function triHTML(f){var e=evFor(f,qk),noNeg=!e||e.lrn==null,noPos=!e||e.lrp==null;
+ return '<div class="tri" role="group" aria-label="'+esc(F[f].nm)+'" data-f="'+f+'"><button type="button" data-v="1"'+(e&&e.lrp!=null&&e.lrp<1?' data-low="1"':'')+' aria-pressed="'+(state[f]===1)+'"'+(noPos?' disabled title="No verified likelihood ratio for presence yet"':'')+'>Yes</button><button type="button" data-v="0" aria-pressed="'+(!state[f])+'" aria-label="Not checked">–</button><button type="button" data-v="-1" aria-pressed="'+(state[f]===-1)+'"'+(noNeg?' disabled title="No verified likelihood ratio for absence"':'')+'>No</button></div>'}
+function renderQ(){
+ $("#qchips").innerHTML=QORDER.map(function(k){return '<button type="button" class="chip" id="q-'+k+'" data-q="'+k+'" aria-pressed="'+(k===qk)+'">'+esc(Q[k].t)+'</button>'}).join("");
+ $("#pre").value=pre[qk];$("#prev").textContent=pre[qk]+"%";$("#prenote").textContent=Q[qk].prenote;
+ var q=Q[qk],ex=q.f.filter(function(f){return F[f].kind==="exam"}),hi=q.f.filter(function(f){return F[f].kind==="history"});
+ function row(f){var d=F[f],e=evFor(f,qk),m="";if(d.fig)m+='<button type="button" class="mini" data-fig="'+d.fig+'">'+(d.fig==="drift"?"How to test drift":"Head impulse test")+'</button>';if(d.plate)m+='<button type="button" class="mini" data-plate="'+d.plate+'">How to elicit</button>';
+  return '<div class="frow"><div><div class="nm">'+esc(d.nm)+'</div><div class="sub">'+badges(f,qk)+'</div>'+(e&&e.note?'<div class="hint">'+esc(e.note)+'</div>':'')+(m?'<div class="minis">'+m+'</div>':'')+'</div>'+triHTML(f)+'</div>'}
+ $("#frows").innerHTML=ex.map(row).join("")+(hi.length?'<div class="kicker grouplab">From the history</div>'+hi.map(row).join(""):"");
+ $("#qnote").innerHTML=q.note?'<div class="warnbox">'+esc(q.note)+'</div>':"";
+ renderResult()}
+function renderResult(){var q=Q[qk],r=compute(qk,pre[qk],state),p=r.p;
+ var h='<span class="kicker">Probability now</span><div class="big" style="margin-top:6px"><b>'+esc(q.dx)+'</b><span class="pct">'+fmt(p)+'%</span></div><div class="meter" role="img" aria-label="Probability '+fmt(p)+' percent, starting from '+pre[qk]+' percent"><i style="width:'+Math.max(1,Math.min(100,p))+'%"></i><s style="left:calc('+pre[qk]+'% - 1px)"></s></div><div class="scale"><span>0</span><span>start '+pre[qk]+'%</span><span>100</span></div>';
+ if(r.parts.length){var top=r.parts.slice().sort(function(a,b){return Math.abs(Math.log(b.l))-Math.abs(Math.log(a.l))})[0];
+  h+='<p class="why"><b>Why:</b> '+esc(F[top.f].nm)+(top.v===1?" present":" absent")+' (LR '+lrTxt(top.l)+') moves this the most. '+esc(F[top.f].mech)+'</p>';
+  if(r.parts.length>1)h+='<div class="warnbox">'+r.parts.length+' findings combined by multiplying their likelihood ratios. That assumes they are independent; related findings overstate the change.</div>';
+  h+='<details class="more"><summary>More</summary><ul>'+r.parts.map(function(x){var e=evFor(x.f,qk);return '<li>'+esc(F[x.f].nm)+(x.v===1?" present":" absent")+': LR '+lrTxt(x.l)+(e.ci?" ("+esc(e.ci)+")":"")+(e.range?" — "+esc(e.range):"")+'. '+esc(SRC[e.src])+'.</li>'}).join("")+'</ul><p>Setting: '+esc(q.ctx)+' Post-test odds = pre-test odds × each likelihood ratio.</p></details>'}
+ else h+='<p class="note" style="margin-top:10px">Mark a finding Yes or No to see the probability move. A dash means not examined.</p>';
+ $("#result").innerHTML=h}
+$("#qchips").addEventListener("click",function(e){var b=e.target.closest("[data-q]");if(!b)return;qk=b.getAttribute("data-q");state={};renderQ()});
+$("#pre").addEventListener("input",function(){pre[qk]=+this.value;$("#prev").textContent=pre[qk]+"%";renderResult()});
+$("#frows").addEventListener("click",function(e){var b=e.target.closest(".tri button");if(!b||b.disabled)return;var t=b.parentNode,f=t.getAttribute("data-f"),v=+b.getAttribute("data-v");$$("button",t).forEach(function(x){x.setAttribute("aria-pressed",String(x===b))});if(v)state[f]=v;else delete state[f];renderResult()});
+
+/* ── Exam steps ── */
+var STEPS=[
+ {id:"mental",t:"Mental status",s:"Level of alertness, then attention: months of the year backwards.",p:"If attention fails, think delirium before dementia and use the CAM. Then orientation, language (naming, repetition, comprehension) and, if relevant, neglect.",figs:[],find:[["CAM positive","cam"],["Aphasia or neglect","Cortical: points above the internal capsule. See Localize."]]},
+ {id:"cn",t:"Cranial nerves",s:"Pupils, fields to confrontation, eye movements, face, tongue.",p:"Upper face is spared in an upper motor neuron facial weakness (bilateral cortical supply) and involved in a lower motor neuron (Bell's) palsy. With vertigo and nystagmus, do HINTS.",figs:[["fig","fields","Visual field defects"],["fig","hit","Head impulse test"]],find:[["Any central HINTS sign","hints"],["Forehead spared, lower face weak","Upper motor neuron facial weakness: stroke until proven otherwise."]]},
+ {id:"motor",t:"Motor",s:"Pronator drift with eyes closed, then power at shoulder abduction, finger extension, hip flexion, ankle dorsiflexion.",p:"Look for wasting and fasciculations, test tone (spastic catch versus cogwheel rigidity), grade power 0–5 (MRC). The pyramidal pattern is weak extensors in the arm and flexors in the leg.",figs:[["fig","drift","How to test drift"]],find:[["Facial paresis, arm drift or abnormal speech","triad"],["Glabellar tap: blinking does not stop","glab"],["Tremor","tremor"],["Weak thumb abduction","abd"]]},
+ {id:"reflex",t:"Reflexes",s:"Biceps, triceps, knee, ankle on both sides, then plantar responses.",p:"Grade 0–4+. Compare sides. Brisk with spread or clonus plus an upgoing toe is upper motor neuron; reduced or absent is lower motor neuron or neuropathy.",figs:[["fig","roots","Reflexes and their roots"],["plate","babinski","Plate: Babinski"]],find:[["Upgoing plantar (Babinski)","Upper motor neuron lesion anywhere from cortex to cord."],["Absent ankle jerks, other reflexes kept","Length-dependent polyneuropathy, or an S1 root."]]},
+ {id:"sens",t:"Sensation",s:"Pinprick and vibration at the toes; move up until normal.",p:"Pin and temperature run in the spinothalamic tract; vibration and position in the dorsal columns. A sensory level on the trunk means the cord. Romberg (steady eyes open, falls eyes closed) means proprioceptive loss.",figs:[["fig","derm","Key sensory points"],["fig","cord","Cord syndromes"]],find:[["Abnormal 128-Hz vibration at the toe","vib"],["Abnormal monofilament","mono"],["Reduced pinprick, median territory","hypalg"]]},
+ {id:"coord",t:"Coordination",s:"Finger–nose and heel–shin.",p:"Ataxia out of proportion to weakness points to the cerebellum or its connections. Test rapid alternating movements.",figs:[],find:[["Limb ataxia","Same-side cerebellar hemisphere."]]},
+ {id:"gait",t:"Gait",s:"Watch the patient walk, then heel to toe.",p:"Ask the patient to walk, turn and walk heel to toe. Shuffling with reduced arm swing suggests parkinsonism; wide-based suggests cerebellar disease. An unexplained inability to walk is a red flag for posterior stroke.",figs:[],find:[["Difficulty walking heel to toe","tandem"]]},
+ {id:"mening",t:"Fever with headache: meningeal signs",s:"Jolt accentuation first.",p:"Ask the patient to turn the head side to side two to three times a second. Kernig, Brudzinski and nuchal rigidity are classic but do not discriminate.",figs:[],find:[["Jolt accentuation","jolt"],["Kernig sign","kernig"],["Nuchal rigidity","neck"]]}
+];
+function lrLine(fk){return F[fk].ev.map(function(e){return Q[e.dx].dx+": "+(e.lrp!=null?(e.lrp>=1?"LR+ ":"LR ")+e.lrp:"")+(e.lrp!=null&&e.lrn!=null?", ":"")+(e.lrn!=null?"LR− "+lrTxt(e.lrn):"")}).join(" · ")}
+$("#steps").innerHTML=STEPS.map(function(s,i){var figs=s.figs.length?'<div class="minis">'+s.figs.map(function(x){return '<button type="button" class="mini" data-'+x[0]+'="'+x[1]+'">'+esc(x[2])+'</button>'}).join("")+'</div>':"";
+ var find='<ul class="find">'+s.find.map(function(x){if(F[x[1]])return '<li><b>'+esc(x[0])+'</b><br><span class="mono" style="font-size:12px">'+esc(lrLine(x[1]))+'</span><br><span class="muted">'+esc(F[x[1]].mech)+'</span></li>';return '<li><b>'+esc(x[0])+'</b><br><span class="muted">'+esc(x[1])+'</span></li>'}).join("")+'</ul>';
+ return '<div class="step" id="step-'+s.id+'"><span class="num">'+(i+1)+'</span><div><b class="t">'+esc(s.t)+'</b><p><b>Screen:</b> '+esc(s.s)+'</p><p class="muted">'+esc(s.p)+'</p>'+figs+find+'</div></div>'}).join("");
+
+/* ── Localize ── */
+var LV=[["cortex","Cortex"],["subcort","Subcortical (internal capsule)"],["brainstem","Brainstem"],["cord","Spinal cord"],["root","Root"],["plexus","Plexus"],["nerve","Peripheral nerve"],["poly","Polyneuropathy"],["nmj","Neuromuscular junction"],["muscle","Muscle"]];
+var WHY={cortex:"Cortical signs (aphasia, neglect, a field cut) put the lesion above the internal capsule. In MCA territory the face and arm are usually weaker than the leg. Next: CT and CTA, then MRI.",
+ subcort:"Face, arm and leg equally weak with upper motor neuron signs but no cortical signs: the fibres are packed together in the internal capsule (or the pons), so a small lesion hits all three. Think lacunar stroke. Next: MRI.",
+ brainstem:"Crossed signs (a cranial nerve on one side, the body on the other) mean a lesion where cranial-nerve nuclei sit beside the long tracts, before the tracts cross. Next: MRI with diffusion; HINTS if vertigo.",
+ cord:"Both legs with upper motor neuron signs and a sensory level: below the level both motor and sensory tracts are cut. Next: urgent MRI of the spine.",
+ root:"Lower motor neuron weakness and sensory loss in one dermatome and myotome, with that root's reflex lost. Next: MRI of that segment if there are red flags or a deficit.",
+ plexus:"Several roots in one limb, lower motor neuron, not fitting a single nerve. Next: MRI of the plexus and EMG.",
+ nerve:"Lower motor neuron deficit confined to one nerve's motor and sensory territory. Next: nerve conduction and EMG.",
+ poly:"Length-dependent: the longest fibres fail first, so toes before fingers and ankle reflexes lost first. Next: glucose or A1c, B12, TSH, protein electrophoresis.",
+ nmj:"Fatigable weakness of eyes and bulbar muscles with normal sensation and reflexes. Next: acetylcholine-receptor antibodies; measure vital capacity if bulbar.",
+ muscle:"Proximal symmetric weakness, normal sensation, reflexes kept until late. Next: CK, thyroid and inflammatory labs, EMG."};
+function lscore(s){var sc={};LV.forEach(function(l){sc[l[0]]=0});var a=function(k,n){sc[k]+=n};
+ if(s.umn){["cortex","subcort","brainstem","cord"].forEach(function(k){a(k,2)});["root","plexus","nerve","poly","nmj","muscle"].forEach(function(k){a(k,-3)})}
+ if(s.lmn){["root","plexus","nerve","poly"].forEach(function(k){a(k,2)});a("muscle",1);["cortex","subcort","brainstem","cord","nmj"].forEach(function(k){a(k,-3)})}
+ if(s.hemi){a("subcort",3);a("cortex",2);a("brainstem",1);["cord","root","plexus","nerve","poly","nmj","muscle"].forEach(function(k){a(k,-2)})}
+ if(s.crossed){a("brainstem",5);["cortex","subcort","cord","root","plexus","nerve","poly","nmj","muscle"].forEach(function(k){a(k,-3)})}
+ if(s.level){a("cord",5);["cortex","subcort","brainstem","root","plexus","nerve","nmj","muscle"].forEach(function(k){a(k,-3)})}
+ if(s.root){a("root",4);a("plexus",1);["cortex","subcort","brainstem","poly","nmj","muscle"].forEach(function(k){a(k,-3)})}
+ if(s.plex){a("plexus",5);a("root",1);["cortex","subcort","brainstem","poly","nmj","muscle"].forEach(function(k){a(k,-3)})}
+ if(s.nerve){a("nerve",5);["cortex","subcort","brainstem","cord","poly","nmj","muscle"].forEach(function(k){a(k,-3)})}
+ if(s.glove){a("poly",5);["cortex","subcort","brainstem","root","plexus","nmj","muscle"].forEach(function(k){a(k,-3)})}
+ if(s.prox){a("muscle",4);a("nmj",1);["cortex","subcort","brainstem","root","plexus","nerve","poly"].forEach(function(k){a(k,-3)})}
+ if(s.fatig){a("nmj",6);["cortex","subcort","cord","root","plexus","nerve","poly"].forEach(function(k){a(k,-3)})}
+ if(s.cortical){a("cortex",6);["subcort","brainstem","cord","root","plexus","nerve","poly","nmj","muscle"].forEach(function(k){a(k,-4)})}
+ if(s.nocort){a("cortex",-3)}
+ if(s.nosens){a("muscle",2);a("nmj",2);["root","plexus","nerve","poly","cord"].forEach(function(k){a(k,-3)})}
+ if(s.sens){a("nmj",-3);a("muscle",-3)}
+ var any=Object.keys(s).length;if(!any)return null;
+ var best=LV.slice().sort(function(x,y){return sc[y[0]]-sc[x[0]]});return{top:best[0][0],sc:sc}}
+var LQ=[{q:"Upper or lower motor neuron signs?",o:[["umn","Upper: spastic, brisk reflexes, Babinski"],["lmn","Lower: wasting, fasciculations, low reflexes"],["","Neither, or can't tell yet"]]},
+ {q:"What is the pattern?",o:[["hemi","One side: face, arm and leg"],["crossed","Crossed: face one side, body the other"],["level","Both legs, with a sensory level"],["root","One limb, one root's territory"],["plex","One limb, several roots"],["nerve","One nerve's territory"],["glove","Distal and symmetric, stocking-glove"],["prox","Proximal and symmetric"],["fatig","Fatigable: eyelids, eyes, swallowing"]]},
+ {q:"Any aphasia, neglect or field cut?",o:[["cortical","Yes"],["nocort","No"]]},
+ {q:"Is sensation affected?",o:[["sens","Yes"],["nosens","No"]]}];
+var lstep=0,ls={},lans=[];
+function axSVG(hit,sc){var W=300,H=30+LV.length*32,g='<line x1="70" y1="20" x2="70" y2="'+(H-14)+'" stroke="var(--line)" stroke-width="10" stroke-linecap="round"/>';
+ LV.forEach(function(l,i){var y=30+i*32,on=hit===l[0],dim=sc&&sc[l[0]]<0;g+='<circle cx="70" cy="'+y+'" r="'+(on?11:7)+'" fill="'+(on?"var(--accent)":dim?"var(--line)":"var(--card)")+'" stroke="'+(on?"var(--accent)":"var(--muted)")+'" stroke-width="2"/><text x="92" y="'+(y+4)+'" style="font-family:var(--mono);font-size:12px'+(on?";font-weight:700":"")+'" fill="'+(on?"var(--accent)":dim?"var(--muted)":"var(--ink)")+'">'+esc(l[1].replace(" (internal capsule)",""))+'</text>'});
+ var yd=30+3.5*32;g+='<line x1="10" y1="'+yd+'" x2="62" y2="'+yd+'" stroke="var(--muted)" stroke-dasharray="3 3"/><text x="6" y="'+(yd-4)+'" style="font-family:var(--mono);font-size:9px" fill="var(--muted)">UMN</text><text x="6" y="'+(yd+11)+'" style="font-family:var(--mono);font-size:9px" fill="var(--muted)">LMN</text>';
+ return '<svg class="ax" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Neuraxis'+(hit?", "+esc(LV.filter(function(l){return l[0]===hit})[0][1])+" highlighted":"")+'">'+g+'</svg>'}
+function renderL(){var x=lscore(ls),h;
+ if(lstep<LQ.length){var Qs=LQ[lstep];h='<div class="prog" aria-hidden="true"><i style="width:'+(lstep/LQ.length*100)+'%"></i></div><p class="kicker" style="margin-top:10px">Question '+(lstep+1)+' of '+LQ.length+'</p><p class="q" id="lqq">'+esc(Qs.q)+'</p><div class="stack" role="group" aria-labelledby="lqq">'+Qs.o.map(function(o,i){return '<button type="button" data-lo="'+i+'">'+esc(o[1])+'</button>'}).join("")+'</div>'}
+ else{var nm=x?LV.filter(function(l){return l[0]===x.top})[0][1]:"Not enough to localize";h='<span class="kicker">Most likely level</span><p class="q">'+esc(nm)+'</p>'+(x?'<p class="why"><b>Why:</b> '+esc(WHY[x.top])+'</p>':'')+(x&&x.top==="cord"?'<div class="minis"><button type="button" class="mini" data-fig="cord">Cord syndromes</button></div>':'')+(x&&x.top==="cortex"?'<div class="minis"><button type="button" class="mini" data-fig="fields">Visual field defects</button></div>':'')+'<details class="more"><summary>More</summary><p>This is pattern recognition, not a probability: it names the level that best fits the answers. Two lesions, or an early or partial syndrome, can mislead it. Source: standard neurologic examination teaching.</p></details>'}
+ h+=(lans.length?'<div class="answers">'+lans.map(function(a){return '<span class="tag">'+esc(a)+'</span>'}).join("")+'</div>':'')+'<div class="casenav"><button type="button" class="btn" data-lback'+(lstep===0?" disabled":"")+'>← Back</button><button type="button" class="btn" data-lreset>Start over</button></div>';
+ $("#lq").innerHTML=h;
+ $("#llv").innerHTML='<span class="kicker">Levels</span><ul class="lvls">'+LV.map(function(l){var c=x?(x.top===l[0]&&lstep>=LQ.length?"hit":(x.sc[l[0]]<0?"out":"")):"";return '<li class="'+c+'"><span>'+esc(l[1])+'</span><span class="kicker">'+(c==="out"?"does not fit":c==="hit"?"best fit":"")+'</span></li>'}).join("")+'</ul>'+(lstep>=LQ.length&&x?axSVG(x.top,x.sc):"")}
+var lhist=[];
+$("#lq").addEventListener("click",function(e){var b=e.target.closest("[data-lo]");if(b){var o=LQ[lstep].o[+b.getAttribute("data-lo")];lhist.push(JSON.stringify(ls));if(o[0])ls[o[0]]=true;lans.push(o[1]);lstep++;renderL();return}
+ if(e.target.closest("[data-lback]")&&lstep>0){lstep--;ls=JSON.parse(lhist.pop());lans.pop();renderL();return}
+ if(e.target.closest("[data-lreset]")){ls={};lans=[];lhist=[];lstep=0;renderL()}});
+renderL();
+
+/* ── NIHSS ── */
+var NI=[["1a","Level of consciousness","look",["Alert","Arousable by minor stimulation","Needs repeated or painful stimulation","Reflex responses only, or unresponsive"]],
+ ["1b","Questions: month and age","talk",["Both correct","One correct","Neither correct"]],
+ ["1c","Commands: open and close eyes, grip and release","talk",["Both done","One done","Neither done"]],
+ ["2","Best gaze","look",["Normal","Partial gaze palsy","Forced deviation"]],
+ ["3","Visual fields","look",["No loss","Partial hemianopia","Complete hemianopia","Bilateral hemianopia, including blindness"]],
+ ["4","Facial palsy","look",["Normal","Minor","Partial (lower face)","Complete (upper and lower)"]],
+ ["5a","Motor arm, left","move",["No drift for 10 s","Drift","Some effort against gravity","No effort against gravity","No movement"]],
+ ["5b","Motor arm, right","move",["No drift for 10 s","Drift","Some effort against gravity","No effort against gravity","No movement"]],
+ ["6a","Motor leg, left","move",["No drift for 5 s","Drift","Some effort against gravity","No effort against gravity","No movement"]],
+ ["6b","Motor leg, right","move",["No drift for 5 s","Drift","Some effort against gravity","No effort against gravity","No movement"]],
+ ["7","Limb ataxia","move",["Absent","Present in one limb","Present in two limbs"]],
+ ["8","Sensory","feel",["Normal","Mild to moderate loss","Severe or total loss"]],
+ ["9","Best language","talk",["Normal","Mild to moderate aphasia","Severe aphasia","Mute, global aphasia"]],
+ ["10","Dysarthria","talk",["Normal","Mild to moderate","Severe"]],
+ ["11","Extinction and inattention","feel",["None","In one modality","Profound, or more than one modality"]]];
+var NG=[["look","Look"],["talk","Talk"],["move","Move"],["feel","Feel"]],nv={};
+function ntotal(v){return Object.keys(v).reduce(function(a,k){return a+v[k]},0)}
+function ninterp(t,n){if(n<NI.length)return "Score all 15 items for the total to mean anything ("+n+" of 15 so far).";
+ if(t===0)return "0: no deficit the scale measures. A score of 0 does not exclude a posterior-circulation stroke; check gait and HINTS.";
+ if(t<6)return t+": below 6, the threshold used in most thrombectomy trials. A low score can still be a disabling deficit that qualifies for thrombolysis; that decision belongs to the stroke team.";
+ return t+": at or above 6, the threshold used in most thrombectomy trials. The NIHSS does not diagnose a large-vessel occlusion; get CTA and involve the stroke team."}
+function renderN(){var t=ntotal(nv),n=Object.keys(nv).length;
+ $("#nitot").innerHTML='<span><span class="kicker">NIHSS total</span><br><span class="muted" style="font-size:12px">'+n+' of 15 scored · range 0–42</span></span><span class="n">'+t+'</span>';
+ $("#nihss").innerHTML=NG.map(function(g){return '<div class="grpname">'+g[1]+'</div>'+NI.filter(function(it){return it[2]===g[0]}).map(function(it){var c=nv[it[0]];return '<div class="ni" id="ni-'+it[0]+'"><div><div class="nm">'+it[0]+' · '+esc(it[1])+'</div><div class="cur">'+(c!=null?c+": "+esc(it[3][c]):"not scored")+'</div></div><div class="sc" role="group" aria-label="'+esc(it[1])+'">'+it[3].map(function(o,k){return '<button type="button" data-ni="'+it[0]+'" data-v="'+k+'" aria-pressed="'+(c===k)+'" aria-label="'+k+': '+esc(o)+'" title="'+esc(o)+'">'+k+'</button>'}).join("")+'</div></div>'}).join("")}).join("")+'<div class="casenav"><button type="button" class="btn" data-nreset>Clear</button></div>';
+ $("#niint").innerHTML='<span class="kicker">What it means</span><p style="font-size:15px;margin-top:6px">'+esc(ninterp(t,n))+'</p><details class="more"><summary>More</summary><p>Score what the patient does, not what you think they could do. Score the first attempt. Arm drift is held 10 seconds at 90° sitting or 45° lying; leg 5 seconds at 30°. Ataxia is scored only if out of proportion to weakness. Source: NIH Stroke Scale (NINDS).</p></details>'}
+$("#nihss").addEventListener("click",function(e){var b=e.target.closest("[data-ni]");if(b){var k=b.getAttribute("data-ni"),v=+b.getAttribute("data-v");nv[k]=v;renderN();var nb=$('[data-ni="'+k+'"][data-v="'+v+'"]');if(nb)nb.focus();return}if(e.target.closest("[data-nreset]")){nv={};renderN()}});
+renderN();
+var TERR=[["MCA, dominant (usually left)","Contralateral face and arm weaker than leg, sensory loss, aphasia, gaze toward the lesion, homonymous field cut."],["MCA, non-dominant","Contralateral face and arm weakness, neglect and extinction, anosognosia, gaze toward the lesion."],["ACA","Contralateral leg weaker than arm; abulia and urinary incontinence."],["PCA","Contralateral homonymous hemianopia, often with macular sparing; alexia without agraphia if dominant."],["Lacunar","Pure motor, pure sensory, sensorimotor, ataxic hemiparesis, or dysarthria–clumsy hand. No cortical signs."],["Brainstem","Crossed signs, diplopia, dysarthria, dysphagia. Lateral medullary: ipsilateral face and contralateral body pain–temperature loss, Horner, ataxia, hoarseness."],["Cerebellar","Ataxia, vertigo, nystagmus, inability to walk; can swell and compress the brainstem in days 2–4."]];
+$("#terr").innerHTML=TERR.map(function(x){return '<div class="terr"><b>'+esc(x[0])+'</b><p>'+esc(x[1])+'</p></div>'}).join("");
+
+/* ── Figures ── */
+var PLATES={babinski:{t:"Babinski sign",src:"/media/exam-neuro/babinski.webp",w:512,h:572,alt:"Sole of the foot stroked with a blunt object from the heel along the lateral border and across the ball toward the big toe; inset shows the big toe extending upward and the other toes fanning.",txt:"Stroke the lateral sole firmly from heel toward the little toe, then across the ball of the foot. Normal: toes curl down. Upgoing great toe (often with fanning) is an upper motor neuron sign."}};
+function figDrift(){return '<svg class="fig" viewBox="0 0 320 170" role="img" aria-label="Pronator drift: one arm falls and turns palm down"><circle cx="40" cy="60" r="16" fill="none" stroke="var(--ink)" stroke-width="2"/><line x1="40" y1="76" x2="40" y2="150" stroke="var(--ink)" stroke-width="2"/><path d="M40 92 L270 70" stroke="var(--muted)" stroke-width="10" stroke-linecap="round"/><text x="276" y="64" style="font-family:var(--mono);font-size:10px" fill="var(--muted)">normal: palm up, level</text><path d="M40 98 L250 132" stroke="var(--hrt-art)" stroke-width="10" stroke-linecap="round"/><path d="M262 92 C 274 104, 272 118, 258 128" fill="none" stroke="var(--hrt-art)" stroke-width="2"/><path d="M258 128 l2 -9 l6 6 z" fill="var(--hrt-art)"/><text x="160" y="160" text-anchor="middle" style="font-family:var(--mono);font-size:10px" fill="var(--muted)">weak arm: falls and turns palm down</text><text x="18" y="38" style="font-family:var(--mono);font-size:10px" fill="var(--muted)">eyes closed</text></svg><p class="figtext">Both arms straight out in front, palms up, eyes closed, for 10–20 seconds. With subtle upper motor neuron weakness the arm drifts down and pronates (palm turns in and down): the supinators and extensors weaken before the pronators and flexors. Drift without pronation, or a drift upward or outward, points to proprioceptive or cerebellar loss.</p>'}
+var FIELDS={nerve:["Optic nerve (right)","Blind in the right eye (monocular loss).",[1,0,1,1]],chiasm:["Optic chiasm","Bitemporal hemianopia: crossing nasal fibres are cut (pituitary tumour).",[1,0,0,1]],tract:["Optic tract (right)","Left homonymous hemianopia.",[1,0,1,0]],meyer:["Temporal lobe, Meyer loop (right)","Left upper quadrant loss in both eyes (\"pie in the sky\").",[2,0,2,0]],pariet:["Parietal radiations (right)","Left lower quadrant loss in both eyes.",[3,0,3,0]],occip:["Occipital cortex (right)","Left homonymous hemianopia with the centre spared (macular sparing).",[4,0,4,0]]};
+function eye(cx,cy,mode,side){var r=26,g='<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="var(--card)" stroke="var(--muted)" stroke-width="1.5"/>';
+ function half(left,top,bot){var x0=left?cx-r:cx,clip='';var y0=top?cy-r:cy,hgt=(top&&bot)?2*r:r;if(!top&&!bot)return "";return '<rect x="'+x0+'" y="'+(top?cy-r:cy)+'" width="'+r+'" height="'+hgt+'" fill="var(--ink)" clip-path="url(#c'+side+')"/>'}
+ var defs='<clipPath id="c'+side+'"><circle cx="'+cx+'" cy="'+cy+'" r="'+r+'"/></clipPath>';
+ if(mode==="all")g+='<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="var(--ink)"/>';
+ else if(mode==="Lhalf")g+=half(true,true,true);else if(mode==="Rhalf")g+=half(false,true,true);
+ else if(mode==="Lup")g+=half(true,true,false);else if(mode==="Llow")g+=half(true,false,true);
+ else if(mode==="Lmac")g+=half(true,true,true)+'<circle cx="'+cx+'" cy="'+cy+'" r="7" fill="var(--card)"/>';
+ g+='<line x1="'+cx+'" y1="'+(cy-r)+'" x2="'+cx+'" y2="'+(cy+r)+'" stroke="var(--line)"/>';
+ return '<defs>'+defs+'</defs>'+g}
+var FMODE={nerve:["none","all"],chiasm:["Lhalf","Rhalf"],tract:["Lhalf","Lhalf"],meyer:["Lup","Lup"],pariet:["Llow","Llow"],occip:["Lmac","Lmac"]};
+function figFields(st){var m=FMODE[st];
+ var path='<svg class="fig" viewBox="0 0 320 210" role="img" aria-label="Visual pathway with lesion at '+esc(FIELDS[st][0])+'"><g fill="none" stroke="var(--muted)" stroke-width="3" stroke-linecap="round"><path d="M110 30 L150 90 L200 150 L230 195"/><path d="M210 30 L170 90 L120 150 L90 195"/><path d="M115 30 L155 90"/><path d="M205 30 L165 90"/></g><circle cx="110" cy="22" r="12" fill="var(--card)" stroke="var(--ink)" stroke-width="2"/><circle cx="210" cy="22" r="12" fill="var(--card)" stroke="var(--ink)" stroke-width="2"/><text x="86" y="26" text-anchor="end" style="font-family:var(--mono);font-size:10px" fill="var(--muted)">left eye</text><text x="234" y="26" style="font-family:var(--mono);font-size:10px" fill="var(--muted)">right eye</text>';
+ var L={nerve:[200,50],chiasm:[160,90],tract:[190,130],meyer:[215,165],pariet:[205,175],occip:[228,192]};
+ Object.keys(L).forEach(function(k){var on=k===st;path+='<g data-fld="'+k+'" tabindex="0" role="button" aria-label="'+esc(FIELDS[k][0])+'" style="cursor:pointer"><circle cx="'+L[k][0]+'" cy="'+L[k][1]+'" r="'+(on?10:8)+'" fill="'+(on?"var(--bad)":"var(--card)")+'" stroke="var(--bad)" stroke-width="2"/></g>'});
+ path+='</svg>';
+ var fl='<div class="fields"><svg viewBox="0 0 60 70" width="90" role="img" aria-label="Left eye field">'+(m[0]==="none"?eye(30,30,"none","a"):eye(30,30,m[0],"a"))+'<text x="30" y="68" text-anchor="middle" style="font-family:var(--mono);font-size:8px" fill="var(--muted)">left eye</text></svg><svg viewBox="0 0 60 70" width="90" role="img" aria-label="Right eye field">'+eye(30,30,m[1],"b")+'<text x="30" y="68" text-anchor="middle" style="font-family:var(--mono);font-size:8px" fill="var(--muted)">right eye</text></svg></div>';
+ return '<div class="seg" role="group" aria-label="Lesion site" style="display:flex;flex-wrap:wrap;margin-top:12px">'+Object.keys(FIELDS).map(function(k){return '<button type="button" data-fld="'+k+'" aria-pressed="'+(k===st)+'">'+esc(FIELDS[k][0].replace(" (right)",""))+'</button>'}).join("")+'</div>'+path+fl+'<p class="figtext"><b>'+esc(FIELDS[st][0])+':</b> '+esc(FIELDS[st][1])+' Fields are drawn as the patient sees them; black is lost.</p>'}
+var CORD={complete:["Complete","Everything below the level: weakness, all sensation, bladder.",["ds","dsr","cs","csr","st","str","gray"]],central:["Central cord","Arms weaker than legs, cape-like pain–temperature loss; usually hyperextension in a stiff neck.",["gray","cs","csr"]],anterior:["Anterior cord","Weakness and pain–temperature loss below the level; vibration and position spared (anterior spinal artery).",["cs","csr","st","str","gray"]],brown:["Brown-Séquard (left)","Same-side weakness and vibration/position loss; opposite-side pain–temperature loss.",["ds","cs","st"]],posterior:["Posterior column","Loss of vibration and position, positive Romberg; strength and pain spared (B12, tabes).",["ds","dsr"]]};
+function figCord(st){var on=CORD[st][2],f=function(k){return on.indexOf(k)>=0?"var(--bad)":"var(--fill)"};
+ var g='<svg class="fig" viewBox="0 0 320 200" role="img" aria-label="Spinal cord cross-section, '+esc(CORD[st][0])+'"><ellipse cx="160" cy="100" rx="120" ry="80" fill="var(--card)" stroke="var(--muted)" stroke-width="2"/>'+
+ '<path d="M160 55 C 140 55, 120 70, 115 100 C 110 130, 135 150, 160 150 C 185 150, 210 130, 205 100 C 200 70, 180 55, 160 55 Z" fill="'+f("gray")+'" stroke="var(--muted)"/>'+
+ '<path d="M150 25 L170 25 L172 70 L148 70 Z" fill="'+f("ds")+'" stroke="var(--muted)" transform="translate(-14,0)"/><path d="M150 25 L170 25 L172 70 L148 70 Z" fill="'+f("dsr")+'" stroke="var(--muted)" transform="translate(14,0)"/>'+
+ '<ellipse cx="78" cy="95" rx="24" ry="20" fill="'+f("cs")+'" stroke="var(--muted)"/><ellipse cx="242" cy="95" rx="24" ry="20" fill="'+f("csr")+'" stroke="var(--muted)"/>'+
+ '<ellipse cx="88" cy="140" rx="24" ry="14" fill="'+f("st")+'" stroke="var(--muted)"/><ellipse cx="232" cy="140" rx="24" ry="14" fill="'+f("str")+'" stroke="var(--muted)"/>'+
+ '<text x="160" y="18" text-anchor="middle" style="font-family:var(--mono);font-size:10px" fill="var(--ink)">dorsal columns (vibration, position)</text><text x="22" y="72" style="font-family:var(--mono);font-size:10px" fill="var(--ink)">corticospinal</text><text x="24" y="172" style="font-family:var(--mono);font-size:10px" fill="var(--ink)">spinothalamic</text><text x="250" y="190" style="font-family:var(--mono);font-size:9px" fill="var(--muted)">anterior ↓</text><text x="10" y="196" style="font-family:var(--mono);font-size:9px" fill="var(--muted)">patient left</text></svg>';
+ return '<div class="seg" role="group" aria-label="Syndrome" style="display:flex;flex-wrap:wrap;margin-top:12px">'+Object.keys(CORD).map(function(k){return '<button type="button" data-cord="'+k+'" aria-pressed="'+(k===st)+'">'+esc(CORD[k][0])+'</button>'}).join("")+'</div>'+g+'<p class="figtext"><b>'+esc(CORD[st][0])+':</b> '+esc(CORD[st][1])+' Red: tracts damaged. Corticospinal and dorsal columns cross in the medulla, so a cord lesion affects the same side; spinothalamic fibres cross within a segment or two, so pain and temperature loss is on the opposite side.</p>'}
+function figRoots(){var R=[["Biceps","C5–6","Musculocutaneous"],["Brachioradialis","C6","Radial"],["Triceps","C7","Radial"],["Finger flexors (Hoffmann)","C8","Median, ulnar"],["Knee (patellar)","L3–4","Femoral"],["Ankle (Achilles)","S1","Tibial"]];
+ return '<table style="width:100%;border-collapse:collapse;margin-top:10px;font-size:14px"><thead><tr><th style="text-align:left;padding:6px 0;border-bottom:1px solid var(--line)" class="kicker">Reflex</th><th style="text-align:left;border-bottom:1px solid var(--line)" class="kicker">Root</th><th style="text-align:left;border-bottom:1px solid var(--line)" class="kicker">Nerve</th></tr></thead><tbody>'+R.map(function(r){return '<tr><td style="padding:8px 0;border-bottom:1px solid var(--line)">'+r[0]+'</td><td class="mono" style="border-bottom:1px solid var(--line)">'+r[1]+'</td><td style="border-bottom:1px solid var(--line)">'+r[2]+'</td></tr>'}).join("")+'</tbody></table><p class="figtext">Grade: 0 absent, 1+ reduced, 2+ normal, 3+ brisk, 4+ with clonus. A reflex lost alone points to its root; all reflexes brisk with an upgoing toe points above the cord level you are testing.</p>'}
+function figDerm(){var P=[["C5","lateral elbow",62,92],["C6","thumb",40,150],["C7","middle finger",30,172],["C8","little finger",56,176],["T4","nipple",120,92],["T10","umbilicus",120,128],["L4","medial malleolus",108,290],["L5","dorsum of foot",128,300],["S1","lateral heel",146,304]];
+ var g='<svg class="fig" viewBox="0 0 240 320" role="img" aria-label="Key sensory points for each root"><g fill="none" stroke="var(--muted)" stroke-width="2"><circle cx="120" cy="30" r="18"/><path d="M98 52 L142 52 L150 150 L138 300 L124 300 L120 175 L116 300 L102 300 L90 150 Z"/><path d="M98 56 L66 90 L46 160"/><path d="M142 56 L174 90 L194 160"/></g>';
+ P.forEach(function(p){g+='<circle cx="'+p[2]+'" cy="'+p[3]+'" r="5" fill="var(--accent)"/><text x="'+(p[2]+(p[2]<120?-8:8))+'" y="'+(p[3]+4)+'" text-anchor="'+(p[2]<120?"end":"start")+'" style="font-family:var(--mono);font-size:10px" fill="var(--ink)">'+p[0]+'</text>'});
+ return g+'</svg><ul class="find" style="margin-top:8px">'+P.map(function(p){return '<li><b>'+p[0]+'</b> · '+p[1]+'</li>'}).join("")+'</ul><p class="note">Schematic, not to scale. Points follow the standard key sensory points used in spinal cord examination.</p>'}
+function figHIT(){return '<svg class="fig" viewBox="0 0 320 150" role="img" aria-label="Head impulse test: normal eyes stay on target; abnormal eyes are dragged with the head and then make a catch-up saccade"><text x="80" y="16" text-anchor="middle" style="font-family:var(--mono);font-size:10px" fill="var(--ink)">eyes stay on target</text><text x="240" y="16" text-anchor="middle" style="font-family:var(--mono);font-size:10px" fill="var(--ink)">catch-up saccade</text><circle cx="80" cy="70" r="30" fill="var(--card)" stroke="var(--muted)" stroke-width="2"/><circle cx="70" cy="64" r="5" fill="var(--ink)"/><circle cx="90" cy="64" r="5" fill="var(--ink)"/><circle cx="240" cy="70" r="30" fill="var(--card)" stroke="var(--muted)" stroke-width="2"/><circle cx="236" cy="64" r="5" fill="var(--ink)"/><circle cx="256" cy="64" r="5" fill="var(--ink)"/><path d="M262 64 C 270 50, 250 46, 240 54" fill="none" stroke="var(--bad)" stroke-width="2"/><path d="M240 54 l1 -8 l6 5 z" fill="var(--bad)"/><path d="M50 112 L110 112" stroke="var(--muted)" stroke-width="2"/><path d="M110 112 l-8 -4 l0 8 z" fill="var(--muted)"/><path d="M210 112 L270 112" stroke="var(--muted)" stroke-width="2"/><path d="M270 112 l-8 -4 l0 8 z" fill="var(--muted)"/><text x="80" y="132" text-anchor="middle" style="font-family:var(--mono);font-size:10px" fill="var(--muted)">quick head turn</text><text x="240" y="132" text-anchor="middle" style="font-family:var(--mono);font-size:10px" fill="var(--muted)">quick head turn</text><text x="80" y="148" text-anchor="middle" style="font-family:var(--mono);font-size:10px" fill="var(--bad)">in constant vertigo: worrying</text><text x="240" y="148" text-anchor="middle" style="font-family:var(--mono);font-size:10px" fill="var(--ok)">in constant vertigo: reassuring</text></svg><p class="figtext">Patient fixes on your nose; you turn the head quickly 10–20° to each side. A catch-up saccade means the vestibular nerve on that side is not working: a peripheral cause such as vestibular neuritis. In a patient with constant vertigo and nystagmus, a <b>normal</b> head impulse is the dangerous result, because the lesion must be central. Only for the acute vestibular syndrome; not for episodic or positional dizziness.</p>'}
+var lastFocus=null;
+function openSheet(html){lastFocus=document.activeElement;$("#sheet").innerHTML=html;$("#sheetwrap").hidden=false;var x=$("#sheet .x");if(x)x.focus()}
+function closeSheet(){$("#sheetwrap").hidden=true;$("#sheet").innerHTML="";if(lastFocus&&lastFocus.focus)lastFocus.focus()}
+function top(k,t){return '<div class="top"><div><span class="kicker">'+k+'</span><h3 id="sheettitle">'+esc(t)+'</h3></div><button type="button" class="x" aria-label="Close">×</button></div>'}
+function showFig(k){if(k==="drift")openSheet(top("Figure","Pronator drift")+figDrift());else if(k==="fields")openSheet(top("Figure","Visual field defects")+'<div id="fbox">'+figFields("tract")+'</div>');else if(k==="cord")openSheet(top("Figure","Cord syndromes")+'<div id="cbox">'+figCord("brown")+'</div>');else if(k==="roots")openSheet(top("Figure","Reflexes and their roots")+figRoots());else if(k==="derm")openSheet(top("Figure","Key sensory points")+figDerm());else if(k==="hit")openSheet(top("Figure","Head impulse test")+figHIT())}
+function showPlate(k){var p=PLATES[k];openSheet(top("Plate",p.t)+'<div class="plate" style="max-width:360px;margin-left:auto;margin-right:auto"><img src="'+p.src+'" alt="'+esc(p.alt)+'" width="'+p.w+'" height="'+p.h+'"></div><div class="credit">Created with BioRender.com</div><p class="figtext">'+esc(p.txt)+'</p>')}
+document.addEventListener("click",function(e){
+ var p=e.target.closest("[data-plate]");if(p){showPlate(p.getAttribute("data-plate"));return}
+ var f=e.target.closest("[data-fig]");if(f){showFig(f.getAttribute("data-fig"));return}
+ var fl=e.target.closest("[data-fld]");if(fl&&$("#fbox")){var k=fl.getAttribute("data-fld");$("#fbox").innerHTML=figFields(k);var nb=$('#fbox button[data-fld="'+k+'"]');if(nb)nb.focus();return}
+ var cd=e.target.closest("[data-cord]");if(cd&&$("#cbox")){var c=cd.getAttribute("data-cord");$("#cbox").innerHTML=figCord(c);var cb=$('#cbox [data-cord="'+c+'"]');if(cb)cb.focus();return}
+ if(e.target.closest("#sheet .x")||e.target===$("#sheetwrap"))closeSheet()});
+document.addEventListener("keydown",function(e){if(e.key==="Escape"&&!$("#sheetwrap").hidden){closeSheet();return}var g=e.target.closest&&e.target.closest("g[data-fld]");if(g&&(e.key==="Enter"||e.key===" ")){e.preventDefault();g.dispatchEvent(new MouseEvent("click",{bubbles:true}))}});
+
+/* ── Practice ── */
+var CASES=[
+ {type:"loc",t:"A 58-year-old has right face and right arm weakness, brisk right reflexes, and cannot name objects or repeat a phrase.",st:{umn:1,hemi:1,cortical:1,sens:1},ans:"cortex"},
+ {type:"loc",t:"A 64-year-old has left facial weakness including the forehead, and weakness of the right arm and leg with an upgoing right toe.",st:{umn:1,crossed:1,nocort:1},ans:"brainstem"},
+ {type:"loc",t:"A 45-year-old with breast cancer has weak legs, brisk knee jerks, upgoing toes, and no pinprick below the umbilicus.",st:{umn:1,level:1,nocort:1,sens:1},ans:"cord"},
+ {type:"loc",t:"A 30-year-old has droopy eyelids and double vision that worsen through the day, with normal sensation and reflexes.",st:{fatig:1,nocort:1,nosens:1},ans:"nmj"},
+ {type:"lr",q:"stroke",pre:10,st:{triad:1},t:"A 70-year-old's family noticed his speech was slurred. You find right arm drift.",ask:"From the source's 10% starting point, roughly what is the probability of stroke?"},
+ {type:"lr",q:"avs",pre:25,st:{hints:1},t:"A 66-year-old with diabetes has had constant vertigo for 10 hours. Head impulse is normal to both sides.",ask:"Starting from 25%, roughly what is the probability of a central cause?"},
+ {type:"lr",q:"men",pre:20,st:{jolt:-1},t:"A 35-year-old with fever and headache. Turning her head quickly side to side does not worsen the headache.",ask:"Starting from 20%, roughly what is the probability of meningitis?"},
+ {type:"nihss",t:"Alert, answers both questions, follows both commands. Normal gaze and fields. Minor right facial weakness. Right arm drifts but does not hit the bed; right leg drifts. No ataxia. Mild right sensory loss. Mild aphasia, mild dysarthria, no extinction.",ask:"What is the NIHSS?",sc:{"1a":0,"1b":0,"1c":0,"2":0,"3":0,"4":1,"5a":0,"5b":1,"6a":0,"6b":1,"7":0,"8":1,"9":1,"10":1,"11":0}}
+];
+var ci=0,done=false;
+function disp(v){return v<1?"<1":v>99?">99":String(v)}
+function pick(arr,right){var out=[right];arr.forEach(function(v){if(out.every(function(o){return Math.abs(o-v)>=8}))out.push(v)});return out.slice(0,4).sort(function(a,b){return a-b})}
+function renderCase(){var c=CASES[ci],opts,right,exp="";done=false;
+ if(c.type==="loc"){var x=lscore(c.st);right=x.top;opts=["cortex","subcort","brainstem","cord","nmj","nerve","muscle"].filter(function(k){return k!==right}).slice(0,3).concat([right]);opts.sort();
+  exp='<p class="why"><b>Why:</b> '+esc(WHY[right])+'</p>';
+  $("#case").innerHTML='<span class="kicker">Case '+(ci+1)+' of '+CASES.length+' · Localize</span><p>'+esc(c.t)+'</p><p><b>Where is the lesion?</b></p><div class="opts">'+opts.map(function(o){return '<button type="button" class="opt" data-o="'+o+'">'+esc(LV.filter(function(l){return l[0]===o})[0][1])+'</button>'}).join("")+'</div>'}
+ else if(c.type==="lr"){var r=compute(c.q,c.pre,c.st);right=Math.round(r.p);var cand=[Math.round(r.p*0.5),Math.round(Math.min(99,r.p+(100-r.p)*0.5)),Math.max(1,right-30),Math.min(99,right+30),50];opts=pick(cand,right);
+  exp='<p class="why"><b>Why:</b> '+c.pre+'% start × '+r.parts.map(function(x){return esc(F[x.f].nm.toLowerCase())+(x.v===1?" present":" absent")+" ×"+lrTxt(x.l)}).join(", ")+' → '+disp(right)+'%. '+esc(F[r.parts[0].f].mech)+'</p>'+(c.q==="avs"?'<div class="warnbox">One study of 101 high-risk patients with trained examiners; treat the number as a guide, not a guarantee.</div>':'')+(c.q==="men"?'<div class="warnbox">Negative jolt makes meningitis unlikely in fever and headache, but if she looks unwell, do the LP anyway.</div>':'');
+  $("#case").innerHTML='<span class="kicker">Case '+(ci+1)+' of '+CASES.length+' · '+esc(Q[c.q].t)+'</span><p>'+esc(c.t)+'</p><p><b>'+esc(c.ask)+'</b></p><div class="opts">'+opts.map(function(o){return '<button type="button" class="opt" data-o="'+o+'">'+disp(o)+'%</button>'}).join("")+'</div>'}
+ else{right=ntotal(c.sc);opts=pick([right-2,right+2,right+5,Math.max(0,right-4)],right);
+  exp='<p class="why"><b>Why:</b> '+NI.filter(function(it){return c.sc[it[0]]}).map(function(it){return it[0]+" "+esc(it[1].toLowerCase())+" "+c.sc[it[0]]}).join(", ")+' = '+right+'.</p>';
+  $("#case").innerHTML='<span class="kicker">Case '+(ci+1)+' of '+CASES.length+' · NIHSS</span><p>'+esc(c.t)+'</p><p><b>'+esc(c.ask)+'</b></p><div class="opts">'+opts.map(function(o){return '<button type="button" class="opt" data-o="'+o+'">'+o+'</button>'}).join("")+'</div>'}
+ $("#case").insertAdjacentHTML("beforeend",'<div id="caseexp" hidden>'+exp+'</div><div class="casenav"><button type="button" class="btn" id="prevc"'+(ci===0?" disabled":"")+'>← Previous</button><button type="button" class="btn" id="nextc"'+(ci===CASES.length-1?" disabled":"")+'>Next →</button></div>');
+ $$("#case .opt").forEach(function(b){b.addEventListener("click",function(){if(done)return;done=true;$$("#case .opt").forEach(function(x){var v=x.getAttribute("data-o");if(String(v)===String(right))x.classList.add("right");else if(x===b)x.classList.add("wrong")});$("#caseexp").hidden=false})});
+ $("#prevc").addEventListener("click",function(){ci--;renderCase()});$("#nextc").addEventListener("click",function(){ci++;renderCase()})}
+renderCase();
+
+/* ── Tabs and hash ── */
+function show(id){$$("section.view").forEach(function(s){s.classList.toggle("on",s.id===id)});$$("nav.tabs [role=tab]").forEach(function(t){t.setAttribute("aria-selected",String(t.getAttribute("aria-controls")===id))});window.scrollTo(0,0)}
+$$("nav.tabs [role=tab]").forEach(function(t){t.addEventListener("click",function(){show(t.getAttribute("aria-controls"))})});
+function fromHash(){var h=(location.hash||"").slice(1);if(!h)return;var el=document.getElementById(h);if(!el)return;var v=el.closest("section.view");if(v)show(v.id);if(h.indexOf("q-")===0&&Q[h.slice(2)]){qk=h.slice(2);state={};renderQ()}setTimeout(function(){el.scrollIntoView()},0)}
+window.addEventListener("hashchange",fromHash);
+renderQ();fromHash();
+window.addEventListener("load",function(){Object.keys(PLATES).forEach(function(k){var i=new Image();i.src=PLATES[k].src})});
+})();
+</script>
+</body>
+</html>
