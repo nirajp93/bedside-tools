@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Cardiac Exam · bedside.tools</title>
+<meta name="description" content="Cardiac physical exam: what each finding does to the differential, how to elicit it, what it sounds like, and practice cases.">
+<script src="/theme.js"></script>
+<style>
+/* Colours: shared site names only. Dark values and extras (--fill --ok --bad --scrim --hrt-*) live in /theme.js. */
+:root{--bg:#FBFBFA; --card:#FFFFFF; --ink:#111113; --muted:#55555D; --line:#ECECEE; --accent:#2B4BDB; --warn:#9A3B00; --warnbg:#FFF6EC}
+:root{--r:14px}
+*{box-sizing:border-box;margin:0;padding:0}
+[hidden]{display:none!important}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.45;padding-bottom:calc(76px + env(safe-area-inset-bottom))}
+a{color:var(--accent);text-decoration:none}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;-webkit-tap-highlight-color:transparent}
+button:focus-visible,a:focus-visible,[tabindex]:focus-visible,summary:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+h1,h2,h3{font-weight:600;letter-spacing:-.01em;line-height:1.15;text-wrap:balance}
+h1{font-size:26px} h2{font-size:21px} h3{font-size:18px}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.kicker{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.muted{color:var(--muted)}
+.wrap{max-width:720px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+
+header{border-bottom:1px solid var(--line)}
+header .wrap{padding-block:8px 14px}
+.back{font-size:14px;color:var(--accent);display:inline-flex;align-items:center;min-height:44px}
+header p{font-size:15px;color:var(--muted);margin-top:4px}
+
+nav.tabs{position:fixed;left:0;right:0;bottom:0;background:var(--bg);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom);z-index:20}
+nav.tabs .wrap{display:flex;padding-block:0}
+nav.tabs button{flex:1;min-height:56px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:var(--muted);font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;border-top:2px solid transparent}
+nav.tabs button[aria-selected=true]{color:var(--accent);border-top-color:var(--accent)}
+section.view{display:none;padding-block:16px 28px}
+section.view.on{display:block}
+.lede{font-size:15px;color:var(--muted);margin-top:4px}
+
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px;margin-top:12px}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--accent);font-size:14px;font-weight:500;text-align:left}
+.chip[aria-pressed=true]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.qchips .chip{color:var(--ink)}
+.qchips .chip[aria-pressed=true]{color:var(--accent-ink)}
+
+/* pre-test */
+.pre{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;margin-top:12px}
+.pre label{font-size:14px}
+.pre input[type=range]{width:100%;height:44px;accent-color:var(--accent);grid-column:1/-1}
+.pre .v{font-family:var(--mono);font-size:15px}
+
+/* result card */
+.result .big{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+.result .big b{font-size:16px;font-weight:600}
+.result .pct{font-family:var(--mono);font-size:30px;line-height:1;font-variant-numeric:tabular-nums}
+.meter{position:relative;height:10px;border-radius:5px;background:var(--fill);margin-top:10px;overflow:hidden}
+.meter i{position:absolute;left:0;top:0;bottom:0;background:var(--accent);border-radius:5px;transition:width .25s}
+.meter s{position:absolute;top:-2px;bottom:-2px;width:2px;background:var(--ink);text-decoration:none}
+.scale{display:flex;justify-content:space-between;font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:4px}
+.why{font-size:15px;margin-top:10px}
+.why b{font-weight:600}
+details.more{margin-top:8px;border-top:1px dashed var(--line);padding-top:2px}
+details.more summary{min-height:44px;display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);cursor:pointer;list-style:none}
+details.more summary::-webkit-details-marker{display:none}
+details.more summary::before{content:"";width:7px;height:7px;border-right:1.5px solid var(--accent);border-bottom:1.5px solid var(--accent);transform:rotate(-45deg);transition:transform .15s}
+details.more[open] summary::before{transform:rotate(45deg)}
+details.more p,details.more li{font-size:14px;margin-bottom:6px}
+details.more ul{padding-left:18px}
+.warnbox{background:var(--warnbg);color:var(--warn);border-radius:10px;padding:10px 12px;font-size:14px;margin-top:10px}
+
+/* findings */
+.frow{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:12px 0;border-top:1px solid var(--line)}
+.frow:first-child{border-top:0}
+.frow .nm{font-size:15px;font-weight:500}
+.frow .sub{margin-top:4px;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.frow .hint{font-size:13px;color:var(--muted);margin-top:4px}
+.lr{font-family:var(--mono);font-size:12px;padding:2px 7px;border-radius:6px;background:var(--fill);white-space:nowrap}
+.lr.up{color:var(--bad);background:var(--badbg)}
+.lr.down{color:var(--ok);background:var(--okbg)}
+.tag{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:2px 6px;border-radius:5px;background:var(--fill);color:var(--muted)}
+.tri{display:inline-grid;grid-auto-flow:column;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--card)}
+.tri button{min-width:46px;min-height:44px;font-size:13px;color:var(--muted);border-left:1px solid var(--line)}
+.tri button:first-child{border-left:0}
+.tri button:disabled{opacity:.35;cursor:not-allowed}
+.tri button[aria-pressed=true][data-v="1"]{background:var(--badbg);color:var(--bad);font-weight:600}
+.tri button[aria-pressed=true][data-v="-1"]{background:var(--okbg);color:var(--ok);font-weight:600}
+.tri button[aria-pressed=true][data-v="0"]{color:var(--ink);font-weight:600}
+.minis{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.mini{min-height:36px;padding:0 12px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--accent);font-size:13px;font-weight:500}
+.grouplab{margin-top:14px}
+
+/* exam steps */
+.step{display:grid;grid-template-columns:32px 1fr;gap:12px;padding:14px 0;border-top:1px solid var(--line)}
+.step:first-child{border-top:0}
+.step .num{font-family:var(--mono);font-size:24px;line-height:1;color:var(--accent)}
+.step b.t{display:block;font-size:17px;font-weight:600}
+.step p{font-size:15px;margin-top:4px}
+.find{margin-top:10px;font-size:14px}
+.find li{list-style:none;padding:8px 0;border-top:1px dashed var(--line)}
+.find li:first-child{border-top:0}
+.find li b{font-weight:600}
+
+/* sounds */
+.snd{padding:14px 0;border-top:1px solid var(--line)}
+.snd:first-child{border-top:0}
+.snd .hd{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+.snd .hd b{font-size:16px;font-weight:600}
+.snd p{font-size:14px;margin-top:6px}
+.pcg{display:block;width:100%;height:auto;margin-top:8px}
+.ctrl{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:8px}
+.play{min-height:44px;padding:0 16px;border-radius:999px;background:var(--accent);color:var(--accent-ink);font-size:14px;font-weight:600;display:inline-flex;align-items:center;gap:8px}
+.play svg{width:12px;height:12px}
+.seg{display:inline-grid;grid-auto-flow:column;gap:2px;padding:3px;background:var(--fill);border-radius:10px}
+.seg button{min-height:38px;padding:0 12px;border-radius:8px;font-size:13px;color:var(--muted)}
+.seg button[aria-pressed=true]{background:var(--card);color:var(--ink);font-weight:600}
+.note{font-size:12px;color:var(--muted)}
+
+/* practice */
+.case p{font-size:15px;margin-top:6px}
+.opts{display:grid;gap:8px;margin-top:12px}
+.opt{min-height:48px;padding:10px 14px;border:1px solid var(--line);border-radius:12px;background:var(--card);text-align:left;font-size:15px}
+.opt.right{border-color:var(--ok);background:var(--okbg);color:var(--ok);font-weight:600}
+.opt.wrong{border-color:var(--bad);background:var(--badbg);color:var(--bad)}
+.casenav{display:flex;justify-content:space-between;align-items:center;margin-top:14px;gap:10px}
+.btn{min-height:44px;padding:0 16px;border:1px solid var(--line);border-radius:999px;background:var(--card);font-size:14px;font-weight:500}
+
+/* sheet */
+#sheetwrap{position:fixed;inset:0;background:var(--scrim);display:flex;align-items:flex-end;justify-content:center;z-index:40}
+#sheet{background:var(--bg);width:100%;max-width:760px;max-height:92vh;overflow:auto;border-radius:18px 18px 0 0;padding:14px max(16px,env(safe-area-inset-right,0px)) calc(18px + env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left,0px))}
+#sheet .top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+#sheet h3{font-size:19px;margin-top:2px}
+.x{flex:none;min-width:44px;min-height:44px;border-radius:999px;border:1px solid var(--line);background:var(--card);font-size:20px;line-height:1}
+.plate{margin-top:12px;border:1px solid var(--line);border-radius:12px;padding:6px;background:var(--card)}
+.plate img{display:block;width:100%;height:auto;border-radius:8px}
+.credit{font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:6px}
+.fig{display:block;width:100%;height:auto;margin-top:10px}
+.figtext{font-size:14px;margin-top:8px}
+.grid-legend{font-size:13px;color:var(--muted);margin-top:6px}
+
+footer{max-width:720px;margin:20px auto 0;padding:16px max(16px,env(safe-area-inset-right,0px)) 8px max(16px,env(safe-area-inset-left,0px));border-top:1px solid var(--line);font-size:13px;color:var(--muted)}
+footer p{margin-top:8px}
+@media (prefers-reduced-motion:reduce){.meter i{transition:none}details.more summary::before{transition:none}}
+@media (min-width:1000px){
+  .duo{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;align-items:start}
+  .duo>.card{margin-top:12px}
+  .stick{position:sticky;top:12px}
+}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <a class="back" href="/">← bedside.tools</a>
+  <h1>Cardiac exam</h1>
+  <p>Examine for what changes the answer: each finding, what it does to the differential, and how to elicit it.</p>
+</div></header>
+
+<main class="wrap">
+<!-- ───────── NARROW ───────── -->
+<section class="view on" id="narrow" aria-labelledby="t-narrow">
+  <span class="kicker">Narrow the differential</span>
+  <p class="lede">Pick the question, set your starting estimate, then mark what you find.</p>
+  <div class="card" id="question">
+    <span class="kicker">The question</span>
+    <div class="chips qchips" id="qchips" style="margin-top:10px"></div>
+    <div class="pre">
+      <label for="pre">Your probability before the exam</label><span class="v" id="prev"></span>
+      <input type="range" id="pre" min="1" max="99" step="1" aria-describedby="prenote">
+    </div>
+    <p class="note" id="prenote"></p>
+  </div>
+  <div class="duo">
+    <div class="card result stick" id="result" aria-live="polite"></div>
+    <div class="card" id="findings"><span class="kicker">Examine for</span><div id="frows"></div></div>
+  </div>
+</section>
+
+<!-- ───────── EXAM ───────── -->
+<section class="view" id="exam" aria-labelledby="t-exam">
+  <span class="kicker">The exam, in order</span>
+  <p class="lede">A complete cardiac exam in seven steps. Tap a plate or figure to see it large.</p>
+  <div class="card" id="steps"></div>
+</section>
+
+<!-- ───────── SOUNDS ───────── -->
+<section class="view" id="sounds" aria-labelledby="t-sounds">
+  <span class="kicker">Heart sounds and murmurs</span>
+  <p class="lede">Each sound drawn on one cardiac cycle, with a synthesized version to play. Use headphones.</p>
+  <div class="minis" style="margin-top:10px"><button type="button" class="mini" data-fig="moves">Manoeuvre responses</button><button type="button" class="mini" data-fig="jvpwave">JVP waveform</button></div>
+  <div class="card" id="sndlist"></div>
+</section>
+
+<!-- ───────── PRACTICE ───────── -->
+<section class="view" id="practice" aria-labelledby="t-practice">
+  <span class="kicker">Practice</span>
+  <p class="lede">Six cases. Each runs through the same numbers as the Narrow tab.</p>
+  <div class="card case" id="case"></div>
+</section>
+</main>
+
+<nav class="tabs" role="tablist" aria-label="Sections"><div class="wrap">
+  <button type="button" role="tab" id="t-narrow" aria-controls="narrow" aria-selected="true">Narrow</button>
+  <button type="button" role="tab" id="t-exam" aria-controls="exam" aria-selected="false">Exam</button>
+  <button type="button" role="tab" id="t-sounds" aria-controls="sounds" aria-selected="false">Sounds</button>
+  <button type="button" role="tab" id="t-practice" aria-controls="practice" aria-selected="false">Practice</button>
+</div></nav>
+
+<div id="sheetwrap" hidden><div id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheettitle"></div></div>
+
+<footer>
+  <p>For education only. Not a substitute for clinical judgment.</p>
+  <p>Last reviewed: 14 November 2026.</p>
+  <p>Sources: likelihood ratios are taken only from these systematic reviews (JAMA Rational Clinical Examination series): Drum B et al. Does this patient have volume overload? JAMA 2026;335:1159-68, doi:10.1001/jama.2026.0446. Wang CS et al. Does this dyspneic patient in the emergency department have congestive heart failure? JAMA 2005;294:1944-56, doi:10.1001/jama.294.15.1944. Choudhry NK, Etchells EE. Does this patient have aortic regurgitation? JAMA 1999;281:2231-8, doi:10.1001/jama.281.23.2231. Roy CL et al. Does this patient with a pericardial effusion have cardiac tamponade? JAMA 2007;297:1810-8, doi:10.1001/jama.297.16.1810. Albassam OT et al. Did this patient have cardiac syncope? JAMA 2019;321:2448-57, doi:10.1001/jama.2019.8001. Evidence tier for every likelihood ratio: systematic review of diagnostic accuracy studies. Technique, mechanisms, sound shapes and manoeuvre responses: standard physical diagnosis teaching (McGee, Evidence-Based Physical Diagnosis, 6th ed., 2025); accuracy figures for aortic stenosis, mitral regurgitation, hypertrophic cardiomyopathy manoeuvres, the abdominojugular test and Kussmaul sign are not shown because they have not yet been verified against their primary studies.</p>
+  <p>Combining likelihood ratios multiplies them, which assumes the findings are independent; findings that travel together (for example JVD and edema) overstate the change. Pre-test probabilities are yours to set; the starting values are examples. Synthesized sounds are approximations, not recordings. Technique plates created with BioRender.com.</p>
+  <p>Privacy: everything runs in your browser. Nothing you enter is sent anywhere or stored, and there are no analytics. Do not enter names, record numbers, or dates of birth.</p>
+</footer>
+
+<script>
+(function(){
+"use strict";
+var $=function(s,r){return (r||document).querySelector(s)}, $$=function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))};
+function esc(s){return String(s).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
+
+/* ── Findings and their verified likelihood ratios ──────────────────────────
+   ev: one entry per target diagnosis. lrp = LR when present, lrn = LR when absent (null = not reported).
+   Where the source gives a range, the engine uses the conservative end and "range" shows the full span. */
+var SRC={
+  drum:"Drum et al., JAMA 2026 (systematic review, 40 studies)",
+  wang:"Wang et al., JAMA 2005 (systematic review, 22 studies)",
+  choud:"Choudhry and Etchells, JAMA 1999 (systematic review; cardiologist examiners)",
+  roy:"Roy et al., JAMA 2007 (systematic review; single study for this finding)",
+  alba:"Albassam et al., JAMA 2019 (systematic review, 11 studies)"
+};
+var F={
+  jvd:{nm:"JVD more than 3 cm above the sternal angle",kind:"exam",step:"jvp",plate:"jvp",fig:"jvpwave",
+    ev:[{dx:"vol",lrp:4.1,lrn:null,ci:"2.9–5.6",src:"drum",note:"Specificity 92%."}],
+    mech:"Right atrial pressure rises with intravascular volume, so the venous column stands higher in the neck."},
+  crackles:{nm:"Crackles at the lung bases",kind:"exam",step:"lungs",
+    ev:[{dx:"vol",lrp:2.7,lrn:null,ci:"1.7–4.5",src:"drum",note:"Specificity 81%."},{dx:"hf",lrp:null,lrn:0.51,ci:"0.37–0.70",src:"wang",note:"Absence of rales lowers heart failure only modestly."}],
+    mech:"Fluid-filled small airways snap open on inspiration. Also heard in fibrosis, pneumonia and atelectasis."},
+  edema:{nm:"Lower-extremity edema",kind:"exam",step:"lungs",
+    ev:[{dx:"vol",lrp:2.2,lrn:null,ci:"1.5–3.1",src:"drum",note:"Specificity 80%."}],
+    mech:"Capillary hydrostatic pressure exceeds oncotic pressure in dependent tissue. Venous disease, calcium-channel blockers and low albumin do the same."},
+  s3:{nm:"S3 gallop",kind:"exam",step:"listen",plate:"ausc",snd:"s3",
+    ev:[{dx:"hf",lrp:11,lrn:null,ci:"4.9–25",src:"wang",note:"The strongest single exam sign for heart failure in ED dyspnea, but often missed: its absence tells you little."}],
+    mech:"Rapid early filling into a stiff, full ventricle stops abruptly and the ventricular wall vibrates."},
+  hxhf:{nm:"History of heart failure",kind:"history",
+    ev:[{dx:"hf",lrp:5.8,lrn:0.45,ci:"4.1–8.0 / 0.38–0.53",src:"wang",note:"History, not exam, but it moves the answer more than most signs."}],
+    mech:"Prior heart failure is the best predictor of heart failure now."},
+  pnd:{nm:"Paroxysmal nocturnal dyspnea",kind:"history",
+    ev:[{dx:"hf",lrp:2.6,lrn:null,ci:"1.5–4.5",src:"wang",note:"Best single symptom for heart failure."}],
+    mech:"Lying flat redistributes fluid centrally; the failing left ventricle cannot handle the added preload."},
+  edm:{nm:"Early diastolic murmur, left sternal border",kind:"exam",step:"forward",plate:"ausc",snd:"ar",
+    ev:[{dx:"ar",lrp:8.8,lrn:0.3,range:"LR+ 8.8–32; LR− 0.2–0.3 (0.1 for moderate or worse AR)",src:"choud",note:"Studies used cardiologists as examiners; accuracy for less expert listeners is not known."}],
+    mech:"Blood falls back through an incompetent aortic valve as soon as aortic pressure exceeds left ventricular pressure in diastole."},
+  pulsus:{nm:"Pulsus paradoxus over 10 mmHg",kind:"exam",step:"vitals",fig:"pulsus",
+    ev:[{dx:"tamp",lrp:3.3,lrn:0.03,ci:"1.8–6.3 / 0.01–0.24",src:"roy",note:"Measured in patients already known to have an effusion. 10 mmHg or less makes tamponade very unlikely (one study)."}],
+    mech:"Inspiration fills the right ventricle, which, inside a tight pericardium, pushes the septum into the left ventricle and drops stroke volume."},
+  age35:{nm:"Age 35 or older at first syncope",kind:"history",
+    ev:[{dx:"sync",lrp:3.3,lrn:0.13,ci:"2.6–4.1 / 0.06–0.25",src:"alba",note:"Absent means first episode before age 35."}],
+    mech:"Structural and arrhythmic causes accumulate with age; reflex syncope usually starts young."},
+  af:{nm:"Known atrial fibrillation or flutter",kind:"history",
+    ev:[{dx:"sync",lrp:7.3,lrn:null,ci:"2.4–22",src:"alba",note:"Specific but insensitive (13%)."}],
+    mech:"Marks an electrically and structurally abnormal heart."},
+  shd:{nm:"Known severe structural heart disease",kind:"history",
+    ev:[{dx:"sync",lrp:3.3,lrn:null,range:"LR 3.3–4.8 (2 studies)",src:"alba",note:""}],
+    mech:"Obstruction or scar can drop output or trigger ventricular arrhythmia."},
+  cyan:{nm:"Cyanosis witnessed during the episode",kind:"history",
+    ev:[{dx:"sync",lrp:6.2,lrn:null,ci:"1.6–24",src:"alba",note:"Rare (sensitivity 8%) but specific."}],
+    mech:"Circulatory arrest rather than a brief reflex fall in pressure."},
+  cold:{nm:"Felt cold before fainting",kind:"history",
+    ev:[{dx:"sync",lrp:0.16,lrn:null,ci:"0.06–0.64",src:"alba",note:"A reflex prodrome. Here \"Yes\" lowers the probability."}],
+    mech:"Autonomic prodrome of vasovagal syncope."},
+  mood:{nm:"Mood change or preoccupation with details before fainting",kind:"history",
+    ev:[{dx:"sync",lrp:0.09,lrn:null,ci:"0.02–0.38",src:"alba",note:"A reflex prodrome. Here \"Yes\" lowers the probability."}],
+    mech:"Prodromal symptoms point to a reflex mechanism."}
+};
+var Q={
+  vol:{t:"Breathless: volume overloaded?",dx:"Intravascular volume overload",pre:50,prenote:"Example start 50%. Prevalence in the source studies ranged 35–69%.",f:["jvd","crackles","edema"],ctx:"Spontaneously breathing adults, mostly with dyspnea."},
+  hf:{t:"Breathless in the ED: heart failure?",dx:"Heart failure",pre:50,prenote:"Example start 50%. Set it from the story and your setting.",f:["s3","crackles","hxhf","pnd"],ctx:"Adults presenting to the emergency department with dyspnea."},
+  ar:{t:"Diastolic murmur: aortic regurgitation?",dx:"Aortic regurgitation (mild or worse)",pre:20,prenote:"Example start 20%.",f:["edm"],ctx:"Patients examined by cardiologists in the source studies."},
+  tamp:{t:"Known effusion: tamponade?",dx:"Cardiac tamponade",pre:40,prenote:"Example start 40%. Only applies once an effusion is known.",f:["pulsus"],ctx:"Patients with a known pericardial effusion."},
+  sync:{t:"Fainted: cardiac syncope?",dx:"Cardiac syncope",pre:20,prenote:"Example start 20%. Most ED syncope is reflex or orthostatic.",f:["age35","af","shd","cyan","cold","mood"],ctx:"Adults with syncope in primary care, emergency or specialty clinics."}
+};
+var QORDER=["vol","hf","ar","tamp","sync"];
+
+function evFor(f,dx){return F[f].ev.filter(function(e){return e.dx===dx})[0]||null}
+function lrOf(f,v,dx){var e=evFor(f,dx);if(!e)return null;return v===1?e.lrp:v===-1?e.lrn:null}
+function post(prePct,lrs){var p=prePct/100,o=p/(1-p);lrs.forEach(function(l){o*=l});return 100*o/(1+o)}
+function fmt(p){return p<1?"<1":p>99?">99":String(Math.round(p))}
+function badges(f,dx){var e=evFor(f,dx);if(!e)return "";var h="";if(e.lrp)h+='<span class="lr '+(e.lrp>=1?"up":"down")+'">'+(e.lrp>=1?"LR+ ":"LR ")+e.lrp+'</span>';if(e.lrn)h+='<span class="lr down">LR− '+e.lrn+'</span>';if(F[f].kind==="history")h+='<span class="tag">history</span>';return h}
+
+/* engine used by Narrow and Practice */
+function compute(qk,prePct,state){
+  var lrs=[],parts=[];
+  Q[qk].f.forEach(function(f){var v=state[f];if(!v)return;var l=lrOf(f,v,qk);if(l==null)return;lrs.push(l);parts.push({f:f,v:v,l:l})});
+  return {p:post(prePct,lrs),parts:parts}
+}
+
+/* ── Narrow tab ── */
+var qk="vol",state={},pre={};QORDER.forEach(function(k){pre[k]=Q[k].pre});
+function triHTML(f){var e=evFor(f,qk);var noNeg=!e||e.lrn==null,noPos=!e||e.lrp==null;
+  return '<div class="tri" role="group" aria-label="'+esc(F[f].nm)+'" data-f="'+f+'">'+
+  '<button type="button" data-v="1" aria-pressed="'+(state[f]===1)+'"'+(noPos?' disabled title="No likelihood ratio for presence in the source"':'')+'>Yes</button>'+
+  '<button type="button" data-v="0" aria-pressed="'+(!state[f])+'" aria-label="Not checked">–</button>'+
+  '<button type="button" data-v="-1" aria-pressed="'+(state[f]===-1)+'"'+(noNeg?' disabled title="No likelihood ratio for absence in the source"':'')+'>No</button></div>'}
+function renderQ(){
+  $("#qchips").innerHTML=QORDER.map(function(k){return '<button type="button" class="chip" id="q-'+k+'" data-q="'+k+'" aria-pressed="'+(k===qk)+'">'+esc(Q[k].t)+'</button>'}).join("");
+  $("#pre").value=pre[qk];$("#prev").textContent=pre[qk]+"%";$("#prenote").textContent=Q[qk].prenote;
+  var q=Q[qk],exam=q.f.filter(function(f){return F[f].kind==="exam"}),hist=q.f.filter(function(f){return F[f].kind==="history"});
+  function row(f){var d=F[f],e=evFor(f,qk);var minis="";
+    if(d.plate)minis+='<button type="button" class="mini" data-plate="'+d.plate+'">How to elicit</button>';
+    if(d.snd)minis+='<button type="button" class="mini" data-sound="'+d.snd+'">Hear it</button>';
+    if(d.fig)minis+='<button type="button" class="mini" data-fig="'+d.fig+'">'+(d.fig==="pulsus"?"How to measure":"JVP waveform")+'</button>';
+    return '<div class="frow"><div><div class="nm">'+esc(d.nm)+'</div><div class="sub">'+badges(f,qk)+'</div>'+(e&&e.note?'<div class="hint">'+esc(e.note)+'</div>':'')+(minis?'<div class="minis">'+minis+'</div>':'')+'</div>'+triHTML(f)+'</div>'}
+  $("#frows").innerHTML=(exam.length?exam.map(row).join(""):"")+(hist.length?'<div class="kicker grouplab">From the history</div>'+hist.map(row).join(""):"");
+  renderResult();
+}
+function renderResult(){
+  var q=Q[qk],r=compute(qk,pre[qk],state),p=r.p,el=$("#result");
+  var h='<span class="kicker">Probability now</span><div class="big" style="margin-top:6px"><b>'+esc(q.dx)+'</b><span class="pct">'+fmt(p)+'%</span></div>';
+  h+='<div class="meter" role="img" aria-label="Probability '+fmt(p)+' percent, starting from '+pre[qk]+' percent"><i style="width:'+Math.max(1,Math.min(100,p))+'%"></i><s style="left:calc('+pre[qk]+'% - 1px)"></s></div><div class="scale"><span>0</span><span>start '+pre[qk]+'%</span><span>100</span></div>';
+  if(r.parts.length){
+    var top=r.parts.slice().sort(function(a,b){return Math.abs(Math.log(b.l))-Math.abs(Math.log(a.l))})[0];
+    var e=evFor(top.f,qk);
+    h+='<p class="why"><b>Why:</b> '+esc(F[top.f].nm)+(top.v===1?" present":" absent")+' (LR '+top.l+') moves this the most. '+esc(F[top.f].mech)+'</p>';
+    if(r.parts.length>1)h+='<div class="warnbox">'+r.parts.length+' findings combined by multiplying their likelihood ratios. That assumes they are independent; related findings overstate the change.</div>';
+    h+='<details class="more"><summary>More</summary><ul>'+r.parts.map(function(x){var e2=evFor(x.f,qk);return '<li>'+esc(F[x.f].nm)+(x.v===1?" present":" absent")+': LR '+x.l+(e2.ci?" (95% CI "+esc(e2.ci)+")":"")+(e2.range?" — "+esc(e2.range):"")+'. '+esc(SRC[e2.src])+'.</li>'}).join("")+'</ul><p>Setting: '+esc(q.ctx)+' Post-test odds = pre-test odds × each likelihood ratio.</p><p>Evidence tier: systematic review of diagnostic accuracy studies.</p></details>';
+  } else {
+    h+='<p class="note" style="margin-top:10px">Mark a finding Yes or No to see the probability move. A dash means not examined.</p>';
+  }
+  el.innerHTML=h;
+}
+$("#qchips").addEventListener("click",function(e){var b=e.target.closest("[data-q]");if(!b)return;qk=b.getAttribute("data-q");state={};renderQ()});
+$("#pre").addEventListener("input",function(){pre[qk]=+this.value;$("#prev").textContent=pre[qk]+"%";renderResult()});
+$("#frows").addEventListener("click",function(e){var b=e.target.closest(".tri button");if(!b||b.disabled)return;var t=b.parentNode,f=t.getAttribute("data-f"),v=+b.getAttribute("data-v");
+  $$("button",t).forEach(function(x){x.setAttribute("aria-pressed",String(x===b))});if(v)state[f]=v;else delete state[f];renderResult()});
+
+/* ── Exam tab ── */
+var STEPS=[
+ {id:"vitals",t:"Position and vital signs",p:"Bed at 30–45°. Note the pulse pressure. If an effusion is known or suspected, measure pulsus paradoxus with a manual cuff.",figs:[["fig","pulsus","How to measure pulsus"]],find:[["Pulsus paradoxus over 10 mmHg","pulsus"],["Wide pulse pressure","In aortic regurgitation the diastolic pressure falls as blood runs back into the ventricle."]]},
+ {id:"jvp",t:"Jugular venous pressure",p:"Head turned slightly away. Find the top of the internal jugular pulsation, between the heads of the sternocleidomastoid. Measure its vertical height above the sternal angle. Tell it from the carotid: the venous pulse has two peaks, falls with inspiration, and is not palpable.",figs:[["plate","jvp","Plate: measuring the JVP"],["fig","jvpwave","JVP waveform"]],find:[["JVD more than 3 cm above the sternal angle","jvd"],["Kussmaul sign: JVP rises with inspiration","Seen in constriction and right ventricular infarction. Accuracy not yet verified."]]},
+ {id:"carotid",t:"Carotid upstroke",p:"One side at a time, at the level of the cricoid. Feel the speed and size of the upstroke.",figs:[],find:[["Slow, small upstroke (parvus et tardus)","Fixed outflow obstruction, as in severe aortic stenosis. Accuracy not yet verified."],["Brisk, collapsing pulse","Large stroke volume running off fast, as in aortic regurgitation."]]},
+ {id:"apex",t:"Apex beat",p:"Patient supine, then left lateral. Normal: 5th intercostal space at or inside the midclavicular line, smaller than a coin, brief.",figs:[["plate","ausc","Plate: landmarks"]],find:[["Displaced, diffuse apex","Left ventricular dilation. Accuracy not yet verified."],["Sustained, heaving apex","Pressure overload: aortic stenosis, hypertension, HCM."]]},
+ {id:"listen",t:"Listen: four areas, then the apex on the left side",p:"Diaphragm at the aortic, pulmonic, tricuspid and mitral areas. Then roll the patient onto the left side and listen at the apex with the bell, light pressure, for S3 and S4.",figs:[["plate","ausc","Plate: where to listen"]],find:[["S3 gallop","s3"],["S4","Atrial kick into a stiff ventricle (hypertension, ischemia, HCM, aortic stenosis). Absent in atrial fibrillation."],["Split S2 through the breath","Physiologic split widens on inspiration; see the Sounds tab for wide, fixed and paradoxical."]]},
+ {id:"forward",t:"Sit forward, breath held out",p:"Patient sitting up and leaning forward, breath held after full expiration. Diaphragm pressed firmly along the left sternal border.",figs:[["plate","ausc","Plate: where to listen"]],find:[["Early diastolic murmur, left sternal border","edm"],["Pericardial rub","Scratchy, often three components; loudest in this position."]]},
+ {id:"moves",t:"Manoeuvres for a murmur",p:"When a systolic murmur's cause is unclear, change preload and afterload: Valsalva strain, squat to stand, sustained handgrip, and breathing in.",figs:[["fig","moves","Manoeuvre responses"]],find:[["Murmur louder with Valsalva or standing","Suggests hypertrophic cardiomyopathy: less filling narrows the outflow tract. Accuracy not yet verified."],["Murmur louder with handgrip","Mitral or aortic regurgitation: higher afterload drives more backward flow."]]},
+ {id:"lungs",t:"Lungs and legs",p:"Posterior bases with deep breaths through an open mouth. Press over the shins for 5 seconds; check the sacrum in a patient in bed.",figs:[],find:[["Crackles at the lung bases","crackles"],["Lower-extremity edema","edema"]]}
+];
+function lrLine(fk){var out=[];F[fk].ev.forEach(function(e){out.push(Q[e.dx].dx+": "+(e.lrp?"LR+ "+e.lrp:"")+(e.lrp&&e.lrn?", ":"")+(e.lrn?"LR− "+e.lrn:""))});return out.join(" · ")}
+$("#steps").innerHTML=STEPS.map(function(s,i){
+  var figs=s.figs.length?'<div class="minis">'+s.figs.map(function(x){return '<button type="button" class="mini" data-'+x[0]+'="'+x[1]+'">'+esc(x[2])+'</button>'}).join("")+'</div>':"";
+  var find='<ul class="find">'+s.find.map(function(x){if(F[x[1]])return '<li><b>'+esc(x[0])+'</b><br><span class="mono" style="font-size:12px">'+esc(lrLine(x[1]))+'</span><br><span class="muted">'+esc(F[x[1]].mech)+'</span></li>';return '<li><b>'+esc(x[0])+'</b><br><span class="muted">'+esc(x[1])+'</span></li>'}).join("")+'</ul>';
+  return '<div class="step" id="step-'+s.id+'"><span class="num">'+(i+1)+'</span><div><b class="t">'+esc(s.t)+'</b><p>'+esc(s.p)+'</p>'+figs+find+'</div></div>'}).join("");
+
+/* ── Sounds: drawing and synthesis ── */
+var SND={
+  normal:{t:"Normal S1 and S2",where:"Everywhere. S1 loudest at the apex, S2 at the base.",mech:"S1: mitral and tricuspid closure. S2: aortic then pulmonic closure.",split:{exp:0,insp:30}},
+  wide:{t:"Wide split S2",where:"Pulmonic area.",mech:"Delayed pulmonic closure (right bundle branch block, pulmonary stenosis) or early aortic closure (severe MR). Split present in expiration and wider on inspiration.",split:{exp:50,insp:80}},
+  fixed:{t:"Fixed split S2",where:"Pulmonic area.",mech:"Atrial septal defect: left-to-right shunt equalizes right-sided filling through the breath, so the split does not change.",split:{exp:60,insp:60}},
+  para:{t:"Paradoxical split S2",where:"Pulmonic area.",mech:"Aortic closure delayed past pulmonic (left bundle branch block, severe aortic stenosis, RV pacing). Split in expiration, closes on inspiration.",split:{exp:45,insp:0,rev:true}},
+  s3:{t:"S3 gallop",where:"Apex, bell, patient on the left side.",mech:"Early rapid filling into a stiff, full ventricle stops abruptly. Normal in the young; in adults over about 40 it means high filling pressure.",split:{exp:0,insp:25},s3:true,ev:"s3"},
+  s4:{t:"S4",where:"Apex, bell, left side.",mech:"Atrial contraction into a stiff, non-compliant ventricle. Needs atrial contraction, so it is absent in atrial fibrillation.",split:{exp:0,insp:25},s4:true},
+  as:{t:"Aortic stenosis",where:"Aortic area, radiating to the right carotid.",mech:"Crescendo–decrescendo midsystolic murmur; later peak and a soft or single S2 mean more severe stenosis.",split:{exp:0,insp:0},mur:{type:"cres",start:60,end:300,fc:300}},
+  mr:{t:"Mitral regurgitation",where:"Apex, radiating to the axilla.",mech:"Holosystolic, plateau murmur from S1 to S2 as blood leaks back into the left atrium all through systole.",split:{exp:0,insp:25},mur:{type:"holo",start:15,end:320,fc:380}},
+  ar:{t:"Aortic regurgitation",where:"Left sternal border, sitting forward, breath out.",mech:"High-pitched decrescendo murmur starting right after S2 as blood falls back into the ventricle.",split:{exp:0,insp:20},mur:{type:"dia",start:335,end:620,fc:520},ev:"edm"},
+  ms:{t:"Mitral stenosis",where:"Apex, bell, left side.",mech:"Opening snap after S2, then a low diastolic rumble with presystolic accentuation (if in sinus rhythm).",split:{exp:0,insp:20},os:true,mur:{type:"rumble",start:420,end:780,fc:110}},
+  hcm:{t:"Hypertrophic cardiomyopathy",where:"Left sternal border, not radiating to the carotids.",mech:"Midsystolic murmur from dynamic outflow obstruction; gets louder when the ventricle is smaller (Valsalva, standing).",split:{exp:0,insp:25},mur:{type:"cres",start:80,end:300,fc:280},valsalva:true}
+};
+var SORDER=["normal","wide","fixed","para","s3","s4","as","mr","ar","ms","hcm"];
+var CYCLE=800; // ms; S1 at 0, S2 at 320
+function pcgSVG(k,mode){
+  var s=SND[k],W=320,H=84,mid=46,x=function(ms){return 12+ms/CYCLE*(W-24)};
+  var insp=mode==="insp",vals=mode==="valsalva";
+  var sp=insp?s.split.insp:s.split.exp,g="";
+  g+='<line x1="12" y1="'+mid+'" x2="'+(W-12)+'" y2="'+mid+'" stroke="var(--line)" stroke-width="1.5"/>';
+  function bar(ms,h,w){return '<rect x="'+(x(ms)-w/2).toFixed(1)+'" y="'+(mid-h)+'" width="'+w+'" height="'+(2*h)+'" rx="2" fill="var(--ink)"/>'}
+  function lab(ms,t){return '<text x="'+x(ms).toFixed(1)+'" y="'+(H-3)+'" text-anchor="middle" style="font-family:var(--mono);font-size:10px" fill="var(--muted)">'+t+'</text>'}
+  var mur=s.mur;
+  if(mur){var amp=vals&&s.valsalva?26:18,pts=[];
+    for(var ms=mur.start;ms<=mur.end;ms+=8){var u=(ms-mur.start)/(mur.end-mur.start),a;
+      if(mur.type==="cres")a=amp*Math.sin(Math.PI*u);else if(mur.type==="holo")a=amp*.8;else if(mur.type==="dia")a=amp*(1-u)*.95;else a=amp*.45*(u<.7?(.9-u*.5):(.55+(u-.7)*2.2));
+      pts.push([x(ms),Math.max(1,a)])}
+    g+='<path d="M'+pts.map(function(q){return q[0].toFixed(1)+" "+(mid-q[1]).toFixed(1)}).join(" L")+" L"+pts.slice().reverse().map(function(q){return q[0].toFixed(1)+" "+(mid+q[1]).toFixed(1)}).join(" L")+' Z" fill="var(--hrt-art)" opacity=".7"/>'}
+  if(s.s4)g+=bar(-60+CYCLE,10,5)+lab(CYCLE-60,"S4");
+  g+=bar(0,28,6)+lab(0,"S1");
+  if(sp>0){var first=s.split.rev?"P2":"A2",second=s.split.rev?"A2":"P2";g+=bar(320,22,5)+bar(320+sp,16,4)+lab(320-6,first)+lab(320+sp+8,second)}else g+=bar(320,22,5)+lab(320,"S2");
+  if(s.s3)g+=bar(470,14,6)+lab(470,"S3");
+  if(s.os)g+=bar(400,12,4)+lab(398,"OS");
+  g+='<text x="'+x(160)+'" y="12" text-anchor="middle" style="font-family:var(--mono);font-size:9px" fill="var(--muted)">systole</text><text x="'+x(560)+'" y="12" text-anchor="middle" style="font-family:var(--mono);font-size:9px" fill="var(--muted)">diastole</text>';
+  return '<svg class="pcg" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Phonocardiogram: '+esc(s.t)+(insp?", inspiration":vals?", Valsalva":"")+'">'+g+'</svg>'}
+var actx=null;
+function ac(){if(!actx){var A=window.AudioContext||window.webkitAudioContext;if(!A)return null;actx=new A()}if(actx.state==="suspended")actx.resume();return actx}
+function thump(c,t,f,d,gain){var o=c.createOscillator(),v=c.createGain();o.type="sine";o.frequency.setValueAtTime(f,t);o.frequency.exponentialRampToValueAtTime(f*.6,t+d);v.gain.setValueAtTime(0,t);v.gain.linearRampToValueAtTime(gain,t+.008);v.gain.exponentialRampToValueAtTime(.0005,t+d);o.connect(v).connect(c.destination);o.start(t);o.stop(t+d+.02)}
+function hiss(c,t,d,type,fc,gain){var n=Math.max(1,Math.floor(c.sampleRate*d)),b=c.createBuffer(1,n,c.sampleRate),ch=b.getChannelData(0);for(var i=0;i<n;i++)ch[i]=Math.random()*2-1;
+  var src=c.createBufferSource();src.buffer=b;var bp=c.createBiquadFilter();bp.type="bandpass";bp.frequency.value=fc;bp.Q.value=fc<150?2:1.1;var g=c.createGain();g.gain.setValueAtTime(0,t);
+  if(type==="cres"){g.gain.linearRampToValueAtTime(gain,t+d*.5);g.gain.linearRampToValueAtTime(0,t+d)}
+  else if(type==="dia"){g.gain.linearRampToValueAtTime(gain,t+.02);g.gain.linearRampToValueAtTime(0,t+d)}
+  else if(type==="rumble"){g.gain.linearRampToValueAtTime(gain*.6,t+.05);g.gain.linearRampToValueAtTime(gain*.35,t+d*.7);g.gain.linearRampToValueAtTime(gain,t+d*.97);g.gain.linearRampToValueAtTime(0,t+d)}
+  else{g.gain.linearRampToValueAtTime(gain,t+.03);g.gain.setValueAtTime(gain,t+d-.03);g.gain.linearRampToValueAtTime(0,t+d)}
+  src.connect(bp).connect(g).connect(c.destination);src.start(t);src.stop(t+d)}
+function beat(c,k,t,mode){var s=SND[k],sp=(mode==="insp"?s.split.insp:s.split.exp)/1000;
+  if(s.s4)thump(c,t-.06,30,.08,.6);
+  thump(c,t,60,.09,.9);
+  if(sp>0){thump(c,t+.32,78,.06,.7);thump(c,t+.32+sp,70,.05,.5)}else thump(c,t+.32,75,.07,.7);
+  if(s.s3)thump(c,t+.47,32,.09,.8);
+  if(s.os)thump(c,t+.40,110,.03,.45);
+  if(s.mur){var m=s.mur,gain=mode==="valsalva"&&s.valsalva?.5:.32;hiss(c,t+m.start/1000,(m.end-m.start)/1000,m.type,m.fc,gain)}}
+var playing=null;
+function stop(){if(!playing)return;clearInterval(playing.id);playing.btn.setAttribute("aria-pressed","false");playing.btn.querySelector("span").textContent="Play";playing=null}
+function play(k,btn,mode){var c=ac();if(!c){btn.querySelector("span").textContent="No audio";return}var same=playing&&playing.btn===btn;stop();if(same)return;
+  var t0=c.currentTime+.06,n=0,beatS=CYCLE/1000;beat(c,k,t0,mode);n=1;
+  var id=setInterval(function(){if(n>=8){stop();return}beat(c,k,t0+n*beatS,mode);n++},CYCLE);
+  btn.setAttribute("aria-pressed","true");btn.querySelector("span").textContent="Stop";playing={id:id,btn:btn}}
+var smode={};
+function sndCard(k,inSheet){var s=SND[k],mode=smode[k]||"exp";
+  var hasInsp=s.split.exp!==s.split.insp,hasVal=!!s.valsalva;
+  var seg=(hasInsp||hasVal)?'<div class="seg" role="group" aria-label="Breathing or manoeuvre">'+(hasInsp?'<button type="button" data-mode="exp" data-k="'+k+'" aria-pressed="'+(mode==="exp")+'">Expiration</button><button type="button" data-mode="insp" data-k="'+k+'" aria-pressed="'+(mode==="insp")+'">Inspiration</button>':'<button type="button" data-mode="exp" data-k="'+k+'" aria-pressed="'+(mode==="exp")+'">At rest</button><button type="button" data-mode="valsalva" data-k="'+k+'" aria-pressed="'+(mode==="valsalva")+'">Valsalva</button>')+'</div>':"";
+  var ev=s.ev?'<p class="mono" style="font-size:12px">'+esc(lrLine(s.ev))+'</p>':"";
+  return '<div class="snd" id="s-'+k+'"><div class="hd"><b>'+esc(s.t)+'</b></div><div class="pcgbox" data-k="'+k+'">'+pcgSVG(k,mode)+'</div><div class="ctrl"><button type="button" class="play" data-play="'+k+'" aria-pressed="false"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 1 L11 6 L2 11 Z" fill="currentColor"/></svg><span>Play</span></button>'+seg+'</div><p><b>Where:</b> '+esc(s.where)+'</p><p class="muted">'+esc(s.mech)+'</p>'+ev+'</div>'}
+function renderSounds(){$("#sndlist").innerHTML=SORDER.map(function(k){return sndCard(k)}).join("")}
+renderSounds();
+document.addEventListener("click",function(e){
+  var b=e.target.closest("[data-play]");if(b){var k=b.getAttribute("data-play");play(k,b,smode[k]||"exp");return}
+  var m=e.target.closest("[data-mode]");if(m){var k2=m.getAttribute("data-k");smode[k2]=m.getAttribute("data-mode");
+    $$('[data-mode][data-k="'+k2+'"]').forEach(function(x){x.setAttribute("aria-pressed",String(x.getAttribute("data-mode")===smode[k2]))});
+    $$('.pcgbox[data-k="'+k2+'"]').forEach(function(x){x.innerHTML=pcgSVG(k2,smode[k2])});if(playing)stop();return}
+});
+
+/* ── Figures and plates (sheet) ── */
+var PLATES={
+  jvp:{t:"Measuring the JVP",src:"/media/exam-cardiac/jvp-measurement.webp",alt:"Patient reclining at 45 degrees; a vertical ruler stands on the sternal angle and a horizontal line runs from the top of the internal jugular pulsation to the ruler; the right atrium lies about 5 cm below the sternal angle.",txt:"The right atrium sits about 5 cm below the sternal angle at any angle of recline, so the height you measure plus about 5 cm approximates right atrial pressure in centimetres of water."},
+  ausc:{t:"Where to listen",src:"/media/exam-cardiac/auscultation-sites.webp",alt:"Anterior chest with the sternum, sternal angle and four auscultation sites: aortic at the 2nd right intercostal space by the sternum, pulmonic at the 2nd left, tricuspid at the left lower sternal border, mitral at the 5th intercostal space in the midclavicular line.",txt:"Find the sternal angle first: the 2nd rib attaches there and the 2nd intercostal space is just below it. Count down from there."}
+};
+function jvpWave(state){
+  var W=320,H=150,base=110,pts;
+  var S={normal:[[0,0],[30,-38],[45,-30],[60,-34],[100,-8],[150,-42],[185,-6],[240,-14],[300,-2]],
+    cannon:[[0,0],[25,-20],[40,-80],[60,-20],[100,-8],[150,-36],[185,-6],[240,-14],[300,-2]],
+    cv:[[0,0],[30,-30],[50,-40],[80,-56],[130,-74],[160,-70],[190,-10],[240,-14],[300,-2]],
+    steepy:[[0,0],[30,-40],[50,-36],[90,-14],[145,-46],[170,-2],[195,-36],[240,-38],[300,-36]],
+    tamp:[[0,0],[30,-42],[60,-30],[110,-6],[150,-40],[200,-36],[250,-38],[300,-38]],
+    af:[[0,0],[45,-24],[100,-8],[150,-44],[185,-6],[240,-14],[300,-2]]};
+  pts=S[state];var x=function(t){return 14+t/300*(W-28)};
+  var d="M"+pts.map(function(p){return x(p[0]).toFixed(1)+" "+(base+p[1])}).join(" L");
+  var labels={normal:[[30,"a"],[45,"c"],[100,"x"],[150,"v"],[185,"y"]],cannon:[[40,"cannon a"],[150,"v"]],cv:[[130,"large cv"],[190,"y"]],steepy:[[30,"a"],[90,"x"],[170,"steep y"]],tamp:[[30,"a"],[110,"x"],[200,"no y"]],af:[[100,"x"],[150,"v"],[185,"y"]]};
+  var lab=labels[state].map(function(l){var p=pts.filter(function(q){return q[0]===l[0]})[0]||[l[0],-40];return '<text x="'+x(l[0]).toFixed(1)+'" y="'+(base+p[1]-8)+'" text-anchor="middle" style="font-family:var(--mono);font-size:11px" fill="var(--ink)">'+l[1]+'</text>'}).join("");
+  return '<svg class="fig" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Jugular venous waveform, '+state+'"><line x1="14" y1="'+base+'" x2="'+(W-14)+'" y2="'+base+'" stroke="var(--line)" stroke-width="1.5"/><path d="'+d+'" fill="none" stroke="var(--hrt-vein)" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>'+lab+'<text x="14" y="'+(H-6)+'" style="font-family:var(--mono);font-size:10px" fill="var(--muted)">S1</text><text x="'+x(150)+'" y="'+(H-6)+'" style="font-family:var(--mono);font-size:10px" fill="var(--muted)">S2</text></svg>'}
+var JVPST={normal:["Normal","a: atrial contraction. c: tricuspid bulging at systole. x: atrial relaxation and descent of the valve ring. v: atrial filling against a closed valve. y: emptying when the valve opens."],
+  cannon:["Cannon a wave","Atrium contracts against a closed tricuspid valve: AV dissociation, complete heart block, ventricular tachycardia."],
+  cv:["Large cv wave","Tricuspid regurgitation: the ventricle pushes blood back into the atrium in systole, filling in the x descent."],
+  steepy:["Steep y descent","Constrictive pericarditis: rapid early filling stops abruptly (often with Kussmaul sign). Also severe tricuspid regurgitation."],
+  tamp:["Blunted y descent","Tamponade: the heart cannot fill when the valve opens because the pericardium is full."],
+  af:["No a wave","Atrial fibrillation: no organized atrial contraction."]};
+function figJVP(st){return '<div class="seg" role="group" aria-label="Waveform" style="margin-top:12px;flex-wrap:wrap;display:flex">'+Object.keys(JVPST).map(function(k){return '<button type="button" data-jvp="'+k+'" aria-pressed="'+(k===st)+'">'+esc(JVPST[k][0])+'</button>'}).join("")+'</div>'+jvpWave(st)+'<p class="figtext">'+esc(JVPST[st][1])+'</p><p class="note">Shapes are schematic, drawn for teaching. Source: standard physical diagnosis teaching (McGee 2025).</p>'}
+var MOVES=[["Breathe in","Raises right-sided return","r"],["Valsalva strain / squat to stand","Less preload","p"],["Squat / passive leg raise","More preload and afterload","s"],["Sustained handgrip","More afterload","h"]];
+var MCOLS=[["AS","as"],["HCM","hcm"],["MR","mr"],["AR","ar"],["Right","rt"]];
+var MDIR={r:{as:"0",hcm:"0",mr:"0",ar:"0",rt:"+"},p:{as:"-",hcm:"+",mr:"-",ar:"-",rt:"-"},s:{as:"+",hcm:"-",mr:"+",ar:"+",rt:"+"},h:{as:"-",hcm:"-",mr:"+",ar:"+",rt:"0"}};
+function figMoves(){var cw=50,rw=118,W=rw+cw*MCOLS.length+8,rh=46,H=30+rh*MOVES.length,g="";
+  MCOLS.forEach(function(c,i){g+='<text x="'+(rw+cw*i+cw/2)+'" y="18" text-anchor="middle" style="font-family:var(--mono);font-size:10px" fill="var(--muted)">'+c[0]+'</text>'});
+  MOVES.forEach(function(m,j){var y=30+rh*j;g+='<line x1="0" y1="'+y+'" x2="'+W+'" y2="'+y+'" stroke="var(--line)"/>';g+='<text x="0" y="'+(y+19)+'" style="font-size:11px" fill="var(--ink)">'+esc(m[0].length>20?m[0].split(" / ")[0]:m[0])+'</text><text x="0" y="'+(y+35)+'" style="font-size:10px" fill="var(--muted)">'+esc(m[1])+'</text>';
+    MCOLS.forEach(function(c,i){var d=MDIR[m[2]][c[1]],cx=rw+cw*i+cw/2,cy=y+rh/2;
+      if(d==="+")g+='<path d="M'+cx+' '+(cy-10)+' L'+(cx+8)+' '+(cy+6)+' L'+(cx-8)+' '+(cy+6)+' Z" fill="var(--bad)"/>';
+      else if(d==="-")g+='<path d="M'+cx+' '+(cy+10)+' L'+(cx+8)+' '+(cy-6)+' L'+(cx-8)+' '+(cy-6)+' Z" fill="var(--ok)"/>';
+      else g+='<line x1="'+(cx-7)+'" y1="'+cy+'" x2="'+(cx+7)+'" y2="'+cy+'" stroke="var(--muted)" stroke-width="2"/>'})});
+  return '<svg class="fig" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Grid of how each manoeuvre changes each murmur">'+g+'</svg><p class="grid-legend">Red up: louder. Green down: softer. Line: little change. Right: right-sided murmurs such as tricuspid regurgitation. The Valsalva row also covers squat to stand.</p><p class="figtext">The one that breaks the pattern is HCM: anything that shrinks the ventricle (Valsalva, standing) narrows the outflow tract and makes it louder, while every other left-sided murmur gets softer. Handgrip separates regurgitant murmurs (louder) from outflow murmurs (softer).</p><p class="note">Directions follow from preload and afterload physiology (McGee 2025; Lembo et al., NEJM 1988). Their accuracy figures are not shown because they have not yet been verified against the primary study.</p>'}
+function figPulsus(){return '<svg class="fig" viewBox="0 0 320 130" role="img" aria-label="Arterial pressure falling with inspiration by more than 10 mmHg"><line x1="20" y1="30" x2="300" y2="30" stroke="var(--muted)" stroke-dasharray="4 4"/><line x1="20" y1="58" x2="300" y2="58" stroke="var(--muted)" stroke-dasharray="4 4"/><text x="300" y="24" text-anchor="end" style="font-family:var(--mono);font-size:10px" fill="var(--muted)">first sounds, expiration only</text><text x="300" y="74" text-anchor="end" style="font-family:var(--mono);font-size:10px" fill="var(--muted)">sounds in every beat</text>'+[0,1,2,3,4,5,6,7].map(function(i){var insp=i>=3&&i<=5,top=insp?52:30,x=34+i*34;return '<path d="M'+x+' 110 L'+(x+6)+' '+top+' L'+(x+16)+' '+(top+20)+' L'+(x+26)+' 110" fill="none" stroke="var(--hrt-art)" stroke-width="2.5" stroke-linejoin="round"/>'}).join("")+'<rect x="128" y="96" width="104" height="22" rx="6" fill="var(--fill)"/><text x="180" y="111" text-anchor="middle" style="font-family:var(--mono);font-size:10px" fill="var(--ink)">inspiration</text></svg><p class="figtext">Inflate the cuff above systolic, then deflate slowly. Note the pressure where you first hear sounds only in expiration, then where you hear them in every beat. The difference is the pulsus paradoxus. Over 10 mmHg in a patient with a known effusion raises the likelihood of tamponade.</p>'}
+var lastFocus=null,sheetKey=null;
+function openSheet(html){lastFocus=document.activeElement;$("#sheet").innerHTML=html;$("#sheetwrap").hidden=false;var x=$("#sheet .x");if(x)x.focus()}
+function closeSheet(){$("#sheetwrap").hidden=true;$("#sheet").innerHTML="";sheetKey=null;if(playing)stop();if(lastFocus&&lastFocus.focus)lastFocus.focus()}
+function top(k,t){return '<div class="top"><div><span class="kicker">'+k+'</span><h3 id="sheettitle">'+esc(t)+'</h3></div><button type="button" class="x" aria-label="Close">×</button></div>'}
+function showPlate(k){var p=PLATES[k];openSheet(top("Plate",p.t)+'<div class="plate"><img src="'+p.src+'" alt="'+esc(p.alt)+'" width="1024" height="572"></div><div class="credit">Created with BioRender.com</div><p class="figtext">'+esc(p.txt)+'</p>')}
+function showFig(k){sheetKey=k;if(k==="jvpwave")openSheet(top("Figure","JVP waveform")+'<div id="jvpbox">'+figJVP("normal")+'</div>');else if(k==="moves")openSheet(top("Figure","Manoeuvre responses")+figMoves());else if(k==="pulsus")openSheet(top("Figure","Measuring pulsus paradoxus")+figPulsus())}
+function showSound(k){openSheet(top("Sound",SND[k].t)+sndCard(k,true))}
+document.addEventListener("click",function(e){
+  var p=e.target.closest("[data-plate]");if(p){showPlate(p.getAttribute("data-plate"));return}
+  var f=e.target.closest("[data-fig]");if(f){showFig(f.getAttribute("data-fig"));return}
+  var s=e.target.closest("[data-sound]");if(s){showSound(s.getAttribute("data-sound"));return}
+  var j=e.target.closest("[data-jvp]");if(j){$("#jvpbox").innerHTML=figJVP(j.getAttribute("data-jvp"));var nb=$('[data-jvp="'+j.getAttribute("data-jvp")+'"]');if(nb)nb.focus();return}
+  if(e.target.closest("#sheet .x")||e.target===$("#sheetwrap"))closeSheet();
+});
+document.addEventListener("keydown",function(e){if(e.key==="Escape"&&!$("#sheetwrap").hidden)closeSheet()});
+
+/* ── Practice ── */
+var CASES=[
+ {q:"hf",pre:50,st:{s3:1},t:"A 68-year-old comes to the ED short of breath. You put her on her left side and hear an S3 at the apex.",ask:"Starting from 50%, roughly what is the probability of heart failure now?"},
+ {q:"vol",pre:50,st:{jvd:1,edema:1},t:"A 74-year-old with dyspnea. The JVP is 6 cm above the sternal angle and there is pitting edema to the shins.",ask:"Starting from 50%, roughly what is the probability of volume overload, if you combine both findings?"},
+ {q:"tamp",pre:40,st:{pulsus:-1},t:"A man with a known moderate effusion after a viral illness is tachycardic. Your manual pulsus is 7 mmHg.",ask:"Starting from 40%, roughly what is the probability of tamponade?"},
+ {q:"ar",pre:20,st:{edm:1},t:"A 52-year-old with a wide pulse pressure. Sitting forward with breath held out, you hear a soft decrescendo murmur right after S2 along the left sternal border.",ask:"Starting from 20%, roughly what is the probability of aortic regurgitation?"},
+ {q:"sync",pre:20,st:{age35:-1,cold:1},t:"A 24-year-old fainted for the first time while standing in a hot line. She felt cold and clammy just before.",ask:"Starting from 20%, roughly what is the probability of cardiac syncope?"},
+ {q:"hf",pre:50,st:{crackles:-1,hxhf:-1},t:"A 60-year-old in the ED with dyspnea. No history of heart failure, and the lung bases are clear.",ask:"Starting from 50%, roughly what is the probability of heart failure now?"}
+];
+var ci=0,answered=false;
+function choices(p){var r=Math.round(p);var cands=[r,Math.round(Math.max(1,Math.min(99,r*0.5))),Math.round(Math.min(99,r+(100-r)*0.5)),Math.round(Math.max(1,r-30)),Math.round(Math.min(99,r+30)),50];var out=[];cands.forEach(function(v){if(out.every(function(o){return Math.abs(o-v)>=8}))out.push(v)});out=out.slice(0,4);return out.sort(function(a,b){return a-b})}
+function renderCase(){var c=CASES[ci],r=compute(c.q,c.pre,c.st),p=r.p,opts=choices(p),right=Math.round(p);answered=false;
+  var parts=r.parts.map(function(x){return esc(F[x.f].nm)+(x.v===1?" present":" absent")+" ×"+x.l}).join(", ");
+  $("#case").innerHTML='<span class="kicker">Case '+(ci+1)+' of '+CASES.length+' · '+esc(Q[c.q].t)+'</span><p>'+esc(c.t)+'</p><p><b>'+esc(c.ask)+'</b></p><div class="opts">'+opts.map(function(o){return '<button type="button" class="opt" data-o="'+o+'">'+(o<1?"<1":o)+'%</button>'}).join("")+'</div><div id="caseexp" hidden><p class="why"><b>Why:</b> '+fmt(c.pre)+'% start × '+parts+' → '+fmt(p)+'%. '+esc(F[r.parts[0].f].mech)+'</p>'+(r.parts.length>1?'<div class="warnbox">Two findings multiplied as if independent. JVD and edema both reflect venous pressure, so the true figure is likely lower.</div>':'')+'</div><div class="casenav"><button type="button" class="btn" id="prevc"'+(ci===0?" disabled":"")+'>← Previous</button><button type="button" class="btn" id="tryc">Try it in Narrow</button><button type="button" class="btn" id="nextc"'+(ci===CASES.length-1?" disabled":"")+'>Next →</button></div>';
+  $$("#case .opt").forEach(function(b){b.addEventListener("click",function(){if(answered)return;answered=true;var v=+b.getAttribute("data-o");$$("#case .opt").forEach(function(x){var xv=+x.getAttribute("data-o");if(xv===right)x.classList.add("right");else if(x===b)x.classList.add("wrong")});$("#caseexp").hidden=false})});
+  $("#prevc").addEventListener("click",function(){ci--;renderCase()});$("#nextc").addEventListener("click",function(){ci++;renderCase()});
+  $("#tryc").addEventListener("click",function(){qk=c.q;pre[qk]=c.pre;state={};Object.keys(c.st).forEach(function(k){state[k]=c.st[k]});renderQ();show("narrow")});
+}
+renderCase();
+
+/* ── Tabs ── */
+function show(id){$$("section.view").forEach(function(s){s.classList.toggle("on",s.id===id)});$$("nav.tabs [role=tab]").forEach(function(t){t.setAttribute("aria-selected",String(t.getAttribute("aria-controls")===id))});if(playing)stop();window.scrollTo(0,0)}
+$$("nav.tabs [role=tab]").forEach(function(t){t.addEventListener("click",function(){show(t.getAttribute("aria-controls"))})});
+function fromHash(){var h=(location.hash||"").slice(1);if(!h)return;var el=document.getElementById(h);if(!el)return;var v=el.closest("section.view");if(v)show(v.id);if(h.indexOf("q-")===0){qk=h.slice(2);state={};renderQ()}setTimeout(function(){el.scrollIntoView()},0)}
+window.addEventListener("hashchange",fromHash);
+
+renderQ();fromHash();
+/* Save the plates for offline use (the site's service worker keeps any file this page loads). */
+window.addEventListener("load",function(){Object.keys(PLATES).forEach(function(k){var i=new Image();i.src=PLATES[k].src})});
+})();
+</script>
+</body>
+</html>
