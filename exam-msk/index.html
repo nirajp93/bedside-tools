@@ -157,6 +157,11 @@ footer p{margin-top:8px}
 .pgrid th{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:400}
 .tablewrap{overflow-x:auto}
 .redflags li{margin:6px 0}
+.curve{display:block;width:100%;max-width:440px;height:auto;margin:12px auto 0;touch-action:pan-y;cursor:ew-resize}
+.curvecap{font-size:13px;color:var(--muted);margin:4px 0 0}
+.extab{width:100%;border-collapse:collapse;font-size:14px;margin:8px 0}
+.extab th,.extab td{padding:6px;border-bottom:1px solid var(--line);text-align:left}
+.extab th{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:400}
 </style>
 </head>
 <body>
@@ -176,6 +181,8 @@ footer p{margin-top:8px}
     <div class="pre"><label for="pre">Your probability before the exam</label><span class="v" id="prev"></span>
       <input type="range" id="pre" min="1" max="99" step="1" aria-describedby="prenote"></div>
     <p class="note" id="prenote"></p>
+    <p class="note" id="prehint">Your best guess from the history, before you examine. Unsure? Drag across the range you find plausible and watch the chart in the result.</p>
+    <div class="minis"><button type="button" class="mini" id="prehelp">How to choose a starting number</button></div>
   </div>
   <div class="duo">
     <div class="card result stick" id="result" aria-live="polite"></div>
@@ -405,6 +412,38 @@ function show(id){$$("section.view").forEach(function(s){s.classList.toggle("on"
 $$("nav.tabs [role=tab]").forEach(function(t){t.addEventListener("click",function(){show(t.getAttribute("aria-controls"))})});
 function fromHash(){var h=(location.hash||"").slice(1);if(!h)return;var el=document.getElementById(h);if(!el)return;var v=el.closest("section.view");if(v)show(v.id);if(h.indexOf("q-")===0&&Q[h.slice(2)]){qk=h.slice(2);state={};renderQ()}if(h.indexOf("p-")===0&&P[h.slice(2)]){pk=h.slice(2);renderP()}setTimeout(function(){el.scrollIntoView()},0)}
 window.addEventListener("hashchange",fromHash);
+/* Starting probability: live curve and explainer */
+function curveHTML(){
+ var s=pre[qk],r=compute(qk,s,state),p=r.p,has=r.parts.length>0,X=function(x){return 34+x*2.56},Y=function(y){return 104-y*0.94},d="",a="",x;
+ for(x=0;x<=100;x+=2){var y=x===0?0:x===100?100:compute(qk,x,state).p;d+=(x?"L":"M")+X(x).toFixed(1)+" "+Y(y).toFixed(1)}
+ a=d+"L"+X(0)+" "+Y(0)+"Z";
+ var dx=X(s),dy=Y(p),right=dx<200,g='<svg class="curve" viewBox="0 0 300 138" role="img" aria-label="Chart of the result against your starting probability. Starting at '+s+' percent gives '+fmt(p)+' percent.">';
+ g+='<path d="M'+X(0)+' '+Y(0)+'L'+X(100)+' '+Y(0)+'M'+X(0)+' '+Y(0)+'L'+X(0)+' '+Y(100)+'" stroke="var(--line)" stroke-width="2" fill="none"/>';
+ [0,50,100].forEach(function(t){g+='<text x="'+X(t)+'" y="118" text-anchor="middle" style="font-family:var(--mono);font-size:9px" fill="var(--muted)">'+t+'</text><text x="28" y="'+(Y(t)+3)+'" text-anchor="end" style="font-family:var(--mono);font-size:9px" fill="var(--muted)">'+t+'</text>'});
+ g+='<text x="'+X(50)+'" y="134" text-anchor="middle" style="font-family:var(--mono);font-size:9px" fill="var(--muted)">your starting probability →</text>';
+ g+='<text x="'+(X(0)+4)+'" y="'+(Y(100)+3)+'" style="font-family:var(--mono);font-size:9px" fill="var(--muted)">result ↑</text>';
+ if(has)g+='<path d="'+a+'" fill="var(--accent)" opacity=".12"/>';
+ g+='<path d="M'+X(0)+' '+Y(0)+'L'+X(100)+' '+Y(100)+'" stroke="var(--muted)" stroke-width="1.5" stroke-dasharray="2 4" fill="none"/>';
+ if(has)g+='<path d="'+d+'" stroke="var(--accent)" stroke-width="2.5" fill="none" stroke-linejoin="round"/>';
+ g+='<path d="M'+dx+' '+Y(0)+'L'+dx+' '+dy+'L'+X(0)+' '+dy+'" stroke="var(--ink)" stroke-width="1" stroke-dasharray="3 3" fill="none" opacity=".55"/>';
+ g+='<circle cx="'+dx+'" cy="'+dy+'" r="6" fill="var(--accent)" stroke="var(--card)" stroke-width="2.5"/>';
+ g+='<text x="'+(right?dx+10:dx-10)+'" y="'+(p>18?dy+14:dy-8)+'" text-anchor="'+(right?"start":"end")+'" style="font-family:var(--mono);font-size:10px;font-weight:600" fill="var(--ink)">'+s+'% → '+fmt(p)+'%</text></svg>';
+ g+='<p class="curvecap">'+(has?'Drag the slider (or the chart) and the dot rides the curve. The further the curve bows from the dotted line, the more these findings tell you.':'No findings marked yet, so the result equals your start (the dotted line). Mark a finding and a curve will bow away from it.')+'</p>';
+ return g}
+var renderResultBase=renderResult;
+renderResult=function(){renderResultBase();var sc=$("#result .scale");if(sc)sc.insertAdjacentHTML("afterend",curveHTML())};
+(function(){var drag=false;
+ function setFrom(e){var sv=$("#result svg.curve");if(!sv)return;var b=sv.getBoundingClientRect(),vx=(e.clientX-b.left)/b.width*300,v=Math.round((vx-34)/2.56);v=Math.max(1,Math.min(99,v));if(v===pre[qk])return;pre[qk]=v;$("#pre").value=v;$("#prev").textContent=v+"%";renderResult()}
+ document.addEventListener("pointerdown",function(e){if(e.target.closest&&e.target.closest("#result svg.curve")){drag=true;setFrom(e)}});
+ document.addEventListener("pointermove",function(e){if(drag)setFrom(e)});
+ document.addEventListener("pointerup",function(){drag=false});document.addEventListener("pointercancel",function(){drag=false})})();
+document.addEventListener("click",function(e){if(!e.target.closest("#prehelp"))return;
+ openSheet('<div class="top"><div><span class="kicker">How to</span><h3 id="sheettitle">Choosing your starting probability</h3></div><button type="button" class="x" aria-label="Close">×</button></div>'+
+ '<p class="figtext">This is how likely you think the diagnosis is before you examine: your estimate from the patient\'s age, risk factors and story. The tool then updates it with each finding you mark.</p>'+
+ '<p class="figtext"><b>Picking a number</b></p><ul class="find"><li>Start from how common the diagnosis is in patients like this, where you work. The slider opens on the source study\'s prevalence or a stated example; the note under it says which.</li><li>Move it up for a classic story and risk factors, down for an atypical one.</li><li>A rough number is fine. What matters is whether the result crosses a point where you would act differently.</li></ul>'+
+ '<p class="figtext"><b>Why the start matters</b><br>The same finding (likelihood ratio 10) takes you to very different places:</p><table class="extab"><thead><tr><th>You start at</th><th>You end at</th></tr></thead><tbody><tr><td>5%</td><td>34%</td></tr><tr><td>30%</td><td>81%</td></tr><tr><td>60%</td><td>94%</td></tr></tbody></table>'+
+ '<p class="figtext"><b>Reading the chart</b><br>Across: your starting probability. Up: the result. The dotted line means no change. The solid curve is the result with the findings you have marked, and the dot is you.</p>'+
+ '<p class="figtext"><b>Check your conclusion</b><br>After marking findings, drag across the range of starting values you find plausible. If you would do the same thing at both ends, the exam has answered the question. If your action would change, you need another test.</p>')});
 renderQ();fromHash();
 })();
 </script>
