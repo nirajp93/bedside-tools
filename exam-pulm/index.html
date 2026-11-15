@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Lung Exam · bedside.tools</title>
+<meta name="description" content="Lung exam: which findings change the answer for pneumonia, effusion, COPD and sleep apnea; the exam in order; and the classic patterns.">
+<script src="/theme.js"></script>
+<style>
+
+/* Colours: shared site names only. Dark values and extras (--fill --ok --bad --scrim --hrt-*) live in /theme.js. */
+:root{--bg:#FBFBFA; --card:#FFFFFF; --ink:#111113; --muted:#55555D; --line:#ECECEE; --accent:#2B4BDB; --warn:#9A3B00; --warnbg:#FFF6EC}
+:root{--r:14px}
+*{box-sizing:border-box;margin:0;padding:0}
+[hidden]{display:none!important}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.45;padding-bottom:calc(76px + env(safe-area-inset-bottom))}
+a{color:var(--accent);text-decoration:none}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;-webkit-tap-highlight-color:transparent}
+button:focus-visible,a:focus-visible,[tabindex]:focus-visible,summary:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+h1,h2,h3{font-weight:600;letter-spacing:-.01em;line-height:1.15;text-wrap:balance}
+h1{font-size:26px} h2{font-size:21px} h3{font-size:18px}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.kicker{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.muted{color:var(--muted)}
+.wrap{max-width:720px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+
+header{border-bottom:1px solid var(--line)}
+header .wrap{padding-block:8px 14px}
+.back{font-size:14px;color:var(--accent);display:inline-flex;align-items:center;min-height:44px}
+header p{font-size:15px;color:var(--muted);margin-top:4px}
+
+nav.tabs{position:fixed;left:0;right:0;bottom:0;background:var(--bg);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom);z-index:20}
+nav.tabs .wrap{display:flex;padding-block:0}
+nav.tabs button{flex:1;min-height:56px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:var(--muted);font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;border-top:2px solid transparent}
+nav.tabs button[aria-selected=true]{color:var(--accent);border-top-color:var(--accent)}
+section.view{display:none;padding-block:16px 28px}
+section.view.on{display:block}
+.lede{font-size:15px;color:var(--muted);margin-top:4px}
+
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px;margin-top:12px}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--accent);font-size:14px;font-weight:500;text-align:left}
+.chip[aria-pressed=true]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.qchips .chip{color:var(--ink)}
+.qchips .chip[aria-pressed=true]{color:var(--accent-ink)}
+
+/* pre-test */
+.pre{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;margin-top:12px}
+.pre label{font-size:14px}
+.pre input[type=range]{width:100%;height:44px;accent-color:var(--accent);grid-column:1/-1}
+.pre .v{font-family:var(--mono);font-size:15px}
+
+/* result card */
+.result .big{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+.result .big b{font-size:16px;font-weight:600}
+.result .pct{font-family:var(--mono);font-size:30px;line-height:1;font-variant-numeric:tabular-nums}
+.meter{position:relative;height:10px;border-radius:5px;background:var(--fill);margin-top:10px;overflow:hidden}
+.meter i{position:absolute;left:0;top:0;bottom:0;background:var(--accent);border-radius:5px;transition:width .25s}
+.meter s{position:absolute;top:-2px;bottom:-2px;width:2px;background:var(--ink);text-decoration:none}
+.scale{display:flex;justify-content:space-between;font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:4px}
+.why{font-size:15px;margin-top:10px}
+.why b{font-weight:600}
+details.more{margin-top:8px;border-top:1px dashed var(--line);padding-top:2px}
+details.more summary{min-height:44px;display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);cursor:pointer;list-style:none}
+details.more summary::-webkit-details-marker{display:none}
+details.more summary::before{content:"";width:7px;height:7px;border-right:1.5px solid var(--accent);border-bottom:1.5px solid var(--accent);transform:rotate(-45deg);transition:transform .15s}
+details.more[open] summary::before{transform:rotate(45deg)}
+details.more p,details.more li{font-size:14px;margin-bottom:6px}
+details.more ul{padding-left:18px}
+.warnbox{background:var(--warnbg);color:var(--warn);border-radius:10px;padding:10px 12px;font-size:14px;margin-top:10px}
+
+/* findings */
+.frow{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:12px 0;border-top:1px solid var(--line)}
+.frow:first-child{border-top:0}
+.frow .nm{font-size:15px;font-weight:500}
+.frow .sub{margin-top:4px;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.frow .hint{font-size:13px;color:var(--muted);margin-top:4px}
+.lr{font-family:var(--mono);font-size:12px;padding:2px 7px;border-radius:6px;background:var(--fill);white-space:nowrap}
+.lr.up{color:var(--bad);background:var(--badbg)}
+.lr.down{color:var(--ok);background:var(--okbg)}
+.tag{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:2px 6px;border-radius:5px;background:var(--fill);color:var(--muted)}
+.tri{display:inline-grid;grid-auto-flow:column;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--card)}
+.tri button{min-width:46px;min-height:44px;font-size:13px;color:var(--muted);border-left:1px solid var(--line)}
+.tri button:first-child{border-left:0}
+.tri button:disabled{opacity:.35;cursor:not-allowed}
+.tri button[aria-pressed=true][data-v="1"]{background:var(--badbg);color:var(--bad);font-weight:600}
+.tri button[aria-pressed=true][data-v="1"][data-low]{background:var(--okbg);color:var(--ok)}
+.tri button[aria-pressed=true][data-v="-1"]{background:var(--okbg);color:var(--ok);font-weight:600}
+.tri button[aria-pressed=true][data-v="0"]{color:var(--ink);font-weight:600}
+.minis{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.mini{min-height:44px;padding:0 12px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--accent);font-size:13px;font-weight:500}
+.grouplab{margin-top:14px}
+
+/* exam steps */
+.step{display:grid;grid-template-columns:32px 1fr;gap:12px;padding:14px 0;border-top:1px solid var(--line)}
+.step:first-child{border-top:0}
+.step .num{font-family:var(--mono);font-size:24px;line-height:1;color:var(--accent)}
+.step b.t{display:block;font-size:17px;font-weight:600}
+.step p{font-size:15px;margin-top:4px}
+.find{margin-top:10px;font-size:14px}
+.find li{list-style:none;padding:8px 0;border-top:1px dashed var(--line)}
+.find li:first-child{border-top:0}
+.find li b{font-weight:600}
+
+/* sounds */
+.snd{padding:14px 0;border-top:1px solid var(--line)}
+.snd:first-child{border-top:0}
+.snd .hd{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+.snd .hd b{font-size:16px;font-weight:600}
+.snd p{font-size:14px;margin-top:6px}
+.pcg{display:block;width:100%;height:auto;margin-top:8px}
+.ctrl{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:8px}
+.play{min-height:44px;padding:0 16px;border-radius:999px;background:var(--accent);color:var(--accent-ink);font-size:14px;font-weight:600;display:inline-flex;align-items:center;gap:8px}
+.play svg{width:12px;height:12px}
+.seg{display:inline-grid;grid-auto-flow:column;gap:2px;padding:3px;background:var(--fill);border-radius:10px}
+.seg button{min-height:40px;padding:0 12px;border-radius:8px;font-size:13px;color:var(--muted)}
+.seg button[aria-pressed=true]{background:var(--card);color:var(--ink);font-weight:600}
+.note{font-size:12px;color:var(--muted)}
+
+/* practice */
+.case p{font-size:15px;margin-top:6px}
+.opts{display:grid;gap:8px;margin-top:12px}
+.opt{min-height:48px;padding:10px 14px;border:1px solid var(--line);border-radius:12px;background:var(--card);text-align:left;font-size:15px}
+.opt.right{border-color:var(--ok);background:var(--okbg);color:var(--ok);font-weight:600}
+.opt.wrong{border-color:var(--bad);background:var(--badbg);color:var(--bad)}
+.casenav{display:flex;justify-content:space-between;align-items:center;margin-top:14px;gap:10px}
+.btn{min-height:44px;padding:0 16px;border:1px solid var(--line);border-radius:999px;background:var(--card);font-size:14px;font-weight:500}
+
+/* sheet */
+#sheetwrap{position:fixed;inset:0;background:var(--scrim);display:flex;align-items:flex-end;justify-content:center;z-index:40}
+#sheet{background:var(--bg);width:100%;max-width:760px;max-height:92vh;overflow:auto;border-radius:18px 18px 0 0;padding:14px max(16px,env(safe-area-inset-right,0px)) calc(18px + env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left,0px))}
+#sheet .top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+#sheet h3{font-size:19px;margin-top:2px}
+.x{flex:none;min-width:44px;min-height:44px;border-radius:999px;border:1px solid var(--line);background:var(--card);font-size:20px;line-height:1}
+.plate{margin-top:12px;border:1px solid var(--line);border-radius:12px;padding:6px;background:var(--card)}
+.plate img{display:block;width:100%;height:auto;border-radius:8px}
+.credit{font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:6px}
+.fig{display:block;width:100%;height:auto;margin-top:10px}
+.figtext{font-size:14px;margin-top:8px}
+.grid-legend{font-size:13px;color:var(--muted);margin-top:6px}
+
+footer{max-width:720px;margin:20px auto 0;padding:16px max(16px,env(safe-area-inset-right,0px)) 8px max(16px,env(safe-area-inset-left,0px));border-top:1px solid var(--line);font-size:13px;color:var(--muted)}
+footer p{margin-top:8px}
+@media (prefers-reduced-motion:reduce){.meter i{transition:none}details.more summary::before{transition:none}}
+@media (min-width:1000px){
+  .duo{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;align-items:start}
+  .duo>.card{margin-top:12px}
+  .stick{position:sticky;top:12px}
+}
+
+.pgrid{width:100%;border-collapse:collapse;font-size:13px;margin-top:10px}
+.pgrid th,.pgrid td{padding:8px 6px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+.pgrid th{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:400}
+.pgrid tr.on td{background:var(--fill);font-weight:600}
+.tablewrap{overflow-x:auto}
+.lungfig{display:block;width:100%;max-width:380px;height:auto;margin:6px auto 0}
+.sigs{display:grid;grid-template-columns:auto 1fr;gap:6px 12px;margin-top:10px;font-size:15px}
+.sigs dt{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding-top:3px}
+.sigs dd{margin:0}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <a class="back" href="/">← bedside.tools</a>
+  <h1>Lung exam</h1>
+  <p>Which findings change the answer, the exam in order, and the patterns that tell consolidation from fluid from air.</p>
+</div></header>
+
+<main class="wrap">
+<section class="view on" id="narrow" aria-labelledby="t-narrow">
+  <span class="kicker">Narrow the differential</span>
+  <p class="lede">Pick the question, set your starting estimate, then mark what you find.</p>
+  <div class="card" id="question">
+    <span class="kicker">The question</span>
+    <div class="chips qchips" id="qchips" style="margin-top:10px"></div>
+    <div class="pre"><label for="pre">Your probability before the exam</label><span class="v" id="prev"></span>
+      <input type="range" id="pre" min="1" max="99" step="1" aria-describedby="prenote"></div>
+    <p class="note" id="prenote"></p>
+  </div>
+  <div class="duo">
+    <div class="card result stick" id="result" aria-live="polite"></div>
+    <div class="card" id="findings"><span class="kicker">Examine for</span><div id="frows"></div><div id="qnote"></div></div>
+  </div>
+</section>
+
+<section class="view" id="exam" aria-labelledby="t-exam">
+  <span class="kicker">The exam, in order</span>
+  <p class="lede">Look, feel, percuss, listen, then voice sounds. Compare side to side at each level.</p>
+  <div class="card" id="steps"></div>
+</section>
+
+<section class="view" id="patterns" aria-labelledby="t-patterns">
+  <span class="kicker">Patterns</span>
+  <p class="lede">Each process changes how sound and vibration travel through the chest. Pick one to see what it does and why.</p>
+  <div class="card"><div class="chips" id="pchips"></div></div>
+  <div class="card" id="pcard" aria-live="polite"></div>
+  <div class="card"><span class="kicker">All patterns side by side</span><div class="tablewrap" id="ptable"></div></div>
+</section>
+
+<section class="view" id="practice" aria-labelledby="t-practice">
+  <span class="kicker">Practice</span>
+  <p class="lede">Six cases: name the pattern, or move the probability.</p>
+  <div class="card case" id="case"></div>
+</section>
+</main>
+
+<nav class="tabs" role="tablist" aria-label="Sections"><div class="wrap">
+  <button type="button" role="tab" id="t-narrow" aria-controls="narrow" aria-selected="true">Narrow</button>
+  <button type="button" role="tab" id="t-exam" aria-controls="exam" aria-selected="false">Exam</button>
+  <button type="button" role="tab" id="t-patterns" aria-controls="patterns" aria-selected="false">Patterns</button>
+  <button type="button" role="tab" id="t-practice" aria-controls="practice" aria-selected="false">Practice</button>
+</div></nav>
+
+<div id="sheetwrap" hidden><div id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheettitle"></div></div>
+
+<footer>
+  <p>For education only. Not a substitute for clinical judgment.</p>
+  <p>Last reviewed: 14 November 2026.</p>
+  <p>Sources for likelihood ratios: Marchello CS et al. Signs and symptoms that rule out community-acquired pneumonia in outpatient adults: a systematic review and meta-analysis. J Am Board Fam Med 2019;32:234-47, doi:10.3122/jabfm.2019.02.180219. Dale AP et al. Clinical gestalt to diagnose pneumonia, sinusitis, and pharyngitis: a meta-analysis. Br J Gen Pract 2019;69:e444-53, doi:10.3399/bjgp19X704297. Wong CL et al. Does this patient have a pleural effusion? JAMA 2009;301:309-17, doi:10.1001/jama.2008.937. Wilcox ME et al. Does this patient have an exudative pleural effusion? JAMA 2014;311:2422-31, doi:10.1001/jama.2014.5552. Straus SE et al. Accuracy of history, wheezing, and forced expiratory time in the diagnosis of chronic obstructive pulmonary disease. J Gen Intern Med 2002;17:684-8, doi:10.1046/j.1525-1497.2002.20102.x (one study). Myers KA et al. Does this patient have obstructive sleep apnea? JAMA 2013;310:731-41, doi:10.1001/jama.2013.276185. Myers KA, Farquhar DR. Does this patient have clubbing? JAMA 2001;286:341-7, doi:10.1001/jama.286.3.341. Evidence tier: systematic reviews of diagnostic accuracy studies, except the COPD findings (one prospective study).</p>
+  <p>Exam technique and the pattern table (trachea, expansion, fremitus, percussion, breath and voice sounds): standard physical diagnosis teaching (expert practice); accuracy figures for individual signs such as egophony and bronchial breath sounds are not shown because they have not been verified against their primary studies. Combining likelihood ratios multiplies them, which assumes the findings are independent. Pre-test probabilities are yours to set; starting values are examples or the source's stated prevalence.</p>
+  <p>Privacy: everything runs in your browser. Nothing you enter is sent anywhere or stored, and there are no analytics. Do not enter names, record numbers, or dates of birth.</p>
+</footer>
+
+<script>
+(function(){
+"use strict";
+var $=function(s,r){return (r||document).querySelector(s)},$$=function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))};
+function esc(s){return String(s).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
+
+var SRC={march:"Marchello et al., J Am Board Fam Med 2019 (systematic review; outpatient adults with acute respiratory infection)",dale:"Dale et al., Br J Gen Pract 2019 (systematic review; outpatient adults)",wong:"Wong et al., JAMA 2009 (systematic review, 5 studies)",wilcox:"Wilcox et al., JAMA 2014 (systematic review)",straus:"Straus et al., J Gen Intern Med 2002 (one prospective study, n = 161, spirometry as reference)",myers:"Myers et al., JAMA 2013 (systematic review; patients referred for sleep evaluation)",club:"Myers and Farquhar, JAMA 2001 (systematic review)"};
+var F={
+ vitals:{nm:"Any abnormal vital sign: temperature, respiratory rate or heart rate",kind:"exam",step:"inspect",ev:[{dx:"pna",lrp:null,lrn:0.24,ci:"0.17–0.34",src:"march",note:"No means all three are normal."}],mech:"Pneumonia is a systemic infection; normal temperature, rate and pulse make it less likely."},
+ vitex:{nm:"Any abnormal vital sign or abnormal lung exam",kind:"exam",step:"listen",ev:[{dx:"pna",lrp:null,lrn:0.10,ci:"0.07–0.13",src:"march",note:"No means vital signs and the lung exam are all normal. If marked, it replaces the vital-signs row."}],mech:"Adding a normal lung exam to normal vital signs makes pneumonia unlikely enough that most patients need no chest X-ray."},
+ gestalt:{nm:"Your overall impression: this is pneumonia",kind:"exam",step:"listen",ev:[{dx:"pna",lrp:7.7,lrn:0.54,ci:"4.8–11.5 / 0.42–0.65",src:"dale",note:"Clinician impression after history and exam. It already contains the other findings, so do not combine it with them."}],mech:"Experienced clinicians integrate many weak signs; as a whole the impression rules in better than any single sign."},
+ dull:{nm:"Dullness to percussion",kind:"exam",step:"percuss",ev:[{dx:"eff",lrp:8.7,lrn:null,ci:"2.2–33.8",src:"wong",note:"Conventional percussion. Confirm with imaging."}],mech:"Fluid between lung and chest wall damps the vibration of the chest, so the note goes flat (stony dull)."},
+ fremitus:{nm:"Reduced tactile fremitus",kind:"exam",step:"palpate",ev:[{dx:"eff",lrp:null,lrn:0.21,ci:"0.12–0.37",src:"wong",note:"No means fremitus is normal and symmetric."}],mech:"Fluid separates the lung from the chest wall, so voice vibration no longer reaches your hand."},
+ light:{nm:"Any of Light's criteria met",kind:"lab",ev:[{dx:"exu",lrp:null,lrn:0.04,ci:"0.02–0.11",src:"wilcox",note:"Fluid:serum protein > 0.5, fluid:serum LDH > 0.6, or fluid LDH > two-thirds of the upper limit of normal for serum. No means none are met."}],mech:"Exudates leak protein and cells through inflamed or invaded pleura; transudates are ultrafiltrate from pressure or oncotic imbalance."},
+ ldh:{nm:"Pleural fluid LDH above 200 U/L",kind:"lab",ev:[{dx:"exu",lrp:18,lrn:null,ci:"6.8–46",src:"wilcox",note:""}],mech:"LDH comes from cells; inflammation, infection and tumour release it into the pleural space."},
+ cholr:{nm:"Fluid:serum cholesterol ratio above 0.3",kind:"lab",ev:[{dx:"exu",lrp:14,lrn:null,ci:"5.5–38",src:"wilcox",note:""}],mech:"Cholesterol crosses into the pleural space only when capillaries and pleura leak."},
+ chol:{nm:"Pleural fluid cholesterol above 55 mg/dL",kind:"lab",ev:[{dx:"exu",lrp:7.1,lrn:null,range:"LR 7.1–250 across studies; lower value used",src:"wilcox",note:"Lower value used."}],mech:"Same mechanism as the ratio."},
+ wheeze:{nm:"Wheezing",kind:"exam",step:"listen",ev:[{dx:"copd",lrp:4.0,lrn:null,src:"straus",note:""}],mech:"Air forced through narrowed airways makes the walls flutter."},
+ fet:{nm:"Forced expiratory time over 9 seconds",kind:"exam",step:"fet",ev:[{dx:"copd",lrp:6.7,lrn:null,src:"straus",note:"Listen over the trachea while the patient breathes out as hard and fast as possible after a full breath in."}],mech:"Obstructed airways empty slowly, so a forced breath out takes longer."},
+ hxcopd:{nm:"Patient reports a history of COPD",kind:"history",ev:[{dx:"copd",lrp:5.6,lrn:null,src:"straus",note:""}],mech:"A prior diagnosis is usually right."},
+ pky:{nm:"Smoked more than 40 pack-years",kind:"history",ev:[{dx:"copd",lrp:3.3,lrn:null,src:"straus",note:""}],mech:"Cumulative smoke exposure drives airway and alveolar damage."},
+ gasp:{nm:"Choking or gasping at night",kind:"history",ev:[{dx:"osa",lrp:3.3,lrn:null,ci:"2.1–4.6",src:"myers",note:"Apnea–hypopnea index ≥ 10 as reference."}],mech:"The airway closes during sleep until the drop in oxygen and rise in CO2 wake the patient."},
+ snore:{nm:"Snoring",kind:"history",ev:[{dx:"osa",lrp:1.1,lrn:null,ci:"1.0–1.1",src:"myers",note:"Common in sleep apnea but also in people without it: barely moves the probability."}],mech:"Partial airway narrowing vibrates the soft palate; most snorers do not have apnea."},
+ lowrisk:{nm:"Only mild snoring and BMI under 26",kind:"history",ev:[{dx:"osa",lrp:0.07,lrn:null,ci:"0.03–0.19",src:"myers",note:"For moderate or severe apnea (AHI ≥ 15). Here Yes lowers the probability."}],mech:"Thin patients with soft snoring rarely have a collapsible airway."},
+ pdr:{nm:"Clubbing: phalangeal depth ratio above 1.0",kind:"exam",step:"inspect",fig:"club",ev:[{dx:"lca",lrp:3.9,lrn:null,src:"club",note:"Depth at the nail bed greater than at the last finger joint."}],mech:"Increased blood flow and connective tissue growth at the nail bed, linked to growth factors released in lung cancer and chronic hypoxic or inflammatory disease."}
+};
+var Q={
+ pna:{t:"Cough and fever: pneumonia?",dx:"Community-acquired pneumonia",pre:5,prenote:"Example start 5%. In outpatient adults with an acute respiratory infection the baseline is about 4%; higher in the ED.",f:["vitals","vitex","gestalt"],ctx:"Outpatient adults and adolescents with an acute respiratory infection; chest radiograph as reference."},
+ eff:{t:"Is there a pleural effusion?",dx:"Pleural effusion",pre:30,prenote:"Example start 30%.",f:["dull","fremitus"],ctx:"Patients examined before chest imaging."},
+ exu:{t:"After the tap: exudate?",dx:"Exudative effusion",pre:60,prenote:"Example start 60%. Most effusions sampled in hospital are exudates.",f:["light","ldh","cholr","chol"],ctx:"Adults undergoing thoracentesis.",note:"Light's criteria are sensitive and will call some transudates (especially after diuresis) exudates; a serum–fluid albumin gradient over 1.2 g/dL suggests a transudate in that case."},
+ copd:{t:"Smoker with dyspnea: COPD?",dx:"Airflow limitation (COPD)",pre:40,prenote:"Example start 40%.",f:["wheeze","fet","hxcopd","pky"],ctx:"Adults with known, suspected or no COPD in primary and secondary care; spirometry as reference.",note:"If wheezing, forced expiratory time over 9 seconds and a history of COPD are all marked, the tool uses the study's combined LR 33; if all three are marked No, it uses 0.18. These come from a multivariable model and are more accurate than multiplying."},
+ osa:{t:"Tired and snores: sleep apnea?",dx:"Obstructive sleep apnea",pre:40,prenote:"Example start 40%. Among patients referred for a sleep study, prevalence ran 21–90%.",f:["gasp","snore","lowrisk"],ctx:"Patients referred for sleep evaluation; polysomnography as reference."},
+ lca:{t:"Clubbing: lung cancer?",dx:"Lung cancer",pre:10,prenote:"Example start 10%.",f:["pdr"],ctx:"Patients assessed for clubbing."}
+};
+var QORDER=["pna","eff","exu","copd","osa","lca"];
+function evFor(f,dx){return F[f].ev.filter(function(e){return e.dx===dx})[0]||null}
+function lrOf(f,v,dx){var e=evFor(f,dx);if(!e)return null;return v===1?e.lrp:v===-1?e.lrn:null}
+function post(p0,lrs){var o=p0/100/(1-p0/100);lrs.forEach(function(l){o*=l});return 100*o/(1+o)}
+function fmt(p){return p<1?"<1":p>99?">99":String(Math.round(p))}
+function badges(f,dx){var e=evFor(f,dx);if(!e)return "";var h="";if(e.lrp!=null)h+='<span class="lr '+(e.lrp>=1.05?"up":e.lrp<=0.95?"down":"")+'">'+(e.lrp>=1?"LR+ ":"LR ")+e.lrp+'</span>';if(e.lrn!=null)h+='<span class="lr down">LR− '+e.lrn+'</span>';if(F[f].kind==="history")h+='<span class="tag">history</span>';if(F[f].kind==="lab")h+='<span class="tag">fluid</span>';return h}
+function compute(qk,p0,st){var lrs=[],parts=[];
+ if(qk==="copd"&&st.wheeze&&st.fet&&st.hxcopd&&st.wheeze===st.fet&&st.fet===st.hxcopd){var c=st.wheeze===1?33:0.18;lrs.push(c);parts.push({f:"combo",v:st.wheeze,l:c});if(st.pky===1){lrs.push(3.3);parts.push({f:"pky",v:1,l:3.3})}return{p:post(p0,lrs),parts:parts}}
+ Q[qk].f.forEach(function(f){var v=st[f];if(!v)return;if(qk==="pna"&&f==="vitals"&&st.vitex===-1)return;var l=lrOf(f,v,qk);if(l==null)return;lrs.push(l);parts.push({f:f,v:v,l:l})});return{p:post(p0,lrs),parts:parts}}
+function pname(x){return x.f==="combo"?(x.v===1?"Wheeze, FET over 9 s and history of COPD all present":"None of wheeze, FET over 9 s or history of COPD"):F[x.f].nm+(x.v===1?": yes":": no")}
+function pmech(x){return x.f==="combo"?"The three findings together come from the study's multivariable model.":F[x.f].mech}
+
+/* Narrow */
+var qk="pna",state={},pre={};QORDER.forEach(function(k){pre[k]=Q[k].pre});
+function triHTML(f){var e=evFor(f,qk),noNeg=!e||e.lrn==null,noPos=!e||e.lrp==null;
+ return '<div class="tri" role="group" aria-label="'+esc(F[f].nm)+'" data-f="'+f+'"><button type="button" data-v="1"'+(e&&e.lrp!=null&&e.lrp<1?' data-low="1"':'')+' aria-pressed="'+(state[f]===1)+'"'+(noPos?' disabled title="No likelihood ratio for presence in the source"':'')+'>Yes</button><button type="button" data-v="0" aria-pressed="'+(!state[f])+'" aria-label="Not checked">–</button><button type="button" data-v="-1" aria-pressed="'+(state[f]===-1)+'"'+(noNeg&&!(qk==="copd"&&["wheeze","fet","hxcopd"].indexOf(f)>=0)?' disabled title="No likelihood ratio for absence in the source"':'')+'>No</button></div>'}
+function renderQ(){
+ $("#qchips").innerHTML=QORDER.map(function(k){return '<button type="button" class="chip" id="q-'+k+'" data-q="'+k+'" aria-pressed="'+(k===qk)+'">'+esc(Q[k].t)+'</button>'}).join("");
+ $("#pre").value=pre[qk];$("#prev").textContent=pre[qk]+"%";$("#prenote").textContent=Q[qk].prenote;
+ var q=Q[qk],groups=[["exam",""],["lab","Pleural fluid"],["history","From the history"]];
+ function row(f){var d=F[f],e=evFor(f,qk),m=d.fig?'<div class="minis"><button type="button" class="mini" data-fig="'+d.fig+'">How to measure</button></div>':"";
+  if(d.step&&!d.fig)m='<div class="minis"><button type="button" class="mini" data-goto="step-'+d.step+'">How to elicit</button></div>';
+  return '<div class="frow"><div><div class="nm">'+esc(d.nm)+'</div><div class="sub">'+badges(f,qk)+'</div>'+(e&&e.note?'<div class="hint">'+esc(e.note)+'</div>':'')+m+'</div>'+triHTML(f)+'</div>'}
+ $("#frows").innerHTML=groups.map(function(g){var fs=q.f.filter(function(f){return F[f].kind===g[0]});if(!fs.length)return "";return (g[1]?'<div class="kicker grouplab">'+g[1]+'</div>':'')+fs.map(row).join("")}).join("");
+ $("#qnote").innerHTML=q.note?'<div class="warnbox">'+esc(q.note)+'</div>':"";
+ renderResult()}
+function renderResult(){var q=Q[qk],r=compute(qk,pre[qk],state),p=r.p;
+ var h='<span class="kicker">Probability now</span><div class="big" style="margin-top:6px"><b>'+esc(q.dx)+'</b><span class="pct">'+fmt(p)+'%</span></div><div class="meter" role="img" aria-label="Probability '+fmt(p)+' percent, starting from '+pre[qk]+' percent"><i style="width:'+Math.max(1,Math.min(100,p))+'%"></i><s style="left:calc('+pre[qk]+'% - 1px)"></s></div><div class="scale"><span>0</span><span>start '+pre[qk]+'%</span><span>100</span></div>';
+ if(r.parts.length){var top=r.parts.slice().sort(function(a,b){return Math.abs(Math.log(b.l))-Math.abs(Math.log(a.l))})[0];
+  h+='<p class="why"><b>Why:</b> '+esc(pname(top))+' (LR '+top.l+') moves this the most. '+esc(pmech(top))+'</p>';
+  if(r.parts.length>1)h+='<div class="warnbox">'+r.parts.length+' findings combined by multiplying their likelihood ratios. That assumes they are independent; related findings overstate the change.</div>';
+  h+='<details class="more"><summary>More</summary><ul>'+r.parts.map(function(x){if(x.f==="combo")return '<li>'+esc(pname(x))+': LR '+x.l+' (multivariable). '+esc(SRC.straus)+'.</li>';var e=evFor(x.f,qk);return '<li>'+esc(pname(x))+': LR '+x.l+(e.ci?" (95% CI "+esc(e.ci)+")":"")+(e.range?" — "+esc(e.range):"")+'. '+esc(SRC[e.src])+'.</li>'}).join("")+'</ul><p>Setting: '+esc(q.ctx)+' Post-test odds = pre-test odds × each likelihood ratio.</p></details>'}
+ else h+='<p class="note" style="margin-top:10px">Mark a finding Yes or No to see the probability move. A dash means not examined.</p>';
+ $("#result").innerHTML=h}
+$("#qchips").addEventListener("click",function(e){var b=e.target.closest("[data-q]");if(!b)return;qk=b.getAttribute("data-q");state={};renderQ()});
+$("#pre").addEventListener("input",function(){pre[qk]=+this.value;$("#prev").textContent=pre[qk]+"%";renderResult()});
+$("#frows").addEventListener("click",function(e){var b=e.target.closest(".tri button");if(!b||b.disabled)return;var t=b.parentNode,f=t.getAttribute("data-f"),v=+b.getAttribute("data-v");$$("button",t).forEach(function(x){x.setAttribute("aria-pressed",String(x===b))});if(v)state[f]=v;else delete state[f];renderResult()});
+
+/* Exam */
+var STEPS=[
+ {id:"inspect",t:"Inspect",s:"Count the respiratory rate for 30–60 seconds; look at the hands and the work of breathing.",p:"Accessory muscles, pursed lips, tripod position, cyanosis, chest shape (barrel), asymmetric movement. Check the fingers for clubbing.",figs:[["fig","club","Measuring clubbing"]],find:[["Any abnormal vital sign","vitals"],["Clubbing","pdr"]]},
+ {id:"palpate",t:"Palpate",s:"Trachea in the notch, then expansion, then tactile fremitus.",p:"Expansion: thumbs at the lower ribs posteriorly, watch them separate on a deep breath. Fremitus: the side of the hand on the back while the patient says \"ninety-nine\", comparing level by level.",figs:[],find:[["Reduced tactile fremitus","fremitus"],["Trachea shifted","Away from a large effusion or tension pneumothorax; toward collapse or fibrosis."]]},
+ {id:"percuss",t:"Percuss",s:"Posterior chest, side to side, top to bottom.",p:"Middle finger flat in the intercostal space, strike its middle phalanx with a loose wrist. Resonant over normal lung, dull over solid or fluid, stony dull over a large effusion, hyperresonant over air.",figs:[],find:[["Dullness to percussion","dull"]]},
+ {id:"listen",t:"Listen",s:"Diaphragm, mouth open, deep breaths; compare side to side.",p:"Vesicular sounds (soft, longer in inspiration) are normal; bronchial sounds (loud, hollow, gap between inspiration and expiration) over the lung field mean consolidated lung conducting from the airway. Crackles: fine late-inspiratory (fibrosis, edema), coarse early (bronchiectasis, COPD). Wheeze, stridor (upper airway, urgent), pleural rub.",figs:[],find:[["Wheezing","wheeze"],["Overall impression: pneumonia","gestalt"],["Abnormal vital signs or lung exam","vitex"]]},
+ {id:"voice",t:"Voice sounds",s:"Where breath sounds are abnormal, test egophony.",p:"Egophony: the patient says \"ee\" and you hear \"ay\" over consolidation. Whispered pectoriloquy: whispered words are clear over consolidation. Bronchophony: spoken words louder. All three mean solid lung conducting sound well; all are reduced over fluid or air.",figs:[],find:[["Egophony","Consolidation, or the compressed lung at the top of an effusion. Accuracy not shown: not yet verified."]]},
+ {id:"fet",t:"Forced expiratory time",s:"Stethoscope over the trachea; one full breath in, then out as hard and fast as possible.",p:"Time until airflow stops. Over 9 seconds suggests airflow limitation.",figs:[],find:[["Forced expiratory time over 9 seconds","fet"]]}
+];
+function lrLine(fk){return F[fk].ev.map(function(e){return Q[e.dx].dx+": "+(e.lrp!=null?(e.lrp>=1?"LR+ ":"LR ")+e.lrp:"")+(e.lrp!=null&&e.lrn!=null?", ":"")+(e.lrn!=null?"LR− "+e.lrn:"")}).join(" · ")}
+$("#steps").innerHTML=STEPS.map(function(s,i){var figs=s.figs.length?'<div class="minis">'+s.figs.map(function(x){return '<button type="button" class="mini" data-'+x[0]+'="'+x[1]+'">'+esc(x[2])+'</button>'}).join("")+'</div>':"";
+ var find='<ul class="find">'+s.find.map(function(x){if(F[x[1]])return '<li><b>'+esc(x[0])+'</b><br><span class="mono" style="font-size:12px">'+esc(lrLine(x[1]))+'</span><br><span class="muted">'+esc(F[x[1]].mech)+'</span></li>';return '<li><b>'+esc(x[0])+'</b><br><span class="muted">'+esc(x[1])+'</span></li>'}).join("")+'</ul>';
+ return '<div class="step" id="step-'+s.id+'"><span class="num">'+(i+1)+'</span><div><b class="t">'+esc(s.t)+'</b><p><b>Do:</b> '+esc(s.s)+'</p><p class="muted">'+esc(s.p)+'</p>'+figs+find+'</div></div>'}).join("");
+
+/* Patterns */
+var P={
+ cons:{t:"Consolidation",trachea:"Central",exp:"Reduced on that side",frem:"Increased",perc:"Dull",breath:"Bronchial",voice:"Increased; egophony",added:"Crackles",why:"Air spaces filled with pus or fluid make the lung solid. Solid tissue carries sound and vibration better than aerated lung, so fremitus and voice sounds increase and the airway's own bronchial sound reaches the chest wall.",cause:"Pneumonia; also hemorrhage or tumour filling alveoli."},
+ eff:{t:"Pleural effusion",trachea:"Away if large",exp:"Reduced",frem:"Reduced",perc:"Stony dull",breath:"Reduced or absent",voice:"Reduced (egophony at the upper edge)",added:"Rub sometimes above the fluid",why:"Fluid sits between lung and chest wall and reflects sound and vibration away from your hand and stethoscope. The lung compressed at the top edge can behave like consolidation.",cause:"Heart failure, parapneumonic, malignancy, cirrhosis, PE."},
+ ptx:{t:"Pneumothorax",trachea:"Away if tension",exp:"Reduced",frem:"Reduced",perc:"Hyperresonant",breath:"Reduced or absent",voice:"Reduced",added:"None",why:"Air in the pleural space separates the lung from the wall; air is a poor conductor, so everything is quiet but the note is drum-like.",cause:"Spontaneous (tall smokers, COPD), trauma, procedures. Tension: hypotension with tracheal shift needs decompression now."},
+ atel:{t:"Lobar collapse",trachea:"Toward",exp:"Reduced",frem:"Reduced (airway blocked)",perc:"Dull",breath:"Reduced",voice:"Reduced",added:"None",why:"A blocked bronchus lets the lobe empty of air and shrink, pulling the trachea and mediastinum toward it. With the airway blocked, sound is not conducted.",cause:"Mucus plug, tumour, foreign body; postoperative."},
+ hyper:{t:"Hyperinflation (COPD)",trachea:"Central",exp:"Reduced on both sides",frem:"Reduced",perc:"Hyperresonant; low diaphragms",breath:"Reduced; prolonged expiration",voice:"Reduced",added:"Wheeze",why:"Trapped air enlarges the lungs and damps transmission; narrowed airways prolong expiration and wheeze.",cause:"COPD; severe asthma attack."},
+ fib:{t:"Pulmonary fibrosis",trachea:"Central (toward if upper-lobe)",exp:"Reduced",frem:"Normal or increased",perc:"Normal",breath:"Vesicular",voice:"Normal",added:"Fine, late-inspiratory \"velcro\" crackles at the bases; often clubbing",why:"Stiff interstitium pops small airways open late in inspiration; the air spaces still hold air, so percussion and breath sounds stay normal.",cause:"Idiopathic pulmonary fibrosis, connective tissue disease, drugs, exposures."},
+ edema:{t:"Pulmonary edema",trachea:"Central",exp:"Normal",frem:"Normal",perc:"Normal (dull at bases if effusions)",breath:"Vesicular",voice:"Normal",added:"Bilateral basal crackles; sometimes wheeze",why:"Fluid in the interstitium and small airways crackles on inspiration, worst where gravity pulls it; without consolidation, conduction is unchanged.",cause:"Heart failure, volume overload, ARDS."}
+};
+var LINKS={cons:'Treating it: <a href="/abx-empiric/">Empiric antibiotics</a>.',edema:'Volume and heart failure signs: <a href="/exam-cardiac/">Cardiac exam</a>.',eff:'Heart failure effusions: <a href="/exam-cardiac/">Cardiac exam</a>.'};
+var PORDER=["cons","eff","ptx","atel","hyper","fib","edema"],pk="cons";
+function lungSVG(k){var W=320,H=220,g="",tx=160;if(k==="eff"||k==="ptx")tx=150;if(k==="atel")tx=170;
+ var L='M150 60 C 110 50, 70 70, 58 120 C 48 165, 60 195, 92 200 L148 200 Z',R='M170 60 C 210 50, 250 70, 262 120 C 272 165, 260 195, 228 200 L172 200 Z';
+ if(k==="hyper"){L='M148 54 C 100 40, 52 66, 44 122 C 38 172, 52 206, 92 210 L148 210 Z';R='M172 54 C 220 40, 268 66, 276 122 C 282 172, 268 206, 228 210 L172 210 Z'}
+ g+='<rect x="'+(tx-6)+'" y="10" width="12" height="54" rx="5" fill="var(--card)" stroke="var(--muted)" stroke-width="2"/>';
+ g+='<path d="M'+tx+' 64 L148 78 M'+tx+' 64 L172 78" stroke="var(--muted)" stroke-width="5" fill="none" stroke-linecap="round"/>';
+ g+='<path d="'+L+'" fill="var(--card)" stroke="var(--muted)" stroke-width="2"/>';
+ if(k==="ptx"){g+='<path d="'+R+'" fill="var(--fill)" stroke="var(--muted)" stroke-width="2" stroke-dasharray="5 4"/><path d="M174 90 C 200 86, 214 110, 212 140 C 210 170, 194 184, 176 186 Z" fill="var(--card)" stroke="var(--muted)" stroke-width="2"/><text x="236" y="120" text-anchor="middle" style="font-family:var(--mono);font-size:10px" fill="var(--ink)">air</text>'}
+ else if(k==="atel"){g+='<path d="'+R+'" fill="var(--card)" stroke="var(--muted)" stroke-width="2"/><path d="M172 64 C 200 60, 222 72, 226 96 L172 118 Z" fill="var(--hrt-art)" opacity=".55"/><text x="316" y="46" text-anchor="end" style="font-family:var(--mono);font-size:10px" fill="var(--ink)">collapsed upper lobe</text>'}
+ else g+='<path d="'+R+'" fill="var(--card)" stroke="var(--muted)" stroke-width="2"/>';
+ if(k==="cons"){g+='<path d="M176 140 C 210 130, 250 140, 258 160 C 262 182, 246 196, 228 198 L176 198 Z" fill="var(--hrt-art)" opacity=".5"/>';for(var i=0;i<14;i++){g+='<circle cx="'+(190+(i*13)%62)+'" cy="'+(152+((i*7)%40))+'" r="2.2" fill="var(--hrt-art)"/>'}g+='<text x="214" y="216" text-anchor="middle" style="font-family:var(--mono);font-size:10px" fill="var(--ink)">consolidated lobe</text>'}
+ if(k==="eff"){g+='<path d="M176 150 Q 220 140 262 128 C 268 160, 260 192, 228 200 L176 200 Z" fill="var(--hrt-vein)" opacity=".45"/><text x="222" y="216" text-anchor="middle" style="font-family:var(--mono);font-size:10px" fill="var(--ink)">fluid, meniscus</text>'}
+ if(k==="fib"){[0,1].forEach(function(s){var x0=s?190:80;for(var i=0;i<6;i++){g+='<path d="M'+(x0+i*8)+' 150 l6 12 l-4 10 l8 14" stroke="var(--muted)" fill="none" stroke-width="1.5"/>'}});g+='<text x="160" y="216" text-anchor="middle" style="font-family:var(--mono);font-size:10px" fill="var(--ink)">basal scarring, both sides</text>'}
+ if(k==="edema"){g+='<path d="M60 160 C 70 190, 92 200, 148 200 L148 150 Z" fill="var(--hrt-vein)" opacity=".3"/><path d="M260 160 C 250 190, 228 200, 172 200 L172 150 Z" fill="var(--hrt-vein)" opacity=".3"/><text x="160" y="216" text-anchor="middle" style="font-family:var(--mono);font-size:10px" fill="var(--ink)">fluid at both bases</text>'}
+ if(k==="hyper"){g+='<text x="160" y="226" text-anchor="middle" style="font-family:var(--mono);font-size:10px" fill="var(--ink)">large lungs, flat diaphragms</text>'}
+ if(tx!==160)g+='<text x="'+tx+'" y="8" text-anchor="middle" style="font-family:var(--mono);font-size:9px" fill="var(--bad)">trachea shifted</text>';
+ g+='<text x="20" y="'+(H-2)+'" style="font-family:var(--mono);font-size:9px" fill="var(--muted)">patient right</text><text x="300" y="'+(H-2)+'" text-anchor="end" style="font-family:var(--mono);font-size:9px" fill="var(--muted)">patient left</text>';
+ return '<svg class="lungfig" viewBox="0 0 '+W+' '+(H+12)+'" role="img" aria-label="Chest diagram: '+esc(P[k].t)+'">'+g+'</svg>'}
+function renderP(){$("#pchips").innerHTML=PORDER.map(function(k){return '<button type="button" class="chip" id="p-'+k+'" data-p="'+k+'" aria-pressed="'+(k===pk)+'">'+esc(P[k].t)+'</button>'}).join("");
+ var p=P[pk];$("#pcard").innerHTML='<span class="kicker">Pattern</span><h3 style="margin-top:4px">'+esc(p.t)+'</h3>'+lungSVG(pk)+'<dl class="sigs"><dt>Trachea</dt><dd>'+esc(p.trachea)+'</dd><dt>Expansion</dt><dd>'+esc(p.exp)+'</dd><dt>Fremitus</dt><dd>'+esc(p.frem)+'</dd><dt>Percussion</dt><dd>'+esc(p.perc)+'</dd><dt>Breath</dt><dd>'+esc(p.breath)+'</dd><dt>Voice</dt><dd>'+esc(p.voice)+'</dd><dt>Added</dt><dd>'+esc(p.added)+'</dd></dl><p class="why"><b>Why:</b> '+esc(p.why)+'</p><details class="more"><summary>More</summary><p>Common causes: '+esc(p.cause)+'</p>'+(LINKS[pk]?'<p>'+LINKS[pk]+'</p>':'')+'<p>Source: standard physical diagnosis teaching. Real patients often mix patterns (consolidation with a small effusion), and small lesions change little on exam.</p></details>';
+ var cols=[["trachea","Trachea"],["frem","Fremitus"],["perc","Percussion"],["breath","Breath"],["voice","Voice"]];
+ $("#ptable").innerHTML='<table class="pgrid"><thead><tr><th>Pattern</th>'+cols.map(function(c){return '<th>'+c[1]+'</th>'}).join("")+'</tr></thead><tbody>'+PORDER.map(function(k){return '<tr class="'+(k===pk?"on":"")+'"><td>'+esc(P[k].t)+'</td>'+cols.map(function(c){return '<td>'+esc(P[k][c[0]])+'</td>'}).join("")+'</tr>'}).join("")+'</tbody></table>'}
+$("#pchips").addEventListener("click",function(e){var b=e.target.closest("[data-p]");if(!b)return;pk=b.getAttribute("data-p");renderP();var nb=$("#p-"+pk);if(nb)nb.focus()});
+renderP();
+
+/* Figures */
+function figClub(){return '<svg class="fig" viewBox="0 0 320 150" role="img" aria-label="Finger in profile: normal and clubbed"><g fill="none" stroke-width="2"><path d="M20 90 L110 90 C 130 90, 140 80, 142 70 L110 70 L20 70" stroke="var(--muted)"/><path d="M110 70 L142 70" stroke="var(--ink)"/><text x="70" y="112" text-anchor="middle" style="font-family:var(--mono);font-size:10px" fill="var(--ink)" stroke="none">normal: angle under 180°</text><path d="M180 92 L270 92 C 300 96, 312 80, 304 62 C 296 50, 280 52, 270 62 L180 66" stroke="var(--muted)"/><path d="M270 62 C 284 52, 300 52, 304 62" stroke="var(--ink)"/><text x="245" y="112" text-anchor="middle" style="font-family:var(--mono);font-size:10px" fill="var(--bad)" stroke="none">clubbed: angle over 180°</text></g><line x1="262" y1="92" x2="262" y2="62" stroke="var(--accent)" stroke-dasharray="3 3"/><line x1="226" y1="92" x2="226" y2="66" stroke="var(--accent)" stroke-dasharray="3 3"/><text x="244" y="140" text-anchor="middle" style="font-family:var(--mono);font-size:10px" fill="var(--accent)">nail-bed depth / joint depth</text></svg><p class="figtext">Look at the index finger from the side. Profile angle (nail plate against the finger at the nail fold): normal up to about 176°; over 180° is clubbing. Phalangeal depth ratio: depth at the nail bed divided by depth at the last finger joint; over 1.0 is clubbing. Schamroth sign: the diamond-shaped window between two opposed nails is lost.</p>'}
+var lastFocus=null;
+function openSheet(html){lastFocus=document.activeElement;$("#sheet").innerHTML=html;$("#sheetwrap").hidden=false;var x=$("#sheet .x");if(x)x.focus()}
+function closeSheet(){$("#sheetwrap").hidden=true;$("#sheet").innerHTML="";if(lastFocus&&lastFocus.focus)lastFocus.focus()}
+document.addEventListener("click",function(e){var f=e.target.closest("[data-fig]");if(f){openSheet('<div class="top"><div><span class="kicker">Figure</span><h3 id="sheettitle">Measuring clubbing</h3></div><button type="button" class="x" aria-label="Close">×</button></div>'+figClub());return}
+ var g=e.target.closest("[data-goto]");if(g){show("exam");var el=document.getElementById(g.getAttribute("data-goto"));if(el)setTimeout(function(){el.scrollIntoView()},0);return}
+ if(e.target.closest("#sheet .x")||e.target===$("#sheetwrap"))closeSheet()});
+document.addEventListener("keydown",function(e){if(e.key==="Escape"&&!$("#sheetwrap").hidden)closeSheet()});
+
+/* Practice */
+var CASES=[
+ {type:"pat",t:"Right lower chest: dull to percussion, increased fremitus, bronchial breath sounds and egophony. Trachea central.",ans:"cons"},
+ {type:"pat",t:"Left base: stony dull, absent fremitus, absent breath sounds. Trachea pushed to the right.",ans:"eff"},
+ {type:"pat",t:"Hypotensive after a central line. Right chest hyperresonant with absent breath sounds; trachea deviated to the left.",ans:"ptx"},
+ {type:"lr",q:"pna",pre:5,st:{vitex:-1},t:"A 40-year-old with three days of cough. Temperature 37.1, rate 14, pulse 78; lungs clear.",ask:"Starting from 5%, roughly what is the probability of pneumonia?"},
+ {type:"lr",q:"eff",pre:30,st:{dull:1},t:"Breathless patient with heart failure; the right base is dull to percussion.",ask:"Starting from 30%, roughly what is the probability of a pleural effusion?"},
+ {type:"lr",q:"copd",pre:40,st:{wheeze:1,fet:1,hxcopd:1},t:"A 66-year-old ex-smoker who says he has COPD; wheeze on exam; forced expiratory time 11 seconds.",ask:"Starting from 40%, roughly what is the probability of airflow limitation?"}
+];
+var ci=0,done=false;
+function disp(v){return v<1?"<1":v>99?">99":String(v)}
+function pick(arr,right){var out=[right];arr.forEach(function(v){v=Math.max(1,Math.min(99,Math.round(v)));if(out.every(function(o){return Math.abs(o-v)>=8}))out.push(v)});return out.slice(0,4).sort(function(a,b){return a-b})}
+function renderCase(){var c=CASES[ci],opts,right,exp="";done=false;
+ if(c.type==="pat"){right=c.ans;opts=["cons","eff","ptx","atel"];if(opts.indexOf(right)<0)opts[3]=right;exp='<p class="why"><b>Why:</b> '+esc(P[right].why)+'</p>';
+  $("#case").innerHTML='<span class="kicker">Case '+(ci+1)+' of '+CASES.length+' · Pattern</span><p>'+esc(c.t)+'</p><p><b>Which pattern?</b></p><div class="opts">'+opts.map(function(o){return '<button type="button" class="opt" data-o="'+o+'">'+esc(P[o].t)+'</button>'}).join("")+'</div>'}
+ else{var r=compute(c.q,c.pre,c.st);right=Math.round(r.p);opts=pick([r.p*0.5,r.p+(100-r.p)*0.5,right-30,right+30,50],right);
+  exp='<p class="why"><b>Why:</b> '+c.pre+'% start × '+r.parts.map(function(x){return esc(pname(x).toLowerCase())+" ×"+x.l}).join(", ")+' → '+disp(right)+'%. '+esc(pmech(r.parts[0]))+'</p>'+(c.q==="copd"?'<div class="warnbox">One study of 161 patients; the combined LR comes from its multivariable model.</div>':'');
+  $("#case").innerHTML='<span class="kicker">Case '+(ci+1)+' of '+CASES.length+' · '+esc(Q[c.q].t)+'</span><p>'+esc(c.t)+'</p><p><b>'+esc(c.ask)+'</b></p><div class="opts">'+opts.map(function(o){return '<button type="button" class="opt" data-o="'+o+'">'+disp(o)+'%</button>'}).join("")+'</div>'}
+ $("#case").insertAdjacentHTML("beforeend",'<div id="caseexp" hidden>'+exp+'</div><div class="casenav"><button type="button" class="btn" id="prevc"'+(ci===0?" disabled":"")+'>← Previous</button><button type="button" class="btn" id="nextc"'+(ci===CASES.length-1?" disabled":"")+'>Next →</button></div>');
+ $$("#case .opt").forEach(function(b){b.addEventListener("click",function(){if(done)return;done=true;$$("#case .opt").forEach(function(x){if(String(x.getAttribute("data-o"))===String(right))x.classList.add("right");else if(x===b)x.classList.add("wrong")});$("#caseexp").hidden=false})});
+ $("#prevc").addEventListener("click",function(){ci--;renderCase()});$("#nextc").addEventListener("click",function(){ci++;renderCase()})}
+renderCase();
+
+/* Tabs */
+function show(id){$$("section.view").forEach(function(s){s.classList.toggle("on",s.id===id)});$$("nav.tabs [role=tab]").forEach(function(t){t.setAttribute("aria-selected",String(t.getAttribute("aria-controls")===id))});window.scrollTo(0,0)}
+$$("nav.tabs [role=tab]").forEach(function(t){t.addEventListener("click",function(){show(t.getAttribute("aria-controls"))})});
+function fromHash(){var h=(location.hash||"").slice(1);if(!h)return;var el=document.getElementById(h);if(!el)return;var v=el.closest("section.view");if(v)show(v.id);if(h.indexOf("q-")===0&&Q[h.slice(2)]){qk=h.slice(2);state={};renderQ()}if(h.indexOf("p-")===0&&P[h.slice(2)]){pk=h.slice(2);renderP()}setTimeout(function(){el.scrollIntoView()},0)}
+window.addEventListener("hashchange",fromHash);
+renderQ();fromHash();
+})();
+</script>
+</body>
+</html>
