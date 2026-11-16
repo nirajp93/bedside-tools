@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pressors &amp; inotropes · bedside.tools</title>
+<meta name="description" content="Shock: the pressure target, which vasopressor or inotrope first, what to add and when, doses and receptors for each agent, with the reasoning in diagrams.">
+<script src="/theme.js"></script>
+<style>
+:root{--bg:#FBFBFA;--card:#FFFFFF;--ink:#111113;--muted:#55555D;--line:#ECECEE;--accent:#2B4BDB;--warn:#9A3B00;--warnbg:#FFF6EC}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5}
+.mono{font-family:var(--mono)}
+.wrap{max-width:720px;margin:0 auto;padding:20px 16px 48px}
+a{color:var(--accent)}
+.back{font-size:14px;text-decoration:none;display:inline-block;min-height:44px;line-height:44px}
+h1{font-size:26px;margin:4px 0 4px;letter-spacing:-.01em}
+.purpose{color:var(--muted);margin:0 0 20px}
+.tabs{display:flex;gap:6px;margin-bottom:16px}
+.tab{flex:1;min-width:0;min-height:44px;border:1px solid var(--line);background:var(--card);border-radius:14px;padding:0 4px;font:inherit;font-size:15px;font-weight:600;color:var(--muted);cursor:pointer}
+.tab[aria-selected="true"]{border-color:var(--accent);color:var(--accent)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
+.label{font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+.grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.grid2{grid-template-columns:1fr 1fr}
+.field{display:flex;flex-direction:column;justify-content:flex-end}
+.field label{display:block;font-size:13px;color:var(--muted);margin-bottom:4px}
+.field input,.field select{width:100%;min-height:44px;border:1px solid var(--line);border-radius:10px;padding:8px 10px;font:inherit;font-family:var(--mono);background:var(--card);color:var(--ink)}
+.field input:focus,.field select:focus,.tab:focus-visible,.chk:focus-within,button:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.checks{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.chk{display:flex;align-items:center;gap:10px;min-height:44px;border:1px solid var(--line);border-radius:10px;padding:6px 10px;font-size:14px;cursor:pointer}
+.chk input{width:20px;height:20px;accent-color:var(--accent);flex:none}
+.card h2{font-size:18px;margin:0 0 2px}
+.head{font-family:var(--mono);font-size:17px;font-weight:600;margin:6px 0 4px;overflow-wrap:anywhere}
+.head.bad{color:var(--bad)}.head.okc{color:var(--ok)}
+.sub{font-size:14px;color:var(--muted);margin:0}
+.card ul{margin:6px 0 0;padding-left:20px}
+.card li{margin-bottom:4px}
+.guard{border-left:3px solid var(--warn);background:var(--warnbg);padding:8px 10px;border-radius:0 10px 10px 0;margin-top:8px;font-size:14.5px}
+.tier{display:inline-block;font-family:var(--mono);font-size:11px;border:1px solid var(--line);border-radius:999px;padding:2px 8px;color:var(--muted);margin:6px 6px 0 0}
+details{margin-top:10px;border-top:1px solid var(--line);padding-top:8px}
+.whyline{margin:10px 0 0;font-size:14.5px;color:var(--muted)}
+.whyline b{color:var(--ink);font-weight:600}
+summary{cursor:pointer;color:var(--accent);font-weight:600;min-height:44px;line-height:44px}
+details p{margin:0 0 8px;font-size:15px}
+.empty{color:var(--muted)}
+.btn{min-height:44px;border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);border-radius:10px;padding:8px 14px;font:inherit;font-weight:600;cursor:pointer}
+.btn.ghost{background:var(--card);color:var(--accent)}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.note{font-size:14px;color:var(--muted)}
+.tl{position:relative;padding-left:26px}
+.tl:before{content:"";position:absolute;left:8px;top:8px;bottom:8px;width:2px;background:var(--line)}
+.st{position:relative;padding:6px 0 10px}
+.st:before{content:"";position:absolute;left:-24px;top:11px;width:12px;height:12px;border-radius:50%;background:var(--card);border:2px solid var(--muted)}
+.st.now:before{background:var(--accent);border-color:var(--accent)}
+.st .when{font-family:var(--mono);font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+.st b{display:block}
+.st .dose{font-family:var(--mono);font-size:14.5px;display:block;overflow-wrap:anywhere}
+.st small{color:var(--muted);font-size:13.5px;display:block}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:6px 6px 6px 0;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:var(--mono);font-size:11.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);font-weight:500}
+td.mono{font-size:13px}
+.tw{overflow-x:auto}
+.case h2{font-size:17px}
+.ans{margin-top:10px;border-top:1px solid var(--line);padding-top:10px}
+footer{margin-top:28px;font-size:13.5px;color:var(--muted)}
+footer p{margin:0 0 8px}
+.panel{display:none}.panel.on{display:block}
+.fig{display:block;width:100%;max-width:460px;height:auto;margin:0 auto}
+.states{display:flex;gap:6px;overflow-x:auto;margin:10px -16px;padding:2px 16px 6px;scrollbar-width:none}
+.states::-webkit-scrollbar{display:none}
+.states.wrapit{flex-wrap:wrap;overflow:visible;margin:10px 0;padding:0}
+.sbtn{flex:none;min-height:44px;min-width:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--ink);font:inherit;font-size:14px;cursor:pointer;white-space:nowrap}
+.sbtn[aria-pressed="true"]{border-color:var(--accent);color:var(--accent);font-weight:600}
+.line1{font-size:15px;margin:10px 0 0}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.chip{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--fill);color:var(--ink);font:inherit;font-size:14px;cursor:pointer}
+.chip svg{flex:none;color:var(--accent)}
+.scrim{position:fixed;inset:0;background:var(--scrim);z-index:20}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:21;max-height:90vh;overflow-y:auto;background:var(--card);border:1px solid var(--line);border-bottom:0;border-radius:20px 20px 0 0;padding:8px 16px 24px;max-width:560px;margin:0 auto}
+.sheethead{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.sheethead h2{font-size:18px;margin:0}
+.xbtn{min-height:44px;min-width:44px;border:0;background:transparent;color:var(--accent);font:inherit;font-weight:600;cursor:pointer}
+.pills{position:sticky;top:0;z-index:5;background:var(--bg);display:flex;gap:6px;overflow-x:auto;margin:0 -16px 12px;padding:8px 16px;border-bottom:1px solid var(--line);scrollbar-width:none}
+.pills::-webkit-scrollbar{display:none}
+.pill{flex:none;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--muted);font:inherit;font-size:14px;cursor:pointer;white-space:nowrap}
+.pill[aria-current="true"]{border-color:var(--accent);color:var(--accent);font-weight:600}
+.chap{scroll-margin-top:70px}
+.cause{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:8px 0;border-top:1px solid var(--line);font-size:15px}
+.cause small{color:var(--muted);font-size:13px;text-align:right;flex:0 1 58%}
+.cause.out span{color:var(--muted);text-decoration:line-through}
+.cause.out,.cause.less{opacity:.6}
+.cause.fav span{font-weight:700}
+.cause.fav span:before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--accent);margin-right:8px}
+.trial{border-left:3px solid var(--accent);padding-left:12px}
+.trial p{margin:0 0 6px;font-size:15px}
+.trial .k{font-family:var(--mono);font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);display:block}
+@media (min-width:900px){
+  .wrap{max-width:1040px}
+  #p-tool.on{display:grid;grid-template-columns:380px minmax(0,1fr);gap:20px;align-items:start}
+  .refgrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;align-items:start}
+  .refgrid .card{margin-bottom:0}
+  #p-learn{max-width:720px;margin:0 auto}
+}
+@media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="/">← bedside.tools</a>
+<h1>Pressors &amp; inotropes</h1>
+<p class="purpose">Shock on the unit: the pressure target, which drug first, what to add and when, and what each agent does.</p>
+
+<div class="tabs" role="tablist">
+  <button class="tab" role="tab" id="t-tool" aria-selected="true" aria-controls="p-tool">Choose</button>
+  <button class="tab" role="tab" id="t-ag" aria-selected="false" aria-controls="p-ag">Agents</button>
+  <button class="tab" role="tab" id="t-learn" aria-selected="false" aria-controls="p-learn">Learn</button>
+  <button class="tab" role="tab" id="t-prac" aria-selected="false" aria-controls="p-prac">Practice</button>
+</div>
+
+<div class="panel on" id="p-tool" role="tabpanel" aria-labelledby="t-tool">
+  <div id="inputs">
+  <div class="card" id="shock">
+    <p class="label">Type of shock</p>
+    <div class="states wrapit" id="typeseg" role="group" aria-label="Type of shock"></div>
+    <div class="checks" id="ticks" style="grid-template-columns:1fr"></div>
+  </div>
+  <div class="card" id="numbers">
+    <p class="label">Patient</p>
+    <div class="grid grid2">
+      <div class="field"><label for="wt">Weight (kg)</label><input id="wt" inputmode="decimal" autocomplete="off"></div>
+      <div class="field"><label for="map">Mean pressure (mm Hg)</label><input id="map" inputmode="decimal" autocomplete="off"></div>
+    </div>
+  </div>
+  <div class="card" id="running">
+    <p class="label">Running now (leave blank if none)</p>
+    <div class="grid grid2">
+      <div class="field"><label for="unit">Norepinephrine, epinephrine and phenylephrine in</label><select id="unit"><option value="min">mcg/min</option><option value="kg">mcg/kg/min</option></select></div>
+      <div class="field"><label for="ne">Norepinephrine</label><input id="ne" inputmode="decimal" autocomplete="off"></div>
+      <div class="field"><label for="vaso">Vasopressin (units/min)</label><input id="vaso" inputmode="decimal" autocomplete="off"></div>
+      <div class="field"><label for="epi">Epinephrine</label><input id="epi" inputmode="decimal" autocomplete="off"></div>
+      <div class="field"><label for="phen">Phenylephrine</label><input id="phen" inputmode="decimal" autocomplete="off"></div>
+      <div class="field"><label for="dopa">Dopamine (mcg/kg/min)</label><input id="dopa" inputmode="decimal" autocomplete="off"></div>
+      <div class="field"><label for="ang">Angiotensin II (ng/kg/min)</label><input id="ang" inputmode="decimal" autocomplete="off"></div>
+      <div class="field"><label for="hrs">Hours on vasopressors</label><input id="hrs" inputmode="decimal" autocomplete="off"></div>
+    </div>
+    <p class="note" style="margin:10px 0 0">Check the pump: mcg/min and mcg/kg/min differ by the patient's weight, and vasopressin is in units per minute, not per hour.</p>
+  </div>
+  </div>
+  <div id="out"></div>
+</div>
+
+<div class="panel" id="p-ag" role="tabpanel" aria-labelledby="t-ag">
+  <div class="refgrid">
+  <div class="card" id="convert">
+    <p class="label">Unit converter</p>
+    <h2>mcg/min and mcg/kg/min</h2>
+    <div class="grid" style="margin-top:10px">
+      <div class="field"><label for="cw">Weight (kg)</label><input id="cw" inputmode="decimal" autocomplete="off"></div>
+      <div class="field"><label for="cm">mcg/min</label><input id="cm" inputmode="decimal" autocomplete="off"></div>
+      <div class="field"><label for="ck">mcg/kg/min</label><input id="ck" inputmode="decimal" autocomplete="off"></div>
+    </div>
+    <p class="note" style="margin:10px 0 0">Type a weight and either dose; the other fills in. Uses the weight you enter: check which weight your unit doses on.</p>
+  </div>
+  <div class="card" id="narrow">
+    <p class="label">Narrow the agent</p>
+    <h2>Which drugs fit this patient less well?</h2>
+    <p class="sub">Tap what is true of the patient. Agents that fit less well fade, with the reason.</p>
+    <div class="states wrapit" id="narseg" role="group" aria-label="Patient feature"></div>
+    <div id="narout"></div>
+  </div>
+  </div>
+  <div id="agents" class="refgrid"></div>
+  <div class="card" id="periph">
+    <p class="label">Peripheral lines</p>
+    <h2>Starting a pressor without a central line</h2>
+    <ul id="periphlist"></ul>
+    <div class="chips" id="periphchip"></div>
+  </div>
+</div>
+
+<div class="panel" id="p-learn" role="tabpanel" aria-labelledby="t-learn">
+  <div class="pills" id="pills"></div>
+  <div class="card chap" id="learn-map" data-pill="Pressure"><p class="label">1 · The equation</p><h2>Pressure is output times resistance</h2><p class="sub">Each kind of shock breaks a different part. Tap a type.</p><div data-figure="map"></div></div>
+  <div class="card chap" id="learn-recept" data-pill="Receptors"><p class="label">2 · Receptors</p><h2>Each drug is a mix of a few effects</h2><p class="sub">Tap a drug to see what it acts on and what that does.</p><div data-figure="recept"></div></div>
+  <div class="card chap" id="learn-ladder" data-pill="Septic ladder"><p class="label">3 · Septic shock</p><h2>Add a second drug before the first runs high</h2><div data-figure="ladder"></div></div>
+  <div class="card chap" id="learn-vaso" data-pill="Vasopressin"><p class="label">4 · Vasopressin</p><h2>Why vasopressin is added, not titrated</h2><p>It works on a different receptor from the catecholamines, so it adds pressure without more adrenergic drive. Tap a dose.</p><div class="states wrapit" id="vasoseg" role="group" aria-label="Vasopressin dose"></div><p class="line1" id="vasoout"></p></div>
+  <div class="card chap" id="learn-dopa" data-pill="Dopamine"><p class="label">5 · Dopamine</p><h2>Why dopamine lost first place</h2><div data-figure="dopa"></div></div>
+  <div class="card chap" id="learn-mil" data-pill="Inodilators"><p class="label">6 · Inodilators</p><h2>Why milrinone and dobutamine can drop the pressure</h2><p class="sub">Both raise output and relax vessels. If output cannot rise enough, pressure falls.</p><div data-figure="recept" data-state="mil"></div></div>
+  <div class="card chap" id="learn-periph" data-pill="Peripheral"><p class="label">7 · Access</p><h2>Start in a good arm vein; do not wait for the line</h2><div data-figure="periph"></div></div>
+  <div class="card chap" id="trials" data-pill="Trials"><p class="label">8 · Trials</p><h2>The trials behind the practice</h2><div id="trialbox"></div><div class="row"><button class="btn" id="go-prac">Try the practice cases</button></div></div>
+</div>
+
+<div class="panel" id="p-prac" role="tabpanel" aria-labelledby="t-prac">
+  <div id="practice"></div>
+</div>
+
+<div class="scrim" id="scrim" hidden></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-t" hidden>
+  <div class="sheethead"><h2 id="sheet-t"></h2><button class="xbtn" id="sheet-x">Close</button></div>
+  <div id="sheet-b"></div>
+</div>
+
+<footer>
+  <p><strong>For education only. Not a substitute for clinical judgment.</strong> Built to national guidance and FDA labels. Drug concentrations, pump units, dosing weight, starting doses, which agents are stocked and who may give bolus doses vary, so adjust to your institution. Pressure targets are starting points. Rows marked expert practice are not from a graded guideline. Evidence tiers are shown as strength and certainty (Surviving Sepsis Campaign, trauma and spinal cord guidelines), class and level (AHA/ACC), expert consensus (ACC, SCAI) or FDA label.</p>
+  <p>Privacy: everything runs in your browser. Nothing you enter is sent anywhere or stored, and there are no analytics; only your light/dark choice is saved on this device. Do not enter names, record numbers, or dates of birth.</p>
+  <p class="mono">Last reviewed: 2026-11-15</p>
+  <p><strong>Sources:</strong> Prescott HC et al., Surviving Sepsis Campaign: international guidelines for management of sepsis and septic shock 2026, Crit Care Med 2026;54:725 (recommendation statements and Quick Guide reviewed) · Evans L et al., Surviving Sepsis Campaign 2021, Intensive Care Med 2021;47:1181 · Sinha SS et al., 2025 ACC Concise Clinical Guidance on the evaluation and management of cardiogenic shock, J Am Coll Cardiol 2025 · Naidu SS et al., SCAI SHOCK stage classification expert consensus update, J Soc Cardiovasc Angiogr Interv 2022;1:100008 · Heidenreich PA et al., 2022 AHA/ACC/HFSA heart failure guideline, Circulation 2022;145:e895 · Creager MA et al., 2026 AHA/ACC guideline for acute pulmonary embolism in adults, Circulation 2026;153:e977 · Konstantinides SV et al., 2019 ESC guidelines on acute pulmonary embolism, Eur Heart J 2020;41:543 · Rossaint R et al., European guideline on major bleeding and coagulopathy following trauma, sixth edition, Crit Care 2023;27:80 · Kwon BK et al., AO Spine/Praxis guideline on hemodynamic management of acute spinal cord injury, Global Spine J 2024;14(3 Suppl):187S · Golden DBK et al., Anaphylaxis: a 2023 practice parameter update, Ann Allergy Asthma Immunol 2024;132:124 · Lieberman P et al., Anaphylaxis: a practice parameter update 2015, Ann Allergy Asthma Immunol 2015;115:341 · Cardona V et al., World Allergy Organization anaphylaxis guidance 2020, World Allergy Organ J 2020;13:100472 · Simons FER et al., World Allergy Organization guidelines for the assessment and management of anaphylaxis, World Allergy Organ J 2011;4:13 · Resuscitation Council UK, emergency treatment of anaphylaxis (infusion recipe only) · 2025 AHA guidelines for CPR and emergency cardiovascular care, Part 10 (anaphylaxis) · FDA prescribing information: Levophed, Vasostrict, Adrenalin, phenylephrine (Biorphen, Vazculep, generic 10 mg/mL), dopamine, dobutamine, milrinone, Giapreza, ProvayBlue, phentolamine (labels current November 2026) · Kotani Y et al., Crit Care 2023;27:29, corrected 2025 · Weingart S, Clin Exp Emerg Med 2015;2:131 · Cole JB et al., J Med Toxicol 2019;15:276 · Tian DH et al., Emerg Med Australas 2020;32:220 · Loubani OM, Green RS, J Crit Care 2015;30:653.e9 · Trials: De Backer D et al., N Engl J Med 2010;362:779 · Russell JA et al., N Engl J Med 2008;358:877 · Khanna A et al., N Engl J Med 2017;377:419 · Venkatesh B et al., N Engl J Med 2018;378:797 · Annane D et al., N Engl J Med 2018;378:809 · Asfar P et al., N Engl J Med 2014;370:1583 · Lamontagne F et al., JAMA 2020;323:938 · Permpikul C et al., Am J Respir Crit Care Med 2019;199:1097 · Mathew R et al., N Engl J Med 2021;385:516 · Levy B et al., J Am Coll Cardiol 2018;72:173 · Jeon K et al., Crit Care 2018;22:131 · Song JU et al., J Korean Med Sci 2020;35:e8 · Ibarra-Estrada M et al., Crit Care 2023;27:110.</p>
+</footer>
+</div>
+
+<script id="engine">
+/* Data and decision engine: no page access here, so the practice cases and the audits run the same code. */
+function r1(n){ return Math.round(n * 10) / 10; }
+function r2(n){ return Math.round(n * 100) / 100; }
+function r3(n){ return Math.round(n * 1000) / 1000; }
+function has(v){ return v != null; }
+
+var TNAME = {sep: 'Septic', cs: 'Cardiogenic', pe: 'Pulmonary embolism', hem: 'Hemorrhagic', neu: 'Spinal cord injury', ana: 'Anaphylaxis'};
+var TYPES = ['sep','cs','pe','hem','neu','ana'];
+var TICKS = {
+  sep: [['age65','Age 65 or older'],['cardiac','Heart is pumping poorly and perfusion is still poor despite fluid and an adequate pressure']],
+  cs: [['hypo','Hypotensive: systolic under 90 or mean under 60'],['perf','Poor perfusion: lactate 2 or more, cool limbs, low urine output'],['fail','Getting worse on the first drug'],['kidney','Kidney function is worsening']],
+  pe: [['perfonly','Pressure is normal but perfusion is poor']],
+  hem: [['tbi','Severe brain injury (GCS 8 or less)'],['ctrl','Bleeding is controlled']],
+  neu: [],
+  ana: [['refr','Still hypotensive after repeated IM doses and fluid'],['bb','Takes a beta-blocker']]
+};
+
+/* Thresholds, each with its source in the decision table. */
+var T = {
+  mapSep: 65, mapSepHi: 70, mapOldLo: 60, mapOldHi: 65,            /* SSC 2026 */
+  vasoAt: 0.25, vasoAtHi: 0.5, vasoFixed: 0.03,       /* SSC 2021 remark and rationale */
+  steroidDose: 0.25, steroidHrs: 4,                   /* SSC 2021 remark */
+  csMapHypo: 60,                                      /* SCAI 2022 stage B */
+  peNeMax: 15,                                        /* AHA/ACC 2026 PE, mcg/min */
+  hemMapLo: 50, hemMapHi: 60, hemTbi: 80,             /* European trauma guideline 2023 */
+  neuLo: 75, neuHi: 95,                               /* AO Spine 2024 */
+  anaPerKg: 0.01, anaMax: 0.5                         /* 2023 practice parameter; WAO 2020 */
+};
+
+/* Agents: one record drives the cards, the receptor figure and the narrowing list. Receptors, effects and "ACC 2025" ranges are Table 2 of the ACC 2025 cardiogenic shock guidance; other doses are FDA labels. */
+var AORDER = ['ne','vaso','epi','phen','dopa','dobu','mil','ang','mb','push'];
+var AG = {
+  ne: {n: 'Norepinephrine', cls: 'Vasopressor with some inotropy', rec: {a1: 3, b1: 2, b2: 1}, eff: ['↑↑','↑↑','↑','↑'],
+    dose: ['Label: start 8 to 12 mcg/min, usual maintenance 2 to 4 mcg/min, titrated to pressure (doses are of norepinephrine base). Many units start lower: follow your protocol.', 'ACC 2025 range in cardiogenic shock: 0.05 to 1 mcg/kg/min.'],
+    watch: 'Extravasation can cause necrosis: infiltrate the area with phentolamine 5 to 10 mg in 10 to 15 mL of saline as soon as possible, within 12 hours. Bradycardia, limb and gut ischemia. Contains a sulfite.',
+    use: 'First choice in septic shock (strong recommendation) and a reasonable first choice in hypotensive cardiogenic shock.'},
+  vaso: {n: 'Vasopressin', cls: 'Vasopressor, not a catecholamine', rec: {v1: 3}, eff: ['↑↑','↑↑','↔ or ↓','↔ or ↓'],
+    dose: ['Septic shock: usually a fixed 0.03 units/min added to norepinephrine (SSC 2021). Label: start 0.01 units/min, adjust by 0.005 units/min every 10 to 15 minutes; data are limited above 0.07 units/min.', 'After heart surgery (label): start 0.03 units/min; data are limited above 0.1 units/min.', 'Coming off (label): once at target for 8 hours without catecholamines, reduce by 0.005 units/min each hour.', 'ACC 2025 range: 0.01 to 0.04 units/min.'],
+    watch: 'Lower cardiac output, bradycardia, tachyarrhythmias, hyponatremia, and ischemia of the heart, gut, skin and fingers (label). Higher doses have been linked to cardiac, digital and gut ischemia (SSC 2021).',
+    use: 'Second agent in septic shock, added to norepinephrine instead of escalating it.'},
+  epi: {n: 'Epinephrine', cls: 'Vasopressor and inotrope', rec: {b1: 3, a1: 2, b2: 2}, eff: ['↑↑','↑↑','↑↑','↑↑'],
+    dose: ['Label, hypotension with septic shock: 0.05 to 2 mcg/kg/min, adjusted every 10 to 15 minutes in steps of 0.05 to 0.2 mcg/kg/min.', 'ACC 2025 range: 0.01 to 0.5 mcg/kg/min.', 'Anaphylaxis: 0.01 mg/kg of the 1 mg/mL solution into the outer thigh muscle, up to 0.5 mg in adults.'],
+    watch: 'Fast heart rate and arrhythmias. Raises lactate, which makes lactate harder to follow. After a heart attack with shock it caused more refractory shock than norepinephrine (37% against 7%, OptimaCC). Extravasation: phentolamine as for norepinephrine.',
+    use: 'Third agent in septic shock; an alternative to norepinephrine plus dobutamine when the heart is failing in sepsis; first drug in anaphylaxis.'},
+  phen: {n: 'Phenylephrine', cls: 'Pure vasopressor', rec: {a1: 3}, eff: ['↑','↑↑','↔ or ↓','↔ or ↓'],
+    dose: ['Generic labels that cover septic or other vasodilatory shock: no bolus; 0.5 to 6 mcg/kg/min, titrated to pressure.', 'Low pressure during anesthesia: brand labels (Biorphen, Vazculep) give a bolus of 40 to 100 mcg and an infusion of 10 to 35 mcg/min, not above 200 mcg/min; some generic labels give a bolus of 50 to 250 mcg.', 'ACC 2025 range: 0.1 to 10 mcg/kg/min.'],
+    watch: 'Can cause severe bradycardia and lower cardiac output (label). Not in the SSC 2026 recommendations. As the only first-line infusion in cardiogenic shock it is strongly discouraged (ACC 2025).',
+    use: 'A pure pressure-raiser when a fast heart rate is the problem; named with vasopressin as a second agent in pulmonary embolism.'},
+  dopa: {n: 'Dopamine', cls: 'Vasopressor and inotrope, dose dependent', rec: {d1: 3, b1: 2, a1: 1}, eff: ['↑↑','↑↑','↑','↑↑'],
+    dose: ['Label: start 2 to 5 mcg/kg/min, raise in steps of 5 to 10 mcg/kg/min, not more than 50 mcg/kg/min.', 'ACC 2025 bands: low 2 to 5, intermediate 5 to 10, high 10 to 20 mcg/kg/min.'],
+    watch: 'Arrhythmias: 24.1% against 12.4% with norepinephrine (SOAP II). Extravasation: phentolamine as for norepinephrine.',
+    use: 'No longer first line: norepinephrine is recommended over it in septic shock (strong, high certainty).'},
+  dobu: {n: 'Dobutamine', cls: 'Inodilator', rec: {b1: 3, b2: 2}, eff: ['↓ or ↔','↓ or ↔','↑↑','↑'],
+    dose: ['Label: start 0.5 to 1 mcg/kg/min; usual range 2 to 20 mcg/kg/min; rarely up to 40.', 'ACC 2025 range: 2 to 10 mcg/kg/min.', 'Pulmonary embolism (AHA/ACC 2026): up to 10 mcg/kg/min.'],
+    watch: 'Fast heart rate, ectopy, low pressure, low potassium (label).',
+    use: 'Low output with an adequate pressure: cardiogenic shock, sepsis with a failing heart (added to norepinephrine), pulmonary embolism with normal pressure.'},
+  mil: {n: 'Milrinone', cls: 'Inodilator, not a catecholamine', rec: {pde: 3}, eff: ['↓↓','↓↓','↑↑','↔ or ↑'],
+    dose: ['ACC 2025 range: 0.125 to 0.5 mcg/kg/min, with no loading dose listed.', 'Label (heart failure): 50 mcg/kg over 10 minutes, then 0.375 to 0.75 mcg/kg/min. The load can drop the pressure and is usually left out in shock.', 'Label, by creatinine clearance (mL/min): 50: 0.43 · 40: 0.38 · 30: 0.33 · 20: 0.28 · 10: 0.23 · 5: 0.20 mcg/kg/min.'],
+    watch: 'Low pressure (2.9%) and ventricular arrhythmias (12.1%) in the label. Cleared by the kidney, so it accumulates and lasts when kidney function falls.',
+    use: 'Low output with an adequate pressure. No better or worse than dobutamine in cardiogenic shock (DOREMI).'},
+  ang: {n: 'Angiotensin II', cls: 'Vasopressor, not a catecholamine', rec: {at1: 3}, eff: ['↑','↑','not in the source table','not in the source table'],
+    dose: ['Label: start 20 ng/kg/min; adjust every 5 minutes by up to 15 ng/kg/min; no more than 80 ng/kg/min in the first 3 hours; maintenance no more than 40 ng/kg/min.', 'A central line is recommended.'],
+    watch: 'Clots: thrombotic events in 13% against 5% with placebo; give venous thromboembolism prophylaxis (label).',
+    use: 'An option in vasodilatory shock that is not responding to other pressors (FDA labelled; ATHOS-3). SSC 2026 suggests norepinephrine over it as the first drug.'},
+  mb: {n: 'Methylene blue', cls: 'Rescue vasopressor, unlabelled use', rec: {no: 3}, eff: ['↑','↑','not in the source table','not in the source table'],
+    dose: ['Not labelled for shock; the label covers methemoglobinemia only (1 mg/kg). SSC 2026 finds the evidence insufficient to recommend for or against.', 'Regimen in the one randomized trial in septic shock: 100 mg in 500 mL saline over 6 hours, once daily for 3 doses (single center, 91 patients).'],
+    watch: 'Serotonin syndrome with serotonergic drugs and opioids (boxed warning). Contraindicated in G6PD deficiency. Turns urine and skin blue.',
+    use: 'Rescue only, with senior and pharmacy input.'},
+  push: {n: 'Push-dose pressors', cls: 'Bolus doses to bridge minutes', rec: {}, eff: null,
+    dose: ['Phenylephrine 100 mcg/mL: 50 to 200 mcg every 1 to 5 minutes.', 'Epinephrine 10 mcg/mL: 5 to 20 mcg every 1 to 5 minutes.', 'Onset under 1 minute; the effect is usually gone within about 5 minutes.', 'Labelled phenylephrine bolus: 40 to 100 mcg (brand labels) or 50 to 250 mcg (some generic labels).'],
+    watch: 'Dosing errors are the danger: in one emergency department series 19% of uses had a human error and 3% were overdoses of 2.5 to 100 times. Use pre-mixed syringes if stocked, say the dose in micrograms, and never give a 1 mg arrest dose to a patient with a pulse.',
+    use: 'A bridge while an infusion is prepared or a brief insult passes. Expert practice, not guideline.'}
+};
+var RECN = {a1: ['α1','tighten vessels'], b1: ['β1','rate + squeeze'], b2: ['β2','relax vessels'], d1: ['D1','dopamine'], v1: ['V','vasopressin'], at1: ['AT1','tighten vessels'], pde: ['PDE-3','enzyme blocked'], no: ['NO','signal blocked']};
+var EFFN = ['Resistance','Pressure','Output','Heart rate'];
+
+/* Narrowing: feature -> agents that fit less well ('less') or are ruled out ('out'), each with the reason. */
+var NARROW = {
+  fast: {n: 'Fast heart rate or arrhythmia', less: {dopa: 'Raises heart rate; arrhythmias 24.1% against 12.4% with norepinephrine', epi: 'Raises heart rate strongly', dobu: 'Raises heart rate; ectopy'}},
+  slow: {n: 'Slow heart rate or low output', less: {phen: 'Can cause severe bradycardia and lower output', vaso: 'Output and heart rate unchanged or lower'}},
+  lowbp: {n: 'Pressure still low', less: {mil: 'Lowers resistance and pressure', dobu: 'Can lower pressure: add to a pressor, not instead of one'}},
+  kidney: {n: 'Kidney function worsening', less: {mil: 'Cleared by the kidney; accumulates'}},
+  nocvc: {n: 'No central line', less: {ang: 'Central line recommended'}},
+  ssri: {n: 'On a serotonergic drug or opioid', less: {mb: 'Serotonin syndrome (boxed warning)'}},
+  g6pd: {n: 'G6PD deficiency', out: {mb: 'Contraindicated'}},
+  isch: {n: 'Limb, gut or heart ischemia', less: {vaso: 'Label lists coronary, mesenteric, skin and digital ischemia'}},
+  lact: {n: 'Following lactate', less: {epi: 'Raises lactate itself'}},
+  cs: {n: 'Cardiogenic shock', less: {dopa: 'More deaths than norepinephrine in the cardiogenic subgroup of SOAP II', phen: 'Alone as first line: strongly discouraged', epi: 'More refractory shock than norepinephrine after a heart attack'}}
+};
+function narrowRows(k){
+  var N = NARROW[k];
+  return AORDER.filter(function(a){ return a !== 'push'; }).map(function(a){
+    var st = N && N.out && N.out[a] ? 'out' : N && N.less && N.less[a] ? 'less' : '';
+    return {a: a, name: AG[a].n, st: st, why: st === 'out' ? N.out[a] : st === 'less' ? N.less[a] : AG[a].cls};
+  });
+}
+
+/* Doses entered -> both units and the norepinephrine-equivalent dose (Kotani 2023). */
+function doses(i){
+  var d = {}, miss = false;
+  ['ne','epi','phen'].forEach(function(k){
+    if (!has(i[k]) || !(i[k] > 0)) return;
+    if (i.unit === 'kg'){ d[k] = {kg: i[k], min: has(i.wt) ? i[k] * i.wt : null}; }
+    else { d[k] = {min: i[k], kg: has(i.wt) ? i[k] / i.wt : null}; if (!has(i.wt)) miss = true; }
+  });
+  ['vaso','dopa','ang'].forEach(function(k){ if (has(i[k]) && i[k] > 0) d[k] = i[k]; });
+  var any = Object.keys(d).length > 0, nee = null;
+  if (any && !miss){
+    nee = (d.ne ? d.ne.kg : 0) + (d.epi ? d.epi.kg : 0) + (d.dopa || 0) / 100 + (d.phen ? d.phen.kg : 0) * 0.06 + (d.vaso || 0) * 2.5 + (d.ang || 0) * 0.0025;
+  }
+  return {d: d, any: any, miss: miss, nee: nee, n: Object.keys(d).length};
+}
+function perMin(lo, hi, wt){ return has(wt) ? ' (' + r1(lo * wt) + ' to ' + r1(hi * wt) + ' mcg/min at ' + wt + ' kg)' : ''; }
+function perKg(lo, hi, wt){ return has(wt) ? ' (' + r2(lo / wt) + ' to ' + r2(hi / wt) + ' mcg/kg/min at ' + wt + ' kg)' : ''; }
+function both(x){ return x.kg != null && x.min != null ? r2(x.kg) + ' mcg/kg/min (' + r1(x.min) + ' mcg/min)' : x.kg != null ? r2(x.kg) + ' mcg/kg/min' : r1(x.min) + ' mcg/min'; }
+
+var WHY = {
+  sepTarget: 'Aiming higher than 65 has not saved lives and costs more drug and more arrhythmia.',
+  sepOld: 'In patients 65 and older, accepting 60 to 65 meant less vasopressor with no more deaths.',
+  ne: 'Norepinephrine tightens vessels and adds a little squeeze, with fewer arrhythmias than dopamine.',
+  titrate: 'Below about 0.25 mcg/kg/min there is still room on one drug; the second is usually added between 0.25 and 0.5.',
+  titrate2: 'Norepinephrine is the drug that is titrated; the others are added when it runs high.',
+  vaso: 'Vasopressin works on a different receptor, so it raises pressure without more adrenergic drive.',
+  epi: 'With two receptors already in use, epinephrine adds both vessel tone and heart squeeze.',
+  refractory: 'When the doses keep climbing, a missed cause is more likely than a missing drug.',
+  attarget: 'Every pressor has a price; at target the next move is down, not up.',
+  inotrope: 'When the heart is not moving blood the gap is output, so the answer is an inotrope on top of the pressor.',
+  steroid: 'Hydrocortisone shortens the time on vasopressors; its effect on survival is small and uncertain.',
+  csNe: 'Norepinephrine raises pressure and output together; a pure vasopressor adds load to a failing heart.',
+  csIno: 'An inodilator raises output and lowers the load on the heart, at the cost of some pressure.',
+  csFail: 'Drugs that do not turn things round quickly are a reason to move to mechanical support, not to keep adding doses.',
+  pe: 'The right ventricle is failing against a blocked circuit: pressure support keeps the coronaries perfused until the clot is dealt with.',
+  peDobu: 'With a normal pressure the gap is output, but dobutamine also relaxes vessels, so the pressure can fall.',
+  peAdd: 'Above about 15 mcg/min norepinephrine may tighten the lung vessels and load the right ventricle further.',
+  hem: 'The problem is volume, not tone: pressors raise the number without replacing blood.',
+  hemTbi: 'An injured brain needs a higher pressure to stay perfused, so the low target does not apply.',
+  neu: 'Loss of sympathetic tone drops resistance and often heart rate; the target protects the injured cord.',
+  ana: 'Epinephrine reverses the vessel dilation, airway narrowing and mediator release at once; delay is what kills.',
+  anaInf: 'Repeated doses with no hold suggest ongoing mediator release that only a continuous dose will cover.',
+  nee: 'Adding the drugs up on one scale shows how much support the patient is really on.',
+  wean: 'Nobody has shown which drug to stop first; what matters is one change at a time.'
+};
+
+function targetOf(i){
+  if (i.type === 'sep') return i.age65 ? {lo: T.mapOldLo, hi: T.mapOldHi, txt: '60 to 65 mm Hg'} : {lo: T.mapSep, hi: T.mapSepHi, txt: '65 mm Hg'};
+  if (i.type === 'cs') return {lo: 65, txt: 'over 60 to 65 mm Hg'};
+  if (i.type === 'hem') return i.tbi ? {lo: T.hemTbi, txt: '80 mm Hg or more'} : i.ctrl ? null : {lo: T.hemMapLo, txt: 'systolic 80 to 90 (mean 50 to 60) mm Hg'};
+  if (i.type === 'neu') return {lo: T.neuLo, hi: T.neuHi, txt: '75 to 80 at least, 90 to 95 at most'};
+  return null;
+}
+function mapState(i){ var t = targetOf(i); if (!t || !has(i.map)) return null; return i.map < t.lo ? 'below' : t.hi && i.map > t.hi ? 'above' : 'at'; }
+function mapSub(i){ var s = mapState(i); if (s === 'at' && i.type === 'hem' && !i.tbi) return 'Mean pressure ' + i.map + ': at or above the low target.'; return s ? 'Mean pressure ' + i.map + ': ' + (s === 'below' ? 'below target.' : s === 'above' ? (i.type === 'sep' && !i.age65 ? 'more than 5 above target.' : 'above the range.') : 'at target.') : null; }
+
+function neeCard(i, D){
+  if (!D.any) return null;
+  if (D.miss) return {id: 'nee', label: 'Total support', head: 'Enter the weight', empty: true, sub: 'Doses in mcg/min need a weight to convert.'};
+  var parts = [], d = D.d;
+  if (d.ne) parts.push('Norepinephrine ' + both(d.ne));
+  if (d.epi) parts.push('Epinephrine ' + both(d.epi) + ' × 1');
+  if (d.vaso) parts.push('Vasopressin ' + d.vaso + ' units/min × 2.5 = ' + r3(d.vaso * 2.5));
+  if (d.phen) parts.push('Phenylephrine ' + both(d.phen) + ' × 0.06 = ' + r3(d.phen.kg * 0.06));
+  if (d.dopa) parts.push('Dopamine ' + d.dopa + ' mcg/kg/min ÷ 100 = ' + r3(d.dopa / 100));
+  if (d.ang) parts.push('Angiotensin II ' + d.ang + ' ng/kg/min × 0.0025 = ' + r3(d.ang * 0.0025));
+  return {id: 'nee', label: 'Total support', head: 'Norepinephrine-equivalent ' + r2(D.nee) + ' mcg/kg/min', sub: 'A way to describe how much support is running. It is not a dosing rule.', list: parts, why: WHY.nee,
+    more: ['Formula (Kotani 2023): norepinephrine + epinephrine + dopamine ÷ 100 + phenylephrine × 0.06 + vasopressin (units/min) × 2.5 + angiotensin II (ng/kg/min) × 0.0025, all catecholamines in mcg/kg/min.', 'Other published formulas weight phenylephrine at one tenth, so totals differ between papers. The paper does not say whether norepinephrine is counted as base or salt.'], tiers: ['Research score, not a guideline']};
+}
+
+function septic(i, D){
+  var c = [], d = D.d, t = targetOf(i), ms = mapState(i), wt = i.wt;
+  c.push({id: 'target', label: 'Septic shock · target', head: 'Mean pressure ' + t.txt, sub: mapSub(i),
+    list: ['Fluid: at least 30 mL/kg of crystalloid in the first 3 hours, adjusted to the patient' + (has(wt) ? ' (' + Math.round(30 * wt) + ' mL at ' + wt + ' kg; use ideal or adjusted weight if BMI is over 30)' : '') + '.', 'If the pressure stays low after the first fluid, start a vasopressor. In unstable shock it may be started alongside the fluid.', 'Do not wait for a central line: start in a good peripheral vein.', 'On a rising dose or more than one drug: place an arterial line.'],
+    why: i.age65 ? WHY.sepOld : WHY.sepTarget, chips: [['map','sep','Why the pressure is low']],
+    more: ['SSC 2026 recommends an initial target of 65 over higher targets, and allows a range within 5 mm Hg (so this tool treats 65 to 70 as at target). For age 65 and older it suggests 60 to 65.', 'SEPSISPAM compared 80 to 85 with 65 to 70: no difference in deaths, more atrial fibrillation with the higher target. The 65 Trial tested 60 to 65 in patients aged 65 and older: 41.0% against 43.8% dead at 90 days.', 'Peripheral start: SSC 2026 says the data are too thin to set a time limit or a site. The 2021 edition advised a short period, in a vein in or above the bend of the elbow.'],
+    tiers: [i.age65 ? 'Target 60 to 65 at age 65+: conditional, low' : 'Target 65: strong, moderate', 'Fluid 30 mL/kg: conditional, low', 'Peripheral start: conditional, very low']});
+  var a = {id: 'agent', label: 'Vasopressor', chips: [['ladder', 's1', 'The septic ladder']], tiers: []};
+  var on = d.ne || d.vaso || d.epi || d.phen || d.dopa || d.ang;
+  if (!on && ms && ms !== 'below'){
+    a.head = 'No vasopressor needed at this pressure'; a.sub = 'Mean pressure ' + i.map + ' without a vasopressor.'; a.list = ['Keep treating the cause and recheck perfusion: lactate, capillary refill, urine output.', 'If the pressure falls below target after the first fluid, start norepinephrine.']; a.chips = [];
+  } else if (!d.ne && !on){
+    a.head = ms ? 'Start norepinephrine' : 'Norepinephrine if the pressure stays low after fluid'; a.sub = 'Titrate to a mean pressure of ' + t.txt + '.';
+    a.list = ['Label: start 8 to 12 mcg/min' + perKg(8, 12, wt) + ', then a usual maintenance of 2 to 4 mcg/min. Many units start lower: follow your protocol.'];
+    a.why = WHY.ne; a.chips.push(['recept','ne','What norepinephrine acts on']);
+    a.more = ['SSC 2026 recommends norepinephrine over dopamine (high certainty), epinephrine and selepressin, and suggests it over vasopressin or angiotensin II as the first drug.', 'SOAP II: deaths 52.5% with dopamine against 48.5% with norepinephrine (not significant), arrhythmias 24.1% against 12.4%.'];
+    a.tiers = ['Norepinephrine first: strong', 'Dose: FDA label'];
+  } else if (!d.ne){
+    a.head = 'Norepinephrine is the first-line drug'; a.sub = 'The drug running is not the recommended first agent in septic shock.';
+    a.list = [ms === 'below' ? 'Add norepinephrine and titrate to a mean pressure of ' + t.txt + ', then review the other drug.' : 'If a vasopressor is still needed, make it norepinephrine.'];
+    a.why = WHY.ne; a.tiers = ['Norepinephrine first: strong'];
+  } else if (!ms){
+    a.head = 'Enter the mean pressure'; a.empty = true; a.sub = 'The next step depends on whether the patient is at target.'; a.chips = [];
+  } else if (ms !== 'below'){
+    a.head = ms === 'above' ? 'Above target: bring the dose down' : 'At target: do not escalate';
+    a.sub = 'Norepinephrine ' + both(d.ne) + (d.vaso ? ' with vasopressin ' + d.vaso + ' units/min' : '') + '.';
+    a.list = [ms === 'above' ? 'Reduce norepinephrine in steps until the mean pressure is back at target.' : 'Hold the dose while the cause is treated, then wean as the pressure allows.'];
+    a.why = WHY.attarget; a.tiers = [i.age65 ? 'Target 60 to 65 at age 65+: conditional, low' : 'Target 65: strong, moderate'];
+  } else if (d.ne.kg == null){ a.head = 'Enter the weight'; a.empty = true; a.sub = 'The point at which a second drug is usually added is given in mcg/kg/min.'; a.chips = [];
+  } else if (d.ne.kg < T.vasoAt){
+      a.head = 'Titrate norepinephrine'; a.sub = 'Now ' + both(d.ne) + (d.vaso ? ' with vasopressin ' + d.vaso + ' units/min' : '') + ', mean pressure below target.';
+      a.list = ['Raise the dose to reach a mean pressure of ' + t.txt + '.', d.vaso ? (d.epi ? 'Raise norepinephrine before raising the other drugs.' : 'There is still room on norepinephrine before a third drug.') : 'Vasopressin is usually added once norepinephrine reaches 0.25 to 0.5 mcg/kg/min' + perMin(T.vasoAt, T.vasoAtHi, wt) + '.', 'Check the fluid has been given and look again for the source.'];
+      a.why = d.vaso ? WHY.titrate2 : WHY.titrate; a.tiers = d.vaso ? ['Norepinephrine first: strong'] : ['Add vasopressin on escalating doses: conditional, moderate', 'The 0.25 to 0.5 mark: 2021 panel practice'];
+      a.more = ['SSC 2026 gives no dose at which to add vasopressin. The 2021 edition said that in the panel\'s practice it is usually started when norepinephrine is 0.25 to 0.5 mcg/kg/min.'];
+  } else if (!d.vaso){
+      a.chips[0][1] = 's2'; a.head = 'Add vasopressin 0.03 units/min'; a.sub = 'Norepinephrine ' + both(d.ne) + ', mean pressure below target.';
+      a.list = ['Add it to norepinephrine instead of raising norepinephrine further.', 'Usually run at a fixed 0.03 units/min, not titrated. The label starts at 0.01 units/min and adjusts by 0.005 every 10 to 15 minutes.'];
+      a.guards = ['Units per minute, not per hour. Data are limited above 0.07 units/min, and higher doses have been linked to heart, finger and gut ischemia.'];
+      a.why = WHY.vaso; a.chips.push(['recept','vaso','What vasopressin acts on']);
+      a.more = ['SSC 2026: on escalating doses of norepinephrine, add vasopressin. It names no threshold; 0.25 to 0.5 mcg/kg/min is the 2021 panel\'s practice.', 'VASST added vasopressin 0.01 to 0.03 units/min: deaths at 28 days 35.4% against 39.3% (not significant); in less severe shock 26.5% against 35.7%.'];
+      a.tiers = ['Add vasopressin: conditional, moderate', 'The 0.25 to 0.5 mark: 2021 panel practice', 'Dose: SSC 2021 text and FDA label'];
+  } else if (!d.epi){
+    a.chips[0][1] = 's3'; a.head = 'Add epinephrine'; a.sub = 'Still below target on norepinephrine and vasopressin.';
+    a.list = ['Label: 0.05 to 2 mcg/kg/min' + perMin(0.05, 2, wt) + ', adjusted every 10 to 15 minutes in steps of 0.05 to 0.2 mcg/kg/min.'];
+    a.guards = ['Epinephrine raises lactate and heart rate: do not read a rising lactate on its own as worsening shock.'];
+    a.why = WHY.epi; a.chips.push(['recept','epi','What epinephrine acts on']);
+    a.tiers = ['Add epinephrine: conditional, very low', 'Dose: FDA label'];
+  } else {
+    a.chips[0][1] = 's3'; a.head = 'Still low on three drugs: look again at the cause'; a.sub = 'Call for senior help.';
+    a.list = ['Angiotensin II is an option: start 20 ng/kg/min, adjust every 5 minutes by up to 15, no more than 80 in the first 3 hours, then no more than 40. Central line recommended.'];
+    a.guards = ['Angiotensin II raises the risk of clots (13% against 5%): give venous thromboembolism prophylaxis.'];
+    a.why = WHY.refractory; a.chips.push(['recept','ang','What angiotensin II acts on']);
+    a.more = ['ATHOS-3: the pressure responded at 3 hours in 69.9% against 23.4% with placebo; deaths at 28 days 46% against 54% (not significant).', 'SSC 2026 finds the evidence insufficient to recommend for or against methylene blue or midodrine, and suggests against terlipressin.'];
+    a.tiers = ['Angiotensin II: FDA label; no SSC recommendation as an added drug', 'Methylene blue: no recommendation'];
+  }
+  c.push(a);
+  if (i.cardiac) c.push({id: 'inotrope', label: 'Failing heart in sepsis', head: ms && ms !== 'below' ? 'Add dobutamine to norepinephrine, or use epinephrine alone' : 'Once the pressure is at target: dobutamine with norepinephrine, or epinephrine alone',
+    list: ['Dobutamine (label): start 0.5 to 1 mcg/kg/min; usual range 2 to 20 mcg/kg/min.', 'Stop it if perfusion does not improve or if arrhythmia or low pressure appears.'],
+    guards: ['An inotrope is added to the vasopressor, not given instead of it: dobutamine alone can drop the pressure.'],
+    why: WHY.inotrope, chips: [['recept','dobu','What dobutamine acts on']],
+    more: ['SSC 2026 suggests against levosimendan, and found too little data to choose between dobutamine and milrinone.'], tiers: ['Dobutamine or epinephrine: conditional, very low', 'Dose: FDA label']});
+  if (on){
+    var big = (d.ne && d.ne.kg != null && d.ne.kg >= T.steroidDose) || (d.epi && d.epi.kg != null && d.epi.kg >= T.steroidDose), long = has(i.hrs) && i.hrs >= T.steroidHrs;
+    c.push({id: 'steroid', label: 'Corticosteroid', head: big && long ? 'Hydrocortisone is suggested: 50 mg IV every 6 hours' : 'Hydrocortisone if the vasopressor need persists',
+      sub: big && long ? '200 mg a day, as 50 mg every 6 hours or a continuous infusion.' : 'Dose when used: 50 mg IV every 6 hours (200 mg a day).',
+      list: big && long ? ['Norepinephrine or epinephrine at 0.25 mcg/kg/min or more, 4 hours or more after starting: the point the 2021 edition gave.'] : ['The 2021 edition suggested starting once norepinephrine or epinephrine is at 0.25 mcg/kg/min or more' + perMin(T.steroidDose, T.steroidDose, wt).replace(/ to [\d.]+/, '') + ', at least 4 hours after starting.' + (big && !has(i.hrs) ? ' Enter the hours on vasopressors.' : '')],
+      why: WHY.steroid,
+      more: ['SSC 2026 suggests IV corticosteroids for adults with septic shock and names no dose or trigger; its quick guide says hydrocortisone, with or without fludrocortisone, if the norepinephrine requirement persists. The dose and the 0.25 mcg/kg/min for 4 hours mark come from the 2021 edition.', 'ADRENAL (hydrocortisone 200 mg a day by infusion): deaths at 90 days 27.9% against 28.8%; shock resolved in a median 3 days against 4.', 'APROCCHSS (hydrocortisone 50 mg every 6 hours plus fludrocortisone 50 mcg by gastric tube daily, 7 days): deaths at 90 days 43.0% against 49.1%.'],
+      tiers: ['Corticosteroids in septic shock: conditional, low', 'Dose and trigger: SSC 2021 remark']});
+  }
+  var n = neeCard(i, D); if (n) c.push(n);
+  if (d.ne && d.vaso && ms === 'below') c.push({id: 'recheck', label: 'Not responding', head: 'Before the next drug, check these',
+    list: ['Source: is there pus to drain, a line to pull, an antibiotic gap?', 'Another kind of shock on top: bleeding, a failing heart, tamponade, pulmonary embolism, tension pneumothorax. Put an ultrasound probe on the chest.', 'Is the number real? Arterial line position and zero.', 'Steroid given?', 'Severe acidemia: bicarbonate is suggested only at pH 7.2 or below with kidney injury, not to make pressors work better.', 'Ionized calcium low after large transfusion.'],
+    why: WHY.refractory, tiers: ['Checklist: expert practice', 'Bicarbonate: SSC 2026, conditional'], more: ['SSC 2026 suggests against bicarbonate to improve hemodynamics or reduce vasopressor needs in lactic acidemia, and suggests against beta-blockers as a treatment for septic shock.']});
+  if (ms && ms !== 'below' && d.ne && d.vaso && !i.cardiac) c.push({id: 'wean', label: 'Coming off', head: 'Wean one drug at a time', sub: 'No guideline sets the order, and the studies disagree.',
+    list: ['One randomized trial (78 patients): low pressure in 68.4% when norepinephrine was reduced first, against 22.5% when vasopressin was reduced first.', 'Five cohort studies pooled (930 patients): the opposite, 31.8% against 54.8%.', 'Vasopressin label: once at target for 8 hours without catecholamines, reduce by 0.005 units/min each hour.'],
+    why: WHY.wean, tiers: ['Order of weaning: expert practice', 'Vasopressin taper: FDA label']});
+  return c;
+}
+
+function cardiogenic(i, D){
+  var c = [], wt = i.wt, hypo = i.hypo || (has(i.map) && i.map < T.csMapHypo);
+  var stage = i.fail ? 'D' : i.perf ? 'C' : hypo ? 'B' : null;
+  var sdesc = {B: 'low pressure or fast heart rate, perfusion still adequate', C: 'poor perfusion that needs a drug or a device', D: 'not responding to the first measures'};
+  c.push({id: 'target', label: 'Cardiogenic shock · stage', head: stage ? 'SCAI stage ' + stage + ': ' + sdesc[stage] : 'Tick what is present', empty: !stage,
+    sub: stage ? 'Mean pressure goal once stable: over 60 to 65 mm Hg.' : 'Stage A is at risk only; stage E is extremis (lactate 8 or more, pH under 7.2).',
+    list: stage ? ['Find the cause now: ECG and echo; a heart attack needs the cath lab.', 'Contact a shock center early, once shock is confirmed or a vasoactive drug is started.'] : null,
+    why: stage ? 'Staging gives the team one word for how sick the patient is and when drugs are no longer enough.' : null, chips: stage ? [['map','cs','Why the pressure is low']] : null,
+    more: stage ? ['SCAI 2022. B: systolic under 90, mean under 60 or a fall of more than 30, or heart rate 100 or more, without poor perfusion. C: poor perfusion needing intervention; lactate 2 or more, cardiac index under 2.2, wedge pressure over 15. D: failing to respond. E: extremis, with lactate 8 or more or pH under 7.2.', 'The heart failure tool on this site covers staging, monitoring and devices in more depth.'] : null,
+    tiers: stage ? ['Staging: expert consensus (SCAI 2022)', 'Pressure goal: expert consensus (ACC 2025)'] : null});
+  if (!stage) return c;
+  var a = {id: 'agent', label: 'Vasoactive drug'};
+  if (hypo){
+    a.head = 'Norepinephrine 0.05 to 1 mcg/kg/min'; a.sub = 'A reasonable first choice when hypotensive' + perMin(0.05, 1, wt).replace(' (', ': ').replace(')', '') + '.';
+    a.list = ['Lowest dose for the shortest time.'].concat(i.perf ? ['If perfusion stays poor once the pressure is restored, add an inotrope: dobutamine 2 to 10 mcg/kg/min or milrinone 0.125 to 0.5 mcg/kg/min.'] : []);
+    a.guards = ['Do not use phenylephrine alone as the first infusion: strongly discouraged.'];
+    a.why = WHY.csNe; a.chips = [['recept','ne','What norepinephrine acts on']];
+  } else if (i.perf || i.fail){
+    a.head = 'If the pressure is adequate: an inodilator may be considered'; a.sub = 'Dobutamine 2 to 10 mcg/kg/min or milrinone 0.125 to 0.5 mcg/kg/min.';
+    a.list = ['Especially when resistance is high (cold, clamped down).', 'Neither is better: in DOREMI the combined bad outcome occurred in 49% with milrinone and 54% with dobutamine.'];
+    a.guards = ['Both can drop the pressure: have norepinephrine ready.'];
+    a.why = WHY.csIno; a.chips = [['recept', i.kidney ? 'dobu' : 'mil', 'What inodilators act on']];
+  } else {
+    a.head = 'Support the pressure only if it is needed'; a.sub = 'Stage B: treat the cause and watch closely for poor perfusion.'; a.list = ['If a drug is needed for pressure, norepinephrine 0.05 to 1 mcg/kg/min is a reasonable first choice.']; a.why = WHY.csNe;
+  }
+  if (i.kidney){ a.guards = (a.guards || []).concat(['Kidney function worsening: use milrinone with care and at a lower dose. Label, by creatinine clearance: 50: 0.43 · 30: 0.33 · 10: 0.23 mcg/kg/min.']); }
+  a.more = ['Dopamine: in SOAP II the 280 patients with cardiogenic shock had more deaths with dopamine than with norepinephrine (P = 0.03).', 'Epinephrine: after a heart attack, refractory shock in 37% against 7% with norepinephrine (OptimaCC, 57 patients).', 'Inotropic support to maintain perfusion in cardiogenic shock: class 1 in the 2022 heart failure guideline.'];
+  a.tiers = ['Agent choice and doses: expert consensus (ACC 2025)', 'Inotropes to maintain perfusion: class 1, B-NR'];
+  c.push(a);
+  if (i.fail) c.push({id: 'escalate', label: 'Not responding', head: 'Call for mechanical support now', sub: 'Do not keep stacking drugs.',
+    list: ['Temporary mechanical support is reasonable when drugs cannot maintain organ function.', 'If the patient is not responding quickly, consider transfer to a center that can provide it.', 'Routine use of temporary support in every case of shock is strongly discouraged.'],
+    why: WHY.csFail, tiers: ['Temporary support: class 2a, B-NR', 'Transfer: class 2b, C-LD']});
+  var n = neeCard(i, D); if (n) c.push(n);
+  return c;
+}
+
+function pe(i, D){
+  var c = [], d = D.d, wt = i.wt;
+  c.push({id: 'target', label: 'Pulmonary embolism with shock', head: 'Reopening the artery is the treatment', sub: 'Pressors and inotropes buy time for it.',
+    list: ['Fluid with caution: small boluses of 500 mL or less; more can overstretch the right ventricle.', 'Refractory shock: VA-ECMO is reasonable where available.'],
+    guards: ['Avoid deep sedation and intubation unless there is another reason for them: positive pressure can collapse a failing right ventricle.'],
+    why: WHY.pe, chips: [['map','pe','Why the pressure is low']],
+    tiers: ['Vasopressors or inotropes in shock from PE: class 1, C-LD', 'Fluid may be considered: class 2b, C-LD', 'Deep sedation or ventilation without indication: class 3, harm', 'VA-ECMO: class 2a, B-NR']});
+  var a = {id: 'agent', label: 'Vasoactive drug'};
+  if (i.perfonly){
+    a.head = 'Dobutamine, up to 10 mcg/kg/min'; a.sub = 'The first agent when the pressure is normal but perfusion is poor.';
+    a.guards = ['Dobutamine can drop the pressure: have norepinephrine ready.']; a.why = WHY.peDobu; a.chips = [['recept','dobu','What dobutamine acts on']];
+  } else if (d.ne && d.ne.min != null && d.ne.min > T.peNeMax && !d.vaso && !d.phen){
+    a.head = 'Add vasopressin or phenylephrine'; a.sub = 'Norepinephrine ' + both(d.ne) + ': above 15 mcg/min, add a second drug instead of going higher.';
+    a.why = WHY.peAdd; a.chips = [['recept','vaso','What vasopressin acts on']];
+  } else if (d.ne && d.ne.min == null){
+    a.head = 'Enter the weight'; a.empty = true; a.sub = 'The point for adding a second drug is 15 mcg/min.';
+  } else {
+    a.head = d.ne ? 'Continue norepinephrine' : 'Norepinephrine'; a.sub = 'The vasopressor of choice in shock from pulmonary embolism.';
+    a.list = (d.ne && (d.vaso || d.phen) ? ['A second vasopressor is already running.'] : !d.ne && (d.vaso || d.phen) ? ['Another vasopressor is running without it: norepinephrine is the first choice.'] : ['Above 15 mcg/min' + (has(wt) ? ' (' + r2(15 / wt) + ' mcg/kg/min at ' + wt + ' kg)' : '') + ', add vasopressin or phenylephrine instead of going higher.']).concat(['Dobutamine up to 10 mcg/kg/min can be added if output stays low.']);
+    a.why = WHY.pe; a.chips = [['recept','ne','What norepinephrine acts on']];
+  }
+  a.more = ['The 2019 European guideline gives norepinephrine 0.2 to 1.0 mcg/kg/min and dobutamine 2 to 20 mcg/kg/min; the 2026 US guideline prefers adding a second drug above 15 mcg/min of norepinephrine.', 'Tamponade and tension pneumothorax are also obstructive shock: drain them. A pressor is only a bridge (expert practice).'];
+  a.tiers = ['Agent choice and doses: guideline supporting text (AHA/ACC 2026)'];
+  c.push(a);
+  var n = neeCard(i, D); if (n) c.push(n);
+  return c;
+}
+
+function hemorrhagic(i, D){
+  var c = [], t = targetOf(i), ms = mapState(i);
+  c.push({id: 'target', label: 'Hemorrhagic shock', head: 'Stop the bleeding and give blood', sub: t ? 'Pressure target: ' + t.txt + (i.tbi ? '.' : ' until the bleeding is controlled.') + (mapSub(i) ? ' ' + mapSub(i) : '') : 'Bleeding controlled: the low target no longer applies; restore a normal pressure.',
+    list: ['Keep ionized calcium in the normal range, especially during massive transfusion.'],
+    guards: i.tbi ? ['Severe brain injury: the low-pressure target does not apply. Keep the mean pressure at 80 or more.'] : !i.ctrl ? ['The low target is not for patients with a severe brain injury.'] : null,
+    why: i.tbi ? WHY.hemTbi : WHY.hem, chips: [['map','hem','Why the pressure is low']],
+    more: ['These targets come from the European trauma guideline (2023); US trauma society statements were not reviewed for this tool.'],
+    tiers: [i.tbi ? 'Mean 80 or more with severe brain injury: grade 1C' : 'Systolic 80 to 90 until bleeding is controlled: grade 1B', 'Calcium: grade 1C']});
+  c.push({id: 'agent', label: 'Vasopressor', head: ms === 'below' ? 'Norepinephrine as a bridge, with blood' : 'A pressor is a bridge, not the treatment',
+    sub: 'If the target cannot be reached with fluid and blood, norepinephrine is added, and only for a short time.',
+    list: (i.tbi ? [] : ['The guideline reserves it for life-threatening hypotension (systolic under 80).']).concat(['Heart not pumping well: dobutamine.']),
+    why: WHY.hem, tiers: ['Norepinephrine in addition to fluids: grade 1C', 'Dobutamine for myocardial dysfunction: grade 1C']});
+  var n = neeCard(i, D); if (n) c.push(n);
+  return c;
+}
+
+function neurogenic(i, D){
+  var c = [], ms = mapState(i);
+  c.push({id: 'target', label: 'Acute spinal cord injury', head: 'Mean pressure at least 75 to 80, at most 90 to 95', sub: 'For 3 to 7 days.' + (mapSub(i) ? ' ' + mapSub(i) : ''),
+    guards: ['A trauma patient with low pressure is bleeding until shown otherwise: look for blood loss before blaming the cord.'],
+    why: WHY.neu, chips: [['map','neu','Why the pressure is low']],
+    more: ['The 2024 guideline replaced the older advice of 85 to 90 for 7 days. Both recommendations are weak, on very low certainty evidence.'], tiers: ['Pressure range and duration: weak, very low', 'Bleeding first: expert practice']});
+  c.push({id: 'agent', label: 'Vasopressor', head: 'Norepinephrine is the usual choice', sub: 'The guideline does not recommend one drug over another.',
+    list: ['Fluid first, but tone is the problem: avoid flooding the patient.'].concat(ms === 'above' ? ['Above the range: reduce the vasopressor.'] : []),
+    guards: ['Phenylephrine can cause severe bradycardia and lower output, and a high cord injury often has a slow heart already.'],
+    why: 'Norepinephrine restores vessel tone and has some effect on heart rate and squeeze; a pure vasopressor does not.', chips: [['recept','ne','What norepinephrine acts on']], tiers: ['Agent choice: expert practice', 'Phenylephrine and bradycardia: FDA label']});
+  var n = neeCard(i, D); if (n) c.push(n);
+  return c;
+}
+
+function anaphylaxis(i, D){
+  var c = [], wt = i.wt, mg = has(wt) ? Math.min(T.anaMax, r2(T.anaPerKg * wt)) : null;
+  c.push({id: 'target', label: 'Anaphylaxis', head: 'Epinephrine into the thigh muscle now' + (mg != null ? ': ' + mg + ' mg' : ''), sub: mg != null ? mg + ' mL of the 1 mg/mL solution, outer mid-thigh.' + (mg > 0.3 && mg < 0.5 ? ' Give 0.3 mg if a child or teenager.' : '') : '0.01 mg/kg of the 1 mg/mL solution, up to 0.5 mg in adults, outer mid-thigh.',
+    list: ['Repeat every 5 to 15 minutes if the response is poor.', 'Lay the patient flat; give 1 to 2 liters of saline rapidly for low pressure in an adult.', 'This is the adult dose. Children and teenagers: no more than 0.3 mg.', 'Antihistamines and steroids are not the treatment for shock.'],
+    guards: ['Never push the 1 mg/mL solution into a vein: this has caused fatal overdoses.'],
+    why: WHY.ana, chips: [['map','ana','Why the pressure is low']],
+    more: ['The US label gives 0.3 to 0.5 mg for adults, repeated every 5 to 10 minutes. The 2023 practice parameter declines to set one interval; the World Allergy Organization gives 5 to 15 minutes.', 'Sources differ on fluid: 1 to 2 liters in adults (2015 practice parameter), 20 mL/kg (World Allergy Organization).'],
+    tiers: ['IM epinephrine dose: practice parameter 2023 and FDA label', 'Repeat interval and fluid: guidance text, ungraded', 'IV push warning: World Allergy Organization 2011']});
+  if (i.refr) c.push({id: 'agent', label: 'Not responding', head: 'Start an epinephrine infusion', sub: 'After repeated IM doses and fluid.',
+    list: ['2015 practice parameter: 1 mg in 1,000 mL (1 mcg/mL); start 2 mcg/min, raise up to 10 mcg/min.', 'Use a pump, continuous monitoring, and the most dilute bag available.'],
+    guards: ['Infusion recipes differ between sources and hospitals (the UK council uses 1 mg in 100 mL): use your own protocol and check the concentration.'],
+    why: WHY.anaInf, chips: [['recept','epi','What epinephrine acts on']], tiers: ['Infusion: practice parameter 2015 table, ungraded']});
+  if (i.bb) c.push({id: 'glucagon', label: 'On a beta-blocker', head: 'Glucagon 1 to 5 mg IV if epinephrine is not working', sub: 'Given slowly, over about 5 minutes.',
+    list: ['Protect the airway: glucagon causes vomiting.'], why: 'Glucagon raises heart rate and squeeze by a route that does not need the blocked beta receptor.',
+    tiers: ['Glucagon in refractory anaphylaxis: 2015 practice parameter, ungraded', 'In cardiac arrest from anaphylaxis on a beta-blocker: class 2b, C-EO (AHA 2025)']});
+  var n = neeCard(i, D); if (n) c.push(n);
+  return c;
+}
+
+var BYTYPE = {sep: septic, cs: cardiogenic, pe: pe, hem: hemorrhagic, neu: neurogenic, ana: anaphylaxis};
+function decide(i){
+  if (!i.type) return {cards: [{id: 'target', label: 'Start here', head: 'Pick the type of shock', empty: true, sub: 'Not sure which? Open Learn for how each one lowers the pressure.'}]};
+  return {cards: BYTYPE[i.type](i, doses(i)), doses: doses(i), target: targetOf(i), mapState: mapState(i)};
+}
+
+var TRIALS = [
+  {q: 'Dopamine or norepinephrine first? (SOAP II)', d: 'Randomized, 1,679 patients with shock of any cause.', r: 'Deaths at 28 days 52.5% with dopamine against 48.5% with norepinephrine (odds ratio 1.17, 95% CI 0.97 to 1.42). Arrhythmias 24.1% against 12.4%. More deaths with dopamine in the 280 with cardiogenic shock.', c: 'Norepinephrine became the first-line vasopressor.', cite: 'De Backer D et al. N Engl J Med 2010;362:779', doi: '10.1056/NEJMoa0907118'},
+  {q: 'Does adding vasopressin save lives? (VASST)', d: 'Randomized, double blind, 778 patients with septic shock on norepinephrine; vasopressin 0.01 to 0.03 units/min or more norepinephrine.', r: 'Deaths at 28 days 35.4% against 39.3% (P = 0.26). In less severe shock 26.5% against 35.7% (P = 0.05).', c: 'Vasopressin is safe to add and spares norepinephrine, but has not been shown to lower mortality.', cite: 'Russell JA et al. N Engl J Med 2008;358:877', doi: '10.1056/NEJMoa067373'},
+  {q: 'Is a higher pressure target better? (SEPSISPAM)', d: 'Randomized, open label, 776 patients with septic shock; mean pressure 80 to 85 against 65 to 70.', r: 'Deaths at 28 days 36.6% against 34.0% (hazard ratio 1.07, 95% CI 0.84 to 1.38). More new atrial fibrillation with the higher target; less kidney replacement with it in patients with chronic hypertension.', c: 'The default target stayed at 65.', cite: 'Asfar P et al. N Engl J Med 2014;370:1583', doi: '10.1056/NEJMoa1312173'},
+  {q: 'Can older patients run lower? (65 Trial)', d: 'Randomized, 2,600 patients aged 65 or older with vasodilatory hypotension; mean pressure 60 to 65 against usual care.', r: 'Deaths at 90 days 41.0% against 43.8% (difference −2.85%, 95% CI −6.75 to 1.05). Less vasopressor used.', c: 'Supports the 2026 suggestion of 60 to 65 for age 65 and older.', cite: 'Lamontagne F et al. JAMA 2020;323:938', doi: '10.1001/jama.2020.0930'},
+  {q: 'Does early norepinephrine help? (CENSER)', d: 'Randomized, double blind, single center, 310 adults with sepsis and hypotension; early low-dose norepinephrine with fluid against standard care.', r: 'Shock controlled by 6 hours in 76.1% against 48.4%. Less pulmonary edema (14.4% against 27.7%) and arrhythmia (11% against 20%).', c: 'Supports starting norepinephrine early. Single center; mortality not different.', cite: 'Permpikul C et al. Am J Respir Crit Care Med 2019;199:1097', doi: '10.1164/rccm.201806-1034OC'},
+  {q: 'Hydrocortisone in septic shock? (ADRENAL)', d: 'Randomized, 3,800 ventilated patients with septic shock; hydrocortisone 200 mg a day by infusion against placebo.', r: 'Deaths at 90 days 27.9% against 28.8% (odds ratio 0.95, 95% CI 0.82 to 1.10). Shock resolved in a median of 3 days against 4.', c: 'Steroids get patients off pressors sooner without a clear survival gain.', cite: 'Venkatesh B et al. N Engl J Med 2018;378:797', doi: '10.1056/NEJMoa1705835'},
+  {q: 'Hydrocortisone plus fludrocortisone? (APROCCHSS)', d: 'Randomized, double blind, 1,241 patients with septic shock; hydrocortisone 50 mg every 6 hours plus fludrocortisone 50 mcg daily for 7 days against placebo.', r: 'Deaths at 90 days 43.0% against 49.1% (relative risk 0.88, 95% CI 0.78 to 0.99).', c: 'The one large trial with a survival benefit, in sicker patients; the reason fludrocortisone is still discussed.', cite: 'Annane D et al. N Engl J Med 2018;378:809', doi: '10.1056/NEJMoa1705716'},
+  {q: 'Angiotensin II when catecholamines fail? (ATHOS-3)', d: 'Randomized, placebo controlled, 344 patients with vasodilatory shock on more than 0.2 mcg/kg/min of norepinephrine or equivalent; 321 treated.', r: 'Pressure response at 3 hours 69.9% against 23.4% (odds ratio 7.95). Deaths at 28 days 46% against 54% (hazard ratio 0.78, 95% CI 0.57 to 1.07).', c: 'Led to FDA approval. The endpoint was pressure, a surrogate; no proven survival benefit.', cite: 'Khanna A et al. N Engl J Med 2017;377:419', doi: '10.1056/NEJMoa1704154'},
+  {q: 'Milrinone or dobutamine in cardiogenic shock? (DOREMI)', d: 'Randomized, double blind, 192 patients.', r: 'Death, arrest, transplant or device, heart attack, stroke or new kidney replacement: 49% with milrinone against 54% with dobutamine (relative risk 0.90, 95% CI 0.69 to 1.19).', c: 'Neither inodilator is better; choose by the patient.', cite: 'Mathew R et al. N Engl J Med 2021;385:516', doi: '10.1056/NEJMoa2026845'},
+  {q: 'Epinephrine or norepinephrine after a heart attack with shock? (OptimaCC)', d: 'Randomized, double blind, 57 patients; stopped early.', r: 'Refractory shock in 37% with epinephrine against 7% with norepinephrine (P = 0.008). Similar change in cardiac index.', c: 'Small, but the reason norepinephrine is preferred in cardiogenic shock.', cite: 'Levy B et al. J Am Coll Cardiol 2018;72:173', doi: '10.1016/j.jacc.2018.04.051'},
+  {q: 'Which drug to wean first? (DOVSS)', d: 'Randomized, double blind, single center, 78 patients recovering from septic shock on norepinephrine and vasopressin; stopped early.', r: 'Low pressure within an hour in 68.4% when norepinephrine was reduced first against 22.5% when vasopressin was reduced first.', c: 'Pooled cohort studies point the other way, so there is no settled order.', cite: 'Jeon K et al. Crit Care 2018;22:131', doi: '10.1186/s13054-018-2034-9'}
+];
+
+/* Figures: plain SVG strings in the shared colour names. */
+var FS = 'font-family:var(--sans)', FM = 'font-family:var(--mono)';
+function svgOpen(vb, label){ return '<svg viewBox="' + vb + '" role="img" aria-label="' + label + '" class="fig">'; }
+function tx(x, y, t, o){ o = o || {}; return '<text x="' + x + '" y="' + y + '" text-anchor="' + (o.a || 'middle') + '" style="' + (o.sans ? FS : FM) + ';font-size:' + (o.s || 11) + 'px;font-weight:' + (o.w || 400) + ';fill:' + (o.c || 'var(--ink)') + '">' + t + '</text>'; }
+function bx(x, y, w, h, t1, t2, st){
+  var fill = st === 'hot' ? 'var(--warnbg)' : st === 'on' ? 'var(--card)' : 'var(--fill)', stroke = st === 'hot' ? 'var(--warn)' : st === 'on' ? 'var(--accent)' : 'var(--line)';
+  return '<g' + (st === 'dim' ? ' opacity=".45"' : '') + '><rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="10" fill="' + fill + '" stroke="' + stroke + '"' + (st === 'hot' || st === 'on' ? ' stroke-width="2"' : '') + '/>' +
+    tx(x + w / 2, y + (t2 ? h / 2 - 2 : h / 2 + 4), t1, {sans: 1, s: 12, w: 600}) + (t2 ? tx(x + w / 2, y + h / 2 + 12, t2, {s: 9.5, c: 'var(--muted)'}) : '') + '</g>';
+}
+
+var RKEYS = ['a1','b1','b2','d1','v1','at1','pde','no'];
+var RECEPT = {};
+['ne','vaso','epi','phen','dopa','dobu','mil','ang','mb'].forEach(function(k){ RECEPT[k] = {n: AG[k].n, line: AG[k].use}; });
+RECEPT.mil.line = 'Milrinone raises output and relaxes vessels by blocking PDE-3, with no catecholamine receptor involved. Resistance and pressure fall.';
+function receptSVG(k){
+  var A = AG[k], s = svgOpen('0 0 360 258', 'Receptors and effects of ' + A.n);
+  RKEYS.forEach(function(r, n){
+    var col = n % 4, row = Math.floor(n / 4), x = 6 + col * 88, y = 8 + row * 62, v = A.rec[r] || 0;
+    s += bx(x, y, 84, 54, RECN[r][0] + (v ? ' ' + '+++'.slice(0, v) : ''), '', v ? 'on' : 'dim');
+    s += '<g' + (v ? '' : ' opacity=".45"') + '>' + tx(x + 42, y + 46, RECN[r][1].length > 16 ? RECN[r][1].slice(0, 15) + '…' : RECN[r][1], {s: 8.5, c: 'var(--muted)'}) + '</g>';
+  });
+  s += tx(6, 150, 'WHAT IT DOES', {a: 'start', s: 10, c: 'var(--muted)'});
+  EFFN.forEach(function(e, n){
+    var x = 6 + n * 88, v = A.eff[n], up = v.indexOf('↑') === 0, dn = v.indexOf('↓') === 0, none = v.indexOf('not') === 0;
+    s += '<rect x="' + x + '" y="160" width="84" height="64" rx="10" fill="' + (dn ? 'var(--warnbg)' : 'var(--fill)') + '" stroke="' + (dn ? 'var(--warn)' : up ? 'var(--accent)' : 'var(--line)') + '"/>';
+    s += tx(x + 42, 180, e, {sans: 1, s: 11.5, w: 600});
+    s += none ? tx(x + 42, 204, 'not listed', {s: 9.5, c: 'var(--muted)'}) : tx(x + 42, 208, v.replace(' or ', ' / '), {s: 16, w: 600, c: dn ? 'var(--warn)' : 'var(--ink)'});
+  });
+  s += tx(180, 246, '+ to +++: strength of effect on that receptor', {s: 9.5, c: 'var(--muted)'});
+  return s + '</svg>';
+}
+
+var MAPD = {
+  sep: {n: 'Septic', hot: ['res'], note: {res: 'vessels dilated'}, line: 'Vessels lose their tone, so resistance falls; output is often high at first. Fluid, then a drug that tightens vessels: norepinephrine.'},
+  cs: {n: 'Cardiogenic', hot: ['out'], note: {out: 'pump failing', res: 'tight, compensating'}, line: 'The pump fails. Vessels clamp down to hold the pressure, which adds load. Support pressure with norepinephrine and output with an inotrope; fix the cause.'},
+  pe: {n: 'Pulmonary embolism', hot: ['out'], note: {out: 'right heart blocked', fill: 'left heart underfilled'}, line: 'Clot blocks the way out of the right ventricle, so the left side is underfilled. Reopen the artery; pressors keep the coronaries perfused meanwhile.'},
+  hem: {n: 'Hemorrhagic', hot: ['fill'], note: {fill: 'blood lost', res: 'tight, compensating'}, line: 'There is not enough blood to fill the heart. Stop the bleeding and replace blood; a pressor only bridges.'},
+  neu: {n: 'Spinal cord injury', hot: ['res'], note: {res: 'sympathetic tone lost', out: 'heart rate may be slow'}, line: 'Sympathetic tone is cut off: vessels dilate and the heart rate may be slow. Restore tone, and keep the cord perfused.'},
+  ana: {n: 'Anaphylaxis', hot: ['res','fill'], note: {res: 'vessels dilated', fill: 'fluid leaks out'}, line: 'Mediators dilate vessels and make them leak, so both resistance and filling fall. Epinephrine reverses it; fluid replaces the leak.'}
+};
+function mapSVG(k){
+  var M = MAPD[k], s = svgOpen('0 0 360 150', 'Pressure equals output times resistance: ' + M.n);
+  function b(x, id, t){ return bx(x, 34, 100, 50, t, M.note[id] || '', M.hot.indexOf(id) >= 0 ? 'hot' : 'on'); }
+  s += b(4, 'fill', 'Filling') + tx(117, 64, '→', {s: 16}) + b(130, 'out', 'Output') + tx(243, 64, '×', {s: 16}) + b(256, 'res', 'Resistance');
+  s += tx(180, 20, 'what fails is outlined', {s: 9.5, c: 'var(--muted)'});
+  s += '<rect x="110" y="104" width="140" height="38" rx="10" fill="var(--fill)" stroke="var(--line)"/>' + tx(180, 127, 'Mean pressure ↓', {sans: 1, s: 12.5, w: 600});
+  s += '<path d="M180 86V102" stroke="var(--muted)" stroke-width="2" fill="none"/>';
+  return s + '</svg>';
+}
+
+var LADDER = {
+  s1: {n: 'Start', at: 1, st: ['hot','dim','dim','dim'], line: 'Norepinephrine first, started in a peripheral vein if that is what there is, titrated to a mean pressure of 65 (60 to 65 at age 65 and older).'},
+  s2: {n: 'Dose rising', at: 2, st: ['on','hot','dim','dim'], line: 'On escalating norepinephrine, add vasopressin. The 2021 panel usually did so at 0.25 to 0.5 mcg/kg/min; the 2026 edition names no number.'},
+  s3: {n: 'Two drugs, still low', at: 3, st: ['on','on','hot','dim'], line: 'Add epinephrine, and look again for a cause that a drug will not fix.'},
+  card: {n: 'Failing heart', at: 4, st: ['on','dim','dim','hot'], line: 'If the pressure is adequate but the heart is pumping poorly and perfusion stays poor, add dobutamine to norepinephrine, or use epinephrine alone.'}
+};
+function ladderSVG(k){
+  var L = LADDER[k], s = svgOpen('0 0 360 236', 'Septic shock ladder: ' + L.n);
+  var rows = [['Norepinephrine','first drug'],['+ Vasopressin','0.03 units/min'],['+ Epinephrine','still below target'],['+ Dobutamine','pressure fine, heart failing']];
+  rows.forEach(function(r, n){ s += bx(6, 176 - n * 56, 160 + n * 22, 46, r[0], r[1], L.st[n]); });
+  s += bx(246, 64, 108, 102, 'Hydrocortisone', '200 mg a day', L.at >= 2 ? 'on' : 'dim');
+  s += '<g' + (L.at >= 2 ? '' : ' opacity=".45"') + '>' + tx(300, 150, 'if the need persists', {s: 9, c: 'var(--muted)'}) + '</g>';
+  return s + '</svg>';
+}
+
+var DOPA = {
+  death: {n: 'Deaths at 28 days', a: ['Dopamine', 52.5], b: ['Norepinephrine', 48.5], max: 100, unit: '%', line: 'SOAP II, 1,679 patients: no significant difference in deaths overall, but more deaths with dopamine in the 280 with cardiogenic shock.'},
+  arr: {n: 'Arrhythmias', a: ['Dopamine', 24.1], b: ['Norepinephrine', 12.4], max: 100, unit: '%', line: 'Twice the arrhythmias with dopamine, mostly atrial fibrillation: the reason norepinephrine is recommended over it.'}
+};
+var PERIPH = {
+  site: {n: 'Where injuries happened', a: ['Below the elbow or knee', 85.3], b: ['At or above', 14.7], max: 100, unit: '%', line: 'Of 204 reported injuries from peripheral pressors, 174 were at sites beyond the bend of the elbow or knee. Use a good vein at or above the elbow.'},
+  rate: {n: 'How often', a: ['Extravasation', 3.4], b: ['No extravasation', 96.6], max: 100, unit: '%', line: 'Across 7 studies and 1,382 patients (mean 22 hours of infusion), 3.4% had extravasation; none had tissue death or limb ischemia.'}
+};
+function barsSVG(D){ return function(k){
+  var d = D[k], s = svgOpen('0 0 360 120', d.n);
+  [d.a, d.b].forEach(function(r, n){
+    var y = 14 + n * 52, w = Math.max(2, 250 * r[1] / d.max);
+    s += tx(6, y + 4, r[0], {a: 'start', sans: 1, s: 12, w: 600});
+    s += '<rect x="6" y="' + (y + 12) + '" width="250" height="20" rx="6" fill="var(--fill)" stroke="var(--line)"/>';
+    s += '<rect x="6" y="' + (y + 12) + '" width="' + w + '" height="20" rx="6" fill="' + (n === 0 ? 'var(--warn)' : 'var(--accent)') + '"/>';
+    s += tx(266, y + 27, r[1] + d.unit, {a: 'start', s: 13, w: 600});
+  });
+  return s + '</svg>';
+}; }
+
+var FIGS = {
+  recept: {t: 'What each drug acts on', states: ['ne','vaso','epi','phen','dopa','dobu','mil','ang','mb'], data: RECEPT, svg: receptSVG},
+  map: {t: 'Why the pressure is low', states: TYPES, data: MAPD, svg: mapSVG},
+  ladder: {t: 'The septic ladder', states: ['s1','s2','s3','card'], data: LADDER, svg: ladderSVG},
+  dopa: {t: 'Dopamine against norepinephrine', states: ['death','arr'], data: DOPA, svg: barsSVG(DOPA)},
+  periph: {t: 'Peripheral pressors: the risk', states: ['site','rate'], data: PERIPH, svg: barsSVG(PERIPH)}
+};
+var PERIPHLIST = ['Start peripherally when there is no central line yet: delay is the bigger risk (SSC 2026, conditional).', 'Use a well-running cannula in a vein at or above the bend of the elbow. Not the hand, wrist or leg.', 'Check the site often and plan the central line; the 2021 edition advised peripheral use for a short period only.', 'If it leaks: stop the infusion at that site and infiltrate the area with phentolamine 5 to 10 mg in 10 to 15 mL of saline within 12 hours (label).', 'Angiotensin II: central line recommended.'];
+var VASODOSE = [['0.03','0.03 units/min','The usual fixed dose in septic shock. It is added once and left, not titrated like a catecholamine.'],['0.06','0.06 units/min','The highest dose used in the trials. The label says data are limited above 0.07 units/min in septic shock.'],['more','Higher','Higher doses have been linked to ischemia of the heart, fingers and gut. This is why the next step is another drug, not more vasopressin.']];
+var CASES = [
+  {t: 'Urosepsis, pressure 58 after fluid', s: 'Age 54, 80 kg. 2.4 liters of crystalloid given. Mean pressure 58. No central line yet.', q: 'Which drug, and do you wait for the line?', i: {type:'sep', wt:80, map:58}, p: 'Norepinephrine, started now in a good peripheral vein, aiming for a mean pressure of 65.'},
+  {t: 'Norepinephrine climbing', s: 'Age 61, 70 kg, pneumonia. Norepinephrine 24 mcg/min for 5 hours. Mean pressure 61.', q: 'More norepinephrine, or something else?', i: {type:'sep', wt:70, map:61, unit:'min', ne:24, hrs:5}, p: '24 mcg/min at 70 kg is 0.34 mcg/kg/min: add vasopressin 0.03 units/min. At this dose for 4 hours or more, hydrocortisone 50 mg every 6 hours is suggested.'},
+  {t: 'Age 78, mean pressure 62', s: '65 kg, septic shock from cholangitis. Norepinephrine 8 mcg/min. Mean pressure 62, making urine, lactate falling.', q: 'Do you push the dose to reach 65?', i: {type:'sep', wt:65, map:62, unit:'min', ne:8, age65:true}, p: 'No. For age 65 and older a range of 60 to 65 is suggested; she is at target.'},
+  {t: 'Two pressors and a weak heart', s: 'Age 49, 90 kg. Norepinephrine 0.4 mcg/kg/min and vasopressin 0.03 units/min. Mean pressure 67. Lactate rising, echo shows a poorly contracting left ventricle.', q: 'What is missing?', i: {type:'sep', wt:90, map:67, unit:'kg', ne:0.4, vaso:0.03, hrs:8, cardiac:true}, p: 'The pressure is at target but output is low: add dobutamine to norepinephrine (or switch to epinephrine alone).'},
+  {t: 'Anterior heart attack, cold and clammy', s: 'Age 67, 85 kg. Pressure 82/50 (mean 61), lactate 4.1, cool legs.', q: 'Which infusion first? Which should you not start alone?', i: {type:'cs', wt:85, map:61, hypo:true, perf:true}, p: 'Stage C. Norepinephrine 0.05 to 1 mcg/kg/min; not phenylephrine alone. Add an inotrope if perfusion stays poor, and call the shock team.'},
+  {t: 'Saddle embolus, pressure 76/40', s: 'Age 58, 100 kg. Norepinephrine at 18 mcg/min, mean pressure 52. The team is preparing for reperfusion.', q: 'Turn the norepinephrine up?', i: {type:'pe', wt:100, map:52, unit:'min', ne:18}, p: 'Above 15 mcg/min, add vasopressin or phenylephrine instead of going higher. Avoid intubation if you can.'},
+  {t: 'Stab wound, no head injury', s: 'Age 30, 75 kg. Pressure 84/50 (mean 61), blood running, theater in 10 minutes.', q: 'Start norepinephrine to reach a mean of 65?', i: {type:'hem', wt:75, map:61}, p: 'No. Until the bleeding is controlled a systolic of 80 to 90 is the target; the treatment is blood and surgery.'},
+  {t: 'Wasp sting, wheeze, pressure 70/40', s: 'Age 44, 92 kg, takes metoprolol.', q: 'Dose, route, and what if it does not work?', i: {type:'ana', wt:92, bb:true}, p: 'Epinephrine 0.5 mg into the thigh muscle (0.01 mg/kg, capped at 0.5 mg), repeated every 5 to 15 minutes. On a beta-blocker and not responding: glucagon 1 to 5 mg IV.'}
+];
+</script>
+
+<script>
+(function(){
+var $ = function(id){ return document.getElementById(id); };
+function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+var ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M7 15l3-4 3 3 2-2 2 3"/></svg>';
+function chip(fig, state, label){ return '<button class="chip" data-fig="' + fig + '" data-state="' + (state || '') + '">' + ICON + esc(label || FIGS[fig].t) + '</button>'; }
+function cardHTML(c){
+  var h = '<div class="card" id="' + c.id + '"><p class="label">' + esc(c.label) + '</p>';
+  h += c.empty ? '<p class="head">' + esc(c.head) + '</p>' : '<h2>' + esc(c.head) + '</h2>';
+  if (c.sub) h += '<p class="sub">' + esc(c.sub) + '</p>';
+  if (c.list) h += '<ul>' + c.list.map(function(s){ return '<li>' + esc(s) + '</li>'; }).join('') + '</ul>';
+  h += (c.guards || []).map(function(g){ return '<div class="guard">' + esc(g) + '</div>'; }).join('');
+  if (c.why) h += '<p class="whyline"><b>Why:</b> ' + esc(c.why) + '</p>';
+  if (c.chips && c.chips.length) h += '<div class="chips">' + c.chips.map(function(x){ return chip(x[0], x[1], x[2]); }).join('') + '</div>';
+  if ((c.more && c.more.length) || (c.tiers && c.tiers.length)) h += '<details><summary>More</summary>' + (c.more || []).map(function(m){ return '<p>' + esc(m) + '</p>'; }).join('') + (c.tiers || []).map(function(t){ return '<span class="tier">' + esc(t) + '</span>'; }).join('') + '</details>';
+  return h + '</div>';
+}
+
+/* Inputs */
+var st = {type: null, t: {}};
+var NUMS = ['wt','map','ne','vaso','epi','phen','dopa','ang','hrs'];
+function read(){
+  var i = {type: st.type, unit: $('unit').value};
+  NUMS.forEach(function(k){ var v = parseFloat($(k).value); i[k] = isFinite(v) && v >= 0 ? v : null; });
+  (TICKS[st.type] || []).forEach(function(t){ if (st.t[t[0]]) i[t[0]] = true; });
+  return i;
+}
+function drawInputs(){
+  $('typeseg').innerHTML = TYPES.map(function(k){ return '<button class="sbtn" data-v="' + k + '" aria-pressed="' + (k === st.type) + '">' + esc(TNAME[k]) + '</button>'; }).join('');
+  var list = TICKS[st.type] || [];
+  $('ticks').hidden = !list.length;
+  $('ticks').innerHTML = list.map(function(t){ return '<label class="chk"><input type="checkbox" data-t="' + t[0] + '"' + (st.t[t[0]] ? ' checked' : '') + '>' + esc(t[1]) + '</label>'; }).join('');
+}
+function build(i){ var o = decide(i); return {o: o, html: o.cards.map(cardHTML).join('')}; }
+function render(){ $('out').innerHTML = build(read()).html; }
+$('typeseg').addEventListener('click', function(e){ var v = e.target.getAttribute('data-v'); if (v){ st = {type: v, t: {}}; drawInputs(); render(); } });
+$('ticks').addEventListener('change', function(e){ var t = e.target.getAttribute('data-t'); if (t){ st.t[t] = e.target.checked; render(); } });
+$('inputs').addEventListener('input', render);
+$('unit').addEventListener('change', render);
+
+/* Tabs */
+var tabs = [['t-tool','p-tool'],['t-ag','p-ag'],['t-learn','p-learn'],['t-prac','p-prac']];
+function show(t){ tabs.forEach(function(p){ var on = p[0] === t; $(p[0]).setAttribute('aria-selected', String(on)); $(p[1]).classList.toggle('on', on); }); }
+tabs.forEach(function(p){ $(p[0]).addEventListener('click', function(){ show(p[0]); }); });
+function fromHash(){ var id = location.hash.slice(1); if (!id) return; var el = $(id); if (!el) return; var pan = el.closest('.panel'); if (pan) tabs.forEach(function(p){ if (p[1] === pan.id) show(p[0]); }); el.scrollIntoView(); }
+window.addEventListener('hashchange', fromHash);
+
+/* Figures and the sheet */
+function mountFig(host, id, state){
+  var F = FIGS[id];
+  function draw(k){
+    var d = F.data[k];
+    host.innerHTML = '<div class="states" role="group" aria-label="' + esc(F.t) + '">' + F.states.map(function(x){ return '<button class="sbtn" data-k="' + x + '" aria-pressed="' + (x === k) + '">' + esc(F.data[x].n) + '</button>'; }).join('') + '</div>' + F.svg(k) + '<p class="line1">' + esc(d.line) + '</p>';
+    var on = host.querySelector('[aria-pressed="true"]'), row = host.querySelector('.states');
+    if (on && row) row.scrollLeft = Math.max(0, on.offsetLeft - 60);
+  }
+  host.onclick = function(e){ var k = e.target.getAttribute && e.target.getAttribute('data-k'); if (k) draw(k); };
+  draw(state && F.data[state] ? state : F.states[0]);
+}
+var lastFocus = null;
+function openSheet(fig, state){
+  lastFocus = document.activeElement;
+  $('sheet-t').textContent = FIGS[fig].t;
+  mountFig($('sheet-b'), fig, state);
+  $('scrim').hidden = false; $('sheet').hidden = false; $('sheet').scrollTop = 0; $('sheet-x').focus();
+}
+function closeSheet(){ if ($('sheet').hidden) return; $('scrim').hidden = true; $('sheet').hidden = true; if (lastFocus && lastFocus.focus) lastFocus.focus(); }
+$('sheet-x').addEventListener('click', closeSheet); $('scrim').addEventListener('click', closeSheet);
+document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeSheet(); });
+document.addEventListener('click', function(e){ var c = e.target.closest && e.target.closest('[data-fig]'); if (c) openSheet(c.getAttribute('data-fig'), c.getAttribute('data-state')); });
+document.querySelectorAll('[data-figure]').forEach(function(h){ mountFig(h, h.getAttribute('data-figure'), h.getAttribute('data-state')); });
+
+/* Agents tab */
+$('agents').innerHTML = AORDER.map(function(k){ var A = AG[k];
+  return '<div class="card" id="ag-' + k + '"><p class="label">' + esc(A.cls) + '</p><h2>' + esc(A.n) + '</h2><p class="sub">' + esc(A.use) + '</p>' +
+    (A.eff ? '<p class="mono" style="font-size:13.5px;margin:10px 0 0">' + EFFN.map(function(e, n){ return A.eff[n].indexOf('not') === 0 ? '' : esc(e + ' ' + A.eff[n]); }).filter(Boolean).join(' · ') + '</p>' : '') +
+    '<ul>' + A.dose.map(function(s){ return '<li>' + esc(s) + '</li>'; }).join('') + '</ul><div class="guard">' + esc(A.watch) + '</div>' +
+    (A.eff ? '<div class="chips">' + chip('recept', k, 'What it acts on') + '</div>' : '') + '</div>';
+}).join('');
+$('periphlist').innerHTML = PERIPHLIST.map(function(s){ return '<li>' + esc(s) + '</li>'; }).join('');
+$('periphchip').innerHTML = chip('periph', 'site');
+var narSel = null;
+function drawNarrow(){
+  $('narseg').innerHTML = Object.keys(NARROW).map(function(k){ return '<button class="sbtn" data-v="' + k + '" aria-pressed="' + (k === narSel) + '">' + esc(NARROW[k].n) + '</button>'; }).join('');
+  $('narout').innerHTML = narrowRows(narSel).map(function(r){ return '<div class="cause' + (r.st ? ' ' + r.st : '') + '"><span>' + esc(r.name) + '</span><small>' + esc(r.why) + '</small></div>'; }).join('') + '<p class="note" style="margin:10px 0 0">' + (narSel ? 'Faded: fits less well, not forbidden. Struck through: contraindicated.' : 'Nothing here replaces the choice by type of shock on the Choose tab.') + '</p>';
+}
+$('narseg').addEventListener('click', function(e){ var v = e.target.getAttribute('data-v'); if (v){ narSel = narSel === v ? null : v; drawNarrow(); } });
+drawNarrow();
+function conv(from){
+  var w = parseFloat($('cw').value), m = parseFloat($('cm').value), k = parseFloat($('ck').value);
+  if (!(w > 0)) return;
+  if (from === 'ck' && isFinite(k)) $('cm').value = r1(k * w);
+  else if (isFinite(m) && from !== 'ck') $('ck').value = r3(m / w);
+  else if (isFinite(k)) $('cm').value = r1(k * w);
+}
+['cw','cm','ck'].forEach(function(id){ $(id).addEventListener('input', function(){ conv(id); }); });
+
+/* Learn tab */
+var vasoSel = '0.03';
+function drawVaso(){ $('vasoseg').innerHTML = VASODOSE.map(function(s){ return '<button class="sbtn" data-v="' + s[0] + '" aria-pressed="' + (s[0] === vasoSel) + '">' + esc(s[1]) + '</button>'; }).join(''); $('vasoout').textContent = VASODOSE.filter(function(s){ return s[0] === vasoSel; })[0][2]; }
+$('vasoseg').addEventListener('click', function(e){ var v = e.target.getAttribute('data-v'); if (v){ vasoSel = v; drawVaso(); } });
+drawVaso();
+(function(){
+  var chaps = [].slice.call(document.querySelectorAll('.chap'));
+  $('pills').innerHTML = chaps.map(function(c, n){ return '<button class="pill" data-go="' + c.id + '" aria-current="' + (n === 0) + '">' + (n + 1) + ' ' + esc(c.getAttribute('data-pill')) + '</button>'; }).join('');
+  $('pills').addEventListener('click', function(e){ var g = e.target.getAttribute('data-go'); if (g) $(g).scrollIntoView(); });
+  function mark(id){ [].forEach.call($('pills').children, function(b){ var on = b.getAttribute('data-go') === id; b.setAttribute('aria-current', String(on)); if (on) $('pills').scrollLeft = Math.max(0, b.offsetLeft - 60); }); }
+  if ('IntersectionObserver' in window){
+    var io = new IntersectionObserver(function(es){ es.forEach(function(en){ if (en.isIntersecting) mark(en.target.id); }); }, {rootMargin: '-30% 0px -60% 0px'});
+    chaps.forEach(function(c){ io.observe(c); });
+  }
+  $('trialbox').innerHTML = TRIALS.map(function(t){ return '<div class="trial" style="margin-top:14px"><p><b>' + esc(t.q) + '</b></p><p><span class="k">Design</span>' + esc(t.d) + '</p><p><span class="k">Result</span>' + esc(t.r) + '</p><p><span class="k">What it changed</span>' + esc(t.c) + '</p><p class="mono" style="font-size:13px"><a href="https://doi.org/' + t.doi + '" rel="noopener">' + esc(t.cite) + '</a></p></div>'; }).join('');
+  $('go-prac').addEventListener('click', function(){ show('t-prac'); window.scrollTo(0, 0); });
+})();
+
+/* Practice: cases run through the same engine */
+function rng(seed){ var a = seed >>> 0; return function(){ a |= 0; a = a + 0x6D2B79F5 | 0; var t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+(function(){
+  var d = new Date(); var rnd = rng(d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate());
+  var order = CASES.map(function(c, n){ return n; });
+  for (var k = order.length - 1; k > 0; k--){ var j = Math.floor(rnd() * (k + 1)); var t = order[k]; order[k] = order[j]; order[j] = t; }
+  $('practice').innerHTML = order.map(function(n, pos){ var c = CASES[n];
+    return '<div class="card case"><p class="label">Case ' + (pos + 1) + '</p><h2>' + esc(c.t) + '</h2><p>' + esc(c.s) + '</p><p><b>' + esc(c.q) + '</b></p><div class="row"><button class="btn" data-ans="' + n + '">Show the answer</button><button class="btn ghost" data-load="' + n + '">Open in the tool</button></div><div class="ans" id="ans' + n + '" hidden></div></div>';
+  }).join('');
+})();
+$('practice').addEventListener('click', function(e){
+  var a = e.target.getAttribute('data-ans'), l = e.target.getAttribute('data-load');
+  if (a != null){ var c = CASES[a]; var box = $('ans' + a); var inp = {unit: 'min'}; Object.keys(c.i).forEach(function(k){ inp[k] = c.i[k]; }); NUMS.forEach(function(k){ if (inp[k] === undefined) inp[k] = null; }); var b = build(inp); box.innerHTML = '<p>' + esc(c.p) + '</p>' + b.html.replace(/ id="[^"]*"/g, ''); box.hidden = false; e.target.hidden = true; }
+  if (l != null){ var c2 = CASES[l]; st = {type: c2.i.type, t: {}}; Object.keys(c2.i).forEach(function(k){ if (c2.i[k] === true) st.t[k] = true; }); drawInputs(); $('unit').value = c2.i.unit || 'min'; NUMS.forEach(function(k){ $(k).value = c2.i[k] != null ? c2.i[k] : ''; }); render(); show('t-tool'); window.scrollTo(0, 0); }
+});
+drawInputs(); render(); fromHash();
+})();
+</script>
+</body>
+</html>
