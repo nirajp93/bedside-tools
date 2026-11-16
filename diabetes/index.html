@@ -779,7 +779,7 @@ function visitEngine(i){
   else { o.cls = 'okc'; o.head = (i.a1c != null || cg) ? 'At goal: keep going' : 'Yearly checklist'; o.sub = 'Work through what is due below.'; o.tiers = []; }
   if (i.health === 'very') o.guards.push({t: 'Very complex or poor health: avoid lows and symptomatic highs; stringent goals add little (13.7c, C).'});
   if (cg && !cg.enough) o.guards.push({t: 'Fewer than 14 days or under 70% active wear: the report may not be representative (Table 6.2).'});
-  if (i.gmi != null && i.a1c != null) o.guards.push({t: 'A1C ' + i.a1c + '% vs GMI ' + i.gmi + '% (difference ' + r1(Math.abs(i.a1c - i.gmi)) + '). GMI approximates A1C but is not the same; consistent, substantial gaps should prompt a look for A1C interference (2.3, B).'});
+  if (i.gmi != null && i.a1c != null) o.gmiNote = 'A1C ' + i.a1c + '% vs GMI ' + i.gmi + '% (difference ' + r1(Math.abs(i.a1c - i.gmi)) + '). GMI approximates A1C but is not the same; a consistent, substantial gap should prompt a look for A1C interference (2.3, B).';
 
   var t1 = i.type === '1', yrs = i.yrs;
   var L = [];
@@ -817,14 +817,14 @@ function box(x, y, w, h, on, lab, sub){
 }
 var SITES = {
   all: {on: ['brain', 'gut', 'panc', 'liver', 'muscle', 'fat', 'kidney'], sub: {}},
-  met: {on: ['liver', 'gut'], sub: {liver: 'less glucose out', gut: 'GI side effects'}},
-  sglt: {on: ['kidney'], sub: {kidney: 'glucose to urine'}},
-  glp: {on: ['brain', 'gut', 'panc'], sub: {brain: 'fuller sooner', gut: 'slower emptying', panc: 'insulin up, glucagon down'}},
-  tirz: {on: ['brain', 'gut', 'panc', 'fat'], sub: {brain: 'fuller sooner', gut: 'slower emptying', panc: 'insulin up, glucagon down', fat: 'GIP receptor'}},
-  dpp: {on: ['gut', 'panc'], sub: {gut: 'own incretins last', panc: 'mild insulin rise'}},
-  su: {on: ['panc'], sub: {panc: 'insulin out at any glucose'}},
-  tzd: {on: ['fat', 'muscle', 'liver'], sub: {fat: 'more insulin-sensitive', muscle: 'takes up more', liver: 'less glucose out'}},
-  ins: {on: ['liver', 'muscle', 'fat'], sub: {liver: 'stops glucose output', muscle: 'takes up glucose', fat: 'stops fat breakdown'}}
+  met: {on: ['liver', 'gut'], sub: {liver: 'less output', gut: 'GI effects'}},
+  sglt: {on: ['kidney'], sub: {kidney: 'to urine'}},
+  glp: {on: ['brain', 'gut', 'panc'], sub: {brain: 'satiety', gut: 'slow emptying', panc: 'more insulin'}},
+  tirz: {on: ['brain', 'gut', 'panc', 'fat'], sub: {brain: 'satiety', gut: 'slow emptying', panc: 'more insulin', fat: 'GIP'}},
+  dpp: {on: ['gut', 'panc'], sub: {gut: 'incretins last', panc: 'mild rise'}},
+  su: {on: ['panc'], sub: {panc: 'any glucose'}},
+  tzd: {on: ['fat', 'muscle', 'liver'], sub: {fat: 'sensitized', muscle: 'more uptake', liver: 'less output'}},
+  ins: {on: ['liver', 'muscle', 'fat'], sub: {liver: 'output stops', muscle: 'more uptake', fat: 'no breakdown'}}
 };
 var FIG = {
   sites: {title: 'Where each drug acts', states: [
@@ -843,8 +843,7 @@ var FIG = {
         box(10, 10, 100, 54, on('brain'), 'Brain', sb('brain')) + box(120, 10, 100, 54, on('gut'), 'Gut', sb('gut')) + box(230, 10, 100, 54, on('panc'), 'Pancreas', sb('panc')) +
         box(10, 98, 100, 54, on('liver'), 'Liver', sb('liver')) + box(120, 98, 100, 54, on('muscle'), 'Muscle', sb('muscle')) + box(230, 98, 100, 54, on('fat'), 'Fat', sb('fat')) +
         box(120, 186, 100, 54, on('kidney'), 'Kidney', sb('kidney')) +
-        '<path d="M170 64 V98 M280 64 V98 M60 64 V98 M170 152 V186" stroke="var(--line)" stroke-width="1.5" fill="none"/>' +
-        T(60, 210, 'blood glucose', {c: 'var(--muted)', s: 10}) + '</svg>';
+        '<path d="M170 64 V98 M280 64 V98 M60 64 V98 M170 152 V186" stroke="var(--line)" stroke-width="1.5" fill="none"/>' + '</svg>';
     }},
   kidney: {title: 'The kidney glucose threshold', states: [
       {k: 'n', l: 'Normal', c: 'Glucose is filtered and almost all of it is taken back by SGLT2 in the proximal tubule. Below the threshold (about 180 mg/dL in adults; schematic), urine has no glucose.'},
@@ -1088,7 +1087,7 @@ function renderVisit(){
   $('bar-visit').innerHTML = barHtml('visit', ['Type ' + v(i.type), i.age != null ? 'age ' + v(i.age) : null, i.a1c != null ? 'A1C ' + v(i.a1c) : null, i.tir != null ? 'TIR ' + v(i.tir, '%') : null, i.sbp != null ? 'BP ' + v(i.sbp) + '/' + (i.dbp != null ? i.dbp : '–') : null]);
   var o = visitEngine(i);
   var goalTxt = o.goal == null ? 'No A1C target: avoid lows and symptomatic highs (13.7c).' : 'A1C goal under ' + o.goal + '%' + (i.health === 'well' && i.age != null && i.age >= 65 ? ' (healthy older adult: 7.0 to 7.5%, 13.7a)' : (i.health === 'complex' ? ' (13.7b)' : ' (6.3a; under 6.5% if healthy with low risk of lows, 6.4)'));
-  var h = card({id: 'visit-next', next: true, label: 'Next step', head: o.head, cls: o.cls, sub: o.sub + ' ' + goalTxt, guards: o.guards, why: o.why, tiers: o.tiers, figs: (i.gmi != null && i.a1c != null) ? ['a1c'] : []});
+  var h = card({id: 'visit-next', next: true, label: 'Next step', head: o.head, cls: o.cls, sub: o.sub + ' ' + goalTxt, guards: o.guards, why: o.why, tiers: o.tiers, figs: o.gmiNote ? ['a1c'] : [], more: o.gmiNote ? '<p>' + o.gmiNote + '</p>' : ''});
   var h2 = '';
   if (o.cgm) {
     var c = o.cgm, val = function(x){ return x == null ? 0 : x; };
