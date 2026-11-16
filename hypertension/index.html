@@ -260,7 +260,7 @@ details .trial{margin:8px 0 12px}
   <p>The 2025 AHA/ACC guideline itself could not be read for this build: its thresholds, goals and class/level grades come from published papers that report it, and are marked "AHA/ACC 2025, as reported". Doses come from the FDA labels; rows marked expert practice or teaching are labeled. Formularies and single-pill combinations vary, so adjust to your institution. Diagrams are schematic.</p>
   <p>Privacy: everything runs in your browser. Nothing you enter is sent anywhere or stored, and there are no analytics. Do not enter names, record numbers, or dates of birth.</p>
   <p class="mono">Last reviewed: 2026-11-16</p>
-  <p><strong>Sources:</strong> 2025 AHA/ACC/multisociety guideline for high blood pressure in adults, Circulation 2025, doi:10.1161/CIR.0000000000001356 (read through: case-based applications, Hypertension 2025, doi:10.1161/HYPERTENSIONAHA.125.25913; ERBP commentary, Nephrol Dial Transplant 2026, doi:10.1093/ndt/gfag055; key-update reviews in Curr Cardiol Rep 2026 and Curr Hypertens Rep 2026) · USPSTF, Screening for hypertension in adults, 2021 (grade A) · KDIGO 2021 guideline for blood pressure in CKD, Kidney Int 2021 (graded 1–2, A–D) · Endocrine Society 2025 guideline on primary aldosteronism, J Clin Endocrinol Metab 2025;110:2453, doi:10.1210/clinem/dgaf284 (all conditional, low or very low certainty) · AHA scientific statement on resistant hypertension, Hypertension 2018;72:e53, doi:10.1161/HYP.0000000000000084 (statement, not graded) · ACOG practice advisory after CHAP, 2022 · USPSTF, Aspirin to prevent preeclampsia, 2021 (grade B) · PREVENT equations, Circulation 2024;149:430 · Combination low-dose treatment: BMJ 2003, doi:10.1136/bmj.326.7404.1427, and Am J Med 2009, doi:10.1016/j.amjmed.2008.09.038 (meta-analyses) · Office severe hypertension cohort, JAMA Intern Med 2016, doi:10.1001/jamainternmed.2016.1509 (observational) · FDA prescribing information (DailyMed, read November 2026) for every drug in the dose table · Trials are cited on their cards.</p>
+  <p><strong>Sources:</strong> 2025 AHA/ACC/multisociety guideline for high blood pressure in adults, Circulation 2025, doi:10.1161/CIR.0000000000001356 (read through: case-based applications, Hypertension 2025, doi:10.1161/HYPERTENSIONAHA.125.25913; ERBP commentary, Nephrol Dial Transplant 2026, doi:10.1093/ndt/gfag055; key-update reviews in Curr Cardiol Rep 2026 and Curr Hypertens Rep 2026) · USPSTF, Screening for hypertension in adults, 2021 (grade A) · KDIGO 2021 guideline for blood pressure in CKD, Kidney Int 2021 (graded 1–2, A–D) · Endocrine Society 2025 guideline on primary aldosteronism, J Clin Endocrinol Metab 2025;110:2453, doi:10.1210/clinem/dgaf284 (all conditional, low or very low certainty) · AHA scientific statement on resistant hypertension, Hypertension 2018;72:e53, doi:10.1161/HYP.0000000000000084 (statement, not graded) · ACOG practice advisory after CHAP, 2022 · USPSTF, Aspirin to prevent preeclampsia, 2021 (grade B) · PREVENT equations, Circulation 2024;149:430 · Combination low-dose treatment: BMJ 2003, doi:10.1136/bmj.326.7404.1427, and Am J Med 2009, doi:10.1016/j.amjmed.2008.09.038 (meta-analyses) · Office severe hypertension cohort (180/110 or more), JAMA Intern Med 2016, doi:10.1001/jamainternmed.2016.1509 (observational) · DASH-Sodium, N Engl J Med 2001, doi:10.1056/NEJM200101043440101 · PRECISION, Lancet 2022, doi:10.1016/S0140-6736(22)02034-7 · ONTARGET, N Engl J Med 2008, doi:10.1056/NEJMoa0801317 · FDA prescribing information (DailyMed, read November 2026) for every drug in the dose table · Trials are cited on their cards.</p>
 </footer>
 </div>
 <script id="engine">
@@ -296,10 +296,11 @@ var E = (function(){
     var conds = i.cvd || i.dm || ckd || i.stroke || i.ccd || i.hfref;
     var prevHigh = has(i.prevent) && i.prevent >= 7.5;
     var risk = conds || prevHigh, known = risk || has(i.prevent);
-    var r = { c: c, ckd: ckd, risk: risk, conds: conds, prevHigh: prevHigh, preg: !!i.preg, frail: !!i.frail };
+    var r = { c: c, ckd: ckd, risk: risk, known: known, conds: conds, prevHigh: prevHigh, preg: !!i.preg, plan: !!i.plan && !i.preg, frail: !!i.frail };
     if (i.preg){
-      /* T20: treat at 140/90 or more; goal under 140/90. */
+      /* T20: treat at 140/90 or more; goal under 140/90; 160/110 or more is severe-range (treat within 30 to 60 minutes, as reported). */
       r.start = i.s >= 140 || i.d >= 90 ? 'drugs' : 'watch';
+      r.severePreg = i.s >= 160 || i.d >= 110;
       r.goal = 'Under 140/90';
       return r;
     }
@@ -315,6 +316,7 @@ var E = (function(){
   function classes(i){
     var o = [];
     if (i.preg) return [{ k: 'preg' }];
+    if (i.plan) return [{ k: 'plan' }];
     if (i.hfref) o.push({ k: 'hf' });
     if (has(i.uacr) && i.uacr >= 30) o.push({ k: 'alb' });
     else if (ok(i.egfr) && i.egfr < 60) o.push({ k: 'ckd' });
@@ -327,7 +329,7 @@ var E = (function(){
   /* T22: creatinine after an ACE inhibitor or ARB (KDIGO practice point 3.2.5). */
   function crRise(base, now){
     if (!ok(base) || !ok(now)) return null;
-    var p = (now - base) / base * 100;
+    var p = Math.round((now - base) / base * 1000) / 10; /* one decimal, so an exact 30% is not read as more */
     return { pct: p, over: p > 30 };
   }
 
@@ -344,6 +346,7 @@ var E = (function(){
     var dStep = { id: 'diur' };
     if (d === 'none') dStep.act = ok(i.egfr) && i.egfr < 30 ? 'add-low' : 'add';
     else if (d === 'hctz') dStep.act = ok(i.egfr) && i.egfr < 30 ? 'switch-low' : 'switch';
+    else if (d === 'loop' && ok(i.egfr) && i.egfr >= 30) dStep.act = 'loop-hi';
     else dStep.done = true;
     steps.push(dStep);
     var mra = { id: 'mra', done: !!i.mra };
@@ -422,7 +425,7 @@ var FIG = {
     box: [340, 236], custom: 'grid',
     states: [
       { n: 'Sustained', cap: 'High in the office and at home: hypertension.', cell: 1 },
-      { n: 'White-coat', cap: 'High only in the office. On its own it carries little extra risk; keep checking at home.', cell: 3 },
+      { n: 'White-coat', cap: 'High only in the office. On its own it carries little extra risk (long-term risk is still debated); keep checking at home.', cell: 3 },
       { n: 'Masked', cap: 'Normal in the office, high at home. Risk is close to sustained hypertension, and it is missed unless someone measures at home.', cell: 0 },
       { n: 'Normal', cap: 'Normal in both settings.', cell: 2 }
     ] },
@@ -525,14 +528,14 @@ function renderDx(){
         list: ['Repeat after rest, with the right cuff.', 'Look for injury: neurological, cardiac, aortic, retinal and kidney (symptoms, exam, creatinine, urinalysis, ECG).', 'Start, restart or intensify oral treatment, and look for what pushed it up: missed doses, NSAIDs, decongestants, stimulants.', 'Arrange close follow-up.'],
         guard: ['Send to the emergency department instead if there is chest pain, shortness of breath, back pain, numbness or weakness, a change in vision, or difficulty speaking.'],
         why: 'without organ injury the risk builds over months, not hours. Rapid lowering has not been shown to help, and in an office cohort, sending patients to the emergency department added admissions without better outcomes.',
-        more: '<p>"Severe hypertension" replaces the old term "hypertensive urgency". The guideline gives no target rate of lowering, so none is shown here.</p>', tier: [AR, 'JAMA Intern Med 2016 (observational)'] });
+        more: '<p>"Severe hypertension" replaces the old term "hypertensive urgency". No target rate of lowering was found in the reports of the guideline, so none is shown here.</p>', tier: [AR, 'JAMA Intern Med 2016 (observational)'] });
   }
   var head = c.name, sub = 'Office ' + bp(s, d) + '. Diagnosis needs the average of 2 or more readings on 2 or more occasions.', list = [], why = '', chips = [];
   if (p){
     var P = PAT[p]; head = P[0]; sub = c.name + ' in the office (' + bp(s, d) + '); home or daytime ambulatory ' + bp(num('d-hs'), num('d-hd')) + '.';
     if (P[1]) list.push(P[1]);
     chips.push(chip('office', PATFIG[p], 'Office against home'));
-    why = p === 'white-coat' ? 'risk follows the pressure at home. White-coat hypertension on its own carries no more cardiovascular risk than normal pressure.'
+    why = p === 'white-coat' ? 'risk follows the pressure at home. White-coat hypertension on its own carries little extra cardiovascular risk, though whether it adds long-term risk is still open.'
       : p === 'masked' || p === 'masked-unc' ? 'masked hypertension carries risk close to sustained hypertension, even though the office reading is normal.'
       : p === 'wc-effect' ? 'adding drugs for office readings that are not there at home risks low pressure, dizziness and falls.' : '';
   } else if (tx){
@@ -562,16 +565,17 @@ function renderStaticDx(){
 function txInputs(){
   var s = num('x-s'), d = num('x-d');
   if (isNaN(s) || isNaN(d)){ s = num('d-s'); d = num('d-d'); }
-  return { s: s, d: d, prevent: num('x-prev'), egfr: num('x-egfr'), uacr: num('x-uacr'), k: num('x-k'), dm: on('x-dm'), ccd: on('x-ccd'), stroke: on('x-stroke'), hfref: on('x-hf'), preg: on('x-preg'), cbp: on('x-cbp'), frail: on('x-frail') };
+  return { s: s, d: d, prevent: num('x-prev'), egfr: num('x-egfr'), uacr: num('x-uacr'), k: num('x-k'), dm: on('x-dm'), ccd: on('x-ccd'), stroke: on('x-stroke'), hfref: on('x-hf'), preg: on('x-preg'), plan: on('x-plan'), cbp: on('x-cbp'), frail: on('x-frail') };
 }
 function renderTx(){
   var i = txInputs(), r = E.treat(i), h = '';
   if (!r){ $('tx-out').innerHTML = empty('Enter the office average here or on the Diagnose tab.'); return; }
   var c = r.c;
   if (r.preg){
-    h += card({ label: 'Pregnant or planning pregnancy', head: r.start === 'drugs' ? 'Treat: 140/90 or more' : 'Under 140/90: no drug needed now', sub: 'Goal under 140/90.',
-      list: ['Labetalol or extended-release nifedipine.', 'Stop ACE inhibitors, ARBs, renin inhibitors, MRAs and atenolol: switch before conception if planning.', 'Low-dose aspirin, 81 mg daily, after 12 weeks: chronic hypertension is a high-risk factor for preeclampsia.', 'Shared care with obstetrics.'],
-      why: 'ACE inhibitors and ARBs injure the developing fetus. Treating at 140/90 rather than waiting for 160/110 cut severe preeclampsia, early delivery and fetal loss (CHAP), without smaller babies.',
+    h += card({ label: 'Pregnant', head: r.severePreg ? 'Severe range: treat now' : r.start === 'drugs' ? 'Treat: 140/90 or more' : 'Under 140/90: no new drug needed now', cls: r.severePreg ? 'bad' : '', sub: 'Goal under 140/90. Already on treatment: continue, switching any drug below that must be avoided.',
+      guard: r.severePreg ? ['160/110 or more in pregnancy: start treatment promptly, within 30 to 60 minutes (as reported), and involve obstetrics today.'] : [],
+      list: ['Labetalol or extended-release nifedipine.', 'Stop ACE inhibitors, ARBs, renin inhibitors, MRAs and atenolol.', 'Low-dose aspirin, 81 mg daily, after 12 weeks: chronic hypertension is a high-risk factor for preeclampsia.', 'Shared care with obstetrics.'],
+      why: 'ACE inhibitors and ARBs injure the developing fetus. Treating at 140/90 rather than only at severe levels (160/105 in CHAP\'s control arm) cut severe preeclampsia, early delivery and fetal loss, without smaller babies.',
       more: '<p>ACOG adopted 140/90 as the threshold to start or adjust treatment after CHAP (2022); CHAP set a threshold, not a goal. The 2025 guideline gives a goal under 140/90 (class 1, B-R), prefers labetalol and extended-release nifedipine (class 1, A), lists the drugs to avoid as harmful (class 3), and dates aspirin from 12 to 28 weeks (as reported).</p>', tier: ['ACOG 2022 advisory', AR, 'USPSTF 2021 aspirin (grade B)'] });
     $('tx-out').innerHTML = h; return;
   }
@@ -598,18 +602,19 @@ function renderTx(){
     var gl = [];
     if (r.ckd) gl.push('Kidney disease: KDIGO suggests systolic under 120 when tolerated, but only with standardized office measurement; applied to routine readings it can overtreat (2B).');
     gl.push('Asymptomatic orthostatic hypotension on treatment is not, by itself, a reason to back off (as reported).');
-    h += card({ id: 'goal', label: 'Goal', head: r.goal === 'Individual' ? 'Set by shared decision' : 'Under 130/80; aim for systolic under 120 if tolerated', sub: r.goal === 'Individual' ? 'No number is given for frailty, limited life expectancy or residential care.' : 'Under 130/80: ' + r.goalTier + ' for this patient\'s risk (as reported).', list: gl,
+    h += card({ id: 'goal', label: 'Goal', head: r.goal === 'Individual' ? 'Set by shared decision' : 'Under 130/80; aim for systolic under 120 if tolerated', sub: r.goal === 'Individual' ? 'No number is given for frailty, limited life expectancy or residential care.' : (r.known ? 'Under 130/80: ' + r.goalTier + ' for this patient\'s risk (as reported).' : 'Under 130/80: class 1, A at increased risk; 2b, B-NR otherwise (as reported).'), list: gl,
       why: r.goal === 'Individual' ? '' : 'in the target trials, a lower systolic target cut cardiovascular events (SPRINT hazard ratio 0.75), at the cost of more fainting and low pressure.',
       chips: [chip('forest', 0, 'The target trials')],
       more: '<p>Diastolic under 80: class 1, B-R. The same goals apply at lower risk, with weaker evidence (class 2b, B-NR). A systolic under 130 also lowers the risk of cognitive impairment and dementia (class 1, A, as reported).</p>', tier: [AR, KD + ' (2B)'] });
     var cl = E.classes(i), L = [], acei = false, hd = '';
     cl.forEach(function(x){
+      if (x.k === 'plan'){ L.push('<b>Planning pregnancy:</b> labetalol or extended-release nifedipine; switch away from ACE inhibitors, ARBs, renin inhibitors, MRAs and atenolol before conception, and keep treating. A goal under 140/90 is reasonable (as reported). Aspirin 81 mg daily after 12 weeks once pregnant.'); hd = 'Switch before conception, keep treating'; }
       if (x.k === 'hf'){ L.push('<b>Heart failure:</b> use the heart failure drugs; see <a href="/hf/">Heart failure</a>.'); hd = hd || 'Heart failure drugs first'; }
-      if (x.k === 'alb'){ var g = i.dm || i.uacr >= 300 ? '1B' : '2C'; L.push('<b>Albuminuria:</b> ACE inhibitor or ARB at the highest approved dose that is tolerated (KDIGO ' + g + ').'); hd = hd || 'ACE inhibitor or ARB first'; acei = true; }
-      if (x.k === 'ckd'){ L.push('<b>eGFR under 60, no albuminuria:</b> an ACE inhibitor or ARB is reasonable; any first-line class works (KDIGO practice point).'); hd = hd || 'Any first-line class; ACE inhibitor or ARB reasonable'; acei = true; }
+      if (x.k === 'alb'){ var g = i.dm || i.uacr > 300 ? '1B' : '2C'; L.push('<b>Albuminuria:</b> ACE inhibitor or ARB at the highest approved dose that is tolerated (KDIGO ' + g + ').'); hd = hd || 'ACE inhibitor or ARB first'; acei = true; }
+      if (x.k === 'ckd'){ L.push('<b>eGFR under 60, no albuminuria:</b> ACE inhibitor or ARB preferred (AHA/ACC 2025, as reported); KDIGO calls it reasonable.'); hd = hd || 'ACE inhibitor or ARB first'; acei = true; }
       if (x.k === 'stroke'){ L.push('<b>Prior stroke or TIA:</b> thiazide-type diuretic, ACE inhibitor or ARB.'); hd = hd || 'Thiazide-type, ACE inhibitor or ARB'; acei = true; }
       if (x.k === 'ccd'){ L.push('<b>Coronary disease:</b> beta-blocker, ACE inhibitor or ARB for the heart, then others.'); hd = hd || 'Beta-blocker, ACE inhibitor or ARB'; acei = true; }
-      if (x.k === 'dm'){ L.push('<b>Diabetes:</b> any first-line class; ACE inhibitor or ARB if albuminuria appears.'); hd = hd || 'Any first-line class'; acei = true; }
+      if (x.k === 'dm'){ L.push('<b>Diabetes, no albuminuria:</b> any first-line class; reports of the 2025 guideline differ on whether an ACE inhibitor or ARB is preferred. With albuminuria, it is.'); hd = hd || 'Any first-line class'; acei = true; }
       if (x.k === 'any'){ L.push('Thiazide-type diuretic, long-acting dihydropyridine calcium channel blocker, ACE inhibitor or ARB. For two drugs, take two different classes.'); hd = 'Any of the four first-line classes'; acei = true; }
     });
     L.push('No race-based first choice: the 2025 guideline dropped it.');
@@ -642,7 +647,7 @@ var DOSES = [
   ['Amlodipine', '5 mg daily (2.5 if small, frail, older or liver disease)', '10; 7 to 14 days between steps', 'Ankle edema, dose-related.'],
   ['Nifedipine extended release', '30 or 60 mg daily', 'Not above 120', 'Swallow whole.'],
   ['Chlorthalidone', '25 mg daily (label); trials used 12.5 (ALLHAT, CLICK)', '50, then 100; more adds little', 'Potassium and uric acid change with the dose.'],
-  ['Hydrochlorothiazide', '25 mg daily', '50', 'Works poorly below eGFR 45.'],
+  ['Hydrochlorothiazide', '25 mg daily', '50', 'Works poorly below eGFR 45 (AHA 2018).'],
   ['Indapamide', '1.25 mg each morning', '2.5 after 4 weeks; then 5', ''],
   ['Spironolactone', '25 to 100 mg daily (label); 12.5 to 25 to start in resistant hypertension', 'Over 100 adds little', 'Hyperkalemia; breast tenderness.'],
   ['Eplerenone', '50 mg daily', '50 twice daily', 'In hypertension, not with CrCl under 50, creatinine over 2.0 (men) or 1.8 (women), type 2 diabetes with microalbuminuria, or potassium supplements or potassium-sparing diuretics.'],
@@ -678,6 +683,7 @@ function diurText(s){
     s.act === 'add' ? ['Add a thiazide-type diuretic', 'Chlorthalidone or indapamide.'] :
     s.act === 'add-low' ? ['Add a diuretic that works at this eGFR', 'Under 30: chlorthalidone (CLICK) or a long-acting loop such as torsemide.'] :
     s.act === 'switch' ? ['Switch the thiazide', 'Hydrochlorothiazide to the same dose of chlorthalidone, or to indapamide: about 7 to 8 mmHg more.'] :
+    s.act === 'loop-hi' ? ['Reconsider the loop diuretic', 'At an eGFR of 30 or more, AHA 2018 uses a thiazide-type diuretic (chlorthalidone or indapamide); long-acting loops are for lower eGFR.'] :
     ['Switch the thiazide', 'eGFR under 30: chlorthalidone (CLICK started at 12.5 mg) or a long-acting loop such as torsemide.'];
 }
 function mraText(s){
@@ -695,7 +701,7 @@ function renderRs(){
   var i = { n: +sel('r-n'), diur: sel('r-diur'), mra: on('r-mra'), bb: on('r-bb'), egfr: num('r-egfr'), k: num('r-k'), hr: num('r-hr'), home: sel('r-home'), adh: on('r-adh'), subs: on('r-subs'), paDone: on('r-pa') };
   var r = E.resistant(i), h = '';
   var head, sub, why = '';
-  if (r.whiteCoat){ head = 'Home readings at goal: white-coat effect'; sub = 'Not resistant. Do not add drugs on office readings alone.'; why = 'office readings at least 20/10 above home readings are a white-coat effect; adding drugs risks low pressure at home.'; }
+  if (r.whiteCoat){ head = 'Home readings at goal: white-coat effect'; sub = 'Not resistant. Do not add drugs on office readings alone.'; why = 'office readings above goal with home readings at goal is a white-coat effect; adding drugs risks low pressure at home.'; }
   else if (!r.three){ head = 'Not resistant yet: build to three classes'; sub = 'A long-acting calcium channel blocker, an ACE inhibitor or ARB, and a diuretic, at full tolerated doses.'; }
   else if (i.home === 'above' && i.adh){ head = 'Resistant hypertension'; sub = 'Above goal on three classes including a diuretic, confirmed at home, with adherence checked.'; }
   else { head = 'Resistant, once confirmed'; sub = 'Three classes including a diuretic. Confirm at home and check adherence before calling it resistant.'; }
@@ -714,7 +720,7 @@ function renderRs(){
     chips: nx && (nx.id === 'mra' || nx.id === 'pa') ? [chip(nx.id === 'mra' ? 'classes' : 'raas', nx.id === 'mra' ? 4 : 1, nx.id === 'mra' ? 'What an MRA does' : 'Renin and aldosterone')] : [],
     more: '<p>If spironolactone is not tolerated: eplerenone twice daily (but not in hypertension with creatinine clearance under 50, creatinine over 2.0 in men or 1.8 in women, type 2 diabetes with microalbuminuria, or with potassium supplements or potassium-sparing diuretics), or amiloride (as reported). Never spironolactone with eplerenone.</p><p>Thiazide-type diuretics work down to an eGFR of 25 to 30; below that, a long-acting loop (AHA 2018).</p>', tier: [A18, LAB, 'PATHWAY-2 (randomized)'] });
   h += card({ label: 'Beyond these steps', head: 'Newer options, specialist care',
-    list: ['<b>Aprocitentan</b> 12.5 mg daily, add-on: office systolic about 3.8 mmHg lower than placebo (PRECISION). Pregnancy must be excluded (boxed warning).', '<b>Baxdrostat</b> 2 mg daily, add-on: systolic 9.8 mmHg lower than placebo at 12 weeks; potassium over 6.0 in 3.0% against 0.4% (BaxHTN). Check potassium and sodium.', '<b>Renal denervation</b> (class 2b, as reported): systolic 140 to 180 or diastolic 90 or more despite four drugs including an MRA, in a specialist team; eGFR limit reported as 40 (sources differ).'],
+    list: ['<b>Aprocitentan</b> 12.5 mg daily, add-on: office systolic about 3.8 mmHg lower than placebo (PRECISION). Pregnancy must be excluded (boxed warning).', '<b>Baxdrostat</b> 2 mg daily, add-on: systolic 9.8 mmHg lower than placebo at 12 weeks; potassium over 6.0 in 3.0% against 0.4% (BaxHTN). Check potassium and sodium.', '<b>Renal denervation</b> (class 2b, as reported): office systolic 140 to 180 and diastolic 90 or more despite optimized drugs, or when several drugs are not tolerated; specialist team. Reports differ on the eGFR limit (40 or 30) and on whether four drugs are required.'],
     more: '<p>Where these sit in the 2025 guideline could not be confirmed for this build.</p>', tier: [LAB, AR] });
   $('rs-out').innerHTML = h;
 }
@@ -724,7 +730,7 @@ function paInputs(){ return { aldo: num('p-aldo'), renin: num('p-renin'), rtype:
 function renderPa(){
   var i = paInputs(), r = E.pa(i);
   if (!r){ $('pa-out').innerHTML = empty('Enter aldosterone and renin, and choose how renin was measured.'); return; }
-  var pra = i.rtype === 'pra', rr = r.ratio == null ? '' : '<p class="sub">Ratio ' + (r.ratio >= 100 ? Math.round(r.ratio) : r.ratio.toFixed(1)) + (pra ? ' (ng/dL per ng/mL/h)' : ' (pmol/L per mU/L)') + ': ' + (r.ratio > r.rcut ? 'above' : 'not above') + ' ' + r.rcut + '.</p>';
+  var pra = i.rtype === 'pra', rr = r.ratio == null ? '' : '<p class="sub">Ratio ' + (r.ratio >= 100 ? Math.round(r.ratio) : r.ratio.toFixed(1)) + (pra ? ' (ng/dL per ng/mL/h)' : ' (pmol/L per mU/L)') + (i.assay === 'ms' ? '; with LC-MS/MS the ratio cut-off is about 25% lower than the immunoassay ' + (pra ? '20' : '70') : '; immunoassay cut-off ' + r.rcut) + '. A check only: the screen itself uses the renin and aldosterone thresholds.</p>';
   var o;
   if (r.pos){
     var g = [];
@@ -738,13 +744,13 @@ function renderPa(){
     o = card({ label: 'Primary aldosteronism screen', head: r.overt ? 'Positive: overt' : 'Positive screen', cls: 'bad', sub: 'Renin ' + i.renin + (pra ? ' ng/mL/h' : ' mU/L') + ' is suppressed and aldosterone ' + i.aldo + ' ng/dL is ' + r.cut + ' or more.', body: rr, list: steps, guard: g,
       why: 'aldosterone is high while renin is switched off: the adrenal, not the kidney, is driving it.' + (i.up || i.mra ? ' Renin stayed low despite a drug that raises it, which makes the result more convincing.' : ''),
       chips: [chip('raas', 1, 'Renin and aldosterone')],
-      more: '<p>Suppression testing is for selected patients considering surgery with an intermediate result. Genetic testing for onset under 20 or a family history. With an adrenal adenoma, a dexamethasone suppression test.</p>', tier: [ES] });
+      more: '<p>Suppression testing is for selected patients considering surgery with an intermediate result. Genetic testing for onset under 20, and for first-degree relatives of someone with familial hyperaldosteronism. With an adrenal adenoma, a dexamethasone suppression test.</p>', tier: [ES] });
   } else {
     var n = [];
     if (r.lowK) n.push('Potassium ' + i.k + ': low potassium lowers aldosterone. Correct it and repeat.');
     if (i.mra) n.push('An MRA or amiloride raises renin: stop it for 4 weeks, if safe, and repeat.');
     if (i.up) n.push('Other diuretics (4 weeks) and ACE inhibitors, ARBs and SGLT2 inhibitors (2 weeks) raise renin. If suspicion stays high and it is safe, repeat off them.');
-    if (r.repeat) n.push('Renin suppressed with aldosterone 5 to 10 ng/dL: repeat on another day.');
+    if (r.repeat) n.push('Renin suppressed with aldosterone 5 to 10 ng/dL: indeterminate. Repeat on another day, after withdrawing interfering drugs where safe.');
     n.push('Rescreen if hypertension worsens, potassium falls, or atrial fibrillation appears without another cause.');
     o = card({ label: 'Primary aldosteronism screen', head: r.fn || r.repeat ? 'Negative, but not conclusive' : 'Negative screen', cls: r.fn || r.repeat ? '' : 'okc',
       sub: r.lowRenin ? 'Renin is suppressed but aldosterone ' + i.aldo + ' ng/dL is under ' + r.cut + '.' : 'Renin ' + i.renin + (pra ? ' ng/mL/h' : ' mU/L') + ' is not suppressed.', body: rr, list: n,
@@ -755,8 +761,8 @@ function renderPa(){
   $('pa-out').innerHTML = o;
 }
 function renderStaticPa(){
-  $('pa-who').innerHTML = '<p class="label">Who to screen</p><p class="head">Resistant, low potassium, sleep apnea</p>' + ul(['<b>AHA/ACC 2025 (class 1, as reported):</b> resistant hypertension whatever the potassium; low potassium, spontaneous or on a diuretic; obstructive sleep apnea; an adrenal incidentaloma; a family history of early hypertension or stroke before 40. All stage 2 may be considered (2b).', '<b>Endocrine Society 2025:</b> suggests screening everyone with hypertension (conditional, low certainty).', '<b>How:</b> morning, seated, aldosterone with renin and potassium; no salt restriction beforehand. The 2025 AHA/ACC guideline keeps every drug except an MRA; the Endocrine Society stops MRAs and amiloride for 4 weeks first.']) +
-    '<p class="whyline"><b>Why:</b> the two guidelines differ on who to screen; both agree that resistant hypertension and low potassium should be screened.</p><details><summary>More</summary><p>Aldosterone in pmol/L: divide by 27.7 for ng/dL. Direct renin is reported in mU/L here; some laboratories use other units, so check before entering. Estrogen-containing contraceptives and drospirenone also affect the result.</p><span class="tier">' + AR + '</span><span class="tier">' + ES + '</span></details>';
+  $('pa-who').innerHTML = '<p class="label">Who to screen</p><p class="head">Resistant, low potassium, sleep apnea</p>' + ul(['<b>AHA/ACC 2025 (class 1, as reported):</b> resistant hypertension whatever the potassium; low potassium, spontaneous or on a diuretic; obstructive sleep apnea; an adrenal incidentaloma; a family history of early hypertension or stroke before 40. All stage 2 may be considered (2b).', '<b>Endocrine Society 2025:</b> suggests screening everyone with hypertension (conditional, low certainty).', '<b>How:</b> morning, seated, aldosterone with renin and potassium; no salt restriction beforehand. The 2025 AHA/ACC guideline continues most drugs, stopping an MRA; the Endocrine Society stops MRAs and amiloride for 4 weeks first.']) +
+    '<p class="whyline"><b>Why:</b> the two guidelines differ on who to screen; both agree that resistant hypertension and low potassium should be screened.</p><details><summary>More</summary><p>Aldosterone in pmol/L: divide by 27.7 for ng/dL. Direct renin is reported in mU/L here; some laboratories use other units, so check before entering. Estrogen-containing contraceptives and drospirenone also affect the result; dihydropyridine calcium channel blockers have a weak false-negative effect.</p><span class="tier">' + AR + '</span><span class="tier">' + ES + '</span></details>';
 }
 
 /* ---------- Not controlled: why still high (narrowing) ---------- */
@@ -766,7 +772,7 @@ var RESULTS = [
   ['home-hi', 'Home average above goal', 'home-ok', { wc: ['out', 'home readings confirm the pressure is high'] }],
   ['refill', 'Refill record complete', '', { adh: ['less', 'refills are a valid measure, though not proof'] }],
   ['pa-pos', 'Renin suppressed, aldosterone high', 'pa-neg', { pa: ['fav', 'positive screen: see Aldosteronism'] }],
-  ['pa-neg', 'Renin not suppressed (off MRA, potassium normal)', 'pa-pos', { pa: ['out', 'renin is not suppressed'] }],
+  ['pa-neg', 'Renin not suppressed (off MRA, potassium normal)', 'pa-pos', { pa: ['less', 'less likely; if on other renin-raising drugs and suspicion stays high, repeat off them'] }],
   ['kid', 'eGFR under 60 or albuminuria', '', { ckd: ['fav', 'kidney disease both causes and follows hypertension'] }],
   ['snore', 'Loud snoring, witnessed apneas, daytime sleepiness', '', { osa: ['fav', 'very common in resistant hypertension: refer for a sleep study'] }],
   ['cr', 'Creatinine jumped on an ACE inhibitor, or flash pulmonary edema', '', { ras: ['fav', 'both point to renal artery stenosis: duplex ultrasound first'] }],
@@ -825,7 +831,7 @@ var CASES = [
   ['190/115 in clinic', 'No symptoms; exam, ECG, urinalysis and creatinine unchanged from baseline.', 'Emergency department?', function(){ var c = E.category(190, 115); return '<b>' + (c.severe ? 'No: severe hypertension without organ injury' : c.name) + '.</b> Start or step up oral treatment today, look for a trigger, and follow up closely. Send to the emergency department only for organ injury.'; }, 'diagnose'],
   ['Three drugs, still high', 'Amlodipine 10, lisinopril 40, hydrochlorothiazide 25. Home average 146/90; refills complete. eGFR 70, potassium 3.3, heart rate 72.', 'What next?', function(){ var r = E.resistant({ n: 3, diur: 'hctz', mra: false, egfr: 70, k: 3.3, hr: 72, home: 'above', adh: true, subs: false, paDone: false }); return '<b>Resistant hypertension.</b> Look for drugs that raise pressure, then screen for aldosteronism: correct the potassium first, because low potassium hides it. Then switch hydrochlorothiazide to chlorthalidone (watch potassium: it will fall), and next add spironolactone once potassium is no higher than 4.5. First open step in the tool: <b>' + (STEP[r.next] ? STEP[r.next][0] : r.next) + '</b>.'; }, 'steps'],
   ['Screen on an ACE inhibitor', 'Aldosterone 18 ng/dL (immunoassay), renin activity 0.3 ng/mL/h, potassium 3.8. Taking lisinopril.', 'Positive?', function(){ var r = E.pa({ aldo: 18, renin: 0.3, rtype: 'pra', assay: 'ia', k: 3.8, up: true }); return '<b>' + (r.pos ? 'Positive' : 'Negative') + '</b> (ratio ' + r.ratio.toFixed(0) + '). An ACE inhibitor raises renin, so a suppressed renin despite it makes the result more convincing. If surgery would be wanted: endocrinology for CT and adrenal vein sampling; if not, spironolactone.'; }, 'aldo'],
-  ['Planning pregnancy', 'Age 31, office 138/88, home 136/86, taking lisinopril, planning pregnancy this year.', 'What changes?', function(){ var r = tx({ s: 138, d: 88, preg: true }); return '<b>Switch lisinopril</b> to labetalol or extended-release nifedipine before conception. In pregnancy, treat at 140/90 or more (' + (r.start === 'drugs' ? 'this reading would be treated' : 'this reading is just below') + '), goal under 140/90, and aspirin 81 mg daily after 12 weeks.'; }, 'treat']
+  ['Planning pregnancy', 'Age 31, office 138/88, home 136/86, taking lisinopril, planning pregnancy this year.', 'What changes?', function(){ var c = E.classes({ plan: true }), r = tx({ s: 138, d: 88, preg: true }); return '<b>' + (c[0].k === 'plan' ? 'Switch lisinopril, keep treating' : c[0].k) + '</b>: labetalol or extended-release nifedipine before conception. Once pregnant, the goal is under 140/90 (' + (r.start === 'drugs' ? 'this reading is above it' : 'this reading meets it') + '), and aspirin 81 mg daily starts after 12 weeks.'; }, 'treat']
 ];
 function renderPractice(){
   $('practice').innerHTML = CASES.map(function(c, i){ return '<div class="card case"><p class="label">Case ' + (i + 1) + '</p><h2>' + c[0] + '</h2><p>' + c[1] + '</p><p><b>' + c[2] + '</b></p><div class="row"><button class="btn" type="button" data-case="' + i + '">Show answer</button></div><div class="ans" id="ans-' + i + '" hidden></div></div>'; }).join('');
@@ -834,9 +840,9 @@ function renderPractice(){
 /* ---------- Inputs, tabs, wiring ---------- */
 function buildInputs(){
   $('dx-in').innerHTML = '<p class="label">Office average</p><div class="grid grid4">' + fld('d-s', 'Systolic', 'mmHg') + fld('d-d', 'Diastolic', 'mmHg') + '</div><p class="label" style="margin-top:16px">Home or daytime ambulatory average, if known</p><div class="grid grid4">' + fld('d-hs', 'Systolic', 'mmHg') + fld('d-hd', 'Diastolic', 'mmHg') + '</div><div class="checks one">' + chk('d-tx', 'Already on blood pressure medicine') + chk('d-inj', 'Signs or symptoms of acute organ injury') + '</div>';
-  $('tx-in').innerHTML = '<p class="label">Pressure</p><div class="grid grid4">' + fld('x-s', 'Systolic', 'mmHg') + fld('x-d', 'Diastolic', 'mmHg') + '</div><p class="note">Left blank, the Diagnose tab\'s office average is used.</p><p class="label" style="margin-top:16px">Risk and labs</p><div class="grid grid4">' + fld('x-prev', 'PREVENT 10-year risk', '%') + fld('x-egfr', 'eGFR', 'mL/min') + fld('x-uacr', 'Albumin-creatinine', 'mg/g') + fld('x-k', 'Potassium', 'mEq/L') + '</div><div class="checks one">' + chk('x-dm', 'Diabetes') + chk('x-ccd', 'Coronary disease') + chk('x-stroke', 'Prior stroke or TIA') + chk('x-hf', 'Heart failure') + chk('x-preg', 'Pregnant or planning pregnancy') + chk('x-cbp', 'Could become pregnant') + chk('x-frail', 'Frail, limited life expectancy, residential care, or symptomatic orthostatic hypotension') + '</div>';
+  $('tx-in').innerHTML = '<p class="label">Pressure</p><div class="grid grid4">' + fld('x-s', 'Systolic', 'mmHg') + fld('x-d', 'Diastolic', 'mmHg') + '</div><p class="note">Left blank, the Diagnose tab\'s office average is used.</p><p class="label" style="margin-top:16px">Risk and labs</p><div class="grid grid4">' + fld('x-prev', 'PREVENT 10-year risk', '%') + fld('x-egfr', 'eGFR', 'mL/min') + fld('x-uacr', 'Albumin-creatinine', 'mg/g') + fld('x-k', 'Potassium', 'mEq/L') + '</div><div class="checks one">' + chk('x-dm', 'Diabetes') + chk('x-ccd', 'Coronary disease') + chk('x-stroke', 'Prior stroke or TIA') + chk('x-hf', 'Heart failure') + chk('x-preg', 'Pregnant') + chk('x-plan', 'Planning pregnancy') + chk('x-cbp', 'Could become pregnant') + chk('x-frail', 'Frail, limited life expectancy, residential care, or symptomatic orthostatic hypotension') + '</div>';
   $('rs-in').innerHTML = '<p class="label">Now taking</p><div class="grid grid4">' + pick('r-n', 'Classes at full dose', [['0', '0'], ['1', '1'], ['2', '2'], ['3', '3'], ['4', '4'], ['5', '5 or more']]) + pick('r-diur', 'Diuretic', [['none', 'None'], ['hctz', 'Hydrochlorothiazide'], ['thl', 'Chlorthalidone or indapamide'], ['loop', 'Loop diuretic']]) + '</div><div class="checks one">' + chk('r-mra', 'Spironolactone or eplerenone') + chk('r-bb', 'Beta-blocker') + '</div><p class="label" style="margin-top:16px">Checks</p><div class="grid grid4">' + pick('r-home', 'Home or ambulatory', [['', 'Not done'], ['above', 'Above goal'], ['goal', 'At goal']]) + fld('r-hr', 'Heart rate', '/min') + fld('r-egfr', 'eGFR', 'mL/min') + fld('r-k', 'Potassium', 'mEq/L') + '</div><div class="checks one">' + chk('r-adh', 'Adherence checked') + chk('r-subs', 'Drugs and substances checked') + chk('r-pa', 'Aldosterone and renin sent') + '</div>';
-  $('pa-in').innerHTML = '<p class="label">Screening result</p><div class="grid grid4">' + fld('p-aldo', 'Aldosterone', 'ng/dL') + pick('p-assay', 'Aldosterone assay', [['ia', 'Immunoassay'], ['ms', 'LC-MS/MS']]) + pick('p-rtype', 'Renin measured as', [['pra', 'Activity, ng/mL/h'], ['drc', 'Concentration, mU/L']]) + fld('p-renin', 'Renin', '') + fld('p-k', 'Potassium', 'mEq/L') + '</div><div class="checks one">' + chk('p-mra', 'On an MRA or amiloride') + chk('p-up', 'On another diuretic, ACE inhibitor, ARB or SGLT2 inhibitor') + chk('p-bb', 'On a beta-blocker') + chk('p-down', 'On clonidine, methyldopa or an NSAID') + chk('p-res', 'Resistant hypertension') + '</div>';
+  $('pa-in').innerHTML = '<p class="label">Screening result</p><div class="grid grid4">' + fld('p-aldo', 'Aldosterone', 'ng/dL') + pick('p-assay', 'Aldosterone assay', [['ia', 'Immunoassay'], ['ms', 'LC-MS/MS']]) + pick('p-rtype', 'Renin measured as', [['pra', 'Activity, ng/mL/h'], ['drc', 'Concentration, mU/L']]) + fld('p-renin', 'Renin', '') + fld('p-k', 'Potassium', 'mEq/L') + '</div><div class="checks one">' + chk('p-mra', 'On an MRA or amiloride') + chk('p-up', 'On another diuretic, ACE inhibitor, ARB, SGLT2 inhibitor or dihydropyridine CCB') + chk('p-bb', 'On a beta-blocker') + chk('p-down', 'On clonidine, methyldopa or an NSAID') + chk('p-res', 'Resistant hypertension') + '</div>';
 }
 var TABS = ['diagnose', 'treat', 'resistant', 'learn', 'practice'];
 function show(id){ TABS.forEach(function(t){ $('t-' + t).setAttribute('aria-selected', String(t === id)); $('p-' + t).classList.toggle('on', t === id); }); var tb = $('t-' + id); if (tb.scrollIntoView) tb.scrollIntoView({ block: 'nearest', inline: 'center' }); }
