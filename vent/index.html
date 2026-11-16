@@ -203,7 +203,7 @@ tr.mark td{font-weight:700;color:var(--accent)}
     <div class="guard">Blood pressure falling with trapped gas: disconnect the ventilator and let the chest empty.</div>
     <p class="whyline"><b>Why:</b> Trapped gas raises the pressure in the chest, which holds back blood returning to the heart, so the blood pressure falls.</p>
     <div class="chips" id="autochip"></div>
-    <details><summary>More</summary><p>For missed triggers caused by trapped gas, added PEEP of about 80% of the trapped pressure can help the patient trigger.</p><span class="tier">Reviews (expert practice)</span></details>
+    <details><summary>More</summary><p>For missed triggers caused by trapped gas, in COPD with flow limitation, added PEEP up to about 80% of the trapped pressure does not add to the hyperinflation and can help the patient trigger.</p><span class="tier">Reviews (expert practice)</span></details>
   </div>
   <div class="card" id="dyssynchrony">
     <p class="label">Fighting the ventilator</p>
@@ -384,9 +384,10 @@ function assess(i){
     else {
       var dp = i.plat - i.peep, comp = has(i.vt) ? i.vt / dp : null, perkg = has(i.vt) && has(i.pbw) && i.pbw > 0 ? i.vt / i.pbw : null;
       var m = {id: 'mech', label: 'Mechanics', head: 'Driving pressure ' + r1(dp) + ' cm H2O', sub: 'Plateau ' + i.plat + ' − PEEP ' + i.peep + '.' + (has(comp) ? ' Compliance ' + r0(comp) + ' mL/cm H2O (normal on a ventilator 60 to 80).' : '') + (has(perkg) ? ' Tidal volume ' + r1(perkg) + ' mL/kg.' : ''), list: [], guards: [], chips: [['press', i.plat > T.platMax || dp > T.dpMark ? 'comp' : 'norm', 'Peak, plateau and PEEP']], tiers: []};
-      if (i.plat > T.platMax){ m.guards.push('Plateau over 30. In ARDS: reduce the tidal volume by 1 mL/kg at a time, to no less than 4 mL/kg' + (has(i.pbw) ? ' (' + r0(4 * i.pbw) + ' mL)' : '') + '. In asthma or COPD: look for trapped gas and lower the rate.'); m.tiers.push('Plateau under 30 in ARDS: strong, moderate'); m.why = WHY.platHigh; }
+      if (i.plat > T.platMax && has(perkg) && r1(perkg) <= T.vtLo){ m.guards.push('Plateau over 30 with the tidal volume already at or below 4 mL/kg: do not go lower. Look for another cause (trapped gas, pneumothorax, a stiff chest wall) and get help.'); m.why = WHY.platHigh; }
+      else if (i.plat > T.platMax){ m.guards.push('Plateau over 30. In ARDS: reduce the tidal volume by 1 mL/kg at a time, to no less than 4 mL/kg' + (has(i.pbw) ? ' (' + r0(4 * i.pbw) + ' mL)' : '') + '. In asthma or COPD: look for trapped gas and lower the rate.'); m.tiers.push('Plateau limit in ARDS: strong, moderate'); m.why = WHY.platHigh; }
       else if (i.plat < T.platLow && has(perkg) && perkg < T.vtGoal && dp <= T.dpMark){ m.list.push('Plateau under 25 with a tidal volume under 6 mL/kg: the tidal volume may go up by 1 mL/kg until the plateau passes 25 or the volume reaches 6 mL/kg.'); m.tiers.push('ARDS Network protocol'); }
-      else m.list.push('Plateau is 30 or less.');
+      else m.list.push('Plateau is 30 or less' + (i.plat > 28 ? ' (in asthma or COPD the mark is 28).' : '.'));
       if (has(perkg) && r1(perkg) < T.vtLo) m.guards.push('Tidal volume is under 4 mL/kg predicted weight: the protocol does not go below 4.');
       if (has(perkg) && r1(perkg) > T.vtHi) m.guards.push('Tidal volume is over 8 mL/kg predicted weight: in ARDS bring it to 6' + (has(i.pbw) ? ' (' + r0(6 * i.pbw) + ' mL)' : '') + '.');
       if (dp > T.dpMark) m.guards.push('Driving pressure over 15: look for a smaller breath or a better PEEP. This mark is expert practice; no guideline sets a number.');
@@ -401,10 +402,10 @@ function assess(i){
   /* Oxygenation */
   var pf = null, sf = null, band = null, by = null;
   if (f !== null && isNaN(f)) c.push({id: 'ox', label: 'Oxygenation', head: 'Check the FiO2', empty: true, sub: 'Enter it as a fraction (0.21 to 1.0) or a percent (21 to 100).'});
-  else if (has(f) && has(i.pao2)){ pf = i.pao2 / f; band = pf <= T.pfSev ? 'severe' : pf <= T.pfMod ? 'moderate' : pf <= T.pfMild ? 'mild' : null; by = 'pf'; }
+  else if (has(f) && has(i.pao2)){ pf = r0(i.pao2 / f); band = pf <= T.pfSev ? 'severe' : pf <= T.pfMod ? 'moderate' : pf <= T.pfMild ? 'mild' : null; by = 'pf'; }
   else if (has(f) && has(i.spo2)){
     if (i.spo2 > T.sfMaxSat) c.push({id: 'ox', label: 'Oxygenation', head: 'SpO2 is above 97%', empty: true, sub: 'The SpO2/FiO2 ratio is only valid at 97% or below. Lower the FiO2 or send a blood gas.'});
-    else { sf = i.spo2 / f; band = sf <= T.sfSev ? 'severe' : sf <= T.sfMod ? 'moderate' : sf <= T.sfMild ? 'mild' : null; by = 'sf'; }
+    else { sf = r0(i.spo2 / f); band = sf <= T.sfSev ? 'severe' : sf <= T.sfMod ? 'moderate' : sf <= T.sfMild ? 'mild' : null; by = 'sf'; }
   } else if (!(f !== null && isNaN(f))) c.push({id: 'ox', label: 'Oxygenation', head: 'Enter FiO2 with PaO2 or SpO2', empty: true, sub: 'P/F is PaO2 divided by FiO2.'});
   if (by){
     var o = {id: 'ox', label: 'Oxygenation', head: (by === 'pf' ? 'P/F ' + r0(pf) : 'SpO2/FiO2 ' + r0(sf)) + (band ? ': ' + band + ' range' : ': above the ARDS range'),
@@ -419,7 +420,7 @@ function assess(i){
 
   /* ARDS ladder: only when the user confirms the other criteria, PEEP is 5 or more, and the ratio is in range */
   if (i.ards && band && okPeep){
-    var L = {id: 'ladder', label: 'ARDS · next steps', list: [], guards: [], tiers: ['Low tidal volume, plateau under 30: strong, moderate', 'Corticosteroids: conditional, moderate'], why: WHY.ladder};
+    var L = {id: 'ladder', label: 'ARDS · next steps', list: [], guards: [], tiers: ['Low tidal volume and plateau limit: strong, moderate', 'Corticosteroids: conditional, moderate'], why: WHY.ladder};
     L.list.push('Every patient: tidal volume 6 mL/kg (4 to 8) predicted weight and plateau 30 or less.');
     L.list.push('Corticosteroids are suggested. Starting more than 2 weeks after onset may do harm.');
     var lvl = 's0';
@@ -433,7 +434,7 @@ function assess(i){
         L.list.push('Neuromuscular blockade if still hypoxemic or fighting the ventilator despite sedation; needs deep sedation, and 48 hours at most where possible.');
         L.tiers.push('Neuromuscular blockade at P/F under 150 with persistent hypoxemia: conditional, low (SCCM 2026)'); lvl = 's2';
       }
-      if (pf < T.pfEcmo){ L.guards.push('P/F under 80: if it stays there despite the steps above (the trial required more than 6 hours), call an ECMO center. Referral is for selected patients early in the illness (within about 7 days).'); L.head = (has(f) && f >= T.fio2Prone ? 'Prone now' : 'Optimise and prone') + '; call an ECMO center if it stays under 80'; L.tiers.push('VV-ECMO in selected severe ARDS: conditional, low (ATS 2024); strong, moderate for patients meeting the EOLIA criteria (ESICM 2023)'); lvl = 's3'; }
+      if (pf < T.pfEcmo){ L.guards.push('P/F under 80: if it stays there despite the steps above (the trial required more than 6 hours), call an ECMO center. Referral is for selected patients early in the illness (within about 7 days).'); L.head = (has(f) && f >= T.fio2Prone ? 'Prone now' : 'Optimise first') + '; call an ECMO center if it stays under 80'; L.tiers.push('VV-ECMO in selected severe ARDS: conditional, low (ATS 2024); strong, moderate for patients meeting the EOLIA criteria (ESICM 2023)'); lvl = 's3'; }
     }
     L.chips = [['ladder', lvl, 'The ARDS ladder']];
     L.more = ['Paralysis: guidelines differ. ATS 2024 suggests it in early severe ARDS (P/F 100 or less, within 48 hours); SCCM 2026 suggests it at P/F under 150 with persistent hypoxemia; the European guideline recommends against routine infusions. ACURASYS favored it; the larger ROSE trial found no difference (42.5% against 42.8%).', 'ECMO: the other criterion is pH under 7.25 with PaCO2 60 or more that persists despite best ventilation. EOLIA enrolled P/F under 50 for over 3 hours or under 80 for over 6 hours; deaths at 60 days were 35% against 46% (not significant, with 28% of controls crossing over).', 'PROSEVA (P/F under 150 on FiO2 0.6 or more, sessions of 16 hours or more): deaths at 28 days 16.0% against 32.8%.'];
@@ -483,7 +484,7 @@ function liberate(i){
     else if (i.stridor && !i.leakok){ e.head = 'Cuff leak test first'; e.list.push('Stridor risk: do the cuff leak test before extubation, then use the plan below.'); }
     else e.head = i.risk ? 'Extubate straight to NIV' : 'Extubate to high-flow nasal oxygen';
     if (i.risk){ e.list.push('High risk: start preventive NIV immediately after extubation, not when the patient is already struggling.'); e.tiers.push('Preventive NIV in high-risk patients: strong, moderate (ATS/CHEST 2017); suggested in ATS 2026 and ERS/ATS 2017 (conditional)'); e.why = WHY.niv; }
-    else { e.list.push('Low risk: high-flow nasal oxygen is suggested after extubation.'); e.tiers.push('High-flow nasal oxygen in low-risk patients: suggested (ATS 2026; ERS 2022, conditional)'); e.why = 'High flow washes out dead space and gives a little pressure; in low-risk patients it lowered reintubation from 12.2% to 4.9%.'; }
+    else { e.list.push('If not high risk: high-flow nasal oxygen is suggested after extubation.'); e.tiers.push('High-flow nasal oxygen in low-risk patients: suggested (ATS 2026; ERS 2022, conditional)'); e.why = 'High flow washes out dead space and gives a little pressure; in low-risk patients it lowered reintubation from 12.2% to 4.9%.'; }
     e.guards = ['If respiratory failure sets in after extubation, do not let NIV delay reintubation.'];
     e.tiers.push('NIV for established post-extubation failure: conditional, against');
     e.more = ['High risk, high flow against NIV: reintubation 22.8% against 19.1%, non-inferior (Hernández 2016). High flow plus NIV against high flow alone: 11.8% against 18.2% (Thille 2019).'];
@@ -491,7 +492,7 @@ function liberate(i){
   }
   if ((i.stridor && !i.leakok) || i.noleak) c.push({id: 'cuff', label: 'Stridor risk', head: i.noleak ? 'Steroid at least 4 hours before extubation' : 'Do a cuff leak test before extubation',
     sub: i.noleak ? 'A repeat cuff leak test is not needed.' : 'Deflate the cuff and look for a leak around the tube.',
-    list: i.noleak ? ['Regimen from the main trial: methylprednisolone 20 mg IV 12 hours before extubation, then every 4 hours until the tube is out.'] : ['No leak: give a systemic steroid at least 4 hours before extubation.'],
+    list: i.noleak ? ['The guideline minimum is 4 hours. The main trial started earlier: methylprednisolone 20 mg IV 12 hours before extubation, then every 4 hours until the tube is out.'] : ['No leak: give a systemic steroid at least 4 hours before extubation.'],
     why: WHY.cuff, more: ['With that regimen laryngeal edema fell from 22% to 3% and reintubation from 8% to 4% (François 2007, 698 patients).'],
     tiers: ['Cuff leak test in high-risk patients: conditional, very low', 'Steroid after a failed test: conditional, moderate']});
   return {cards: c, ready: ready};
@@ -561,7 +562,7 @@ function bx(x, y, w, h, t1, t2, st){
 var PRESS = {
   norm: {n: 'Normal', peak: 22, plat: 18, peep: 5, base: 5, line: 'Peak is the pressure to push gas down the tube and fill the lung. Hold the breath in and it falls to the plateau: the pressure the lung itself is under. Plateau minus PEEP is the driving pressure.'},
   res: {n: 'High resistance', peak: 38, plat: 18, peep: 5, base: 5, hot: 'gap', line: 'Peak is up but the plateau has not moved: the problem is in the tube or airways. Kinked or bitten tube, secretions, bronchospasm.'},
-  comp: {n: 'Stiff lung', peak: 36, plat: 32, peep: 5, base: 5, hot: 'dp', line: 'Peak and plateau are both up: the lung or chest is stiffer. Pneumothorax, trapped gas, edema, worsening ARDS. The driving pressure has risen with it.'},
+  comp: {n: 'Stiff lung', peak: 36, plat: 32, peep: 5, base: 5, hot: 'dp', line: 'Peak and plateau are both up: the lung or chest is stiffer. Pneumothorax, trapped gas, a tube in one main bronchus, edema, worsening ARDS. The driving pressure has risen with it.'},
   auto: {n: 'Trapped gas', peak: 31, plat: 27, peep: 5, base: 12, hot: 'base', line: 'The pressure at the end of the breath never gets down to the set PEEP: gas is trapped. Subtracting the set PEEP then overstates the driving pressure.'}
 };
 function pressSVG(k){
@@ -610,7 +611,7 @@ function ladderSVG(k){
 
 var BARS = {
   arma: {n: 'Small breaths', a: ['12 mL/kg', 39.8], b: ['6 mL/kg', 31.0], line: 'ARMA, 861 patients: deaths fell from 39.8% to 31.0% with 6 mL/kg predicted weight and a plateau of 30 or less.'},
-  prone: {n: 'Proning', a: ['Supine', 32.8], b: ['Prone 16 hours', 16.0], line: 'PROSEVA, 466 patients with P/F under 150: deaths at 28 days 32.8% supine, 16.0% prone.'},
+  prone: {n: 'Proning', a: ['Supine', 32.8], b: ['Prone 16 hours', 16.0], line: 'PROSEVA, 466 patients with P/F under 150 on FiO2 0.6 or more: deaths at 28 days 32.8% supine, 16.0% prone.'},
   sbt: {n: 'Breathing trial', a: ['T-piece, 2 hours', 74.0], b: ['Pressure support, 30 min', 82.3], good: 1, line: 'Subirà, 1,153 patients: 82.3% were extubated successfully after a 30-minute pressure-support trial, 74.0% after 2 hours on a T-piece.'}
 };
 function barsSVG(k){
