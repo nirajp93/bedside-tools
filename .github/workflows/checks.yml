@@ -1,0 +1,52 @@
+# Runs on every pull request (and on main after a merge).
+# - standards: reads every tool and checks the rules in docs/standards.md a script can check (seconds)
+# - pages: opens every tool in a headless browser at phone and desktop width, light and dark, then offline;
+#          screenshots are attached to the run as "screenshots" for review
+# Findings listed in scripts/standards-baseline.json are known and do not fail the run; new ones do.
+name: checks
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: checks-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  standards:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Standards check
+        run: node scripts/check-standards.mjs | tee -a "$GITHUB_STEP_SUMMARY"
+
+  pages:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install headless browser
+        run: |
+          npm install --no-save --no-package-lock playwright@1
+          npx playwright install --with-deps chromium
+      - name: Page check (phone + desktop, light + dark, offline)
+        run: node scripts/check-pages.mjs
+      - name: Attach screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots
+          path: screenshots/
+          retention-days: 14
