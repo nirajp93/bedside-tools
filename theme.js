@@ -38,7 +38,7 @@
     '@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){' + DARK + '}}' +
     ':root[data-theme="dark"]{' + DARK + '}' +
     '.bt-theme{display:inline-grid;grid-template-columns:repeat(3,auto);gap:4px;padding:4px;margin-top:8px;background:var(--line);border-radius:12px}' +
-    '.bt-theme button{height:36px;min-width:60px;padding:0 12px;border:0;border-radius:9px;background:transparent;font:inherit;font-size:13px;font-weight:500;color:var(--muted);cursor:pointer}' +
+    '.bt-theme button{height:44px;min-width:60px;padding:0 12px;border:0;border-radius:9px;background:transparent;font:inherit;font-size:13px;font-weight:500;color:var(--muted);cursor:pointer}' +
     '.bt-theme button[aria-pressed="true"]{background:var(--card);color:var(--ink);font-weight:600}' +
     '.disc{border:0;padding:0;margin:0}' +
     '.disc summary{min-height:44px;display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:500;line-height:1.4;letter-spacing:0;text-transform:none;color:var(--ink);cursor:pointer;list-style:none}' +
