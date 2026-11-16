@@ -347,7 +347,7 @@ function num(v){ var n = parseFloat(v); return isFinite(n) ? n : null; }
 function r1(x){ return Math.round(x * 10) / 10; }
 function rU(x){ return Math.round(x); }
 
-/* Doses: FDA labels read 2026-11-16 (see footer). cost: relative tier from ADA 2026 Tables 9.3-9.4. */
+/* Doses: FDA labels read 2026-11-16 (see footer). cost: relative tier from ADA 2026 Table 9.3 (finerenone not listed). */
 var DRUG = {
   metformin: {n:'Metformin ER', cls:'Biguanide', start:'500 mg with the evening meal', step:'+500 mg each week', max:'2000 mg once daily (IR to 2550 mg/day)', kid:'Do not start at eGFR 30 to 45; below 45 reassess and reduce; stop below 30. Hold for iodinated contrast if eGFR 30 to 60, liver disease, alcohol use disorder, heart failure or intra-arterial contrast; recheck eGFR at 48 h.', cost:'$'},
   empagliflozin: {n:'Empagliflozin', cls:'SGLT2 inhibitor', start:'10 mg each morning', step:'25 mg for more glucose lowering', max:'25 mg', kid:'Heart and kidney trials enrolled eGFR 20 and up; not for glucose lowering below 30. Hold 3 days before surgery.', cost:'$$'},
@@ -437,7 +437,7 @@ function medsEngine(i){
 
   /* metformin */
   if (i.met) {
-    if (eg != null && eg < 30) add('met', 'stop', 'Stop metformin', 'eGFR under 30 (label: contraindicated).', '', 'label, Table 9.2');
+    if (eg != null && eg < 30) add('met', 'stop', 'Stop metformin', 'eGFR under 30 (label: contraindicated; ADA Table 9.2).', '', 'label');
     else if (eg != null && eg < 45) add('met', 'cut', 'Reduce metformin', 'eGFR 30 to 44: reduce the dose and reassess (ADA §9, label). Many cap at 1000 mg/day (expert practice; no number in ADA or the label).', '', '§9, label');
     else add('met', 'keep', 'Metformin', 'Keep. Check B12 yearly after 5 years (Table 4.1) or with anemia or neuropathy (3.10).' + (i.hf ? ' Fine in stable heart failure if eGFR over 30 (10.45).' : ''), '', '§9');
   } else if (gap != null && gap > 0 && (eg == null || eg >= 45)) {
@@ -446,7 +446,8 @@ function medsEngine(i){
   }
 
   /* DPP-4 (9.18) */
-  if (i.dpp4 && (onInc || L.some(function(x){ return x.key === 'inc' && (x.state === 'add' || x.state === 'next'); })))
+  if (i.dpp4 && i.panc) add('dpp4', 'stop', 'Stop the DPP-4 inhibitor', 'Past pancreatitis: avoid incretin-based drugs (§2, §9).', '', '§2, §9');
+  else if (i.dpp4 && (onInc || L.some(function(x){ return x.key === 'inc' && (x.state === 'add' || x.state === 'next'); })))
     add('dpp4', 'stop', 'Stop the DPP-4 inhibitor', 'Do not combine with a GLP-1 RA or tirzepatide (9.18, B).', '', '9.18');
   else if (i.dpp4) add('dpp4', 'keep', 'DPP-4 inhibitor', 'No heart, kidney, weight or liver benefit; ADA advises limiting or replacing it.' + (eg != null && eg < 45 ? ' Check the kidney dose (sitagliptin 50 mg at eGFR 30 to 44, 25 mg below 30; linagliptin unchanged).' : ''), '', '§9');
 
@@ -585,7 +586,7 @@ function insulinEngine(i){
       o.ladder = [{state: 'add', name: 'GLP-1 RA or tirzepatide', detail: 'Meds tab for the drug and steps.'}, {state: 'later', name: 'Basal insulin if still above goal', detail: '10 units or 0.1 to 0.2 units/kg/day.'}];
     } else if (!i.sev && !aboveGoal) {
       o.head = 'No insulin needed now';
-      o.sub = 'Enter A1C or fasting glucose. Basal insulin is added when glucose stays above goal on GLP-1-based therapy (Fig 9.5).';
+      o.sub = (i.a1c == null && i.fpg == null) ? 'Enter A1C or fasting glucose. Basal insulin is added when glucose stays above goal on GLP-1-based therapy (Fig 9.5).' : 'At goal on GLP-1-based therapy. Basal insulin is added only if glucose stays above goal (Fig 9.5).';
       o.ladder = [];
     } else {
       var lo = wt ? rU(0.1 * wt) : null, hi = wt ? rU(0.2 * wt) : null;
@@ -616,7 +617,7 @@ function insulinEngine(i){
 
   if (i.low === 'unexplained' || i.low === 'severe') {
     var cut1 = rU(b * 0.8), cut2 = rU(b * 0.9);
-    o.head = (i.low === 'severe' ? 'Level 2 or 3 low: ' : '') + 'lower basal 10 to 20%: ' + b + ' → ' + cut1 + ' to ' + cut2 + ' units';
+    o.head = (i.low === 'severe' ? 'Level 2 or 3 low: find the cause; if none, ' : '') + 'lower basal 10 to 20%: ' + b + ' → ' + cut1 + ' to ' + cut2 + ' units';
     o.head = o.head.charAt(0).toUpperCase() + o.head.slice(1);
     o.sub = (i.low === 'severe' ? 'Find the cause first (timing, missed meal, alcohol, exercise, kidney function, other drugs); if there is no clear cause, lower 10 to 20% (Fig 9.5) and reevaluate the plan (6.19).' : 'Low with no clear cause (Fig 9.5). Review timing, meals, alcohol, kidney function and other drugs.');
     o.why = i.low === 'severe' ? 'A level 2 or 3 low is dangerous in itself; the plan changes even if the A1C is high.' : 'A low with no other cause means the dose is more than the body needs at that time of day.';
@@ -665,7 +666,7 @@ function screenEngine(i){
   var o = {cls: '', head: '', sub: '', why: '', ladder: [], guards: [], tiers: [], type: null, prediabetes: false, diabetes: false};
   var useA1c = i.a1c != null && !i.a1cbad;
   var hits = [], pre = [];
-  if (useA1c && i.a1c >= 6.5) hits.push('A1C ' + i.a1c + '%'); else if (useA1c && i.a1c >= 5.7) pre.push('A1C ' + i.a1c + '%');
+  if (useA1c && i.a1c >= 6.5) hits.push('A1C ' + i.a1c.toFixed(1) + '%'); else if (useA1c && i.a1c >= 5.7) pre.push('A1C ' + i.a1c.toFixed(1) + '%');
   if (i.fpg != null && i.fpg >= 126) hits.push('fasting ' + i.fpg); else if (i.fpg != null && i.fpg >= 100) pre.push('fasting ' + i.fpg);
   if (i.ogtt != null && i.ogtt >= 200) hits.push('2-h ' + i.ogtt); else if (i.ogtt != null && i.ogtt >= 140) pre.push('2-h ' + i.ogtt);
   var anyRes = useA1c || i.fpg != null || i.ogtt != null || i.rand != null;
@@ -785,9 +786,9 @@ function visitEngine(i){
   var hiBad = (o.goal != null && i.a1c != null && i.a1c >= o.goal) || (cg && cg.rows.some(function(r){ return r.n === 'Time in range 70–180' && !r.ok; }));
   var bpHigh = (i.sbp != null && i.sbp >= 130) || (i.dbp != null && i.dbp >= 80);
 
-  if (lowBad) { o.cls = 'bad'; o.head = 'Too much time low: deintensify'; o.sub = 'Time below range is above target. Lower or switch insulin, sulfonylureas or meglitinides (6.3c, 6.6, B).'; o.why = 'Time below 70 above target predicts severe lows; safety comes before the A1C.'; o.tiers = ['ADA 2026 6.3c B', '6.6 B']; }
+  if (lowBad) { o.cls = 'bad'; o.head = 'Too much time low: deintensify'; o.sub = 'Time below range is above target. Lower or switch insulin, sulfonylureas or meglitinides (6.3c, 6.6, B).'; o.why = 'Time below range above target predicts severe lows; safety comes before the A1C.'; o.tiers = ['ADA 2026 6.3c B', '6.6 B']; }
   else if (hiBad) { o.head = 'Above glycemic goal: intensify'; o.sub = (o.goal != null ? 'Goal A1C under ' + o.goal + '%. ' : '') + 'Use the Meds or Insulin tab; do not delay (9.15, A).'; o.why = 'Each step closer to goal lowers eye, kidney and nerve complications.'; o.tiers = ['ADA 2026 6.3a A', '13.7 C', '9.15 A']; }
-  else if (bpHigh) { o.head = 'Blood pressure above 130/80'; o.sub = 'Confirm, then treat to under 130/80 (10.4, 10.6, A); 150/90 and up: two drugs or a single pill (10.7, A).'; o.why = 'Blood pressure lowering reduces cardiovascular events and slows kidney disease in diabetes (§10).'; o.tiers = ['ADA 2026 10.4 A', '10.6 A']; }
+  else if (bpHigh) { o.head = 'Blood pressure above 130/80'; o.sub = 'Confirm, then treat to under 130/80 (10.4, 10.6, A); 150/90 and up: two drugs or a single pill (10.7, A).'; o.why = 'Blood pressure lowering reduces cardiovascular events and slows kidney disease in diabetes (§10, §11).'; o.tiers = ['ADA 2026 10.4 A', '10.6 A']; }
   else if (i.ascvd && (!i.statin || (i.ldl != null && i.ldl >= 55))) { o.head = i.statin ? 'LDL above 55 with ASCVD' : 'ASCVD: start a high-intensity statin'; o.sub = 'High-intensity statin for LDL under 55 and at least 50% lower; add ezetimibe or a PCSK9 inhibitor if not reached (10.26-10.27).'; o.why = 'After a cardiovascular event, the lower the LDL the fewer repeat events.'; o.tiers = ['ADA 2026 10.26 A', '10.27 B']; }
   else if (!i.ascvd && !i.statin && i.age != null && i.age >= 40 && i.age <= 75) { o.head = 'Start a statin'; o.sub = 'Age 40 to 75: at least moderate intensity (10.18, A); high intensity, LDL under 70 and 50% lower if one or more extra ASCVD risk factors (10.20, A).'; o.why = 'Statins cut cardiovascular events in diabetes regardless of starting LDL.'; o.tiers = ['ADA 2026 10.18 A', '10.20 A']; }
   else if (i.fib4 != null && i.fib4 >= 1.3) { o.head = 'FIB-4 ' + i.fib4 + ': elastography'; o.sub = 'Liver stiffness by transient elastography (or ELF if unavailable) (4.23, B); refer if high risk (4.24, B).'; o.why = 'FIB-4 of 1.3 or more cannot exclude advanced fibrosis, so a second test is needed.'; o.tiers = ['ADA 2026 4.23 B']; }
