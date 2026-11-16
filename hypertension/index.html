@@ -573,7 +573,7 @@ function renderTx(){
   var c = r.c;
   if (r.preg){
     h += card({ label: 'Pregnant', head: r.severePreg ? 'Severe range: treat now' : r.start === 'drugs' ? 'Treat: 140/90 or more' : 'Under 140/90: no new drug needed now', cls: r.severePreg ? 'bad' : '', sub: 'Goal under 140/90. Already on treatment: continue, switching any drug below that must be avoided.',
-      guard: r.severePreg ? ['160/110 or more in pregnancy: start treatment promptly, within 30 to 60 minutes (as reported), and involve obstetrics today.'] : [],
+      guard: r.severePreg ? ['160/110 or more in pregnancy, confirmed on a repeat reading within 15 minutes: start treatment within 30 to 60 minutes (as reported), and involve obstetrics today.'] : [],
       list: ['Labetalol or extended-release nifedipine.', 'Stop ACE inhibitors, ARBs, renin inhibitors, MRAs and atenolol.', 'Low-dose aspirin, 81 mg daily, after 12 weeks: chronic hypertension is a high-risk factor for preeclampsia.', 'Shared care with obstetrics.'],
       why: 'ACE inhibitors and ARBs injure the developing fetus. Treating at 140/90 rather than only at severe levels (160/105 in CHAP\'s control arm) cut severe preeclampsia, early delivery and fetal loss, without smaller babies.',
       more: '<p>ACOG adopted 140/90 as the threshold to start or adjust treatment after CHAP (2022); CHAP set a threshold, not a goal. The 2025 guideline gives a goal under 140/90 (class 1, B-R), prefers labetalol and extended-release nifedipine (class 1, A), lists the drugs to avoid as harmful (class 3), and dates aspirin from 12 to 28 weeks (as reported).</p>', tier: ['ACOG 2022 advisory', AR, 'USPSTF 2021 aspirin (grade B)'] });
@@ -598,6 +598,13 @@ function renderTx(){
   if (r.frail && r.start === 'drugs') guard.push('Frail, limited life expectancy, residential care or symptomatic orthostatic hypotension: set the goal together with the patient, and start low.');
   h += card({ label: 'Start drugs?', head: head, sub: sub, guard: guard, why: why,
     more: '<p>Increased risk means clinical cardiovascular disease (coronary disease, stroke, heart failure), diabetes, chronic kidney disease (eGFR under 60 or albumin-creatinine 30 mg/g or more), or a PREVENT 10-year total cardiovascular risk of 7.5% or more. PREVENT replaced the pooled cohort equations; it counts heart failure as well as heart attack and stroke. Do not recalculate it after treatment starts.</p><p>Drugs at stage 2, and at stage 1 with increased risk: class 1, A. Lifestyle first at lower risk: class 1, B-R. Two classes at stage 2: class 1, B-R; one drug at stage 1: class 2a, C-EO (as reported).</p><p><a href="https://professional.heart.org/en/guidelines-and-statements/about-prevent-calculator" rel="noopener">PREVENT calculator (AHA)</a></p>', tier: [AR, 'USPSTF 2021 for rescreening'] });
+  if (r.plan){
+    h += card({ label: 'Planning pregnancy', head: 'Switch before conception, keep treating', cls: '',
+      list: ['Already on an ACE inhibitor, ARB, renin inhibitor, MRA or atenolol: switch now to labetalol or extended-release nifedipine. Do not simply stop treatment.', 'Starting treatment: use labetalol or extended-release nifedipine from the start.', 'A goal under 140/90 is reasonable (as reported).', 'Once pregnant: aspirin 81 mg daily after 12 weeks; tick Pregnant above.'],
+      why: 'ACE inhibitors and ARBs carry a boxed warning for injury to the developing fetus; switching before conception avoids any exposure.',
+      more: '<p>Whether to start treatment follows the usual rules above; the drug choice and goal change.</p>', tier: [AR, LAB, 'USPSTF 2021 aspirin (grade B)'] });
+    $('tx-out').innerHTML = h; return;
+  }
   if (c.k >= 2){
     var gl = [];
     if (r.ckd) gl.push('Kidney disease: KDIGO suggests systolic under 120 when tolerated, but only with standardized office measurement; applied to routine readings it can overtreat (2B).');
@@ -611,7 +618,7 @@ function renderTx(){
       if (x.k === 'plan'){ L.push('<b>Planning pregnancy:</b> labetalol or extended-release nifedipine; switch away from ACE inhibitors, ARBs, renin inhibitors, MRAs and atenolol before conception, and keep treating. A goal under 140/90 is reasonable (as reported). Aspirin 81 mg daily after 12 weeks once pregnant.'); hd = 'Switch before conception, keep treating'; }
       if (x.k === 'hf'){ L.push('<b>Heart failure:</b> use the heart failure drugs; see <a href="/hf/">Heart failure</a>.'); hd = hd || 'Heart failure drugs first'; }
       if (x.k === 'alb'){ var g = i.dm || i.uacr > 300 ? '1B' : '2C'; L.push('<b>Albuminuria:</b> ACE inhibitor or ARB at the highest approved dose that is tolerated (KDIGO ' + g + ').'); hd = hd || 'ACE inhibitor or ARB first'; acei = true; }
-      if (x.k === 'ckd'){ L.push('<b>eGFR under 60, no albuminuria:</b> ACE inhibitor or ARB preferred (AHA/ACC 2025, as reported); KDIGO calls it reasonable.'); hd = hd || 'ACE inhibitor or ARB first'; acei = true; }
+      if (x.k === 'ckd'){ L.push('<b>eGFR under 60, no albuminuria:</b> ACE inhibitor or ARB reasonable (KDIGO); reports of the 2025 guideline differ on whether it is preferred.'); hd = hd || 'ACE inhibitor or ARB reasonable'; acei = true; }
       if (x.k === 'stroke'){ L.push('<b>Prior stroke or TIA:</b> thiazide-type diuretic, ACE inhibitor or ARB.'); hd = hd || 'Thiazide-type, ACE inhibitor or ARB'; acei = true; }
       if (x.k === 'ccd'){ L.push('<b>Coronary disease:</b> beta-blocker, ACE inhibitor or ARB for the heart, then others.'); hd = hd || 'Beta-blocker, ACE inhibitor or ARB'; acei = true; }
       if (x.k === 'dm'){ L.push('<b>Diabetes, no albuminuria:</b> any first-line class; reports of the 2025 guideline differ on whether an ACE inhibitor or ARB is preferred. With albuminuria, it is.'); hd = hd || 'Any first-line class'; acei = true; }
@@ -633,7 +640,7 @@ function renderTx(){
 }
 function renderLabs(){
   var r = E.crRise(num('c-base'), num('c-now'));
-  $('lab-out').innerHTML = card({ label: 'After starting', head: r ? 'Creatinine up ' + Math.round(r.pct) + '%: ' + (r.over ? 'more than 30%, reassess' : r.pct < 0 ? 'no rise' : 'continue') : 'Creatinine and potassium in 2 to 4 weeks', cls: r && r.over ? 'bad' : '',
+  $('lab-out').innerHTML = card({ label: 'After starting', head: r ? 'Creatinine up ' + r.pct + '%: ' + (r.over ? 'more than 30%, reassess' : r.pct < 0 ? 'no rise' : 'continue') : 'Creatinine and potassium in 2 to 4 weeks', cls: r && r.over ? 'bad' : '',
     list: ['After starting or raising an ACE inhibitor or ARB: creatinine and potassium in 2 to 4 weeks.', 'Continue unless creatinine rises more than 30% within 4 weeks.', 'High potassium: lower it (diet, diuretic, binder) before cutting the drug.', 'Spironolactone: potassium within 1 week of starting or of any dose change, and again when the ACE inhibitor or ARB changes (label).', 'Thiazide-type: potassium falls with the dose (labels).', 'Visit monthly after a start or change until at goal, using home readings (as reported).'],
     guard: r && r.over ? ['More than 30%: look for volume depletion, an NSAID or a newly added diuretic, and think of renal artery stenosis.'] : [],
     why: 'a creatinine rise of up to 30% is expected: the drug lowers pressure inside the glomerulus, which is also how it protects the kidney.',
@@ -683,7 +690,7 @@ function diurText(s){
     s.act === 'add' ? ['Add a thiazide-type diuretic', 'Chlorthalidone or indapamide.'] :
     s.act === 'add-low' ? ['Add a diuretic that works at this eGFR', 'Under 30: chlorthalidone (CLICK) or a long-acting loop such as torsemide.'] :
     s.act === 'switch' ? ['Switch the thiazide', 'Hydrochlorothiazide to the same dose of chlorthalidone, or to indapamide: about 7 to 8 mmHg more.'] :
-    s.act === 'loop-hi' ? ['Reconsider the loop diuretic', 'At an eGFR of 30 or more, AHA 2018 uses a thiazide-type diuretic (chlorthalidone or indapamide); long-acting loops are for lower eGFR.'] :
+    s.act === 'loop-hi' ? ['Reconsider the loop diuretic', 'At an eGFR of 30 or more, AHA 2018 uses a thiazide-type diuretic (chlorthalidone or indapamide); long-acting loops are for lower eGFR or low albumin. Keep the loop if it is there for heart failure or edema.'] :
     ['Switch the thiazide', 'eGFR under 30: chlorthalidone (CLICK started at 12.5 mg) or a long-acting loop such as torsemide.'];
 }
 function mraText(s){
@@ -749,7 +756,7 @@ function renderPa(){
     var n = [];
     if (r.lowK) n.push('Potassium ' + i.k + ': low potassium lowers aldosterone. Correct it and repeat.');
     if (i.mra) n.push('An MRA or amiloride raises renin: stop it for 4 weeks, if safe, and repeat.');
-    if (i.up) n.push('Other diuretics (4 weeks) and ACE inhibitors, ARBs and SGLT2 inhibitors (2 weeks) raise renin. If suspicion stays high and it is safe, repeat off them.');
+    if (i.up) n.push('Other diuretics (4 weeks) and ACE inhibitors, ARBs, SGLT2 inhibitors and dihydropyridine calcium channel blockers (2 weeks; the calcium channel blocker effect is weak) raise renin. If suspicion stays high and it is safe, repeat off them.');
     if (r.repeat) n.push('Renin suppressed with aldosterone 5 to 10 ng/dL: indeterminate. Repeat on another day, after withdrawing interfering drugs where safe.');
     n.push('Rescreen if hypertension worsens, potassium falls, or atrial fibrillation appears without another cause.');
     o = card({ label: 'Primary aldosteronism screen', head: r.fn || r.repeat ? 'Negative, but not conclusive' : 'Negative screen', cls: r.fn || r.repeat ? '' : 'okc',
