@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Decompensated cirrhosis · bedside.tools</title>
+<meta name="description" content="Decompensated cirrhosis at the bedside: MELD 3.0 and Child-Pugh, ascitic fluid and SBP with albumin doses, variceal bleeding, HRS-AKI and terlipressin, hepatic encephalopathy, with the physiology in diagrams.">
+<script src="/theme.js"></script>
+<style>
+:root{--bg:#FBFBFA;--card:#FFFFFF;--ink:#111113;--muted:#55555D;--line:#ECECEE;--accent:#2B4BDB;--warn:#9A3B00;--warnbg:#FFF6EC}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5}
+.mono{font-family:var(--mono)}
+.wrap{max-width:720px;margin:0 auto;padding:20px 16px 48px}
+a{color:var(--accent)}
+.back{font-size:14px;text-decoration:none;display:inline-block;min-height:44px;line-height:44px}
+h1{font-size:26px;margin:4px 0 4px;letter-spacing:-.01em}
+.purpose{color:var(--muted);margin:0 0 20px}
+.tabs{display:flex;gap:6px;margin-bottom:16px}
+.tab{flex:1;min-width:0;min-height:44px;border:1px solid var(--line);background:var(--card);border-radius:14px;padding:0 4px;font:inherit;font-size:15px;font-weight:600;color:var(--muted);cursor:pointer}
+.tab[aria-selected="true"]{border-color:var(--accent);color:var(--accent)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
+.label{font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+.grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.grid4{grid-template-columns:1fr 1fr}
+.field{display:flex;flex-direction:column;justify-content:flex-end}
+.field label{display:block;font-size:13px;color:var(--muted);margin-bottom:4px}
+.field input{width:100%;min-height:44px;border:1px solid var(--line);border-radius:10px;padding:8px 10px;font:inherit;font-family:var(--mono);background:var(--card);color:var(--ink)}
+.field input:focus,.tab:focus-visible,.chk:focus-within,button:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.checks{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.chk{display:flex;align-items:center;gap:10px;min-height:44px;border:1px solid var(--line);border-radius:10px;padding:6px 10px;font-size:14px;cursor:pointer}
+.chk input{width:20px;height:20px;accent-color:var(--accent);flex:none}
+.card h2{font-size:18px;margin:0 0 2px}
+.head{font-family:var(--mono);font-size:17px;font-weight:600;margin:6px 0 4px;overflow-wrap:anywhere}
+.head.bad{color:var(--bad)}.head.okc{color:var(--ok)}
+.sub{font-size:14px;color:var(--muted);margin:0}
+.card ul{margin:6px 0 0;padding-left:20px}
+.card li{margin-bottom:4px}
+.guard{border-left:3px solid var(--warn);background:var(--warnbg);padding:8px 10px;border-radius:0 10px 10px 0;margin-top:8px;font-size:14.5px}
+.tier{display:inline-block;font-family:var(--mono);font-size:11px;border:1px solid var(--line);border-radius:999px;padding:2px 8px;color:var(--muted);margin:6px 6px 0 0}
+details{margin-top:10px;border-top:1px solid var(--line);padding-top:8px}
+.whyline{margin:10px 0 0;font-size:14.5px;color:var(--muted)}
+.whyline b{color:var(--ink);font-weight:600}
+summary{cursor:pointer;color:var(--accent);font-weight:600;min-height:44px;line-height:44px}
+details p{margin:0 0 8px;font-size:15px}
+.empty{color:var(--muted)}
+.btn{min-height:44px;border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);border-radius:10px;padding:8px 14px;font:inherit;font-weight:600;cursor:pointer}
+.btn.ghost{background:var(--card);color:var(--accent)}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.note{font-size:14px;color:var(--muted)}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:6px 6px 6px 0;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:var(--mono);font-size:11.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);font-weight:500}
+td.mono{font-size:13px}
+.tw{overflow-x:auto}
+.case h2{font-size:17px}
+.ans{margin-top:10px;border-top:1px solid var(--line);padding-top:10px}
+footer{margin-top:28px;font-size:13.5px;color:var(--muted)}
+footer p{margin:0 0 8px}
+.panel{display:none}.panel.on{display:block}
+.fig{display:block;width:100%;max-width:460px;height:auto;margin:0 auto}
+.states{display:flex;gap:6px;overflow-x:auto;margin:10px -16px;padding:2px 16px 6px;scrollbar-width:none}
+.states::-webkit-scrollbar{display:none}
+.sbtn{flex:none;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--ink);font:inherit;font-size:14px;cursor:pointer;white-space:nowrap}
+.sbtn[aria-pressed="true"]{border-color:var(--accent);color:var(--accent);font-weight:600}
+.labs6{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:10px}
+.labs6.l4{grid-template-columns:repeat(4,1fr)}
+.lab{background:var(--fill);border-radius:10px;padding:6px 8px}
+.lab span{display:block;font-size:12px;color:var(--muted)}
+.lab b{font-family:var(--mono);font-size:13.5px}
+.lab.ch{box-shadow:inset 0 0 0 1.5px var(--warn)}
+.line1{font-size:15px;margin:10px 0 0}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.chip{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--fill);color:var(--ink);font:inherit;font-size:14px;cursor:pointer}
+.chip svg{flex:none;color:var(--accent)}
+.scrim{position:fixed;inset:0;background:var(--scrim);z-index:20}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:21;max-height:90vh;overflow-y:auto;background:var(--card);border:1px solid var(--line);border-bottom:0;border-radius:20px 20px 0 0;padding:8px 16px 24px;max-width:560px;margin:0 auto}
+.sheethead{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.sheethead h2{font-size:18px;margin:0}
+.xbtn{min-height:44px;min-width:44px;border:0;background:transparent;color:var(--accent);font:inherit;font-weight:600;cursor:pointer}
+.pills{position:sticky;top:0;z-index:5;background:var(--bg);display:flex;gap:6px;overflow-x:auto;margin:0 -16px 12px;padding:8px 16px;border-bottom:1px solid var(--line);scrollbar-width:none}
+.pills::-webkit-scrollbar{display:none}
+.pill{flex:none;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--muted);font:inherit;font-size:14px;cursor:pointer;white-space:nowrap}
+.pill[aria-current="true"]{border-color:var(--accent);color:var(--accent);font-weight:600}
+.chap{scroll-margin-top:70px}
+.cause{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:8px 0;border-top:1px solid var(--line);font-size:15px}
+.cause small{color:var(--muted);font-size:13px;text-align:right;flex:0 1 46%}
+.cause.out span{color:var(--muted);text-decoration:line-through}
+.cause.out,.cause.less,.cause.unl{opacity:.6}
+.cause.fav span{font-weight:700}
+.cause.fav span:before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--accent);margin-right:8px}
+.seg{display:flex;gap:8px;margin:10px 0 0}
+.trial{border-left:3px solid var(--accent);padding-left:12px}
+.trial p{margin:0 0 6px;font-size:15px}
+.trial .k{font-family:var(--mono);font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);display:block}
+@media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+
+.field select{width:100%;min-height:44px;border:1px solid var(--line);border-radius:10px;padding:8px 10px;font:inherit;font-size:15px;background:var(--card);color:var(--ink)}
+.field select:focus{outline:2px solid var(--accent);outline-offset:2px}
+.steps{display:flex;gap:6px;margin:0 0 14px}
+.stepb{flex:1;min-width:0;min-height:44px;border:1px solid var(--line);background:var(--card);border-radius:10px;font:inherit;font-family:var(--mono);font-size:13.5px;color:var(--muted);cursor:pointer;padding:0 4px}
+.stepb[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:600}
+.stp{display:none}.stp.on{display:block}
+.tab{font-size:14px}
+.grp{font-size:13px;color:var(--muted);margin:0 0 10px}
+.ans{margin:8px 0 2px;border:0;padding:0;font-weight:700;font-size:16px}
+.case .ans{margin-top:12px;border-top:1px solid var(--line);padding-top:12px;font-weight:400}
+.pl{display:block;font-family:var(--mono);font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);font-weight:400}
+.pillar{padding:8px 0;border-top:1px solid var(--line)}.pillar:first-of-type{border-top:0}
+.pn{display:flex;justify-content:space-between;gap:10px;align-items:baseline}.pn span{font-size:12.5px;color:var(--muted)}
+.pbar{height:8px;background:var(--fill);border-radius:99px;overflow:hidden;margin-top:6px}.pbar i{display:block;height:100%;background:var(--accent);border-radius:99px}
+.stage{display:flex;gap:4px;margin:2px 0 8px}
+.stage span{flex:1;text-align:center;font-family:var(--mono);font-weight:600;padding:9px 0;border-radius:9px;background:var(--fill);color:var(--muted)}
+.stage .on{background:var(--badbg);color:var(--bad)}
+.guard.big{margin:0 0 14px;font-size:15.5px}
+.checks.one{grid-template-columns:1fr}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.tile{min-height:76px;text-align:left;border:1px solid var(--line);border-radius:14px;background:var(--card);color:var(--ink);font:inherit;font-size:14.5px;padding:10px 12px;cursor:pointer}
+.tile span{display:block;font-size:12px;color:var(--accent);margin-bottom:4px}
+.tile:focus-visible,.stepb:focus-visible,.chip:focus-visible,.sbtn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+details.tr{margin:0;border-top:1px solid var(--line);padding:0}
+details.tr:first-child{border-top:0}
+details .trial{margin:8px 0 12px}
+.card>.tier{margin-top:10px}
+.lh{font-size:19px;margin:26px 0 4px;scroll-margin-top:12px}
+.lh:first-of-type{margin-top:6px}
+.lead{color:var(--muted);margin:0 0 12px;font-size:15px}
+.jump{margin:0 0 6px}
+.jump .chip{text-decoration:none}
+.inl .states{flex-wrap:wrap;overflow:visible}
+.inl svg{display:block;width:100%;max-width:440px;height:auto;margin:0 auto}
+.tlist{border-top:1px solid var(--line);margin-top:12px;padding-top:10px}
+.tl summary{display:list-item;min-height:44px;line-height:1.35;padding:8px 0}
+.tl .take{display:block;color:var(--muted);font-size:14px}
+.use{margin:12px 0 0;font-size:14.5px}
+.use a{display:inline-flex;align-items:center;min-height:44px;color:var(--accent);text-decoration:none;font-weight:600}
+.fnav{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center;border-top:1px solid var(--line);margin-top:14px;padding-top:12px}
+.navb{min-height:48px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);font:inherit;font-size:13.5px;padding:6px 10px;cursor:pointer;text-align:left}
+.navb.nx{text-align:right;border-color:var(--accent);color:var(--accent);font-weight:600}
+.navb:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.fcount{font-size:12px;color:var(--muted)}
+.guard a,.card a{overflow-wrap:anywhere}
+
+.tabs{overflow-x:auto;scrollbar-width:none;margin:0 -16px 16px;padding:2px 16px}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:none;padding:0 14px;white-space:nowrap}
+.node rect{fill:var(--card);stroke:var(--muted);stroke-width:1.2}
+.node text{fill:var(--ink);font-family:var(--mono);font-size:11.5px}
+.node .s{fill:var(--muted);font-size:10px}
+.node.hi rect{stroke:var(--accent);stroke-width:2.4;fill:var(--fill)}
+.node.hi text{font-weight:700}
+.node.off{opacity:.3}
+.arr{stroke:var(--muted);stroke-width:1.4;fill:none}
+.arr.hi{stroke:var(--accent);stroke-width:2.4}
+.arr.off{opacity:.25}
+.ah{fill:var(--muted)}
+.bar{fill:var(--fill);stroke:var(--muted);stroke-width:1.2}
+.bar.a{fill:var(--accent);stroke:var(--accent)}
+.svt{fill:var(--ink);font-family:var(--mono);font-size:11.5px}
+.svm{fill:var(--muted);font-family:var(--mono);font-size:10.5px}
+.gap{stroke:var(--warn);stroke-width:2;fill:none}
+.cap{font-size:15px;margin:8px 0 0}
+.src{font-size:12.5px;color:var(--muted);margin:8px 0 0}
+.send{font-size:14.5px;margin:0 0 6px}
+.nums{font-family:var(--mono)}
+.big{font-family:var(--mono);font-size:30px;font-weight:700;line-height:1.1}
+.trio{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px}
+.trio div{background:var(--fill);border-radius:10px;padding:8px 10px}
+.trio span{display:block;font-size:12px;color:var(--muted)}
+.trio b{font-family:var(--mono);font-size:20px}
+.field .hint{font-size:12px;color:var(--muted);margin-top:3px}
+@media (min-width:900px){
+  .tabs{margin:0 0 16px;padding:0}
+  .tab{flex:1}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="/">← bedside.tools</a>
+<h1>Decompensated cirrhosis</h1>
+<p class="purpose">Scores, the tap, the bleed, the kidney and the brain: what to do next, and why.</p>
+
+<div class="tabs" role="tablist">
+  <button class="tab" role="tab" id="t-scores" aria-selected="true" aria-controls="p-scores">Scores</button>
+  <button class="tab" role="tab" id="t-ascites" aria-selected="false" aria-controls="p-ascites">Ascites · SBP</button>
+  <button class="tab" role="tab" id="t-bleed" aria-selected="false" aria-controls="p-bleed">Variceal bleed</button>
+  <button class="tab" role="tab" id="t-hrs" aria-selected="false" aria-controls="p-hrs">HRS-AKI</button>
+  <button class="tab" role="tab" id="t-he" aria-selected="false" aria-controls="p-he">Encephalopathy</button>
+  <button class="tab" role="tab" id="t-learn" aria-selected="false" aria-controls="p-learn">Learn</button>
+  <button class="tab" role="tab" id="t-practice" aria-selected="false" aria-controls="p-practice">Practice</button>
+</div>
+
+<div class="panel on" id="p-scores" role="tabpanel" aria-labelledby="t-scores">
+  <div class="two" id="scores"><div class="card" id="scores-in"></div><div id="scores-out" aria-live="polite"></div></div>
+</div>
+
+<div class="panel" id="p-ascites" role="tabpanel" aria-labelledby="t-ascites">
+  <div class="steps" id="ascites"><button class="stepb" type="button" data-group="as" data-step="fluid" aria-pressed="true">Fluid · SBP</button><button class="stepb" type="button" data-group="as" data-step="diuretics" aria-pressed="false">Diuretics</button><button class="stepb" type="button" data-group="as" data-step="lvp" aria-pressed="false">Big tap</button></div>
+  <div class="stp on" id="fluid"><div class="two"><div class="card" id="fluid-in"></div><div><div id="fluid-out" aria-live="polite"></div><div class="card" id="workup"></div></div></div></div>
+  <div class="stp" id="diuretics"><div class="refgrid" id="diur-out"></div></div>
+  <div class="stp" id="lvp"><div class="two"><div class="card" id="lvp-in"></div><div id="lvp-out" aria-live="polite"></div></div></div>
+</div>
+
+<div class="panel" id="p-bleed" role="tabpanel" aria-labelledby="t-bleed">
+  <div class="two" id="bleed"><div class="card" id="bleed-in"></div><div id="bleed-out" aria-live="polite"></div></div>
+</div>
+
+<div class="panel" id="p-hrs" role="tabpanel" aria-labelledby="t-hrs">
+  <div class="steps" id="hrs"><button class="stepb" type="button" data-group="hr" data-step="aki" aria-pressed="true">AKI first steps</button><button class="stepb" type="button" data-group="hr" data-step="terli" aria-pressed="false">Vasoconstrictors</button></div>
+  <div class="stp on" id="aki"><div class="two"><div class="card" id="aki-in"></div><div id="aki-out" aria-live="polite"></div></div></div>
+  <div class="stp" id="terli"><div class="two"><div class="card" id="terli-in"></div><div id="terli-out" aria-live="polite"></div></div></div>
+</div>
+
+<div class="panel" id="p-he" role="tabpanel" aria-labelledby="t-he">
+  <div class="two" id="he"><div class="card" id="he-in"></div><div id="he-out" aria-live="polite"></div></div>
+</div>
+
+<div class="panel" id="p-learn" role="tabpanel" aria-labelledby="t-learn">
+  <div id="learn"></div>
+  <div class="card" id="trials"><p class="label">Trials</p><div id="trial-list"></div></div>
+</div>
+
+<div class="panel" id="p-practice" role="tabpanel" aria-labelledby="t-practice">
+  <div id="practice"></div>
+</div>
+
+<div class="scrim" id="scrim" hidden></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-t" hidden>
+  <div class="sheethead"><h2 id="sheet-t"></h2><button class="xbtn" id="sheet-x" type="button">Close</button></div>
+  <div id="sheet-b"></div>
+</div>
+
+<footer>
+  <p><strong>For education only. Not a substitute for clinical judgment.</strong> Built to US guidance (AASLD), with the FDA label for terlipressin. AASLD practice guidance statements are expert consensus and are not graded; rows marked expert practice or teaching convention are labelled. Antibiotic choice, albumin caps, terlipressin and TIPS availability vary, so adjust to your institution. Diagrams are schematic.</p>
+  <p>Privacy: everything runs in your browser. Nothing you enter is sent anywhere or stored, and there are no analytics; only your light/dark choice is saved on this device. Do not enter names, record numbers, or dates of birth.</p>
+  <p class="mono">Last reviewed: 2026-11-16</p>
+  <p><strong>Sources:</strong> Biggins SW et al., Diagnosis, evaluation and management of ascites, spontaneous bacterial peritonitis and hepatorenal syndrome: 2021 AASLD practice guidance, Hepatology 2021;74:1014 · Kaplan DE et al., AASLD practice guidance on risk stratification and management of portal hypertension and varices in cirrhosis, Hepatology 2024;79:1180 · Vilstrup H et al., Hepatic encephalopathy in chronic liver disease: 2014 AASLD/EASL practice guideline, Hepatology 2014;60:715 · Nadim MK et al., Acute kidney injury in patients with cirrhosis: ADQI and International Club of Ascites joint consensus, J Hepatol 2024;81:163 · de Franchis R et al., Baveno VII, J Hepatol 2022;76:959 (labelled notes) · Kim WR et al., MELD 3.0, Gastroenterology 2021;161:1887 · OPTN Policy 9.1 (MELD 3.0 in effect 2023; MELD-Na 2016) · Wiesner R et al., Gastroenterology 2003;124:91 · Akriviadis EA, Runyon BA, Gastroenterology 1990;98:127 · FDA prescribing information: TERLIVAZ (terlipressin), revised 06/2026 · Trials are cited on their cards.</p>
+</footer>
+</div>
+<script id="engine">
+/* Clinical rules. Every number here has a row in the decision table. No DOM in this block. */
+var E = (function(){
+  function cl(v, lo, hi){ return Math.min(hi, Math.max(lo, v)); }
+  function ln(v){ return Math.log(v); }
+  function ok(v){ return typeof v === 'number' && isFinite(v) && v > 0; }
+
+  /* MELD (UNOS), MELD-Na (OPTN 2016) and MELD 3.0 (Kim 2021; OPTN 2023). l: bili, inr, cr, na, alb, female, dialysis */
+  function meld(l){
+    if (!(ok(l.bili) && ok(l.inr) && ok(l.cr))) return null;
+    var b = Math.max(1, l.bili), i = Math.max(1, l.inr);
+    var cr4 = l.dialysis ? 4 : cl(l.cr, 1, 4), cr3 = l.dialysis ? 3 : cl(l.cr, 1, 3);
+    var mi = Math.round(9.57 * ln(cr4) + 3.78 * ln(b) + 11.2 * ln(i) + 6.43);
+    var out = { meld: cl(mi, 6, 40), meldna: null, meld3: null, capped: l.dialysis || l.cr > 3 };
+    if (ok(l.na)){
+      var na = cl(l.na, 125, 137), d = 137 - na;
+      var mn = mi > 11 ? mi + 1.32 * d - 0.033 * mi * d : mi;
+      out.meldna = cl(Math.round(mn), 6, 40);
+      if (ok(l.alb)){
+        var a = 3.5 - cl(l.alb, 1.5, 3.5);
+        var m3 = (l.female ? 1.33 : 0) + 4.56 * ln(b) + 0.82 * d - 0.24 * d * ln(b) + 9.09 * ln(i) + 11.14 * ln(cr3) + 1.85 * a - 1.83 * a * ln(cr3) + 6;
+        out.raw3 = m3; out.meld3 = cl(Math.round(m3), 6, 40);
+      }
+    }
+    return out;
+  }
+
+  /* Child-Pugh. asc and he: 0 none, 1 slight / grade 1-2, 2 moderate / grade 3-4 */
+  function childPugh(l){
+    if (!(ok(l.bili) && ok(l.inr) && ok(l.alb)) || l.asc == null || l.he == null) return null;
+    var p = (l.bili < 2 ? 1 : l.bili <= 3 ? 2 : 3) + (l.alb > 3.5 ? 1 : l.alb >= 2.8 ? 2 : 3) + (l.inr < 1.7 ? 1 : l.inr <= 2.3 ? 2 : 3) + (l.asc + 1) + (l.he + 1);
+    return { score: p, cls: p <= 6 ? 'A' : p <= 9 ? 'B' : 'C' };
+  }
+
+  /* Ascitic fluid. f: salb, aalb, prot, pmn, culture ('', 'neg', 'pos'), gluLow, ldhHigh, poly, focal */
+  function fluid(f){
+    var r = { saag: null, portal: null, cardiac: false, lowProt: false, sbp: false, bacterascites: false, flags: [] };
+    if (ok(f.salb) && ok(f.aalb)){ r.saag = Math.round((f.salb - f.aalb) * 10) / 10; r.portal = r.saag >= 1.1; }
+    if (ok(f.prot) || f.prot === 0){ r.cardiac = r.portal === true && f.prot > 2.5; r.lowProt = f.prot < 1.5; if (f.prot > 1) r.flags.push('total protein above 1 g/dL'); }
+    if (f.gluLow) r.flags.push('glucose below 50 mg/dL');
+    if (f.ldhHigh) r.flags.push('LDH above the serum upper limit');
+    if (f.poly) r.flags.push('more than one organism');
+    if (typeof f.pmn === 'number' && isFinite(f.pmn)){ r.sbp = f.pmn > 250; r.bacterascites = !r.sbp && f.culture === 'pos'; }
+    if (f.focal) r.flags.push('a focal intra-abdominal source');
+    r.secondary = r.sbp && r.flags.length > 0;
+    return r;
+  }
+  function sbpAlbumin(kg){ return ok(kg) ? { d1: Math.round(1.5 * kg), d3: Math.round(kg) } : null; }
+  /* Who gains most from albumin in SBP: creatinine >1.0, BUN >30 or bilirubin >5 */
+  function sbpHighRisk(l){ return (ok(l.cr) && l.cr > 1.0) || (ok(l.bun) && l.bun > 30) || (ok(l.bili) && l.bili > 5); }
+  /* Primary prophylaxis "can be considered": protein <1.5 plus kidney (Cr >1.2, BUN >25, Na <130) or liver (Child-Pugh >9 and bilirubin >3) */
+  function primaryPpx(l){
+    if (!(typeof l.prot === 'number' && l.prot < 1.5)) return false;
+    return (ok(l.cr) && l.cr > 1.2) || (ok(l.bun) && l.bun > 25) || (ok(l.na) && l.na < 130) || (ok(l.cp) && l.cp > 9 && ok(l.bili) && l.bili > 3);
+  }
+  /* Large-volume paracentesis: albumin 6-8 g per litre when more than 5 L is removed */
+  function lvp(L, risk){
+    if (!ok(L)) return null;
+    return { give: L > 5 ? 'yes' : risk ? 'consider' : 'no', lo: Math.round(6 * L), hi: Math.round(8 * L), over8: L > 8 };
+  }
+  /* Hyponatraemia bands in cirrhosis */
+  function naBand(na){ if (!ok(na)) return null; return na < 120 ? 'severe' : na <= 125 ? 'moderate' : na <= 135 ? 'mild' : 'normal'; }
+
+  /* Pre-emptive TIPS: Child-Pugh C 10-13, or Child-Pugh B above 7 (8 or 9) with active bleeding at endoscopy */
+  function tips(cp, active){
+    if (!ok(cp)) return null;
+    if (cp >= 10 && cp <= 13) return 'yes';
+    if ((cp === 8 || cp === 9) && active) return 'yes';
+    if (cp >= 14) return 'outside';
+    return 'no';
+  }
+  var NSBB = [
+    { d: 'Carvedilol', start: '6.25 mg once daily', up: 'to 6.25 mg twice daily after 2 to 3 days', max: '12.5 mg/day', maxA: '12.5 mg/day', goal: 'no heart-rate goal' },
+    { d: 'Propranolol', start: '20 to 40 mg twice daily', up: 'every 2 to 3 days', max: '320 mg/day', maxA: '160 mg/day', goal: 'heart rate 55 to 60' },
+    { d: 'Nadolol', start: '20 to 40 mg at bedtime', up: 'every 2 to 3 days', max: '160 mg/day', maxA: '80 mg/day', goal: 'heart rate 55 to 60' }
+  ];
+
+  /* AKI stage (AASLD 2021 Table 10) */
+  function aki(base, cur, rrt){
+    if (rrt) return { stage: 3, ratio: null, rise: null };
+    if (!(ok(base) && ok(cur))) return null;
+    var rise = cur - base, ratio = cur / base, st = 0;
+    if (ratio > 3 || (cur > 4 && rise >= 0.3)) st = 3;
+    else if (ratio > 2) st = 2;
+    else if (rise >= 0.3 - 1e-9 || ratio >= 1.5) st = 1;
+    return { stage: st, ratio: ratio, rise: rise };
+  }
+  function albChallenge(kg){ return ok(kg) ? Math.round(kg) : null; }
+  /* Terlipressin day-4 rule (TERLIVAZ label): start = creatinine before the first dose */
+  function terliDay4(start, d4){
+    if (!(ok(start) && ok(d4))) return null;
+    var fall = (start - d4) / start * 100;
+    return { fall: fall, act: d4 >= start ? 'stop' : fall >= 30 ? 'continue' : 'increase' };
+  }
+  /* Label cautions. f: hypoxia, ischemia, aclf3, overload, cr, meld */
+  function terliGuards(f){
+    var no = [], care = [];
+    if (f.hypoxia) no.push('Hypoxia (SpO2 below 90%) or worsening respiratory symptoms: contraindicated until it resolves.');
+    if (f.ischemia) no.push('Ongoing coronary, peripheral or mesenteric ischaemia: contraindicated.');
+    if (f.aclf3) care.push('ACLF grade 3: the label says to avoid use; risk of fatal respiratory failure is higher.');
+    if (f.overload) care.push('Volume overload raises the risk of respiratory failure: cut back albumin and fluids, consider a diuretic, and manage it before or while treating.');
+    if (ok(f.cr) && f.cr > 5) care.push('Creatinine above 5 mg/dL: unlikely to benefit.');
+    if (ok(f.meld) && f.meld >= 35) care.push('MELD 35 or higher and listed for transplant: benefits may not outweigh risks.');
+    return { no: no, care: care };
+  }
+
+  /* Hepatic encephalopathy. grade 0 (minimal) to 4; episode 1 first, 2 recurrent */
+  function he(grade, episode){
+    if (grade == null) return null;
+    return { overt: grade >= 2, airway: grade >= 3, rifaximin: grade >= 2 && episode >= 2 };
+  }
+
+  return { meld: meld, childPugh: childPugh, fluid: fluid, sbpAlbumin: sbpAlbumin, sbpHighRisk: sbpHighRisk, primaryPpx: primaryPpx, lvp: lvp, naBand: naBand, tips: tips, NSBB: NSBB, aki: aki, albChallenge: albChallenge, terliDay4: terliDay4, terliGuards: terliGuards, he: he };
+})();
+</script>
+<script id="figures">
+/* Diagrams: one drawing per topic with switchable states. Drawn for this site. */
+function $(id){ return document.getElementById(id); }
+function esc(s){ return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;'); }
+var FIG = {
+  portal: { title: 'Portal pressure: where it comes from, what lowers it', src: 'AASLD 2024 (gradient of 10 mmHg or more defines clinically significant portal hypertension; beta-blocker mechanisms, Table 3). Schematic.',
+    box: [340, 240],
+    nodes: [['gut', 8, 95, 92, 50, 'Gut, spleen', 'inflow'], ['pv', 124, 95, 84, 50, 'Portal vein', 'pressure'], ['liv', 234, 95, 98, 50, 'Liver', 'resistance'], ['hv', 234, 14, 98, 42, 'Hepatic vein', 'to the heart'], ['var', 124, 14, 84, 42, 'Varices', 'collaterals'], ['asc', 124, 186, 84, 42, 'Ascites', '']],
+    arrows: [['gut', 'pv'], ['pv', 'liv'], ['liv', 'hv'], ['pv', 'var'], ['pv', 'asc'], ['pv', 'hv', 4]],
+    states: [
+      { n: 'Healthy', cap: 'Portal blood crosses the liver with almost no pressure drop. No collaterals, no ascites.', off: ['var', 'asc'] },
+      { n: 'Cirrhosis', cap: 'Scar raises resistance and splanchnic vasodilation raises inflow. Once the gradient reaches about 10 mmHg, varices and ascites can form.', hi: ['liv', 'gut', 'pv'] },
+      { n: 'Over-transfusion', cap: 'Extra volume lands in the portal bed. Pressure climbs and the varix bleeds again, so aim for a haemoglobin of about 7 g/dL.', hi: ['gut', 'pv', 'var'] },
+      { n: 'Beta-blocker', cap: 'Lower cardiac output and splanchnic vasoconstriction cut inflow. Carvedilol also lowers resistance inside the liver.', hi: ['gut', 'liv'] },
+      { n: 'TIPS', cap: 'A stent from portal to hepatic vein bypasses the resistance. Pressure falls; more unfiltered blood reaches the brain.', hi: ['pv', 'hv'], off: ['liv'] }
+    ] },
+  hrs: { title: 'Why the kidney fails in cirrhosis', src: 'AASLD 2021 (HRS-AKI, post-paracentesis circulatory dysfunction); ADQI/ICA 2024. Schematic.',
+    box: [340, 336],
+    nodes: [['ph', 50, 6, 240, 40, 'Portal hypertension', ''], ['vd', 50, 62, 240, 40, 'Splanchnic vasodilation', 'blood pools in the gut'], ['ev', 50, 118, 240, 40, 'Low effective arterial volume', ''], ['ra', 50, 174, 240, 40, 'Renin, sympathetic, ADH on', 'sodium and water kept'], ['rv', 50, 230, 240, 40, 'Renal vasoconstriction', ''], ['gf', 50, 286, 240, 40, 'GFR falls: HRS-AKI', 'kidney itself is intact']],
+    arrows: [['ph', 'vd'], ['vd', 'ev'], ['ev', 'ra'], ['ra', 'rv'], ['rv', 'gf']],
+    states: [
+      { n: 'Cirrhosis', cap: 'The kidney is being squeezed, not damaged. Sodium retention makes ascites; the same chain, pushed further, shuts down filtration.', hi: ['vd', 'ev'] },
+      { n: 'Infection (SBP)', cap: 'Inflammation deepens the vasodilation. The kidney is the organ that pays, which is why SBP is treated with albumin as well as antibiotics.', hi: ['vd', 'ev', 'gf'] },
+      { n: 'Big tap, no albumin', cap: 'Removing more than 5 L drops arterial filling further. Albumin at the time of the tap prevents this.', hi: ['ev', 'ra'] },
+      { n: 'Albumin', cap: 'Refills the arterial side. If creatinine does not improve after volume expansion, the cause is not simple volume depletion.', hi: ['ev'] },
+      { n: 'Vasoconstrictor', cap: 'Terlipressin or norepinephrine tightens the splanchnic bed: arterial pressure rises and the kidney relaxes.', hi: ['vd', 'rv', 'gf'] }
+    ] },
+  nh3: { title: 'Ammonia: gut to brain', src: 'AASLD/EASL 2014 (precipitants, lactulose, rifaximin). Mechanism is teaching convention. Schematic.',
+    box: [340, 240],
+    nodes: [['gut', 8, 100, 96, 50, 'Gut bacteria', 'make ammonia'], ['pv', 126, 100, 80, 50, 'Portal', 'blood'], ['liv', 230, 100, 102, 50, 'Liver', 'clears it'], ['sh', 126, 16, 80, 42, 'Shunts', 'bypass'], ['br', 230, 16, 102, 42, 'Brain', 'astrocytes swell'], ['st', 8, 190, 96, 42, 'Stool', 'ammonium out']],
+    arrows: [['gut', 'pv'], ['pv', 'liv'], ['pv', 'sh'], ['sh', 'br'], ['gut', 'st']],
+    states: [
+      { n: 'Healthy', cap: 'The liver clears gut ammonia on first pass. Almost none reaches the brain.', hi: ['liv'], off: ['sh', 'br'] },
+      { n: 'Cirrhosis', cap: 'Fewer working hepatocytes and blood shunting around the liver: ammonia reaches the brain.', hi: ['sh', 'br'] },
+      { n: 'Precipitant', cap: 'Infection, a GI bleed (blood is a protein load), constipation, diuretics or low potassium push more ammonia through. Find and fix the trigger.', hi: ['gut', 'pv', 'br'] },
+      { n: 'Lactulose', cap: 'Acidifies the colon so ammonia is trapped as ammonium, and speeds transit so it leaves in stool.', hi: ['gut', 'st'] },
+      { n: 'Rifaximin', cap: 'A gut-only antibiotic: fewer ammonia-producing bacteria. Added to lactulose after a recurrence.', hi: ['gut'] }
+    ] },
+  saag: { title: 'The albumin gradient (SAAG)', src: 'AASLD 2021 Table 4 and text (gradient of 1.1 g/dL or more reflects portal hypertension; protein above 2.5 g/dL supports a cardiac source). Bar heights are examples.',
+    box: [340, 220], custom: true,
+    states: [
+      { n: 'Portal hypertension', cap: 'Pressure pushes water across; albumin stays in the blood. Wide gap: 1.1 g/dL or more.', s: 3.0, a: 0.8 },
+      { n: 'Peritoneal disease', cap: 'Tumour or tuberculosis makes the peritoneum leak protein. Narrow gap: under 1.1 g/dL, which excludes portal hypertension.', s: 3.0, a: 2.4 },
+      { n: 'Heart failure', cap: 'Pressure is high, so the gap is still wide, but the sinusoids are healthy and let protein through: fluid protein above 2.5 g/dL.', s: 3.6, a: 2.0 }
+    ] }
+};
+var FIGS = Object.keys(FIG);
+function figSvg(id, k){
+  var f = FIG[id], st = f.states[k], o = '<svg class="fig" viewBox="0 0 ' + f.box[0] + ' ' + f.box[1] + '" role="img" aria-label="' + esc(f.title + ': ' + st.n) + '">';
+  if (f.custom){
+    var sc = 42, base = 180, hs = st.s * sc, ha = st.a * sc, gap = Math.round((st.s - st.a) * 10) / 10;
+    o += '<line class="arr" x1="30" y1="' + base + '" x2="310" y2="' + base + '"/>';
+    o += '<rect class="bar a" x="60" y="' + (base - hs) + '" width="70" height="' + hs + '" rx="4"/><rect class="bar" x="190" y="' + (base - ha) + '" width="70" height="' + ha + '" rx="4"/>';
+    o += '<text class="svt" x="95" y="198" text-anchor="middle">Serum ' + st.s.toFixed(1) + '</text><text class="svt" x="225" y="198" text-anchor="middle">Ascites ' + st.a.toFixed(1) + '</text>';
+    o += '<path class="gap" d="M278 ' + (base - hs) + ' h12 v' + (hs - ha) + ' h-12"/><text class="svt" x="296" y="' + (base - (hs + ha) / 2 + 4) + '" style="font-weight:700">' + gap.toFixed(1) + '</text>';
+    o += '<text class="svm" x="170" y="214" text-anchor="middle">albumin, g/dL (example values)</text><text class="svm" x="296" y="' + (base - hs - 8) + '" text-anchor="middle">gap</text>';
+    return o + '</svg>';
+  }
+  var N = {}; f.nodes.forEach(function(n){ N[n[0]] = n; });
+  var hi = st.hi || [], off = st.off || [];
+  f.arrows.forEach(function(a){
+    if (a[2] != null && a[2] !== k) return;
+    var p = N[a[0]], q = N[a[1]], x1, y1, x2, y2, dx = (q[1] + q[3] / 2) - (p[1] + p[3] / 2), dy = (q[2] + q[4] / 2) - (p[2] + p[4] / 2);
+    if (Math.abs(dx) > Math.abs(dy)){ x1 = dx > 0 ? p[1] + p[3] : p[1]; x2 = dx > 0 ? q[1] : q[1] + q[3]; y1 = p[2] + p[4] / 2; y2 = q[2] + q[4] / 2; }
+    else { y1 = dy > 0 ? p[2] + p[4] : p[2]; y2 = dy > 0 ? q[2] : q[2] + q[4]; x1 = p[1] + p[3] / 2; x2 = q[1] + q[3] / 2; }
+    var L = Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1)) || 1, ux = (x2 - x1) / L, uy = (y2 - y1) / L, bx = x2 - ux * 7, by = y2 - uy * 7;
+    var c = off.indexOf(a[0]) >= 0 || off.indexOf(a[1]) >= 0 ? ' off' : (hi.indexOf(a[0]) >= 0 && hi.indexOf(a[1]) >= 0) || a[2] != null ? ' hi' : '';
+    o += '<g class="arr' + c + '"><line x1="' + x1 + '" y1="' + y1 + '" x2="' + bx.toFixed(1) + '" y2="' + by.toFixed(1) + '"/><polygon class="ah" stroke="none" points="' + x2 + ',' + y2 + ' ' + (bx - uy * 4).toFixed(1) + ',' + (by + ux * 4).toFixed(1) + ' ' + (bx + uy * 4).toFixed(1) + ',' + (by - ux * 4).toFixed(1) + '"/></g>';
+  });
+  f.nodes.forEach(function(n){
+    var c = hi.indexOf(n[0]) >= 0 ? ' hi' : off.indexOf(n[0]) >= 0 ? ' off' : '', cx = n[1] + n[3] / 2, cy = n[2] + n[4] / 2;
+    o += '<g class="node' + c + '"><rect x="' + n[1] + '" y="' + n[2] + '" width="' + n[3] + '" height="' + n[4] + '" rx="8"/><text x="' + cx + '" y="' + (cy + (n[6] ? -2 : 4)) + '" text-anchor="middle">' + esc(n[5]) + '</text>' + (n[6] ? '<text class="s" x="' + cx + '" y="' + (cy + 12) + '" text-anchor="middle">' + esc(n[6]) + '</text>' : '') + '</g>';
+  });
+  return o + '</svg>';
+}
+function figBlock(id, k, where){
+  var f = FIG[id];
+  return figSvg(id, k) + '<div class="states" role="group" aria-label="Diagram state">' + f.states.map(function(s, i){ return '<button class="sbtn" type="button" data-fig="' + id + '" data-k="' + i + '" data-where="' + where + '" aria-pressed="' + (i === k) + '">' + esc(s.n) + '</button>'; }).join('') + '</div><p class="cap">' + esc(f.states[k].cap) + '</p><p class="src">' + esc(f.src) + '</p>';
+}
+var lastFocus = null;
+function openFig(id, k){ lastFocus = document.activeElement; $('sheet-t').textContent = FIG[id].title; $('sheet-b').innerHTML = figBlock(id, k || 0, 'sheet'); $('scrim').hidden = false; $('sheet').hidden = false; $('sheet-x').focus(); }
+function closeFig(){ if ($('sheet').hidden) return; $('sheet').hidden = true; $('scrim').hidden = true; if (lastFocus && lastFocus.focus) lastFocus.focus(); }
+var ICON = '<svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><rect x="1.5" y="2.5" width="13" height="11" rx="2" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M4 10.5l2.5-3 2 2 1.5-1.5 2 2.5" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>';
+function chip(id, k, text){ return '<button class="chip" type="button" data-open="' + id + '" data-k="' + (k || 0) + '">' + ICON + esc(text) + '</button>'; }
+</script>
+<script id="ui">
+function num(id){ var e = $(id); if (!e || e.value === '') return NaN; return parseFloat(e.value); }
+function on(id){ var e = $(id); return !!(e && e.checked); }
+function sel(id){ var e = $(id); return e ? e.value : ''; }
+function fld(id, label, ph, hint){ return '<div class="field"><label for="' + id + '">' + label + '</label><input id="' + id + '" type="number" inputmode="decimal" step="any" min="0" placeholder="' + (ph || '') + '">' + (hint ? '<span class="hint">' + hint + '</span>' : '') + '</div>'; }
+function pick(id, label, opts){ return '<div class="field"><label for="' + id + '">' + label + '</label><select id="' + id + '">' + opts.map(function(o){ return '<option value="' + o[0] + '">' + o[1] + '</option>'; }).join('') + '</select></div>'; }
+function chk(id, label){ return '<label class="chk"><input type="checkbox" id="' + id + '">' + label + '</label>'; }
+function ul(a){ return '<ul>' + a.map(function(x){ return '<li>' + x + '</li>'; }).join('') + '</ul>'; }
+function card(o){
+  return '<div class="card"' + (o.id ? ' id="' + o.id + '"' : '') + '><p class="label">' + o.label + '</p>' + (o.head ? '<p class="head' + (o.cls ? ' ' + o.cls : '') + '">' + o.head + '</p>' : '') + (o.sub ? '<p class="sub">' + o.sub + '</p>' : '') + (o.body || '') + (o.list ? ul(o.list) : '') +
+    (o.guard || []).map(function(g){ return '<div class="guard">' + g + '</div>'; }).join('') +
+    (o.why ? '<p class="whyline"><b>Why:</b> ' + o.why + '</p>' : '') + (o.chips ? '<div class="chips">' + o.chips.join('') + '</div>' : '') +
+    (o.more ? '<details><summary>More</summary>' + o.more + (o.tier || []).map(function(t){ return '<span class="tier">' + t + '</span>'; }).join('') + '</details>' : '') + '</div>';
+}
+function empty(t){ return '<div class="card"><p class="empty">' + t + '</p></div>'; }
+var T21 = 'AASLD 2021 guidance statement (consensus, ungraded)', T24 = 'AASLD 2024 guidance statement (consensus, ungraded)';
+
+/* ---------- Scores ---------- */
+var WHY = {
+  sex: 'creatinine overestimates kidney function in women, so older scores underrated their risk. MELD 3.0 adds 1.33 points for female sex.',
+  alb: 'low albumin predicts death independently of the other labs, so MELD 3.0 counts it. Its weight shrinks as creatinine rises.',
+  na: 'low sodium marks the severity of portal hypertension: the more vasodilated the circulation, the more water the kidney keeps.',
+  cap: 'creatinine is capped at 3.0 mg/dL (and set to 3.0 on dialysis), so kidney failure cannot swamp the liver terms.',
+  base: 'MELD ranks short-term risk from labs alone, with no judgment calls. Child-Pugh adds ascites and encephalopathy but depends on the examiner.'
+};
+function scoreLabs(){ return { bili: num('s-bili'), inr: num('s-inr'), cr: num('s-cr'), na: num('s-na'), alb: num('s-alb'), female: sel('s-sex') === 'f', dialysis: on('s-hd'), asc: sel('s-asc') === '' ? null : +sel('s-asc'), he: sel('s-he') === '' ? null : +sel('s-he') }; }
+function scoreWhy(l, m){ return m.capped ? WHY.cap : l.female ? WHY.sex : l.alb < 3.5 ? WHY.alb : l.na < 137 ? WHY.na : WHY.base; }
+function renderScores(){
+  var l = scoreLabs(), m = E.meld(l), cp = E.childPugh(l), h = '';
+  if (!m){ $('scores-out').innerHTML = empty('Enter bilirubin, INR and creatinine to start. Add sodium and albumin for MELD 3.0.'); return; }
+  var main = m.meld3 != null ? m.meld3 : m.meldna != null ? m.meldna : m.meld, name = m.meld3 != null ? 'MELD 3.0' : m.meldna != null ? 'MELD-Na' : 'MELD';
+  h += card({ label: name, body: '<p class="big">' + main + '</p><div class="trio"><div><span>MELD 3.0</span><b>' + (m.meld3 != null ? m.meld3 : '–') + '</b></div><div><span>MELD-Na</span><b>' + (m.meldna != null ? m.meldna : '–') + '</b></div><div><span>MELD</span><b>' + m.meld + '</b></div></div>',
+    sub: m.meld3 == null ? 'Add ' + (m.meldna == null ? 'sodium and albumin' : 'albumin') + ' for MELD 3.0.' : '',
+    guard: m.capped ? ['Creatinine is capped: 3.0 mg/dL for MELD 3.0 and 4.0 mg/dL for MELD and MELD-Na. Two or more dialysis sessions, or 24 hours of continuous dialysis, in the past 7 days count as the cap.'] : [],
+    why: scoreWhy(l, m),
+    more: '<p>MELD 3.0 has ranked adult US transplant candidates since July 2023. Scores run from 6 to 40. Values below 1.0 are set to 1.0; sodium is bounded at 125 to 137 mEq/L and albumin at 1.5 to 3.5 g/dL.</p><p>What it predicts: death within about 90 days without a transplant. On the 1999 to 2001 US wait list, 3-month mortality was 1.9% at a MELD of 9 or less and 71.3% at 40 or more (original MELD). In the MELD 3.0 cohort a score of 20 carried about 5% 90-day mortality.</p><p>MELD 3.0 discriminated slightly better than MELD-Na (c-statistic 0.869 against 0.862) and moved more women up the list.</p>',
+    tier: ['Kim 2021', 'OPTN Policy 9.1', 'Wiesner 2003'] });
+  if (cp) h += card({ label: 'Child-Pugh', head: 'Class ' + cp.cls + ' · ' + cp.score + ' points', sub: 'A 5 to 6 · B 7 to 9 · C 10 to 15. The variceal bleed tab uses this score.',
+    more: '<div class="tw"><table><tr><th>Points</th><th>1</th><th>2</th><th>3</th></tr><tr><td>Bilirubin, mg/dL</td><td>&lt;2</td><td>2 to 3</td><td>&gt;3</td></tr><tr><td>Albumin, g/dL</td><td>&gt;3.5</td><td>2.8 to 3.5</td><td>&lt;2.8</td></tr><tr><td>INR</td><td>&lt;1.7</td><td>1.7 to 2.3</td><td>&gt;2.3</td></tr><tr><td>Ascites</td><td>None</td><td>Slight</td><td>Moderate</td></tr><tr><td>Encephalopathy</td><td>None</td><td>Grade 1 to 2</td><td>Grade 3 to 4</td></tr></table></div><p>The original 1973 score used seconds of prothrombin-time prolongation; the INR bands are a later convention and some tables print 2.2.</p>',
+    tier: ['teaching convention'] });
+  else h += empty('Add albumin, ascites and encephalopathy for Child-Pugh.');
+  $('scores-out').innerHTML = h;
+}
+function cpScore(){ var c = E.childPugh(scoreLabs()); return c ? c.score : NaN; }
+
+/* ---------- Ascites and SBP ---------- */
+function albLine(g){ return '<b class="nums">' + g + ' g</b> (' + (g * 4) + ' mL of 25%)'; }
+function renderFluid(){
+  var f = { salb: num('f-salb'), aalb: num('f-aalb'), prot: num('f-prot'), pmn: num('f-pmn'), culture: sel('f-cx'), gluLow: on('f-glu'), ldhHigh: on('f-ldh'), poly: on('f-poly'), focal: on('f-focal') };
+  var kg = num('f-kg'), l = { cr: num('f-cr'), bun: num('f-bun'), bili: num('f-bili'), na: num('f-na'), prot: f.prot, cp: cpScore() }, r = E.fluid(f), h = '';
+  if (r.saag == null && isNaN(f.pmn)){ $('fluid-out').innerHTML = empty('Enter the fluid results. The cell count alone is enough to rule SBP in or out.'); setWork(null, null); return; }
+  if (!isNaN(f.pmn)){
+    if (r.sbp){
+      var a = E.sbpAlbumin(kg), mdr = on('f-mdr');
+      h += card({ label: 'Infection', head: 'SBP: treat now', cls: 'bad', sub: 'PMN ' + f.pmn + '/mm³ (above 250). Do not wait for the culture.',
+        list: [mdr ? 'Hospital-acquired or resistant-organism risk: <b>piperacillin-tazobactam</b>. Add vancomycin if prior MRSA infection or a positive swab (daptomycin if known VRE). Meropenem instead if recent piperacillin-tazobactam or known resistant gram-negatives.' : 'Community-acquired: <b>IV third-generation cephalosporin</b> (cefotaxime 2 g every 12 hours is the dose the guidance prints; ceftriaxone is the usual alternative).',
+          'Duration 5 to 7 days. Narrow when the culture returns.',
+          a ? 'Albumin day 1 (1.5 g/kg): ' + albLine(a.d1) + '. Day 3 (1 g/kg): ' + albLine(a.d3) + '.' : 'Albumin 1.5 g/kg on day 1 and 1 g/kg on day 3. Enter weight for the dose.',
+          'Repeat the tap at 48 hours: a PMN fall of less than 25% means the antibiotic is failing.'],
+        guard: ['Hold beta-blockers if mean arterial pressure is below 65 mmHg or AKI develops. Stop diuretics if AKI develops.'].concat(a && a.d1 > 100 ? ['Day 1 dose is above 100 g. The guidance sets no ceiling, but many hospitals cap a single albumin dose: adjust to your institution.'] : []),
+        why: 'infection deepens splanchnic vasodilation and the kidney fails. Albumin with the antibiotic cut kidney injury from 33% to 10% and in-hospital death from 29% to 10%' + (E.sbpHighRisk(l) ? '; the benefit is clearest in patients like this one, with kidney injury or jaundice at diagnosis.' : '.'),
+        chips: [chip('hrs', 1, 'Why the kidney fails')],
+        more: '<p>Albumin helps most when creatinine is above 1.0 mg/dL, BUN above 30 mg/dL or bilirubin above 5 mg/dL at diagnosis.</p><p>If a susceptible organism is isolated and the patient is clearly improving, the 48-hour tap can be skipped. No response: broaden antibiotics and image for a secondary cause.</p><p>After this episode, long-term prophylaxis is indicated (see below).</p>',
+        tier: [T21, 'Sort 1999 (randomised trial)'] });
+      if (r.secondary) h += card({ label: 'Is it really spontaneous?', head: 'Think secondary peritonitis', list: ['Present: ' + r.flags.join('; ') + '.', 'Spontaneous infection is nearly always one organism in low-protein fluid. Image the abdomen and call surgery; antibiotics alone will not fix a perforation or abscess.'],
+        more: '<p>The classic fluid pattern of a perforated viscus is total protein above 1 g/dL, glucose below 50 mg/dL and LDH above the serum upper limit. The guidance asks for glucose and LDH only when a secondary cause is suspected.</p>', tier: ['Akriviadis and Runyon 1990 (case series)', T21] });
+    } else if (r.bacterascites){
+      h += card({ label: 'Infection', head: 'Bacterascites: no antibiotics yet', sub: 'PMN ' + f.pmn + '/mm³ (250 or below) with a positive culture.', list: ['Most cases clear on their own or are contaminants.', 'Repeat the tap. Treat if the PMN count is now above 250 or the patient has signs of infection.'], more: '<p>Culture positive, cell count negative: the fluid has been colonised but there is no inflammatory response.</p>', tier: [T21] });
+    } else {
+      h += card({ label: 'Infection', head: 'No SBP', cls: 'okc', sub: 'PMN ' + f.pmn + '/mm³ (250 or below)' + (f.culture === '' ? '. Follow the culture.' : '.'), more: '<p>Tap again if the patient deteriorates: fever, pain, encephalopathy, kidney injury or a GI bleed.</p>', tier: [T21] });
+    }
+  }
+  if (r.saag != null){
+    h += card({ label: 'Gradient', head: 'SAAG ' + r.saag.toFixed(1) + ' g/dL: ' + (r.portal ? 'portal hypertension' : 'not portal hypertension'),
+      sub: r.portal ? (r.cardiac ? 'Fluid protein above 2.5 g/dL points to a cardiac cause rather than cirrhosis.' : !isNaN(f.prot) ? 'Fluid protein ' + f.prot + ' g/dL: fits cirrhosis.' : 'Add total protein to separate cirrhosis from a cardiac cause.') : 'Look for peritoneal carcinomatosis or tuberculosis: send cytology and image the abdomen.',
+      why: r.portal ? 'high sinusoidal pressure pushes water across but leaves albumin in the blood, so the gap between serum and fluid albumin is wide (1.1 g/dL or more).' : 'a gradient under 1.1 g/dL means protein is leaking across the peritoneum itself, which pressure alone does not do.',
+      chips: [chip('saag', r.portal ? (r.cardiac ? 2 : 0) : 1, 'The albumin gradient')],
+      more: '<p>Gradient = serum albumin minus fluid albumin, drawn the same day. 1.1 g/dL or more reflects portal hypertension: cirrhosis, right heart failure, massive liver metastases. Under 1.1 excludes it.</p>', tier: [T21] });
+  }
+  var prior = on('f-prior'), pp = E.primaryPpx(l);
+  if (prior || r.sbp || r.lowProt) h += card({ label: 'Prevention', head: prior || r.sbp ? 'Long-term prophylaxis after SBP' : pp ? 'Primary prophylaxis can be considered' : 'Low-protein fluid: higher SBP risk',
+    list: prior || r.sbp ? ['Ciprofloxacin 500 mg daily. Norfloxacin, the studied drug, is not sold in the US; direct evidence for ciprofloxacin is limited.'] :
+      pp ? ['Fluid protein below 1.5 g/dL plus kidney dysfunction (creatinine above 1.2, BUN above 25, sodium below 130) or liver failure (Child-Pugh above 9 with bilirubin above 3).', 'The guidance says evidence is not strong: weigh against resistance and C. difficile.'] :
+      ['Protein below 1.5 g/dL predisposes to SBP. Prophylaxis is considered only with kidney dysfunction or liver failure as well; enter creatinine, BUN, sodium and bilirubin to check.'],
+    more: '<p>Any GI bleed in cirrhosis: ceftriaxone 1 g daily (see the variceal bleed tab), after ruling out SBP.</p>', tier: [T21] });
+  $('fluid-out').innerHTML = h;
+  setWork(r.saag == null ? null : r.portal, isNaN(f.prot) ? null : f.prot > 2.5);
+}
+var CAUSES = [['Cirrhosis', 'p', 'l'], ['Right heart failure', 'p', 'h'], ['Massive liver metastases', 'p', ''], ['Peritoneal carcinomatosis', 'n', ''], ['Tuberculous peritonitis', 'n', '']];
+var WK = { saag: null, prot: null };
+function setWork(saag, prot){ WK.saag = saag; WK.prot = prot; drawWork(); }
+function drawWork(){
+  function b(k, v, t){ return '<button class="sbtn" type="button" data-wk="' + k + '" data-v="' + v + '" aria-pressed="' + (WK[k] === v) + '">' + t + '</button>'; }
+  var h = '<p class="label">Workup that narrows</p><p class="send"><b>Send first:</b> cell count with differential, albumin (fluid and serum), total protein, culture in blood-culture bottles at the bedside (at least 10 mL, before antibiotics).</p><p class="send"><b>Only if the picture calls for it:</b> glucose and LDH (suspected secondary peritonitis), cytology (gradient under 1.1), amylase (pancreatic disease).</p><p class="note">Tap a result to see what it leaves.</p><div class="states">' + b('saag', true, 'SAAG ≥1.1') + b('saag', false, 'SAAG <1.1') + b('prot', true, 'Protein >2.5') + b('prot', false, 'Protein ≤2.5') + '</div>';
+  CAUSES.forEach(function(c){
+    var out = '', why = '';
+    if (WK.saag === true && c[1] === 'n'){ out = 'out'; why = 'wide gradient reflects portal hypertension'; }
+    if (WK.saag === false && c[1] === 'p'){ out = 'out'; why = 'gradient under 1.1 excludes portal hypertension'; }
+    if (!out && WK.prot === true && c[2] === 'l'){ out = 'less'; why = 'cirrhotic fluid is usually low in protein'; }
+    if (!out && WK.prot === false && c[2] === 'h'){ out = 'less'; why = 'cardiac ascites is usually above 2.5 g/dL'; }
+    if (!out && WK.prot === true && c[2] === 'h' && WK.saag !== false){ out = 'fav'; why = 'high gradient with high protein'; }
+    h += '<div class="cause ' + out + '"><span>' + c[0] + '</span><small>' + why + '</small></div>';
+  });
+  $('workup').innerHTML = h + '<p class="src">AASLD 2021 Tables 3 and 4. Mixed causes occur: a patient with cirrhosis can also have peritoneal disease.</p>';
+}
+function renderDiur(){
+  $('diur-out').innerHTML =
+    card({ label: 'Start and titrate', head: 'Spironolactone 100 mg ± furosemide 40 mg daily', list: ['Sodium 2 g (90 mmol) a day. No fluid restriction unless sodium is 125 or below.', 'Raise spironolactone in steps at least 72 hours apart, to 400 mg/day; furosemide towards 160 mg/day.', 'Weight loss 0.5 kg a day; up to 1 kg a day if there is leg oedema.', 'Once the ascites is controlled, cut to the lowest dose that holds it.'],
+      why: 'the kidney keeps sodium because aldosterone is high, so the aldosterone blocker does the main work. Fluid leaves the abdomen at only about 500 mL a day; faster loss comes out of the plasma.', chips: [chip('hrs', 0, 'Why sodium is retained')],
+      more: '<p>Painful gynaecomastia: switch to amiloride or eplerenone. Cramps: baclofen 10 to 30 mg a day or albumin 20 to 40 g a week.</p>', tier: [T21] }) +
+    card({ label: 'When to stop diuretics', head: 'AKI · sodium 125 or below · encephalopathy', list: ['Stop at the diagnosis of AKI.', 'Sodium 120 to 125: stop diuretics and restrict water to 1 L a day.', 'Worsening encephalopathy without another cause.', 'Potassium below 3 or above 6 counts as a diuretic complication.'],
+      guard: ['Avoid NSAIDs, ACE inhibitors, ARBs and aminoglycosides in anyone with ascites: each can tip the kidney over.'],
+      more: '<p>These complications, when they prevent an effective dose, define diuretic-intractable ascites.</p>', tier: [T21] }) +
+    card({ label: 'Low sodium', head: 'Treat by band, correct slowly', list: ['126 to 135: monitor; no specific treatment.', '120 to 125: water 1 L a day and stop diuretics.', 'Below 120: stricter water restriction plus albumin.', 'If correcting: 4 to 6 mEq/L per 24 hours, never more than 8.'],
+      why: 'the sodium is diluted, not lost: ADH is switched on by low effective arterial volume, so the fix is less water and better filling, not salt.',
+      more: '<p>Hypertonic saline is reserved for symptomatic or severe hyponatraemia or imminent transplant. Vaptans: short term only (30 days or less), with caution.</p>', tier: [T21] }) +
+    card({ label: 'Refractory ascites', head: 'Serial large taps; think TIPS and transplant', list: ['Defined as no response to spironolactone 400 mg plus furosemide 160 mg for a week with sodium restriction, early recurrence within 4 weeks, or diuretic complications.', 'Large-volume paracentesis is first line.', 'TIPS in selected patients; a MELD of 18 or more makes a poor candidate.', 'Refer for transplant evaluation.'],
+      guard: ['Beta-blockers are not banned, but use caution with systolic pressure below 90 mmHg, sodium below 130 or AKI.'],
+      more: '<p>Midodrine is not recommended for refractory ascites. Long-term albumin infusions outside paracentesis: no recommendation; the two large trials disagree (see Learn).</p>', tier: [T21] });
+}
+function renderLvp(){
+  var L = num('l-vol'), risk = on('l-bp') || on('l-na') || on('l-aki'), r = E.lvp(L, risk);
+  if (!r){ $('lvp-out').innerHTML = empty('Enter the volume removed, or the volume you plan to remove.'); return; }
+  $('lvp-out').innerHTML = card({ label: 'Albumin with the tap', head: r.give === 'yes' ? 'Give ' + r.lo + ' to ' + r.hi + ' g of albumin' : r.give === 'consider' ? 'Strongly consider albumin: ' + r.lo + ' to ' + r.hi + ' g' : 'Albumin may not be needed',
+    sub: r.give === 'yes' ? '6 to 8 g per litre removed (' + (r.lo * 4) + ' to ' + (r.hi * 4) + ' mL of 25%), given at the time of the tap.' : r.give === 'consider' ? '5 L or less, but low blood pressure, low sodium or AKI raise the risk.' : '5 L or less with none of the risk factors.',
+    guard: (r.over8 ? ['More than 8 L in one session raises the risk of circulatory dysfunction even with albumin.'] : []),
+    list: ['Do not give plasma or platelets before a paracentesis: a raised INR or low platelet count is not a contraindication.'],
+    why: r.give === 'no' ? '' : 'taking off a large volume drops effective arterial filling within hours; renin rises, and kidney injury and hyponatraemia follow. Albumin holds the volume in.',
+    chips: [chip('hrs', 2, 'What a big tap does')],
+    more: '<p>The 6 to 8 g per litre dose is expert opinion. The guidance defines a large-volume tap as more than 5 L.</p>', tier: [T21, 'dose: expert opinion'] });
+}
+
+/* ---------- Variceal bleed ---------- */
+function renderBleed(){
+  var cp = num('b-cp'); if (isNaN(cp)) cp = cpScore();
+  var active = on('b-active'), unc = on('b-unc'), gv = on('b-gv'), asc = on('b-asc'), t = E.tips(cp, active), h = '';
+  h += card({ label: 'First hour', head: 'Octreotide, ceftriaxone, restrictive transfusion, scope within 12 h',
+    list: ['<b>Octreotide</b> 50 mcg IV bolus, then 25 to 50 mcg/hour. Start before endoscopy; continue 2 to 5 days.', '<b>Ceftriaxone</b> 1 g IV daily, up to 5 days. Stop once bleeding is controlled and there is no infection.', '<b>Transfuse</b> to a haemoglobin of about 7 g/dL, higher only for comorbidity such as coronary disease or for instability.', '<b>Endoscopy</b> within 12 hours of presentation; band ligation if oesophageal varices are the source.', 'Erythromycin 125 to 250 mg IV, 30 to 120 minutes before the scope, clears the stomach.'],
+    guard: ['Do not give plasma or platelets to reach an INR or platelet target: no benefit, and plasma may cause harm.', 'Protect the airway before endoscopy if the patient is confused or actively vomiting blood. No routine nasogastric tube.'],
+    why: 'extra volume goes straight into the portal bed and raises the pressure behind the varix. In the trial of a 7 against a 9 g/dL threshold, the restrictive group had better 6-week survival (95% against 91%) and less rebleeding.',
+    chips: [chip('portal', 2, 'What transfusion does to portal pressure')],
+    more: '<p>Stop the PPI once a variceal source is confirmed, unless there is another indication. Image the liver (Doppler ultrasound, CT or MRI) for portal vein thrombosis and cancer once stable. Start feeding when bleeding is controlled.</p><p>Baveno VII adds: no tranexamic acid, and lactulose (oral or enema) to clear blood and prevent encephalopathy.</p><p>Terlipressin is used for this elsewhere but is not approved for it in the US.</p>',
+    tier: [T24, 'Villanueva 2013 (randomised trial)', 'Baveno VII consensus'] });
+  if (t) h += card({ label: 'Pre-emptive TIPS', head: t === 'yes' ? 'Meets criteria: call for TIPS within 72 hours' : t === 'outside' ? 'Child-Pugh ' + cp + ': outside the criteria' : 'Does not meet criteria', cls: t === 'yes' ? 'bad' : '',
+    sub: t === 'yes' ? 'Child-Pugh ' + cp + (cp >= 10 ? ' (class C, 10 to 13).' : ' (class B above 7) with active bleeding at endoscopy.') + ' Ideally within 24 hours of the first endoscopy. Transfer if TIPS is not available.' : t === 'outside' ? 'The trials enrolled Child-Pugh C up to 13. Decide case by case with hepatology; assess transplant candidacy.' : 'Criteria: Child-Pugh C 10 to 13, or Child-Pugh B above 7 with active bleeding at endoscopy.' + (cp === 8 || cp === 9 ? ' Tick active bleeding if it was seen.' : ''),
+    why: t === 'yes' ? 'these patients rebleed or fail treatment often enough that lowering portal pressure early, before the next bleed, improves survival: 86% against 61% at one year in the first trial.' : '',
+    chips: [chip('portal', 4, 'What TIPS does')],
+    more: '<p>The trials excluded older and pregnant patients, liver cancer beyond early stage, severe kidney disease, complete portal vein thrombosis, heart failure, bleeding from non-oesophageal varices and patients already on secondary prophylaxis. Mortality stays high at a MELD above 19, but early TIPS still did better than standard care.</p><p>Measuring the pressure gradient during a bleed is not recommended.</p><p>After pre-emptive TIPS no beta-blocker or banding programme is needed.</p>', tier: [T24, 'García-Pagán 2010 (randomised trial)'] });
+  else h += empty('Enter a Child-Pugh score (or fill in the Scores tab) to check pre-emptive TIPS criteria.');
+  if (unc) h += card({ label: 'Bleeding not controlled', head: 'Intubate, tamponade, salvage TIPS', cls: 'bad', list: ['Secure the airway first.', 'Balloon tamponade: 24 hours at most. A covered oesophageal stent can stay up to a week (not FDA approved).', 'Either is a bridge: arrange salvage TIPS before it comes out.', 'Rebleed within 5 days after initial control: repeat endoscopy or rescue TIPS.'], tier: [T24], more: '<p>Assess transplant candidacy now.</p>' });
+  if (gv) h += card({ label: 'Gastric fundal varices', head: 'GOV2 or IGV1: different playbook', list: ['Same first hour. Then cross-sectional imaging to map the shunts.', 'First-line options: cyanoacrylate injection, TIPS, or retrograde obliteration (preferred when TIPS is contraindicated).', 'Refer to a centre that does these if yours does not. A gastric balloon (Linton-Nachlas or Minnesota) can bridge.'], more: '<p>Cyanoacrylate is not FDA approved for this use. After glue, add a beta-blocker and repeat endoscopy every 2 to 4 weeks until obliteration.</p>', tier: [T24] });
+  h += card({ label: 'Before discharge', head: 'Beta-blocker plus banding', sub: 'For everyone who did not get TIPS.',
+    list: ['Start the beta-blocker when the octreotide stops, once eating, no later than day 5.', 'Repeat banding every 2 to 4 weeks until the varices are gone.'],
+    body: '<div class="tw"><table><tr><th>Drug</th><th>Start</th><th>Increase</th><th>Max' + (asc ? ' (ascites)' : '') + '</th></tr>' + E.NSBB.map(function(n){ return '<tr><td>' + n.d + '</td><td>' + n.start + '</td><td>' + n.up + '; ' + n.goal + '</td><td class="mono">' + (asc ? n.maxA : n.max) + '</td></tr>'; }).join('') + '</table></div>',
+    guard: ['Keep systolic pressure at 90 mmHg or above. Reduce or stop if it stays below 90.'],
+    why: 'rebleeding runs up to 60% in a year without prophylaxis. Beta-blockers lower portal inflow; bands remove the varix; together they beat either alone.',
+    chips: [chip('portal', 3, 'How beta-blockers lower pressure')],
+    more: '<p>Carvedilol is the preferred beta-blocker; a lower starting dose may suit Child-Pugh B or C. Contraindications: asthma, advanced heart block, bradyarrhythmia.</p><p>If a beta-blocker has to be stopped, the patient needs endoscopic surveillance and banding instead.</p>', tier: [T24] });
+  $('bleed-out').innerHTML = h;
+}
+
+/* ---------- HRS-AKI ---------- */
+var HRSC = ['Cirrhosis with ascites', 'No improvement after 2 days off diuretics with albumin 1 g/kg/day', 'No shock', 'No recent nephrotoxins (NSAIDs, aminoglycosides, contrast)', 'No proteinuria above 500 mg/day and no haematuria above 50 cells per field', 'Normal kidney ultrasound'];
+function renderAki(){
+  var base = num('a-base'), cur = num('a-cur'), kg = num('a-kg'), r = E.aki(base, cur, on('a-rrt')), h = '';
+  if (!r){ $('aki-out').innerHTML = empty('Enter baseline and current creatinine. Baseline is the most recent stable value in the past 3 months.'); return; }
+  var met = HRSC.every(function(_, i){ return on('a-c' + i); }), g = E.albChallenge(kg);
+  if (r.stage === 0) h += card({ label: 'Stage', head: 'Does not meet AKI criteria', cls: 'okc', sub: 'AKI needs a rise of 0.3 mg/dL within 48 hours or 50% within 7 days.', more: '<p>A creatinine in the normal range can still hide a low GFR in cirrhosis: muscle mass is low. Watch the trend.</p>', tier: [T21] });
+  else {
+    h += card({ label: 'Stage', head: 'AKI stage ' + r.stage, cls: r.stage >= 2 ? 'bad' : '', sub: r.ratio ? cur + ' from ' + base + ' mg/dL: ' + r.ratio.toFixed(1) + ' times baseline.' + (r.stage === 1 && cur >= 1.5 ? ' Stage 1 with creatinine 1.5 or above does worse than stage 1 below it.' : '') : 'On renal replacement therapy.',
+      list: ['Stop diuretics. Stop NSAIDs and other nephrotoxins. Consider holding the beta-blocker, especially if hypotensive.', 'Look for infection: diagnostic paracentesis, cultures, chest film, urine.', 'Replace real volume losses (bleeding, diarrhoea from lactulose, over-diuresis).', (r.stage >= 2 ? '<b>Albumin 1 g/kg/day for 2 days</b>' : 'If no better in 1 to 2 days, or it progresses: <b>albumin 1 g/kg/day for 2 days</b>') + (g ? ': ' + albLine(g) + ' a day.' : '. Enter weight for the dose.')],
+      guard: ['Watch for pulmonary oedema on albumin. Avoid a bladder catheter unless it is needed.'].concat(g && g > 100 ? ['Above 100 g a day: European guidance caps the daily dose at 100 g. Adjust to your institution.'] : []),
+      why: 'the first question is whether the kidney simply needs filling. Volume depletion is the commonest cause of AKI in cirrhosis, and a failed albumin challenge is what defines hepatorenal syndrome.',
+      chips: [chip('hrs', 3, 'Why albumin is the test')],
+      more: '<p>Stages: 1 is a rise of 0.3 mg/dL or more, up to 2 times baseline; 2 is above 2 and up to 3 times; 3 is above 3 times, or creatinine above 4 mg/dL with an acute rise of 0.3 or more, or dialysis.</p><p>The 2024 ADQI and International Club of Ascites consensus adds a urine-output criterion (0.5 mL/kg/hour or less for 6 hours) and matches fluid to cause: blood for bleeding, crystalloid for depletion, albumin for SBP or suspected hepatorenal syndrome.</p>', tier: [T21, 'ADQI/ICA 2024 consensus'] });
+    h += card({ label: 'Is it hepatorenal syndrome?', head: met ? 'Meets HRS-AKI criteria: start a vasoconstrictor with albumin' : 'Tick each criterion as it is confirmed', cls: met ? 'bad' : '',
+      sub: met ? 'Go to Vasoconstrictors. Call hepatology and assess transplant candidacy now.' : 'All six are needed. Until then keep treating the causes above.',
+      why: met ? 'nothing is structurally wrong with the kidney; it is being starved by its own vasoconstriction. Tightening the splanchnic circulation gives the pressure back.' : '',
+      chips: [chip('hrs', 4, 'What vasoconstrictors fix')],
+      more: '<p>The 2024 consensus shortens the wait: no improvement within 24 hours of adequate volume resuscitation, given only when clinically indicated, and "no strong evidence for another cause" in place of the urine and ultrasound exclusions; chronic kidney disease or proteinuria no longer rules it out. This revision is debated. A fractional sodium excretion under 1% is common in cirrhosis without AKI and does not make the diagnosis.</p><p>The main alternative is acute tubular necrosis, and telling the two apart is hard.</p>', tier: [T21 + ', Table 11', 'ADQI/ICA 2024 consensus'] });
+  }
+  $('aki-out').innerHTML = h;
+}
+function renderTerli(){
+  var s = num('t-start'), d4 = num('t-d4'), meld = num('t-meld'), kg = num('t-kg');
+  if (isNaN(meld)){ var m = E.meld(scoreLabs()); if (m) meld = m.meld3 != null ? m.meld3 : m.meldna != null ? m.meldna : m.meld; }
+  var g = E.terliGuards({ hypoxia: on('t-hyp'), ischemia: on('t-isc'), aclf3: on('t-aclf'), overload: on('t-vol'), cr: s, meld: meld }), r = E.terliDay4(s, d4), h = '';
+  h += card({ label: 'Terlipressin', head: g.no.length ? 'Do not start terlipressin now' : '0.85 mg IV every 6 hours, days 1 to 3', cls: g.no.length ? 'bad' : '',
+    list: g.no.length ? g.no.concat(['Use norepinephrine instead, in the ICU.']) : ['Check oxygen saturation before the first dose and monitor with pulse oximetry during treatment.', 'Albumin alongside: 1 g/kg on day 1' + (isNaN(kg) ? '' : ' (' + Math.round(kg) + ' g)') + ', then 40 to 50 g a day (the 2024 consensus says 20 to 40 g a day, adjusted to volume status).', 'Day 4: reassess against the pre-treatment creatinine (below).', 'Stop 24 hours after two creatinine values of 1.5 mg/dL or less at least 2 hours apart, or at 14 days.'],
+    guard: (g.no.length ? [] : ['Boxed warning: serious or fatal respiratory failure. Do not start if SpO2 is below 90%. If hypoxia or new respiratory symptoms develop, stop.']).concat(g.care),
+    why: 'terlipressin constricts the dilated splanchnic bed, so arterial pressure rises and the kidney lets go. The same vasoconstriction, plus albumin, is what floods the lungs.',
+    chips: [chip('hrs', 4, 'What vasoconstrictors fix')],
+    more: '<p>In the US trial, hepatorenal syndrome reversed in 32% on terlipressin against 17% on placebo; death from respiratory disorders by day 90 was 11% against 2%. Survival was not better.</p><p>Contraindicated with ongoing coronary, peripheral or mesenteric ischaemia. Continuous infusion (2 mg a day, raised to a maximum of 12 mg a day) is used elsewhere to reduce ischaemic effects but is not in the US label.</p>', tier: ['FDA label 06/2026', 'CONFIRM 2021 (randomised trial)', T21] });
+  if (r) h += card({ label: 'Day 4', head: r.act === 'continue' ? 'Fell ' + r.fall.toFixed(0) + '%: continue 0.85 mg every 6 hours' : r.act === 'increase' ? 'Fell ' + r.fall.toFixed(0) + '%: may increase to 1.7 mg every 6 hours' : 'At or above the starting value: stop terlipressin', cls: r.act === 'stop' ? 'bad' : '',
+    sub: 'Creatinine ' + d4 + ' against ' + s + ' mg/dL before the first dose. The rule: a fall of 30% or more continues; less than 30% may double; none stops.',
+    more: '<p>Maximum 14 days. Recurrence after stopping can be treated again.</p>', tier: ['FDA label 06/2026'] });
+  h += card({ label: 'If terlipressin cannot be used', head: 'Norepinephrine in the ICU', list: ['Start 0.5 mg/hour. Aim for a rise in mean arterial pressure of at least 10 mmHg or urine output above 200 mL per 4 hours.', 'If neither is reached, add 0.5 mg/hour every 4 hours, to a maximum of 3 mg/hour.', 'Give albumin with it.', 'If neither drug can be given: midodrine 5 to 15 mg every 8 hours with octreotide 100 to 200 mcg every 8 hours (or 50 mcg/hour IV). Efficacy is low.'],
+    more: '<p>Norepinephrine appears as effective as terlipressin, with fewer data. Response to either: creatinine below 1.5 mg/dL or within 0.3 of baseline, over at most 14 days. If creatinine is still at or above the starting value after 4 days at the maximum tolerated dose, stop.</p><p>Dialysis is a bridge for transplant candidates; for others, set a clear endpoint first. TIPS is not recommended for HRS-AKI.</p>', tier: [T21] });
+  $('terli-out').innerHTML = h;
+}
+
+/* ---------- Encephalopathy ---------- */
+var WH = [['Minimal', 'Abnormal only on testing. No clinical signs.'], ['Grade 1', 'Trivial lack of awareness, short attention, altered sleep. Oriented.'], ['Grade 2', 'Lethargy, disoriented for time, personality change, asterixis.'], ['Grade 3', 'Somnolent to semi-stuporous, responds to stimuli, confused, disoriented for place.'], ['Grade 4', 'Coma.']];
+function renderHe(){
+  var gs = sel('h-grade'), ep = +sel('h-ep') || 1, h = '';
+  if (gs === ''){ $('he-out').innerHTML = empty('Pick the grade that fits the patient now.'); return; }
+  var gr = +gs, r = E.he(gr, ep);
+  h += card({ label: 'West Haven', head: WH[gr][0] + ': ' + (r.overt ? 'overt' : 'covert') + ' encephalopathy', sub: WH[gr][1], guard: r.airway ? ['Cannot protect the airway: ICU, and intubate if needed. Give lactulose by tube or as an enema.'] : [],
+    more: '<p>Covert covers minimal and grade 1; overt starts at grade 2, where disorientation or asterixis appears. A normal ammonia should make you look for another diagnosis; a high one does not grade the episode or guide treatment.</p>', tier: ['AASLD/EASL 2014'] });
+  h += card({ label: 'Find the trigger', head: 'Treat the precipitant first', list: ['Infection: tap the ascites, culture blood and urine, chest film.', 'GI bleed.', 'Too much diuretic, dehydration, low potassium or sodium.', 'Constipation or missed lactulose.', 'Sedatives, opioids and other centrally acting drugs.', 'No trigger found: look for a large shunt, including a TIPS.'],
+    why: 'most episodes have a cause that pushes more ammonia past the liver. Fixing it shortens the episode more than any drug.', chips: [chip('nh3', 2, 'Ammonia: gut to brain')],
+    more: '<p>Four things run in parallel: care for the altered consciousness, look for other causes of confusion, find the precipitant, and start empirical treatment.</p>', tier: ['AASLD/EASL 2014, grade II-2, A, 1'] });
+  if (r.overt) h += card({ label: 'Treat', head: 'Lactulose 25 mL every 1 to 2 hours' + (r.rifaximin ? ', and add rifaximin' : ''),
+    list: ['Until at least two soft stools, then titrate to 2 to 3 soft stools a day.'].concat(r.rifaximin ? ['<b>Rifaximin 550 mg twice daily</b> on top of lactulose, to prevent the next episode.'] : ['First episode: continue lactulose afterwards to prevent recurrence.']),
+    guard: ['More is not better: overuse causes dehydration, high sodium, aspiration and can itself bring on encephalopathy.'],
+    why: r.rifaximin ? 'on top of lactulose, rifaximin roughly halved breakthrough episodes over 6 months (22% against 46%) and cut admissions.' : 'lactulose acidifies the colon so ammonia is trapped as ammonium, and it shortens transit so less is absorbed.',
+    chips: [chip('nh3', r.rifaximin ? 4 : 3, r.rifaximin ? 'What rifaximin does' : 'What lactulose does')],
+    more: '<p>Do not restrict protein: 1.2 to 1.5 g/kg a day and 35 to 40 kcal/kg a day (ideal body weight), in small meals with a late-evening snack.</p><p>Polyethylene glycol 4 L cleared an episode faster than lactulose in one small single-centre trial; the 2014 guideline asked for confirmation.</p><p>Prophylaxis can stop if the precipitant is controlled and liver function or nutrition has recovered.</p>', tier: ['AASLD/EASL 2014 guideline', 'Bass 2010 (randomised trial)'] });
+  else h += card({ label: 'Treat', head: 'No routine drug treatment for covert encephalopathy', sub: 'Treat case by case when it affects work, driving or quality of life. Review sedating drugs and nutrition.', more: '<p>Covert encephalopathy predicts overt episodes. Counsel about driving.</p>', tier: ['AASLD/EASL 2014'] });
+  $('he-out').innerHTML = h;
+}
+
+/* ---------- Learn ---------- */
+var CHAPS = [
+  ['One pressure, four problems', 'Scar and extra inflow raise the pressure in the portal vein. Everything else on this page follows from that.', 'portal', 1, 'Variceal bleed', 'bleed'],
+  ['Read the fluid', 'Two numbers sort the cause of ascites: the albumin gap and the total protein. One more, the neutrophil count, finds infection.', 'saag', 0, 'Ascites · SBP', 'fluid'],
+  ['The kidney is squeezed, not broken', 'The same vasodilation that makes ascites can shut the kidney down. Albumin and vasoconstrictors work by refilling the arterial side.', 'hrs', 0, 'HRS-AKI', 'aki'],
+  ['Ammonia needs a push', 'Encephalopathy usually has a trigger. Treat it, then trap ammonia in the gut.', 'nh3', 1, 'Encephalopathy', 'he']
+];
+var TRIALS = [
+  ['Sort 1999', 'Albumin with antibiotics in SBP', 'Does albumin prevent kidney failure in SBP?', 'Randomised, 126 patients: cefotaxime alone or with albumin 1.5 g/kg then 1 g/kg on day 3.', 'Kidney impairment 33% against 10%; in-hospital death 29% against 10%; 3-month death 41% against 22%.', 'Made albumin part of SBP treatment.', 'N Engl J Med 1999;341:403', '10.1056/NEJM199908053410603'],
+  ['Villanueva 2013', 'Restrictive transfusion in upper GI bleeding', 'Transfuse at 7 or at 9 g/dL?', 'Randomised, 921 patients with acute upper GI bleeding, stratified by cirrhosis.', '6-week survival 95% against 91% (hazard ratio for death 0.55). Benefit in Child-Pugh A and B; portal pressure rose in the liberal group.', 'Set the haemoglobin target of about 7 g/dL.', 'N Engl J Med 2013;368:11', '10.1056/NEJMoa1211801'],
+  ['García-Pagán 2010', 'Early TIPS after variceal bleeding', 'Does TIPS within 72 hours help high-risk patients?', 'Randomised, 63 patients: Child-Pugh C, or B with active bleeding. Small trial.', '1-year survival 86% against 61%; free of failure to control bleeding or rebleeding 97% against 50%.', 'Basis of pre-emptive TIPS criteria.', 'N Engl J Med 2010;362:2370', '10.1056/NEJMoa0910102'],
+  ['CONFIRM 2021', 'Terlipressin for hepatorenal syndrome', 'Does terlipressin plus albumin reverse HRS?', 'Randomised, double-blind, 300 patients, 2:1 against placebo.', 'Verified reversal 32% against 17%. Death by day 90: 51% against 45%; death from respiratory disorders 11% against 2%.', 'Led to US approval, with a boxed warning for respiratory failure.', 'N Engl J Med 2021;384:818', '10.1056/NEJMoa2008290'],
+  ['Bass 2010', 'Rifaximin to prevent encephalopathy', 'Does rifaximin keep patients in remission?', 'Randomised, double-blind, 299 patients with recurrent episodes; over 90% also on lactulose; 6 months.', 'Breakthrough episode 22.1% against 45.9% (hazard ratio 0.42); admission 13.6% against 22.6%.', 'Rifaximin added to lactulose after a recurrence.', 'N Engl J Med 2010;362:1071', '10.1056/NEJMoa0907893'],
+  ['ATTIRE 2021', 'Daily albumin for inpatients', 'Does topping albumin up to 3.0 g/dL help inpatients with decompensated cirrhosis?', 'Randomised, open-label, 777 patients.', 'Infection, kidney dysfunction or death: 29.7% against 30.2%. More serious adverse events with albumin.', 'No routine albumin infusion to chase a number.', 'N Engl J Med 2021;384:808', '10.1056/NEJMoa2022166'],
+  ['ANSWER 2018', 'Long-term weekly albumin', 'Does long-term albumin help outpatients with ascites on diuretics?', 'Randomised, open-label, 431 patients, albumin 40 g twice weekly for 2 weeks and then weekly, for up to 18 months.', '18-month survival 77% against 66% (hazard ratio 0.62).', 'Not adopted in US guidance: open-label, and at odds with other trials.', 'Lancet 2018;391:2417', '10.1016/S0140-6736(18)30840-7'],
+  ['PREDESCI 2019', 'Beta-blockers before decompensation', 'Do beta-blockers prevent the first decompensation?', 'Randomised, double-blind, 201 patients with compensated cirrhosis and significant portal hypertension; propranolol or carvedilol.', 'Decompensation or death 16% against 27% (hazard ratio 0.51), mostly less ascites.', 'Shifted the goal of beta-blockers from varices to decompensation.', 'Lancet 2019;393:1597', '10.1016/S0140-6736(18)31875-0']
+];
+function renderLearn(){
+  $('learn').innerHTML = CHAPS.map(function(c, i){ return '<h2 class="lh" id="learn-' + c[2] + '">' + (i + 1) + '. ' + c[0] + '</h2><p class="lead">' + c[1] + '</p><div class="card inl" id="lf-' + c[2] + '">' + figBlock(c[2], c[3], 'lf-' + c[2]) + '<p class="use"><a href="#' + c[5] + '">Use it: ' + c[4] + ' →</a></p></div>'; }).join('');
+  $('trial-list').innerHTML = TRIALS.map(function(t){ return '<details class="tr tl"><summary>' + t[0] + '<span class="take">' + t[1] + '</span></summary><div class="trial"><p><span class="k">Question</span>' + t[2] + '</p><p><span class="k">Design</span>' + t[3] + '</p><p><span class="k">Result</span>' + t[4] + '</p><p><span class="k">What it changed</span>' + t[5] + '</p><p class="note">' + t[6] + ' · doi:' + t[7] + '</p></div></details>'; }).join('');
+}
+
+/* ---------- Practice: every answer is computed by the engine above ---------- */
+var CASES = [
+  ['A woman with a creatinine of 1.5', 'Female. Bilirubin 6.0, INR 1.5, creatinine 1.5, sodium 131, albumin 2.2.', 'What is her MELD 3.0, and why is it higher than her MELD-Na?', function(){ var m = E.meld({ bili: 6, inr: 1.5, cr: 1.5, na: 131, alb: 2.2, female: true }); return '<b>MELD 3.0 ' + m.meld3 + '</b>, MELD-Na ' + m.meldna + ', MELD ' + m.meld + '. The extra comes from the 1.33 points for female sex and from her low albumin. Creatinine overestimates kidney function in women, so the older scores underrated their risk.'; }, 'scores'],
+  ['Cloudy tap on admission', '70 kg. Fluid PMN 480/mm³, fluid albumin 0.9, serum albumin 2.8, fluid protein 0.9. Creatinine 1.4.', 'What is the diagnosis and how much albumin?', function(){ var r = E.fluid({ salb: 2.8, aalb: 0.9, prot: 0.9, pmn: 480 }), a = E.sbpAlbumin(70); return '<b>' + (r.sbp ? 'SBP' : 'No SBP') + '</b>, gradient ' + r.saag.toFixed(1) + ' g/dL (portal hypertension). Third-generation cephalosporin now, plus albumin <b>' + a.d1 + ' g</b> on day 1 and <b>' + a.d3 + ' g</b> on day 3. With a creatinine above 1.0 she is in the group that benefits most.'; }, 'fluid'],
+  ['Haematemesis, Child-Pugh 11', 'Bleeding oesophageal varices banded at endoscopy. Child-Pugh score 11. Haemoglobin 7.4.', 'Transfuse? And what should be arranged in the next 72 hours?', function(){ var t = E.tips(11, false); return 'No transfusion: the target is about 7 g/dL. <b>' + (t === 'yes' ? 'Pre-emptive TIPS' : 'No TIPS') + '</b>: Child-Pugh C 10 to 13 qualifies without active bleeding, ideally within 24 hours. Octreotide and ceftriaxone continue meanwhile.'; }, 'bleed'],
+  ['Creatinine 0.9 to 2.1', '80 kg, tense ascites, on spironolactone and furosemide. Creatinine 2.1 from a baseline of 0.9.', 'What stage, and what is the first move?', function(){ var r = E.aki(0.9, 2.1, false); return '<b>AKI stage ' + r.stage + '</b> (' + r.ratio.toFixed(1) + ' times baseline). Stop diuretics and nephrotoxins, tap for SBP, and give albumin 1 g/kg/day for 2 days: <b>' + E.albChallenge(80) + ' g a day</b>. No response then makes hepatorenal syndrome the working diagnosis.'; }, 'aki'],
+  ['Terlipressin, day 4', 'Creatinine was 3.0 before the first dose. On day 4 it is 2.4. Saturating 96% on room air.', 'Continue, increase or stop?', function(){ var r = E.terliDay4(3.0, 2.4); return 'Creatinine fell ' + r.fall.toFixed(0) + '%, less than 30%: the dose <b>' + (r.act === 'increase' ? 'may be increased to 1.7 mg every 6 hours' : r.act) + '</b>. Keep watching oxygen saturation; stop if hypoxia develops.'; }, 'terli'],
+  ['Second admission for confusion', 'Disoriented for time, asterixis, second episode this year. Already on lactulose but missed doses. No fever.', 'What grade, and what changes at discharge?', function(){ var r = E.he(2, 2); return '<b>Grade 2, overt.</b> Look for the trigger (here, missed lactulose, but still tap any ascites). Lactulose 25 mL every 1 to 2 hours to two soft stools' + (r.rifaximin ? ', and <b>add rifaximin 550 mg twice daily</b> for the recurrence.' : '.'); }, 'he']
+];
+function renderPractice(){
+  $('practice').innerHTML = CASES.map(function(c, i){ return '<div class="card case"><p class="label">Case ' + (i + 1) + '</p><h2>' + c[0] + '</h2><p>' + c[1] + '</p><p><b>' + c[2] + '</b></p><div class="row"><button class="btn" type="button" data-case="' + i + '">Show answer</button></div><div class="ans" id="ans-' + i + '" hidden></div></div>'; }).join('');
+}
+
+/* ---------- Inputs, tabs, wiring ---------- */
+function buildInputs(){
+  $('scores-in').innerHTML = '<p class="label">Labs</p><div class="grid">' + fld('s-bili', 'Bilirubin', 'mg/dL') + fld('s-inr', 'INR', '') + fld('s-cr', 'Creatinine', 'mg/dL') + fld('s-na', 'Sodium', 'mEq/L') + fld('s-alb', 'Albumin', 'g/dL') + pick('s-sex', 'Sex', [['m', 'Male'], ['f', 'Female']]) + '</div><div class="checks one">' + chk('s-hd', 'Dialysis twice or more in the past week') + '</div><p class="label" style="margin-top:16px">For Child-Pugh</p><div class="grid grid4">' + pick('s-asc', 'Ascites', [['', 'Choose'], ['0', 'None'], ['1', 'Slight'], ['2', 'Moderate or more']]) + pick('s-he', 'Encephalopathy', [['', 'Choose'], ['0', 'None'], ['1', 'Grade 1 to 2'], ['2', 'Grade 3 to 4']]) + '</div>';
+  $('fluid-in').innerHTML = '<p class="label">Ascitic fluid</p><div class="grid">' + fld('f-pmn', 'PMN count', '/mm³') + fld('f-aalb', 'Fluid albumin', 'g/dL') + fld('f-prot', 'Fluid protein', 'g/dL') + fld('f-salb', 'Serum albumin', 'g/dL') + pick('f-cx', 'Culture', [['', 'Pending'], ['neg', 'Negative'], ['pos', 'Positive']]) + fld('f-kg', 'Weight', 'kg') + '</div><p class="label" style="margin-top:16px">Blood, if known</p><div class="grid">' + fld('f-cr', 'Creatinine', 'mg/dL') + fld('f-bun', 'BUN', 'mg/dL') + fld('f-bili', 'Bilirubin', 'mg/dL') + fld('f-na', 'Sodium', 'mEq/L') + '</div><div class="checks">' + chk('f-mdr', 'In hospital over 48 h or resistant-organism risk') + chk('f-prior', 'Previous SBP') + chk('f-glu', 'Fluid glucose below 50') + chk('f-ldh', 'Fluid LDH above serum upper limit') + chk('f-poly', 'More than one organism') + chk('f-focal', 'Focal abdominal source on exam or imaging') + '</div>';
+  $('lvp-in').innerHTML = '<p class="label">Large-volume paracentesis</p><div class="grid grid4">' + fld('l-vol', 'Volume removed', 'litres') + '</div><div class="checks one">' + chk('l-bp', 'Systolic pressure below 90 mmHg') + chk('l-na', 'Sodium below 130') + chk('l-aki', 'AKI') + '</div>';
+  $('bleed-in').innerHTML = '<p class="label">This bleed</p><div class="grid grid4">' + fld('b-cp', 'Child-Pugh score', '5 to 15', 'Blank uses the Scores tab') + '</div><div class="checks one">' + chk('b-active', 'Active bleeding seen at endoscopy') + chk('b-unc', 'Bleeding not controlled') + chk('b-gv', 'Gastric fundal varices (GOV2 or IGV1)') + chk('b-asc', 'Ascites present') + '</div>';
+  $('aki-in').innerHTML = '<p class="label">Creatinine</p><div class="grid">' + fld('a-base', 'Baseline', 'mg/dL') + fld('a-cur', 'Now', 'mg/dL') + fld('a-kg', 'Weight', 'kg') + '</div><div class="checks one">' + chk('a-rrt', 'On renal replacement therapy') + '</div><p class="label" style="margin-top:16px">HRS-AKI criteria</p><div class="checks one">' + HRSC.map(function(c, i){ return chk('a-c' + i, c); }).join('') + '</div>';
+  $('terli-in').innerHTML = '<p class="label">Before and during treatment</p><div class="grid grid4">' + fld('t-start', 'Creatinine before first dose', 'mg/dL') + fld('t-d4', 'Creatinine on day 4', 'mg/dL') + fld('t-kg', 'Weight', 'kg') + fld('t-meld', 'MELD', '', 'Blank uses the Scores tab') + '</div><div class="checks one">' + chk('t-hyp', 'SpO2 below 90% or worsening breathing') + chk('t-isc', 'Ongoing cardiac, limb or gut ischaemia') + chk('t-aclf', 'ACLF grade 3') + chk('t-vol', 'Volume overload') + '</div>';
+  $('he-in').innerHTML = '<p class="label">Now</p><div class="grid grid4">' + pick('h-grade', 'West Haven grade', [['', 'Choose']].concat(WH.map(function(w, i){ return [String(i), w[0]]; }))) + pick('h-ep', 'Episode', [['1', 'First overt episode'], ['2', 'Recurrent']]) + '</div><div class="tw" style="margin-top:12px"><table>' + WH.map(function(w){ return '<tr><td class="mono">' + w[0] + '</td><td>' + w[1] + '</td></tr>'; }).join('') + '</table></div>';
+}
+var TABS = ['scores', 'ascites', 'bleed', 'hrs', 'he', 'learn', 'practice'];
+function show(id){ TABS.forEach(function(t){ $('t-' + t).setAttribute('aria-selected', String(t === id)); $('p-' + t).classList.toggle('on', t === id); }); var tb = $('t-' + id); if (tb.scrollIntoView) tb.scrollIntoView({ block: 'nearest', inline: 'center' }); if (id === 'bleed') renderBleed(); if (id === 'hrs') renderTerli(); }
+function step(group, id){ Array.prototype.forEach.call(document.querySelectorAll('[data-group="' + group + '"]'), function(b){ var is = b.dataset.step === id; b.setAttribute('aria-pressed', String(is)); $(b.dataset.step).classList.toggle('on', is); }); }
+function fromHash(){ var id = location.hash.slice(1); if (!id) return; if (TABS.indexOf(id) >= 0){ show(id); return; } var el = $(id); if (!el) return; var sp = el.closest('.stp'); if (sp){ var b = document.querySelector('[data-step="' + sp.id + '"]'); if (b) step(b.dataset.group, sp.id); } var pan = el.closest('.panel'); if (pan) show(pan.id.slice(2)); el.scrollIntoView(); }
+function renderAll(){ renderScores(); renderFluid(); renderLvp(); renderBleed(); renderAki(); renderTerli(); renderHe(); }
+(function init(){
+  buildInputs(); renderDiur(); renderLearn(); renderPractice(); renderAll();
+  document.addEventListener('input', renderAll);
+  document.addEventListener('click', function(e){
+    var t = e.target.closest ? e.target.closest('button,a') : null; if (!t) return;
+    if (t.classList.contains('tab')){ show(t.id.slice(2)); return; }
+    if (t.dataset.step){ step(t.dataset.group, t.dataset.step); return; }
+    if (t.dataset.open){ openFig(t.dataset.open, +t.dataset.k); return; }
+    if (t.dataset.fig){ var w = t.dataset.where, host = w === 'sheet' ? $('sheet-b') : $(w), use = host.querySelector('.use'); host.innerHTML = figBlock(t.dataset.fig, +t.dataset.k, w) + (use ? use.outerHTML : ''); var nb = host.querySelector('[data-k="' + t.dataset.k + '"]'); if (nb) nb.focus(); return; }
+    if (t.dataset.wk){ var v = t.dataset.v === 'true'; WK[t.dataset.wk] = WK[t.dataset.wk] === v ? null : v; drawWork(); return; }
+    if (t.dataset.case){ var a = $('ans-' + t.dataset.case), c = CASES[+t.dataset.case]; a.innerHTML = '<p>' + c[3]() + '</p><p class="use"><a href="#' + c[4] + '">Open in the tool →</a></p>'; a.hidden = false; t.hidden = true; return; }
+    if (t.id === 'sheet-x'){ closeFig(); return; }
+  });
+  $('scrim').addEventListener('click', closeFig);
+  document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeFig(); });
+  window.addEventListener('hashchange', fromHash); fromHash();
+})();
+</script>
+</body>
+</html>
