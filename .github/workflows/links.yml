@@ -1,0 +1,39 @@
+# Checks every outside link in the tools (guidelines, DOIs, trial pages) once a week and on demand.
+# Journals often block automated requests (403) or rate-limit them (429); those count as reachable.
+# Never blocks a merge. A weekly run that finds broken links opens (or updates) one issue.
+name: links
+
+on:
+  schedule:
+    - cron: '17 14 * * 1'   # Mondays, 06:17 Pacific
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  links:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check outside links
+        id: lychee
+        uses: lycheeverse/lychee-action@v2
+        with:
+          args: >-
+            --no-progress --max-concurrency 8 --timeout 30 --max-retries 2
+            --accept 200..=299,403,429
+            --exclude-path docs --exclude-path scripts
+            '*/index.html' 'index.html'
+          output: ./lychee/out.md
+          fail: false
+      - name: Open or update an issue when links are broken
+        if: steps.lychee.outputs.exit_code != 0
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          title="Broken source links"
+          num=$(gh issue list --state open --search "in:title \"$title\"" --json number --jq '.[0].number')
+          if [ -n "$num" ]; then gh issue edit "$num" --body-file ./lychee/out.md
+          else gh issue create --title "$title" --body-file ./lychee/out.md; fi
