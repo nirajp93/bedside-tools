@@ -1005,7 +1005,7 @@ var VK = (function(){
   function g(id){ return document.getElementById(id); }
   function q(s){ return String(s).replace(/[&<>"]/g, function(c){ return {'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c]; }); }
   var PIC = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M5 21c1-4 4-6 7-6s6 2 7 6"/></svg>';
-  function img(id){ var P = C.plates[id]; return '<div class="vk-plate"><div class="vk-pw"><img src="' + P.src + '" alt="' + q(P.alt) + '" width="1024" height="576" loading="lazy">' + (P.hot || []).map(function(h, k){ return '<button class="vk-hot" type="button" data-vk-hot="' + id + ':' + k + '" style="left:' + h[0] + '%;top:' + h[1] + '%" aria-label="' + q(h[2]) + '">' + (k + 1) + '</button>'; }).join('') + '</div><span class="vk-credit">Created with BioRender.com</span></div>'; }
+  function img(id){ var P = C.plates[id]; return '<div class="vk-plate"><div class="vk-pw"><img src="' + P.src + '" alt="' + q(P.alt) + '" width="1024" height="572" loading="lazy">' + (P.hot || []).map(function(h, k){ return '<button class="vk-hot" type="button" data-vk-hot="' + id + ':' + k + '" style="left:' + h[0] + '%;top:' + h[1] + '%" aria-label="' + q(h[2]) + '">' + (k + 1) + '</button>'; }).join('') + '</div><span class="vk-credit">Created with BioRender.com</span></div>'; }
   function plateHtml(id){ var P = C.plates[id]; return img(id) + (P.hot ? '<div class="vk-hl">' + P.hot.map(function(h, k){ return '<button class="chip" type="button" data-vk-hot="' + id + ':' + k + '" aria-pressed="false"><span class="vk-n">' + (k + 1) + '</span>' + q(h[2]) + '</button>'; }).join('') + '</div><div class="vk-out" aria-live="polite"></div>' : '') + '<p class="vk-cap">' + P.cap + '</p><p class="vk-src">' + P.src2 + '</p>'; }
   function chip(id, label){ return '<button class="chip" type="button" data-vk-plate="' + id + '">' + PIC + q(label || C.plates[id].t) + '</button>'; }
   function openPlate(id){ try { lastFocus = document.activeElement; } catch (e) {} g('sheet-t').textContent = C.plates[id].t; g('sheet-b').innerHTML = plateHtml(id); g('sheet-b').setAttribute('data-vk-open', id); g('scrim').hidden = false; g('sheet').hidden = false; g('sheet').scrollTop = 0; g('sheet-x').focus(); }
@@ -1053,17 +1053,17 @@ var VK = (function(){
 VK.init({
  chips: [['learn-store', 'kcell', 'Where potassium lives: tap each site'], ['learn-kidney', 'nephron']],
  plates: {
-  nephron: {t: 'The nephron, segment by segment', src: '/media/electrolytes/nephron-segments.webp', alt: 'One nephron, segment by segment: glomerulus, proximal convoluted tubule, thin descending limb, thick ascending limb with the macula densa, distal convoluted tubule, connecting tubule, and cortical and medullary collecting duct.', cap: 'Tap a numbered segment for what it does with potassium, magnesium and phosphate, and which drugs act there.', src2: 'Standard renal physiology; schematic.',
+  nephron: {t: 'The nephron, segment by segment', src: '/media/electrolytes/nephron-segments.webp', alt: 'One nephron, segment by segment: glomerulus, proximal convoluted tubule, thin descending and ascending limbs, thick ascending limb with the macula densa, distal convoluted tubule, connecting tubule, and cortical and medullary collecting duct.', cap: 'Tap a numbered segment for what it does with potassium, magnesium and phosphate, and which drugs act there.', src2: 'Standard renal physiology; schematic.',
    hot: [[35.2, 34.7, 'Proximal tubule', 'pt'], [51.5, 52, 'Thick ascending limb', 'tal'], [58.6, 33, 'Distal tubule', 'dct'], [70.1, 38, 'Collecting duct', 'ccd']]},
   kcell: {t: 'Where potassium lives', src: '/media/electrolytes/potassium-cell.webp', alt: 'A body cell packed with potassium and surrounded by sodium, with the sodium-potassium pump in its membrane moving potassium in and sodium out, an insulin receptor, a beta receptor, and hydrogen ions outside the cell.', cap: 'Tap a site: each one moves potassium across the membrane without changing the body total.', src2: 'Lines from this tool\'s potassium figure.',
-   hot: [[50.3, 20.8, 'Sodium-potassium pump', 'pump'], [30.3, 29.5, 'Insulin', 'ins'], [29.3, 76.4, 'Beta-2 receptor', 'beta'], [70.8, 81.6, 'Acid', 'acid']]}
+   hot: [[50.3, 20.8, 'Sodium-potassium pump', 'pump'], [36.5, 36, 'Insulin', 'ins'], [36, 82, 'Beta-2 receptor', 'beta'], [63, 87, 'Acid', 'acid']]}
  },
  hot: {
-  pt: function(){ return '<p>The proximal tubule reabsorbs most filtered phosphate (PTH reduces this) and about two-thirds of filtered sodium and water.</p>'; },
-  tal: function(){ return '<p>NKCC2 takes up sodium, potassium and chloride; the positive charge it leaves in the lumen pushes calcium and magnesium between the cells. A loop diuretic blocks NKCC2, so it wastes potassium, magnesium and calcium.</p>'; },
+  pt: function(){ return '<p>The proximal tubule reabsorbs most filtered phosphate (PTH reduces this), about two-thirds of filtered sodium, water and potassium, and a small share of magnesium. Acetazolamide and SGLT2 inhibitors act here.</p>'; },
+  tal: function(){ return '<p>NKCC2 takes up sodium, potassium and chloride. The potassium leaks back into the lumen through ROMK, which leaves the lumen positive and pushes calcium and magnesium between the cells: this is where most filtered magnesium is reabsorbed. A loop diuretic blocks NKCC2, so it wastes potassium, magnesium and calcium.</p>'; },
   dct: function(){ return '<p>The distal tubule fine-tunes magnesium and sodium (NCC, the thiazide target). Thiazides waste potassium and magnesium but lower urine calcium.</p>'; },
-  ccd: function(){ return '<p>' + MGPLUG.low.line + '</p><p>Aldosterone drives potassium secretion here; more sodium reaching this segment (diuretics) means more potassium lost.</p>'; },
-  pump: function(){ return '<p>' + KSTORE.normal.line + '</p>'; },
+  ccd: function(){ return '<p>Aldosterone, and more sodium reaching this segment (diuretics), drive potassium secretion through the ROMK channel.</p><p>' + KKID.lowmg.line + '</p>'; },
+  pump: function(){ return '<p>The pump uses ATP to move 3 sodium out and 2 potassium in, which keeps potassium inside cells.</p><p>' + KSTORE.normal.line + '</p>'; },
   ins: function(){ return '<p>' + KSTORE.insulin.line + '</p>'; },
   beta: function(){ return '<p>' + KSTORE.beta.line + '</p>'; },
   acid: function(){ return '<p>' + KSTORE.acid.line + '</p>'; }
@@ -1071,11 +1071,11 @@ VK.init({
  preds: {
   'learn-store': {q: 'Insulin is started. What does the serum potassium do, and why?', a: function(){ return [['Falls: potassium moves into cells', 1], ['Falls: the kidney excretes it', 0], ['Rises: cells release it', 0]]; }, why: function(){ return KSTORE.insulin.line; }, fig: ['kstore', 'insulin', 'Where potassium lives']},
   'learn-mg': {q: 'Potassium 3.0 and magnesium 1.2. What do you replace?', a: function(){ var g = compute({k: 3.0, mg: 1.2, route: 'po'}).k.guards.join(' '); var mg = /[Mm]agnesium is low/.test(g); return [['Both, magnesium first or together', mg], ['Potassium only', 0], ['Magnesium only', 0]]; }, why: function(){ return MGPLUG.fixed.line + ' ' + MGPLUG.low.line; }, fig: ['mgplug', 'low', 'Why potassium needs magnesium']},
-  'learn-phos': {q: 'Feeding restarts after a week of starvation. Which level falls first?', a: function(){ return [['Phosphate (with potassium and magnesium)', 1], ['Sodium', 0], ['Calcium', 0]]; }, why: function(){ return REFEED.feeding.line; }, fig: ['refeed', 'feeding', 'Refeeding: where phosphate goes']}
+  'learn-phos': {q: 'Feeding restarts after a week of starvation. Which low level is the hallmark of refeeding?', a: function(){ return [['Phosphate (often with potassium and magnesium)', 1], ['Sodium', 0], ['Calcium', 0]]; }, why: function(){ return REFEED.feeding.line; }, fig: ['refeed', 'feeding', 'Refeeding: where phosphate goes']}
  },
  sliders: {
-  k: {ranges: [{key: 'k', label: 'Serum potassium', min: 1.8, max: 4.2, step: 0.1, value: 2.9, unit: 'mEq/L', fmt: function(x){ return x.toFixed(1); }}], note: 'Runs this tool\'s potassium engine: general ward, oral route, normal kidney function, no symptoms.',
-   run: function(v){ var o = compute({k: v.k, route: 'po'}).k; if (!o) return ''; return '<div class="card"><p class="label">Potassium</p><p class="head">' + o.head + '</p>' + (o.lines[0] ? '<p class="sub">' + o.lines[0] + '</p>' : '') + (o.guards[0] ? '<div class="guard">' + o.guards[0] + '</div>' : '') + '</div>'; }}
+  k: {ranges: [{key: 'k', label: 'Serum potassium', min: 1.8, max: 4.2, step: 0.1, value: 2.9, unit: 'mEq/L', fmt: function(x){ return x.toFixed(1); }}], note: 'Runs this tool\'s potassium engine: general ward, oral route, normal kidney function, no symptoms. Below 2.5 it switches to IV, 40 mEq at a time with a recheck after each.',
+   run: function(v){ var o = compute({k: v.k, route: 'po'}).k; if (!o) return ''; return '<div class="card"><p class="label">Potassium</p><p class="head">' + o.head + '</p>' + (o.lines.length ? '<p class="sub">' + o.lines.filter(function(x, j){ return j === 0 || /^Recheck/.test(x); }).join(' ') + '</p>' : '') + (o.guards[0] ? '<div class="guard">' + o.guards[0] + '</div>' : '') + '</div>'; }}
  },
  flows: {
   lowk: {t: 'Walk a low potassium', steps: [
