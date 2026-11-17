@@ -157,6 +157,7 @@ footer p{margin:0 0 8px}
 .vk-btn{min-height:44px;border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);border-radius:10px;padding:8px 14px;font:inherit;font-weight:600;cursor:pointer;margin-top:10px}
 .vk-btn.ghost{background:var(--card);color:var(--accent)}
 .vk-hot:focus-visible,.vk-opt:focus-visible,.vk-cell:focus-visible,.vk-btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+@media (max-width:479px){.vk-hot{width:20px;height:20px;font-size:11px}}
 @media (min-width:900px){.vk-grid{grid-template-columns:repeat(3,1fr)}.vk-hot{width:30px;height:30px}}
 </style>
 </head>
@@ -1067,8 +1068,8 @@ var RL = {}; RESULTS.forEach(function(r){ RL[r[0]] = r[1]; });
 VK.init({
  chips: [['learn-brain', 'brain'], ['learn-adh', 'nephron'], ['learn-adh', 'water', 'The water axis: tap each site']],
  plates: {
-  water: {t: 'The water axis', src: '/media/hyponatremia/water-axis.webp', alt: 'A body outline: hypothalamus and posterior pituitary in the head, a carotid stretch receptor signalling to the brain, an arrow from the pituitary to the kidney, and a zoom of a collecting duct cell with water channels moving water from the urine into the blood.', cap: 'Tap a numbered site: what switches ADH on or off, and what it does in the kidney.', src2: 'Lines from this tool\'s ADH figure; aquaporin line is standard physiology.',
-   hot: [[29.8, 13, 'Hypothalamus: osmoreceptors', 'osm'], [30, 19.2, 'Posterior pituitary: ADH', 'adh'], [32.2, 32, 'Stretch receptors (carotid, aortic arch)', 'baro'], [35.2, 76.4, 'Kidney', 'kid'], [63.5, 41.7, 'Aquaporin-2 water channels', 'aqp']]},
+  water: {t: 'The water axis', src: '/media/hyponatremia/water-axis.webp', alt: 'A body outline: hypothalamus and posterior pituitary in the head, stretch receptors (carotid, aortic arch) signalling to the brain, an arrow from the pituitary to the kidney, and a zoom of a collecting duct cell with water channels moving water from the urine into the blood.', cap: 'Tap a numbered site: what switches ADH on or off, and what it does in the kidney.', src2: 'Lines from this tool\'s ADH figure; aquaporin line is standard physiology.',
+   hot: [[29.8, 11, 'Hypothalamus: osmoreceptors', 'osm'], [30, 19.2, 'Posterior pituitary: ADH', 'adh'], [32.2, 32, 'Stretch receptors (carotid, aortic arch)', 'baro'], [35.2, 76.4, 'Kidney', 'kid'], [63.5, 41.7, 'Aquaporin-2 water channels', 'aqp']]},
   brain: {t: 'The brain cell in hyponatremia', src: '/media/hyponatremia/brain-cell.webp', alt: 'Three panels of a brain cell: normal; acute hyponatremia with the cell swollen as water moves in; chronic, adapted, with solutes leaving and the cell back near normal size; and an inset where a too-fast correction shrinks the adapted cell.', cap: BRAIN.acute.line + ' ' + BRAIN.adapted.line + ' ' + BRAIN.fast.line, src2: 'Lines from this tool\'s brain figure (Sterns 2024).'},
   nephron: {t: 'The nephron, segment by segment', src: '/media/hyponatremia/nephron-segments.webp', alt: 'One nephron, segment by segment: glomerulus, proximal convoluted tubule, thin descending and ascending limbs, thick ascending limb with the macula densa, distal convoluted tubule, connecting tubule, and cortical and medullary collecting duct.', cap: 'Tap a numbered segment: where urine is diluted and where ADH decides how much water comes back.', src2: 'Standard renal physiology; schematic.',
    hot: [[51.5, 52, 'Thick ascending limb: diluting segment', 'tal'], [58.6, 33, 'Distal tubule', 'dct'], [70.1, 78, 'Medullary collecting duct: ADH', 'mcd']]}
@@ -1101,7 +1102,7 @@ VK.init({
   ]}
  },
  grids: {
-  causes: {items: CAUSES.map(function(c){ return [c[0], function(){ var r = []; Object.keys(c[1]).forEach(function(k){ var s = c[1][k]; var lab = RL[k] || k, why = s[1] && s[1].toLowerCase() !== lab.toLowerCase() ? ' (' + s[1] + ')' : '', verb = s[0] === 'fav' ? 'favors it' : s[0] === 'out' ? (k === 'osmNl' ? 'argues strongly against it, unless urea or alcohol raise the measured osmolality' : k === 'cortOk' ? 'makes it unlikely' : 'argues strongly against it') : s[0] === 'unl' ? 'makes it unlikely' : null; if (verb) r.push('<p><b>' + lab + ':</b> ' + verb + why + '</p>'); }); return r.join('') || '<p>No single result decides it.</p>'; }]; })}
+  causes: {items: CAUSES.map(function(c){ return [c[0], function(){ var r = []; Object.keys(c[1]).forEach(function(k){ var s = c[1][k]; var lab = RL[k] || k, why = s[1] && s[1].toLowerCase() !== lab.toLowerCase() && k !== 'osmNl' ? ' (' + s[1] + ')' : '', verb = s[0] === 'fav' ? 'favors it' : s[0] === 'out' ? (k === 'osmNl' ? 'argues strongly against it, unless urea or alcohol raise the measured osmolality' : k === 'cortOk' ? 'makes it unlikely' : 'argues strongly against it') : s[0] === 'unl' ? 'makes it unlikely' : null; if (verb) r.push('<p><b>' + lab + ':</b> ' + verb + why + '</p>'); }); return r.join('') || '<p>No single result decides it.</p>'; }]; })}
  }
 });
 </script>
