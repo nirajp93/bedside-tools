@@ -1077,33 +1077,33 @@ var VK = (function(){
 VK.init({
  chips: [['learn-switch', 'body', 'DKA in the body: tap each organ']],
  plates: {
-  body: {t: 'DKA in the body', src: '/media/dka/dka-body.webp', alt: 'A body outline with the brain, lungs, liver, pancreas with a zoom of an islet, abdominal fat, kidneys and bladder, thigh muscle, and a central blood vessel carrying glucose and ketone bodies.', cap: 'Tap a numbered organ: its part in DKA.', src2: 'Lines from this tool\'s insulin switch, potassium and osmotic diuresis figures.',
+  body: {t: 'DKA in the body', src: '/media/dka/dka-body.webp', alt: 'A body outline with the brain, lungs, liver, pancreas with a zoom of an islet, abdominal fat, kidneys and bladder, thigh muscle, and a central blood vessel carrying glucose and ketone bodies.', cap: 'Tap a numbered organ: its part in DKA.', src2: 'Lines from this tool\'s insulin switch, potassium and osmotic diuresis figures and its Why notes; lung, pancreas and brain lead lines are standard physiology.',
    hot: [[50, 9.5, 'Brain', 'brain'], [45.9, 36.5, 'Lungs', 'lung'], [46.9, 48.6, 'Liver', 'liver'], [68.8, 48.6, 'Pancreas: islet', 'panc'], [52.2, 58.2, 'Fat', 'fat'], [45.9, 66.8, 'Kidney', 'kid'], [44.4, 89.4, 'Muscle', 'mus']]}
  },
  hot: {
-  brain: function(){ return '<p>' + WHY.osm + '</p>'; },
-  lung: function(){ return '<p>Deep, rapid breathing blows off CO2 to offset the ketoacidosis.</p>'; },
+  brain: function(){ return '<p>Drowsiness tracks how high the osmolality and how severe the acidosis are. Cerebral edema is rare in adults with DKA.</p><p><b>HHS or mixed:</b> ' + WHY.osm + '</p>'; },
+  lung: function(){ return '<p>Deep, rapid breathing blows off CO2 to partly offset the ketoacidosis.</p>'; },
   liver: function(){ return '<p>' + SWITCH.dka.line + '</p>'; },
-  panc: function(){ return '<p>' + SWITCH.normal.line + '</p><p>' + SWITCH.hhs.line + '</p>'; },
+  panc: function(){ return '<p>In DKA the beta cells make almost no insulin and glucagon rises: the switch that holds back fat breakdown and ketone production is off.</p><p><b>Normally:</b> ' + SWITCH.normal.line + '</p>'; },
   fat: function(){ return '<p>' + SWITCH.dka.line + '</p>'; },
   kid: function(){ return '<p>' + OSMLOOP.dka.line + '</p>'; },
   mus: function(){ return '<p>' + KDKA.present.line + '</p><p>' + KDKA.treat.line + '</p>'; }
  },
  preds: {
   'learn-k': {q: 'Potassium 3.1 at presentation. Start insulin?', a: function(){ var s = kGate(3.1).state; return [['No: replace potassium first', s === 'hold'], ['Yes, with potassium in the fluids', s === 'replace'], ['Yes, no potassium needed', s === 'none']]; }, why: function(){ return WHY.kLow + ' ' + KDKA.gate.line; }, fig: ['kdka', 'gate', 'Potassium: high outside, low overall']},
-  'learn-day1': {q: 'Glucose 230, still acidotic. Stop the insulin?', a: function(){ var o = assess({glu: 230, bohb: 4, hco3: 12, ph: 7.2, k: 4.2, na: 136, cl: 104}); return [['No: add dextrose and keep the insulin running', o.dextroseNow], ['Yes: glucose is controlled', 0]]; }, why: function(){ return WHY.dex; }, fig: ['curves', '', 'Glucose falls first, ketones last']},
-  'learn-water': {q: 'Measured sodium is rising while glucose falls. What does it mean?', a: function(){ return [['Expected: water returns to cells as glucose falls', 1], ['Too much saline: stop fluids', 0]]; }, why: function(){ return NACORR.later.line; }, fig: ['nacorr', 'later', 'Measured and corrected sodium']}
+  'learn-day1': {q: 'Glucose 230, still acidotic. Stop the insulin?', a: function(){ var o = assess({glu: 230, bohb: 4, hco3: 12, ph: 7.2, k: 4.2, na: 136, cl: 104}); return [['No: add dextrose and keep the insulin running at a lower rate', o.dextroseNow], ['Yes: glucose is controlled', 0]]; }, why: function(){ return WHY.dex; }, fig: ['curves', '', 'Glucose falls first, ketones last']},
+  'learn-water': {q: 'Measured sodium is rising while glucose falls. What does it mean?', a: function(){ return [['Expected, if it roughly matches 1.6 per 100 mg/dL fall: water returns to cells', 1], ['Too much saline: stop fluids', 0]]; }, why: function(){ return NACORR.later.line; }, fig: ['nacorr', 'later', 'Measured and corrected sodium']}
  },
  sliders: {
-  hour: {ranges: [{key: 'glu', label: 'Glucose this hour', min: 120, max: 500, step: 10, value: 320, unit: 'mg/dL'}, {key: 'k', label: 'Potassium this hour', min: 2.6, max: 6.0, step: 0.1, value: 4.0, unit: 'mEq/L', fmt: function(x){ return x.toFixed(1); }}], note: 'Runs this tool\'s engine for a 70 kg adult in moderate DKA (pH 7.15, HCO3 10, BOHB 5).',
-   run: function(v){ var o = assess({glu: v.glu, k: v.k, wt: 70, ph: 7.15, hco3: 10, bohb: 5, na: 135, cl: 100}); return kCard(o.k, 'vk-k', false) + '<div class="card"><p class="label">Insulin and dextrose</p><p class="head">' + (o.k.state === 'hold' ? 'Insulin waits for potassium' : 'Insulin ' + o.insulin.rate + ' units/h') + '</p><p class="sub">' + (o.dextroseNow ? 'Glucose under 250: add 5% or 10% dextrose and keep the insulin running; target ' + o.insulin.target + ' mg/dL.' : 'No dextrose yet; add it when glucose falls below 250.') + '</p></div>'; }}
+  hour: {ranges: [{key: 'glu', label: 'Glucose this hour', min: 120, max: 500, step: 10, value: 320, unit: 'mg/dL'}, {key: 'k', label: 'Potassium this hour', min: 2.6, max: 6.0, step: 0.1, value: 4.0, unit: 'mEq/L', fmt: function(x){ return x.toFixed(1); }}], note: 'Runs this tool\'s engine for a 70 kg adult with known diabetes in moderate DKA (pH 7.15, HCO3 10, BOHB 5), insulin drip already running.',
+   run: function(v){ var o = assess({glu: v.glu, k: v.k, wt: 70, ph: 7.15, hco3: 10, bohb: 5, na: 135, cl: 100, dm: true}); if (!o.insulin) return ''; var hold = o.k.state === 'hold'; return kCard(o.k, 'vk-k', true) + '<div class="card"><p class="label">Insulin and dextrose</p><p class="head">' + (hold ? 'Insulin paused until potassium is 3.5 or higher' : o.dextroseNow ? 'Insulin ' + o.insulin.halfRate + ' units/h (0.05 units/kg/h) with dextrose' : 'Insulin ' + o.insulin.rate + ' units/h') + '</p><p class="sub">' + (o.dextroseNow ? 'Glucose under 250: add 5% or 10% dextrose' + (hold ? '.' : ' and keep the insulin running at the lower rate; target ' + o.insulin.target + ' mg/dL.') : 'No dextrose yet; add it when glucose falls below 250.') + '</p></div>'; }}
  },
  flows: {
   first: {t: 'The first hours of DKA', steps: [
    {q: 'Glucose 480, pH 7.12, HCO3 9, BOHB 6.2, alert. What comes first?', a: function(){ return [['IV fluids', 1], ['Insulin bolus', 0], ['Bicarbonate', 0]]; }, show: function(){ return '<p>' + OSMLOOP.fluids.line + '</p>'; }},
    {q: 'Potassium 3.3. Insulin now?', a: function(){ var s = kGate(3.3).state; return [['Not yet', s === 'hold'], ['Yes', s !== 'hold']]; }, show: function(){ return kCard(kGate(3.3), 'vk-f2', false); }},
    {q: 'Potassium now 3.9 after replacement. Insulin rate for 70 kg?', reveal: 'Run the engine', show: function(){ var o = assess({glu: 480, ph: 7.12, hco3: 9, bohb: 6.2, k: 3.9, wt: 70, na: 134, cl: 98}); return '<p>Insulin <b>' + o.insulin.rate + ' units/h</b> (' + o.insulin.perKg + ' units/kg/h); target glucose ' + o.insulin.target + ' mg/dL.</p>'; }},
-   {q: 'Six hours later glucose is 240 but BOHB is still 3.4. Next?', a: function(){ var o = assess({glu: 240, ph: 7.25, hco3: 14, bohb: 3.4, k: 4.1, wt: 70, na: 138, cl: 106}); return [['Add dextrose, keep insulin', o.dextroseNow], ['Stop insulin', 0]]; }, show: function(){ return '<p>' + WHY.dex + '</p>'; }}
+   {q: 'Six hours later glucose is 240 but BOHB is still 3.4. Next?', a: function(){ var o = assess({glu: 240, ph: 7.25, hco3: 14, bohb: 3.4, k: 4.1, wt: 70, na: 138, cl: 106}); return [['Add dextrose, keep insulin at a lower rate', o.dextroseNow], ['Stop insulin', 0]]; }, show: function(){ var o = assess({glu: 240, ph: 7.25, hco3: 14, bohb: 3.4, k: 4.1, wt: 70, na: 138, cl: 106}); return '<p>' + WHY.dex + ' Reduce the insulin to 0.05 units/kg/h (' + o.insulin.halfRate + ' units/h for 70 kg).</p>'; }}
   ]}
  }
 });
