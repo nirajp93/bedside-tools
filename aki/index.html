@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AKI workup · bedside.tools</title>
+<meta name="description" content="Acute kidney injury: KDIGO stage from creatinine and urine output, FENa and FEUrea with their limits, where the kidney is failing, drugs to stop or adjust, when to image and when to call nephrology.">
+<script src="/theme.js"></script>
+<style>
+:root{--bg:#FBFBFA;--card:#FFFFFF;--ink:#111113;--muted:#55555D;--line:#ECECEE;--accent:#2B4BDB;--warn:#9A3B00;--warnbg:#FFF6EC}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5}
+.mono{font-family:var(--mono)}
+.wrap{max-width:720px;margin:0 auto;padding:20px 16px 48px}
+a{color:var(--accent)}
+.back{font-size:14px;text-decoration:none;display:inline-block;min-height:44px;line-height:44px}
+h1{font-size:26px;margin:4px 0 4px;letter-spacing:-.01em}
+.purpose{color:var(--muted);margin:0 0 20px}
+.tabs{display:flex;gap:6px;margin-bottom:16px}
+.tab{flex:1;min-width:0;min-height:44px;border:1px solid var(--line);background:var(--card);border-radius:14px;padding:0 4px;font:inherit;font-size:15px;font-weight:600;color:var(--muted);cursor:pointer}
+.tab[aria-selected="true"]{border-color:var(--accent);color:var(--accent)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
+.label{font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+.grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.field{display:flex;flex-direction:column;justify-content:flex-end}
+.field label{display:block;font-size:13px;color:var(--muted);margin-bottom:4px}
+.field input{width:100%;min-height:44px;border:1px solid var(--line);border-radius:10px;padding:8px 10px;font:inherit;font-family:var(--mono);background:var(--card);color:var(--ink)}
+.field input:focus,.tab:focus-visible,.chk:focus-within,button:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.checks{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.chk{display:flex;align-items:center;gap:10px;min-height:44px;border:1px solid var(--line);border-radius:10px;padding:6px 10px;font-size:14px;cursor:pointer}
+.chk input{width:20px;height:20px;accent-color:var(--accent);flex:none}
+.q{font-size:13px;color:var(--muted);margin:14px 0 0}
+.seg{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.card h2{font-size:18px;margin:0 0 2px}
+.head{font-family:var(--mono);font-size:17px;font-weight:600;margin:6px 0 4px;overflow-wrap:anywhere}
+.head.bad{color:var(--bad)}.head.okc{color:var(--ok)}.head.wn{color:var(--warn)}
+.sub{font-size:14px;color:var(--muted);margin:0}
+.card ul,.card ol{margin:6px 0 0;padding-left:20px}
+.card li{margin-bottom:4px}
+.guard{border-left:3px solid var(--warn);background:var(--warnbg);padding:8px 10px;border-radius:0 10px 10px 0;margin-top:8px;font-size:14.5px}
+.guard.bad{border-left-color:var(--bad);background:var(--badbg)}
+.tier{display:inline-block;font-family:var(--mono);font-size:11px;border:1px solid var(--line);border-radius:999px;padding:2px 8px;color:var(--muted);margin:6px 6px 0 0}
+details{margin-top:10px;border-top:1px solid var(--line);padding-top:8px}
+.whyline{margin:10px 0 0;font-size:14.5px;color:var(--muted)}
+.whyline b{color:var(--ink);font-weight:600}
+summary{cursor:pointer;color:var(--accent);font-weight:600;min-height:44px;line-height:44px}
+details p{margin:0 0 8px;font-size:15px}
+details li{font-size:15px}
+.empty{color:var(--muted)}
+.btn{min-height:44px;border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);border-radius:10px;padding:8px 14px;font:inherit;font-weight:600;cursor:pointer}
+.btn.ghost{background:var(--card);color:var(--accent)}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.note{font-size:14px;color:var(--muted)}
+.nums{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:10px}
+.num{background:var(--fill);border-radius:10px;padding:6px 8px}
+.num span{display:block;font-size:12px;color:var(--muted)}
+.num b{font-family:var(--mono);font-size:14px}
+.num.hot{box-shadow:inset 0 0 0 1.5px var(--warn)}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:6px 6px 6px 0;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:var(--mono);font-size:11.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);font-weight:500}
+.tw{overflow-x:auto}
+.case h2{font-size:17px}
+.ans{margin-top:10px;border-top:1px solid var(--line);padding-top:10px}
+.ans .card{border-color:var(--line);margin:10px 0 0}
+footer{margin-top:28px;font-size:13.5px;color:var(--muted)}
+footer p{margin:0 0 8px}
+@media (min-width:900px){
+  .wrap{max-width:1040px}
+  #p-tool.on{display:grid;grid-template-columns:360px minmax(0,1fr);gap:20px;align-items:start}
+  #inputs{position:sticky;top:16px;max-height:calc(100vh - 32px);overflow-y:auto}
+  .refgrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;align-items:start}
+  #narrow,#kdigo{grid-column:1 / -1}
+  #p-learn{max-width:720px;margin:0 auto}
+  .refgrid .card{margin-bottom:0}
+  #inputs .grid{grid-template-columns:1fr 1fr}
+}
+.panel{display:none}.panel.on{display:block}
+.fig{display:block;width:100%;max-width:460px;height:auto;margin:0 auto}
+.states{display:flex;gap:6px;overflow-x:auto;margin:10px -16px;padding:2px 16px 6px;scrollbar-width:none}
+.states::-webkit-scrollbar{display:none}
+.sbtn{flex:none;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--ink);font:inherit;font-size:14px;cursor:pointer;white-space:nowrap}
+.sbtn[aria-pressed="true"]{border-color:var(--accent);color:var(--accent);font-weight:600}
+.line1{font-size:15px;margin:10px 0 0}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.chip{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--fill);color:var(--ink);font:inherit;font-size:14px;cursor:pointer}
+.chip svg{flex:none;color:var(--accent)}
+.scrim{position:fixed;inset:0;background:var(--scrim);z-index:20}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:21;max-height:90vh;overflow-y:auto;background:var(--card);border:1px solid var(--line);border-bottom:0;border-radius:20px 20px 0 0;padding:8px 16px 24px;max-width:560px;margin:0 auto}
+.sheethead{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.sheethead h2{font-size:18px;margin:0}
+.xbtn{min-height:44px;min-width:44px;border:0;background:transparent;color:var(--accent);font:inherit;font-weight:600;cursor:pointer}
+.pills{position:sticky;top:0;z-index:5;background:var(--bg);display:flex;gap:6px;overflow-x:auto;margin:0 -16px 12px;padding:8px 16px;border-bottom:1px solid var(--line);scrollbar-width:none}
+.pills::-webkit-scrollbar{display:none}
+.pill{flex:none;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--muted);font:inherit;font-size:14px;cursor:pointer;white-space:nowrap}
+.pill[aria-current="true"]{border-color:var(--accent);color:var(--accent);font-weight:600}
+.chap{scroll-margin-top:70px}
+.cause{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:8px 0;border-top:1px solid var(--line);font-size:15px}
+.cause small{color:var(--muted);font-size:13px;text-align:right;flex:0 1 55%}
+.cause.less{opacity:.6}
+.cause.less span{color:var(--muted);text-decoration:line-through}
+.cause.fav span{font-weight:700}
+.cause.fav span:before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--accent);margin-right:8px}
+.ptr{border-top:1px solid var(--line);padding:8px 0}
+.ptr b{display:block}
+.ptr span{font-size:14px;color:var(--muted)}
+.trial{border-left:3px solid var(--accent);padding-left:12px}
+.trial p{margin:0 0 6px;font-size:15px}
+.trial .k{font-family:var(--mono);font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);display:block}
+@media (max-width:420px){.grid{grid-template-columns:1fr 1fr}.checks{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="/">← bedside.tools</a>
+<h1>AKI workup</h1>
+<p class="purpose">Stage it, find where the kidney is failing, and stop what is hurting it.</p>
+
+<div class="tabs" role="tablist">
+  <button class="tab" role="tab" id="t-tool" aria-selected="true" aria-controls="p-tool">Kidney</button>
+  <button class="tab" role="tab" id="t-learn" aria-selected="false" aria-controls="p-learn">Learn</button>
+  <button class="tab" role="tab" id="t-ref" aria-selected="false" aria-controls="p-ref">Reference</button>
+  <button class="tab" role="tab" id="t-prac" aria-selected="false" aria-controls="p-prac">Practice</button>
+</div>
+
+<div class="panel on" id="p-tool" role="tabpanel" aria-labelledby="t-tool">
+  <div id="inputs">
+  <div class="card" id="creat">
+    <p class="label">Creatinine (mg/dL)</p>
+    <div class="grid">
+      <div class="field"><label for="cr0">Baseline</label><input id="cr0" inputmode="decimal" autocomplete="off"></div>
+      <div class="field"><label for="cr1">Now</label><input id="cr1" inputmode="decimal" autocomplete="off"></div>
+    </div>
+    <p class="q">The rise happened over</p>
+    <div class="seg" data-seg="win" role="group" aria-label="Time of the rise">
+      <button class="sbtn" data-v="48" aria-pressed="true">48 h or less</button>
+      <button class="sbtn" data-v="7d" aria-pressed="false">2 to 7 days</button>
+      <button class="sbtn" data-v="long" aria-pressed="false">Longer or unknown</button>
+    </div>
+    <label class="chk" style="margin-top:12px"><input type="checkbox" id="rrt">Dialysis or CRRT already started</label>
+    <p class="note" style="margin:8px 0 0">Baseline: the most recent steady value before this illness (KDIGO 2026 draft: an outpatient value from 8 to 365 days before admission).</p>
+  </div>
+  <div class="card" id="uo">
+    <p class="label">Urine output</p>
+    <div class="grid">
+      <div class="field"><label for="uml">Urine (mL)</label><input id="uml" inputmode="decimal" autocomplete="off"></div>
+      <div class="field"><label for="uh">Over (hours)</label><input id="uh" inputmode="decimal" autocomplete="off"></div>
+      <div class="field"><label for="wt">Weight (kg)</label><input id="wt" inputmode="decimal" autocomplete="off"></div>
+    </div>
+    <p class="note" style="margin:8px 0 0">The KDIGO 2026 draft uses ideal body weight; actual weight in obesity makes the rate look lower.</p>
+  </div>
+  <div class="card" id="indices">
+    <p class="label">Urine and blood chemistry</p>
+    <div class="grid">
+      <div class="field"><label for="sna">Serum Na</label><input id="sna" inputmode="decimal" autocomplete="off"></div>
+      <div class="field"><label for="una">Urine Na</label><input id="una" inputmode="decimal" autocomplete="off"></div>
+      <div class="field"><label for="ucr">Urine creat</label><input id="ucr" inputmode="decimal" autocomplete="off"></div>
+      <div class="field"><label for="bun">BUN</label><input id="bun" inputmode="decimal" autocomplete="off"></div>
+      <div class="field"><label for="uun">Urine urea N</label><input id="uun" inputmode="decimal" autocomplete="off"></div>
+    </div>
+    <p class="note" style="margin:8px 0 0">Uses the creatinine "Now" above. Urine and serum creatinine in the same units; urine urea nitrogen and BUN in the same units.</p>
+    <div class="checks" id="ticks-a"></div>
+  </div>
+  <div class="card" id="sediment">
+    <p class="label">Urine under the microscope (fresh, looked at by a person)</p>
+    <div class="checks" id="ticks-s"></div>
+  </div>
+  <div class="card" id="context">
+    <p class="label">Clues to obstruction</p>
+    <div class="checks" id="ticks-o"></div>
+    <p class="label" style="margin-top:16px">Setting</p>
+    <div class="checks" id="ticks-c"></div>
+  </div>
+  <div class="card" id="meds">
+    <p class="label">Drugs and exposures in the last few days</p>
+    <div class="checks" id="ticks-m"></div>
+  </div>
+  </div>
+  <div id="out"><div class="card empty">Enter baseline and current creatinine, or urine output, to start. Add urine chemistry, sediment and drugs to find the cause.</div></div>
+</div>
+
+<div class="panel" id="p-learn" role="tabpanel" aria-labelledby="t-learn">
+  <div class="pills" id="pills"></div>
+  <div class="card chap" id="learn-where" data-pill="Where"><p class="label">1 · Three places to fail</p><h2>Before, inside, or after the kidney</h2><p class="sub">Pick a cause to see which part fails and what the urine shows.</p><div data-figure="where"></div></div>
+  <div class="card chap" id="learn-lag" data-pill="Creatinine lags"><p class="label">2 · The number is late</p><h2>Creatinine trails the injury</h2><p class="sub">Filtration can fall in an hour; creatinine takes days to catch up.</p><div data-figure="lag"></div></div>
+  <div class="card chap" id="learn-tubule" data-pill="Sodium and urea"><p class="label">3 · Reading the tubule</p><h2>What FENa and FEUrea measure</h2><p class="sub">Pick a state. Watch what the tubule keeps and what reaches the urine.</p><div data-figure="tubule"></div></div>
+  <div class="card chap" id="learn-sediment" data-pill="Microscope"><p class="label">4 · The urine sediment</p><h2>Casts are molds of the tubule</h2><p class="sub">Pick a finding.</p><div data-figure="sediment"></div></div>
+  <div class="card chap" id="trials" data-pill="Trials"><p class="label">5 · Evidence</p><h2>Three trials that changed the defaults</h2><div id="trialbox"></div><div class="row"><button class="btn" id="go-prac">Try the practice cases</button></div></div>
+</div>
+
+<div class="panel" id="p-ref" role="tabpanel" aria-labelledby="t-ref">
+ <div class="refgrid">
+  <div class="card" id="kdigo">
+    <p class="label">KDIGO 2012 · definition and stage</p>
+    <h2>Is it AKI, and how bad?</h2>
+    <p class="sub">AKI is any one of: creatinine up 0.3 mg/dL or more within 48 hours; creatinine 1.5 times baseline or more, known or presumed to have happened within the prior 7 days; urine under 0.5 mL/kg/h for 6 hours.</p>
+    <div class="tw"><table>
+      <tr><th>Stage</th><th>Creatinine</th><th>Urine output</th></tr>
+      <tr><td class="mono">1</td><td>1.5–1.9 × baseline, or up ≥ 0.3 mg/dL</td><td>&lt; 0.5 mL/kg/h for 6–12 h</td></tr>
+      <tr><td class="mono">2</td><td>2.0–2.9 × baseline</td><td>&lt; 0.5 mL/kg/h for ≥ 12 h</td></tr>
+      <tr><td class="mono">3</td><td>3.0 × baseline, or ≥ 4.0 mg/dL, or dialysis started</td><td>&lt; 0.3 mL/kg/h for ≥ 24 h, or none for ≥ 12 h</td></tr>
+    </table></div>
+    <p class="whyline"><b>Why:</b> The stage is the worse of the two columns. A creatinine of 4.0 or more counts as stage 3 only once the definition above is met, so stable kidney disease is not AKI.</p>
+    <details><summary>More</summary>
+      <p>Acute kidney disease (KDIGO 2012): kidney function abnormal for less than 3 months, for example creatinine up 50% or more or GFR down 35% or more, without meeting the AKI definition. The 2026 draft keeps the creatinine and urine thresholds, adds cystatin C and kidney damage biomarkers, and splits AKI that lasts 48 hours or less (transient) from longer (persistent).</p>
+      <p>Cystatin C can help when creatinine is unreliable (very low muscle mass, amputation, drugs that block creatinine secretion): KDIGO 2026 draft Rec 1.1.1 (2B).</p>
+      <span class="tier">KDIGO 2012, 2.1.1–2.1.2 (not graded)</span><span class="tier">KDIGO 2026 draft, PP 1.1.1–1.3.1</span>
+    </details>
+  </div>
+  <div class="card" id="fe-ref">
+    <p class="label">Urine indices</p>
+    <h2>FENa and FEUrea, and when they mislead</h2>
+    <p class="sub mono" style="margin-top:6px">FENa = (urine Na × serum Cr) ÷ (serum Na × urine Cr) × 100</p>
+    <p class="sub mono">FEUrea = (urine urea N × serum Cr) ÷ (BUN × urine Cr) × 100</p>
+    <ul>
+      <li>FENa under 1% fits a prerenal pattern; tubular injury and obstruction usually run higher (in oliguric patients, prerenal under 1, tubular necrosis over 3).</li>
+      <li>Best when oliguric with no kidney disease and no diuretic: sensitivity 95%, specificity 91%. On diuretics specificity falls to 54%.</li>
+      <li>FEUrea 35% or under fits a prerenal pattern; urea is reabsorbed passively, so diuretics move it less. One study (n = 102) found it better than FENa on diuretics; a second (n = 99) found specificity of 33% on diuretics.</li>
+      <li>FENa can be low despite intrinsic disease: acute glomerulonephritis, early obstruction, some sepsis.</li>
+      <li>FEUrea is unreliable in sepsis, osmotic diuresis, mannitol or acetazolamide.</li>
+    </ul>
+    <p class="whyline"><b>Why:</b> Both indices ask one question: is the tubule still able to hold on to what was filtered? A diuretic answers "no" on the tubule's behalf.</p>
+    <details><summary>More</summary>
+      <p>The KDIGO 2026 draft advises reserving FENa and FEUrea for selected situations because of their limited overall usefulness (PP 2.5.4). In cirrhosis, FENa is an adjunct; very low values favour hepatorenal AKI, but not on their own (PP 2.5.5).</p>
+      <span class="tier">Espinel 1976; Miller 1978 (single studies)</span><span class="tier">Abdelhafez 2022 meta-analysis</span><span class="tier">Carvounis 2002; Pépin 2007</span><span class="tier">KDIGO 2026 draft PP 2.5.4–2.5.5 (ungraded)</span>
+    </details>
+  </div>
+  <div class="card" id="sed-ref">
+    <p class="label">Urine sediment</p>
+    <h2>What each finding points to</h2>
+    <div class="tw"><table>
+      <tr><th>Finding</th><th>Points to</th></tr>
+      <tr><td>Muddy brown granular casts, tubular epithelial cells</td><td>Acute tubular injury</td></tr>
+      <tr><td>No casts, no tubular cells (bland)</td><td>Prerenal or obstruction more likely; does not exclude interstitial nephritis</td></tr>
+      <tr><td>Red cell casts, dysmorphic red cells</td><td>Glomerular disease, usually</td></tr>
+      <tr><td>White cell casts, sterile pyuria</td><td>Interstitial nephritis; also pyelonephritis</td></tr>
+      <tr><td>Dipstick blood with few or no red cells</td><td>Heme pigment: myoglobin (check CK) or hemoglobin</td></tr>
+    </table></div>
+    <p class="whyline"><b>Why:</b> A cast forms inside a tubule and takes its shape, so whatever is caught in it came from the kidney itself.</p>
+    <details><summary>More</summary>
+      <p>The KDIGO 2026 draft suggests urine microscopy, especially when the cause is unclear (Rec 2.5.1, 2D). Automated urinalysis is not reliable enough to diagnose tubular injury, glomerulonephritis or interstitial nephritis. Do not send urine eosinophils: neither necessary nor sufficient for interstitial nephritis (PP 2.5.2).</p>
+      <p>In a study of 267 patients, any casts or tubular cells strongly predicted tubular necrosis when it was suspected; when prerenal AKI was suspected, a sediment with neither had a negative predictive value of 91%. Red cell casts can occur in interstitial nephritis, and about 1 in 5 cases of interstitial nephritis have a bland sediment.</p>
+      <span class="tier">KDIGO 2026 draft Rec 2.5.1 (2D), PP 2.5.1–2.5.2</span><span class="tier">Perazella 2008 (study)</span><span class="tier">red and white cell casts, pigment: expert practice and reviews</span>
+    </details>
+  </div>
+  <div class="card" id="imaging">
+    <p class="label">Imaging</p>
+    <h2>Bladder scan first; ultrasound when obstruction is possible</h2>
+    <ul>
+      <li>Bladder scan or catheter flush first whenever retention is possible.</li>
+      <li>Kidney ultrasound when there is anuria or oliguria, urinary symptoms, stones or past hydronephrosis, recurrent urinary infection, prostate disease, neurogenic bladder, pelvic cancer or surgery, a single kidney, or a catheter that drains poorly; and when the cause stays unclear.</li>
+      <li>Low yield when none of those clues is present and a prerenal, heart failure or drug cause is evident.</li>
+    </ul>
+    <p class="whyline"><b>Why:</b> Obstruction is fixable, but in hospitalized AKI it is uncommon; the clues pick out who has it.</p>
+    <details><summary>More</summary>
+      <p>In 797 inpatients with AKI who had ultrasound, 10.6% had hydronephrosis and 3.3% needed an intervention. In the study's low-risk group, 3.1% had hydronephrosis and 0.4% needed an intervention. That group was defined by a seven-factor rule that included race; this tool does not use race and does not claim that study's yield for its own advice.</p>
+      <span class="tier">KDIGO 2026 draft PP 2.5.9 (ungraded)</span><span class="tier">Licurse 2010 (cross-sectional study)</span><span class="tier">bladder scan: expert practice</span>
+    </details>
+  </div>
+  <div class="card" id="drug-ref">
+    <p class="label">Drugs</p>
+    <h2>Stop, switch, reduce, monitor</h2>
+    <ul>
+      <li>Stop: NSAIDs. Hold while creatinine rises or the patient is dry or hypotensive: ACE inhibitor, ARB, ARNI, MRA, diuretics (unless overloaded), SGLT2 inhibitor.</li>
+      <li>Metformin: label says stop if eGFR below 30 and in shock, sepsis or hypoxemia.</li>
+      <li>Avoid aminoglycosides when an alternative exists; once daily and levels if used. Lipid amphotericin over conventional.</li>
+      <li>Vancomycin by AUC (400–600), not trough alone.</li>
+      <li>Do not dose by an eGFR equation while creatinine is changing: follow the creatinine and urine output trend.</li>
+      <li>Raise creatinine without lowering GFR: trimethoprim, cimetidine, cobicistat, dolutegravir.</li>
+    </ul>
+    <p class="whyline"><b>Why:</b> Drugs are the most reversible cause, and every renally cleared dose is now too high.</p>
+    <details><summary>More</summary>
+      <p>The KDIGO 2026 draft recommends multimodal drug and nephrotoxin stewardship (Rec 4.2.1, 1C) and starting or resuming RAS inhibitors after AKI in adults unless contraindicated (Rec 6.2.1, 1B). Holding them during the rise is expert practice. SGLT2 inhibitors and RAS inhibitors lower GFR through haemodynamics without injuring the kidney.</p>
+      <p>Iodinated contrast: do not delay a needed study; lowest dose; 0.9% saline for high-risk patients who are not overloaded (2026 draft Rec 4.9.2.1, 1B). Bicarbonate and acetylcysteine add nothing (PRESERVE). Metformin and contrast: the US label stops it at eGFR 30–60, the 2026 draft only with AKI or eGFR 30 or under.</p>
+      <span class="tier">KDIGO 2012, 3.8.1 (2A), 3.8.2 (2B), 3.8.3 (1A), 3.8.6 (2A)</span><span class="tier">KDIGO 2026 draft Rec 4.2.1 (1C), PP 4.5.1–4.5.2, Table 26</span><span class="tier">Rybak 2020 vancomycin guideline (A-II)</span><span class="tier">metformin US label</span>
+    </details>
+  </div>
+  <div class="card" id="rrt-ref">
+    <p class="label">Supportive care and dialysis</p>
+    <h2>What helps, what does not, when to dialyse</h2>
+    <ul>
+      <li>Crystalloid, not colloid, for volume (KDIGO 2012, 2B; 2026 draft, 1B). Buffered crystalloid over 0.9% saline unless traumatic brain injury (2026 draft, 1B).</li>
+      <li>Vasopressors with fluids in vasodilatory shock (2012, 1C); MAP above 65 (2026 draft, 2C).</li>
+      <li>Diuretics for volume overload only, not to treat AKI (2012, 2C).</li>
+      <li>No low-dose dopamine (2012, 1A), fenoldopam (2C) or natriuretic peptide (2C to prevent, 2B to treat).</li>
+      <li>Dialysis urgently for life-threatening fluid, potassium or acid-base problems that do not respond to treatment, uremic complications (pericarditis, encephalopathy, bleeding), or a dialyzable poison.</li>
+      <li>Without those, starting early does not help: wait and watch (2026 draft Rec 5.1.1, 1C; STARRT-AKI).</li>
+    </ul>
+    <p class="whyline"><b>Why:</b> Most AKI recovers if perfusion is restored and the injury stops; dialysis replaces function, it does not speed recovery.</p>
+    <details><summary>More</summary>
+      <p>KDIGO 2012, 5.1.1 (not graded): start dialysis emergently when life-threatening changes in fluid, electrolyte and acid-base balance exist. Hepatorenal AKI: vasoconstrictor therapy (2026 draft Rec 3.6.1, 1C); see <a href="/cirrhosis/#aki">cirrhosis</a>.</p>
+      <span class="tier">KDIGO 2012, 3.1.1, 3.1.2, 3.4.2, 3.5.1–3.5.3, 5.1.1</span><span class="tier">KDIGO 2026 draft Rec 3.1.1–3.1.2, 3.2.1, 5.1.1</span><span class="tier">uremic and poison indications: expert practice</span>
+    </details>
+  </div>
+  <div class="card" id="narrow">
+    <p class="label">Workup · tap each result you have</p>
+    <h2>Narrow the differential</h2>
+    <div class="states" id="nw-results" role="group" aria-label="Results"></div>
+    <div id="nw-causes"></div>
+    <p class="line1" id="nw-next"></p>
+    <p class="whyline"><b>Why:</b> Urine and a bladder scan are cheap and fast; together they split the kidney into before, inside and after.</p>
+    <details><summary>More</summary>
+      <p><b>Send first:</b> basic metabolic panel, urinalysis with microscopy on a fresh sample, spot urine sodium, creatinine and urea nitrogen (before diuretics if possible), a bladder scan, and a medicine review. CK if the patient was down, crushed, seized or is on a statin with pain.</p>
+      <p><b>Send after a result:</b> kidney ultrasound if obstruction is possible or the cause is unclear. With red cell casts or blood and protein: nephrology the same day and serologies as they advise. Serum free light chains and protein electrophoresis if myeloma is possible.</p>
+      <p>Faded means less likely, never excluded: two causes often coexist (sepsis and contrast, heart failure and a diuretic).</p>
+      <span class="tier">fading rules: expert practice, from the sources above</span>
+    </details>
+  </div>
+ </div>
+</div>
+
+<div class="panel" id="p-prac" role="tabpanel" aria-labelledby="t-prac">
+  <div id="practice"></div>
+</div>
+
+<div class="scrim" id="scrim" hidden></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-t" hidden>
+  <div class="sheethead"><h2 id="sheet-t"></h2><button class="xbtn" id="sheet-x">Close</button></div>
+  <div id="sheet-b"></div>
+</div>
+
+<footer>
+  <p><strong>For education only. Not a substitute for clinical judgment.</strong> Built to the KDIGO 2012 AKI guideline, the current final edition. The KDIGO 2026 AKI and AKD guideline was a public review draft when this was reviewed; rows from it are marked "draft" and may change. Rows marked expert practice are not from a graded guideline. Drug lists are examples, not complete; adjust to your institution's formulary and dosing service.</p>
+  <p>Privacy: everything runs in your browser. Nothing you enter is sent anywhere or stored, and there are no analytics. Do not enter names, record numbers, or dates of birth.</p>
+  <p class="mono">Last reviewed: 2026-11-18</p>
+  <p><strong>Sources:</strong> KDIGO Clinical Practice Guideline for Acute Kidney Injury, Kidney Int Suppl 2012;2:1 (graded 1–2, A–D) · KDIGO 2026 Clinical Practice Guideline for AKI and AKD, public review draft, March 2026 (graded; draft) · Espinel CH, JAMA 1976;236:579 · Miller TR et al., Ann Intern Med 1978;89:47 · Carvounis CP et al., Kidney Int 2002;62:2223 · Pépin MN et al., Am J Kidney Dis 2007;50:566 · Abdelhafez M et al., Clin J Am Soc Nephrol 2022;17:785 (meta-analysis) · Perazella MA et al., Clin J Am Soc Nephrol 2008;3:1615 · Licurse A et al., Arch Intern Med 2010;170:1900 · Rybak MJ et al., Am J Health Syst Pharm 2020;77:835 (vancomycin) · Metformin hydrochloride US prescribing information · Trials: Semler MW et al., N Engl J Med 2018;378:829 (SMART) · STARRT-AKI Investigators, N Engl J Med 2020;383:240 · Weisbord SD et al., N Engl J Med 2018;378:603 (PRESERVE) · Qian ET et al., JAMA 2023;330:1557 (ACORN) · Diagrams are schematic and drawn for this site.</p>
+</footer>
+</div>
+
+<script id="engine">
+/* Pure decision engine. No DOM access. Units: creatinine, BUN, urea nitrogen mg/dL; sodium mmol/L; urine mL; hours; kg.
+   Every threshold is listed in the tool's decision table (aki-record.md). */
+function r2(x){ return Math.round(x * 100) / 100; }
+function r1(x){ return Math.round(x * 10) / 10; }
+var EPS = 1e-9;
+
+/* KDIGO 2012 Table 2, with the 2.1 rule that creatinine >= 4.0 counts only once the AKI definition is met. */
+function stageCr(i){
+  var o = {stage: null};
+  if (i.rrt) { o.stage = 3; o.met = true; o.by = 'rrt'; }
+  if (i.cr0 == null || i.cr1 == null || i.cr0 <= 0) return o;
+  var rise = r2(i.cr1 - i.cr0), ratio = Math.round(i.cr1 / i.cr0 * 1000) / 1000;
+  o.rise = rise; o.ratio = ratio;
+  var by03 = i.win === '48' && rise >= 0.3 - EPS;
+  var by15 = (i.win === '48' || i.win === '7d') && ratio >= 1.5 - EPS;
+  if (!(by03 || by15)){
+    if (!o.met){ o.stage = 0; o.slow = i.win === 'long' && (ratio >= 1.5 - EPS || rise >= 0.3 - EPS); o.akd = i.win === 'long' && ratio >= 1.5 - EPS; o.fall = rise < 0; }
+    return o;
+  }
+  o.met = true;
+  var s = 1;
+  if (ratio >= 2 - EPS) s = 2;
+  if (ratio >= 3 - EPS || i.cr1 >= 4 - EPS) s = 3;
+  if (!o.by){ o.stage = s; o.by = by15 ? 'ratio' : '03'; if (s === 3 && ratio < 3 - EPS) o.by = '4'; }
+  o.crStage = s;
+  return o;
+}
+function stageUO(i){
+  if (i.uml == null || i.uh == null || i.wt == null || i.wt <= 0 || i.uh <= 0) return null;
+  var rate = Math.round(i.uml / i.wt / i.uh * 1000) / 1000, h = i.uh, s = 0;
+  if (h < 6 - EPS) return {rate: rate, stage: null, short: true};
+  if (rate < 0.5 - EPS) s = 1;
+  if (rate < 0.5 - EPS && h >= 12 - EPS) s = 2;
+  if ((rate < 0.3 - EPS && h >= 24 - EPS) || (i.uml === 0 && h >= 12 - EPS)) s = 3;
+  return {rate: rate, stage: s, anuric: i.uml === 0};
+}
+function fe(i){
+  var o = {};
+  if (i.una != null && i.sna && i.ucr && i.cr1 != null) o.fena = r2(i.una * i.cr1 / (i.sna * i.ucr) * 100);
+  if (i.uun != null && i.bun && i.ucr && i.cr1 != null) o.feu = r1(i.uun * i.cr1 / (i.bun * i.ucr) * 100);
+  if (o.fena == null && o.feu == null) return null;
+  o.diur = !!i.diur;
+  if (o.fena != null) o.naPre = o.fena < 1 - EPS;
+  if (o.feu != null) o.uPre = o.feu <= 35 + EPS;
+  /* lead index: FEUrea when a diuretic was given and FEUrea is available, otherwise FENa (decision table 2.7) */
+  o.lead = o.diur && o.feu != null ? 'feu' : (o.fena != null ? 'fena' : 'feu');
+  if (o.lead === 'fena') o.pattern = o.diur ? (o.naPre ? 'pre' : 'unclear') : (o.naPre ? 'pre' : 'notpre');
+  else o.pattern = o.uPre ? (o.diur ? 'prePossible' : 'pre') : 'notpre';
+  return o;
+}
+var OBS = ['hn','uti','prost','single','cath'];
+var NEPHROTOX = ['nsaid','acei','mra','sglt2','amg','vanc','ampho','acyc','cni','lith','ppi','contrast'];
+function decide(i){
+  var o = {cr: stageCr(i), uo: stageUO(i), fe: fe(i)};
+  var cs = o.cr.stage, us = o.uo && o.uo.stage;
+  o.any = cs != null || (o.uo != null);
+  o.stage = Math.max(cs || 0, us || 0);
+  if (cs == null && (us == null)) o.stage = null;
+  o.aki = o.stage != null && o.stage > 0;
+  o.obsClues = OBS.filter(function(k){ return i[k]; });
+  o.anuric = o.uo && o.uo.anuric;
+  o.oliguric = o.uo && o.uo.rate < 0.5 - EPS;
+  o.drugs = NEPHROTOX.filter(function(k){ return i[k]; }).concat(i.metf ? ['metf'] : []).concat(i.tmp ? ['tmp'] : []);
+  o.ptr = pointers(i, o);
+  return o;
+}
+/* Where it fails: each pointer with the input that raised it. */
+function pointers(i, o){
+  var p = [];
+  var F = o.fe;
+  if (o.obsClues.length || o.anuric) p.push({k: 'post', n: 'Obstruction possible', r: (o.anuric ? 'no urine' : '') + (o.anuric && o.obsClues.length ? '; ' : '') + o.obsClues.map(function(k){ return OBS_N[k]; }).join(', ')});
+  if (i.gran) p.push({k: 'atn', n: 'Acute tubular injury', r: 'granular casts or tubular cells in the urine'});
+  if (i.rbcc) p.push({k: 'gn', n: 'Glomerulonephritis or vasculitis', r: 'red cell casts or dysmorphic red cells'});
+  if (i.wbcc) p.push({k: 'ain', n: 'Interstitial nephritis (or pyelonephritis)', r: 'white cell casts or sterile pyuria' + (i.ppi || i.nsaid ? ', with a culprit drug' : '')});
+  if (i.heme || i.crush) p.push({k: 'pig', n: 'Heme pigment: rhabdomyolysis or hemolysis', r: [i.heme ? 'blood on dipstick with few red cells' : '', i.crush ? 'down, crushed, seizure or severe exertion' : ''].filter(Boolean).join('; ')});
+  if (F && (F.pattern === 'pre' || F.pattern === 'prePossible')) p.push({k: 'pre', n: F.pattern === 'pre' ? 'Prerenal pattern' : 'Prerenal pattern possible', r: (F.lead === 'feu' ? 'FEUrea ' + F.feu + '%' : 'FENa ' + F.fena + '%') + (F.pattern === 'prePossible' ? ' on a diuretic; low specificity' : '')});
+  if (F && F.pattern === 'notpre' && !i.gran) p.push({k: 'atn', n: 'Tubular injury or obstruction more likely than prerenal', r: F.lead === 'feu' ? 'FEUrea ' + F.feu + '%' : 'FENa ' + F.fena + '% without a diuretic'});
+  if (i.hf) p.push({k: 'pre', n: 'Cardiorenal (low flow or congestion)', r: 'heart failure'});
+  if (i.cirr) p.push({k: 'pre', n: 'Cirrhosis: think hepatorenal AKI after volume and drugs', r: 'cirrhosis', link: '/cirrhosis/#aki'});
+  if (i.sepsis) p.push({k: 'atn', n: 'Sepsis: hypoperfusion and tubular injury', r: 'sepsis or shock'});
+  if (i.nsaid || i.acei) p.push({k: 'pre', n: 'Haemodynamic drug effect', r: [i.nsaid ? 'NSAID' : '', i.acei ? 'ACE inhibitor, ARB or ARNI' : ''].filter(Boolean).join(' and ')});
+  if (i.amg || i.vanc || i.ampho || i.acyc || i.contrast) p.push({k: 'atn', n: 'Toxic tubular injury possible', r: ['amg','vanc','ampho','acyc','contrast'].filter(function(k){ return i[k]; }).map(function(k){ return MED_N[k]; }).join(', ')});
+  if (i.bland && !i.gran && !i.rbcc && !i.wbcc) p.push({k: 'pre', n: 'Bland urine: prerenal or obstruction more likely', r: 'no casts or tubular cells; interstitial nephritis is still possible'});
+  return p;
+}
+var OBS_N = {hn: 'stones or past hydronephrosis', uti: 'recurrent urinary infection', prost: 'prostate, neurogenic bladder or pelvic cancer or surgery', single: 'single kidney', cath: 'catheter draining poorly'};
+var MED_N = {nsaid: 'NSAID', acei: 'ACE inhibitor, ARB or ARNI', mra: 'MRA (spironolactone, eplerenone)', sglt2: 'SGLT2 inhibitor', metf: 'Metformin', amg: 'aminoglycoside', vanc: 'vancomycin', ampho: 'amphotericin', acyc: 'IV acyclovir', cni: 'Tacrolimus or cyclosporine', lith: 'Lithium', ppi: 'Proton pump inhibitor', contrast: 'iodinated contrast', tmp: 'Trimethoprim'};
+
+/* Narrowing workup (Reference). States: fav, in, less. */
+var CAUSES = [['pre','Prerenal: volume loss or low flow'],['hemo','Haemodynamic drugs: NSAID, ACE inhibitor or ARB'],['atn','Acute tubular injury'],['pig','Pigment: rhabdomyolysis or hemolysis'],['ain','Interstitial nephritis'],['gn','Glomerulonephritis or vasculitis'],['obs','Obstruction']];
+var RESULTS = [['feLo','FENa under 1%, no diuretic','fe'],['feHi','FENa 1% or more, no diuretic','fe'],['gran','Granular casts or tubular cells',''],['bland','Bland sediment',''],['rbcc','Red cell casts',''],['wbcc','White cell casts or sterile pyuria',''],['heme','Dipstick blood, few red cells',''],['ck','CK very high',''],['hn','Hydronephrosis or full bladder','us'],['nohn','No hydronephrosis, empty bladder','us']];
+var NRULES = {
+  feLo: {fav: {pre: 'tubules are holding sodium', hemo: 'tubules are holding sodium'}, less: {atn: 'an injured tubule usually cannot hold sodium this well (some sepsis can)'}},
+  feHi: {fav: {atn: 'sodium leaks from an injured tubule'}, less: {pre: 'an under-filled kidney with working tubules usually holds sodium under 1%', hemo: 'same reason as prerenal'}},
+  gran: {fav: {atn: 'casts of dead tubular cells'}, less: {pre: 'casts point to injury, not under-filling', hemo: 'casts point to injury'}},
+  bland: {fav: {pre: 'no sign of injury in the urine'}, less: {atn: 'no casts or tubular cells (negative predictive value 91% when injury was not suspected)', gn: 'no red cell casts or dysmorphic cells'}},
+  rbcc: {fav: {gn: 'red cells cast in the tubule usually come through the glomerulus'}},
+  wbcc: {fav: {ain: 'white cells in the interstitium spill into the urine'}},
+  heme: {fav: {pig: 'the dipstick reads heme pigment, not red cells'}},
+  ck: {fav: {pig: 'muscle breakdown releases myoglobin'}},
+  hn: {fav: {obs: 'outflow is blocked'}},
+  nohn: {less: {obs: 'no dilated system and no retained urine'}}
+};
+function narrow(sel){
+  return CAUSES.map(function(c){
+    var fav = [], less = [];
+    Object.keys(sel).forEach(function(r){ var R = NRULES[r]; if (!R) return; if (R.fav && R.fav[c[0]]) fav.push(R.fav[c[0]]); if (R.less && R.less[c[0]]) less.push(R.less[c[0]]); });
+    var st = fav.length && !less.length ? 'fav' : less.length && !fav.length ? 'less' : 'in';
+    return {k: c[0], name: c[1], st: st, why: st === 'fav' ? fav[0] : st === 'less' ? less[0] : (fav.length ? 'mixed results' : '')};
+  });
+}
+function narrowNext(sel){
+  var n = [];
+  if (!sel.feLo && !sel.feHi) n.push('spot urine sodium, creatinine and urea nitrogen');
+  if (!sel.gran && !sel.bland && !sel.rbcc && !sel.wbcc && !sel.heme) n.push('urinalysis with microscopy on a fresh sample');
+  if (!sel.hn && !sel.nohn) n.push('a bladder scan, and an ultrasound if obstruction is possible');
+  if (sel.heme && !sel.ck) n.push('CK');
+  if (sel.rbcc) n.push('nephrology today, serologies as they advise');
+  if (sel.wbcc) n.push('stop the likely drug; nephrology');
+  if (sel.hn) n.push('relieve the obstruction: catheter, or urology for the upper tract');
+  return n.length ? n.join('; ') + '.' : 'Recheck creatinine and urine output; if no cause fits, ask nephrology.';
+}
+</script>
+<script>
+(function(){
+var $ = function(id){ return document.getElementById(id); };
+function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+var TICKS = {
+  'ticks-a': [['diur','Loop or thiazide diuretic in the last 24 h'],['ckd','Chronic kidney disease']],
+  'ticks-s': [['gran','Muddy brown granular casts or tubular cells'],['bland','Bland: no casts, no tubular cells'],['rbcc','Red cell casts or dysmorphic red cells'],['wbcc','White cell casts or sterile pyuria'],['heme','Dipstick blood, few or no red cells']],
+  'ticks-o': [['hn','Stones or past hydronephrosis'],['uti','Recurrent urinary infection'],['prost','Prostate, neurogenic bladder, pelvic cancer or surgery'],['single','Single kidney'],['cath','Catheter draining poorly']],
+  'ticks-c': [['sepsis','Sepsis or shock'],['hf','Heart failure'],['cirr','Cirrhosis'],['crush','Down for hours, crush, seizure, extreme exertion'],['transplant','Kidney transplant']],
+  'ticks-m': [['nsaid','NSAID'],['acei','ACE inhibitor, ARB or ARNI'],['mra','MRA (spironolactone, eplerenone)'],['sglt2','SGLT2 inhibitor'],['metf','Metformin'],['amg','Aminoglycoside'],['vanc','Vancomycin'],['ampho','Amphotericin'],['acyc','IV acyclovir'],['cni','Tacrolimus or cyclosporine'],['lith','Lithium'],['ppi','Proton pump inhibitor'],['tmp','Trimethoprim'],['contrast','Iodinated contrast']]
+};
+var ticked = {}, seg = {win: '48'};
+var NUMS = ['cr0','cr1','uml','uh','wt','sna','una','ucr','bun','uun'];
+Object.keys(TICKS).forEach(function(h){
+  $(h).innerHTML = TICKS[h].map(function(t){ return '<label class="chk"><input type="checkbox" data-k="' + t[0] + '">' + esc(t[1]) + '</label>'; }).join('');
+  $(h).addEventListener('change', function(e){ var k = e.target.getAttribute('data-k'); if (k){ ticked[k] = e.target.checked; render(); } });
+});
+$('rrt').addEventListener('change', render);
+document.querySelectorAll('[data-seg]').forEach(function(g){
+  g.addEventListener('click', function(e){ var v = e.target.getAttribute('data-v'); if (!v) return; seg[g.getAttribute('data-seg')] = v; [].forEach.call(g.children, function(b){ b.setAttribute('aria-pressed', String(b.getAttribute('data-v') === v)); }); render(); });
+});
+NUMS.forEach(function(k){ $(k).addEventListener('input', render); });
+function read(){
+  var i = {};
+  NUMS.forEach(function(k){ var v = parseFloat($(k).value); i[k] = isFinite(v) && v >= 0 ? v : null; });
+  Object.keys(ticked).forEach(function(k){ if (ticked[k]) i[k] = true; });
+  i.win = seg.win; i.rrt = $('rrt').checked;
+  return i;
+}
+
+/* ---------- figures ---------- */
+var FS = 'font-family:var(--sans)', FM = 'font-family:var(--mono)';
+function svgOpen(vb, label){ return '<svg viewBox="' + vb + '" role="img" aria-label="' + esc(label) + '" class="fig">'; }
+function markers(p){ return '<defs><marker id="' + p + 'a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--muted)"/></marker><marker id="' + p + 'h" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--warn)"/></marker></defs>'; }
+function box(x, y, w, h, t1, t2, hot){
+  var st = hot === 'bad' ? 'var(--bad)' : hot ? 'var(--warn)' : 'var(--line)', fl = hot === 'bad' ? 'var(--badbg)' : hot ? 'var(--warnbg)' : 'var(--fill)';
+  return '<rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="10" fill="' + fl + '" stroke="' + st + '"' + (hot ? ' stroke-width="2"' : '') + '/>' +
+    '<text x="' + (x + w / 2) + '" y="' + (y + (t2 ? h / 2 - 3 : h / 2 + 4)) + '" text-anchor="middle" style="' + FS + ';font-size:12px;font-weight:600;fill:var(--ink)">' + esc(t1) + '</text>' +
+    (t2 ? '<text x="' + (x + w / 2) + '" y="' + (y + h / 2 + 12) + '" text-anchor="middle" style="' + FM + ';font-size:10.5px;fill:var(--muted)">' + esc(t2) + '</text>' : '');
+}
+function txt(x, y, t, st, anchor){ return '<text x="' + x + '" y="' + y + '" text-anchor="' + (anchor || 'middle') + '" style="' + (st || FM + ';font-size:10.5px;fill:var(--muted)') + '">' + esc(t) + '</text>'; }
+
+var WHERE = {
+  normal: {n: 'Normal', hot: '', line: 'Blood flows in, the glomerulus filters, the tubule reclaims salt and water, urine drains out.', urine: 'urine: normal'},
+  pre: {n: 'Prerenal', hot: 'in', line: 'Too little flow reaches the glomerulus: volume loss, heart failure, cirrhosis, or an NSAID or ACE inhibitor effect. The tubule still works and holds on to sodium.', urine: 'bland urine; FENa often under 1%'},
+  atn: {n: 'Tubular injury', hot: 'tub', line: 'Tubular cells are injured by low flow, sepsis, toxins or pigment; dead cells slough into the lumen.', urine: 'granular casts, tubular cells; FENa usually 1% or more'},
+  ain: {n: 'Interstitial', hot: 'int', line: 'Inflammation around the tubules, most often from a drug (proton pump inhibitor, antibiotic, NSAID).', urine: 'white cells, white cell casts; can be bland'},
+  gn: {n: 'Glomerular', hot: 'glo', line: 'Inflamed glomeruli leak red cells and protein.', urine: 'red cell casts, dysmorphic red cells; FENa can be low'},
+  post: {n: 'Obstruction', hot: 'out', line: 'Outflow is blocked: prostate or bladder, both ureters, or one ureter of a single kidney.', urine: 'often bland; bladder scan or ultrasound shows it'}
+};
+function whereSVG(k, p){
+  var s = WHERE[k], h = svgOpen('0 0 340 236', 'Where the kidney fails: ' + s.n) + markers(p);
+  h += box(8, 92, 70, 52, 'Blood in', 'flow', s.hot === 'in' ? 'warn' : false);
+  h += '<rect x="98" y="8" width="150" height="196" rx="16" fill="none" stroke="var(--muted)" stroke-dasharray="4 4"/>' + txt(173, 24, 'KIDNEY');
+  h += box(108, 34, 130, 48, 'Glomerulus', 'filters', s.hot === 'glo' ? 'bad' : false);
+  h += box(108, 94, 130, 48, 'Tubule', 'reclaims Na, water', s.hot === 'tub' ? 'bad' : false);
+  h += box(108, 154, 130, 42, 'Interstitium', 'around tubules', s.hot === 'int' ? 'bad' : false);
+  h += box(262, 92, 70, 52, 'Outflow', 'ureters', s.hot === 'out' ? 'warn' : false);
+  h += '<path d="M78 118H104" stroke="' + (s.hot === 'in' ? 'var(--warn)' : 'var(--muted)') + '" stroke-width="' + (s.hot === 'in' ? 1.5 : 2.5) + '"' + (s.hot === 'in' ? ' stroke-dasharray="4 3"' : '') + ' marker-end="url(#' + p + (s.hot === 'in' ? 'h' : 'a') + ')"/>';
+  h += '<path d="M240 118H258" stroke="' + (s.hot === 'out' ? 'var(--warn)' : 'var(--muted)') + '" stroke-width="2.5" marker-end="url(#' + p + (s.hot === 'out' ? 'h' : 'a') + ')"/>';
+  if (s.hot === 'out') h += '<path d="M290 150V168M282 162L290 170L298 162" fill="none" stroke="var(--warn)" stroke-width="2"/>' + txt(297, 186, 'blocked') ;
+  else h += '<path d="M297 144V176" stroke="var(--muted)" stroke-width="2.5" marker-end="url(#' + p + 'a)"/>' + txt(297, 192, 'urine');
+  h += txt(170, 226, s.urine, FM + ';font-size:11px;fill:var(--ink)');
+  return h + '</svg>';
+}
+
+/* Creatinine after a fall in filtration: one-compartment model, schematic. Baseline 1.0 mg/dL; filtration falls to 25%. */
+function lagSeries(k){
+  var kel = 1.2, dt = 0.02, cr = 1, out = [];
+  for (var t = 0; t <= 5 + 1e-9; t += dt){
+    var g = k === 'recover' && t >= 2 ? 1 : 0.25;
+    out.push([r2(t), cr, g]);
+    cr += dt * kel * (1 - g * cr);
+  }
+  return out;
+}
+function crAt(S, d){ var best = S[0]; S.forEach(function(p){ if (Math.abs(p[0] - d) < Math.abs(best[0] - d)) best = p; }); return r1(best[1]); }
+var LAG = {
+  drop: {n: 'Filtration falls and stays down'},
+  recover: {n: 'Filtration recovers on day 2'}
+};
+function lagLine(k){ var S = lagSeries(k); if (k === 'drop') return 'Filtration falls to a quarter at hour 0. Creatinine is only ' + crAt(S, 1) + ' at day 1 and ' + crAt(S, 2) + ' at day 2, still climbing toward 4.0.'; var pk = 0; S.forEach(function(p){ if (p[1] > pk) pk = p[1]; }); return 'Filtration is back to normal on day 2, the day creatinine peaks (' + r1(pk) + '); it is still ' + crAt(S, 3) + ' at day 3.'; }
+function lagSVG(k, p){
+  var S = lagSeries(k), X = function(t){ return 40 + t * 56; }, Y = function(c){ return 170 - c * 36; }, YG = function(g){ return 170 - g * 144; };
+  var h = svgOpen('0 0 360 210', 'Creatinine lags behind filtration: ' + LAG[k].n);
+  for (var c = 0; c <= 4; c++) h += '<line x1="40" x2="320" y1="' + Y(c) + '" y2="' + Y(c) + '" stroke="var(--line)"/>' + txt(34, Y(c) + 4, String(c), FM + ';font-size:10px;fill:var(--muted)', 'end');
+  for (var d = 0; d <= 5; d++) h += txt(X(d), 186, 'day ' + d, FM + ';font-size:10px;fill:var(--muted)');
+  h += '<path d="M' + X(-0.3) + ' ' + YG(1) + 'L' + X(0) + ' ' + YG(1) + S.map(function(q){ return 'L' + X(q[0]).toFixed(1) + ' ' + YG(q[2]).toFixed(1); }).join('') + '" fill="none" stroke="var(--muted)" stroke-width="2" stroke-dasharray="5 4"/>' + txt(326, YG(1) + 4, '100%', FM + ';font-size:10px;fill:var(--muted)', 'start') + txt(326, YG(0.25) + 14, '25%', FM + ';font-size:10px;fill:var(--muted)', 'start');
+  h += '<path d="' + S.map(function(q, n){ return (n ? 'L' : 'M') + X(q[0]).toFixed(1) + ' ' + Y(q[1]).toFixed(1); }).join('') + '" fill="none" stroke="var(--accent)" stroke-width="3"/>';
+  h += txt(44, 14, 'creatinine, mg/dL (solid) · filtration (dashed)', FM + ';font-size:10px;fill:var(--muted)', 'start');
+  h += txt(186, 204, 'schematic: one-compartment model, numbers illustrative', FM + ';font-size:9.5px;fill:var(--muted)');
+  return h + '</svg>';
+}
+
+var TUB = {
+  pre: {n: 'Under-filled', line: 'Angiotensin and aldosterone drive sodium back into the blood; water follows, and urea follows water in the proximal tubule. FENa under 1%, FEUrea 35% or under.', na: 'under 1%', u: '35% or under', back: 'u', loop: 'u', cast: false},
+  atn: {n: 'Injured tubule', line: 'Injured cells cannot reclaim sodium, so it leaks into the urine; dead cells pack into casts. FENa usually 1% or more, FEUrea above 35%.', na: '1% or more', u: 'above 35%', back: 'd', loop: 'd', cast: true},
+  loop: {n: 'Loop diuretic', line: 'The diuretic blocks sodium uptake in the thick ascending limb, so FENa rises even in an under-filled kidney. Urea is still reclaimed upstream, so FEUrea moves less, but it misleads too.', na: 'often 1% or more', u: 'often 35% or under', back: 'u', loop: 'x', cast: false}
+};
+function tubSVG(k, p){
+  var s = TUB[k], h = svgOpen('0 0 340 230', 'Tubule handling of sodium and urea: ' + s.n) + markers(p);
+  var st = function(v){ return v === 'u' ? 'var(--accent)' : v === 'x' ? 'var(--bad)' : 'var(--muted)'; };
+  h += '<circle cx="34" cy="60" r="20" fill="var(--fill)" stroke="var(--muted)"/>' + txt(34, 64, 'glom', FM + ';font-size:10px;fill:var(--ink)');
+  h += '<path d="M54 60H120 Q130 60 130 70 V140 Q130 160 150 160 Q170 160 170 140 V70 Q170 60 180 60 H250 V170 H300" fill="none" stroke="' + (k === 'atn' ? 'var(--bad)' : 'var(--ink)') + '" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" opacity=".18"/>';
+  h += '<path d="M54 60H120 Q130 60 130 70 V140 Q130 160 150 160 Q170 160 170 140 V70 Q170 60 180 60 H250 V170 H300" fill="none" stroke="' + (k === 'atn' ? 'var(--bad)' : 'var(--muted)') + '" stroke-width="2"' + (k === 'atn' ? ' stroke-dasharray="6 4"' : '') + '/>';
+  h += txt(98, 82, 'proximal'); h += txt(150, 182, 'loop'); h += txt(224, 82, 'distal'); h += txt(282, 188, 'collecting');
+  /* reabsorption arrows back to blood (upward) */
+  [[82, 'Na + urea'], [210, 'Na']].forEach(function(a){ h += '<path d="M' + a[0] + ' 56V26" stroke="' + st(s.back) + '" stroke-width="' + (s.back === 'u' ? 3 : 1.5) + '"' + (s.back === 'd' ? ' stroke-dasharray="4 3"' : '') + ' marker-end="url(#' + p + 'a)"/>' + txt(a[0], 18, a[1], FM + ';font-size:10px;fill:var(--ink)'); });
+  h += '<path d="M178 120H206" stroke="' + st(s.loop) + '" stroke-width="' + (s.loop === 'u' ? 3 : 1.5) + '"' + (s.loop !== 'u' ? ' stroke-dasharray="4 3"' : '') + ' marker-end="url(#' + p + 'a)"/>' + txt(212, 124, 'Na', FM + ';font-size:10px;fill:var(--ink)', 'start');
+  if (s.loop === 'x') h += '<path d="M182 112L198 128M198 112L182 128" stroke="var(--bad)" stroke-width="3"/>' + txt(232, 124, 'blocked', FM + ';font-size:10px;fill:var(--bad)', 'start');
+  if (s.cast) h += '<rect x="226" y="96" width="14" height="40" rx="7" fill="var(--warn)" opacity=".7"/>' + txt(232, 150, 'cast', FM + ';font-size:10px;fill:var(--warn)');
+  h += '<rect x="8" y="198" width="160" height="26" rx="8" fill="var(--fill)"/>' + txt(88, 215, 'FENa ' + s.na, FM + ';font-size:10px;fill:var(--ink)');
+  h += '<rect x="174" y="198" width="160" height="26" rx="8" fill="var(--fill)"/>' + txt(254, 215, 'FEUrea ' + s.u, FM + ';font-size:10px;fill:var(--ink)');
+  return h + '</svg>';
+}
+
+var SED = {
+  gran: {n: 'Granular cast', line: 'Muddy brown granular casts: debris of dead tubular cells molded in the tubule. They point to acute tubular injury.'},
+  rtec: {n: 'Tubular cells', line: 'Renal tubular epithelial cells: shed lining cells, often with a large round nucleus. They also point to tubular injury.'},
+  rbc: {n: 'Red cell cast', line: 'Red cell casts and dysmorphic red cells usually mean glomerular bleeding: glomerulonephritis or vasculitis. Same-day nephrology.'},
+  wbc: {n: 'White cell cast', line: 'White cell casts or sterile pyuria point to interstitial nephritis, or pyelonephritis. A bland urine does not exclude interstitial nephritis.'},
+  bland: {n: 'Bland', line: 'No casts and no tubular cells: prerenal or obstruction more likely, when injury was not suspected.'}
+};
+function sedSVG(k, p){
+  var h = svgOpen('0 0 340 160', 'Urine sediment: ' + SED[k].n);
+  h += '<circle cx="170" cy="80" r="74" fill="var(--fill)" stroke="var(--line)"/>';
+  function cast(fill){ return '<rect x="104" y="62" width="132" height="36" rx="18" fill="var(--card)" stroke="var(--muted)" stroke-width="1.5"/>' + fill; }
+  if (k === 'gran'){ var d = ''; for (var n = 0; n < 33; n++){ var x = 116 + (n % 11) * 11 + (n % 3) * 2, y = 70 + Math.floor(n / 11) * 10 + (n % 2) * 2; d += '<circle cx="' + x + '" cy="' + y + '" r="' + (1.6 + (n % 3) * 0.7) + '" fill="var(--warn)"/>'; } h += cast(d); }
+  if (k === 'rbc'){ var r = ''; for (var m = 0; m < 6; m++) r += '<circle cx="' + (124 + m * 19) + '" cy="' + (m % 2 ? 86 : 74) + '" r="8" fill="var(--badbg)" stroke="var(--bad)" stroke-width="1.5"/>'; h += cast(r); }
+  if (k === 'wbc'){ var w = ''; for (var q = 0; q < 5; q++){ var cx = 128 + q * 22, cy = q % 2 ? 86 : 74; w += '<circle cx="' + cx + '" cy="' + cy + '" r="10" fill="var(--card)" stroke="var(--accent)"/><circle cx="' + (cx - 3) + '" cy="' + (cy - 2) + '" r="3" fill="var(--accent)"/><circle cx="' + (cx + 3) + '" cy="' + (cy + 2) + '" r="3" fill="var(--accent)"/>'; } h += cast(w); }
+  if (k === 'rtec'){ [[130, 64], [186, 92], [214, 58]].forEach(function(c){ h += '<rect x="' + (c[0] - 18) + '" y="' + (c[1] - 14) + '" width="36" height="28" rx="10" fill="var(--card)" stroke="var(--muted)"/><circle cx="' + c[0] + '" cy="' + c[1] + '" r="7" fill="var(--muted)"/>'; }); }
+  if (k === 'bland'){ h += txt(170, 84, 'few cells, no casts', FM + ';font-size:11px;fill:var(--muted)'); }
+  h += txt(170, 152, 'drawn for this site, not to scale', FM + ';font-size:9.5px;fill:var(--muted)');
+  return h + '</svg>';
+}
+
+var FIGS = {
+  where: {t: 'Where the kidney fails', data: WHERE, states: ['normal','pre','atn','ain','gn','post'], svg: whereSVG},
+  lag: {t: 'Creatinine lags the injury', data: LAG, states: ['drop','recover'], svg: lagSVG, line: lagLine},
+  tubule: {t: 'What FENa and FEUrea read', data: TUB, states: ['pre','atn','loop'], svg: tubSVG},
+  sediment: {t: 'The urine sediment', data: SED, states: ['gran','rtec','rbc','wbc','bland'], svg: sedSVG}
+};
+var ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M7 15l3-4 3 3 2-2 2 3"/></svg>';
+var figN = 0;
+function mountFig(host, id, state){
+  var F = FIGS[id], pre = 'f' + (++figN) + '-';
+  function draw(k){
+    host.innerHTML = '<div class="states" role="group" aria-label="' + esc(F.t) + '">' + F.states.map(function(x){ return '<button class="sbtn" data-k="' + x + '" aria-pressed="' + (x === k) + '">' + esc(F.data[x].n) + '</button>'; }).join('') + '</div>' + F.svg(k, pre) + '<p class="line1">' + esc(F.line ? F.line(k) : F.data[k].line) + '</p>';
+    var on = host.querySelector('[aria-pressed="true"]'), row = host.querySelector('.states');
+    if (on && row) row.scrollLeft = Math.max(0, on.offsetLeft - 60);
+  }
+  host.onclick = function(e){ var k = e.target.getAttribute && e.target.getAttribute('data-k'); if (k) draw(k); };
+  draw(state && F.data[state] ? state : F.states[0]);
+}
+function chip(fig, state, label){ return '<button class="chip" data-fig="' + fig + '" data-state="' + (state || '') + '">' + ICON + esc(label || FIGS[fig].t) + '</button>'; }
+var lastFocus = null;
+function openSheet(fig, state){
+  lastFocus = document.activeElement;
+  $('sheet-t').textContent = FIGS[fig].t;
+  mountFig($('sheet-b'), fig, state);
+  $('scrim').hidden = false; $('sheet').hidden = false; $('sheet').scrollTop = 0; $('sheet-x').focus();
+}
+function closeSheet(){ if ($('sheet').hidden) return; $('scrim').hidden = true; $('sheet').hidden = true; if (lastFocus && lastFocus.focus) lastFocus.focus(); }
+$('sheet-x').addEventListener('click', closeSheet); $('scrim').addEventListener('click', closeSheet);
+document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeSheet(); });
+
+/* ---------- cards ---------- */
+function more(list, tiers){
+  if ((!list || !list.length) && (!tiers || !tiers.length)) return '';
+  return '<details><summary>More</summary>' + (list || []).map(function(x){ return '<p>' + x + '</p>'; }).join('') + (tiers || []).map(function(t){ return '<span class="tier">' + esc(t) + '</span>'; }).join('') + '</details>';
+}
+function why(w){ return w ? '<p class="whyline"><b>Why:</b> ' + esc(w) + '</p>' : ''; }
+function ul(a){ return '<ul>' + a.map(function(x){ return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>'; }
+function card(id, label, inner){ return '<div class="card" id="' + id + '"><p class="label">' + esc(label) + '</p>' + inner + '</div>'; }
+function guard(t, bad){ return '<div class="guard' + (bad ? ' bad' : '') + '">' + esc(t) + '</div>'; }
+var WINN = {'48': 'within 48 h', '7d': 'over 2 to 7 days', 'long': 'over more than 7 days or an unknown time'};
+
+var WHY = {
+  post: 'A blocked outflow raises pressure back up the tubule and stops filtration; it is a fixable cause.',
+  gn: 'Red cell casts usually mean bleeding from inflamed glomeruli, which can destroy them within days.',
+  ain: 'Interstitial nephritis is inflammation around the tubules, most often from a drug; stopping the drug is the main treatment.',
+  pig: 'Myoglobin and hemoglobin are filtered and injure the tubule; the dipstick reads both as blood.',
+  gran: 'Dead tubular cells slough and pack into casts: muddy brown casts mean the tubule itself is injured.',
+  pre: 'Under-filled kidneys hold on to sodium, and a working tubule can push FENa below 1%; but glomerulonephritis, early obstruction and some sepsis can too.',
+  notpre: 'An injured tubule often cannot hold sodium, so it leaks into urine; chronic kidney disease and diuretics also raise FENa.',
+  hf: 'In heart failure, low output and high venous pressure both cut filtration.',
+  cirr: 'In cirrhosis, splanchnic vasodilation leaves the kidney under-filled even with ascites.',
+  sepsis: 'Sepsis injures the kidney through low pressure, inflammation and microcirculatory change at once.',
+  hemo: 'NSAIDs remove the prostaglandins that keep the afferent arteriole open; ACE inhibitors and ARBs relax the efferent one, so filtration pressure falls.',
+  tox: 'These drugs injure tubular cells directly; the risk rises with dose, duration and a kidney already under strain.',
+  bland: 'A clean sediment makes tubular injury less likely, but about one in five cases of interstitial nephritis look bland.'
+};
+function ptrWhy(P){
+  if (!P.length) return '';
+  var p = P[0];
+  if (p.k === 'post') return WHY.post;
+  if (p.k === 'gn') return WHY.gn;
+  if (p.k === 'ain') return WHY.ain;
+  if (p.k === 'pig') return WHY.pig;
+  if (/granular/.test(p.r)) return WHY.gran;
+  if (/^Prerenal/.test(p.n)) return WHY.pre;
+  if (/^Tubular injury or obstruction/.test(p.n)) return WHY.notpre;
+  if (/^Cardiorenal/.test(p.n)) return WHY.hf;
+  if (/^Cirrhosis/.test(p.n)) return WHY.cirr;
+  if (/^Sepsis/.test(p.n)) return WHY.sepsis;
+  if (/^Haemodynamic/.test(p.n)) return WHY.hemo;
+  if (/^Toxic/.test(p.n)) return WHY.tox;
+  if (/^Bland/.test(p.n)) return WHY.bland;
+  return '';
+}
+function ptrOrder(P){
+  var rank = function(p){ return p.k === 'post' ? 0 : p.k === 'gn' ? 1 : p.k === 'ain' ? 2 : p.k === 'pig' ? 3 : /granular/.test(p.r) ? 4 : /^Prerenal|^Tubular injury or/.test(p.n) ? 5 : 6; };
+  return P.slice().sort(function(a, b){ return rank(a) - rank(b); });
+}
+var DRUG = {
+  nsaid: 'NSAID: stop.',
+  acei: 'ACE inhibitor, ARB or ARNI: hold while creatinine is rising or the patient is dry, hypotensive or hyperkalemic; plan to restart after recovery.',
+  mra: 'MRA: hold while creatinine is rising or potassium is high.',
+  diur: 'Diuretic: hold unless volume overloaded; use it for overload, not to make urine.',
+  sglt2: 'SGLT2 inhibitor: hold while acutely ill or volume-depleted; decide on restarting after recovery.',
+  metf: 'Metformin: hold. The US label stops it in shock, sepsis or hypoxemia, contraindicates it below eGFR 30, and stops it for iodinated contrast at eGFR 30 to 60.',
+  amg: 'Aminoglycoside: switch if there is any alternative; if not, once daily with levels.',
+  vanc: 'Vancomycin: dose by AUC 400 to 600 with levels, not trough alone; involve pharmacy.',
+  ampho: 'Amphotericin: use a lipid formulation.',
+  acyc: 'IV acyclovir: can form crystals in the tubule; dose for current function and keep the patient hydrated.',
+  cni: 'Tacrolimus or cyclosporine: check a level.',
+  lith: 'Lithium: check a level; it accumulates as filtration falls.',
+  ppi: 'Proton pump inhibitor: a common cause of interstitial nephritis; stop it if there is pyuria, rash, or no other cause.',
+  tmp: 'Trimethoprim: blocks creatinine secretion, so creatinine rises without a fall in GFR; it can also raise potassium.',
+  contrast: 'Iodinated contrast: no drug treats contrast injury (bicarbonate and acetylcysteine failed in PRESERVE). Do not withhold a needed study next time; use the lowest dose.'
+};
+
+function build(i){
+  var o = decide(i), h = '';
+  if (!o.any && !o.fe) return {o: o, html: '<div class="card empty">Enter baseline and current creatinine, or urine output, to start. Add urine chemistry, sediment and drugs to find the cause.</div>'};
+  var C = o.cr, U = o.uo;
+  /* safety first */
+  if (o.aki || o.anuric) h += card('now', 'Check first', ul(['Potassium, and an ECG if it is high.', 'Bicarbonate and pH.', 'Volume: lungs, oxygen, edema, blood pressure.', 'Bladder: scan it or flush the catheter.']) + why('These kill before the creatinine matters, and each has a fix today.') + more(['Dialysis is started urgently for potassium, acidosis or fluid overload that do not respond to treatment (see the last card).'], ['KDIGO 2012, 2.3.1 and 5.1.1 (not graded)', 'checklist: expert practice']));
+  /* stage */
+  var sh = '', cls = '', sub = [], w = '', g = '';
+  if (o.stage == null){ sh = U && U.short ? 'Urine output: need 6 hours or more' : 'Enter both creatinine values'; }
+  else if (o.aki){ sh = 'KDIGO stage ' + o.stage; cls = o.stage === 3 ? 'bad' : o.stage === 2 ? 'wn' : ''; }
+  else if (C.slow){ sh = 'Not AKI by KDIGO timing'; cls = 'wn'; }
+  else sh = 'No AKI by KDIGO criteria';
+  if (C.rise != null) sub.push('Creatinine ' + i.cr0 + ' to ' + i.cr1 + ' ' + WINN[i.win] + ': ' + r2(C.ratio) + ' times baseline, ' + (C.rise >= 0 ? 'up ' : 'down ') + Math.abs(C.rise) + ' mg/dL' + (C.met && C.crStage ? ' (stage ' + C.crStage + (C.by === '4' ? ', by reaching 4.0 or more after an acute rise' : '') + ')' : '') + '.');
+  if (C.by === 'rrt') sub.push('Dialysis started: stage 3.');
+  if (U && U.stage != null) sub.push('Urine ' + U.rate + ' mL/kg/h over ' + i.uh + ' h' + (U.stage ? ' (stage ' + U.stage + ')' : ' (no stage by urine)') + '.');
+  if (U && U.short) sub.push('Urine ' + U.rate + ' mL/kg/h, but over less than 6 hours: too short to stage.');
+  if (C.fall) g += guard('Creatinine is below the baseline: the kidney is recovering, or the baseline is wrong.');
+  if (i.tmp && C.rise != null && C.rise > 0) g += guard('Trimethoprim blocks creatinine secretion: part of this rise may not be a fall in filtration.');
+  if (C.slow) g += guard('The rise is real but slower than KDIGO allows for AKI.' + (C.akd ? ' Up 50% or more: acute kidney disease if under 3 months, otherwise chronic kidney disease.' : ''));
+  if (i.cr1 != null && i.cr1 >= 4 && C.met === undefined && !C.slow) g += guard('A creatinine of 4.0 or more is stage 3 only after an acute rise that meets the definition.');
+  if (o.aki) w = (C.met && C.by !== 'rrt') ? 'Creatinine lags: it keeps rising for a day or more after filtration falls, so today\'s number understates the injury.' : (U && U.stage) ? 'Urine output can fall before creatinine rises, so it flags injury earlier, though it is less specific.' : '';
+  else if (C.slow) w = 'KDIGO\'s creatinine rule needs the rise within 7 days; a slower rise is acute or chronic kidney disease.';
+  var nums = '<div class="nums"><div class="num' + (C.ratio >= 1.5 ? ' hot' : '') + '"><span>× baseline</span><b>' + (C.ratio != null ? r2(C.ratio) : '–') + '</b></div><div class="num' + (C.rise >= 0.3 ? ' hot' : '') + '"><span>Rise mg/dL</span><b>' + (C.rise != null ? C.rise : '–') + '</b></div><div class="num' + (U && U.rate < 0.5 ? ' hot' : '') + '"><span>mL/kg/h</span><b>' + (U ? U.rate : '–') + '</b></div></div>';
+  var sm = ['Stage is the worse of creatinine and urine output. Stage 1: 1.5–1.9 times baseline or up 0.3; urine under 0.5 mL/kg/h for 6–12 h. Stage 2: 2.0–2.9 times; under 0.5 for 12 h or more. Stage 3: 3 times, 4.0 or more, or dialysis; under 0.3 for 24 h or none for 12 h.', 'The tool uses the average rate over the hours entered; KDIGO means the rate held throughout. The 2026 draft uses ideal body weight.'];
+  if (o.aki) sm.push('If creatinine is unreliable (low muscle mass, amputation, a drug that blocks secretion), cystatin C can help (2026 draft Rec 1.1.1, 2B).');
+  h += card('stage', 'Stage', g + '<p class="head ' + cls + '">' + esc(sh) + '</p>' + (sub.length ? '<p class="sub">' + esc(sub.join(' ')) + '</p>' : '') + nums + why(w) + '<div class="chips">' + chip('lag', C.met ? 'drop' : 'drop') + '</div>' + more(sm, ['KDIGO 2012, 2.1.1–2.1.2 (not graded)', 'KDIGO 2026 draft, PP 1.1.1–1.3.1']));
+  /* indices */
+  var F = o.fe;
+  if (F){
+    var ih = '', head = '', hc = '', fw = '';
+    if (F.lead === 'fena'){
+      head = 'FENa ' + F.fena + '%: ' + (F.pattern === 'pre' ? (F.diur ? 'prerenal pattern despite a diuretic' : 'prerenal pattern') : F.pattern === 'notpre' ? 'does not fit a prerenal pattern' : 'not interpretable on a diuretic');
+      hc = F.pattern === 'pre' ? 'okc' : F.pattern === 'notpre' ? 'wn' : '';
+      fw = F.pattern === 'pre' ? WHY.pre : F.pattern === 'notpre' ? WHY.notpre : 'Diuretics block sodium reabsorption, so FENa rises even when the kidney is under-filled.';
+    } else {
+      head = 'FEUrea ' + F.feu + '%: ' + (F.pattern === 'prePossible' ? 'prerenal pattern possible' : F.pattern === 'pre' ? 'prerenal pattern' : 'prerenal less likely');
+      hc = F.pattern === 'notpre' ? 'wn' : '';
+      fw = 'Diuretics block sodium reabsorption and raise FENa even in an under-filled kidney; urea is reabsorbed passively upstream, so FEUrea moves less, but it has its own false positives.';
+    }
+    if (F.diur) ih += guard('On a diuretic: FENa specificity falls to 54% (meta-analysis); FEUrea specificity was 33% in one study. Read both with the sediment and the story.');
+    if (i.ckd) ih += guard('Chronic kidney disease: FENa is less reliable (with kidney disease or diuretics, sensitivity 83% and specificity 66%).');
+    ih += '<p class="head ' + hc + '">' + esc(head) + '</p>';
+    if (o.oliguric && !F.diur && !i.ckd && F.lead === 'fena') ih += '<p class="sub">Oliguric, no diuretic, no kidney disease: FENa works best here (sensitivity 95%, specificity 91%).</p>';
+    else if (o.uo && !o.oliguric && F.lead === 'fena') ih += '<p class="sub">Not oliguric: FENa is less informative than when urine output is low.</p>';
+    ih += '<div class="nums"><div class="num' + (F.lead === 'fena' ? ' hot' : '') + '"><span>FENa</span><b>' + (F.fena != null ? F.fena + '%' : '–') + '</b></div><div class="num' + (F.lead === 'feu' ? ' hot' : '') + '"><span>FEUrea</span><b>' + (F.feu != null ? F.feu + '%' : '–') + '</b></div><div class="num"><span>Diuretic</span><b>' + (F.diur ? 'yes' : 'no') + '</b></div></div>';
+    var im = ['Read with: FENa under 1% fits prerenal; 1% or more fits tubular injury or obstruction. FEUrea 35% or under fits prerenal. Neither is reliable alone.', 'Low FENa despite intrinsic disease: acute glomerulonephritis, early obstruction, some sepsis.'];
+    if (F.diur && F.feu == null) im.push('Add urine urea nitrogen and BUN for FEUrea.');
+    if (i.cirr) im.push('Cirrhosis: FENa is an adjunct; very low values favour hepatorenal AKI, but not on their own (2026 draft PP 2.5.5). See <a href="/cirrhosis/#aki">cirrhosis</a>.');
+    im.push('The KDIGO 2026 draft advises reserving these indices for selected situations (PP 2.5.4).');
+    h += card('index', 'Urine indices', ih + why(fw) + '<div class="chips">' + chip('tubule', F.diur ? 'loop' : (F.pattern === 'pre' ? 'pre' : 'atn')) + '</div>' + more(im, ['Espinel 1976; Miller 1978 (studies)', 'Abdelhafez 2022 (meta-analysis)', 'Carvounis 2002; Pépin 2007 (studies)']));
+  }
+  /* where */
+  var P = ptrOrder(o.ptr);
+  if (o.aki || P.length){
+    var wh = P.length ? '<p class="head">' + esc(P.length === 1 ? P[0].n : 'Where it may be failing') + '</p>' + P.map(function(p){ return '<div class="ptr"><b>' + esc(p.n) + (p.link ? ' · <a href="' + p.link + '">open</a>' : '') + '</b><span>' + esc(p.r) + '</span></div>'; }).join('') : '<p class="head">Not enough to say yet</p><p class="sub">Add urine microscopy, urine sodium and creatinine, clues to obstruction and the setting.</p>';
+    var fk = P.length ? P[0].k : 'normal'; if (fk === 'pig') fk = 'atn';
+    var sedk = i.rbcc ? 'rbc' : i.wbcc ? 'wbc' : i.gran ? 'gran' : i.bland ? 'bland' : '';
+    var nsel = narrowSel(o, i);
+    h += card('where', 'Where it is failing', wh + why(ptrWhy(P)) + '<div class="chips">' + chip('where', fk) + (sedk ? chip('sediment', sedk) : '') + '</div><div class="row"><button class="btn ghost" data-narrow="' + esc(JSON.stringify(nsel)) + '">Narrow the differential</button></div>' + more(['Two causes often coexist: sepsis with contrast, heart failure with a diuretic, an NSAID on top of volume loss.', 'Heart failure: see <a href="/hf/">heart failure</a> for decongestion and creatinine bumps.'], ['pointers: expert practice, from the sources in the footer']));
+  }
+  /* imaging */
+  if (o.aki || o.anuric || o.obsClues.length){
+    var clue = o.obsClues.length || o.anuric, evident = (F && (F.pattern === 'pre')) || i.hf || i.cirr || i.nsaid || i.acei || i.gran;
+    var mh, ms;
+    if (clue){ mh = 'Bladder scan now, then kidney ultrasound'; ms = ['Scan the bladder or flush the catheter now.', 'Kidney ultrasound for ' + (o.anuric ? 'no urine' : '') + (o.anuric && o.obsClues.length ? ' and ' : '') + o.obsClues.map(function(k){ return OBS_N[k]; }).join(', ') + '.', 'If the bladder is full: catheter, and watch for a large diuresis after relief.']; }
+    else if (evident){ mh = 'Bladder scan; ultrasound can wait'; ms = ['Scan the bladder or flush the catheter.', 'No clue to obstruction and a likely cause is present: ultrasound is low-yield now.', 'Get one if the cause stays unclear or creatinine keeps rising.']; }
+    else { mh = 'Bladder scan, then kidney ultrasound'; ms = ['Scan the bladder or flush the catheter.', 'No clear cause yet: a kidney ultrasound is reasonable.']; }
+    h += card('image', 'Imaging', '<p class="head' + (clue ? ' wn' : '') + '">' + esc(mh) + '</p>' + ul(ms) + why(clue ? WHY.post : 'Without clues, obstruction is uncommon in hospital AKI; the clues pick out who has it.') + more(['In 797 inpatients with AKI who had ultrasound, 10.6% had hydronephrosis and 3.3% needed an intervention; those without the risk factors rarely did.'], ['KDIGO 2026 draft PP 2.5.9 (ungraded)', 'Licurse 2010 (study)', 'bladder scan: expert practice']));
+  }
+  /* drugs */
+  var dl = o.drugs.concat(i.diur ? ['diur'] : []);
+  if (o.aki || dl.length){
+    var order = ['nsaid','acei','mra','diur','sglt2','metf','amg','vanc','ampho','acyc','cni','lith','ppi','tmp','contrast'];
+    var dlist = order.filter(function(k){ return dl.indexOf(k) >= 0; }).map(function(k){ return DRUG[k]; });
+    if (o.aki) dlist.push('Every renally cleared drug: while creatinine is changing, dose by the trend in creatinine and urine output, not an eGFR equation.');
+    var dm = ['Multimodal stewardship: stop the drug if possible, switch to a less harmful one, reduce the dose, and monitor levels (2026 draft Rec 4.2.1, 1C). After recovery, the 2026 draft recommends starting or resuming ACE inhibitors or ARBs in adults unless contraindicated (Rec 6.2.1, 1B).'];
+    if (i.vanc) dm.push('Vancomycin with piperacillin-tazobactam: the vancomycin guideline flags observational reports of more AKI (ungraded); a randomized trial (ACORN, 2023) found no more AKI with piperacillin-tazobactam than with cefepime. Do not switch antibiotics for the kidney alone.');
+    if (i.contrast) dm.push('Contrast: 0.9% saline for high-risk patients who are not overloaded (2026 draft Rec 4.9.2.1, 1B); no prophylactic dialysis.');
+    h += card('drugs', 'Drugs to stop or adjust', (dlist.length ? ul(dlist) : '<p class="sub">Tick the drugs above to see what to do with each.</p>') + why(dl.length ? 'Drugs that lower filtration or injure the tubule are the most reversible part of AKI, and every renally cleared dose is now too high.' : '') + more(dm, ['KDIGO 2012, 3.4.2 (2C), 3.8.1–3.8.6', 'KDIGO 2026 draft Rec 4.2.1 (1C), PP 4.5.1–4.5.2', 'Rybak 2020 (A-II)', 'metformin US label', 'others: expert practice']));
+  }
+  /* supportive */
+  if (o.aki){
+    var sp = ['If volume is needed: buffered crystalloid (lactated Ringer\'s, Plasma-Lyte) rather than 0.9% saline, unless traumatic brain injury; not albumin or starch.', 'Shock: vasopressor with fluids; MAP above 65.', 'Diuretics only for volume overload.', 'No low-dose dopamine.'];
+    if (i.heme || i.crush) sp.push('Pigment risk: crystalloid early; check CK.');
+    if (i.cirr) sp.push('Cirrhosis: stop diuretics and nephrotoxins, give albumin, then consider hepatorenal AKI and a vasoconstrictor.');
+    h += card('support', 'Supportive care', ul(sp) + why('Most AKI recovers when perfusion is restored and the injury stops; nothing proven speeds the kidney itself.') + more(['Balanced versus saline: SMART (n = 15,802 ICU adults), major kidney events 14.3% vs 15.4%.', i.cirr ? 'Hepatorenal AKI: see <a href="/cirrhosis/#aki">cirrhosis</a>.' : ''].filter(Boolean), ['KDIGO 2012, 3.1.1 (2B), 3.1.2 (1C), 3.4.2 (2C), 3.5.1 (1A)', 'KDIGO 2026 draft Rec 3.1.1–3.1.2 (1B), 3.2.1 (2C)', 'pigment: KDIGO 2026 draft PP 3.8.1']));
+  }
+  /* nephrology and dialysis */
+  if (o.aki || o.anuric){
+    var tr = [];
+    if (o.stage === 3) tr.push('Stage 3');
+    if (i.rrt) tr.push('Already on dialysis');
+    if (o.anuric) tr.push('No urine output');
+    if (i.rbcc) tr.push('Red cell casts: possible glomerulonephritis or vasculitis (same day)');
+    if (i.wbcc) tr.push('Possible interstitial nephritis');
+    if (i.heme || i.crush) tr.push('Pigment injury');
+    if (i.transplant) tr.push('Kidney transplant');
+    var nh = tr.length ? 'Call nephrology today' : 'Nephrology if it is not improving or the cause is unclear';
+    h += card('call', 'Nephrology and dialysis', '<p class="head' + (tr.length ? ' wn' : '') + '">' + esc(nh) + '</p>' + (tr.length ? ul(tr) : '') + guard('Dialysis now for potassium, acidosis or fluid overload that do not respond to treatment; uremic pericarditis, encephalopathy or bleeding; or a dialyzable poison.', o.stage === 3) + why('Dialysis replaces function but does not speed recovery, so it is started for complications, not for a number.') + more(['STARRT-AKI (n = 3019): starting within 12 hours did not lower 90-day death (43.9% vs 43.7%) and left more survivors on dialysis (10.4% vs 6.0%).', 'After discharge: recheck creatinine; the 2026 draft suggests risk-stratifying AKI survivors for nephrology follow-up (Rec 6.1.2, 2D).'], ['KDIGO 2012, 5.1.1 (not graded)', 'KDIGO 2026 draft Rec 5.1.1 (1C)', 'referral triggers: expert practice']));
+  }
+  return {o: o, html: h};
+}
+function narrowSel(o, i){
+  var s = {};
+  if (o.fe && o.fe.fena != null && !o.fe.diur) s[o.fe.naPre ? 'feLo' : 'feHi'] = 1;
+  ['gran','bland','rbcc','wbcc','heme'].forEach(function(k){ if (i[k]) s[k] = 1; });
+  return s;
+}
+function render(){ $('out').innerHTML = build(read()).html; }
+document.addEventListener('click', function(e){
+  var c = e.target.closest && e.target.closest('[data-fig]'); if (c){ openSheet(c.getAttribute('data-fig'), c.getAttribute('data-state')); return; }
+  var n = e.target.closest && e.target.closest('[data-narrow]'); if (n){ nwSel = JSON.parse(n.getAttribute('data-narrow')); drawNarrow(); show('t-ref'); $('narrow').scrollIntoView(); }
+});
+
+/* ---------- tabs ---------- */
+var tabs = [['t-tool','p-tool'],['t-learn','p-learn'],['t-ref','p-ref'],['t-prac','p-prac']];
+function show(t){ tabs.forEach(function(p){ var on = p[0] === t; $(p[0]).setAttribute('aria-selected', String(on)); $(p[1]).classList.toggle('on', on); }); }
+tabs.forEach(function(p){ $(p[0]).addEventListener('click', function(){ show(p[0]); }); });
+function fromHash(){ var id = location.hash.slice(1); if (!id) return; var el = $(id); if (!el) return; var pan = el.closest('.panel'); if (pan) tabs.forEach(function(p){ if (p[1] === pan.id) show(p[0]); }); el.scrollIntoView(); }
+window.addEventListener('hashchange', fromHash);
+
+/* ---------- narrowing workup ---------- */
+var nwSel = {};
+function drawNarrow(){
+  $('nw-results').innerHTML = RESULTS.map(function(r){ return '<button class="sbtn" data-r="' + r[0] + '" data-g="' + r[2] + '" aria-pressed="' + !!nwSel[r[0]] + '">' + esc(r[1]) + '</button>'; }).join('');
+  var rows = narrow(nwSel), ord = {fav: 0, 'in': 1, less: 2};
+  rows.sort(function(a, b){ return ord[a.st] - ord[b.st]; });
+  $('nw-causes').innerHTML = rows.map(function(c){ return '<div class="cause ' + c.st + '"><span>' + esc(c.name) + '</span><small>' + esc(c.st === 'in' ? (c.why ? 'still possible: ' + c.why : 'still possible') : (c.st === 'less' ? 'less likely: ' : 'favoured: ') + c.why) + '</small></div>'; }).join('');
+  $('nw-next').innerHTML = '<b>Send next:</b> ' + esc(narrowNext(nwSel));
+}
+$('nw-results').addEventListener('click', function(e){
+  var r = e.target.getAttribute('data-r'); if (!r) return; var g = e.target.getAttribute('data-g'), was = !!nwSel[r];
+  if (g) RESULTS.forEach(function(x){ if (x[2] === g) delete nwSel[x[0]]; });
+  if (was) delete nwSel[r]; else nwSel[r] = 1;
+  var left = $('nw-results').scrollLeft; drawNarrow(); $('nw-results').scrollLeft = left;
+});
+drawNarrow();
+
+/* ---------- Learn ---------- */
+var TRIALS = [
+  {q: 'SMART (2018): balanced crystalloid or saline in the ICU?', d: 'Pragmatic cluster-randomized multiple-crossover trial, five ICUs at one academic centre, 15,802 adults.', r: 'Major adverse kidney events within 30 days 14.3% with balanced crystalloid vs 15.4% with saline (odds ratio 0.91, 95% CI 0.84 to 0.99). Small absolute difference; single centre, not blinded.', c: 'Balanced crystalloid became the default fluid for most critically ill adults.', cite: 'Semler MW et al. N Engl J Med 2018;378:829', doi: '10.1056/NEJMoa1711584'},
+  {q: 'STARRT-AKI (2020): does starting dialysis early help?', d: 'Multinational randomized trial, 3019 critically ill adults with severe AKI: start within 12 hours vs wait for a conventional indication or AKI over 72 hours.', r: '90-day death 43.9% vs 43.7% (relative risk 1.00). Dialysis dependence among survivors 10.4% vs 6.0%; adverse events 23.0% vs 16.5%. 38% of the standard group never needed dialysis.', c: 'Dialysis is started for complications, not for a creatinine or a stage.', cite: 'STARRT-AKI Investigators. N Engl J Med 2020;383:240', doi: '10.1056/NEJMoa2000741'},
+  {q: 'PRESERVE (2018): bicarbonate or acetylcysteine before angiography?', d: '2-by-2 factorial randomized trial, 5177 high-risk patients (4993 analysed): IV 1.26% bicarbonate vs 0.9% saline, and oral acetylcysteine vs placebo.', r: 'Death, dialysis or persistent creatinine rise at 90 days: bicarbonate 4.4% vs saline 4.7%; acetylcysteine 4.6% vs placebo 4.5%. No difference in contrast-associated AKI. Stopped early for futility.', c: 'Neither is given to protect the kidney from contrast; isotonic saline remains the option for high-risk patients.', cite: 'Weisbord SD et al. N Engl J Med 2018;378:603', doi: '10.1056/NEJMoa1710933'}
+];
+document.querySelectorAll('[data-figure]').forEach(function(hst){ mountFig(hst, hst.getAttribute('data-figure'), hst.getAttribute('data-state')); });
+(function(){
+  var chaps = [].slice.call(document.querySelectorAll('.chap'));
+  $('pills').innerHTML = chaps.map(function(c, n){ return '<button class="pill" data-go="' + c.id + '" aria-current="' + (n === 0) + '">' + (n + 1) + ' ' + esc(c.getAttribute('data-pill')) + '</button>'; }).join('');
+  $('pills').addEventListener('click', function(e){ var g = e.target.getAttribute('data-go'); if (g) $(g).scrollIntoView(); });
+  function mark(id){ [].forEach.call($('pills').children, function(b){ var on = b.getAttribute('data-go') === id; b.setAttribute('aria-current', String(on)); if (on) $('pills').scrollLeft = Math.max(0, b.offsetLeft - 60); }); }
+  if ('IntersectionObserver' in window){
+    var io = new IntersectionObserver(function(es){ es.forEach(function(en){ if (en.isIntersecting) mark(en.target.id); }); }, {rootMargin: '-30% 0px -60% 0px'});
+    chaps.forEach(function(c){ io.observe(c); });
+  }
+  $('trialbox').innerHTML = TRIALS.map(function(t){ return '<div class="trial" style="margin-top:14px"><p><b>' + esc(t.q) + '</b></p><p><span class="k">Design</span>' + esc(t.d) + '</p><p><span class="k">Result</span>' + esc(t.r) + '</p><p><span class="k">What it changed</span>' + esc(t.c) + '</p><p class="mono" style="font-size:13px">' + esc(t.cite) + ' · <a href="https://doi.org/' + t.doi + '" rel="noopener">doi:' + esc(t.doi) + '</a></p></div>'; }).join('');
+  $('go-prac').addEventListener('click', function(){ show('t-prac'); window.scrollTo(0, 0); });
+})();
+
+/* ---------- Practice: cases run through the same engine ---------- */
+var CASES = [
+  {t: 'Three days of vomiting', s: 'Age 62. Creatinine 1.0 last month, 1.6 now, rise over about 36 hours. Serum Na 136, urine Na 15, urine creatinine 80. Bland urine. No diuretic.', q: 'Stage, and where is it failing?', i: {cr0: 1.0, cr1: 1.6, win: '48', sna: 136, una: 15, ucr: 80, bland: true}, p: 'Stage 1 (1.6 times baseline). FENa about 0.2% with a bland sediment: prerenal pattern. Fluids, hold anything nephrotoxic, recheck.'},
+  {t: 'Heart failure on furosemide', s: 'Age 74, IV furosemide for three days. Creatinine 1.2 to 2.6 over 3 days. Serum Na 132, urine Na 60, urine creatinine 50, BUN 60, urine urea nitrogen 300.', q: 'The FENa is over 2%. Is this tubular injury?', i: {cr0: 1.2, cr1: 2.6, win: '7d', sna: 132, una: 60, ucr: 50, bun: 60, uun: 300, diur: true, hf: true}, p: 'Stage 2 (2.2 times). FENa 2.4% is uninterpretable on a diuretic; FEUrea 26% makes a prerenal pattern possible, but FEUrea is not specific on diuretics either. Decide with the exam: over-diuresis versus congestion or low output. See the heart failure tool.'},
+  {t: 'Septic shock on vancomycin', s: 'Age 55. Creatinine 0.9 to 3.1 in 48 hours. 200 mL of urine in 24 hours, weight 70 kg. Serum Na 138, urine Na 55, urine creatinine 40. Muddy brown granular casts.', q: 'Stage and cause? Dialysis now?', i: {cr0: 0.9, cr1: 3.1, win: '48', uml: 200, uh: 24, wt: 70, sna: 138, una: 55, ucr: 40, gran: true, sepsis: true, vanc: true}, p: 'Stage 3 by both creatinine (3.4 times) and urine (0.12 mL/kg/h for 24 h). Granular casts and FENa 3.1%: acute tubular injury. Dialysis only for refractory potassium, acidosis, overload or uremic complications; STARRT-AKI found no benefit in starting early.'},
+  {t: 'Older man, no urine since last night', s: 'Age 81 with prostate enlargement. No urine for 14 hours, weight 80 kg. Creatinine 1.1 yesterday morning, 1.9 now.', q: 'Stage, and the first test?', i: {cr0: 1.1, cr1: 1.9, win: '48', uml: 0, uh: 14, wt: 80, prost: true}, p: 'Creatinine gives stage 1, but anuria for 12 hours or more makes it stage 3. Bladder scan now, catheter if full, then kidney ultrasound.'},
+  {t: 'Rash a week after a new PPI', s: 'Age 68. Creatinine 1.0 to 2.2 over 5 days. White cell casts and sterile pyuria. Started omeprazole 10 days ago.', q: 'Likely cause and next step?', i: {cr0: 1.0, cr1: 2.2, win: '7d', wbcc: true, ppi: true}, p: 'Stage 2 (2.2 times). White cell casts with a culprit drug: interstitial nephritis. Stop the PPI, call nephrology. Do not send urine eosinophils.'},
+  {t: 'Small rise on co-trimoxazole', s: 'Age 45, started trimethoprim-sulfamethoxazole 2 days ago. Creatinine 1.0 to 1.25 in 24 hours. Feels well, normal urine output.', q: 'Is this AKI?', i: {cr0: 1.0, cr1: 1.25, win: '48', tmp: true}, p: 'No AKI by KDIGO: up 0.25, under the 0.3 threshold. Trimethoprim blocks creatinine secretion, so part of a rise can occur without any fall in filtration. Check potassium.'},
+  {t: 'Creatinine 4.1 in clinic', s: 'Age 70 with advanced chronic kidney disease. Creatinine 3.9 two days ago, 4.1 today.', q: 'Is this stage 3 AKI because it is over 4.0?', i: {cr0: 3.9, cr1: 4.1, win: '48'}, p: 'No. The rise is 0.2 and 1.05 times baseline, so the AKI definition is not met. KDIGO counts 4.0 or more as stage 3 only after the definition is met.'}
+];
+$('practice').innerHTML = CASES.map(function(c, n){
+  return '<div class="card case"><p class="label">Case ' + (n + 1) + '</p><h2>' + esc(c.t) + '</h2><p>' + esc(c.s) + '</p><p><b>' + esc(c.q) + '</b></p><div class="row"><button class="btn" data-ans="' + n + '">Show the answer</button><button class="btn ghost" data-load="' + n + '">Open in the tool</button></div><div class="ans" id="ans' + n + '" hidden></div></div>';
+}).join('');
+$('practice').addEventListener('click', function(e){
+  var a = e.target.getAttribute('data-ans'), l = e.target.getAttribute('data-load');
+  if (a != null){ var c = CASES[a]; var box = $('ans' + a); var b = build(c.i); box.innerHTML = '<p>' + esc(c.p) + '</p>' + b.html.replace(/ id="[^"]*"/g, ''); box.hidden = false; e.target.hidden = true; }
+  if (l != null) load(CASES[l].i);
+});
+function load(i){
+  NUMS.forEach(function(k){ $(k).value = i[k] != null ? i[k] : ''; });
+  ticked = {}; Object.keys(TICKS).forEach(function(h){ TICKS[h].forEach(function(t){ if (i[t[0]]) ticked[t[0]] = true; }); });
+  document.querySelectorAll('#inputs .checks input').forEach(function(x){ x.checked = !!ticked[x.getAttribute('data-k')]; });
+  $('rrt').checked = !!i.rrt;
+  seg = {win: i.win || '48'};
+  document.querySelectorAll('[data-seg]').forEach(function(g){ var v = seg[g.getAttribute('data-seg')]; [].forEach.call(g.children, function(b){ b.setAttribute('aria-pressed', String(b.getAttribute('data-v') === v)); }); });
+  render(); show('t-tool'); window.scrollTo(0, 0);
+}
+window.__aki = {build: build, decide: decide, CASES: CASES};
+fromHash();
+})();
+</script>
+</body>
+</html>
