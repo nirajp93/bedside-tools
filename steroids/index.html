@@ -216,7 +216,7 @@ footer p{margin:0 0 8px}
       <li>Physiologic daily dose: hydrocortisone 15–25 mg, prednisone or prednisolone 4–6 mg, methylprednisolone 3–5 mg, dexamethasone 0.25–0.5 mg. The adrenal makes about 9–10 mg of cortisol a day.</li>
       <li>At risk: more than physiologic for 3–4 weeks or longer, by any route. Assume suppression with Cushingoid features.</li>
       <li>Under 3–4 weeks at any dose: stop without a taper and without testing.</li>
-      <li>Current or recent use, not tested: stress-dose when ill or having a procedure.</li>
+      <li>Current or recent long-term use, not tested: stress-dose when ill or having a procedure. After a short course this is not routinely needed, but treat hypotension as adrenal crisis.</li>
       <li>Do not test while the dose is still above physiologic or still needed for the disease.</li>
     </ul>
     <p class="whyline"><b>Why:</b> Steroid above the body's own output suppresses CRH and ACTH; after weeks the adrenal cortex atrophies, and recovery can take months to years.</p>
@@ -263,7 +263,7 @@ footer p{margin:0 0 8px}
       <li>Suspect it with hypotension or shock, collapse, or acute abdominal symptoms, vomiting or diarrhea in anyone on, or recently off, any steroid, by any route, at any dose.</li>
       <li>Hydrocortisone 100 mg IV or IM immediately; rapid IV 0.9% saline; then 200 mg over 24 h (infusion, or 50 mg every 6 h) until recovered. Treat the trigger.</li>
       <li>Do not wait for labs or imaging. Giving it to someone who turns out not to need it is safe.</li>
-      <li>Labs may show low sodium, low glucose, raised urea and creatinine, lymphocytes or eosinophils up; not required for the diagnosis.</li>
+      <li>Labs may show low sodium (with raised urine sodium), high potassium, low glucose, raised urea and creatinine, lymphocytes or eosinophils up; none is required for the diagnosis.</li>
     </ul>
     <p class="whyline"><b>Why:</b> Adrenal crisis is volume loss and vasodilation; without cortisol, fluids and pressors often fail.</p>
     <details><summary>More</summary>
@@ -297,7 +297,7 @@ footer p{margin:0 0 8px}
       <p>Cortisol is a continuum, not a cut-off, and assays differ: know your laboratory's values. Falsely high with oral estrogen or pregnancy; falsely low with low albumin or binding globulin (cirrhosis, nephrotic syndrome, malnutrition, long critical illness), night shifts, jet lag. The guideline excludes dexamethasone from the 24-hour hold; dexamethasone is not measured by most cortisol assays but keeps suppressing the axis, so switch off it before testing (interpretation).</p>
       <p>No routine dynamic test. If cortisol stays between 5 and 10, a 250 µg ACTH test can be considered: a peak under about 18 µg/dL (500 nmol/L) at 30 or 60 minutes suggests adrenal insufficiency, depending on assay. The 1 µg test is not advised.</p>
       <p>Withdrawal syndrome (fatigue, aches, sleep and mood change) usually appears once prednisone is under 15 mg; adrenal insufficiency is a concern once the taper reaches 5–7.5 mg, or earlier with critical illness or vomiting.</p>
-      <span class="tier">ESE/ES 2024 R2.1–R2.3, R2.5–R2.8 (weak, very low or good practice), R2.11, Tables 4–5</span>
+      <span class="tier">ESE/ES 2024 R2.1, R2.5, R2.6, R2.8 (weak, very low); R2.7 (recommend, very low; cut-offs suggested); R2.2, R2.3, R2.11 (good practice); Tables 4–5</span>
     </details>
   </div>
   <div class="card" id="narrow">
@@ -353,7 +353,8 @@ function predEq(dose, d){ return conv(dose, d, 'pred'); }
 function hcEq(dose, d){ return conv(dose, d, 'hc'); }
 
 /* Physiologic band (ESE Definitions: prednisone 4–6 mg) */
-function band(pe){ return pe < 4 ? 'below' : pe <= 6 ? 'phys' : 'above'; }
+var PHYS = {hc: [15, 25], pred: [4, 6], pnl: [4, 6], mp: [3, 5], dex: [0.25, 0.5]};
+function band(dose, d){ var r = PHYS[d], x = dose; if (!r){ r = PHYS.pred; x = predEq(dose, d); } return x < r[0] ? 'below' : x <= r[1] ? 'phys' : 'above'; }
 
 /* HPA risk. Exposure = 5 mg prednisone-equivalent or more for 3 weeks or longer in the last 12 months
    (ESE: above physiologic for 3–4 weeks; SfE: 5 mg for 4 weeks), or repeated courses (SfE), or Cushingoid (ESE R2.10). */
@@ -419,6 +420,7 @@ function stress(i, R){
     o.head = 'No stress dose needed'; o.cls = 'okc';
     o.rx.push(['Plan', i.status === 'now' ? 'Continue the usual dose; give it IV if they cannot take tablets.' : 'No steroid needed for the adrenal.']);
     if (i.status === 'now' && i.dose != null && (s === 'severe' || s === 'surglong')) o.rx.push(['If nil by mouth', ivEq(i)]);
+    if (R.k === 'low' && s !== 'minor' && s !== 'local' && s !== 'bowel') o.guards.push(['Short course only: stress cover is not routinely needed. Hypotension or collapse: treat as adrenal crisis.', true]);
     o.notes.push(R.k === 'recov' ? 'The axis has been shown to recover (morning cortisol over 10 µg/dL).' : 'Under 3 weeks of exposure: suppression is rarely clinically relevant (ESE R2.1). If they become hypotensive or collapse, treat as adrenal crisis.');
     o.why = R.k === 'recov' ? 'A recovered adrenal raises its own cortisol under stress.' : 'Short courses rarely suppress the axis enough to matter, so the adrenal can still respond.';
     return o;
@@ -497,7 +499,8 @@ function taper(i, R){
   if (i.status !== 'now' || i.dose == null) return null;
   var pe = predEq(i.dose, i.drug), o = {pe: pe, bands: [], notes: []};
   if (R.k === 'low' && !i.cush){ o.k = 'short'; return o; }
-  o.k = pe > 6 ? 'high' : 'phys';
+  o.k = band(i.dose, i.drug) === 'above' ? 'high' : 'phys';
+  if (o.k === 'high' && DRUGS[i.drug].long){ o.k = 'long'; return o; }
   var d = pe;
   if (d > 40){ o.bands.push({from: d, to: 40, step: '5–10 mg', every: 'every week', min: Math.ceil((d - 40) / 10), max: Math.ceil((d - 40) / 5), unit: 'weeks'}); d = 40; }
   if (d > 20){ var n1 = Math.ceil((d - 20) / 5); o.bands.push({from: d, to: 20, step: '5 mg', every: 'every week', min: n1, max: n1, unit: 'weeks'}); d = 20; }
@@ -533,7 +536,7 @@ function narrow(sel){
   return CAUSES.map(function(c){ return {k: c[0], name: c[1], st: st[c[0]], why: why[c[0]]}; });
 }
 function narrowNext(sel){
-  if (sel.bp && (sel.lyte || sel.fever)) return 'Unwell with low pressure: treat as adrenal crisis now (hydrocortisone 100 mg IV or IM, saline).';
+  if (sel.bp) return 'Low pressure: consider adrenal crisis. If unwell, hydrocortisone 100 mg IV or IM and saline now; if stable, stress-dose and recheck before any test.';
   if (sel.lo && !sel.chi && !sel.clo) return 'Morning cortisol at 8–9 am, 24 h after the last dose, once on a physiologic dose.';
   if (sel.hi) return 'If the disease is quiet, go back to the last tolerated dose and slow the taper (withdrawal).';
   if (!Object.keys(sel).length) return 'Blood pressure lying and standing, weight, sodium, potassium, glucose and disease markers.';
@@ -715,9 +718,10 @@ function build(i){
   if (i.dose == null && !touched) return {html: '<div class="card empty">Pick the steroid and enter the daily dose to see equivalents. Add the exposure and situation for adrenal risk, stress dosing and a taper.</div>'};
   /* 1. equivalents */
   if (i.dose != null){
-    var pe = predEq(i.dose, i.drug), b = band(pe);
+    var pe = predEq(i.dose, i.drug), b = band(i.dose, i.drug);
     var rows = ORDER.map(function(k){ var v = conv(i.dose, i.drug, k), o = DRUGS[k].old || d.old ? conv(i.dose, i.drug, k, true) : null; return '<tr' + (k === i.drug ? ' class="src"' : '') + '><td>' + esc(DRUGS[k].n) + '</td><td class="mono">' + esc(mg(v)) + (o != null && rnd(o) !== rnd(v) ? '<br><span class="note">older table: ' + esc(mg(o)) + '</span>' : '') + '</td></tr>'; }).join('');
-    var bt = b === 'above' ? 'Above physiologic (prednisone 4–6 mg a day).' : b === 'phys' ? 'Within the physiologic range (prednisone 4–6 mg a day).' : 'Below the physiologic range (prednisone 4–6 mg a day).';
+    var pr = PHYS[i.drug] ? d.n.toLowerCase() + ' ' + PHYS[i.drug][0] + '–' + PHYS[i.drug][1] + ' mg' : 'prednisone 4–6 mg';
+    var bt = (b === 'above' ? 'Above physiologic' : b === 'phys' ? 'Within the physiologic range' : 'Below the physiologic range') + ' (' + pr + ' a day).';
     var w = (i.drug === 'hc' || i.drug === 'cort') ? WHY.eqSalt : d.long ? WHY.eqLong : WHY.eq;
     var ml = ['Equal doses from the ESE/ES 2024 table, a guide only; individual response varies. ' + (d.old ? d.n + ' is listed as ' + d.old + ' mg = hydrocortisone 20 mg in older tables (Liu 2013); both are shown.' : 'Dexamethasone and betamethasone differ by a third between tables; the older figures are shown under them.'),
       'Oral and IV doses are treated as equal. Prednisone, prednisolone and cortisone are tablets only: for IV, use methylprednisolone or hydrocortisone.',
@@ -731,7 +735,7 @@ function build(i){
     rh = 'Assume adrenal suppression'; rcls = 'wn';
     rl = ['Because of: ' + R.why.join(', ') + '.', 'Stress-dose for illness, procedures and surgery (choose the situation).', 'Do not stop suddenly; taper once the disease allows.', 'Teach sick-day rules; give a steroid emergency card and an injectable hydrocortisone kit once the dose nears physiologic.'];
     if (i.status === 'stopped') rl.splice(1, 0, 'Recently stopped and not tested: still at risk; recovery can take months to years.');
-    if (i.status === 'now' && i.dose != null && band(predEq(i.dose, i.drug)) !== 'above') rl.push('At or below physiologic now, but the axis may still be suppressed until tested (morning cortisol).');
+    if (i.status === 'now' && i.dose != null && band(i.dose, i.drug) !== 'above') rl.push('At or below physiologic now, but the axis may still be suppressed until tested (morning cortisol).');
     if (i.status === 'now' && d.long) rl.push(d.n + ' is long-acting and suppresses most.');
     rw = i.cush ? WHY.cush : WHY.risk;
     rg = guard('Hypotension, collapse, vomiting or diarrhea: treat as adrenal crisis (hydrocortisone 100 mg IV or IM now).', false);
@@ -751,12 +755,14 @@ function build(i){
     var th, tb = '', tw, tl = [], tm = [];
     if (T.k === 'short'){ th = 'Stop without a taper'; tb = '<p class="sub">Under 3 weeks of exposure: no taper and no testing needed.</p>'; tw = WHY.tShort; }
     else {
-      th = T.k === 'high' ? 'Taper from prednisone ' + mg(T.pe) : 'At a physiologic dose (prednisone ' + mg(T.pe) + ')';
+      th = T.k === 'high' ? 'Taper from prednisone ' + mg(T.pe) : T.k === 'long' ? 'Switch before tapering' : (band(i.dose, i.drug) === 'below' ? 'Below a physiologic dose' : 'At a physiologic dose') + ' (prednisone ' + mg(T.pe) + ')';
       if (d.long) tb += guard('Switch ' + d.n.toLowerCase() + ' to prednisone or hydrocortisone once the long-acting drug is no longer needed. For brain tumors, spinal cord compression or chemotherapy, the treating team sets the taper: do not turn a high dexamethasone dose into an equally high prednisone dose by default.', false);
       if (T.k === 'high'){
         tb += T.bands.map(function(x){ return '<div class="band"><b>' + esc(rnd(x.from) + ' → ' + x.to) + '</b><span>' + esc('down ' + x.step + ' ' + x.every + ' (' + (x.min === x.max ? x.min : x.min + '–' + x.max) + ' ' + x.unit + ')') + '</span></div>'; }).join('');
         tb += '<div class="band"><b>at 5</b><span>' + esc('stop and check: keep tapering 1 mg every 4 weeks with clinical watch, or a morning cortisol') + '</span></div>';
         tb += '<p class="note" style="margin:6px 0 0">' + esc('About ' + T.min + (T.max > T.min ? ' to ' + T.max : '') + ' weeks to reach 5 mg at these steps, if the disease stays quiet.') + '</p>';
+      } else if (T.k === 'long'){
+        tb += '<p class="sub">' + esc('Equal to prednisone ' + mg(T.pe) + ' a day. The steps below 40 mg (Reference, Tapering) start after the switch, from the dose the treating team chooses.') + '</p>';
       } else {
         tb += ul(['Either keep tapering, 1 mg every 4 weeks (or hydrocortisone 20 mg, down 5 mg every 4 weeks), watching for symptoms; or', 'Morning cortisol at 8–9 am, at least 24 h after the last dose: over 10 µg/dL stop; 5–10 continue and repeat in weeks to months; under 5 continue and repeat in a few months.']);
       }
@@ -765,7 +771,7 @@ function build(i){
       tw = d.long ? WHY.tLong : T.k === 'high' ? WHY.tHigh : WHY.tPhys;
       tm = ['Steps from ESE/ES 2024 Table 4 by prednisone-equivalent dose: over 40 mg, 5–10 mg every week; 20–40 mg, 5 mg every week; 10–20 mg, 2.5 mg every 1–4 weeks; 5–10 mg, 1 mg every 1–4 weeks. A dose exactly on a boundary takes the smaller step. Larger, faster steps are possible at high doses, and a faster taper may be needed for steroid psychosis, uncontrolled glucose or blood pressure, or herpetic keratitis.', 'No routine dynamic testing. Cortisol is a continuum and assays differ; falsely high on oral estrogen, falsely low with low albumin. Dexamethasone keeps suppressing the axis, so switch off it before testing.', 'For other steroids, convert to the prednisone-equivalent, taper on prednisone (or hydrocortisone near the end).'];
     }
-    h += card('out-taper', 'Taper', '<p class="head">' + esc(th) + '</p>' + tb + why(tw) + (T.k !== 'short' ? chip('axis', 'taper') : '') + more(tm, ['ESE/ES 2024 R2.1, R2.5, R2.6, R2.7 (weak, very low)', 'R2.2, R2.3, R2.11 (good practice)', 'Table 4']));
+    h += card('out-taper', 'Taper', '<p class="head">' + esc(th) + '</p>' + tb + why(tw) + (T.k !== 'short' ? chip('axis', 'taper') : '') + more(tm, ['ESE/ES 2024 R2.1, R2.5, R2.6 (weak, very low)', 'R2.7 (morning cortisol first: recommend, very low; cut-offs suggested)', 'R2.2, R2.3, R2.11 (good practice)', 'Table 4']));
   }
   return {html: h, R: R};
 }
@@ -821,7 +827,7 @@ document.querySelectorAll('[data-figure]').forEach(function(hst){ mountFig(hst, 
 var CASES = [
   {t: 'COPD flare, five days of prednisone', s: 'Age 66. Prednisone 40 mg a day for 5 days for a COPD exacerbation, now better. No other steroid this year.', q: 'Taper?', i: {drug: 'pred', dose: 40, status: 'now', expo: 'short', sit: 'none'}, p: 'No. Under 3 weeks at any dose: stop without a taper or testing.'},
   {t: 'Hip replacement on prednisone 10 mg', s: 'Age 70, rheumatoid arthritis, prednisone 10 mg a day for 2 years. Elective hip replacement under spinal anesthesia, expected to eat the same day.', q: 'Steroid plan?', i: {drug: 'pred', dose: 10, status: 'now', expo: 'long', sit: 'surgshort'}, p: 'ESE/ES 2024: hydrocortisone 100 mg IV at induction, then 200 mg over 24 h (or 50 mg every 6 h); once eating, back to 10 mg, which already equals the guideline\'s post-operative example. For rheumatoid arthritis and elective hip or knee replacement, ACR/AAHKS 2022 suggests the usual dose alone (conditional): agree a plan with anesthesia.'},
-  {t: 'Colonoscopy on prednisone 5 mg', s: 'Age 74, polymyalgia rheumatica, prednisone 5 mg a day for 3 years. Colonoscopy with sedation, no general anesthesia.', q: 'Extra steroid?', i: {drug: 'pred', dose: 5, status: 'now', expo: 'long', sit: 'bowel'}, p: 'Usual dose; IV equivalent if nil by mouth for long. She is still at risk: years on a physiologic dose after higher doses, never tested.'},
+  {t: 'Colonoscopy on prednisone 5 mg', s: 'Age 74, polymyalgia rheumatica, prednisone 5 mg a day for 3 years. Colonoscopy with sedation, no general anesthesia.', q: 'Extra steroid?', i: {drug: 'pred', dose: 5, status: 'now', expo: 'long', sit: 'bowel'}, p: 'Usual dose; IV equivalent if nil by mouth for long. She is still at risk: years of exposure and never tested.'},
   {t: 'Pneumonia two months after stopping', s: 'Age 58. Prednisone 30 mg a day for 4 months for organizing pneumonia, stopped 2 months ago without testing. Now admitted with pneumonia, BP 80/50, sodium 128, vomiting.', q: 'What now?', i: {drug: 'pred', dose: 30, status: 'stopped', expo: 'long', sit: 'crisis'}, p: 'Treat as adrenal crisis: hydrocortisone 100 mg IV now and rapid saline, then 200 mg over 24 h. Do not wait for a cortisol.'},
   {t: 'Coming off 60 mg', s: 'Age 52. Prednisone 60 mg a day for 3 months for a vasculitis now in remission; the specialist agrees to taper.', q: 'Taper plan?', i: {drug: 'pred', dose: 60, status: 'now', expo: 'long', sit: 'none'}, p: '60 to 40 in 5–10 mg weekly steps, 40 to 20 by 5 mg weekly, 20 to 10 by 2.5 mg every 1–4 weeks, 10 to 5 by 1 mg every 1–4 weeks; at 5 mg, keep tapering slowly or check a morning cortisol. Stress-dose throughout.'},
   {t: 'Dexamethasone for brain metastases', s: 'Age 61. Dexamethasone 4 mg four times a day (16 mg a day) for 6 weeks; radiotherapy finished and the oncologist wants to come off.', q: 'What is it in prednisone, and how to come off?', i: {drug: 'dex', dose: 16, status: 'now', expo: 'mid', sit: 'none'}, p: 'Prednisone-equivalent 160 mg (107 mg by the older table). The oncology team sets the dexamethasone taper; switch to prednisone or hydrocortisone once dexamethasone is no longer needed, then taper by Table 4. Do not simply swap for prednisone 160 mg.'},
