@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Steroid conversion · bedside.tools</title>
+<meta name="description" content="Glucocorticoid equivalent doses, who is at risk of adrenal suppression, stress dosing for illness, procedures and surgery, adrenal crisis, and how to taper.">
+<script src="/theme.js"></script>
+<style>
+:root{--bg:#FBFBFA;--card:#FFFFFF;--ink:#111113;--muted:#55555D;--line:#ECECEE;--accent:#2B4BDB;--warn:#9A3B00;--warnbg:#FFF6EC}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5}
+.mono{font-family:var(--mono)}
+.wrap{max-width:720px;margin:0 auto;padding:20px 16px 48px}
+a{color:var(--accent)}
+.back{font-size:14px;text-decoration:none;display:inline-block;min-height:44px;line-height:44px}
+h1{font-size:26px;margin:4px 0 4px;letter-spacing:-.01em}
+.purpose{color:var(--muted);margin:0 0 20px}
+.tabs{display:flex;gap:6px;margin-bottom:16px}
+.tab{flex:1;min-width:0;min-height:44px;border:1px solid var(--line);background:var(--card);border-radius:14px;padding:0 4px;font:inherit;font-size:15px;font-weight:600;color:var(--muted);cursor:pointer}
+.tab[aria-selected="true"]{border-color:var(--accent);color:var(--accent)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
+.label{font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+.grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.field{display:flex;flex-direction:column;justify-content:flex-end}
+.field label{display:block;font-size:13px;color:var(--muted);margin-bottom:4px}
+.field input{width:100%;min-height:44px;border:1px solid var(--line);border-radius:10px;padding:8px 10px;font:inherit;font-family:var(--mono);background:var(--card);color:var(--ink)}
+.field input:focus,.tab:focus-visible,.chk:focus-within,button:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.checks{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.chk{display:flex;align-items:center;gap:10px;min-height:44px;border:1px solid var(--line);border-radius:10px;padding:6px 10px;font-size:14px;cursor:pointer}
+.chk input{width:20px;height:20px;accent-color:var(--accent);flex:none}
+.q{font-size:13px;color:var(--muted);margin:14px 0 0}
+.seg{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.card h2{font-size:18px;margin:0 0 2px}
+.head{font-family:var(--mono);font-size:17px;font-weight:600;margin:6px 0 4px;overflow-wrap:anywhere}
+.head.bad{color:var(--bad)}.head.okc{color:var(--ok)}.head.wn{color:var(--warn)}
+.sub{font-size:14px;color:var(--muted);margin:0}
+.card ul,.card ol{margin:6px 0 0;padding-left:20px}
+.card li{margin-bottom:4px}
+.guard{border-left:3px solid var(--warn);background:var(--warnbg);padding:8px 10px;border-radius:0 10px 10px 0;margin-top:8px;font-size:14.5px}
+.guard.bad{border-left-color:var(--bad);background:var(--badbg)}
+.tier{display:inline-block;font-family:var(--mono);font-size:11px;border:1px solid var(--line);border-radius:999px;padding:2px 8px;color:var(--muted);margin:6px 6px 0 0}
+details{margin-top:10px;border-top:1px solid var(--line);padding-top:8px}
+.whyline{margin:10px 0 0;font-size:14.5px;color:var(--muted)}
+.whyline b{color:var(--ink);font-weight:600}
+summary{cursor:pointer;color:var(--accent);font-weight:600;min-height:44px;line-height:44px}
+details p{margin:0 0 8px;font-size:15px}
+details li{font-size:15px}
+.empty{color:var(--muted)}
+.btn{min-height:44px;border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);border-radius:10px;padding:8px 14px;font:inherit;font-weight:600;cursor:pointer}
+.btn.ghost{background:var(--card);color:var(--accent)}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.note{font-size:14px;color:var(--muted)}
+.nums{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:10px}
+.num{background:var(--fill);border-radius:10px;padding:6px 8px}
+.num span{display:block;font-size:12px;color:var(--muted)}
+.num b{font-family:var(--mono);font-size:14px}
+.num.hot{box-shadow:inset 0 0 0 1.5px var(--warn)}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:6px 6px 6px 0;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:var(--mono);font-size:11.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);font-weight:500}
+.tw{overflow-x:auto}
+.case h2{font-size:17px}
+.ans{margin-top:10px;border-top:1px solid var(--line);padding-top:10px}
+.ans .card{border-color:var(--line);margin:10px 0 0}
+footer{margin-top:28px;font-size:13.5px;color:var(--muted)}
+footer p{margin:0 0 8px}
+@media (min-width:900px){
+  .wrap{max-width:1040px}
+  #p-tool.on{display:grid;grid-template-columns:360px minmax(0,1fr);gap:20px;align-items:start}
+  #inputs{position:sticky;top:16px;max-height:calc(100vh - 32px);overflow-y:auto}
+  .refgrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;align-items:start}
+  #narrow,#equiv{grid-column:1 / -1}
+  #p-learn{max-width:720px;margin:0 auto}
+  .refgrid .card{margin-bottom:0}
+  #inputs .grid{grid-template-columns:1fr 1fr}
+  #inputs .dgrid{grid-template-columns:1fr 1fr}
+  #inputs .checks{grid-template-columns:1fr}
+}
+.panel{display:none}.panel.on{display:block}
+.fig{display:block;width:100%;max-width:460px;height:auto;margin:0 auto}
+.states{display:flex;gap:6px;overflow-x:auto;margin:10px -16px;padding:2px 16px 6px;scrollbar-width:none}
+.states::-webkit-scrollbar{display:none}
+.sbtn{flex:none;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--ink);font:inherit;font-size:14px;cursor:pointer;white-space:nowrap}
+.sbtn[aria-pressed="true"]{border-color:var(--accent);color:var(--accent);font-weight:600}
+.line1{font-size:15px;margin:10px 0 0}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.chip{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--fill);color:var(--ink);font:inherit;font-size:14px;cursor:pointer}
+.chip svg{flex:none;color:var(--accent)}
+.scrim{position:fixed;inset:0;background:var(--scrim);z-index:20}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:21;max-height:90vh;overflow-y:auto;background:var(--card);border:1px solid var(--line);border-bottom:0;border-radius:20px 20px 0 0;padding:8px 16px 24px;max-width:560px;margin:0 auto}
+.sheethead{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.sheethead h2{font-size:18px;margin:0}
+.xbtn{min-height:44px;min-width:44px;border:0;background:transparent;color:var(--accent);font:inherit;font-weight:600;cursor:pointer}
+.pills{position:sticky;top:0;z-index:5;background:var(--bg);display:flex;gap:6px;overflow-x:auto;margin:0 -16px 12px;padding:8px 16px;border-bottom:1px solid var(--line);scrollbar-width:none}
+.pills::-webkit-scrollbar{display:none}
+.pill{flex:none;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--muted);font:inherit;font-size:14px;cursor:pointer;white-space:nowrap}
+.pill[aria-current="true"]{border-color:var(--accent);color:var(--accent);font-weight:600}
+.chap{scroll-margin-top:70px}
+.cause{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:8px 0;border-top:1px solid var(--line);font-size:15px}
+.cause small{color:var(--muted);font-size:13px;text-align:right;flex:0 1 55%}
+.cause.less{opacity:.6}
+.cause.less span{color:var(--muted);text-decoration:line-through}
+.cause.fav span{font-weight:700}
+.cause.fav span:before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--accent);margin-right:8px}
+.ptr{border-top:1px solid var(--line);padding:8px 0}
+.ptr b{display:block}
+.ptr span{font-size:14px;color:var(--muted)}
+.trial{border-left:3px solid var(--accent);padding-left:12px}
+.trial p{margin:0 0 6px;font-size:15px}
+.trial .k{font-family:var(--mono);font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);display:block}
+@media (max-width:420px){.grid{grid-template-columns:1fr 1fr}.checks{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+.dgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin-top:4px}
+.dgrid .sbtn{padding:0 6px;font-size:13.5px;white-space:normal;line-height:1.15;border-radius:12px}
+.sit{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px}
+.sit .sbtn{white-space:normal;line-height:1.2;border-radius:12px;text-align:left;padding:6px 12px}
+.eqr{font-size:13px}.eqr td,.eqr th{padding-right:8px}
+.eqt td:last-child,.eqt th:last-child{text-align:right}
+.eqt tr.src td{font-weight:700}
+.band{display:grid;grid-template-columns:auto 1fr;gap:2px 12px;border-top:1px solid var(--line);padding:8px 0;font-size:15px}
+.band b{font-family:var(--mono);font-size:14px;white-space:nowrap}
+.band span{color:var(--muted);font-size:14px}
+.rx{border-top:1px solid var(--line);padding:8px 0}
+.rx b{display:block;font-size:13px;font-family:var(--mono);letter-spacing:.04em;text-transform:uppercase;color:var(--muted);font-weight:500}
+@media (max-width:420px){.dgrid{grid-template-columns:repeat(2,minmax(0,1fr))}.sit{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="/">← bedside.tools</a>
+<h1>Steroid conversion</h1>
+<p class="purpose">Equivalent doses, who is at risk of adrenal insufficiency, stress dosing for illness and surgery, and how to taper.</p>
+
+<div class="tabs" role="tablist">
+  <button class="tab" role="tab" id="t-tool" aria-selected="true" aria-controls="p-tool">Steroid</button>
+  <button class="tab" role="tab" id="t-learn" aria-selected="false" aria-controls="p-learn">Learn</button>
+  <button class="tab" role="tab" id="t-ref" aria-selected="false" aria-controls="p-ref">Reference</button>
+  <button class="tab" role="tab" id="t-prac" aria-selected="false" aria-controls="p-prac">Practice</button>
+</div>
+
+<div class="panel on" id="p-tool" role="tabpanel" aria-labelledby="t-tool">
+  <div id="inputs">
+  <div class="card" id="drug">
+    <p class="label">Steroid and daily dose</p>
+    <div class="dgrid" data-seg="drug" role="group" aria-label="Steroid"></div>
+    <div class="grid" style="margin-top:12px">
+      <div class="field"><label for="dose">Total mg per day</label><input id="dose" inputmode="decimal" autocomplete="off"></div>
+    </div>
+    <p class="note" style="margin:8px 0 0">Oral or IV. Equivalents do not apply to inhaled, topical, joint or depot injections.</p>
+  </div>
+  <div class="card" id="course">
+    <p class="label">Exposure</p>
+    <p class="q" style="margin-top:0">Now</p>
+    <div class="seg" data-seg="status" role="group" aria-label="Taking now or stopped">
+      <button class="sbtn" data-v="now" aria-pressed="true">Taking it now</button>
+      <button class="sbtn" data-v="stopped" aria-pressed="false">Stopped in the last 12 months</button>
+    </div>
+    <p class="q">In the last 12 months, 5 mg prednisone-equivalent or more for</p>
+    <div class="seg" data-seg="expo" role="group" aria-label="Duration of exposure">
+      <button class="sbtn" data-v="short" aria-pressed="true">Under 3 weeks</button>
+      <button class="sbtn" data-v="mid" aria-pressed="false">3 weeks to 3 months</button>
+      <button class="sbtn" data-v="long" aria-pressed="false">Over 3 months</button>
+    </div>
+    <div class="checks" id="ticks-r"></div>
+  </div>
+  <div class="card" id="situation">
+    <p class="label">Situation</p>
+    <div class="sit" data-seg="sit" role="group" aria-label="Situation"></div>
+  </div>
+  </div>
+  <div id="out"><div class="card empty">Pick the steroid and enter the daily dose to see equivalents. Add the exposure and situation for adrenal risk, stress dosing and a taper.</div></div>
+</div>
+
+<div class="panel" id="p-learn" role="tabpanel" aria-labelledby="t-learn">
+  <div class="pills" id="pills"></div>
+  <div class="card chap" id="learn-axis" data-pill="The axis"><p class="label">1 · Why steroids switch the adrenal off</p><h2>The HPA axis and its brake</h2><p class="sub">Pick a state. Watch what happens to CRH, ACTH and the adrenal.</p><div data-figure="axis"></div></div>
+  <div class="card chap" id="learn-potency" data-pill="Potency"><p class="label">2 · Not all steroids are equal</p><h2>Strength, salt and duration</h2><p class="sub">Pick what to compare.</p><div data-figure="potency"></div></div>
+  <div class="card chap" id="learn-stress" data-pill="Stress"><p class="label">3 · Cover the stress</p><h2>More stress, more cortisol</h2><p class="sub">Pick a level of stress.</p><div data-figure="ladder"></div></div>
+  <div class="card chap" id="learn-taper" data-pill="Coming off"><p class="label">4 · Coming off</p><h2>Big steps high, small steps low</h2><p class="sub">ACTH comes back first; the adrenal follows weeks to years later.</p><div data-figure="axis" data-state="taper"></div></div>
+  <div class="card chap" id="trials" data-pill="Trials"><p class="label">5 · Evidence</p><h2>How much is enough for surgery?</h2><p class="sub">Two small trials; the guideline doses are expert consensus.</p><div id="trialbox"></div><div class="row"><button class="btn" id="go-prac">Try the practice cases</button></div></div>
+</div>
+
+<div class="panel" id="p-ref" role="tabpanel" aria-labelledby="t-ref">
+ <div class="refgrid">
+  <div class="card" id="equiv">
+    <p class="label">Equivalent doses · oral or IV</p>
+    <h2>Approximately equal anti-inflammatory doses</h2>
+    <div class="tw"><table class="eqr">
+      <thead><tr><th>Drug</th><th>Equal dose</th><th>Strength</th><th>Lasts (h)</th><th>Salt</th></tr></thead>
+      <tbody>
+        <tr><td>Hydrocortisone</td><td class="mono">20 mg</td><td class="mono">1</td><td class="mono">8–12</td><td>Yes</td></tr>
+        <tr><td>Cortisone acetate</td><td class="mono">25 mg</td><td class="mono">0.8</td><td class="mono">8–12</td><td>Yes</td></tr>
+        <tr><td>Prednisone</td><td class="mono">5 mg</td><td class="mono">4</td><td class="mono">12–36</td><td>Low</td></tr>
+        <tr><td>Prednisolone</td><td class="mono">5 mg</td><td class="mono">4</td><td class="mono">12–36</td><td>Low</td></tr>
+        <tr><td>Methylprednisolone</td><td class="mono">4 mg</td><td class="mono">5</td><td class="mono">12–36</td><td>Minimal</td></tr>
+        <tr><td>Triamcinolone</td><td class="mono">4 mg</td><td class="mono">5</td><td class="mono">12–36</td><td>None</td></tr>
+        <tr><td>Dexamethasone</td><td class="mono">0.5 mg (older: 0.75)</td><td class="mono">30–60</td><td class="mono">36–72</td><td>Minimal</td></tr>
+        <tr><td>Betamethasone</td><td class="mono">0.5 mg (older: 0.6)</td><td class="mono">25–40</td><td class="mono">36–72</td><td>Negligible</td></tr>
+        <tr><td>Fludrocortisone</td><td class="mono">—</td><td class="mono">10–15</td><td class="mono">12–36</td><td>Very high (125–150)</td></tr>
+      </tbody>
+    </table></div>
+    <p class="whyline"><b>Why:</b> The equal doses are estimates from receptor strength and duration; they ignore the salt-retaining effect and vary between people.</p>
+    <details><summary>More</summary>
+      <p>Equal doses, strength and biological half-life from the 2024 ESE/Endocrine Society guideline, Table 1, which calls them historical conversion factors to be used as a guide. The 2013 review by Liu and colleagues lists dexamethasone 0.75 mg and betamethasone 0.6 mg as equal to hydrocortisone 20 mg, so dexamethasone conversions differ by a third depending on the table used.</p>
+      <p>Salt-retaining (mineralocorticoid) effect from Liu 2013: fludrocortisone 0.1 mg has about the salt-retaining effect of hydrocortisone 20 mg or prednisone 50 mg. At equal anti-inflammatory doses, prednisone retains far less salt than hydrocortisone; methylprednisolone, dexamethasone and betamethasone hardly any.</p>
+      <p>Deflazacort 7.5 mg is also listed as equal to hydrocortisone 20 mg (ESE Table 1).</p>
+      <span class="tier">ESE/ES 2024 Table 1</span><span class="tier">Liu 2013 Table 3</span>
+    </details>
+  </div>
+  <div class="card" id="physio">
+    <p class="label">Who is at risk</p>
+    <h2>Physiologic dose and suppression</h2>
+    <ul>
+      <li>Physiologic daily dose: hydrocortisone 15–25 mg, prednisone or prednisolone 4–6 mg, methylprednisolone 3–5 mg, dexamethasone 0.25–0.5 mg. The adrenal makes about 9–10 mg of cortisol a day.</li>
+      <li>At risk: more than physiologic for 3–4 weeks or longer, by any route. Assume suppression with Cushingoid features.</li>
+      <li>Under 3–4 weeks at any dose: stop without a taper and without testing.</li>
+      <li>Current or recent long-term use, not tested: stress-dose when ill or having a procedure. After a short course this is not routinely needed, but treat hypotension as adrenal crisis.</li>
+      <li>Do not test while the dose is still above physiologic or still needed for the disease.</li>
+    </ul>
+    <p class="whyline"><b>Why:</b> Steroid above the body's own output suppresses CRH and ACTH; after weeks the adrenal cortex atrophies, and recovery can take months to years.</p>
+    <details><summary>More</summary>
+      <p>The guideline treats exposure as several risks together: potency (dexamethasone, betamethasone and fluticasone highest), route (systemic and joint injections highest), dose, duration (over 3 months highest), obesity and older age. The tool counts 3 weeks as long-term (the cautious end of "3–4 weeks") and uses 5 mg prednisone-equivalent as the exposure cut-off.</p>
+      <p>Older teaching put the line at 20 mg of prednisone for 3 weeks; the 2024 guideline does not use it.</p>
+      <p>Repeated short courses: UK Society for Endocrinology guidance also counts repeated courses as a risk: 3 or more courses in 12 months of prednisolone 40 mg a day or more for a week or longer.</p>
+      <p>No fludrocortisone in steroid-induced adrenal insufficiency: aldosterone is controlled by renin and potassium, so it is preserved.</p>
+      <span class="tier">ESE/ES 2024 Definitions, R2.1 (weak, very low), R2.4 and R2.10 (good practice), R2.12 (strong), R3.1 (good practice), Table 3</span><span class="tier">repeated courses: Society for Endocrinology (UK)</span>
+    </details>
+  </div>
+  <div class="card" id="nonoral">
+    <p class="label">Inhaled, topical, joint injections</p>
+    <h2>Non-oral steroids can suppress too</h2>
+    <ul>
+      <li>Think of adrenal insufficiency with: symptoms on current or recent non-oral steroid; several formulations at once; high-dose inhaled or topical; inhaled or topical for over a year; a joint injection in the past 2 months; a strong CYP3A4 inhibitor (ritonavir, cobicistat, itraconazole, voriconazole, posaconazole, clarithromycin).</li>
+      <li>Biochemical suppression in pooled studies: inhaled 7.8% overall (27% if over a year), joint injections 52%, topical 4.7%, nasal 4.2%.</li>
+      <li>Fluticasone is the inhaled steroid most often linked to adrenal insufficiency and Cushing syndrome.</li>
+    </ul>
+    <p class="whyline"><b>Why:</b> Enough drug is absorbed from lungs, skin and joints to reach the pituitary, and CYP3A4 inhibitors stop it being cleared.</p>
+    <details><summary>More</summary>
+      <p>Joint injections often suppress cortisol for about 4 weeks; recovery can be confirmed in the following 4 weeks. Most of these figures are biochemical; symptoms are much rarer.</p>
+      <span class="tier">ESE/ES 2024 R2.9 (weak, very low), Table 6</span>
+    </details>
+  </div>
+  <div class="card" id="stressref">
+    <p class="label">Stress dosing · ESE/ES 2024 Table 8</p>
+    <h2>By level of stress</h2>
+    <div class="rx"><b>Minor illness or procedure under local</b>Hydrocortisone 40 mg a day (20, 10, 10), prednisone 10 mg, or dexamethasone 1 mg, by mouth, for 2–5 days or until well. Not needed if already taking that much.</div>
+    <div class="rx"><b>Bowel procedure without anesthesia</b>Not on a steroid now: hydrocortisone 20 mg (10, 5, 5). On one: usual dose.</div>
+    <div class="rx"><b>Severe illness, surgery under general or regional, labor</b>Hydrocortisone 100 mg IV at induction or now, then 200 mg over 24 h by infusion (or 50 mg IV every 6 h). Then an increased oral dose for 48 h once eating. Not needed if already on hydrocortisone 200 mg, prednisone 50 mg or dexamethasone 6–8 mg a day, but give it IV if they cannot take tablets.</div>
+    <div class="rx"><b>Adrenal crisis</b>Hydrocortisone 100 mg IV or IM now, rapid IV saline, then 200 mg over 24 h until recovered.</div>
+    <p class="whyline"><b>Why:</b> A suppressed adrenal cannot raise cortisol under stress, and vomiting or fasting stops tablets being absorbed.</p>
+    <details><summary>More</summary>
+      <p>The guideline bases these doses on practice and earlier UK and Endocrine Society guidance, and says lower doses are also routinely used for moderate and major stress. US practice often uses less: for rheumatoid arthritis, spondyloarthritis or lupus with elective hip or knee replacement, the 2022 ACR/AAHKS guideline suggests the usual daily dose instead of extra steroid (conditional, low quality). Two small trials found no more hypotension with the usual dose (Learn, Trials).</p>
+      <p>Oral for minor stress without instability or prolonged vomiting or diarrhea; parenteral for moderate or major stress, procedures under general or regional anesthesia, or when oral intake is not possible. High body weight may need more.</p>
+      <span class="tier">ESE/ES 2024 R3.1, R3.1A, R3.1B (good practice), Table 8</span><span class="tier">ACR/AAHKS 2022 (conditional, low)</span>
+    </details>
+  </div>
+  <div class="card" id="crisis">
+    <p class="label">Adrenal crisis</p>
+    <h2>Treat first, test later</h2>
+    <ul>
+      <li>Suspect it with hypotension or shock, collapse, or acute abdominal symptoms, vomiting or diarrhea in anyone on, or recently off, any steroid, by any route, at any dose.</li>
+      <li>Hydrocortisone 100 mg IV or IM immediately; rapid IV 0.9% saline; then 200 mg over 24 h (infusion, or 50 mg every 6 h) until recovered. Treat the trigger.</li>
+      <li>Do not wait for labs or imaging. Giving it to someone who turns out not to need it is safe.</li>
+      <li>Labs may show low sodium (with raised urine sodium), high potassium, low glucose, raised urea and creatinine, lymphocytes or eosinophils up; none is required for the diagnosis.</li>
+    </ul>
+    <p class="whyline"><b>Why:</b> Adrenal crisis is volume loss and vasodilation; without cortisol, fluids and pressors often fail.</p>
+    <details><summary>More</summary>
+      <p>Shock is typically out of proportion to the trigger. Triggers include infection, surgery, trauma, missed doses and gastroenteritis. Risk is higher with past crises, age over 65 and more illness, and at the time of tapering or stopping. High potassium is less typical than in primary adrenal failure because aldosterone is preserved. In very high body weight, higher doses may be considered. Refer to endocrinology after any crisis.</p>
+      <span class="tier">ESE/ES 2024 R3.2 (good practice), R2.11, Table 9</span>
+    </details>
+  </div>
+  <div class="card" id="taperref">
+    <p class="label">Tapering · ESE/ES 2024 Table 4</p>
+    <h2>Steps by prednisone-equivalent dose</h2>
+    <div class="tw"><table>
+      <thead><tr><th>Dose now</th><th>Step down</th><th>Every</th></tr></thead>
+      <tbody>
+        <tr><td class="mono">over 40 mg</td><td class="mono">5–10 mg</td><td>week</td></tr>
+        <tr><td class="mono">20–40 mg</td><td class="mono">5 mg</td><td>week</td></tr>
+        <tr><td class="mono">10–20 mg</td><td class="mono">2.5 mg</td><td>1–4 weeks</td></tr>
+        <tr><td class="mono">5–10 mg</td><td class="mono">1 mg</td><td>1–4 weeks</td></tr>
+        <tr><td class="mono">5 mg</td><td class="mono">1 mg (or hydrocortisone 20 mg, down 5 mg)</td><td>4 weeks, if no symptoms or testing is reassuring</td></tr>
+      </tbody>
+    </table></div>
+    <ul>
+      <li>Taper only when the disease is controlled and the steroid is no longer needed.</li>
+      <li>Switch dexamethasone or betamethasone to prednisone or hydrocortisone once the long-acting drug is no longer needed; avoid evening doses.</li>
+      <li>At a physiologic dose: keep tapering and watch for symptoms, or check a morning cortisol.</li>
+      <li>Morning cortisol at 8–9 am, at least 24 h after the last dose: over 10 µg/dL (300 nmol/L) recovered, can stop; 5–10 continue the physiologic dose and repeat in weeks to months; under 5 (150 nmol/L) continue and repeat in a few months.</li>
+      <li>Withdrawal symptoms: go back to the last tolerated dose and slow down.</li>
+      <li>Endocrinology: no recovery after a year on a physiologic dose, or any adrenal crisis.</li>
+    </ul>
+    <p class="whyline"><b>Why:</b> Above physiologic doses the risk is flare and withdrawal, not adrenal insufficiency, so steps can be larger; near 5 mg the axis has to restart, so steps get smaller.</p>
+    <details><summary>More</summary>
+      <p>Cortisol is a continuum, not a cut-off, and assays differ: know your laboratory's values. Falsely high with oral estrogen or pregnancy; falsely low with low albumin or binding globulin (cirrhosis, nephrotic syndrome, malnutrition, long critical illness), night shifts, jet lag. The guideline excludes dexamethasone from the 24-hour hold; dexamethasone is not measured by most cortisol assays but keeps suppressing the axis, so switch off it before testing (interpretation).</p>
+      <p>No routine dynamic test. If cortisol stays between 5 and 10, a 250 µg ACTH test can be considered: a peak under about 18 µg/dL (500 nmol/L) at 30 or 60 minutes suggests adrenal insufficiency, depending on assay. The 1 µg test is not advised.</p>
+      <p>Withdrawal syndrome (fatigue, aches, sleep and mood change) usually appears once prednisone is under 15 mg; adrenal insufficiency is a concern once the taper reaches 5–7.5 mg, or earlier with critical illness or vomiting.</p>
+      <span class="tier">ESE/ES 2024 R2.1, R2.5, R2.6, R2.8 (weak, very low); R2.7 (recommend, very low; cut-offs suggested); R2.2, R2.3, R2.11 (good practice); Tables 4–5</span>
+    </details>
+  </div>
+  <div class="card" id="narrow">
+    <p class="label">Unwell during a taper · tap each finding you have</p>
+    <h2>Withdrawal, adrenal insufficiency, or flare?</h2>
+    <div class="states" id="nw-results" role="group" aria-label="Findings"></div>
+    <div id="nw-causes"></div>
+    <p class="line1" id="nw-next"></p>
+    <p class="whyline"><b>Why:</b> The three overlap in symptoms; the dose, blood pressure, sodium and glucose, and disease markers separate them.</p>
+    <details><summary>More</summary>
+      <p><b>Check first:</b> blood pressure lying and standing, weight, sodium, potassium and glucose, and the disease's own markers (for example ESR or CRP). <b>Only once on a physiologic dose:</b> morning cortisol, 24 h after the last dose.</p>
+      <p>Faded means less likely, never excluded. Withdrawal and adrenal insufficiency often coexist; Cushingoid features mean the axis is still assumed to be suppressed.</p>
+      <span class="tier">ESE/ES 2024 Table 5, R2.3 rationale; fading rules: expert practice</span>
+    </details>
+  </div>
+ </div>
+</div>
+
+<div class="panel" id="p-prac" role="tabpanel" aria-labelledby="t-prac">
+  <div id="practice"></div>
+</div>
+
+<div class="scrim" id="scrim" hidden></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-t" hidden>
+  <div class="sheethead"><h2 id="sheet-t"></h2><button class="xbtn" id="sheet-x">Close</button></div>
+  <div id="sheet-b"></div>
+</div>
+
+<footer>
+  <p><strong>For education only. Not a substitute for clinical judgment.</strong> Built to the 2024 European Society of Endocrinology and Endocrine Society guideline on glucocorticoid-induced adrenal insufficiency, the current edition. Most of its recommendations are good practice statements or weak recommendations on very low-quality evidence; stress doses are expert consensus. Adults only. Equivalent doses are estimates. Adjust to your institution's perioperative protocol.</p>
+  <p>Privacy: everything runs in your browser. Nothing you enter is sent anywhere or stored, and there are no analytics. Do not enter names, record numbers, or dates of birth.</p>
+  <p class="mono">Last reviewed: 2026-11-18</p>
+  <p><strong>Sources:</strong> Beuschlein F et al. European Society of Endocrinology and Endocrine Society joint clinical guideline: diagnosis and therapy of glucocorticoid-induced adrenal insufficiency. J Clin Endocrinol Metab 2024;109:1657 and Eur J Endocrinol 2024;190:G25 (GRADE; good practice statements) · Liu D et al. A practical guide to the monitoring and management of the complications of systemic corticosteroid therapy. Allergy Asthma Clin Immunol 2013;9:30 (review) · Goodman SM et al. 2022 ACR/AAHKS guideline for perioperative management of antirheumatic medication in elective hip or knee arthroplasty. Arthritis Rheumatol 2022;74:1464 (conditional, low) · Society for Endocrinology (UK) criteria for adrenal suppression risk (expert guidance) · Glowniak JV, Loriaux DL. Surgery 1997;121:123 (randomized, n = 18) · Zaghiyan K et al. Ann Surg 2014;259:32 (randomized, n = 92).</p>
+</footer>
+</div>
+<script id="engine">
+/* Pure decision engine. No DOM access. Doses in mg per day. Every number is in the tool's decision table
+   (steroids-record.md): ESE/ES 2024 Tables 1, 4, 8; Liu 2013 Table 3. */
+var DRUGS = {
+  pred: {n: 'Prednisone', eq: 5, pot: '4', hl: '12–36', mc: 'low', oral: true},
+  mp:   {n: 'Methylprednisolone', eq: 4, pot: '5', hl: '12–36', mc: 'minimal'},
+  hc:   {n: 'Hydrocortisone', eq: 20, pot: '1', hl: '8–12', mc: 'yes'},
+  dex:  {n: 'Dexamethasone', eq: 0.5, old: 0.75, pot: '30–60', hl: '36–72', mc: 'minimal', long: true},
+  pnl:  {n: 'Prednisolone', eq: 5, pot: '4', hl: '12–36', mc: 'low', oral: true},
+  beta: {n: 'Betamethasone', eq: 0.5, old: 0.6, pot: '25–40', hl: '36–72', mc: 'negligible', long: true},
+  tri:  {n: 'Triamcinolone', eq: 4, pot: '5', hl: '12–36', mc: 'none'},
+  cort: {n: 'Cortisone acetate', eq: 25, pot: '0.8', hl: '8–12', mc: 'yes', oral: true}
+};
+var ORDER = ['pred','mp','hc','dex','pnl','beta','tri','cort'];
+function rnd(x){ if (x >= 100) return Math.round(x); if (x >= 10) return Math.round(x * 2) / 2; if (x >= 1) return Math.round(x * 10) / 10; return Math.round(x * 100) / 100; }
+function conv(dose, from, to, useOld){ var a = DRUGS[from], b = DRUGS[to]; var ea = useOld && a.old ? a.old : a.eq, eb = useOld && b.old ? b.old : b.eq; return dose / ea * eb; }
+function predEq(dose, d){ return conv(dose, d, 'pred'); }
+function hcEq(dose, d){ return conv(dose, d, 'hc'); }
+
+/* Physiologic band (ESE Definitions: prednisone 4–6 mg) */
+var PHYS = {hc: [15, 25], pred: [4, 6], pnl: [4, 6], mp: [3, 5], dex: [0.25, 0.5]};
+function band(dose, d){ var r = PHYS[d], x = dose; if (!r){ r = PHYS.pred; x = predEq(dose, d); } return x < r[0] ? 'below' : x <= r[1] ? 'phys' : 'above'; }
+
+/* HPA risk. Exposure = 5 mg prednisone-equivalent or more for 3 weeks or longer in the last 12 months
+   (ESE: above physiologic for 3–4 weeks; SfE: 5 mg for 4 weeks), or repeated courses (SfE), or Cushingoid (ESE R2.10). */
+function risk(i){
+  if (i.recov) return {k: 'recov'};
+  var why = [];
+  if (i.cush) why.push('Cushingoid features');
+  if (i.expo === 'mid') why.push('3 weeks to 3 months of exposure');
+  if (i.expo === 'long') why.push('over 3 months of exposure');
+  if (i.rep) why.push('repeated courses');
+  if (why.length) return {k: 'risk', why: why, high: i.expo === 'long' || (i.status === 'now' && DRUGS[i.drug].long)};
+  return {k: 'low'};
+}
+
+/* Stress thresholds (ESE Table 8): minor = HC 40, prednisone 10, dexamethasone 1; major = HC 200, prednisone 50, dexamethasone 6–8 (8 used).
+   Other agents by hydrocortisone equivalence (inference). */
+function enough(i, level){
+  if (i.status !== 'now' || i.dose == null) return false;
+  var d = i.drug;
+  if (d === 'dex' || d === 'beta') return level === 'minor' ? i.dose >= 1 : i.dose >= 8;
+  return hcEq(i.dose, d) >= (level === 'minor' ? 40 : 200);
+}
+/* Oral "double" dose for minor stress and the 48 h after surgery (ESE Table 8). */
+function minorDose(i){
+  var d = i.drug;
+  if (i.status !== 'now') return {t: 'Hydrocortisone 40 mg a day: 20 mg on rising, 10 mg at midday, 10 mg at 5 pm', src: 'table'};
+  if (d === 'hc') return {t: 'Increase hydrocortisone to 40 mg a day: 20 mg on rising, 10 mg at midday, 10 mg at 5 pm', src: 'table'};
+  if (d === 'pred' || d === 'pnl') return {t: 'Increase ' + DRUGS[d].n.toLowerCase() + ' to 10 mg a day, in one or two doses', src: 'table'};
+  if (d === 'dex') return {t: 'Increase dexamethasone to 1 mg once a day', src: 'table'};
+  return {t: 'Increase ' + DRUGS[d].n.toLowerCase() + ' to ' + rnd(conv(40, 'hc', d)) + ' mg a day (equal to hydrocortisone 40 mg)', src: 'equiv'};
+}
+function ivEq(i){
+  if (i.status !== 'now' || i.dose == null) return '';
+  return 'IV equivalent of the usual dose: hydrocortisone ' + rnd(hcEq(i.dose, i.drug)) + ' mg a day in 2–3 doses, or methylprednisolone ' + rnd(conv(i.dose, i.drug, 'mp')) + ' mg a day.';
+}
+
+var SIT = {
+  none: 'Routine, or planning a taper',
+  minor: 'Minor illness: fever, antibiotics at home, bed rest',
+  local: 'Procedure under local anesthesia',
+  bowel: 'Bowel procedure without anesthesia',
+  severe: 'Severe illness: admitted, IV antibiotics, vomiting',
+  surgshort: 'Surgery under general or regional, eating soon',
+  surglong: 'Surgery under general or regional, nil by mouth or long recovery',
+  labor: 'Labor and vaginal delivery',
+  crisis: 'Possible adrenal crisis: hypotension, collapse, vomiting'
+};
+
+function stress(i, R){
+  var s = i.sit, o = {rx: [], guards: [], notes: [], tiers: ['ESE/ES 2024 Table 8; R3.1 (good practice)']};
+  if (s === 'crisis'){
+    o.head = 'Treat as adrenal crisis now'; o.cls = 'bad';
+    o.rx.push(['Now', 'Hydrocortisone 100 mg IV or IM immediately, and rapid IV 0.9% saline.']);
+    o.rx.push(['Then', 'Hydrocortisone 200 mg over 24 h by continuous infusion (or 50 mg IV or IM every 6 h) until recovered, with endocrinology advice.']);
+    o.guards.push(['Do not wait for cortisol, labs or imaging. Treating someone who turns out not to need it is safe.', true]);
+    o.notes.push('Applies whatever the steroid, route or dose, and even if never tested. Find and treat the trigger (infection, missed doses, gastroenteritis). Consider a higher dose in very high body weight.');
+    o.why = 'Adrenal crisis is volume loss and vasodilation; without cortisol, fluids and pressors often fail.';
+    o.tiers = ['ESE/ES 2024 R3.2 (good practice), Table 9'];
+    return o;
+  }
+  if (s === 'none') return null;
+  if (R.k !== 'risk'){
+    o.head = 'No stress dose needed'; o.cls = 'okc';
+    o.rx.push(['Plan', i.status === 'now' ? 'Continue the usual dose; give it IV if they cannot take tablets.' : 'No steroid needed for the adrenal.']);
+    if (i.status === 'now' && i.dose != null && (s === 'severe' || s === 'surglong')) o.rx.push(['If nil by mouth', ivEq(i)]);
+    if (R.k === 'low' && s !== 'minor' && s !== 'local' && s !== 'bowel') o.guards.push(['Short course only: stress cover is not routinely needed. Hypotension, collapse, vomiting or diarrhea: treat as adrenal crisis.', true]);
+    o.notes.push(R.k === 'recov' ? 'The axis has been shown to recover (morning cortisol over 10 µg/dL).' : 'Under 3 weeks of exposure: suppression is rarely clinically relevant (ESE R2.1). If they become hypotensive or collapse, treat as adrenal crisis.');
+    o.tiers = R.k === 'recov' ? ['ESE/ES 2024 R2.7'] : ['ESE/ES 2024 R2.1 (weak, very low); applying it to stress cover is an interpretation of R3.1', 'crisis: R3.2 (good practice)'];
+    o.why = R.k === 'recov' ? 'A recovered adrenal raises its own cortisol under stress.' : 'Short courses rarely suppress the axis enough to matter, so the adrenal can still respond.';
+    return o;
+  }
+  var minorish = s === 'minor' || s === 'local';
+  if (minorish){
+    if (enough(i, 'minor')){
+      o.head = 'No increase needed'; o.cls = 'okc';
+      o.rx.push(['Plan', 'The current dose already equals hydrocortisone 40 mg, prednisone 10 mg or dexamethasone 1 mg a day or more. Continue it.']);
+      o.guards.push(['Give more, IV, if hemodynamically unstable or vomiting.', false]);
+      o.why = 'The current dose already covers this level of stress.';
+      if (['mp','tri','cort','beta','pnl'].indexOf(i.drug) >= 0) o.tiers.push('threshold for this drug by equivalence (inference)');
+      return o;
+    }
+    var m = minorDose(i);
+    o.head = 'Oral stress dose'; o.cls = 'wn';
+    if (s === 'minor'){
+      o.rx.push(['Dose', m.t + '.']);
+      o.rx.push(['How long', '2 to 5 days until well, or for the course of antibiotics; then back to the usual dose.']);
+    } else {
+      var t = i.status !== 'now' || i.drug === 'hc' ? 'Hydrocortisone 20 mg 1 h before, 10 mg 6 h after, 10 mg after a further 6 h (40 mg in total)' :
+        (i.drug === 'pred' || i.drug === 'pnl') ? DRUGS[i.drug].n + ' 10 mg as a single dose 1 h before' :
+        i.drug === 'dex' ? 'Dexamethasone 1 mg as a single dose 1 h before' :
+        DRUGS[i.drug].n + ' ' + rnd(conv(40, 'hc', i.drug)) + ' mg (equal to hydrocortisone 40 mg) 1 h before';
+      o.rx.push(['Day of the procedure', t + '.']);
+      o.rx.push(['After', 'Continue the increased dose while unwell, then back to the usual dose.']);
+    }
+    if (m.src === 'equiv') o.tiers.push('dose for this drug by equivalence (guideline: "a dose equivalent to 40 mg hydrocortisone")');
+    o.guards.push(['Vomiting, diarrhea, or hypotension: switch to IV or IM (severe illness).', false]);
+    o.why = 'A suppressed adrenal cannot raise cortisol when ill, so the extra has to be given.';
+    o.tiers[0] = 'ESE/ES 2024 Table 8; R3.1A (good practice)';
+    return o;
+  }
+  if (s === 'bowel'){
+    o.head = i.status === 'now' ? 'Usual dose' : 'Small oral cover'; o.cls = i.status === 'now' ? 'okc' : 'wn';
+    if (i.status === 'now'){ o.rx.push(['Plan', 'Continue the usual dose.']); if (i.dose != null) o.rx.push(['If nil by mouth for long', ivEq(i)]); }
+    else o.rx.push(['Plan', 'Hydrocortisone 10 mg 1 h before, 5 mg 6 h after, 5 mg after a further 6 h (20 mg in total).']);
+    o.why = 'Bowel preparation can stop tablets being absorbed; a small dose covers the procedure.';
+    return o;
+  }
+  /* moderate and major: severe, surgery, labor */
+  if (enough(i, 'major')){
+    o.head = 'No increase needed; make sure it is given'; o.cls = 'okc';
+    o.rx.push(['Plan', 'The current dose already equals hydrocortisone 200 mg, prednisone 50 mg or dexamethasone 8 mg a day or more.']);
+    o.rx.push(['If nil by mouth, vomiting, or cannot take tablets', ivEq(i)]);
+    o.why = 'The current dose already covers major stress, but only if it is absorbed.';
+    if (i.drug === 'dex' || i.drug === 'beta') o.notes.push('Dexamethasone threshold: the guideline gives 6–8 mg; the tool uses 8.');
+    return o;
+  }
+  o.head = s === 'severe' ? 'IV stress dose' : s === 'labor' ? 'IV cover for labor' : 'IV cover for surgery'; o.cls = 'wn';
+  if (s === 'severe'){
+    o.rx.push(['In hospital', 'Hydrocortisone 100 mg IV or IM now, then 200 mg over 24 h by continuous infusion (or 50 mg IV every 6 h). Dose and duration after that depend on the illness and how they respond.']);
+    o.rx.push(['Before reaching hospital', 'Hydrocortisone 100 mg IM, repeated after 6 h if needed; admit if not settling.']);
+  } else if (s === 'labor'){
+    o.rx.push(['Labor', 'Hydrocortisone 100 mg IV at the onset of labor, then 200 mg over 24 h (or 50 mg IV every 6 h).']);
+  } else {
+    o.rx.push(['At induction', 'Hydrocortisone 100 mg IV, then 200 mg over 24 h by continuous infusion (or 50 mg IV every 6 h).']);
+    if (s === 'surglong') o.rx.push(['While nil by mouth', 'Continue hydrocortisone 200 mg over 24 h (or 50 mg every 6 h).']);
+    var post;
+    if (enough(i, 'minor')) post = 'Once eating: back to the usual dose. The guideline\'s example post-operative dose (hydrocortisone 40 mg, prednisone 10 mg, dexamethasone 1 mg a day for 48 h) is not above the current dose (inference from Table 8).';
+    else post = 'Once eating' + (s === 'surglong' ? ' and recovering without complications' : '') + ': ' + minorDose(i).t.charAt(0).toLowerCase() + minorDose(i).t.slice(1) + ' for 48 h, then ' + (i.status === 'now' ? 'the usual pre-operative dose.' : 'stop.');
+    o.rx.push(['After', post]);
+    o.guards.push(['Complications (sepsis, severe pain): keep the higher oral dose or go back to IV.', false]);
+    o.notes.push('Many US centers use less. For rheumatoid arthritis, spondyloarthritis or lupus having an elective hip or knee replacement, ACR/AAHKS 2022 suggests the usual daily dose rather than extra steroid (conditional, low quality). The ESE/ES guideline itself notes lower doses are routinely used. Two small trials found no more hypotension with the usual dose (Learn, Trials).');
+    o.tiers.push('ACR/AAHKS 2022 (conditional, low)');
+  }
+  if ((i.drug === 'dex' || i.drug === 'beta') && i.status === 'now' && i.dose >= 6) o.notes.push('Dexamethasone 6–8 mg a day may already be enough by the guideline; the tool uses 8 mg as the cut-off.');
+  o.notes.push('High body weight may need more.');
+  o.tiers[0] = 'ESE/ES 2024 Table 8; R3.1B (good practice)';
+  o.why = 'A suppressed adrenal cannot answer major stress, and vomiting or fasting stops tablets being absorbed, so the cover is given IV.';
+  return o;
+}
+
+/* Taper (ESE R2.1, R2.2, R2.5, R2.6, Table 4). Bands on prednisone-equivalent; a dose exactly on a boundary takes the smaller step. */
+function taper(i, R){
+  if (i.status !== 'now' || i.dose == null) return null;
+  var pe = predEq(i.dose, i.drug), o = {pe: pe, bands: [], notes: []};
+  if (R.k === 'low' && !i.cush){ o.k = 'short'; return o; }
+  o.k = band(i.dose, i.drug) === 'above' ? 'high' : 'phys';
+  if (o.k === 'high' && DRUGS[i.drug].long){ o.k = 'long'; return o; }
+  var d = pe;
+  if (d > 40){ o.bands.push({from: d, to: 40, step: '5–10 mg', every: 'every week', min: Math.ceil((d - 40) / 10), max: Math.ceil((d - 40) / 5), unit: 'weeks'}); d = 40; }
+  if (d > 20){ var n1 = Math.ceil((d - 20) / 5); o.bands.push({from: d, to: 20, step: '5 mg', every: 'every week', min: n1, max: n1, unit: 'weeks'}); d = 20; }
+  if (d > 10){ var n2 = Math.ceil((d - 10) / 2.5); o.bands.push({from: d, to: 10, step: '2.5 mg', every: 'every 1–4 weeks', min: n2, max: n2 * 4, unit: 'weeks'}); d = 10; }
+  if (d > 5){ var n3 = Math.ceil(d - 5); o.bands.push({from: d, to: 5, step: '1 mg', every: 'every 1–4 weeks', min: n3, max: n3 * 4, unit: 'weeks'}); d = 5; }
+  o.min = 0; o.max = 0; o.bands.forEach(function(b){ o.min += b.min; o.max += b.max; });
+  return o;
+}
+
+/* Narrowing: unwell during a taper (ESE Table 5, R2.3 rationale) */
+var CAUSES = [['wd', 'Glucocorticoid withdrawal syndrome'], ['ai', 'Adrenal insufficiency'], ['flare', 'Flare of the underlying disease'], ['other', 'Another illness (infection, other cause)']];
+var RESULTS = [
+  ['hi', 'Dose still over 7.5 mg', 'dose'], ['lo', 'Dose 7.5 mg or less', 'dose'],
+  ['bp', 'Low BP, orthostasis or weight loss', ''],
+  ['lyte', 'Low sodium or low glucose', 'lab'], ['norm', 'Sodium and glucose normal', 'lab'],
+  ['dz', 'Disease signs or markers back', ''],
+  ['fever', 'Fever or new infection', ''],
+  ['chi', 'Morning cortisol over 10', 'cort'], ['clo', 'Morning cortisol under 5', 'cort']
+];
+function narrow(sel){
+  var st = {}, why = {};
+  CAUSES.forEach(function(c){ st[c[0]] = 'in'; why[c[0]] = ''; });
+  function set(k, s, w){ if (st[k] === 'fav' && s === 'less') return; if (st[k] === 'less' && s === 'fav'){ st[k] = 'in'; why[k] = w; return; } st[k] = s; why[k] = w; }
+  if (sel.hi) set('ai', 'less', 'the dose still covers daily needs, unless critically ill or vomiting');
+  if (sel.lo) set('ai', 'in', 'adrenal insufficiency becomes a concern once the taper reaches 5–7.5 mg');
+  if (sel.bp){ set('ai', 'fav', 'hypotension and weight loss point to too little cortisol'); set('wd', 'less', 'withdrawal does not lower blood pressure'); }
+  if (sel.lyte){ set('ai', 'fav', 'low sodium or glucose fit cortisol deficiency'); set('wd', 'less', 'electrolytes are normal in withdrawal'); }
+  if (sel.norm) set('ai', 'less', 'often, but not always, lowers sodium or glucose');
+  if (sel.dz) set('flare', 'fav', 'disease-specific signs or markers have returned');
+  if (sel.fever){ set('other', 'fav', 'infection is also the commonest trigger of adrenal crisis: stress-dose'); }
+  if (sel.chi) set('ai', 'less', 'a morning cortisol over 10 µg/dL suggests the axis has recovered');
+  if (sel.clo) set('ai', 'fav', 'a morning cortisol under 5 µg/dL means persistent insufficiency is very likely');
+  return CAUSES.map(function(c){ return {k: c[0], name: c[1], st: st[c[0]], why: why[c[0]]}; });
+}
+function narrowNext(sel){
+  if (sel.bp) return 'Low pressure: consider adrenal crisis. If unwell, hydrocortisone 100 mg IV or IM and saline now; if stable, stress-dose and recheck before any test.';
+  if (sel.lo && !sel.chi && !sel.clo) return 'Morning cortisol at 8–9 am, 24 h after the last dose, once on a physiologic dose.';
+  if (sel.hi) return 'If the disease is quiet, go back to the last tolerated dose and slow the taper (withdrawal).';
+  if (!Object.keys(sel).length) return 'Blood pressure lying and standing, weight, sodium, potassium, glucose and disease markers.';
+  return 'Match the next step to the leading cause; if unsure, discuss a temporary return to the last tolerated dose.';
+}
+</script>
+<script>
+(function(){
+var $ = function(id){ return document.getElementById(id); };
+function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+var TICKS = {'ticks-r': [['cush', 'Cushingoid features'], ['rep', 'Repeated courses: 3 or more in 12 months'], ['recov', 'Tested and recovered: morning cortisol over 10 µg/dL']]};
+var seg = {drug: 'pred', status: 'now', expo: 'short', sit: 'none'}, ticked = {}, touched = false;
+document.querySelector('[data-seg="drug"]').innerHTML = ORDER.map(function(k){ return '<button class="sbtn" data-v="' + k + '" aria-pressed="' + (k === 'pred') + '">' + esc(DRUGS[k].n.replace(' acetate', '')) + '</button>'; }).join('');
+document.querySelector('[data-seg="sit"]').innerHTML = Object.keys(SIT).map(function(k){ return '<button class="sbtn" data-v="' + k + '" aria-pressed="' + (k === 'none') + '">' + esc(SIT[k]) + '</button>'; }).join('');
+Object.keys(TICKS).forEach(function(h){
+  $(h).innerHTML = TICKS[h].map(function(t){ return '<label class="chk"><input type="checkbox" data-k="' + t[0] + '">' + esc(t[1]) + '</label>'; }).join('');
+  $(h).addEventListener('change', function(e){ var k = e.target.getAttribute('data-k'); if (k){ ticked[k] = e.target.checked; touched = true; render(); } });
+});
+function paint(g){ var v = seg[g.getAttribute('data-seg')]; [].forEach.call(g.children, function(b){ b.setAttribute('aria-pressed', String(b.getAttribute('data-v') === v)); }); }
+document.querySelectorAll('[data-seg]').forEach(function(g){
+  g.addEventListener('click', function(e){ var b = e.target.closest('[data-v]'); if (!b) return; seg[g.getAttribute('data-seg')] = b.getAttribute('data-v'); paint(g); touched = true; render(); });
+});
+$('dose').addEventListener('input', render);
+function read(){
+  var v = parseFloat($('dose').value);
+  var i = {drug: seg.drug, status: seg.status, expo: seg.expo, sit: seg.sit, dose: isFinite(v) && v > 0 ? v : null};
+  Object.keys(ticked).forEach(function(k){ if (ticked[k]) i[k] = true; });
+  return i;
+}
+
+/* ---------- figures ---------- */
+var FS = 'font-family:var(--sans)', FM = 'font-family:var(--mono)';
+function svgOpen(vb, label){ return '<svg viewBox="' + vb + '" role="img" aria-label="' + esc(label) + '" class="fig">'; }
+function markers(p){ return '<defs><marker id="' + p + 'a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--muted)"/></marker><marker id="' + p + 'h" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--warn)"/></marker></defs>'; }
+function box(x, y, w, h, t1, t2, hot, dash){
+  var st = hot === 'bad' ? 'var(--bad)' : hot ? 'var(--warn)' : 'var(--line)', fl = hot === 'bad' ? 'var(--badbg)' : hot ? 'var(--warnbg)' : 'var(--fill)';
+  return '<rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="10" fill="' + fl + '" stroke="' + st + '"' + (hot ? ' stroke-width="2"' : '') + (dash ? ' stroke-dasharray="4 3"' : '') + '/>' +
+    '<text x="' + (x + w / 2) + '" y="' + (y + (t2 ? h / 2 - 3 : h / 2 + 4)) + '" text-anchor="middle" style="' + FS + ';font-size:12px;font-weight:600;fill:var(--ink)">' + esc(t1) + '</text>' +
+    (t2 ? '<text x="' + (x + w / 2) + '" y="' + (y + h / 2 + 12) + '" text-anchor="middle" style="' + FM + ';font-size:10.5px;fill:' + (hot ? (hot === 'bad' ? 'var(--bad)' : 'var(--warn)') : 'var(--muted)') + '">' + esc(t2) + '</text>' : '');
+}
+function txt(x, y, t, st, anchor){ return '<text x="' + x + '" y="' + y + '" text-anchor="' + (anchor || 'middle') + '" style="' + (st || FM + ';font-size:10.5px;fill:var(--muted)') + '">' + esc(t) + '</text>'; }
+function arrow(x1, y1, x2, y2, p, off){ return '<line x1="' + x1 + '" y1="' + y1 + '" x2="' + x2 + '" y2="' + y2 + '" stroke="' + (off ? 'var(--line)' : 'var(--muted)') + '" stroke-width="2"' + (off ? ' stroke-dasharray="4 3"' : '') + ' marker-end="url(#' + p + 'a)"/>'; }
+
+var AXIS = {
+  normal: {n: 'Normal', crh: ['CRH', ''], acth: ['ACTH', ''], adr: ['cortisol', 'about 10 mg a day', ''], pill: '', line: 'CRH drives ACTH and ACTH drives the adrenal cortex; cortisol brakes both. The adrenal makes about 9–10 mg of cortisol a day.'},
+  drug: {n: 'On a steroid', crh: ['CRH', 'off', 'w'], acth: ['ACTH', 'off', 'w'], adr: ['adrenal', 'shrinks, cortisol low', 'w'], pill: 'steroid above physiologic', off: true, line: 'The steroid presses the same brake. CRH and ACTH fall, and after weeks without ACTH the adrenal cortex shrinks.'},
+  taper: {n: 'Tapering', crh: ['CRH', 'recovering', ''], acth: ['ACTH', 'rising first', ''], adr: ['adrenal', 'still small', 'w'], pill: 'near physiologic', small: true, line: 'As the dose nears physiologic, the hypothalamus and pituitary recover first and ACTH rises. The shrunken cortex takes longer: a few months, sometimes up to 4 years.'},
+  stress: {n: 'Under stress', crh: ['CRH', 'off', 'w'], acth: ['ACTH', 'off', 'w'], adr: ['adrenal', 'cannot respond', 'bad'], pill: 'steroid above physiologic', off: true, stress: true, line: 'Illness or surgery should drive more CRH and ACTH. A suppressed axis cannot answer, so the extra cortisol has to be given.'},
+  recov: {n: 'Recovered', crh: ['CRH', ''], acth: ['ACTH', ''], adr: ['cortisol', 'back', ''], pill: '', line: 'ACTH and cortisol are back. A morning cortisol over 10 µg/dL means the steroid can stop.'}
+};
+function axisSVG(k, p){
+  var S = AXIS[k], h = svgOpen('0 0 340 250', 'HPA axis: ' + S.n) + markers(p);
+  h += box(70, 12, 130, 42, 'Hypothalamus', S.crh[0] + (S.crh[1] ? ': ' + S.crh[1] : ''), S.crh[2] ? 'w' : '', S.off);
+  h += box(70, 92, 130, 42, 'Pituitary', S.acth[0] + (S.acth[1] ? ': ' + S.acth[1] : ''), S.acth[2] ? 'w' : '', S.off);
+  var aw = S.adr[2] && k !== 'stress' ? 96 : 130, ax = 70 + (130 - aw) / 2;
+  h += box(ax, 172, aw, 46, 'Adrenal', S.adr[1] || S.adr[0], S.adr[2] === 'bad' ? 'bad' : S.adr[2] ? 'w' : '', false);
+  h += arrow(135, 54, 135, 90, p, S.off) + arrow(135, 134, 135, 170, p, S.off);
+  /* brake: cortisol feedback on the left */
+  h += '<path d="M70 195 H40 V33 H66" fill="none" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#' + p + 'a)"/><line x1="40" y1="113" x2="66" y2="113" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#' + p + 'a)"/>';
+  h += txt(32, 120, 'brake', FM + ';font-size:10px;fill:var(--muted)', 'end') + txt(58, 28, '−', FS + ';font-size:14px;font-weight:700;fill:var(--ink)') + txt(58, 108, '−', FS + ';font-size:14px;font-weight:700;fill:var(--ink)');
+  if (S.pill){
+    h += '<rect x="226" y="' + (S.small ? 104 : 96) + '" width="' + (S.small ? 80 : 104) + '" height="' + (S.small ? 22 : 34) + '" rx="' + (S.small ? 11 : 17) + '" fill="var(--warnbg)" stroke="var(--warn)" stroke-width="2"/>';
+    h += txt(226 + (S.small ? 40 : 52), S.small ? 119 : 117, S.small ? 'small dose' : 'steroid', FS + ';font-size:12px;font-weight:600;fill:var(--warn)');
+    h += txt(278, S.small ? 140 : 146, S.pill, FM + ';font-size:9.5px;fill:var(--muted)');
+    h += '<path d="M226 113 H204" fill="none" stroke="var(--warn)" stroke-width="2" marker-end="url(#' + p + 'h)"/><path d="M270 96 V33 H204" fill="none" stroke="var(--warn)" stroke-width="2" marker-end="url(#' + p + 'h)"/>';
+  }
+  if (S.stress){ h += box(226, 12, 104, 42, 'Illness, surgery', 'needs more', 'bad'); }
+  h += txt(135, 240, k === 'normal' || k === 'recov' ? 'cortisol reaches the body' : k === 'stress' ? 'give stress-dose steroid' : k === 'taper' ? 'the tablet still covers daily needs' : 'the body runs on the tablet', FM + ';font-size:10.5px;fill:var(--muted)');
+  return h + '</svg>';
+}
+
+var POT = [['hc', 1, 1], ['cort', 0.8, 0.8], ['pred', 4, 4], ['pnl', 4, 4], ['mp', 5, 5], ['tri', 5, 5], ['dex', 30, 60], ['beta', 25, 40]];
+var SALT = {yes: [200, 'yes'], low: [60, 'low'], minimal: [12, 'minimal'], negligible: [6, 'negligible'], none: [0, 'none']};
+var HL = {hc: [8, 12], cort: [8, 12], pred: [12, 36], pnl: [12, 36], mp: [12, 36], tri: [12, 36], dex: [36, 72], beta: [36, 72]};
+var POTS = {
+  str: {n: 'Strength', line: 'Dexamethasone is 30–60 times as strong as hydrocortisone, so 0.5 mg does what hydrocortisone 20 mg does. Prednisone is 4 times as strong.'},
+  salt: {n: 'Salt retention', line: 'Hydrocortisone and cortisone also retain salt; prednisone much less; methylprednisolone, dexamethasone and betamethasone hardly at all. Fludrocortisone 0.1 mg retains as much salt as hydrocortisone 20 mg or prednisone 50 mg.'},
+  dur: {n: 'Duration', line: 'Dexamethasone and betamethasone act for 36–72 hours and suppress ACTH around the clock, so they suppress the axis most; they are switched to shorter-acting drugs to taper.'}
+};
+function potSVG(k, p){
+  var h = svgOpen('0 0 340 250', 'Steroids compared: ' + POTS[k].n), X0 = 128, W = k === 'str' ? 168 : 196;
+  POT.forEach(function(r, n){
+    var y = 14 + n * 26, d = DRUGS[r[0]];
+    h += txt(X0 - 8, y + 13, d.n.replace(' acetate', ''), FS + ';font-size:11.5px;fill:var(--ink)', 'end');
+    var x1 = X0, x2;
+    if (k === 'str'){ var sc = function(v){ return X0 + W * Math.log(v / 0.5) / Math.log(120); }; x1 = X0; x2 = sc(r[2]); var xa = sc(r[1]);
+      h += '<rect x="' + x1 + '" y="' + (y + 3) + '" width="' + Math.max(2, xa - x1) + '" height="14" rx="4" fill="var(--accent)"/>';
+      if (r[2] > r[1]) h += '<rect x="' + xa + '" y="' + (y + 3) + '" width="' + (x2 - xa) + '" height="14" rx="4" fill="var(--accent)" opacity=".4"/>';
+      h += txt(x2 + 4, y + 14, r[1] === r[2] ? String(r[1]) : r[1] + '–' + r[2], FM + ';font-size:10.5px;fill:var(--ink)', 'start');
+    } else if (k === 'salt'){ var s = SALT[d.mc];
+      if (s[0]) h += '<rect x="' + X0 + '" y="' + (y + 3) + '" width="' + s[0] * W / 200 + '" height="14" rx="4" fill="var(--warn)"/>';
+      h += txt(X0 + s[0] * W / 200 + 4, y + 14, s[1], FM + ';font-size:10.5px;fill:var(--ink)', 'start');
+    } else { var hl = HL[r[0]], a = X0 + hl[0] / 72 * W, b = X0 + hl[1] / 72 * W;
+      h += '<rect x="' + a + '" y="' + (y + 3) + '" width="' + (b - a) + '" height="14" rx="4" fill="var(--accent)"/>';
+    }
+  });
+  if (k === 'str') h += txt(X0 + W / 2, 236, 'times hydrocortisone (log scale)');
+  if (k === 'salt') h += txt(X0 + W / 2, 236, 'salt-retaining effect, qualitative');
+  if (k === 'dur'){ [0, 24, 48, 72].forEach(function(t){ var x = X0 + t / 72 * W; h += '<line x1="' + x + '" y1="10" x2="' + x + '" y2="222" stroke="var(--line)"/>' + txt(x, 236, t + ' h'); }); }
+  return h + '</svg>';
+}
+
+var LAD = {
+  minor: {n: 'Minor illness', s: 1, line: 'Fever, antibiotics at home or bed rest: hydrocortisone 40 mg a day by mouth (prednisone 10 mg, dexamethasone 1 mg) for 2–5 days or until well.'},
+  proc: {n: 'Procedure, local', s: 1, line: 'Procedure under local anesthesia: the same 40 mg of hydrocortisone, the first dose 1 h before.'},
+  major: {n: 'Major stress', s: 2, line: 'Severe illness, surgery under general or regional anesthesia, labor: hydrocortisone 100 mg IV, then 200 mg over 24 h; back to tablets at a higher dose for 48 h once eating.'},
+  crisis: {n: 'Crisis', s: 3, line: 'Adrenal crisis: hydrocortisone 100 mg IV or IM now, rapid saline, then 200 mg over 24 h until recovered.'}
+};
+function ladSVG(k, p){
+  var h = svgOpen('0 0 340 220', 'Stress dose ladder: ' + LAD[k].n), L = LAD[k].s;
+  var steps = [['Usual dose', 'tablets'], ['Minor', 'HC 40 mg PO'], ['Major', 'HC 100 IV + 200/24 h'], ['Crisis', '100 IV + saline']];
+  steps.forEach(function(s, n){
+    var x = 8 + n * 82, hgt = 40 + n * 44, y = 200 - hgt, on = n === L;
+    h += '<rect x="' + x + '" y="' + y + '" width="76" height="' + hgt + '" rx="8" fill="' + (on ? (n === 3 ? 'var(--badbg)' : 'var(--warnbg)') : 'var(--fill)') + '" stroke="' + (on ? (n === 3 ? 'var(--bad)' : 'var(--warn)') : 'var(--line)') + '"' + (on ? ' stroke-width="2"' : '') + '/>';
+    h += txt(x + 38, y + 18, s[0], FS + ';font-size:12px;font-weight:600;fill:var(--ink)');
+    var parts = s[1].split(' + ');
+    parts.forEach(function(t, m){ h += txt(x + 38, y + 34 + m * 13, (m ? '+ ' : '') + t, FM + ';font-size:9.5px;fill:' + (on ? (n === 3 ? 'var(--bad)' : 'var(--warn)') : 'var(--muted)')); });
+  });
+  h += txt(170, 215, 'hydrocortisone (HC) per day, ESE/ES 2024 Table 8');
+  return h + '</svg>';
+}
+
+var FIGS = {
+  axis: {t: 'The HPA axis and its brake', states: ['normal','drug','taper','stress','recov'], data: AXIS, svg: axisSVG},
+  potency: {t: 'Strength, salt and duration', states: ['str','salt','dur'], data: POTS, svg: potSVG},
+  ladder: {t: 'Stress dose ladder', states: ['minor','proc','major','crisis'], data: LAD, svg: ladSVG}
+};
+var ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M7 15l3-4 3 3 2-2 2 3"/></svg>';
+var figN = 0;
+function mountFig(host, id, state){
+  var F = FIGS[id], pre = 'f' + (++figN) + '-';
+  function draw(k){
+    host.innerHTML = '<div class="states" role="group" aria-label="' + esc(F.t) + '">' + F.states.map(function(x){ return '<button class="sbtn" data-k="' + x + '" aria-pressed="' + (x === k) + '">' + esc(F.data[x].n) + '</button>'; }).join('') + '</div>' + F.svg(k, pre) + '<p class="line1">' + esc(F.data[k].line) + '</p>';
+    var on = host.querySelector('[aria-pressed="true"]'), row = host.querySelector('.states');
+    if (on && row) row.scrollLeft = Math.max(0, on.offsetLeft - 60);
+  }
+  host.onclick = function(e){ var k = e.target.getAttribute && e.target.getAttribute('data-k'); if (k) draw(k); };
+  draw(state && F.data[state] ? state : F.states[0]);
+}
+function chip(fig, state, label){ return '<div class="chips"><button class="chip" data-fig="' + fig + '" data-state="' + (state || '') + '">' + ICON + esc(label || FIGS[fig].t) + '</button></div>'; }
+var lastFocus = null;
+function openSheet(fig, state){
+  lastFocus = document.activeElement;
+  $('sheet-t').textContent = FIGS[fig].t;
+  mountFig($('sheet-b'), fig, state);
+  $('scrim').hidden = false; $('sheet').hidden = false; $('sheet').scrollTop = 0; $('sheet-x').focus();
+}
+function closeSheet(){ if ($('sheet').hidden) return; $('scrim').hidden = true; $('sheet').hidden = true; if (lastFocus && lastFocus.focus) lastFocus.focus(); }
+$('sheet-x').addEventListener('click', closeSheet); $('scrim').addEventListener('click', closeSheet);
+document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeSheet(); });
+
+/* ---------- cards ---------- */
+function more(list, tiers){
+  if ((!list || !list.length) && (!tiers || !tiers.length)) return '';
+  return '<details><summary>More</summary>' + (list || []).map(function(x){ return '<p>' + esc(x) + '</p>'; }).join('') + (tiers || []).map(function(t){ return '<span class="tier">' + esc(t) + '</span>'; }).join('') + '</details>';
+}
+function why(w){ return w ? '<p class="whyline"><b>Why:</b> ' + esc(w) + '</p>' : ''; }
+function ul(a){ return '<ul>' + a.map(function(x){ return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>'; }
+function card(id, label, inner){ return '<div class="card" id="' + id + '"><p class="label">' + esc(label) + '</p>' + inner + '</div>'; }
+function guard(t, bad){ return '<div class="guard' + (bad ? ' bad' : '') + '">' + esc(t) + '</div>'; }
+function mg(x){ return rnd(x) + ' mg'; }
+
+var WHY = {
+  eqSalt: 'Hydrocortisone also acts on the salt-retaining (mineralocorticoid) receptor; prednisone much less, and methylprednisolone or dexamethasone barely, so salt and potassium handling change when you switch.',
+  eqLong: 'Dexamethasone acts for 36 to 72 hours, so it suppresses ACTH around the clock and is the hardest steroid to come off.',
+  eq: 'These are equal anti-inflammatory doses: the drugs differ in receptor strength and duration. They are estimates and ignore the salt-retaining effect.',
+  low: 'Short courses can suppress the axis briefly, but clinically relevant adrenal insufficiency after under 3–4 weeks is rare.',
+  risk: 'Steroid above the body\'s own output suppresses CRH and ACTH; after weeks the adrenal cortex atrophies, and recovery can take months to years.',
+  cush: 'Cushingoid features mean exposure has been high enough, for long enough, to assume the axis is suppressed.',
+  recov: 'A morning cortisol over 10 µg/dL means the adrenal is making its own cortisol again.',
+  tHigh: 'Above physiologic doses the risk is flare and withdrawal symptoms rather than adrenal insufficiency (unless critically ill or vomiting), so steps can be larger.',
+  tPhys: 'Near 5 mg of prednisone the dose stops covering the body\'s needs, so the axis has to restart: steps get smaller.',
+  tLong: 'Long-acting steroids suppress ACTH around the clock; a shorter-acting morning dose leaves the axis a window to recover.',
+  tShort: 'Under 3–4 weeks the axis is rarely suppressed enough to matter, so the guideline suggests stopping without a taper.'
+};
+
+function build(i){
+  var h = '', R = risk(i), d = DRUGS[i.drug];
+  if (i.dose == null && !touched) return {html: '<div class="card empty">Pick the steroid and enter the daily dose to see equivalents. Add the exposure and situation for adrenal risk, stress dosing and a taper.</div>'};
+  /* 1. equivalents */
+  if (i.dose != null){
+    var pe = predEq(i.dose, i.drug), b = band(i.dose, i.drug);
+    var rows = ORDER.map(function(k){ var v = conv(i.dose, i.drug, k), o = DRUGS[k].old || d.old ? conv(i.dose, i.drug, k, true) : null; return '<tr' + (k === i.drug ? ' class="src"' : '') + '><td>' + esc(DRUGS[k].n) + '</td><td class="mono">' + esc(mg(v)) + (o != null && rnd(o) !== rnd(v) ? '<br><span class="note">older table: ' + esc(mg(o)) + '</span>' : '') + '</td></tr>'; }).join('');
+    var pr = PHYS[i.drug] ? d.n.toLowerCase() + ' ' + PHYS[i.drug][0] + '–' + PHYS[i.drug][1] + ' mg' : 'prednisone 4–6 mg';
+    var bt = (b === 'above' ? 'Above physiologic' : b === 'phys' ? 'Within the physiologic range' : 'Below the physiologic range') + ' (' + pr + ' a day).';
+    var w = (i.drug === 'hc' || i.drug === 'cort') ? WHY.eqSalt : d.long ? WHY.eqLong : WHY.eq;
+    var ml = ['Equal doses from the ESE/ES 2024 table, a guide only; individual response varies. ' + (d.old ? d.n + ' is listed as ' + d.old + ' mg = hydrocortisone 20 mg in older tables (Liu 2013); both are shown.' : 'Dexamethasone and betamethasone differ by a third between tables; the older figures are shown under them.'),
+      'Oral and IV doses are treated as equal. Prednisone, prednisolone and cortisone are tablets only: for IV, use methylprednisolone or hydrocortisone.',
+      'Going from hydrocortisone to an equal dose of methylprednisolone or dexamethasone removes most of the salt-retaining effect; fludrocortisone is not needed for steroid-induced adrenal insufficiency, where aldosterone is preserved.'];
+    h += card('out-eq', 'Equivalent doses', '<p class="head">' + esc(mg(i.dose) + ' ' + d.n.toLowerCase() + ' = ' + (i.drug === 'pred' ? 'hydrocortisone ' + mg(hcEq(i.dose, i.drug)) : 'prednisone ' + mg(pe))) + '</p><p class="sub">' + esc(bt + ' Hydrocortisone-equivalent ' + mg(hcEq(i.dose, i.drug)) + ' a day.') + '</p><div class="tw" style="margin-top:8px"><table class="eqt"><tbody>' + rows + '</tbody></table></div>' + why(w) + chip('potency', d.long ? 'dur' : (i.drug === 'hc' || i.drug === 'cort') ? 'salt' : 'str') + more(ml, ['ESE/ES 2024 Table 1', 'Liu 2013 Table 3']));
+  }
+  /* 2. adrenal risk */
+  var rh, rcls, rl = [], rw, rg = '';
+  if (R.k === 'recov'){ rh = 'Axis recovered on testing'; rcls = 'okc'; rl = ['Usual-dose rules apply: no stress dose for the adrenal.']; rw = WHY.recov; }
+  else if (R.k === 'risk'){
+    rh = 'Assume adrenal suppression'; rcls = 'wn';
+    rl = ['Because of: ' + R.why.join(', ') + '.', 'Stress-dose for illness, procedures and surgery (choose the situation).', 'Do not stop suddenly; taper once the disease allows.', 'Teach sick-day rules; give a steroid emergency card and an injectable hydrocortisone kit once the dose nears physiologic.'];
+    if (i.status === 'stopped') rl.splice(1, 0, 'Recently stopped and not tested: still at risk; recovery can take months to years.');
+    if (i.status === 'now' && i.dose != null && band(i.dose, i.drug) !== 'above') rl.push('At or below physiologic now, but the axis may still be suppressed until tested (morning cortisol).');
+    if (i.status === 'now' && d.long) rl.push(d.n + ' is long-acting and suppresses most.');
+    rw = i.cush ? WHY.cush : WHY.risk;
+    rg = guard('Hypotension, collapse, vomiting or diarrhea: treat as adrenal crisis (hydrocortisone 100 mg IV or IM now).', false);
+  } else { rh = 'Low concern for adrenal suppression'; rcls = 'okc'; rl = ['Under 3 weeks of exposure in the last year: can stop without a taper or testing.', 'Still think of adrenal crisis if they become hypotensive while on or just after the course.']; rw = WHY.low; }
+  h += card('out-hpa', 'Adrenal risk', '<p class="head ' + rcls + '">' + esc(rh) + '</p>' + ul(rl) + rg + why(rw) + chip('axis', R.k === 'recov' ? 'recov' : R.k === 'risk' ? 'drug' : 'normal') +
+    more(['Exposure counted: 5 mg prednisone-equivalent or more for 3 weeks or longer in the last 12 months. The guideline defines risk as any dose above physiologic for 3–4 weeks or longer; UK guidance uses 5 mg for 4 weeks. "Recent" is not defined in the guideline: the tool uses 12 months, as Liu 2013 does for untested patients. Recovery can take from a few months to 4 years.', 'Older teaching used 20 mg of prednisone for 3 weeks as the line; the 2024 guideline does not.', 'Non-oral steroids (inhaled, topical, joint injections) can suppress too: see Reference.'],
+      ['ESE/ES 2024 Definitions; R2.1 (weak, very low); R2.10, R3.1 (good practice); Table 3', 'repeated courses: Society for Endocrinology (UK)']));
+  /* 3. stress */
+  var S = stress(i, R);
+  if (S){
+    var lad = i.sit === 'crisis' ? 'crisis' : (i.sit === 'minor' || i.sit === 'bowel') ? 'minor' : i.sit === 'local' ? 'proc' : 'major';
+    h += card('out-stress', 'Stress dose · ' + SIT[i.sit], '<p class="head ' + S.cls + '">' + esc(S.head) + '</p>' + S.rx.map(function(r){ return '<div class="rx"><b>' + esc(r[0]) + '</b>' + esc(r[1]) + '</div>'; }).join('') + S.guards.map(function(g){ return guard(g[0], g[1]); }).join('') + why(S.why) + chip('ladder', lad) + more(S.notes, S.tiers));
+  }
+  /* 4. taper */
+  var T = taper(i, R);
+  if (T){
+    var th, tb = '', tw, tl = [], tm = [];
+    if (T.k === 'short'){ th = 'Stop without a taper'; tb = '<p class="sub">Under 3 weeks of exposure: no taper and no testing needed.</p>'; tw = WHY.tShort; }
+    else {
+      th = T.k === 'high' ? 'Taper from prednisone ' + mg(T.pe) : T.k === 'long' ? 'Switch before tapering' : (band(i.dose, i.drug) === 'below' ? 'Below a physiologic dose' : 'At a physiologic dose') + ' (' + d.n.toLowerCase() + ' ' + mg(i.dose) + ')';
+      if (d.long) tb += guard('Switch ' + d.n.toLowerCase() + ' to prednisone or hydrocortisone once the long-acting drug is no longer needed. For brain tumors, spinal cord compression or chemotherapy, the treating team sets the taper: do not turn a high dexamethasone dose into an equally high prednisone dose by default.', false);
+      if (T.k === 'high'){
+        tb += T.bands.map(function(x){ return '<div class="band"><b>' + esc(rnd(x.from) + ' → ' + x.to) + '</b><span>' + esc('down ' + x.step + ' ' + x.every + ' (' + (x.min === x.max ? x.min : x.min + '–' + x.max) + ' ' + x.unit + ')') + '</span></div>'; }).join('');
+        tb += '<div class="band"><b>at 5</b><span>' + esc('stop and check: keep tapering 1 mg every 4 weeks with clinical watch, or a morning cortisol') + '</span></div>';
+        tb += '<p class="note" style="margin:6px 0 0">' + esc('About ' + T.min + (T.max > T.min ? ' to ' + T.max : '') + ' weeks to reach 5 mg at these steps, if the disease stays quiet.') + '</p>';
+      } else if (T.k === 'long'){
+        tb += '<p class="sub">' + esc('Equal to prednisone ' + mg(T.pe) + ' a day. The steps below 40 mg (Reference, Tapering) start after the switch, from the dose the treating team chooses.') + '</p>';
+      } else {
+        tb += ul(['Either keep tapering, 1 mg every 4 weeks (or hydrocortisone 20 mg, down 5 mg every 4 weeks), watching for symptoms; or', 'Morning cortisol at 8–9 am, at least 24 h after the last dose: over 10 µg/dL stop; 5–10 continue and repeat in weeks to months; under 5 continue and repeat in a few months.']);
+      }
+      tl = ['Taper only when the disease is controlled and the steroid is no longer needed.', 'Withdrawal symptoms (fatigue, aches, poor sleep, low mood): go back to the last tolerated dose and slow down.', 'Endocrinology if no recovery after a year on a physiologic dose, or after any adrenal crisis.'];
+      tb += ul(tl);
+      tw = d.long ? WHY.tLong : T.k === 'high' ? WHY.tHigh : WHY.tPhys;
+      tm = ['Steps from ESE/ES 2024 Table 4 by prednisone-equivalent dose: over 40 mg, 5–10 mg every week; 20–40 mg, 5 mg every week; 10–20 mg, 2.5 mg every 1–4 weeks; 5–10 mg, 1 mg every 1–4 weeks. A dose exactly on a boundary takes the smaller step. Larger, faster steps are possible at high doses, and a faster taper may be needed for steroid psychosis, uncontrolled glucose or blood pressure, or herpetic keratitis.', 'No routine dynamic testing. Cortisol is a continuum and assays differ; falsely high on oral estrogen, falsely low with low albumin. Dexamethasone keeps suppressing the axis, so switch off it before testing.', 'For other steroids, convert to the prednisone-equivalent, taper on prednisone (or hydrocortisone near the end).'];
+    }
+    h += card('out-taper', 'Taper', '<p class="head">' + esc(th) + '</p>' + tb + why(tw) + (T.k !== 'short' ? chip('axis', 'taper') : '') + more(tm, ['ESE/ES 2024 R2.1, R2.5, R2.6 (weak, very low)', 'R2.7 (morning cortisol first: recommend, very low; cut-offs suggested)', 'R2.2, R2.3, R2.11 (good practice)', 'Table 4']));
+  }
+  return {html: h, R: R};
+}
+function render(){ $('out').innerHTML = build(read()).html; }
+document.addEventListener('click', function(e){
+  var c = e.target.closest && e.target.closest('[data-fig]'); if (c){ openSheet(c.getAttribute('data-fig'), c.getAttribute('data-state')); return; }
+});
+
+/* ---------- tabs ---------- */
+var tabs = [['t-tool','p-tool'],['t-learn','p-learn'],['t-ref','p-ref'],['t-prac','p-prac']];
+function show(t){ tabs.forEach(function(p){ var on = p[0] === t; $(p[0]).setAttribute('aria-selected', String(on)); $(p[1]).classList.toggle('on', on); }); }
+tabs.forEach(function(p){ $(p[0]).addEventListener('click', function(){ show(p[0]); }); });
+function fromHash(){ var id = location.hash.slice(1); if (!id) return; var el = $(id); if (!el) return; var pan = el.closest('.panel'); if (pan) tabs.forEach(function(p){ if (p[1] === pan.id) show(p[0]); }); el.scrollIntoView(); }
+window.addEventListener('hashchange', fromHash);
+
+/* ---------- narrowing ---------- */
+var nwSel = {};
+function drawNarrow(){
+  $('nw-results').innerHTML = RESULTS.map(function(r){ return '<button class="sbtn" data-r="' + r[0] + '" data-g="' + r[2] + '" aria-pressed="' + !!nwSel[r[0]] + '">' + esc(r[1]) + '</button>'; }).join('');
+  var rows = narrow(nwSel), ord = {fav: 0, 'in': 1, less: 2};
+  rows.sort(function(a, b){ return ord[a.st] - ord[b.st]; });
+  $('nw-causes').innerHTML = rows.map(function(c){ return '<div class="cause ' + c.st + '"><span>' + esc(c.name) + '</span><small>' + esc(c.st === 'in' ? (c.why ? 'still possible: ' + c.why : 'still possible') : (c.st === 'less' ? 'less likely: ' : 'favoured: ') + c.why) + '</small></div>'; }).join('');
+  $('nw-next').innerHTML = '<b>Next:</b> ' + esc(narrowNext(nwSel));
+}
+$('nw-results').addEventListener('click', function(e){
+  var r = e.target.getAttribute('data-r'); if (!r) return; var g = e.target.getAttribute('data-g'), was = !!nwSel[r];
+  if (g) RESULTS.forEach(function(x){ if (x[2] === g) delete nwSel[x[0]]; });
+  if (was) delete nwSel[r]; else nwSel[r] = 1;
+  var left = $('nw-results').scrollLeft; drawNarrow(); $('nw-results').scrollLeft = left;
+});
+drawNarrow();
+
+/* ---------- Learn ---------- */
+var TRIALS = [
+  {q: 'Glowniak and Loriaux (1997): do suppressed patients need extra steroid for surgery?', d: 'Randomized, double-blind; 18 patients on at least 7.5 mg prednisone for months with adrenal insufficiency on ACTH testing, mostly major operations. All kept their usual prednisone; 6 also got perioperative cortisol, 12 got saline.', r: 'Hypotension in 1 patient in each group, both corrected with fluid; pulse and blood pressure similar. Very small and unequal arms.', c: 'Raised the question whether the usual daily dose is enough; did not change guideline doses.', cite: 'Glowniak JV, Loriaux DL. Surgery 1997;121:123', doi: '10.1016/s0039-6060(97)90280-4'},
+  {q: 'Zaghiyan (2014): high or usual dose for major colorectal surgery?', d: 'Single-blind noninferiority trial, one center, 92 steroid-treated patients with inflammatory bowel disease: hydrocortisone 100 mg IV three times a day then taper, vs IV hydrocortisone equal to the usual oral dose then taper.', r: 'No postural hypotension on day 1 in 95% (high dose) vs 96% (usual dose); noninferiority 95% CI −0.08 to 0.09.', c: 'Supports lower perioperative doses in some centers; single center, surrogate outcome.', cite: 'Zaghiyan K et al. Ann Surg 2014;259:32', doi: '10.1097/SLA.0b013e318297adca'}
+];
+document.querySelectorAll('[data-figure]').forEach(function(hst){ mountFig(hst, hst.getAttribute('data-figure'), hst.getAttribute('data-state')); });
+(function(){
+  var chaps = [].slice.call(document.querySelectorAll('.chap'));
+  $('pills').innerHTML = chaps.map(function(c, n){ return '<button class="pill" data-go="' + c.id + '" aria-current="' + (n === 0) + '">' + (n + 1) + ' ' + esc(c.getAttribute('data-pill')) + '</button>'; }).join('');
+  $('pills').addEventListener('click', function(e){ var g = e.target.getAttribute('data-go'); if (g) $(g).scrollIntoView(); });
+  function mark(id){ [].forEach.call($('pills').children, function(b){ var on = b.getAttribute('data-go') === id; b.setAttribute('aria-current', String(on)); if (on) $('pills').scrollLeft = Math.max(0, b.offsetLeft - 60); }); }
+  if ('IntersectionObserver' in window){
+    var io = new IntersectionObserver(function(es){ es.forEach(function(en){ if (en.isIntersecting) mark(en.target.id); }); }, {rootMargin: '-30% 0px -60% 0px'});
+    chaps.forEach(function(c){ io.observe(c); });
+  }
+  $('trialbox').innerHTML = TRIALS.map(function(t){ return '<div class="trial" style="margin-top:14px"><p><b>' + esc(t.q) + '</b></p><p><span class="k">Design</span>' + esc(t.d) + '</p><p><span class="k">Result</span>' + esc(t.r) + '</p><p><span class="k">What it changed</span>' + esc(t.c) + '</p><p class="mono" style="font-size:13px">' + esc(t.cite) + ' · <a href="https://doi.org/' + t.doi + '" rel="noopener">doi:' + esc(t.doi) + '</a></p></div>'; }).join('');
+  $('go-prac').addEventListener('click', function(){ show('t-prac'); window.scrollTo(0, 0); });
+})();
+
+/* ---------- Practice: cases run through the same engine ---------- */
+var CASES = [
+  {t: 'COPD flare, five days of prednisone', s: 'Age 66. Prednisone 40 mg a day for 5 days for a COPD exacerbation, now better. No other steroid this year.', q: 'Taper?', i: {drug: 'pred', dose: 40, status: 'now', expo: 'short', sit: 'none'}, p: 'No. Under 3 weeks at any dose: stop without a taper or testing.'},
+  {t: 'Hip replacement on prednisone 10 mg', s: 'Age 70, rheumatoid arthritis, prednisone 10 mg a day for 2 years. Elective hip replacement under spinal anesthesia, expected to eat the same day.', q: 'Steroid plan?', i: {drug: 'pred', dose: 10, status: 'now', expo: 'long', sit: 'surgshort'}, p: 'ESE/ES 2024: hydrocortisone 100 mg IV at induction, then 200 mg over 24 h (or 50 mg every 6 h); once eating, back to 10 mg, which already equals the guideline\'s post-operative example. For rheumatoid arthritis and elective hip or knee replacement, ACR/AAHKS 2022 suggests the usual dose alone (conditional): agree a plan with anesthesia.'},
+  {t: 'Colonoscopy on prednisone 5 mg', s: 'Age 74, polymyalgia rheumatica, prednisone 5 mg a day for 3 years. Colonoscopy with sedation, no general anesthesia.', q: 'Extra steroid?', i: {drug: 'pred', dose: 5, status: 'now', expo: 'long', sit: 'bowel'}, p: 'Usual dose; IV equivalent if nil by mouth for long. She is still at risk: years of exposure and never tested.'},
+  {t: 'Pneumonia two months after stopping', s: 'Age 58. Prednisone 30 mg a day for 4 months for organizing pneumonia, stopped 2 months ago without testing. Now admitted with pneumonia, BP 80/50, sodium 128, vomiting.', q: 'What now?', i: {drug: 'pred', dose: 30, status: 'stopped', expo: 'long', sit: 'crisis'}, p: 'Treat as adrenal crisis: hydrocortisone 100 mg IV now and rapid saline, then 200 mg over 24 h. Do not wait for a cortisol.'},
+  {t: 'Coming off 60 mg', s: 'Age 52. Prednisone 60 mg a day for 3 months for a vasculitis now in remission; the specialist agrees to taper.', q: 'Taper plan?', i: {drug: 'pred', dose: 60, status: 'now', expo: 'long', sit: 'none'}, p: '60 to 40 in 5–10 mg weekly steps, 40 to 20 by 5 mg weekly, 20 to 10 by 2.5 mg every 1–4 weeks, 10 to 5 by 1 mg every 1–4 weeks; at 5 mg, keep tapering slowly or check a morning cortisol. Stress-dose throughout.'},
+  {t: 'Dexamethasone for brain metastases', s: 'Age 61. Dexamethasone 4 mg four times a day (16 mg a day) for 6 weeks; radiotherapy finished and the oncologist wants to come off.', q: 'What is it in prednisone, and how to come off?', i: {drug: 'dex', dose: 16, status: 'now', expo: 'mid', sit: 'none'}, p: 'Prednisone-equivalent 160 mg (107 mg by the older table). The oncology team sets the dexamethasone taper; switch to prednisone or hydrocortisone once dexamethasone is no longer needed, then taper by Table 4. Do not simply swap for prednisone 160 mg.'},
+  {t: 'Lupus with a fever at home', s: 'Age 34, lupus, prednisone 7.5 mg a day for 2 years. Fever and a urinary infection, on oral antibiotics at home, blood pressure normal.', q: 'Change the steroid?', i: {drug: 'pred', dose: 7.5, status: 'now', expo: 'long', sit: 'minor'}, p: 'Increase to prednisone 10 mg a day for 2–5 days or the antibiotic course, then back to 7.5 mg. IV hydrocortisone if vomiting or hypotensive.'},
+  {t: 'Methylprednisolone in the ED', s: 'Age 29, asthma. Methylprednisolone 125 mg IV once in the ED; going home on oral steroid. No steroid this year.', q: 'What prednisone dose is that?', i: {drug: 'mp', dose: 125, status: 'now', expo: 'short', sit: 'none'}, p: 'Prednisone about 156 mg (125 ÷ 4 × 5). A short course needs no taper.'}
+];
+$('practice').innerHTML = CASES.map(function(c, n){
+  return '<div class="card case"><p class="label">Case ' + (n + 1) + '</p><h2>' + esc(c.t) + '</h2><p>' + esc(c.s) + '</p><p><b>' + esc(c.q) + '</b></p><div class="row"><button class="btn" data-ans="' + n + '">Show the answer</button><button class="btn ghost" data-load="' + n + '">Open in the tool</button></div><div class="ans" id="ans' + n + '" hidden></div></div>';
+}).join('');
+$('practice').addEventListener('click', function(e){
+  var a = e.target.getAttribute('data-ans'), l = e.target.getAttribute('data-load');
+  if (a != null){ var c = CASES[a]; var box = $('ans' + a); var t = touched; touched = true; var b = build(c.i); touched = t; box.innerHTML = '<p>' + esc(c.p) + '</p>' + b.html.replace(/ id="[^"]*"/g, ''); box.hidden = false; e.target.hidden = true; }
+  if (l != null) load(CASES[l].i);
+});
+function load(i){
+  $('dose').value = i.dose != null ? i.dose : '';
+  seg = {drug: i.drug, status: i.status, expo: i.expo, sit: i.sit};
+  ticked = {}; TICKS['ticks-r'].forEach(function(t){ if (i[t[0]]) ticked[t[0]] = true; });
+  document.querySelectorAll('#ticks-r input').forEach(function(x){ x.checked = !!ticked[x.getAttribute('data-k')]; });
+  document.querySelectorAll('[data-seg]').forEach(paint);
+  touched = true; render(); show('t-tool'); window.scrollTo(0, 0);
+}
+fromHash();
+})();
+</script>
+</body>
+</html>
