@@ -149,8 +149,7 @@ footer p{margin:0 0 8px}
 .vk-btn{min-height:44px;border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);border-radius:10px;padding:8px 14px;font:inherit;font-weight:600;cursor:pointer;margin-top:10px}
 .vk-btn.ghost{background:var(--card);color:var(--accent)}
 .vk-hot:focus-visible,.vk-opt:focus-visible,.vk-cell:focus-visible,.vk-btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-@media (max-width:479px){.vk-hot{width:20px;height:20px;font-size:11px}}
-@media (min-width:900px){.vk-grid{grid-template-columns:repeat(3,1fr)}.vk-hot{width:30px;height:30px}}
+@media (min-width:900px){.vk-grid{grid-template-columns:repeat(4,1fr)}.vk-hot{width:30px;height:30px}}
 .vk-chip{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--ink);font:inherit;font-size:14px;cursor:pointer;text-align:left}
 .vk-chip svg{flex:none;color:var(--accent)}
 .vk-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
@@ -895,7 +894,7 @@ var VK = (function(){
   function g(id){ return document.getElementById(id); }
   function q(s){ return String(s).replace(/[&<>"]/g, function(c){ return {'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c]; }); }
   var PIC = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M5 21c1-4 4-6 7-6s6 2 7 6"/></svg>';
-  function img(id){ var P = C.plates[id]; return '<div class="vk-plate"><div class="vk-pw"' + (P.w ? ' style="max-width:' + P.w + 'px;margin:0 auto"' : '') + '><img src="' + P.src + '" alt="' + q(P.alt) + '" width="' + (P.w || 1024) + '" height="' + (P.h || 572) + '" loading="lazy">' + (P.hot || []).map(function(h, k){ return '<button class="vk-hot" type="button" data-vk-hot="' + id + ':' + k + '" style="left:' + h[0] + '%;top:' + h[1] + '%" aria-label="' + q(h[2]) + '">' + (k + 1) + '</button>'; }).join('') + '</div><span class="vk-credit">Created with BioRender.com</span></div>'; }
+  function img(id){ var P = C.plates[id]; return '<div class="vk-plate"><div class="vk-pw"' + (P.w ? ' style="max-width:' + P.w + 'px;margin:0 auto"' : '') + '><img src="' + P.src + '" alt="' + q(P.alt) + '" width="' + (P.w || 1024) + '" height="' + (P.h || 572) + '" loading="lazy">' + (P.hot || []).map(function(h, k){ return '<button class="vk-hot" type="button" tabindex="-1" aria-hidden="true" data-vk-hot="' + id + ':' + k + '" style="left:' + h[0] + '%;top:' + h[1] + '%" aria-label="' + q(h[2]) + '">' + (k + 1) + '</button>'; }).join('') + '</div><span class="vk-credit">Created with BioRender.com</span></div>'; }
   function plateHtml(id){ var P = C.plates[id]; return img(id) + (P.hot ? '<div class="vk-hl">' + P.hot.map(function(h, k){ return '<button class="chip vk-chip" type="button" data-vk-hot="' + id + ':' + k + '" aria-pressed="false"><span class="vk-n">' + (k + 1) + '</span>' + q(h[2]) + '</button>'; }).join('') + '</div><div class="vk-out" aria-live="polite"></div>' : '') + '<p class="vk-cap">' + P.cap + '</p><p class="vk-src">' + P.src2 + '</p>'; }
   function chip(id, label){ return '<button class="chip vk-chip" type="button" data-vk-plate="' + id + '">' + PIC + q(label || C.plates[id].t) + '</button>'; }
   function openPlate(id){ var b; if (C.open){ b = C.open(C.plates[id].t, plateHtml(id)); if (b) { b.setAttribute('data-vk-sheet', ''); b.setAttribute('data-vk-open', id); } return; }
@@ -906,7 +905,7 @@ var VK = (function(){
   function answer(key, j){ var box = document.querySelector('[data-vk-pred="' + key + '"]'), P = C.preds[key]; if (!box || box.getAttribute('data-done')) return; box.setAttribute('data-done', '1'); var ok = mark(box, j), a = box.querySelector('.vk-ans');
     a.innerHTML = '<p><b>' + (ok ? 'Right.' : 'Not quite.') + '</b> ' + P.why() + '</p>' + (typeof P.fig === 'function' ? P.fig() : P.fig ? '<button class="chip vk-chip" type="button" data-fig="' + P.fig[0] + '" data-state="' + (P.fig[1] || '') + '">' + VK_FIC + q(P.fig[2]) + '</button>' : ''); a.hidden = false; }
   function slHtml(id){ var S = C.sliders[id]; return '<div class="vk-sl" data-vk-sl="' + id + '">' + S.ranges.map(function(r){ return '<label for="vk-' + id + '-' + r.key + '">' + r.label + ' <b data-vk-v="' + r.key + '"></b></label><input type="range" id="vk-' + id + '-' + r.key + '" data-vk-k="' + r.key + '" min="' + r.min + '" max="' + r.max + '" step="' + r.step + '" value="' + r.value + '">'; }).join('') + '<div class="vk-res" aria-live="polite"></div>' + (S.note ? '<p class="vk-src">' + S.note + '</p>' : '') + '</div>'; }
-  function slRun(w){ var S = C.sliders[w.getAttribute('data-vk-sl')], v = {}; S.ranges.forEach(function(r){ var x = +w.querySelector('[data-vk-k="' + r.key + '"]').value; v[r.key] = x; w.querySelector('[data-vk-v="' + r.key + '"]').textContent = (r.fmt ? r.fmt(x) : x) + (r.unit ? ' ' + r.unit : ''); }); w.querySelector('.vk-res').innerHTML = S.run(v); }
+  function slRun(w){ var S = C.sliders[w.getAttribute('data-vk-sl')], v = {}; S.ranges.forEach(function(r){ var el = w.querySelector('[data-vk-k="' + r.key + '"]'), x = +el.value, tx = (r.fmt ? r.fmt(x) : x) + (r.unit ? ' ' + r.unit : ''); v[r.key] = x; w.querySelector('[data-vk-v="' + r.key + '"]').textContent = tx; el.setAttribute('aria-valuetext', tx); }); w.querySelector('.vk-res').innerHTML = S.run(v); }
   function flowHtml(id){ var F = C.flows[id]; return '<div class="vk-flow" data-vk-flow="' + id + '"><p class="head vk-head">' + F.t + '</p><div class="vk-dots">' + F.steps.map(function(_, k){ return '<i class="vk-d' + (k ? '' : ' on') + '"></i>'; }).join('') + '</div><div class="vk-fb"></div></div>'; }
   function step(id, k){ var F = C.flows[id], S = F.steps[k], w = document.querySelector('[data-vk-flow="' + id + '"]'); if (!w || !S) return; FS[id] = k;
     w.querySelectorAll('.vk-d').forEach(function(d, j){ d.classList.toggle('on', j <= k); });
@@ -947,17 +946,17 @@ var VK = (function(){
   function who(keys){ return ['ne','vaso','epi','phen','dopa','dobu','ang'].filter(function(k){ return keys.some(function(r){ return AG[k] && AG[k].rec && AG[k].rec[r]; }); }).map(function(k){ return AG[k].n; }).join(', '); }
   VK.init({
     plates: {
-      sites: {t: 'Where vasoactive drugs act', src: '/media/pressors/pressor-sites.webp', w: 500, h: 572, alt: 'Body outline with the pituitary, heart, lungs and kidneys, and close-ups of heart muscle and an arteriole wall',
-        hot: [[44.4, 17, 'Posterior pituitary', 'pit'], [81.2, 37, 'Heart muscle', 'heart'], [85.4, 66, 'Arteriole wall', 'vessel'], [36.2, 40, 'Airways', 'lung'], [36.2, 63, 'Kidney', 'kid']],
-        cap: 'Each drug is a mix of a few receptor effects. Tap a site to see which receptor works there and which drugs reach it.',
-        src2: 'Receptor profiles: this tool\'s drug table (labels; SSC 2026; ACC 2025). Airway and kidney lines: standard physiology.'}
+      sites: {t: 'Where vasoactive drugs act', src: '/media/pressors/pressor-sites.webp', w: 500, h: 572, alt: 'Body outline with the pituitary, heart, lungs and kidneys, and close-ups of heart muscle and a typical resistance-vessel wall',
+        hot: [[48, 12, 'Posterior pituitary', 'pit'], [81.2, 37, 'Heart muscle', 'heart'], [85.4, 66, 'Vessel wall', 'vessel'], [36.2, 40, 'Airways', 'lung'], [33, 57, 'Kidney', 'kid']],
+        cap: 'Each drug is a mix of a few receptor effects. Tap a site to see which receptor works there and which drugs reach it. The vessel close-up stands for small arteries everywhere, not only the kidney\'s.',
+        src2: 'Receptor profiles: this tool\'s drug table (labels; SSC 2026; ACC 2025). Airway and kidney lines: standard physiology; renal-dose dopamine: ANZICS trial (Lancet 2000).'}
     },
     hot: {
-      pit: function(){ return '<p>Vasopressin is made in the hypothalamus and released from here. As a drug it acts on V receptors in vessel walls, a different receptor from the catecholamines.</p><p>' + RECEPT.vaso.line + '</p>' + fchip('recept', 'vaso', 'Vasopressin'); },
-      heart: function(){ return '<p><b>' + RECN.b1[0] + ':</b> ' + RECN.b1[1] + '. Drugs that act here: ' + who(['b1']) + '.</p><p>Milrinone raises output without a receptor, by blocking PDE-3.</p>' + fchip('recept', 'dobu', 'Dobutamine'); },
-      vessel: function(){ return '<p><b>' + RECN.a1[0] + ', ' + RECN.v1[0] + ' and ' + RECN.at1[0] + ':</b> ' + RECN.a1[1] + '. Drugs that act here: ' + who(['a1','v1','at1']) + '.</p><p><b>' + RECN.b2[0] + ':</b> ' + RECN.b2[1] + ', which is why some drugs lower resistance.</p>' + fchip('recept', 'phen', 'Phenylephrine'); },
+      pit: function(){ return '<p>Vasopressin is made in the hypothalamus and released from here. As a drug it acts on V1 receptors in vessel walls, a different receptor from the catecholamines.</p><p>' + RECEPT.vaso.line + '</p>' + fchip('recept', 'vaso', 'Vasopressin'); },
+      heart: function(){ return '<p><b>' + RECN.b1[0] + ':</b> ' + RECN.b1[1] + '. Drugs that act here: ' + who(['b1']) + '.</p><p>Milrinone raises output without a surface receptor, by blocking the PDE-3 enzyme inside the cell.</p>' + fchip('recept', 'dobu', 'Dobutamine'); },
+      vessel: function(){ return '<p><b>' + RECN.a1[0] + ', ' + RECN.v1[0] + ' and ' + RECN.at1[0] + ':</b> ' + RECN.a1[1] + '. Drugs that act here: ' + who(['a1','v1','at1']) + '.</p><p><b>' + RECN.b2[0] + ':</b> ' + RECN.b2[1] + ', which is one way some drugs lower resistance. Milrinone relaxes vessels by blocking PDE-3; methylene blue blocks the nitric oxide signal that keeps vessels open.</p>' + fchip('recept', 'phen', 'Phenylephrine'); },
       lung: function(){ return '<p>' + RECN.b2[0] + ' receptors also relax the airways: one reason epinephrine is the first drug in anaphylaxis.</p>' + fchip('recept', 'epi', 'Epinephrine'); },
-      kid: function(){ return '<p>' + RECN.d1[0] + ' receptors widen kidney and gut vessels; dopamine acts on them. Low "renal-dose" dopamine does not protect the kidneys.</p><p>' + DOPA.arr.line + '</p>' + fchip('dopa', 'arr', 'Why dopamine lost first place'); }
+      kid: function(){ return '<p>' + RECN.d1[0] + ' receptors widen kidney and gut vessels; dopamine acts on them. Low "renal-dose" dopamine does not protect the kidneys.</p><p>Why it lost first place anyway: ' + DOPA.arr.line + '</p>' + fchip('dopa', 'arr', 'Why dopamine lost first place'); }
     },
     preds: {
       'learn-ladder': {q: 'Septic shock. Norepinephrine is rising and the mean pressure is still under 65. Next?',
@@ -965,13 +964,13 @@ var VK = (function(){
         why: function(){ return LADDER.s2.line; }, fig: function(){ return fchip('ladder', 's2', 'The septic ladder'); }},
       'learn-mil': {q: 'Cardiogenic shock, mean pressure 58, cold and clammy. Start milrinone first?',
         a: function(){ return [['Yes: it raises output', false], ['No: it can drop the pressure further', true]]; },
-        why: function(){ return RECEPT.mil.line + ' ' + AG.ne.use; }, fig: function(){ return fchip('recept', 'mil', 'Milrinone'); }}
+        why: function(){ return RECEPT.mil.line + ' With a mean pressure of 58, raise the pressure with norepinephrine first; add an inotrope once the pressure holds.'; }, fig: function(){ return fchip('recept', 'mil', 'Milrinone'); }}
     },
     sliders: {
       units: {ranges: [{key: 'wt', label: 'Weight', min: 40, max: 150, step: 1, value: 80, unit: 'kg'},
                        {key: 'd', label: 'Norepinephrine', min: 0.02, max: 1, step: 0.01, value: 0.1, unit: 'mcg/kg/min', fmt: function(x){ return x.toFixed(2); }}],
-        note: 'Same conversion as the calculator: mcg/min = mcg/kg/min × weight. ' + AG.ne.dose[1],
-        run: function(v){ return '<p><b>' + both({kg: v.d, min: v.d * v.wt}) + '</b> at ' + v.wt + ' kg.</p>'; }}
+        note: 'Same conversion as the calculator: mcg/min = mcg/kg/min × weight. ' + AG.ne.dose[1] + ' Label start: 8 to 12 mcg/min.',
+        run: function(v){ return '<p><b>' + v.d.toFixed(2) + ' mcg/kg/min = ' + (Math.round(v.d * v.wt * 10) / 10) + ' mcg/min</b> at ' + v.wt + ' kg.</p>'; }}
     }
   });
 })();
