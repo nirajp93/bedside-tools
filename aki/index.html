@@ -139,7 +139,7 @@ footer p{margin:0 0 8px}
       <button class="sbtn" data-v="7d" aria-pressed="false">2 to 7 days</button>
       <button class="sbtn" data-v="long" aria-pressed="false">More than 7 days</button>
     </div>
-    <p class="note" style="margin:8px 0 0">Timing unknown? If the illness suggests the rise is recent, KDIGO presumes it happened within 7 days: choose 2 to 7 days. If a rise of 0.3 or more happened within any 48-hour span, choose 48 h or less.</p>
+    <p class="note" style="margin:8px 0 0">Timing unknown? KDIGO allows a rise to be presumed to have happened within 7 days when the illness suggests it is recent: choose 2 to 7 days. If a rise of 0.3 or more happened within any 48-hour span, at any point, choose 48 h or less.</p>
     <label class="chk" style="margin-top:12px"><input type="checkbox" id="rrt">Dialysis or CRRT already started</label>
     <p class="note" style="margin:8px 0 0">Baseline: the most recent steady value before this illness (KDIGO 2026 draft: an outpatient value from 8 to 365 days before admission).</p>
   </div>
@@ -674,8 +674,8 @@ var DRUG = {
   mra: 'MRA: hold while creatinine is rising or potassium is high.',
   diur: 'Diuretic: hold unless volume overloaded; use it for overload, not to make urine.',
   sglt2: 'SGLT2 inhibitor: hold while acutely ill or volume-depleted; decide on restarting after recovery.',
-  metf: 'Metformin: hold. The US label stops it in shock, sepsis or hypoxemia, contraindicates it below eGFR 30, and stops it for iodinated contrast at eGFR 30 to 60.',
-  amg: 'Aminoglycoside: switch if there is any alternative; if unavoidable, dose with pharmacy using levels (once-daily dosing was studied in steady, normal kidney function).',
+  metf: 'Metformin: hold. The US label stops it in shock, sepsis or other hypoxic states, contraindicates it below eGFR 30, and stops it for iodinated contrast at eGFR 30 to 60.',
+  amg: 'Aminoglycoside: switch if there is any alternative; if unavoidable, dose with pharmacy using levels (KDIGO suggests once-daily dosing only when kidney function is normal and steady, 3.8.2).',
   vanc: 'Vancomycin (serious MRSA infection): AUC 400 to 600 with levels, not trough alone; involve pharmacy.',
   ampho: 'Amphotericin: use a lipid formulation.',
   acyc: 'IV acyclovir: can form crystals in the tubule; dose for current function and keep the patient hydrated.',
@@ -704,10 +704,10 @@ function build(i){
   if (U && U.short) sub.push('Urine ' + U.rate + ' mL/kg/h, but over less than 6 hours: too short to stage.');
   if (C.fall) g += guard('Creatinine is below the baseline: the kidney is recovering, or the baseline is wrong.');
   if (i.tmp && C.rise != null && C.rise > 0) g += guard('Trimethoprim blocks creatinine secretion: part of this rise may not be a fall in filtration.');
-  if (C.slow) g += guard('The rise is real but took longer than 7 days.' + (C.akd ? ' Up more than 50%: acute kidney disease if under 3 months; chronic kidney disease if GFR stays under 60 for 3 months or more.' : ''));
+  if (C.slow) g += guard('The rise is real but took longer than 7 days.' + (C.akd ? ' Up more than 50%: acute kidney disease if under 3 months; chronic kidney disease if GFR stays under 60 for more than 3 months.' : ''));
   if (i.cr1 != null && i.cr1 >= 4 && C.met === undefined && !C.slow) g += guard('A creatinine of 4.0 or more is stage 3 only after an acute rise that meets the definition.');
   if (o.aki) w = (C.met && C.by !== 'rrt') ? 'Creatinine lags: it keeps rising for a day or more after filtration falls, so today\'s number understates the injury.' : (U && U.stage) ? 'Urine output can fall before creatinine rises, so it flags injury earlier, though it is less specific.' : '';
-  else if (C.slow) w = 'KDIGO\'s creatinine rule needs the rise within 7 days; a slower rise is acute or chronic kidney disease.';
+  else if (C.slow) w = 'KDIGO\'s creatinine rule needs the rise within 7 days; a slower rise may be acute or chronic kidney disease.';
   var nums = '<div class="nums"><div class="num' + (C.ratio >= 1.5 ? ' hot' : '') + '"><span>× baseline</span><b>' + (C.ratio != null ? r2(C.ratio) : '–') + '</b></div><div class="num' + (C.rise >= 0.3 ? ' hot' : '') + '"><span>Rise mg/dL</span><b>' + (C.rise != null ? C.rise : '–') + '</b></div><div class="num' + (U && U.rate < 0.5 ? ' hot' : '') + '"><span>mL/kg/h</span><b>' + (U ? U.rate : '–') + '</b></div></div>';
   var sm = ['Stage is the worse of creatinine and urine output. Stage 1: 1.5–1.9 times baseline or up 0.3; urine under 0.5 mL/kg/h for 6–12 h. Stage 2: 2.0–2.9 times; under 0.5 for 12 h or more. Stage 3: 3 times, 4.0 or more, or dialysis; under 0.3 for 24 h or none for 12 h.', 'The tool uses the average rate over the hours entered, as the 2026 draft does ("mean urine volume", by ideal body weight); KDIGO 2012 does not say whether the rate is averaged or held hour by hour.'];
   if (o.aki) sm.push('If creatinine is unreliable (low muscle mass, amputation, a drug that blocks secretion), cystatin C can help (2026 draft Rec 1.1.1, 2B).');
@@ -871,7 +871,6 @@ function load(i){
   document.querySelectorAll('[data-seg]').forEach(function(g){ var v = seg[g.getAttribute('data-seg')]; [].forEach.call(g.children, function(b){ b.setAttribute('aria-pressed', String(b.getAttribute('data-v') === v)); }); });
   render(); show('t-tool'); window.scrollTo(0, 0);
 }
-window.__aki = {build: build, decide: decide, CASES: CASES};
 fromHash();
 })();
 </script>
