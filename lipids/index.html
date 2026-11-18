@@ -307,7 +307,7 @@ details.tr{margin:0;border-top:1px solid var(--line);padding:0}
 <p><b>Interactions:</b> simvastatin no more than 20 mg with amiodarone, amlodipine, ranolazine or bempedoic acid; no more than 10 mg with diltiazem, verapamil or dronedarone; no more than 40 mg with ticagrelor. Pravastatin no more than 40 mg with bempedoic acid. Never gemfibrozil with any statin. Colchicine: watch for muscle toxicity.</p>
 <p><b>Other cautions:</b> bempedoic acid raises urate and creatinine (gout 3.1% vs 2.1% in CLEAR). Bile acid sequestrants raise TG; avoid if TG ≥300. Omega-3 ethyl esters (with DHA) can raise LDL-C. Icosapent ethyl: more atrial fibrillation and bleeding in REDUCE-IT.</p>
 <p><b>HoFH and FCS only (specialist):</b> evinacumab 15 mg/kg IV every 4 weeks, lomitapide, olezarsen 80 mg monthly.</p>
-<span class="tier">Doses and % reductions: guideline Tables 5–6 (corrected Sep 2026)</span><span class="tier">Interactions: guideline Table 22</span>
+<span class="tier">Doses and % reductions: guideline Tables 5–6 (corrected Sep 2026)</span><span class="tier">Interactions: guideline Table 27</span>
 </details>
 </div>
 </section>
@@ -320,7 +320,7 @@ details.tr{margin:0;border-top:1px solid var(--line);padding:0}
 <ul>
 <li><b>Lipid panel</b>, nonfasting is fine; ask for Martin/Hopkins or Sampson/NIH LDL and non-HDL (class 1, B-NR). Fasting if nonfasting TG ≥400.</li>
 <li><b>Lp(a)</b>, once in every adult, in nmol/L by an isoform-insensitive assay (class 1, B-NR).</li>
-<li><b>A1C, TSH, CMP (eGFR, liver), UACR</b>, and pregnancy test when relevant: secondary causes before calling it genetic (class 1, B-NR).</li>
+<li><b>A1C, TSH, CMP (eGFR, liver), UACR</b>, and pregnancy test when relevant: secondary causes before calling it genetic (class 1, B-NR for LDL ≥190; expert practice otherwise).</li>
 </ul>
 <p class="whyline"><b>Why:</b> One Lp(a) is enough because it is about 90% inherited and barely changes over life.</p>
 </div>
@@ -412,13 +412,13 @@ function preventRisk(p, outcome, thirty){
   for (var i = 0; i < terms.length; i++) x += terms[i] * t[i];
   return Math.exp(x) / (1 + Math.exp(x));
 }
-var PREV_RANGE = {age: [30, 79], tc: [130, 320], hdl: [20, 100], sbp: [90, 180], egfr: [15, 140]};
+var PREV_RANGE = {age: [30, 79], tc: [130, 320], hdl: [20, 100], sbp: [90, 200], egfr: [15, 140]};
 function prevent(p){
   var need = ['age', 'sex', 'tc', 'hdl', 'sbp', 'egfr'];
   for (var i = 0; i < need.length; i++) if (p[need[i]] == null) return {ok: false, why: 'needs age, sex, total and HDL cholesterol, systolic BP and eGFR'};
   for (var k in PREV_RANGE){ var r = PREV_RANGE[k]; if (p[k] < r[0] || p[k] > r[1]) return {ok: false, why: (k === 'age' ? 'PREVENT is validated for ages 30 to 79' : k.toUpperCase() + ' outside the range PREVENT was built on (' + r[0] + '–' + r[1] + ')'), range: k}; }
   var r10 = preventRisk(p, 'ascvd', false), r30 = preventRisk(p, 'ascvd', true);
-  return {ok: true, r10: r10, r30: r30, cvd10: preventRisk(p, 'total_cvd', false), cvd30: preventRisk(p, 'total_cvd', true), cat: riskCat(r10)};
+  return {ok: true, r10: r10, r30: r30, r30ok: p.age <= 59, cvd10: preventRisk(p, 'total_cvd', false), cvd30: preventRisk(p, 'total_cvd', true), cat: riskCat(r10)};
 }
 function riskCat(r){ var x = r * 100; return x < 3 ? 'low' : x < 5 ? 'borderline' : x < 10 ? 'intermediate' : 'high'; } // G 4.2.3.2
 
@@ -429,13 +429,14 @@ function vhr(p){
   return {events: ev, conds: hc, vhr: ev >= 2 || (ev === 1 && hc >= 2)};
 }
 
-// --- Lp(a) (G 3.4 Table 9, 4.2.10): thresholds by unit, never converted
+// --- Lp(a) (G 3.4 Table 4, 4.2.10): thresholds by unit, never converted
 function lpaInfo(p){
   if (p.lpa == null) return null;
   var nm = p.lpaUnit !== 'mg';
   var v = p.lpa, hi = nm ? v >= 125 : v >= 50, spec = nm ? v >= 200 : v >= 75, rr;
-  if (nm) rr = v >= 430 ? '4×' : v >= 350 ? '3×' : v >= 250 ? '2×' : v >= 125 ? '1.4×' : v >= 75 ? '1.2×' : 'reference';
-  else rr = v >= 180 ? '4×' : v >= 150 ? '3×' : v >= 100 ? '2×' : v >= 50 ? '1.4×' : v >= 30 ? '1.2×' : 'reference';
+  var pts = nm ? [[430, '4×'], [350, '3×'], [250, '2×'], [125, '1.4×'], [75, '1.2×']] : [[180, '4×'], [150, '3×'], [100, '2×'], [50, '1.4×'], [30, '1.2×']];
+  rr = 'reference (median)';
+  for (var i = 0; i < pts.length; i++){ if (v >= pts[i][0]){ rr = (i === 0 || v === pts[i][0]) ? pts[i][1] : 'between ' + pts[i][1] + ' and ' + pts[i - 1][1]; break; } }
   return {high: hi, specialist: spec, rr: rr, unit: nm ? 'nmol/L' : 'mg/dL'};
 }
 
@@ -490,6 +491,7 @@ function route(p){
   if (p.ascvd){
     if (V.vhr) set('vhr', 'Clinical ASCVD, very high risk', 'high', 'g55', ['High-intensity statin, LDL <55: class 1, A', 'Add ezetimibe and/or PCSK9 antibody: class 1, A', 'Bempedoic acid: 2a, B-R', 'Inclisiran if antibody not tolerated or obtainable: 2a, B-R'], p.sams ? ['bemp', 'eze', 'pcsk9', 'incl'] : ['eze', 'pcsk9', 'bemp', 'incl'], 'why_ascvd');
     else if (p.ckd3) set('ascvd_ckd', 'Clinical ASCVD with CKD stage 3 or higher', 'high', 'g55', ['High intensity ± ezetimibe and/or PCSK9 antibody, LDL <55: class 1, B-R'], ['eze', 'pcsk9'], 'why_ascvd');
+    else if ((ldl0 != null && ldl0 >= 190) || p.hefh) set('ascvd_sev', 'Clinical ASCVD with severe hypercholesterolemia or FH', 'max', 'g55', ['Maximally tolerated statin, add ezetimibe, PCSK9 antibody and/or bempedoic acid to LDL <55: class 1, B-R', 'Inclisiran if LDL ≥100 on statin ± ezetimibe: 2a, B-R'], p.sams ? ['bemp', 'eze', 'pcsk9', 'incl'] : ['eze', 'pcsk9', 'bemp', 'incl'], 'why_sev');
     else { set('ascvd', 'Clinical ASCVD, not very high risk', 'high', 'g70', ['High-intensity statin, LDL <70: class 1, A', 'Add ezetimibe, PCSK9 antibody or bempedoic acid: 2a, B-R', 'Optional goal LDL <55: 2a, B-R'], p.sams ? ['bemp', 'eze', 'pcsk9'] : ['eze', 'pcsk9', 'bemp'], 'why_ascvd'); R.goalOpt = 'g55'; }
     if (ldl0 != null && ldl0 >= 190) R.notes.push('LDL was ≥190 before treatment: also exclude secondary causes and consider FH genetic testing.');
     return finish(R, p);
@@ -503,10 +505,12 @@ function route(p){
   }
   if (p.cac != null){
     var c = p.cac;
-    if (c >= 1000) { set('cac1000', 'Coronary calcium ≥1000', 'high', 'g55', ['≥50% LDL reduction, LDL <55: class 1, B-NR'], ['eze', 'pcsk9', 'bemp'], 'why_cac'); return finish(R, p); }
-    if (c >= 300) { set('cac300', 'Coronary calcium 300–999', 'high', 'g70', ['≥50% reduction, LDL <70: class 1, B-R', 'May intensify to LDL <55: 2a, B-NR'], ['eze', 'pcsk9', 'bemp'], 'why_cac'); R.goalOpt = 'g55'; return finish(R, p); }
-    if (c >= 100 || p.cac75) { set('cac100', 'Coronary calcium ' + (c >= 100 ? '100–299' : '≥75th percentile'), 'high', 'g70', ['≥50% reduction, LDL <70: class 1, B-R'], ['eze', 'pcsk9', 'bemp'], 'why_cac'); return finish(R, p); }
-    if (c >= 1) { set('cac1', 'Coronary calcium 1–99, under the 75th percentile', 'moderate', 'g100', ['Moderate intensity, LDL <100: 2a, B-R'], ['eze'], 'why_cac'); return finish(R, p); }
+    if (c >= 1000) { set('cac1000', 'Coronary calcium ≥1000', 'high', 'g55', ['≥50% LDL reduction, LDL <55: class 1, B-NR'], ['eze', 'pcsk9', 'bemp'], 'why_cac'); special(R, p, ldl0, P); return finish(R, p); }
+    if (c >= 300) { set('cac300', 'Coronary calcium 300–999', 'high', 'g70', ['≥50% reduction, LDL <70: class 1, B-R', 'May intensify to LDL <55: 2a, B-NR'], ['eze', 'pcsk9', 'bemp'], 'why_cac'); R.goalOpt = 'g55'; special(R, p, ldl0, P); return finish(R, p); }
+    if (c >= 100 || p.cac75) { set('cac100', 'Coronary calcium ' + (c >= 100 ? '100–299' : '≥75th percentile'), 'high', 'g70', ['≥50% reduction, LDL <70: class 1, B-R'], ['eze', 'pcsk9', 'bemp'], 'why_cac'); special(R, p, ldl0, P); return finish(R, p); }
+    if (c >= 1 && !(p.dm && age >= 40 && age <= 75)) { set('cac1', 'Coronary calcium 1–99, under the 75th percentile', 'moderate', 'g100', ['Moderate intensity, LDL <100: 2a, B-R'], ['eze'], 'why_cac'); special(R, p, ldl0, P); return finish(R, p); }
+    if (c >= 1) R.notes.push('CAC 1–99 alone would point to a moderate statin; the diabetes recommendation is used because it can call for more.');
+    if (c < 1) {
     // CAC 0
     var blockers = cac0Blockers(p, ldl0);
     var cat = P.ok ? P.cat : null;
@@ -515,23 +519,34 @@ function route(p){
       return finish(R, p);
     }
     R.notes.push(blockers.length ? 'CAC 0 does not justify deferring here: ' + blockers.join(', ') + '.' : 'CAC 0 is used to defer only at borderline or intermediate risk.');
+    }
   }
   if (p.dm && age != null){
     if (age >= 40 && age <= 75){
-      if (p.dmMulti || dmEnh(p).length >= 2) set('dm_hi', 'Diabetes, age 40–75, with multiple risk factors', 'high', 'g70', ['High intensity, LDL <70: 2a, B-R', 'PREVENT ≥10%: add ezetimibe or PCSK9 antibody may be reasonable: 2b, C-LD'], ['eze', 'pcsk9'], 'why_dm');
+      var nrf = rfCount(p), nen = dmEnh(p).length;
+      if (p.dmMulti || nrf >= 2 || (nrf >= 1 && nen >= 1) || nen >= 2) set('dm_hi', 'Diabetes, age 40–75, with multiple risk factors', 'high', 'g70', ['High intensity, LDL <70: 2a, B-R'], ['eze', 'pcsk9'], 'why_dm');
+      else if (nrf || nen) set('dm_rf', 'Diabetes, age 40–75, with a risk factor', 'moderate', 'g70', ['Moderate intensity: class 1, A', 'With an ASCVD or diabetes-specific risk factor, goal LDL <70 (Figure 1)', 'Multiple risk factors: high intensity is reasonable (2a, B-R)'], ['eze', 'pcsk9'], 'why_dm');
       else set('dm', 'Diabetes, age 40–75', 'moderate', 'g100', ['Moderate intensity, LDL <100: class 1, A'], ['eze'], 'why_dm');
+      R.notes.push('Risk factors counted: ' + nrf + ' ASCVD (smoking, hypertension or BP medicine, family history, CKD) and ' + nen + ' diabetes-specific. "Multiple" = 2 or more in total; this count is the tool\'s reading of the guideline.');
+      if (P.ok && P.r10 >= 0.10) R.notes.push('PREVENT ≥10% with diabetes: adding ezetimibe or a PCSK9 antibody to reach LDL <70 may be reasonable (2b, C-LD).');
       if (p.sams) R.notes.push('Statin side effects with diabetes: ezetimibe, bempedoic acid or a PCSK9 antibody (class 1, B-R).');
-      if (tgHi && p.tg < 500) R.notes.push('TG 150–499 with LDL <100 on a statin and another risk factor: icosapent ethyl 2 g twice daily may be considered (2b, B-R).');
+      var Ln = ldlNow(p).v;
+      if (tgHi && p.tg < 500 && p.fasting && p.onStatin && Ln != null && Ln < 100 && rfCount(p) >= 1) R.notes.push('Fasting TG 150–499 with LDL <100 on a statin and another risk factor: icosapent ethyl 2 g twice daily may be considered (2b, B-R).');
       return finish(R, p);
     }
     if (age >= 20 && age < 40 && dmEnh(p).length){ set('dm_young', 'Diabetes, age 20–39, with diabetes-specific risk enhancers', 'moderate', null, ['Moderate-intensity statin may be reasonable: 2b, C-LD'], [], 'why_dm'); return finish(R, p); }
     if (age > 75){ set('dm_old', 'Diabetes, over 75', 'moderate', null, ['Moderate statin may be reasonable if life expectancy ≥2.5 years: 2b, C-LD'], [], 'why_old'); return finish(R, p); }
   }
-  var base = primary(p, P, ldl0, set, R);
-  if (p.ckd3 && age >= 40 && age <= 75 && ldl0 != null && ldl0 >= 70){ R.intensity = R.intensity === 'high' ? 'high' : 'moderate'; R.title = 'CKD stage 3 or higher, age 40–75' + (R.goal ? ' (goal from ' + (P.ok ? P.cat + ' PREVENT risk' : 'risk') + ')' : ''); R.key = 'ckd'; R.tiers.unshift('Moderate statin or moderate statin + ezetimibe: class 1, B-R'); R.ladder = ['eze']; if (!R.goal) R.goal = 'g100'; }
-  if (p.hiv && age >= 40 && age <= 75){ if (!R.intensity) R.intensity = 'moderate'; R.title = 'HIV on stable ART, age 40–75' + (R.key ? ' · ' + R.title : ''); R.key = R.key || 'hiv'; R.tiers.unshift('Statin to prevent a first ASCVD event: class 1, B-R (REPRIEVE used pitavastatin 4 mg)'); R.notes.push('Check antiretroviral interactions before choosing the statin.'); }
+  primary(p, P, ldl0, set, R);
+  special(R, p, ldl0, P);
   return finish(R, p);
 }
+function special(R, p, ldl0, P){
+  var age = p.age;
+  if (p.ckd3 && age >= 40 && age <= 75 && (ldl0 == null || (ldl0 >= 70 && ldl0 < 190))){ if (R.intensity !== 'high') R.intensity = 'moderate'; R.title = 'CKD stage 3 or higher, age 40–75 · ' + R.title; R.key = R.key || 'ckd'; R.tiers.unshift('Moderate statin or moderate statin + ezetimibe: class 1, B-R'); if (R.ladder.indexOf('eze') < 0) R.ladder.unshift('eze'); R.notes.push('The CKD recommendation sets no LDL goal; any goal shown comes from the risk category.'); }
+  if (p.hiv && age >= 40 && age <= 75){ if (!R.intensity) R.intensity = 'moderate'; R.title = 'HIV on stable ART, age 40–75 · ' + R.title; R.key = R.key || 'hiv'; R.tiers.unshift('Statin to prevent a first ASCVD event: class 1, B-R (REPRIEVE used pitavastatin 4 mg)'); R.notes.push('Check antiretroviral interactions before choosing the statin.'); }
+}
+function rfCount(p){ return (p.smoke ? 1 : 0) + ((p.bptx || p.hcHtn || (p.sbp != null && p.sbp >= 130)) ? 1 : 0) + (p.enFhx ? 1 : 0) + (p.ckd3 ? 1 : 0); }
 function primary(p, P, ldl0, set, R){
   var age = p.age, nh = (p.tc != null && p.hdl != null) ? p.tc - p.hdl : null;
   if (ldl0 != null && ldl0 < 70 && nh != null && nh < 100 && !hasRF(p) && !enhancers(p).length){ set('nolt', 'LDL <70 and non-HDL <100 untreated, no other risk factors', null, null, ['Starting lipid-lowering therapy is unlikely to help: class 3, no benefit'], [], ''); return; }
@@ -545,7 +560,7 @@ function primary(p, P, ldl0, set, R){
   else if (cat === 'intermediate') { var LA = lpaInfo(p), upper = P.r10 >= 0.075 || (LA && LA.high); set('inter', 'PREVENT intermediate risk (5–<10%)', upper ? 'high' : 'moderate', 'g100', ['At least moderate intensity; high at the upper end: class 1, A', 'LDL <100: 2a, B-NR', 'CAC if the decision is uncertain: class 1, B-R'], ['eze', 'bemp'], 'why_prev'); R.minIntensity = 'moderate'; if (upper) R.notes.push(P.r10 >= 0.075 ? 'Upper half of the intermediate band (7.5% or more): high intensity is favored. The guideline says "higher end" without a number; 7.5% is this tool\'s reading (expert practice).' : 'Elevated Lp(a) favors more intensive LDL lowering (guideline take-home 6).'); }
   else if (cat === 'borderline') { var hcrp = p.crp != null && p.crp >= 2 && p.crp2; set('border', 'PREVENT borderline risk (3–<5%)', hcrp ? 'high' : 'moderate', 'g100', ['If a statin is chosen: moderate intensity: 2a, A', 'Risk enhancers personalize the decision: 2a, B-NR', 'LDL <100: 2a, B-NR'].concat(hcrp ? ['hsCRP ≥2 on 2 occasions: high intensity can be useful: 2a, B-R'] : []), ['eze', 'bemp'], 'why_border'); R.optional = !enhancers(p).length; }
   else {
-    if (age <= 59 && ((ldl0 != null && ldl0 >= 160) || P.r30 >= 0.10)) set('low_life', 'PREVENT low 10-year risk, high lifetime exposure', 'moderate', null, ['Moderate statin is reasonable: 2a, C-LD'], [], 'why_life');
+    if (age <= 59 && ((ldl0 != null && ldl0 >= 160) || P.r30 >= 0.10)) set('low_life', 'PREVENT low 10-year risk, high lifetime exposure', 'moderate', 'g100', ['Moderate statin is reasonable: 2a, C-LD', 'LDL <100 (Figure 6)'], ['eze'], 'why_life');
     else set('low', 'PREVENT low risk (<3%)', null, null, ['Counsel on diet, activity and weight: class 1, A'], [], '');
   }
 }
@@ -558,14 +573,15 @@ function finish(R, p){
   var L = ldlNow(p), cur = p.statin || 'none';
   R.ldl = L; R.nonhdl = (p.tc != null && p.hdl != null) ? p.tc - p.hdl : null;
   var want = R.intensity === 'max' ? 'high' : R.intensity;
+  if (p.sams && want) { R.samsMode = true; want = (cur === 'none' ? null : cur); }
   var G = R.goal ? GOALS[R.goal] : null;
   var steps = [];
-  if (L.v != null && want){
+  if (L.v != null && (want || R.samsMode)){
     var base = L.v / (1 - STATIN_PCT[cur]);
     // add-ons already in use
     ['eze', 'pcsk9', 'bemp', 'incl'].forEach(function(k){ if (p[k]) base = base / (1 - ADDON[k].pct); });
     var running = L.v;
-    if (RANK[want] > RANK[cur]){
+    if (want && RANK[want] > RANK[cur]){
       running = base * (1 - STATIN_PCT[want]);
       ['eze', 'pcsk9', 'bemp', 'incl'].forEach(function(k){ if (p[k]) running *= (1 - ADDON[k].pct); });
       var lo = want === 'high' ? null : base * (1 - 0.49), hi = want === 'high' ? running : base * (1 - 0.30);
@@ -584,7 +600,8 @@ function finish(R, p){
   R.steps = steps;
   R.atGoal = G && L.v != null ? (L.v < G.ldl && (R.nonhdl == null || R.nonhdl < G.nh)) : null;
   // next action
-  if (!want) R.next = null;
+  if (R.samsMode){ var sx = steps[0]; R.next = (G && L.v != null && R.atGoal) ? {k: 'keep', txt: 'At goal: continue; recheck every 6–12 months'} : (sx ? {k: sx.k, txt: ADDON[sx.k].name} : {k: 'keep', txt: 'See the muscle-symptom plan below'}); }
+  else if (!want) R.next = null;
   else if (RANK[want] > RANK[cur]) R.next = {k: 'statin', txt: INT_TXT[want === 'high' ? 'high' : want]};
   else if (G && L.v != null && !R.atGoal){ var nx = steps.filter(function(s){ return s.k !== 'statin'; })[0]; R.next = nx ? {k: nx.k, txt: ADDON[nx.k].name} : {k: 'spec', txt: 'Lipid specialist: not at goal on the available steps'}; }
   else R.next = {k: 'keep', txt: 'Continue current therapy; recheck lipids every 6–12 months'};
@@ -594,12 +611,12 @@ function finish(R, p){
 // Overlays (decision table §3 overlays + TG and pregnancy safety)
 function overlays(p, R){
   var o = {boxes: [], lines: []};
-  if (p.preg === 'planning') o.boxes.push({t: 'Planning pregnancy', b: p.hefh || p.ascvd ? 'With FH or ASCVD, continuing a statin may be reasonable after an individual discussion (2b, C-LD). Otherwise stop statins 1 to 2 months before trying to conceive (class 1, C-LD).' : 'Stop statins 1 to 2 months before trying to conceive (class 1, C-LD). Bile acid sequestrants are the option for LDL during pregnancy (2a, C-EO).'});
+  if (p.preg === 'planning') o.boxes.push({t: 'Planning pregnancy', b: p.hefh || p.ascvd ? 'Stop statins 1 to 2 months before trying to conceive (class 1, C-LD for people not at high ASCVD risk). With FH or ASCVD, discuss: continuing during pregnancy may be reasonable (2b, C-LD).' : 'Stop statins 1 to 2 months before trying to conceive (class 1, C-LD). Bile acid sequestrants are the option for LDL during pregnancy (2a, C-EO).'});
   if (p.preg === 'pregnant') o.boxes.push({t: 'Pregnant', b: 'Stop statins unless FH or ASCVD and after an individual discussion (2b). Avoid ezetimibe, bempedoic acid, PCSK9 antibodies, inclisiran and niacin. Bile acid sequestrants are reasonable (2a, C-EO). TG ≥500: a fibrate after the first trimester or omega-3 ethyl esters (2a, B-NR).'});
-  if (p.preg === 'lactating') o.boxes.push({t: 'Breastfeeding', b: 'Avoid statins, ezetimibe, bempedoic acid, PCSK9 antibodies, inclisiran and fibrates. Bile acid sequestrants are not excreted in milk.'});
+  if (p.preg === 'lactating') o.boxes.push({t: 'Breastfeeding', b: 'Avoid statins, ezetimibe, bempedoic acid, PCSK9 antibodies, inclisiran, fibrates, niacin, evinacumab and lomitapide. Bile acid sequestrants are not excreted in milk.'});
   if (p.tg != null && p.tg >= 1000) o.boxes.push({t: 'TG ' + p.tg + ': pancreatitis risk', b: 'Very-low-fat diet, no alcohol or added sugar, dietitian referral now (class 1, B-NR). A fibrate or prescription omega-3 is reasonable (2a, B-NR); look for familial chylomicronemia if it persists (olezarsen, class 1). Check secondary causes: diabetes control, alcohol, drugs, hypothyroidism, pregnancy.'});
   var L = lpaInfo(p);
-  if (L && L.high) o.lines.push({k: 'lpa', h: 'Lp(a) ' + p.lpa + ' ' + L.unit + ' · about ' + L.rr + ' the median risk', b: 'Control every other risk factor early (class 1, B-NR)' + (p.ascvd ? '; with ASCVD and not at goal on a maximal statin, add a PCSK9 antibody (class 1, B-R)' : '') + (L.specialist ? '. ≥' + (L.unit === 'nmol/L' ? '200 nmol/L' : '75 mg/dL') + ': lipid specialist.' : '.') + ' Test first-degree relatives (class 1).'});
+  if (L && L.high) o.lines.push({k: 'lpa', h: 'Lp(a) ' + p.lpa + ' ' + L.unit + ' · ' + L.rr + ' the median risk (Table 4)', b: 'Control every other risk factor early (class 1, B-NR)' + (p.ascvd ? '; with ASCVD and not at goal on a maximal statin, add a PCSK9 antibody (class 1, B-R)' : '') + (L.specialist ? '. ≥' + (L.unit === 'nmol/L' ? '200 nmol/L' : '75 mg/dL') + ': lipid specialist.' : '.') + ' Test first-degree relatives (class 1).'});
   if (p.age > 75 && !p.ascvd) o.lines.push({k: 'old', h: 'Over 75', b: 'Base the decision on function, frailty and life expectancy, not age alone (class 1, C-EO). A moderate statin may be reasonable with life expectancy ≥2.5 years (2b).'});
   if (p.le1) o.lines.push({k: 'le', h: 'Life expectancy under a year', b: 'Stopping lipid-lowering therapy may be reasonable (2b, B-R).'});
   if (p.hfref && !p.ascvd) o.lines.push({k: 'hf', h: 'HFrEF without ASCVD', b: 'Starting lipid-lowering therapy does not reduce events (class 3, no benefit).'});
@@ -629,13 +646,13 @@ function tgPlan(p, R){
   if (t >= 1000){ o.band = '≥1000'; o.lines.push('Very-low-fat diet, no alcohol or added sugar; dietitian referral', 'Fibrate (fenofibrate 40–200 mg daily, dose for kidney function) or prescription omega-3', 'Persistent from youth or with pancreatitis: look for familial chylomicronemia; olezarsen 80 mg monthly'); o.tiers.push('Diet: class 1, B-NR', 'Fibrate or Rx omega-3: 2a, B-NR', 'Olezarsen in FCS: class 1, B-R'); }
   else if (t >= 500){ o.band = '500–999'; o.lines.push('No alcohol; low added sugar and refined carbs; individualized fat limit', 'Fibrate or prescription omega-3 to lower pancreatitis risk, especially if it stays high on diet'); o.tiers.push('Diet: class 1, B-NR', 'Fibrate or Rx omega-3: 2a, B-NR'); }
   else { o.band = fasting ? '150–499' : 'nonfasting ' + t; o.lines.push('Find and fix secondary causes; lifestyle first: 5–10% weight loss, ≥150 min/week activity, resistance training 2 days/week, low added sugar, limit alcohol');
-    if (p.ascvd && R.ldl && R.ldl.v != null && R.ldl.v >= 55) o.lines.push('With ASCVD and LDL ≥55 on a statin: intensify LDL lowering first (class 1, B-R)');
+    if (p.ascvd && p.statin === 'high' && R.ldl && R.ldl.v != null && R.ldl.v >= 55 && R.nonhdl != null && R.nonhdl >= 85) o.lines.push('With ASCVD, LDL ≥55 and non-HDL ≥85 on a maximal statin: intensify LDL lowering first (class 1, B-R)');
     if ((p.ascvd || (p.dm && hasRF(p))) && p.age >= 50 && R.ldl && R.ldl.v != null && R.ldl.v < 100 && p.statin && p.statin !== 'none') o.lines.push('Icosapent ethyl 2 g twice daily with food may be reasonable (2b, B-R)');
     o.tiers.push('Lifestyle first: class 1, A/B-NR'); }
   return o;
 }
 
-// Labs narrowing data (G Table 15, Table 21; §3.3–3.4)
+// Labs narrowing data (G Table 15, Table 23; §3.3–3.4)
 var NARROW = {
   ldl: {causes: [['FH (LDLR, APOB, PCSK9) or polygenic', 'fh'], ['Hypothyroidism', 'thy'], ['Nephrotic syndrome or CKD', 'neph'], ['Cholestatic liver disease', 'chol'], ['Drugs: high-dose thiazide, steroids, estrogen/androgen, antipsychotics, cyclosporine', 'drug'], ['Diet: saturated/trans fat, ketogenic diet, rapid weight change', 'diet'], ['Pregnancy or menopause', 'preg']],
     results: [
@@ -709,10 +726,10 @@ function renderRisk(p){
     var cats = ['low', 'borderline', 'intermediate', 'high'], names = ['&lt;3', '3–5', '5–10', '≥10%'];
     var bar = '<div class="cat" aria-hidden="true">' + cats.map(function(c, i){ return '<span' + (c === P.cat ? ' class="on"' : '') + '>' + names[i] + '</span>'; }).join('') + '</div>';
     var en = enhancers(p);
-    var body = '<div class="pair"><div><span class="big">' + pct(P.r10) + '</span><span class="note">10-year ASCVD</span></div><div><span class="big" style="font-size:22px">' + pct(P.r30) + '</span><span class="note">30-year ASCVD</span></div></div>' + bar;
+    var body = '<div class="pair"><div><span class="big">' + pct(P.r10) + '</span><span class="note">10-year ASCVD</span></div><div><span class="big" style="font-size:22px">' + (P.r30ok ? pct(P.r30) : '—') + '</span><span class="note">30-year ASCVD' + (P.r30ok ? '' : ': shown only to age 59') + '</span></div></div>' + bar;
     body += '<p class="line1">' + (en.length ? '<b>Risk enhancers:</b> ' + en.map(esc).join(' · ') : 'No risk enhancers ticked.') + '</p>';
     if ((P.cat === 'intermediate' || P.cat === 'borderline') && p.cac == null) body += '<p class="line1">Unsure about a statin? A CAC score can reclassify (men ≥40, women ≥45; class 1, B-R).</p>';
-    out += card({id: 'risk-res', label: 'PREVENT-ASCVD', head: P.cat.charAt(0).toUpperCase() + P.cat.slice(1) + ' risk', body: body, why: P.cat === 'low' ? (p.age <= 59 && P.r30 >= 0.10 ? WHY.why_life : '') : (P.cat === 'borderline' ? WHY.why_border : WHY.why_prev), more: '<p>Total CVD (ASCVD + heart failure): ' + pct(P.cvd10) + ' at 10 years, ' + pct(P.cvd30) + ' at 30 years; used for blood-pressure decisions.</p><p>PREVENT is race-free and about 40–50% lower than the old pooled cohort equations for the same person, so the thresholds were lowered: 3, 5 and 10% roughly match the old 5, 7.5 and 20%.</p><p>Base model; HbA1c, UACR and ZIP-code versions not used here.</p>', tiers: ['Categories: class 1, B-NR', 'Khan et al, Circulation 2024'], chips: '<div class="chips"><button class="chip" type="button" data-goto="l-risk">' + ICON + 'How PREVENT works</button></div>'});
+    out += card({id: 'risk-res', label: 'PREVENT-ASCVD', head: P.cat.charAt(0).toUpperCase() + P.cat.slice(1) + ' risk', body: body, why: P.cat === 'low' ? (p.age <= 59 && P.r30 >= 0.10 ? WHY.why_life : '') : (P.cat === 'borderline' ? WHY.why_border : WHY.why_prev), more: '<p>Total CVD (ASCVD + heart failure): ' + pct(P.cvd10) + ' at 10 years' + (P.r30ok ? ', ' + pct(P.cvd30) + ' at 30 years' : '') + '; used for blood-pressure decisions.</p><p>30-year estimates are reported only for ages 30–59, as in the AHA calculator.</p><p>PREVENT is race-free and about 40–50% lower than the old pooled cohort equations for the same person, so the thresholds were lowered: 3, 5 and 10% roughly match the old 5, 7.5 and 20%.</p><p>Base model; HbA1c, UACR and ZIP-code versions not used here.</p>', tiers: ['Categories: class 1, B-NR', 'Khan et al, Circulation 2024'], chips: '<div class="chips"><button class="chip" type="button" data-goto="l-risk">' + ICON + 'How PREVENT works</button></div>'});
   } else if (p.age != null || p.tc != null){
     out += card({label: 'PREVENT-ASCVD', head: 'Not calculated', body: '<p class="line1">PREVENT ' + esc(P.why) + '.</p>'});
   } else {
@@ -757,7 +774,9 @@ function renderTreat(p){
   if (!R.key){ $('treat-out').innerHTML = out + card({body: '<p class="empty">Enter the patient on the Risk tab, or tap Try an example there.</p>'}); return R; }
   var head, body = '', figs = [];
   var G = R.goal ? GOALS[R.goal] : null;
-  if (R.key === 'cac0') head = 'Defer the statin; repeat CAC in 3–7 years';
+  if (R.samsMode && R.next && R.next.k !== 'keep') head = 'Add ' + ADDON[R.next.k].short.replace('+ ', '') + ' (statin-attributed muscle symptoms)';
+  else if (R.samsMode) head = R.atGoal ? 'At goal: keep going' : 'Follow the muscle-symptom plan below';
+  else if (R.key === 'cac0') head = 'Defer the statin; repeat CAC in 3–7 years';
   else if (R.key === 'nolt') head = 'No lipid-lowering drug';
   else if (!R.intensity) head = R.key === 'low' ? 'Lifestyle; no statin at this risk' : (R.key === 'young' ? 'Lifestyle now' : 'Not enough to decide');
   else if (R.next && R.next.k === 'statin') head = (p.statin && p.statin !== 'none' ? 'Raise to ' : (R.optional ? 'If treating: ' : 'Start ')) + (R.intensity === 'max' ? 'the maximally tolerated (high-intensity) statin' : R.intensity + '-intensity statin');
@@ -783,7 +802,7 @@ function renderTreat(p){
   out += card({id: 'plan', label: 'Do now', head: head, body: body, why: why, more: more, tiers: R.tiers, chips: chipsFor(figs)});
   if (R.prev && R.prev.ok && !p.ascvd && R.key !== 'sev70' && R.key !== 'sev100') out += '';
   if (O.lines.length) out += '<div class="card" id="overlays"><p class="label">Also for this patient</p>' + O.lines.map(function(l){ return '<div class="ov"><b>' + esc(l.h) + '</b><p>' + esc(l.b) + '</p>' + (l.k === 'lpa' ? '<div class="chips"><button class="chip" type="button" data-plate="lpa">' + ICON + 'The Lp(a) particle</button></div>' : '') + '</div>'; }).join('') + '</div>';
-  if (p.sams){ var S = samsPlan(p, R); out += card({id: 'muscle', label: 'Muscle symptoms on statins', head: esc(S.plan), body: '<p class="sub">' + esc(S.grp) + (S.goal ? ' · goal LDL &lt;' + GOALS[S.goal].ldl + ', non-HDL &lt;' + GOALS[S.goal].nh : '') + '</p><p class="line1">First: look for secondary causes (hypothyroidism, interacting drugs, heavy exercise); check strength and CK if symptoms are severe. Discuss the higher risk that comes with stopping.</p>', why: 'In blinded crossover testing, symptoms were about as common on placebo as on statin (SAMSON), and non-statin drugs still cut events (CLEAR Outcomes).', more: '<p>Entry point: side effects on 2 or more statins, one at the lowest approved dose. Myalgia with normal CK is common; myositis (CK above normal) is rare; rhabdomyolysis (CK over 10× with kidney injury) and HMGCR necrotizing myopathy are very rare.</p><p>Coenzyme Q10 is not recommended (class 3).</p>', tiers: [S.tier ? S.tier : 'Guideline 4.2.11'], chips: '<div class="chips"><button class="chip" type="button" data-goto="l-muscle">' + ICON + 'Nocebo and myopathy</button></div>'}); }
+  if (p.sams){ var S = samsPlan(p, R); out += card({id: 'muscle', label: 'Muscle symptoms on statins', head: esc(S.plan), body: '<p class="sub">' + esc(S.grp) + (S.goal ? ' · goal LDL &lt;' + GOALS[S.goal].ldl + ', non-HDL &lt;' + GOALS[S.goal].nh : '') + '</p><p class="line1">First: look for secondary causes (hypothyroidism, interacting drugs, heavy exercise); check strength and CK if symptoms are severe. Discuss the higher risk that comes with stopping.</p>', why: 'In blinded crossover testing, symptoms were about as common on placebo as on statin (SAMSON), and non-statin drugs still cut events (CLEAR Outcomes).', more: '<p>Entry point: side effects on 2 or more statins, one at the lowest approved dose. Myalgia with normal CK is common; myositis (CK above normal) is rare; rhabdomyolysis (CK over 10× with kidney injury) is rare; HMGCR necrotizing myopathy is very rare.</p><p>Coenzyme Q10 is not recommended (class 3).</p>', tiers: [S.tier ? S.tier : 'Guideline 4.2.11'], chips: '<div class="chips"><button class="chip" type="button" data-goto="l-muscle">' + ICON + 'Nocebo and myopathy</button></div>'}); }
   var T = tgPlan(p, R);
   if (T) out += card({id: 'tgcard', label: 'Triglycerides ' + p.tg + (p.fasting ? ' fasting' : ' nonfasting'), head: T.band === '≥1000' ? 'Lower the pancreatitis risk now' : (T.band === '500–999' ? 'Diet first; a fibrate or omega-3 is reasonable' : 'Secondary causes and lifestyle first'), body: '<ul>' + T.lines.map(function(x){ return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>', why: p.tg >= 500 ? 'Above roughly 500–1000 the main danger is pancreatitis, not just the heart.' : 'When TG is high, LDL-C undercounts atherogenic particles; non-HDL and apoB count them all.', tiers: T.tiers, chips: chipsFor(['lpl']) + '<div class="chips"><button class="chip" type="button" data-goto="narrow-tg">' + ICON + 'Narrow the cause</button></div>'});
   $('treat-out').innerHTML = out;
@@ -827,7 +846,7 @@ var PLATES = {
   plaque: {t: 'How plaque forms', src: '/media/lipids/plaque.webp', alt: 'Four panels of an artery wall: normal; LDL particles entering the intima; monocytes becoming macrophages and foam cells; a plaque with a large lipid core, thin cap and a ruptured surface with thrombus.', cap: 'apoB particles that cross the endothelium get stuck, are modified, and are eaten by macrophages; the lipid core grows until a thin cap ruptures.', hot: [[14, 45, 'Normal wall'], [35, 47, 'LDL enters and is retained'], [56, 42, 'Monocyte enters'], [69, 51, 'Foam cell'], [86, 54, 'Necrotic lipid core'], [85, 33, 'Cap rupture and clot']], info: ['Endothelium over a thin intima and the smooth-muscle media.', 'Particles under about 70 nm (LDL, remnants, Lp(a)) cross the endothelium; the number of particles, measured as apoB, drives how many get trapped.', 'Retained, oxidized LDL activates the endothelium, which recruits monocytes.', 'Macrophages swallow modified LDL through scavenger receptors and become lipid-laden foam cells.', 'Dying foam cells leave a necrotic lipid core.', 'A thin fibrous cap over a large core can rupture; platelets and thrombus cause the acute event. Lowering LDL shrinks the core and thickens the cap.']},
   hepatocyte: {t: 'The LDL receptor and PCSK9', src: '/media/lipids/hepatocyte.webp', alt: 'A liver cell with LDL receptors binding LDL, an endosome, a recycling vesicle returning receptors to the surface, PCSK9 binding a receptor and taking it to the lysosome, and cholesterol-making enzymes in the endoplasmic reticulum.', cap: 'Every statin, ezetimibe, bempedoic acid and PCSK9 drug works mainly by leaving more LDL receptors on the liver surface.', hot: [[25, 19, 'LDL receptor'], [37, 22, 'Coated pit'], [36, 55, 'Endosome'], [46, 38, 'Receptor recycles'], [60, 13, 'PCSK9'], [45, 80, 'Lysosome'], [64, 64, 'Cholesterol synthesis']], info: ['Each receptor binds apoB-100 on LDL and can recycle about 150 times.', 'The receptor-LDL pair is pulled into the cell in a clathrin-coated pit.', 'Acid in the endosome releases LDL from the receptor.', 'Free receptors return to the surface to catch more LDL.', 'PCSK9 binds the receptor so it goes to the lysosome instead of recycling. PCSK9 antibodies (evolocumab, alirocumab) block it; inclisiran silences its mRNA. Result: more receptors, LDL down 45–64%.', 'LDL is broken down and its cholesterol released.', 'HMG-CoA reductase (statins) and ATP citrate lyase (bempedoic acid) sit on this pathway. Less cholesterol made inside → the cell makes more LDL receptors.']},
   gut: {t: 'Absorption: ezetimibe and bile acid sequestrants', src: '/media/lipids/gut.webp', alt: 'Intestinal lumen with cholesterol micelles and NPC1L1 transporters on enterocytes, chylomicrons leaving into a pale lacteal, and bile acids bound to resin beads moving toward the colon.', cap: 'Less cholesterol reaching the liver from the gut means the liver makes more LDL receptors.', hot: [[24, 27, 'Cholesterol in micelles'], [22, 45, 'NPC1L1 transporter'], [22, 67, 'Chylomicron leaves'], [45, 82, 'Lacteal (lymph)'], [80, 26, 'Bile acids bound to resin']], info: ['Dietary and biliary cholesterol is carried in mixed micelles.', 'Ezetimibe blocks NPC1L1, cutting cholesterol absorption; LDL falls about 25% on top of a statin.', 'Absorbed cholesterol leaves in chylomicrons.', 'Chylomicrons enter lymph before the blood.', 'Sequestrants bind bile acids so they are lost in stool; the liver uses cholesterol to make more. They can raise TG.']},
-  lpa: {t: 'The Lp(a) particle', src: '/media/lipids/lpa.webp', alt: 'An LDL-like particle with apoB-100 linked by a disulfide bond to a long apolipoprotein(a) chain of repeated kringle loops, beside a plain LDL particle.', cap: 'Lp(a) is an LDL particle with apo(a) attached. The number of kringle repeats is inherited; fewer repeats mean more particles.', hot: [[21, 48, 'apo(a) kringles'], [6, 50, 'Protease-like domain'], [38, 51, 'Disulfide bond'], [60, 30, 'apoB-100'], [84, 50, 'Plain LDL']], info: ['apo(a) has many copies of kringle IV type 2; the copy number is set by the LPA gene and is the main determinant of the level.', 'This domain resembles plasminogen but is inactive, which may slow clot breakdown (pro-thrombotic).', 'One disulfide bond links apo(a) to apoB-100.', 'Because it carries apoB, Lp(a) is atherogenic like LDL; it also carries oxidized phospholipids that inflame the wall and calcify the aortic valve.', 'Statins do not lower Lp(a) (they can raise it slightly); PCSK9 antibodies lower it about 25%. The first Lp(a)-lowering outcome trial (Lp(a)HORIZON, 2026) did not reduce events.']},
+  lpa: {t: 'The Lp(a) particle', src: '/media/lipids/lpa.webp', alt: 'An LDL-like particle with apoB-100 linked by a disulfide bond to a long apolipoprotein(a) chain of repeated kringle loops, beside a plain LDL particle.', cap: 'Lp(a) is an LDL particle with apo(a) attached. The number of kringle repeats is inherited; fewer repeats mean more particles.', hot: [[21, 48, 'apo(a) kringles'], [6, 50, 'Protease-like domain'], [38, 51, 'Disulfide bond'], [60, 30, 'apoB-100'], [84, 50, 'Plain LDL']], info: ['apo(a) has many copies of kringle IV type 2; the copy number is set by the LPA gene and is the main determinant of the level.', 'This domain resembles plasminogen but has no protease activity. A clot-promoting role has been proposed, but current evidence does not show impaired fibrinolysis or more venous thrombosis (EAS 2022).', 'One disulfide bond links apo(a) to apoB-100.', 'Because it carries apoB, Lp(a) is atherogenic like LDL; it also carries oxidized phospholipids that inflame the wall and calcify the aortic valve.', 'Statins do not lower Lp(a) (they can raise it slightly); PCSK9 antibodies lower it about 25%. The first Lp(a)-lowering outcome trial (Lp(a)HORIZON, 2026) did not reduce events.']},
   lpl: {t: 'Triglycerides and lipoprotein lipase', src: '/media/lipids/lpl.webp', alt: 'A capillary with chylomicrons and VLDL docked to lipoprotein lipase on the endothelium, fatty acids passing into an adipocyte and a muscle cell, and smaller remnants staying in the lumen.', cap: 'Lipoprotein lipase on the capillary wall empties triglyceride-rich particles; apoC-III slows it.', hot: [[39, 33, 'Chylomicron'], [33, 48, 'Lipoprotein lipase'], [43, 26, 'apoC-III'], [43, 64, 'Fatty acids'], [30, 78, 'Fat cell'], [68, 77, 'Muscle'], [88, 33, 'Remnants']], info: ['Chylomicrons carry dietary triglyceride; VLDL carries the liver\'s.', 'LPL hydrolyzes triglyceride. Fibrates raise LPL activity (PPAR-alpha). Missing LPL or its partners causes familial chylomicronemia: TG over 1000 from childhood.', 'apoC-III inhibits LPL and remnant clearance; olezarsen silences it (approved for FCS).', 'Fatty acids go to fat for storage or muscle for fuel.', 'Insulin activates LPL in fat: why uncontrolled diabetes raises TG.', 'Muscle LPL rises with exercise.', 'Remnants are small enough to enter the artery wall and are atherogenic; they are counted in non-HDL and apoB but not LDL-C.']},
   fh: {t: 'Signs of familial hypercholesterolemia', src: '/media/lipids/fh-signs.webp', alt: 'Three panels: a thickened Achilles tendon with a xanthoma, an eye with a white-gray corneal arcus at the edge of the cornea, and yellow plaques on the eyelids.', cap: 'Tendon xanthomas strongly suggest FH; arcus before 45 supports it; xanthelasma is less specific.', hot: [[11, 60, 'Tendon xanthoma'], [46, 49, 'Corneal arcus'], [75, 45, 'Xanthelasma']], info: ['Cholesterol deposits in the Achilles or extensor tendons of the hands: feel for a thickened, nodular tendon. Highly specific for FH.', 'A white-gray ring at the corneal edge; common in older adults, but before about 45 it points to high LDL (expert practice).', 'Yellow plaques on the eyelids; about half of people with them have normal lipids, so check a panel but do not diagnose FH from them alone.']}
 };
@@ -871,7 +890,7 @@ var TRIALS = [
   {n: 'STRENGTH', y: 2020, q: 'Does EPA plus DHA do the same?', d: '13,078 high risk on statins; omega-3 carboxylic acids vs corn oil.', r: '12.0% vs 12.2%, HR 0.99; stopped for futility.', c: 'Not all omega-3s are equal; fish oil is not icosapent ethyl.', doi: '10.1001/jama.2020.22258'},
   {n: 'PROMINENT', y: 2022, q: 'Does lowering TG with a fibrate help in diabetes?', d: '10,497 with type 2 diabetes, TG 200–499, low HDL; pemafibrate vs placebo.', r: 'TG −26% but apoB +4.8%; events HR 1.03.', c: 'Lowering TG without lowering apoB does not help the heart.', doi: '10.1056/NEJMoa2210645'},
   {n: 'REPRIEVE', y: 2023, q: 'Statin for people with HIV at low to moderate risk?', d: '7,769 aged 40–75 on ART; pitavastatin 4 mg vs placebo; 5.1 years.', r: '4.81 vs 7.32 events per 1000 person-years, HR 0.65; more myalgia (2.3 vs 1.4%) and diabetes (5.3 vs 4.0%).', c: 'Statin for people with HIV aged 40–75 (class 1, B-R).', doi: '10.1056/NEJMoa2304146'},
-  {n: 'Lp(a)HORIZON', y: 2026, post: true, q: 'Does lowering Lp(a) cut events?', d: '8,323 with ASCVD, median Lp(a) 236 nmol/L; pelacarsen vs placebo; 4.7 years.', r: 'Lp(a) 64 vs 233 nmol/L at a year; events 12.3% vs 12.1%, HR 1.02 (0.90–1.15).', c: 'Published after the guideline; Lp(a) stays a risk marker that calls for lowering everything else. Other Lp(a) drugs are still in trials.', doi: '10.1056/NEJMoa2610159'}
+  {n: 'Lp(a)HORIZON', y: 2026, post: true, q: 'Does lowering Lp(a) cut events?', d: '8,350 with ASCVD (8,322 analyzed), median Lp(a) 236 nmol/L; pelacarsen vs placebo; 4.7 years.', r: 'Lp(a) 64 vs 233 nmol/L at a year; events 12.3% vs 12.1%, HR 1.02 (0.90–1.15).', c: 'Published after the guideline; Lp(a) stays a risk marker that calls for lowering everything else. Other Lp(a) drugs are still in trials.', doi: '10.1056/NEJMoa2610159'}
 ];
 function trialHtml(T){ return '<details class="tr"><summary><b>' + esc(T.n) + '</b> · ' + T.y + (T.post ? '<span class="flag">after the guideline</span>' : '') + '<span class="take">' + esc(T.q) + '</span></summary><div class="trial"><p><span class="k">Design</span>' + esc(T.d) + '</p><p><span class="k">Result</span>' + esc(T.r) + '</p><p><span class="k">What it changed</span>' + esc(T.c) + '</p>' + (T.weak ? '<p><span class="k">Caution</span>' + esc(T.weak) + '</p>' : '') + '<p><a href="https://doi.org/' + T.doi + '" rel="noopener" target="_blank">doi ' + T.doi + '</a></p></div></details>'; }
 
@@ -885,11 +904,11 @@ function buildLearn(){
   h += learnSec('l-receptor', 'The LDL receptor decides your LDL', 'Most LDL-lowering drugs work by leaving more receptors on the liver.', plateCard('hepatocyte') + plateCard('gut'));
   h += learnSec('l-drugs', 'Where each drug acts', 'Tap a drug for its site, effect and outcome trial.', '<div class="card"><div class="mgrid" id="drug-grid">' + DRUGS.map(function(d, i){ return '<button class="mcell" type="button" data-drug="' + i + '" aria-expanded="false">' + esc(d[0]) + '</button>'; }).join('') + '</div><div id="drug-det"></div></div>');
   h += learnSec('l-stack', 'Stacking therapy to reach a goal', 'Each drug takes its percentage of what is left, so add-ons shrink in absolute terms.', '<div class="card"><div class="sl"><span class="sll"><span>Starting LDL (no drugs)</span><span class="mono" id="stk-v">160</span></span><input type="range" id="sl-stk" min="70" max="300" step="5" value="160" aria-label="Starting LDL"></div><div class="chips" id="stk-chips"><button class="chip" type="button" data-stk="moderate" aria-pressed="false">Moderate statin</button><button class="chip" type="button" data-stk="high" aria-pressed="true">High statin</button><button class="chip" type="button" data-stk="eze" aria-pressed="false">Ezetimibe</button><button class="chip" type="button" data-stk="pcsk9" aria-pressed="false">PCSK9 antibody</button><button class="chip" type="button" data-stk="bemp" aria-pressed="false">Bempedoic acid</button></div><div class="slfig" id="stk-fig"></div><p class="slout" id="stk-out"></p><p class="note">Estimate: midpoints of the guideline\'s expected reductions (moderate 40%, high 50%, ezetimibe 25%, PCSK9 antibody 55%, bempedoic acid 17.5%), assumed to multiply.</p></div>');
-  h += learnSec('l-lpa', 'Lp(a): inherited, diet-proof', 'Measure once. High levels add risk at any LDL.', plateCard('lpa') + predHtml(PRED[1]) + '<div class="card"><p class="label">Relative risk by level (vs median 20 nmol/L)</p><div class="mgrid" id="lpa-grid">' + LPA_LADDER.map(function(r, i){ return '<button class="mcell" type="button" data-lpaq="' + i + '" aria-expanded="false"><span class="mono">' + esc(r[0]) + '</span></button>'; }).join('') + '</div><div id="lpa-det"></div><p class="note">Guideline Table 9. nmol/L and mg/dL are not interchangeable: particle size varies with the kringle count.</p></div>');
+  h += learnSec('l-lpa', 'Lp(a): inherited, diet-proof', 'Measure once. High levels add risk at any LDL.', plateCard('lpa') + predHtml(PRED[1]) + '<div class="card"><p class="label">Relative risk by level (vs median 20 nmol/L)</p><div class="mgrid" id="lpa-grid">' + LPA_LADDER.map(function(r, i){ return '<button class="mcell" type="button" data-lpaq="' + i + '" aria-expanded="false"><span class="mono">' + esc(r[0]) + '</span></button>'; }).join('') + '</div><div id="lpa-det"></div><p class="note">Guideline Table 4. nmol/L and mg/dL are not interchangeable: particle size varies with the kringle count.</p></div>');
   h += learnSec('l-tg', 'Triglycerides: heart and pancreas', 'Above about 500 the worry shifts from the arteries to the pancreas.', plateCard('lpl') + predHtml(PRED[2]) + '<div class="card" id="tg-flow"><p class="label">Step through: what to do at each TG level</p><div class="chips" id="tg-steps"></div><div id="tg-res"></div></div>');
   h += learnSec('l-fh', 'Familial hypercholesterolemia', 'One in about 250 people; LDL ≥190 from birth. Find it, treat early, test the family.', plateCard('fh') + predHtml(PRED[3]));
   h += learnSec('l-risk', 'How PREVENT estimates risk', 'Move the sliders: these run the same equations as the Risk tab.', '<div class="card"><p class="label">PREVENT, live</p><div class="sl"><span class="sll"><span>Age</span><span class="mono" id="pv-age-v"></span></span><input type="range" id="pv-age" min="30" max="79" value="55" aria-label="Age"></div><div class="sl"><span class="sll"><span>Systolic BP</span><span class="mono" id="pv-sbp-v"></span></span><input type="range" id="pv-sbp" min="100" max="180" value="140" aria-label="Systolic BP"></div><div class="sl"><span class="sll"><span>Non-HDL cholesterol</span><span class="mono" id="pv-nh-v"></span></span><input type="range" id="pv-nh" min="80" max="260" step="5" value="160" aria-label="Non-HDL cholesterol"></div><div class="chips"><button class="chip" type="button" data-pv="sex" aria-pressed="false">Female</button><button class="chip" type="button" data-pv="smoke" aria-pressed="false">Smoker</button><button class="chip" type="button" data-pv="dm" aria-pressed="false">Diabetes</button><button class="chip" type="button" data-pv="bptx" aria-pressed="true">BP medicine</button></div><div id="pv-out"></div><p class="note">HDL 50, eGFR 90, not on a statin. Calculate, then Personalize with enhancers, then Reclassify with CAC if unsure (the guideline\'s CPR model).</p></div>');
-  h += learnSec('l-cac', 'Coronary calcium reclassifies', 'Tap a score; the Treat engine answers for a 55-year-old at 6% PREVENT risk.', '<div class="card"><div class="chips" id="cac-steps"></div><div id="cac-res"></div></div>');
+  h += learnSec('l-cac', 'Coronary calcium reclassifies', 'Tap a score; the Treat engine answers for a 55-year-old man at borderline PREVENT risk (about 4%).', '<div class="card"><div class="chips" id="cac-steps"></div><div id="cac-res"></div></div>');
   h += learnSec('l-muscle', 'Statin muscle symptoms', 'Most are nocebo, but some are real. Risk factors make them likelier.', '<div class="card"><p class="label">Risk factors (guideline Table 24)</p><div class="mgrid">' + SAMS_RF.map(function(r){ return '<span class="mcell" style="cursor:default">' + esc(r) + '</span>'; }).join('') + '</div><p class="line1">Rechallenge with a different statin, a low dose, or alternate-day dosing before giving up; non-statins are the fallback.</p></div>');
   h += learnSec('l-trials', 'Trials behind the recommendations', '', '<div class="card">' + TRIALS.map(trialHtml).join('') + '</div>');
   $('learn-body').innerHTML = h;
@@ -922,7 +941,7 @@ function pvRender(){
   var age = +$('pv-age').value, sbp = +$('pv-sbp').value, nh = +$('pv-nh').value;
   $('pv-age-v').textContent = age; $('pv-sbp-v').textContent = sbp; $('pv-nh-v').textContent = nh;
   var P = prevent({age: age, sex: PV.sex, tc: nh + 50, hdl: 50, sbp: sbp, bptx: PV.bptx, dm: PV.dm, smoke: PV.smoke, egfr: 90, onStatin: false});
-  $('pv-out').innerHTML = P.ok ? '<div class="pair" style="margin-top:8px"><div><span class="big">' + pct(P.r10) + '</span><span class="note">10-year ASCVD · ' + P.cat + '</span></div><div><span class="big" style="font-size:22px">' + pct(P.r30) + '</span><span class="note">30-year</span></div></div>' : '<p class="note">' + esc(P.why) + '</p>';
+  $('pv-out').innerHTML = P.ok ? '<div class="pair" style="margin-top:8px"><div><span class="big">' + pct(P.r10) + '</span><span class="note">10-year ASCVD · ' + P.cat + '</span></div><div><span class="big" style="font-size:22px">' + (P.r30ok ? pct(P.r30) : '—') + '</span><span class="note">30-year' + (P.r30ok ? '' : ' (to age 59)') + '</span></div></div>' : '<p class="note">' + esc(P.why) + '</p>';
 }
 var TGB = [['150–499', 300], ['500–999', 700], ['≥1000', 1400]];
 function tgFlow(i){
