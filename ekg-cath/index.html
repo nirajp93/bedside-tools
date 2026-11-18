@@ -550,7 +550,7 @@ a:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible,s
   <div class="card chap" id="learn-try" data-pill="Try it"><p class="kicker">3 · Try it</p><h2>Predict, then move the numbers</h2><div id="vk-preds"></div>
     <h3 style="margin-top:18px">The ST threshold</h3><div data-vk="slider:thr"></div>
     <h3 style="margin-top:18px">Left bundle branch block: the ratio rule</h3><div data-vk="slider:sg"></div>
-    <h3 style="margin-top:18px">Four patients, four tiers</h3><div data-vk="flow:tier"></div></div>
+    <h3 style="margin-top:18px">Four scenarios: who goes, and how fast</h3><div data-vk="flow:tier"></div></div>
   <div class="card chap" id="trials" data-pill="Trials"><p class="kicker">4 · Evidence</p><h2>Six trials behind the call</h2><p class="lead2">Each card: the question, the design, the result, and what it changed.</p><div id="trialbox"></div></div>
   <div class="rowb"><button id="go-prac" type="button">Practice cases</button></div>
 </section>
@@ -1287,7 +1287,7 @@ var VK = (function(){
     open: function(title, html){ var sh = document.getElementById('figsheet'); sh.innerHTML = '<div class="closebar"><div><p class="kicker">Anatomy plate</p><h3 id="figtitle"></h3></div><button class="btn" id="figclose">Close</button></div><div class="vk-body"></div>'; sh.querySelector('h3').textContent = title; var b = sh.querySelector('.vk-body'); b.innerHTML = html; document.getElementById('figwrap').hidden = false; document.body.style.overflow = 'hidden'; sh.scrollTop = 0; sh.querySelector('#figclose').focus({preventScroll: true}); return b; },
     plates: {
       cor: {t: 'The coronary arteries', src: '/media/ekg-cath/coronaries.webp', w: 420, h: 572, alt: 'Front of the heart with the right coronary artery on the left of the picture and the left anterior descending and circumflex arteries on the right',
-        hot: [[41.9, 38, 'Left main', 'LM'], [62.7, 49, 'Proximal LAD', 'pLAD'], [65.1, 70, 'Mid LAD', 'mLAD'], [76.1, 61, 'First diagonal', 'D1'], [80.2, 50.3, 'Circumflex', 'LCx'], [34.6, 49, 'Proximal RCA', 'pRCA'], [20.7, 74, 'Distal RCA', 'dRCA']],
+        hot: [[41.9, 38, 'Left main', 'LM'], [62.7, 49, 'Proximal LAD', 'pLAD'], [65.1, 70, 'Mid LAD', 'mLAD'], [71.4, 64.7, 'First diagonal', 'D1'], [80.2, 50.3, 'Circumflex', 'LCx'], [34.6, 49, 'Proximal RCA', 'pRCA'], [20.7, 74, 'Distal RCA', 'dRCA']],
         cap: 'Front of a right-dominant heart. Tap a number for what an occlusion there does to the ECG, then open it on the heart and timeline below. Drawn schematically: the left main really runs behind the pulmonary trunk.',
         src2: 'ECG lines and supply: this tool\'s anatomy tab (Wagner 2009; Birnbaum 1996; Engelen 1999; Nikus 2021).'},
       occ: {t: 'Occluded, then reperfused', src: '/media/ekg-cath/occluded-reperfused.webp', alt: 'Left, a coronary artery blocked by clot on a ruptured plaque, with pale muscle beneath. Right, the same artery opened by a balloon and stent, with pink muscle beneath',
@@ -1295,11 +1295,11 @@ var VK = (function(){
         cap: 'Why the call is about time: the artery is shut, and the muscle it feeds is dying until it is opened.',
         src2: 'Timing: 2025 ACC/AHA ACS guideline, as in this tool\'s tier. Mechanism: standard physiology.'},
       leads: {t: 'Posterior and right-sided leads', src: '/media/ekg-cath/extra-leads.webp', w: 304, h: 556, alt: 'Back view with V7, V8 and V9 across the left back, and front view of the right chest with V4R',
-        hot: [[53.6, 25, 'V7', 'v7'], [69.4, 25, 'V8', 'v8'], [84.5, 25, 'V9', 'v9'], [57.6, 68, 'V4R', 'v4r']],
+        hot: [[47.6, 30.2, 'V7', 'v7'], [63.4, 30.2, 'V8', 'v8'], [78.5, 30.2, 'V9', 'v9'], [51.6, 73.6, 'V4R', 'v4r']],
         cap: 'Record these when the 12 leads leave a question: depression in V1–V3, or an inferior infarct.',
         src2: 'Positions and thresholds: Fourth Universal Definition of MI, 2018, as in this tool.'},
-      cond: {t: 'The wiring and its blood supply', src: '/media/ekg-cath/conduction.webp', w: 460, h: 572, alt: 'Cut-away heart with the sinus node, AV node, His bundle, bundle branches and Purkinje fibres drawn in yellow',
-        hot: [[21.5, 37, 'Sinus node', 'sa'], [32.6, 52.5, 'AV node', 'av'], [46, 55, 'His bundle and bundle branches', 'bb'], [87, 73, 'Purkinje fibres', 'pk']],
+      cond: {t: 'The wiring and its blood supply', src: '/media/ekg-cath/conduction.webp', w: 460, h: 572, alt: 'Cut-away heart with the sinus node, AV node, His bundle, bundle branches and Purkinje fibers drawn in yellow',
+        hot: [[21.5, 37, 'Sinus node', 'sa'], [32.6, 52.5, 'AV node', 'av'], [51, 56, 'His bundle and bundle branches', 'bb'], [87, 73, 'Purkinje fibers', 'pk']],
         cap: 'Which artery feeds each part of the wiring decides which infarct causes which block.',
         src2: 'Supply and block: Nikus 2021 and this tool\'s anatomy tab. Purkinje line: standard physiology.'}
     },
@@ -1309,19 +1309,19 @@ var VK = (function(){
       clot: function(){ return '<p>The clot fills the lumen. The muscle beyond it is injured through its full thickness, and its injury current shows as ST elevation in the leads facing it, with depression in the leads opposite.</p>' + fc('vector', 'Injury vector'); },
       isch: function(){ return '<p>Without flow, muscle dies from the inner layer outward over hours. How much survives depends on how soon the artery opens.</p>'; },
       pci: function(){ return '<p>Primary PCI: a wire crosses the clot, a balloon opens the artery and a stent holds it open.</p><p><b>' + stemiNow.cls + '.</b></p>'; },
-      rep: function(){ return '<p>Flow is back: muscle that has not yet died can recover.</p><p>' + stemiNow.why[1] + '</p>'; },
+      rep: function(){ return '<p>Flow is back: muscle that has not yet died can recover. The sooner the artery opens, the more muscle survives.</p><p><b>' + stemiNow.cls + '.</b></p>'; },
       v7: function(){ return '<p>Left posterior axillary line, level with V6.</p><p>' + thrNote('post', 35, 40) + '</p>' + fc('terr3', 'Posterior territory'); },
       v8: function(){ return '<p>Left mid-scapular line, at the tip of the scapula, level with V6.</p><p>' + thrNote('post', 35, 40) + '</p>'; },
       v9: function(){ return '<p>Left paraspinal border, level with V6.</p><p>' + thrNote('post', 35, 40) + '</p>'; },
       v4r: function(){ var e = ev('RV infarction'); return '<p>Right fifth intercostal space, midclavicular line: the mirror image of V4.</p><p>' + thrNote('right', 25, 30) + '</p><p>' + e.ecg + '.</p>' + fc('terr2', 'Inferior territory'); },
       sa: function(){ var e = ev('Sinus bradycardia'); return '<p><b>Supply:</b> ' + e.ter + '.</p><p><b>ECG:</b> ' + e.ecg + '.</p>'; },
       av: function(){ var e = ev('AV nodal block'); return '<p><b>Supply:</b> ' + e.ter + '.</p><p><b>ECG:</b> ' + e.ecg + '.</p><p>' + e.bed + '.</p>'; },
-      bb: function(){ var e = ev('Block below the node'); return '<p><b>Supply:</b> ' + e.ter + '.</p><p><b>ECG:</b> ' + e.ecg + '.</p><p>' + e.bed + '.</p>' + fc('sgarbossa', 'ST in bundle branch block'); },
-      pk: function(){ return '<p>The Purkinje fibres spread the impulse through both ventricles at once, so a normal QRS is narrow. When a bundle branch is blocked, one ventricle is activated late, through muscle, and the QRS widens.</p>' + fc('qrs', 'QRS width'); }
+      bb: function(){ var e = ev('Block below the node'); return '<p><b>Supply:</b> ' + e.ter + '.</p><p><b>ECG:</b> ' + e.ecg + '.</p><p>' + e.bed + '.</p><p>The His bundle itself is fed mainly by the AV nodal artery, with help from LAD septal branches; the left posterior fascicle has a dual supply.</p>' + fc('sgarbossa', 'ST in bundle branch block'); },
+      pk: function(){ return '<p>The Purkinje fibers spread the impulse through both ventricles at once, so a normal QRS is narrow. When a bundle branch is blocked, one ventricle is activated late, through muscle, and the QRS widens.</p>' + fc('qrs', 'QRS width'); }
     },
     preds: {
       pPost: {host: 'vk-preds', q: 'Chest pain. ST depression in V1–V3 with tall R waves and upright T waves. What is it most likely?',
-        a: function(){ return [['Anterior subendocardial ischaemia', false], ['Posterior occlusion: record V7–V9', true], ['A normal variant', false]]; },
+        a: function(){ return [['Anterior subendocardial ischemia', false], ['Posterior occlusion: record V7–V9', true], ['A normal variant', false]]; },
         why: function(){ return TERR[3].pts.join(' '); }, fig: function(){ return fc('terr3', 'Posterior territory'); }},
       pRca: {host: 'vk-preds', q: 'ST elevation in II, III and aVF, with III taller than II and ST depression in aVL. Which artery?',
         a: function(){ return [['Right coronary', true], ['Circumflex', false], ['Left anterior descending', false]]; },
@@ -1340,14 +1340,14 @@ var VK = (function(){
                      {key: 'mm', label: 'Measured ST elevation', min: 0, max: 4, step: 0.5, value: 1.5, unit: 'mm'}],
         note: 'Same rule as the threshold calculator on the Read tab (Fourth Universal Definition of MI, 2018).',
         run: function(v){ return '<p>' + thrCalc(LEADS[v.lead], v.sex ? 'f' : 'm', v.age, v.mm, true).txt + '</p>'; }},
-      sg: {ranges: [{key: 'ste', label: 'Discordant ST elevation', min: 0.5, max: 10, step: 0.5, value: 2, unit: 'mm'},
+      sg: {ranges: [{key: 'ste', label: 'Discordant ST elevation', min: 1, max: 10, step: 0.5, value: 2, unit: 'mm'},
                     {key: 's', label: 'Depth of the preceding S wave', min: 2, max: 30, step: 1, value: 12, unit: 'mm'}],
-        note: 'The ratio rule only; the two concordance rules are on the Read tab. Smith SW et al., Ann Emerg Med 2012.',
-        run: function(v){ return '<p>' + sgarbCalc(false, false, v.ste, v.s).txt + '</p>'; }}
+        note: 'The ratio rule only, which needs at least 1 mm of discordant ST elevation; the two concordance rules are on the Read tab. Smith SW et al., Ann Emerg Med 2012.',
+        run: function(v){ return '<p>' + sgarbCalc(false, false, v.ste, v.s).txt.replace('by the three criteria', 'by the ratio rule') + '</p>'; }}
     },
     flows: {
       tier: {t: 'Who goes to the lab, and how fast?', steps: [
-        {q: '58-year-old, 45 minutes of crushing chest pain. ST elevation V1–V4 meets the threshold, with inferior reciprocal depression. Which tier?', a: function(){ return tierOpts(stemiNow.t); }, show: function(){ return tierLine(stemiNow); }},
+        {q: '58-year-old woman, 45 minutes of crushing chest pain. ST elevation V1–V4 meets the threshold, with inferior reciprocal depression. Which tier?', a: function(){ return tierOpts(stemiNow.t); }, show: function(){ return tierLine(stemiNow); }},
         {q: 'The same tracing, but the pain began 30 hours ago and she is now pain-free and stable.', a: function(){ return tierOpts(tierCalc('stemi', 'gt24', false, false, false).t); }, show: function(){ return tierLine(tierCalc('stemi', 'gt24', false, false, false)); }},
         {q: 'Still 30 hours, but now cold and hypotensive: cardiogenic shock.', a: function(){ return tierOpts(tierCalc('stemi', 'gt24', true, false, false).t); }, show: function(){ return tierLine(tierCalc('stemi', 'gt24', true, false, false)); }},
         {q: 'A different patient: no ST elevation, but ST depression and a rising troponin. Pain settled on treatment; stable.', a: function(){ return tierOpts(tierCalc('isch', 'lt12', false, false, true).t); }, show: function(){ return tierLine(tierCalc('isch', 'lt12', false, false, true)); }}
