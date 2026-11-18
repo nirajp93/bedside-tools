@@ -420,8 +420,9 @@ function stress(i, R){
     o.head = 'No stress dose needed'; o.cls = 'okc';
     o.rx.push(['Plan', i.status === 'now' ? 'Continue the usual dose; give it IV if they cannot take tablets.' : 'No steroid needed for the adrenal.']);
     if (i.status === 'now' && i.dose != null && (s === 'severe' || s === 'surglong')) o.rx.push(['If nil by mouth', ivEq(i)]);
-    if (R.k === 'low' && s !== 'minor' && s !== 'local' && s !== 'bowel') o.guards.push(['Short course only: stress cover is not routinely needed. Hypotension or collapse: treat as adrenal crisis.', true]);
+    if (R.k === 'low' && s !== 'minor' && s !== 'local' && s !== 'bowel') o.guards.push(['Short course only: stress cover is not routinely needed. Hypotension, collapse, vomiting or diarrhea: treat as adrenal crisis.', true]);
     o.notes.push(R.k === 'recov' ? 'The axis has been shown to recover (morning cortisol over 10 µg/dL).' : 'Under 3 weeks of exposure: suppression is rarely clinically relevant (ESE R2.1). If they become hypotensive or collapse, treat as adrenal crisis.');
+    o.tiers = R.k === 'recov' ? ['ESE/ES 2024 R2.7'] : ['ESE/ES 2024 R2.1 (weak, very low); applying it to stress cover is an interpretation of R3.1', 'crisis: R3.2 (good practice)'];
     o.why = R.k === 'recov' ? 'A recovered adrenal raises its own cortisol under stress.' : 'Short courses rarely suppress the axis enough to matter, so the adrenal can still respond.';
     return o;
   }
@@ -755,7 +756,7 @@ function build(i){
     var th, tb = '', tw, tl = [], tm = [];
     if (T.k === 'short'){ th = 'Stop without a taper'; tb = '<p class="sub">Under 3 weeks of exposure: no taper and no testing needed.</p>'; tw = WHY.tShort; }
     else {
-      th = T.k === 'high' ? 'Taper from prednisone ' + mg(T.pe) : T.k === 'long' ? 'Switch before tapering' : (band(i.dose, i.drug) === 'below' ? 'Below a physiologic dose' : 'At a physiologic dose') + ' (prednisone ' + mg(T.pe) + ')';
+      th = T.k === 'high' ? 'Taper from prednisone ' + mg(T.pe) : T.k === 'long' ? 'Switch before tapering' : (band(i.dose, i.drug) === 'below' ? 'Below a physiologic dose' : 'At a physiologic dose') + ' (' + d.n.toLowerCase() + ' ' + mg(i.dose) + ')';
       if (d.long) tb += guard('Switch ' + d.n.toLowerCase() + ' to prednisone or hydrocortisone once the long-acting drug is no longer needed. For brain tumors, spinal cord compression or chemotherapy, the treating team sets the taper: do not turn a high dexamethasone dose into an equally high prednisone dose by default.', false);
       if (T.k === 'high'){
         tb += T.bands.map(function(x){ return '<div class="band"><b>' + esc(rnd(x.from) + ' → ' + x.to) + '</b><span>' + esc('down ' + x.step + ' ' + x.every + ' (' + (x.min === x.max ? x.min : x.min + '–' + x.max) + ' ' + x.unit + ')') + '</span></div>'; }).join('');
