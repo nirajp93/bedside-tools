@@ -774,7 +774,7 @@ function renderTreat(p){
   if (!R.key){ $('treat-out').innerHTML = out + card({body: '<p class="empty">Enter the patient on the Risk tab, or tap Try an example there.</p>'}); return R; }
   var head, body = '', figs = [];
   var G = R.goal ? GOALS[R.goal] : null;
-  if (R.samsMode && R.next && R.next.k !== 'keep') head = 'Add ' + ADDON[R.next.k].short.replace('+ ', '') + ' (statin-attributed muscle symptoms)';
+  if (R.samsMode && R.next && R.next.k !== 'keep') head = (p.ascvd ? 'Reduced-dose statin if tolerated, plus ' : 'Add ') + ADDON[R.next.k].short.replace('+ ', '') + ' (statin-attributed muscle symptoms)';
   else if (R.samsMode) head = R.atGoal ? 'At goal: keep going' : 'Follow the muscle-symptom plan below';
   else if (R.key === 'cac0') head = 'Defer the statin; repeat CAC in 3–7 years';
   else if (R.key === 'nolt') head = 'No lipid-lowering drug';
@@ -799,7 +799,7 @@ function renderTreat(p){
   if (R.key.indexOf('sev') === 0) figs.push('fh');
   if (R.key.indexOf('cac') === 0) figs.push('plaque');
   if (!figs.length) figs.push('hepatocyte');
-  out += card({id: 'plan', label: 'Do now', head: head, body: body, why: why, more: more, tiers: R.tiers, chips: chipsFor(figs)});
+  out += card({id: 'plan', label: 'Do now', head: head, body: body, why: why, more: more, tiers: R.samsMode ? ['Statin-attributed muscle symptoms: plan from guideline 4.2.11 (see card below)'].concat(R.tiers.map(function(t){ return 'Without intolerance: ' + t; })) : R.tiers, chips: chipsFor(figs)});
   if (R.prev && R.prev.ok && !p.ascvd && R.key !== 'sev70' && R.key !== 'sev100') out += '';
   if (O.lines.length) out += '<div class="card" id="overlays"><p class="label">Also for this patient</p>' + O.lines.map(function(l){ return '<div class="ov"><b>' + esc(l.h) + '</b><p>' + esc(l.b) + '</p>' + (l.k === 'lpa' ? '<div class="chips"><button class="chip" type="button" data-plate="lpa">' + ICON + 'The Lp(a) particle</button></div>' : '') + '</div>'; }).join('') + '</div>';
   if (p.sams){ var S = samsPlan(p, R); out += card({id: 'muscle', label: 'Muscle symptoms on statins', head: esc(S.plan), body: '<p class="sub">' + esc(S.grp) + (S.goal ? ' · goal LDL &lt;' + GOALS[S.goal].ldl + ', non-HDL &lt;' + GOALS[S.goal].nh : '') + '</p><p class="line1">First: look for secondary causes (hypothyroidism, interacting drugs, heavy exercise); check strength and CK if symptoms are severe. Discuss the higher risk that comes with stopping.</p>', why: 'In blinded crossover testing, symptoms were about as common on placebo as on statin (SAMSON), and non-statin drugs still cut events (CLEAR Outcomes).', more: '<p>Entry point: side effects on 2 or more statins, one at the lowest approved dose. Myalgia with normal CK is common; myositis (CK above normal) is rare; rhabdomyolysis (CK over 10× with kidney injury) is rare; HMGCR necrotizing myopathy is very rare.</p><p>Coenzyme Q10 is not recommended (class 3).</p>', tiers: [S.tier ? S.tier : 'Guideline 4.2.11'], chips: '<div class="chips"><button class="chip" type="button" data-goto="l-muscle">' + ICON + 'Nocebo and myopathy</button></div>'}); }
