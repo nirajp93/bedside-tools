@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Opioid conversion · bedside.tools</title>
+<meta name="description" content="Convert between opioids and routes with the cross-tolerance reduction built in: daily dose, per-dose schedule, breakthrough dose, fentanyl patch and methadone rules, MME and naloxone.">
+<script src="/theme.js"></script>
+<style>
+:root{--bg:#FBFBFA;--card:#FFFFFF;--ink:#111113;--muted:#55555D;--line:#ECECEE;--accent:#2B4BDB;--warn:#9A3B00;--warnbg:#FFF6EC}
+:root{--bg:#FBFBFA;--card:#FFFFFF;--ink:#111113;--muted:#55555D;--line:#ECECEE;--accent:#2B4BDB;--warn:#9A3B00;--warnbg:#FFF6EC}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5}
+.mono{font-family:var(--mono)}
+.wrap{max-width:720px;margin:0 auto;padding:20px 16px 48px}
+a{color:var(--accent)}
+.back{font-size:14px;text-decoration:none;display:inline-block;min-height:44px;line-height:44px}
+h1{font-size:26px;margin:4px 0 4px;letter-spacing:-.01em}
+.purpose{color:var(--muted);margin:0 0 20px}
+.tabs{display:flex;gap:6px;margin-bottom:16px}
+.tab{flex:1;min-width:0;min-height:44px;border:1px solid var(--line);background:var(--card);border-radius:14px;padding:0 4px;font:inherit;font-size:15px;font-weight:600;color:var(--muted);cursor:pointer}
+.tab[aria-selected="true"]{border-color:var(--accent);color:var(--accent)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
+.label{font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+.grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.field{display:flex;flex-direction:column;justify-content:flex-end}
+.field label{display:block;font-size:13px;color:var(--muted);margin-bottom:4px}
+.field input{width:100%;min-height:44px;border:1px solid var(--line);border-radius:10px;padding:8px 10px;font:inherit;font-family:var(--mono);background:var(--card);color:var(--ink)}
+.field input:focus,.tab:focus-visible,.chk:focus-within,button:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.checks{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.chk{display:flex;align-items:center;gap:10px;min-height:44px;border:1px solid var(--line);border-radius:10px;padding:6px 10px;font-size:14px;cursor:pointer}
+.chk input{width:20px;height:20px;accent-color:var(--accent);flex:none}
+.q{font-size:13px;color:var(--muted);margin:14px 0 0}
+.seg{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.card h2{font-size:18px;margin:0 0 2px}
+.head{font-family:var(--mono);font-size:17px;font-weight:600;margin:6px 0 4px;overflow-wrap:anywhere}
+.head.bad{color:var(--bad)}.head.okc{color:var(--ok)}.head.wn{color:var(--warn)}
+.sub{font-size:14px;color:var(--muted);margin:0}
+.card ul,.card ol{margin:6px 0 0;padding-left:20px}
+.card li{margin-bottom:4px}
+.guard{border-left:3px solid var(--warn);background:var(--warnbg);padding:8px 10px;border-radius:0 10px 10px 0;margin-top:8px;font-size:14.5px}
+.guard.bad{border-left-color:var(--bad);background:var(--badbg)}
+.tier{display:inline-block;font-family:var(--mono);font-size:11px;border:1px solid var(--line);border-radius:999px;padding:2px 8px;color:var(--muted);margin:6px 6px 0 0}
+details{margin-top:10px;border-top:1px solid var(--line);padding-top:8px}
+.whyline{margin:10px 0 0;font-size:14.5px;color:var(--muted)}
+.whyline b{color:var(--ink);font-weight:600}
+summary{cursor:pointer;color:var(--accent);font-weight:600;min-height:44px;line-height:44px}
+details p{margin:0 0 8px;font-size:15px}
+details li{font-size:15px}
+.empty{color:var(--muted)}
+.btn{min-height:44px;border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);border-radius:10px;padding:8px 14px;font:inherit;font-weight:600;cursor:pointer}
+.btn.ghost{background:var(--card);color:var(--accent)}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.note{font-size:14px;color:var(--muted)}
+.nums{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:10px}
+.num{background:var(--fill);border-radius:10px;padding:6px 8px}
+.num span{display:block;font-size:12px;color:var(--muted)}
+.num b{font-family:var(--mono);font-size:14px}
+.num.hot{box-shadow:inset 0 0 0 1.5px var(--warn)}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:6px 6px 6px 0;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:var(--mono);font-size:11.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);font-weight:500}
+.tw{overflow-x:auto}
+.case h2{font-size:17px}
+.ans{margin-top:10px;border-top:1px solid var(--line);padding-top:10px}
+.ans .card{border-color:var(--line);margin:10px 0 0}
+footer{margin-top:28px;font-size:13.5px;color:var(--muted)}
+footer p{margin:0 0 8px}
+@media (min-width:900px){
+  .wrap{max-width:1040px}
+  #p-tool.on{display:grid;grid-template-columns:360px minmax(0,1fr);gap:20px;align-items:start}
+  #inputs{position:sticky;top:16px;max-height:calc(100vh - 32px);overflow-y:auto}
+  .refgrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;align-items:start}
+  #narrow,#equiv{grid-column:1 / -1}
+  #p-learn{max-width:720px;margin:0 auto}
+  .refgrid .card{margin-bottom:0}
+  #inputs .grid{grid-template-columns:1fr 1fr}
+  #inputs .dgrid{grid-template-columns:1fr 1fr}
+  #inputs .checks{grid-template-columns:1fr}
+}
+.panel{display:none}.panel.on{display:block}
+.fig{display:block;width:100%;max-width:460px;height:auto;margin:0 auto}
+.states{display:flex;gap:6px;overflow-x:auto;margin:10px -16px;padding:2px 16px 6px;scrollbar-width:none}
+.states::-webkit-scrollbar{display:none}
+.sbtn{flex:none;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--ink);font:inherit;font-size:14px;cursor:pointer;white-space:nowrap}
+.sbtn[aria-pressed="true"]{border-color:var(--accent);color:var(--accent);font-weight:600}
+.line1{font-size:15px;margin:10px 0 0}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.chip{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--fill);color:var(--ink);font:inherit;font-size:14px;cursor:pointer}
+.chip svg{flex:none;color:var(--accent)}
+.scrim{position:fixed;inset:0;background:var(--scrim);z-index:20}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:21;max-height:90vh;overflow-y:auto;background:var(--card);border:1px solid var(--line);border-bottom:0;border-radius:20px 20px 0 0;padding:8px 16px 24px;max-width:560px;margin:0 auto}
+.sheethead{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.sheethead h2{font-size:18px;margin:0}
+.xbtn{min-height:44px;min-width:44px;border:0;background:transparent;color:var(--accent);font:inherit;font-weight:600;cursor:pointer}
+.pills{position:sticky;top:0;z-index:5;background:var(--bg);display:flex;gap:6px;overflow-x:auto;margin:0 -16px 12px;padding:8px 16px;border-bottom:1px solid var(--line);scrollbar-width:none}
+.pills::-webkit-scrollbar{display:none}
+.pill{flex:none;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--muted);font:inherit;font-size:14px;cursor:pointer;white-space:nowrap}
+.pill[aria-current="true"]{border-color:var(--accent);color:var(--accent);font-weight:600}
+.chap{scroll-margin-top:70px}
+.cause{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:8px 0;border-top:1px solid var(--line);font-size:15px}
+.cause small{color:var(--muted);font-size:13px;text-align:right;flex:0 1 55%}
+.cause.less{opacity:.6}
+.cause.less span{color:var(--muted);text-decoration:line-through}
+.cause.fav span{font-weight:700}
+.cause.fav span:before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--accent);margin-right:8px}
+.ptr{border-top:1px solid var(--line);padding:8px 0}
+.ptr b{display:block}
+.ptr span{font-size:14px;color:var(--muted)}
+.trial{border-left:3px solid var(--accent);padding-left:12px}
+.trial p{margin:0 0 6px;font-size:15px}
+.trial .k{font-family:var(--mono);font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);display:block}
+@media (max-width:420px){.grid{grid-template-columns:1fr 1fr}.checks{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+.dgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin-top:4px}
+.dgrid .sbtn{padding:0 6px;font-size:13.5px;white-space:normal;line-height:1.15;border-radius:12px}
+.sit{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px}
+.sit .sbtn{white-space:normal;line-height:1.2;border-radius:12px;text-align:left;padding:6px 12px}
+.eqr{font-size:13px}.eqr td,.eqr th{padding-right:8px}
+.eqt td:last-child,.eqt th:last-child{text-align:right}
+.eqt tr.src td{font-weight:700}
+.band{display:grid;grid-template-columns:auto 1fr;gap:2px 12px;border-top:1px solid var(--line);padding:8px 0;font-size:15px}
+.band b{font-family:var(--mono);font-size:14px;white-space:nowrap}
+.band span{color:var(--muted);font-size:14px}
+.rx{border-top:1px solid var(--line);padding:8px 0}
+.rx b{display:block;font-size:13px;font-family:var(--mono);letter-spacing:.04em;text-transform:uppercase;color:var(--muted);font-weight:500}
+@media (max-width:420px){.dgrid{grid-template-columns:repeat(2,minmax(0,1fr))}.sit{grid-template-columns:1fr}}
+.field select{width:100%;min-height:44px;border:1px solid var(--line);border-radius:10px;padding:0 8px;font:inherit;font-size:15px;background:var(--card);color:var(--ink)}
+.field select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.orow{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr) auto;gap:8px;align-items:end;margin-bottom:10px}
+.orow .xbtn{color:var(--muted)}
+.unit{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.big{font-family:var(--mono);font-size:22px;font-weight:600;margin:4px 0 2px;overflow-wrap:anywhere}
+.step{display:grid;grid-template-columns:auto 1fr;gap:2px 10px;border-top:1px solid var(--line);padding:6px 0;font-size:14.5px}
+.step b{font-family:var(--mono);font-size:13px;color:var(--muted);font-weight:500}
+@media (max-width:420px){.orow{grid-template-columns:1fr 1fr}.orow .field:first-child{grid-column:1 / -1}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="/">← bedside.tools</a>
+<h1>Opioid conversion</h1>
+<p class="purpose">Switch opioid or route with the cross-tolerance cut built in: new daily dose, schedule, breakthrough dose, patch and methadone rules, MME and naloxone.</p>
+
+<div class="tabs" role="tablist">
+  <button class="tab" role="tab" id="t-tool" aria-selected="true" aria-controls="p-tool">Convert</button>
+  <button class="tab" role="tab" id="t-learn" aria-selected="false" aria-controls="p-learn">Learn</button>
+  <button class="tab" role="tab" id="t-ref" aria-selected="false" aria-controls="p-ref">Reference</button>
+  <button class="tab" role="tab" id="t-prac" aria-selected="false" aria-controls="p-prac">Practice</button>
+</div>
+
+<div class="panel on" id="p-tool" role="tabpanel" aria-labelledby="t-tool">
+  <div id="inputs">
+  <div class="card" id="current">
+    <p class="label">Taking now · total over 24 hours</p>
+    <div id="rows"></div>
+    <button class="btn ghost" id="addrow" type="button">Add another opioid</button>
+    <p class="note" style="margin:8px 0 0">Add the as-needed doses actually taken in the last 24 hours to the scheduled ones. Patch and IV fentanyl in mcg per hour.</p>
+  </div>
+  <div class="card" id="target">
+    <p class="label">Switch to</p>
+    <div class="field"><label for="tgt">New opioid and route</label><select id="tgt"></select></div>
+  </div>
+  <div class="card" id="patient">
+    <p class="label">Patient</p>
+    <div class="checks" id="ticks"></div>
+  </div>
+  </div>
+  <div id="out"><div class="card empty">Enter what the patient takes now and pick the new opioid to see the starting dose, schedule and breakthrough dose.</div></div>
+</div>
+
+<div class="panel" id="p-learn" role="tabpanel" aria-labelledby="t-learn">
+  <div class="pills" id="pills"></div>
+  <div class="card chap" id="learn-currency" data-pill="One currency"><p class="label">1 · One currency</p><h2>Everything goes through oral morphine</h2><p class="sub">Each bar is the same pain relief. Switch to see the CDC risk factors, which are a different set of numbers.</p><div data-figure="currency"></div></div>
+  <div class="card chap" id="learn-tol" data-pill="Cross-tolerance"><p class="label">2 · Why start lower</p><h2>Tolerance only partly carries over</h2><p class="sub">The calculated dose is where you would land if tolerance carried over fully. Pick a kind of switch.</p><div data-figure="tol"></div></div>
+  <div class="card chap" id="learn-mtd" data-pill="Methadone"><p class="label">3 · Methadone</p><h2>The higher the dose, the stronger methadone is</h2><p class="sub">The ratio is not fixed, and methadone builds up for days.</p><div data-figure="mtd"></div></div>
+  <div class="card chap" id="learn-patch" data-pill="Patch"><p class="label">4 · Fentanyl patch</p><h2>A depot in the skin</h2><p class="sub">Slow on, slow off. Pick putting it on or taking it off.</p><div data-figure="patch"></div></div>
+  <div class="card chap" id="learn-proof" data-pill="Evidence"><p class="label">5 · How good are the numbers?</p><h2>A rough guide, not a law</h2>
+    <p class="line1">Equianalgesic ratios come mostly from small single-dose and observational studies, and people vary a lot. No trial has tested one conversion strategy against another, so there are no trial cards here.</p>
+    <p class="line1">That is why the tool always cuts the calculated dose, adds a breakthrough dose, and asks you to reassess within a day.</p>
+    <div class="row"><button class="btn" id="go-prac">Try the practice cases</button></div></div>
+</div>
+
+<div class="panel" id="p-ref" role="tabpanel" aria-labelledby="t-ref">
+ <div class="refgrid">
+  <div class="card" id="equi">
+    <p class="label">Equal doses and MME factors</p>
+    <h2>Equianalgesic table</h2>
+    <div class="tw"><table class="eqt">
+      <thead><tr><th>Drug</th><th>Equal to oral morphine 25 mg</th><th>CDC MME factor</th></tr></thead>
+      <tbody id="eqbody"></tbody>
+    </table></div>
+    <p class="whyline"><b>Why:</b> The equal doses are for switching; the MME factors are for judging overdose risk and are not for switching.</p>
+    <details><summary>More</summary>
+      <p>Equal doses from Fast Fact #36 (4th edition, 2024): morphine 10 mg IV = 25 mg oral = hydromorphone 2 mg IV = 5 mg oral; hydrocodone 25 mg oral = oxycodone 20 mg oral. The oral-to-IV and IV-to-oral ratios may not be the same; this is a rough guide.</p>
+      <p>MME factors from CDC 2022 (oral and transdermal only; fentanyl per mcg/h). The CDC table says not to use MME to work out the dose when converting one opioid to another. Oxycodone is 1.5 in the CDC table and 1.25 in the conversion table: the CDC number errs high for risk counting, the conversion number errs low for safety when switching.</p>
+      <p>Not converted by ratio here: oxymorphone, codeine, tramadol, tapentadol, methadone (away from it), the fentanyl patch (away from it) and IV fentanyl (except to and from the patch). Buprenorphine is outside this tool.</p>
+      <span class="tier">FF36 (expert practice)</span><span class="tier">CDC 2022 MME table</span>
+    </details>
+  </div>
+  <div class="card" id="patchref">
+    <p class="label">Fentanyl patch</p>
+    <h2>Starting a patch</h2>
+    <div class="tw"><table class="eqt">
+      <thead><tr><th>Oral morphine mg/day</th><th>Patch mcg/h</th></tr></thead>
+      <tbody id="patchbody"></tbody>
+    </table></div>
+    <p class="whyline"><b>Why:</b> The label's table deliberately underestimates, because the patch is slow to reach levels and slow to leave.</p>
+    <details><summary>More</summary>
+      <p>Only for opioid-tolerant patients (see below). Work out the oral morphine equivalent, then use this table (label Table 2). The label's Table 1 for named drugs runs higher than converting through the Fast Fact #36 table; the tool uses the lower result, as the label prefers to underestimate.</p>
+      <p>Stop all other around-the-clock opioids when the patch goes on. Levels are therapeutic only after 18–36 hours, so keep a breakthrough opioid. Do not increase before 3 days; judge further increases after two 3-day patches.</p>
+      <p>From an IV fentanyl infusion: 1:1 (mcg/h to mcg/h); keep the infusion going 6 hours after the patch goes on, halve it for 6 hours, then stop (one study of 15 inpatients).</p>
+      <p>Mild to moderate liver or kidney impairment: start at half the dose; severe: avoid. Heat (heating pads, hot baths, saunas) and fever raise absorption; at 40 °C levels could rise by about a third.</p>
+      <p>Never use these tables backwards. After removal, levels fall by about half in 20–27 hours and the skin keeps releasing drug for at least 24 hours.</p>
+      <span class="tier">Duragesic label 2022</span><span class="tier">FF2 2025</span><span class="tier">Kornick 2001, 2003 (small series)</span>
+    </details>
+  </div>
+  <div class="card" id="methref">
+    <p class="label">Methadone</p>
+    <h2>Switching to methadone</h2>
+    <div class="tw"><table class="eqt">
+      <thead><tr><th>Oral morphine mg/day</th><th>Methadone a day, % of that</th></tr></thead>
+      <tbody id="mtdbody"></tbody>
+    </table></div>
+    <p class="whyline"><b>Why:</b> Methadone gets relatively stronger as the prior dose rises, and it accumulates for days, so the ratio widens and the start is capped.</p>
+    <details><summary>More</summary>
+      <p>Label: this is not a table of equal doses, and it cannot be used to convert from methadone to another opioid. Deaths have occurred in opioid-tolerant patients during conversion. Stop other around-the-clock opioids; divide the daily dose (for example every 8 hours) and round down. Underestimating is safer.</p>
+      <p>APS/CPDD guideline: when switching, start at 75–90% less than the calculated equal dose and no higher than 30–40 mg a day; raise by no more than 10 mg a day every 5–7 days. The label allows changes every 3–5 days; the guideline is the stricter.</p>
+      <p>ECG before starting if there are QTc risk factors (strong), consider in everyone (weak); repeat 2–4 weeks after starting, at 30–40 mg a day and at 100 mg a day. QTc over 500 ms: do not start; 450–500 ms: consider another opioid and correct causes. Torsades is more common above 200 mg a day.</p>
+      <p>Peak respiratory depression comes later and lasts longer than pain relief; half-life 8–59 hours. Many drugs change methadone levels (CYP3A4, 2B6, 2C19, 2C9, 2D6): check every new drug with a pharmacist. Other tables differ (Fast Fact #75 uses 3:1 under 100 mg morphine up to 20:1 over 1000, and then cuts a further 25–50%).</p>
+      <span class="tier">Methadone label (Table 1)</span><span class="tier">APS 2014: start low (strong, moderate); ECG and QTc (strong/weak, low)</span>
+    </details>
+  </div>
+  <div class="card" id="tolerant">
+    <p class="label">Opioid-tolerant</p>
+    <h2>Who counts as opioid-tolerant</h2>
+    <p class="sub">For a week or longer, at least:</p>
+    <ul>
+      <li>oral morphine 60 mg a day</li><li>fentanyl patch 25 mcg/h</li><li>oral oxycodone 30 mg a day</li><li>oral hydromorphone 8 mg a day</li><li>oral oxymorphone 25 mg a day</li><li>oral hydrocodone 60 mg a day</li><li>or an equal dose of another opioid</li>
+    </ul>
+    <p class="whyline"><b>Why:</b> The patch and long-acting high-strength products assume tolerance; in anyone else the first dose can stop breathing.</p>
+    <details><summary>More</summary>
+      <p>The tool adds up each opioid as a share of its threshold. IV doses count through the equal-dose table (IV morphine 24 mg, IV hydromorphone 4.8 mg a day each make one full share), which is stricter than the label's own patch table. Tramadol and tapentadol are not counted.</p>
+      <span class="tier">Duragesic label</span>
+    </details>
+  </div>
+  <div class="card" id="mmeref">
+    <p class="label">Risk · CDC 2022</p>
+    <h2>MME and naloxone</h2>
+    <ul>
+      <li>Offer naloxone when prescribing opioids, particularly with: a history of overdose, a substance use disorder, sleep-disordered breathing, 50 MME a day or more, a benzodiazepine, or a return to a dose they have lost tolerance to (after a taper or release from prison).</li>
+      <li>Before raising the total to 50 MME a day or more, pause and reassess benefit and risk. No dose is free of risk.</li>
+      <li>Use particular caution with opioids and benzodiazepines together.</li>
+    </ul>
+    <p class="whyline"><b>Why:</b> Overdose risk rises with dose and with anything else that slows breathing.</p>
+    <details><summary>More</summary>
+      <p>The CDC guideline is for outpatients, including prescriptions at hospital discharge. It does not cover cancer pain, sickle cell disease, palliative or end-of-life care, or inpatient care. Naloxone can also be offered when a household member is at risk.</p>
+      <p>Tapering: about 10% a month or slower after a year or more of use; never stop abruptly.</p>
+      <span class="tier">Rec 8 naloxone: category A, evidence type 4</span><span class="tier">Rec 4: A, 3</span><span class="tier">Rec 11: B, 3</span>
+    </details>
+  </div>
+  <div class="card" id="renal">
+    <p class="label">Kidneys</p>
+    <h2>Opioids when eGFR is under 30</h2>
+    <div class="band"><b>Avoid</b><span>Codeine; meperidine (seizures from normeperidine)</span></div>
+    <div class="band"><b>Caution</b><span>Morphine (metabolites build up; minimize long-acting forms), hydromorphone (may be preferable, no clear consensus), oxycodone (accumulates: adjust dose or interval)</span></div>
+    <div class="band"><b>Relatively safe</b><span>Fentanyl (no active metabolites), methadone</span></div>
+    <p class="whyline"><b>Why:</b> Morphine and codeine are cleared as active metabolites by the kidney, so they build up and cause sedation and myoclonus.</p>
+    <details><summary>More</summary>
+      <p>Fast Fact #161 cites dose cuts of 25% for creatinine clearance 10–50 and 50% under 10 for morphine, oxycodone and hydromorphone. The patch label is stricter than the Fast Fact: half dose in mild to moderate kidney impairment, avoid in severe.</p>
+      <p>When eGFR is under 30 the tool uses the 50% cut for a change of drug (expert practice).</p>
+      <span class="tier">FF161 2024 (expert practice)</span>
+    </details>
+  </div>
+  <div class="card" id="narrow">
+    <p class="label">After a switch · tap each finding you have</p>
+    <h2>Too sleepy, or in more pain?</h2>
+    <div class="states" id="nw-results" role="group" aria-label="Findings"></div>
+    <div id="nw-causes"></div>
+    <p class="line1" id="nw-next"></p>
+    <p class="whyline"><b>Why:</b> After a switch, the timing, the kidneys, heat on a patch and other sedatives separate too much opioid from too little.</p>
+    <details><summary>More</summary>
+      <p><b>Check first:</b> breathing rate, oxygen saturation, pupils, sedation level, and every dose given in the last 24 hours including as-needed doses. <b>Then:</b> eGFR, temperature and anything warming a patch, and the drug chart for benzodiazepines and new interacting drugs.</p>
+      <p>Faded means less likely, never excluded. Treat slow breathing first: naloxone and support breathing.</p>
+      <span class="tier">Methadone label; patch label; FF161; CDC Rec 11; fading rules: expert practice</span>
+    </details>
+  </div>
+ </div>
+</div>
+
+<div class="panel" id="p-prac" role="tabpanel" aria-labelledby="t-prac">
+  <div id="practice"></div>
+</div>
+
+<div class="scrim" id="scrim" hidden></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-t" hidden>
+  <div class="sheethead"><h2 id="sheet-t"></h2><button class="xbtn" id="sheet-x">Close</button></div>
+  <div id="sheet-b"></div>
+</div>
+
+<footer>
+  <p><strong>For education only. Not a substitute for clinical judgment.</strong> Adults only. Conversion ratios are rough guides: start lower than calculated, give a breakthrough dose, and reassess within 24 hours. Methadone, patch and high-dose conversions deserve a pharmacist or palliative care. Adjust to your institution's formulary and order sets.</p>
+  <p>Privacy: everything runs in your browser. Nothing you enter is sent anywhere or stored, and there are no analytics. Do not enter names, record numbers, or dates of birth.</p>
+  <p class="mono">Last reviewed: 2026-11-19</p>
+  <p><strong>Sources:</strong> Fast Fact #36 Calculating opioid dose conversions, 4th ed. 2024; #20 Opioid dose escalation, 2020; #2 Converting to transdermal fentanyl, 4th ed. 2025; #75 Methadone for the treatment of pain, 4th ed. 2025; #161 Opioid use in renal failure, 5th ed. 2024 (Palliative Care Network of Wisconsin; expert practice) · Dowell D et al. CDC clinical practice guideline for prescribing opioids for pain, United States, 2022. MMWR Recomm Rep 2022;71(3):1 (GRADE; categories A/B, evidence types 3–4) · Duragesic (fentanyl transdermal system) prescribing information, 2022 · Methadone hydrochloride tablets prescribing information (Dolophine 2021; generic 2025) · Chou R et al. Methadone safety: APS/CPDD guideline with the Heart Rhythm Society. J Pain 2014;15:321 (strong/weak; low to moderate quality) · Kornick CA et al. Cancer 2001;92:3056 and Cancer 2003;97:3121 (case series, IV fentanyl and patch 1:1).</p>
+</footer>
+</div>
+<script id="engine">
+/* Opioid conversion engine. Ratios: Fast Fact #36 (2024). MME: CDC 2022. Patch: Duragesic label. Methadone: label Table 1 + APS 2014. */
+var DR = {
+  mpo:  {n: 'Morphine, oral', s: 'oral morphine', drug: 'morphine', iv: false, ome: 1, mme: 1, tol: 60, step: 2.5, u: 'mg'},
+  miv:  {n: 'Morphine, IV', s: 'IV morphine', drug: 'morphine', iv: true, ome: 2.5, step: 0.5, hstep: 0.5, u: 'mg'},
+  hpo:  {n: 'Hydromorphone, oral', s: 'oral hydromorphone', drug: 'hm', iv: false, ome: 5, mme: 5, tol: 8, step: 0.5, u: 'mg'},
+  hiv:  {n: 'Hydromorphone, IV', s: 'IV hydromorphone', drug: 'hm', iv: true, ome: 12.5, step: 0.1, hstep: 0.1, u: 'mg'},
+  opo:  {n: 'Oxycodone, oral', s: 'oral oxycodone', drug: 'oxy', iv: false, ome: 1.25, mme: 1.5, tol: 30, step: 2.5, u: 'mg'},
+  hcpo: {n: 'Hydrocodone, oral', s: 'oral hydrocodone', drug: 'hc', iv: false, ome: 1, mme: 1, tol: 60, step: 2.5, u: 'mg'},
+  ompo: {n: 'Oxymorphone, oral', s: 'oral oxymorphone', drug: 'om', iv: false, mme: 3, tol: 25, u: 'mg', nr: true},
+  cod:  {n: 'Codeine, oral', s: 'codeine', drug: 'cod', iv: false, mme: 0.15, tol: 150, u: 'mg', nr: true},
+  tram: {n: 'Tramadol, oral', s: 'tramadol', drug: 'tram', iv: false, mme: 0.2, u: 'mg', nr: true},
+  tap:  {n: 'Tapentadol, oral', s: 'tapentadol', drug: 'tap', iv: false, mme: 0.4, u: 'mg', nr: true},
+  mtd:  {n: 'Methadone, oral', s: 'methadone', drug: 'mtd', iv: false, mme: 4.7, tol: 20, u: 'mg'},
+  ftd:  {n: 'Fentanyl patch', s: 'fentanyl patch', drug: 'fent', iv: false, mme: 2.4, tol: 25, u: 'mcg/h', patch: true},
+  fiv:  {n: 'Fentanyl, IV infusion', s: 'IV fentanyl', drug: 'fent', iv: true, tol: 25, u: 'mcg/h'}
+};
+var FROM = ['mpo','miv','hpo','hiv','opo','hcpo','ompo','cod','tram','tap','mtd','ftd','fiv'];
+var TO = ['mpo','miv','hpo','hiv','opo','hcpo','ftd','mtd','fiv'];
+/* Duragesic Table 2: oral morphine mg/day upper bound -> mcg/h */
+var PATCH = [[60,134,25],[135,224,50],[225,314,75],[315,404,100],[405,494,125],[495,584,150],[585,674,175],[675,764,200],[765,854,225],[855,944,250],[945,1034,275],[1035,1124,300]];
+/* Methadone label Table 1: OME band -> % (lower % at a shared boundary) */
+var MTD = [[0,100,0.20,0.30,'under 100'],[100,300,0.10,0.20,'100 to 300'],[300,600,0.08,0.12,'300 to 600'],[600,1000,0.05,0.10,'600 to 1,000']];
+var FF75 = [[100,3],[300,5],[600,10],[800,12],[1000,15],[Infinity,20]];
+
+function down(x, st){ return Math.floor(x / st + 1e-9) * st; }
+function near(x, st){ return Math.round(x / st) * st; }
+function fmt(x){ if (x == null || !isFinite(x)) return '–'; var r = Math.round(x * 100) / 100; return String(r); }
+function r1(x){ return x >= 100 ? Math.round(x) : x >= 10 ? Math.round(x * 2) / 2 : Math.round(x * 100) / 100; }
+
+function patchFor(ome){ if (ome < 60) return 0; for (var k = 0; k < PATCH.length; k++){ var next = k + 1 < PATCH.length ? PATCH[k + 1][0] : 1125; if (ome < next) return PATCH[k][2]; } return null; }
+function mtdBand(ome){ for (var k = 0; k < MTD.length; k++) if (ome < MTD[k][1]) return MTD[k]; return null; }
+function ff75(ome){ for (var k = 0; k < FF75.length; k++) if (ome <= FF75[k][0]) return FF75[k][1]; }
+
+/* i = {rows:[{d,v}], to, wk, unc, old, se, renal, liver, benzo, osa, od, qt} */
+function compute(i){
+  var R = {rows: [], warn: [], flags: []};
+  var rows = (i.rows || []).filter(function(r){ return DR[r.d] && r.v > 0; });
+  R.rows = rows; if (!rows.length || !i.to) return R;
+  var T = DR[i.to]; R.T = T;
+  var ome = 0, omeOK = true, mme = 0, mmeIV = false, tolIdx = 0, tolCount = true;
+  rows.forEach(function(r){
+    var D = DR[r.d];
+    if (D.ome) ome += r.v * D.ome; else omeOK = false;
+    if (D.mme != null && !D.iv) mme += r.v * D.mme; else mmeIV = true;
+    if (D.tol) tolIdx += r.v / D.tol; else if (D.ome) tolIdx += r.v * D.ome / 60; else tolCount = false;
+  });
+  R.ome = omeOK ? ome : null; R.mme = mme; R.mmeIV = mmeIV; R.tolIdx = tolIdx; R.tolCount = tolCount;
+  R.tolerant = tolIdx >= 1 && !!i.wk;
+  var flags = [];
+  if (i.old) flags.push('older or frail'); if (i.se) flags.push('prior opioid side effects'); if (i.renal) flags.push('eGFR under 30');
+  if (i.liver) flags.push('liver impairment'); if (i.benzo) flags.push('benzodiazepine'); if (i.osa) flags.push('sleep apnea');
+  R.flags = flags;
+  var kinds = {}; rows.forEach(function(r){ kinds[r.d] = 1; });
+  var only = rows.length === 1 ? rows[0].d : null;
+  var has = function(k){ return !!kinds[k]; };
+  var nr = rows.some(function(r){ return DR[r.d].nr; });
+
+  if (only && only === i.to){ R.mode = 'same'; return R; }
+  if (i.to === 'fiv'){
+    if (only === 'ftd'){ R.mode = 'patch2iv'; R.rate = rows[0].v; return R; }
+    R.mode = 'none'; R.why = 'toFiv'; return R;
+  }
+  if (has('ftd')){ R.mode = 'none'; R.why = 'fromPatch'; return R; }
+  if (has('mtd')){ R.mode = 'none'; R.why = 'fromMtd'; return R; }
+  if (has('fiv')){
+    if (only === 'fiv' && i.to === 'ftd'){ R.mode = 'iv2patch'; R.rate = rows[0].v; var best = 0; [12.5, 25, 37.5, 50, 62.5, 75, 87.5, 100].forEach(function(x){ if (x <= R.rate) best = x; }); if (R.rate > 100) best = down(R.rate, 12.5); R.patchRate = best; return R; }
+    R.mode = 'none'; R.why = 'fromFiv'; return R;
+  }
+  if (nr){ R.mode = 'none'; R.why = 'noRatio'; return R; }
+
+  /* everything left converts through oral morphine */
+  if (i.to === 'ftd'){
+    R.mode = 'patch';
+    if (!R.tolerant){ R.block = 'tol'; return R; }
+    if (ome > 1124){ R.block = 'high'; return R; }
+    var p = patchFor(ome); R.patchFull = p;
+    R.patchRate = (i.liver || i.renal) ? p / 2 : p;
+    R.bt = btFromPrior(ome);
+    return R;
+  }
+  if (i.to === 'mtd'){
+    R.mode = 'mtd';
+    if (ome > 1000){ R.block = 'high'; return R; }
+    if (i.qt){ R.block = 'qt'; }
+    var b = mtdBand(ome); R.band = b;
+    R.lo = ome * b[2]; R.hi = ome * b[3];
+    R.start = Math.min(R.lo, 30);
+    var per = down(R.start / 3, 2.5);
+    if (per >= 2.5){ R.per = per; R.freq = 'every 8 hours'; R.daily = per * 3; }
+    else { R.per = 2.5; R.freq = 'every 12 hours'; R.daily = 5; R.naive = true; }
+    R.ff75 = ome / ff75(ome);
+    R.bt = btFromPrior(ome);
+    R.newMme = R.daily * DR.mtd.mme;
+    return R;
+  }
+  /* ordinary ratio conversion */
+  R.mode = 'ratio';
+  R.calc = ome / T.ome;
+  var sameDrug = rows.every(function(r){ return DR[r.d].drug === T.drug; });
+  R.route = sameDrug;
+  var blockHigh = flags.length > 0;
+  if (sameDrug){ R.pct = 0.75; }
+  else { R.pct = (i.unc && !blockHigh) ? 0.75 : 0.5; }
+  R.daily = R.calc * R.pct;
+  R.per = down(R.daily / 6, T.step);
+  if (R.per < T.step){ R.per = T.step; R.tiny = true; }
+  if (T.iv) R.hr = down(R.daily / 24, T.hstep);
+  R.btLo = R.daily * 0.10; R.btHi = R.daily * 0.15;
+  var bl = Math.ceil(R.btLo / T.step - 1e-9) * T.step, bh = down(R.btHi, T.step);
+  if (bl > bh) { bl = bh = Math.max(T.step, near((R.btLo + R.btHi) / 2, T.step)); }
+  R.bt = {lo: bl, hi: bh, drug: T.s, every: T.iv ? 'every 1 hour' : 'every 2 hours'};
+  if (!T.iv) R.newMme = R.per * 6 * T.mme;
+  return R;
+}
+/* Breakthrough on a patch or methadone start: 10-15% of the prior oral morphine after a 50% cut, as oral morphine (expert practice applying FF20) */
+function btFromPrior(ome){
+  var base = ome * 0.5, lo = Math.ceil(base * 0.10 / 2.5 - 1e-9) * 2.5, hi = down(base * 0.15, 2.5);
+  if (lo > hi) lo = hi = Math.max(2.5, near(base * 0.125, 2.5));
+  return {lo: lo, hi: hi, drug: 'oral morphine (or an equal immediate-release dose)', every: 'every 2 hours'};
+}
+/* Opioid-naive oral start for the target: one dose of 5-10 MME (CDC 2022) */
+function naiveStart(T){
+  if (T.iv || !T.mme || T.patch || T.drug === 'mtd') return null;
+  var lo = Math.max(T.step, Math.ceil(5 / T.mme / T.step - 1e-9) * T.step), hi = down(10 / T.mme, T.step);
+  if (hi < lo) hi = lo;
+  return {lo: lo, hi: hi};
+}
+
+/* narrowing: after a switch */
+var RESULTS = [
+  ['rr', 'Slow breathing, pinpoint pupils', ''],
+  ['mtd', 'Started methadone in the last days', ''],
+  ['kid', 'eGFR under 30 on morphine, codeine or hydromorphone', ''],
+  ['heat', 'Fever or heat on a patch', ''],
+  ['bzd', 'Taking a benzodiazepine', ''],
+  ['wd', 'Yawning, sweating, runny nose, diarrhea, pain up', '']
+];
+var CAUSES = [
+  ['excess', 'Too much opioid from the new dose'],
+  ['mtdacc', 'Methadone building up'],
+  ['metab', 'Metabolites building up'],
+  ['heat', 'Patch absorbing more'],
+  ['sed', 'Another sedative adding on'],
+  ['wd', 'Withdrawal or too little opioid']
+];
+function narrow(sel){
+  var st = {}, why = {};
+  CAUSES.forEach(function(c){ st[c[0]] = 'in'; why[c[0]] = ''; });
+  function set(k, s, w){ if (st[k] === 'fav' && s === 'less') return; if (st[k] === 'less' && s === 'fav'){ st[k] = 'in'; why[k] = w; return; } st[k] = s; why[k] = w; }
+  if (sel.rr){ set('excess', 'fav', 'classic opioid toxicity'); set('wd', 'less', 'withdrawal does not slow breathing'); }
+  if (sel.mtd){ set('mtdacc', 'fav', 'peak respiratory depression lags pain relief; half-life up to 59 h'); }
+  else set('mtdacc', 'less', 'no recent methadone start');
+  if (sel.kid){ set('metab', 'fav', 'active metabolites cleared by the kidney'); } else set('metab', 'less', 'kidney function not low');
+  if (sel.heat){ set('heat', 'fav', 'heat and fever raise fentanyl absorption'); } else set('heat', 'less', 'no patch heat or fever');
+  if (sel.bzd){ set('sed', 'fav', 'opioid plus benzodiazepine adds to sedation and overdose risk'); }
+  if (sel.wd){ set('wd', 'fav', 'cut was too deep, or the old drug wore off before the new one worked'); set('excess', 'less', 'withdrawal signs argue against too much'); }
+  return CAUSES.map(function(c){ return {k: c[0], name: c[1], st: st[c[0]], why: why[c[0]]}; });
+}
+function narrowNext(sel){
+  if (sel.rr) return 'Support breathing and give naloxone in small doses; stop the scheduled opioid and recheck the total dose.';
+  if (sel.wd) return 'Give the breakthrough dose, check when the last old dose or patch was, and consider a smaller cross-tolerance cut next time.';
+  if (sel.mtd) return 'Hold or reduce methadone and monitor for at least the next few days; do not titrate faster than every 5–7 days.';
+  if (sel.kid) return 'Switch to fentanyl or a reduced, less frequent dose; avoid codeine.';
+  if (sel.heat) return 'Remove heat sources and treat fever; consider a lower patch strength.';
+  if (sel.bzd) return 'Review the benzodiazepine; offer naloxone.';
+  return 'Tap the findings you have.';
+}
+</script>
+<script>
+(function(){
+var $ = function(id){ return document.getElementById(id); };
+function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+var TICKS = [['wk', 'On this dose for a week or longer'], ['unc', 'Pain not controlled now'], ['old', 'Age 65 or older, or frail'], ['se', 'Sedation or other side effects on the current opioid'], ['renal', 'eGFR under 30'], ['liver', 'Liver impairment'], ['benzo', 'Taking a benzodiazepine'], ['osa', 'Sleep apnea or other sleep-disordered breathing'], ['od', 'Past overdose or substance use disorder'], ['qt', 'QTc 450 ms or more, or on QT-prolonging drugs']];
+var ticked = {}, rows = [{d: 'mpo', v: ''}];
+$('ticks').innerHTML = TICKS.map(function(t){ return '<label class="chk"><input type="checkbox" data-k="' + t[0] + '">' + esc(t[1]) + '</label>'; }).join('');
+$('ticks').addEventListener('change', function(e){ var k = e.target.getAttribute('data-k'); if (k){ ticked[k] = e.target.checked; render(); } });
+$('tgt').innerHTML = '<option value="">Pick one</option>' + TO.map(function(k){ return '<option value="' + k + '">' + esc(DR[k].n) + '</option>'; }).join('');
+$('tgt').addEventListener('change', render);
+function drawRows(){
+  $('rows').innerHTML = rows.map(function(r, n){
+    return '<div class="orow"><div class="field"><label for="d' + n + '">Opioid ' + (n + 1) + '</label><select id="d' + n + '" data-n="' + n + '">' + FROM.map(function(k){ return '<option value="' + k + '"' + (k === r.d ? ' selected' : '') + '>' + esc(DR[k].n) + '</option>'; }).join('') + '</select></div>' +
+      '<div class="field"><label for="v' + n + '">' + (DR[r.d].u === 'mcg/h' ? 'mcg per hour' : 'mg per 24 h') + '</label><input id="v' + n + '" data-n="' + n + '" inputmode="decimal" autocomplete="off" value="' + esc(r.v) + '"></div>' +
+      (rows.length > 1 ? '<button class="xbtn" type="button" data-rm="' + n + '" aria-label="Remove opioid ' + (n + 1) + '">Remove</button>' : '<span></span>') + '</div>';
+  }).join('');
+  $('addrow').hidden = rows.length >= 3;
+}
+$('rows').addEventListener('change', function(e){ var n = e.target.getAttribute('data-n'); if (n != null && e.target.tagName === 'SELECT'){ rows[n].d = e.target.value; var keep = rows[n].v; drawRows(); render(); } });
+$('rows').addEventListener('input', function(e){ var n = e.target.getAttribute('data-n'); if (n != null && e.target.tagName === 'INPUT'){ rows[n].v = e.target.value; render(); } });
+$('rows').addEventListener('click', function(e){ var n = e.target.getAttribute('data-rm'); if (n != null){ rows.splice(+n, 1); drawRows(); render(); } });
+$('addrow').addEventListener('click', function(){ if (rows.length < 3){ rows.push({d: 'opo', v: ''}); drawRows(); render(); var x = $('v' + (rows.length - 1)); if (x) x.focus(); } });
+function read(){
+  var i = {rows: rows.map(function(r){ var v = parseFloat(r.v); return {d: r.d, v: isFinite(v) && v > 0 ? v : 0}; }), to: $('tgt').value};
+  Object.keys(ticked).forEach(function(k){ if (ticked[k]) i[k] = true; });
+  return i;
+}
+
+/* ---------- figures ---------- */
+var FS = 'font-family:var(--sans)', FM = 'font-family:var(--mono)';
+function svgOpen(vb, label){ return '<svg viewBox="' + vb + '" role="img" aria-label="' + esc(label) + '" class="fig">'; }
+function txt(x, y, t, st, anchor){ return '<text x="' + x + '" y="' + y + '" text-anchor="' + (anchor || 'middle') + '" style="' + (st || FM + ';font-size:10.5px;fill:var(--muted)') + '">' + esc(t) + '</text>'; }
+function rect(x, y, w, h, fill, stroke, extra){ return '<rect x="' + x + '" y="' + y + '" width="' + Math.max(0, w) + '" height="' + h + '" rx="4" fill="' + fill + '"' + (stroke ? ' stroke="' + stroke + '"' : '') + (extra || '') + '/>'; }
+
+var CUR = {
+  eq: {n: 'Equal doses', line: 'Morphine 25 mg oral = 10 mg IV = hydromorphone 5 mg oral = 2 mg IV = oxycodone 20 mg = hydrocodone 25 mg. Convert everything to oral morphine first, then to the new drug.'},
+  mme: {n: 'CDC risk factors', line: 'MME per mg (CDC 2022): useful for overdose risk, not for switching. Oxycodone counts 1.5 here but converts at 1.25; methadone counts 4.7 at any dose.'}
+};
+function curSVG(k){
+  var h = svgOpen('0 0 340 230', 'Equal doses of opioids'), y = 14;
+  if (k === 'eq'){
+    var L = [['Morphine oral', '25 mg'], ['Morphine IV', '10 mg'], ['Hydromorphone oral', '5 mg'], ['Hydromorphone IV', '2 mg'], ['Oxycodone oral', '20 mg'], ['Hydrocodone oral', '25 mg']];
+    L.forEach(function(r, n){ var yy = y + n * 34; h += txt(4, yy + 15, r[0], FS + ';font-size:12px;fill:var(--ink)', 'start') + rect(150, yy + 2, 140, 20, 'var(--fill)', 'var(--line)') + txt(220, yy + 16, r[1], FM + ';font-size:12px;font-weight:600;fill:var(--ink)'); });
+    h += txt(220, 222, 'each bar = the same pain relief', FM + ';font-size:10px;fill:var(--muted)');
+  } else {
+    var M = [['Codeine', 0.15], ['Tramadol', 0.2], ['Tapentadol', 0.4], ['Morphine', 1], ['Hydrocodone', 1], ['Oxycodone', 1.5], ['Oxymorphone', 3], ['Methadone', 4.7], ['Hydromorphone', 5]];
+    M.forEach(function(r, n){ var yy = y + n * 22; h += txt(4, yy + 12, r[0], FS + ';font-size:11.5px;fill:var(--ink)', 'start') + rect(110, yy + 2, r[1] / 5 * 180, 13, 'var(--accent)') + txt(116 + r[1] / 5 * 180, yy + 12, String(r[1]), FM + ';font-size:10.5px;fill:var(--ink)', 'start'); });
+    h += txt(170, 222, 'MME per mg a day · fentanyl patch 2.4 per mcg/h', FM + ';font-size:10px;fill:var(--muted)');
+  }
+  return h + '</svg>';
+}
+var TOL = {
+  route: {n: 'Same drug, new route', pct: [75, 75], line: 'Same molecule, so tolerance carries over; only absorption changes. Fast Fact #36 starts at about 75% of the calculated dose.'},
+  drug: {n: 'New drug', pct: [50, 75], line: 'Different molecules act a little differently at the receptor, so tolerance to one only partly covers the other. Start at 50–75% of the calculated dose (the tool uses 50% unless pain is uncontrolled and no risk is ticked).'},
+  patch: {n: 'To a patch', pct: [0, 0], line: 'The patch table already lands low on purpose, so no extra cut: but levels take 18–36 hours, so keep a breakthrough dose.'},
+  mtd: {n: 'To methadone', pct: [10, 25], line: 'Start 75–90% below the calculated equal dose and no higher than 30–40 mg a day; it accumulates for days.'}
+};
+function tolSVG(k){
+  var S = TOL[k], h = svgOpen('0 0 340 180', 'Cross-tolerance: ' + S.n), W = 240, x0 = 90;
+  h += txt(4, 40, 'Calculated', FS + ';font-size:12px;fill:var(--ink)', 'start') + rect(x0, 26, W, 22, 'var(--fill)', 'var(--line)') + txt(x0 + W - 6, 41, '100%', FM + ';font-size:11px;fill:var(--muted)', 'end');
+  h += txt(4, 92, 'Start', FS + ';font-size:12px;font-weight:600;fill:var(--ink)', 'start');
+  if (k === 'patch'){
+    h += rect(x0, 78, W, 22, 'none', 'var(--accent)', ' stroke-dasharray="4 3"') + txt(x0 + W / 2, 93, 'label table: already conservative', FM + ';font-size:10.5px;fill:var(--accent)');
+  } else {
+    var a = S.pct[0] / 100 * W, b = S.pct[1] / 100 * W;
+    h += rect(x0, 78, a, 22, 'var(--accent)') + (b > a ? rect(x0 + a, 78, b - a, 22, 'var(--fill)', 'var(--accent)', ' stroke-dasharray="3 3"') : '');
+    h += txt(x0 + b + 6, 93, S.pct[0] === S.pct[1] ? S.pct[0] + '%' : S.pct[0] + '–' + S.pct[1] + '%', FM + ';font-size:11px;font-weight:600;fill:var(--ink)', 'start');
+  }
+  h += '<line x1="' + x0 + '" y1="120" x2="' + (x0 + W) + '" y2="120" stroke="var(--line)"/>';
+  h += txt(x0 - 86, 138, 'gap = tolerance that does not carry over', FM + ';font-size:10.5px;fill:var(--muted)', 'start');
+  h += txt(x0 - 86, 160, 'then: breakthrough doses, reassess in 24 h', FM + ';font-size:10.5px;fill:var(--muted)', 'start');
+  return h + '</svg>';
+}
+var curOME = null;
+var MTDF = {
+  label: {n: 'Label table', line: 'Methadone a day as a share of the oral morphine dose: 20–30% under 100 mg, falling to 5–10% at 600–1,000 mg. Above 1,000 mg: specialist only.'},
+  cap: {n: 'Start cap', line: 'Whatever the table says, start no higher than 30–40 mg a day (APS/CPDD); the tool uses the lower of the table\'s low end and 30 mg.'},
+  ff75: {n: 'Another table', line: 'Fast Fact #75 uses ratios from 3:1 to 20:1 (dotted) and then cuts again: the tables disagree, which is why methadone needs experience.'}
+};
+function mtdSVG(k){
+  var h = svgOpen('0 0 340 230', 'Methadone dose against oral morphine dose'), X = function(o){ return 46 + o / 1000 * 280; }, Y = function(m){ return 196 - m / 120 * 180; };
+  h += '<line x1="46" y1="196" x2="326" y2="196" stroke="var(--muted)"/><line x1="46" y1="16" x2="46" y2="196" stroke="var(--muted)"/>';
+  [0, 250, 500, 750, 1000].forEach(function(o){ h += txt(X(o), 210, String(o)); });
+  [0, 40, 80, 120].forEach(function(m){ h += txt(40, Y(m) + 4, String(m), null, 'end'); });
+  h += txt(186, 226, 'oral morphine mg/day', FM + ';font-size:10px;fill:var(--muted)') + txt(52, 12, 'methadone mg/day', FM + ';font-size:10px;fill:var(--muted)', 'start');
+  MTD.forEach(function(b){
+    var p = 'M' + X(b[0]) + ' ' + Y(b[0] * b[2]) + ' L' + X(b[1]) + ' ' + Y(b[1] * b[2]) + ' L' + X(b[1]) + ' ' + Y(b[1] * b[3]) + ' L' + X(b[0]) + ' ' + Y(b[0] * b[3]) + 'Z';
+    h += '<path d="' + p + '" fill="' + (k === 'label' ? 'var(--accent)' : 'var(--fill)') + '" fill-opacity="' + (k === 'label' ? '.35' : '1') + '" stroke="var(--accent)" stroke-width="1"/>';
+  });
+  if (k === 'ff75'){
+    var pts = [], prev = 0;
+    [[100,3],[300,5],[600,10],[800,12],[1000,15]].forEach(function(r){ pts.push(X(prev) + ',' + Y(prev / r[1]), X(r[0]) + ',' + Y(r[0] / r[1])); prev = r[0]; });
+    h += '<polyline points="' + pts.join(' ') + '" fill="none" stroke="var(--warn)" stroke-width="2" stroke-dasharray="3 3"/>' + txt(X(160), Y(64), 'FF #75', FM + ';font-size:10.5px;fill:var(--warn)');
+  }
+  h += '<rect x="46" y="' + Y(40) + '" width="280" height="' + (Y(30) - Y(40)) + '" fill="' + (k === 'cap' ? 'var(--warnbg)' : 'none') + '" stroke="var(--warn)" stroke-dasharray="' + (k === 'cap' ? '0' : '4 3') + '"/>' + txt(52, Y(40) - 5, 'start cap 30–40', FM + ';font-size:10px;font-weight:600;fill:var(--warn)', 'start');
+  if (curOME != null && curOME <= 1000){ h += '<line x1="' + X(curOME) + '" y1="16" x2="' + X(curOME) + '" y2="196" stroke="var(--ink)" stroke-width="1.5"/>' + txt(X(curOME) + 4, 26, 'yours: ' + Math.round(curOME), FM + ';font-size:10.5px;font-weight:600;fill:var(--ink)', 'start'); }
+  return h + '</svg>';
+}
+var PF = {
+  on: {n: 'Putting it on', line: 'Levels rise slowly: therapeutic only after 18–36 hours, peak 20–72 hours, steady by the end of the second 3-day patch. Do not raise the dose before 3 days.'},
+  off: {n: 'Taking it off', line: 'The skin depot keeps releasing drug for at least 24 hours; levels fall by about half in 20–27 hours. Start the next opioid low and use breakthrough doses.'}
+};
+function patchSVG(k){
+  var h = svgOpen('0 0 340 200', 'Fentanyl patch levels over time, schematic'), X = function(t){ return 30 + t / 144 * 300; }, Y = function(v){ return 160 - v * 130; };
+  h += '<line x1="30" y1="160" x2="330" y2="160" stroke="var(--muted)"/><line x1="30" y1="20" x2="30" y2="160" stroke="var(--muted)"/>';
+  [0, 24, 48, 72, 96, 120, 144].forEach(function(t){ h += txt(X(t), 174, t + 'h'); });
+  h += '<line x1="30" y1="' + Y(0.55) + '" x2="330" y2="' + Y(0.55) + '" stroke="var(--ok)" stroke-dasharray="4 3"/>' + txt(326, Y(0.55) - 4, 'therapeutic', FM + ';font-size:10px;fill:var(--ok)', 'end');
+  if (k === 'on'){
+    var p = [], t, v;
+    for (t = 0; t <= 144; t += 4){ v = 0.85 * (1 - Math.exp(-t / 22)); p.push(X(t).toFixed(1) + ',' + Y(v).toFixed(1)); }
+    h += '<polyline points="' + p.join(' ') + '" fill="none" stroke="var(--accent)" stroke-width="2.5"/>';
+    h += rect(X(18), 24, X(36) - X(18), 136, 'var(--fill)', null, ' fill-opacity=".8"') + txt((X(18) + X(36)) / 2, 36, '18–36 h', FM + ';font-size:10.5px;font-weight:600;fill:var(--ink)');
+    h += '<line x1="' + X(72) + '" y1="24" x2="' + X(72) + '" y2="160" stroke="var(--warn)" stroke-dasharray="3 3"/>' + txt(X(72) + 4, 150, 'first increase: day 3+', FM + ';font-size:10px;fill:var(--warn)', 'start');
+  } else {
+    var q = [], s, w;
+    for (s = 0; s <= 144; s += 4){ w = 0.8 * Math.pow(0.5, s / 24); q.push(X(s).toFixed(1) + ',' + Y(w).toFixed(1)); }
+    h += '<polyline points="' + q.join(' ') + '" fill="none" stroke="var(--accent)" stroke-width="2.5"/>';
+    h += '<line x1="' + X(20) + '" y1="' + Y(0.4) + '" x2="' + X(27) + '" y2="' + Y(0.4) + '" stroke="var(--ink)" stroke-width="2"/>' + txt(X(30), Y(0.4) + 4, 'half gone at 20–27 h', FM + ';font-size:10.5px;font-weight:600;fill:var(--ink)', 'start');
+    h += txt(X(0) + 4, 32, 'patch removed', FM + ';font-size:10px;fill:var(--muted)', 'start');
+  }
+  h += txt(180, 196, 'schematic, not to scale', FM + ';font-size:10px;fill:var(--muted)');
+  return h + '</svg>';
+}
+var FIGS = {
+  currency: {t: 'One currency: oral morphine', states: ['eq', 'mme'], data: CUR, svg: curSVG},
+  tol: {t: 'Why the start is lower', states: ['route', 'drug', 'patch', 'mtd'], data: TOL, svg: tolSVG},
+  mtd: {t: 'Methadone is not linear', states: ['label', 'cap', 'ff75'], data: MTDF, svg: mtdSVG},
+  patch: {t: 'The patch is a depot', states: ['on', 'off'], data: PF, svg: patchSVG}
+};
+var ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M7 15l3-4 3 3 2-2 2 3"/></svg>';
+function mountFig(host, id, state){
+  var F = FIGS[id];
+  function draw(k){
+    host.innerHTML = '<div class="states" role="group" aria-label="' + esc(F.t) + '">' + F.states.map(function(x){ return '<button class="sbtn" data-k="' + x + '" aria-pressed="' + (x === k) + '">' + esc(F.data[x].n) + '</button>'; }).join('') + '</div>' + F.svg(k) + '<p class="line1">' + esc(F.data[k].line) + '</p>';
+  }
+  host.onclick = function(e){ var k = e.target.getAttribute && e.target.getAttribute('data-k'); if (k) draw(k); };
+  draw(state && F.data[state] ? state : F.states[0]);
+}
+function chips(list){ return '<div class="chips">' + list.map(function(c){ return '<button class="chip" data-fig="' + c[0] + '" data-state="' + (c[1] || '') + '">' + ICON + esc(c[2] || FIGS[c[0]].t) + '</button>'; }).join('') + '</div>'; }
+var lastFocus = null;
+function openSheet(fig, state){
+  lastFocus = document.activeElement;
+  $('sheet-t').textContent = FIGS[fig].t;
+  mountFig($('sheet-b'), fig, state);
+  $('scrim').hidden = false; $('sheet').hidden = false; $('sheet').scrollTop = 0; $('sheet-x').focus();
+}
+function closeSheet(){ if ($('sheet').hidden) return; $('scrim').hidden = true; $('sheet').hidden = true; if (lastFocus && lastFocus.focus) lastFocus.focus(); }
+$('sheet-x').addEventListener('click', closeSheet); $('scrim').addEventListener('click', closeSheet);
+document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeSheet(); });
+
+/* ---------- cards ---------- */
+function more(list, tiers){ return '<details><summary>More</summary>' + (list || []).map(function(x){ return '<p>' + esc(x) + '</p>'; }).join('') + (tiers || []).map(function(t){ return '<span class="tier">' + esc(t) + '</span>'; }).join('') + '</details>'; }
+function why(w){ return w ? '<p class="whyline"><b>Why:</b> ' + esc(w) + '</p>' : ''; }
+function card(id, label, inner){ return '<div class="card" id="' + id + '"><p class="label">' + esc(label) + '</p>' + inner + '</div>'; }
+function guard(t, bad){ return '<div class="guard' + (bad ? ' bad' : '') + '">' + esc(t) + '</div>'; }
+function u(T){ return T.u; }
+function pr(x){ return x === 12.5 ? '12' : fmt(x); }
+
+var WHY = {
+  drug: 'Tolerance to one opioid only partly carries over to another, so the calculated equal dose overshoots; start lower and cover the gap with breakthrough doses.',
+  route: 'Same drug, so tolerance carries over and only absorption changes: a smaller cut is enough.',
+  renal: 'With eGFR under 30, kidney-cleared metabolites build up, so the deeper cut is used and the drug choice matters.',
+  patch: 'The label table lands low on purpose and the patch takes 18–36 hours to reach levels, so there is no extra cut but early breakthrough doses matter.',
+  mtd: 'Methadone gets relatively stronger the higher the prior dose and builds up over days, so the ratio widens with dose and the start is capped.',
+  noRatio: 'No ratio in this tool\'s sources runs this way, so start the new opioid as if opioid-naive and titrate quickly with breakthrough doses.',
+  fromPatch: 'The skin keeps releasing fentanyl for at least a day after removal, and the patch tables cannot be run backwards.',
+  fromMtd: 'Methadone lingers for days and its ratio depends on dose, so there is no safe table away from it.',
+  tol: 'The patch is only for opioid-tolerant patients; in anyone else the first patch can stop breathing.'
+};
+
+function build(i){
+  var R = compute(i), h = '';
+  curOME = R.ome != null ? R.ome : null;
+  if (!R.rows.length || !i.to) return '<div class="card empty">Enter what the patient takes now and pick the new opioid to see the starting dose, schedule and breakthrough dose.</div>';
+  var T = R.T;
+  if (R.mode === 'same') return card('r-main', 'No conversion', '<p class="head">Same opioid and route</p><p class="sub">Pick a different opioid or route.</p>');
+
+  if (R.mode === 'ratio'){
+    var per = T.iv ? fmt(R.per) + ' mg IV every 4 hours' : fmt(R.per) + ' mg every 4 hours';
+    h += '<div class="card" id="r-main"><p class="label">Start · ' + esc(T.s) + '</p>';
+    h += '<p class="big">' + esc(per) + '</p>';
+    if (T.iv) h += '<p class="sub">or ' + esc(fmt(R.hr)) + ' mg/h as an infusion or PCA basal rate only where monitored</p>';
+    h += '<p class="sub">New total ' + esc(fmt(r1(R.daily))) + ' mg a day: ' + Math.round(R.pct * 100) + '% of the calculated ' + esc(fmt(r1(R.calc))) + ' mg</p>';
+    h += '<div class="nums"><div class="num"><span>Breakthrough</span><b>' + esc(R.bt.lo === R.bt.hi ? fmt(R.bt.lo) : fmt(R.bt.lo) + '–' + fmt(R.bt.hi)) + ' mg</b></div><div class="num"><span>As needed</span><b>' + esc(R.bt.every.replace('every ', 'q')) + '</b></div><div class="num"><span>Oral morphine</span><b>' + esc(fmt(r1(R.ome))) + ' mg</b></div></div>';
+    h += guard('Cross-tolerance cut applied: ' + Math.round((1 - R.pct) * 100) + '% off the calculated dose' + (R.route ? ' (same drug, route change).' : (R.pct === 0.5 ? (R.flags.length ? ' (' + R.flags.join(', ') + ').' : ' (default for a new drug).') : ' (pain uncontrolled, no risk ticked).')) + ' Reassess within 24 hours.');
+    if (R.tiny) h += guard('The calculated dose is below the smallest practical dose; the smallest step is shown. Consider as-needed dosing only.');
+    h += guards(i, R);
+    var w = R.route ? WHY.route : (i.renal ? WHY.renal : WHY.drug);
+    h += why(w);
+    h += chips([['tol', R.route ? 'route' : 'drug'], ['currency', 'eq']]);
+    var steps = R.rows.map(function(r){ var D = DR[r.d]; return D.n + ' ' + fmt(r.v) + ' mg/day × ' + D.ome + ' = ' + fmt(r1(r.v * D.ome)) + ' mg oral morphine'; });
+    h += more(steps.concat([
+      'Total oral morphine equivalent ' + fmt(r1(R.ome)) + ' mg ÷ ' + T.ome + ' = ' + fmt(r1(R.calc)) + ' mg ' + T.s + ' a day (calculated).',
+      R.route ? 'Route change of the same drug: start at about 75% (Fast Fact #36 worked example).' : 'New drug: start at 50–75% of the calculated dose: ' + fmt(r1(R.calc * 0.5)) + '–' + fmt(r1(R.calc * 0.75)) + ' mg a day. The tool uses 50% unless pain is uncontrolled and none of age, side effects, kidneys, liver, benzodiazepine or sleep apnea is ticked.',
+      'Divided every 4 hours and rounded down to a practical dose. Long-acting forms: once the dose is stable, give the same daily total split as the product directs.',
+      'Breakthrough: 10–15% of the new daily total, ' + R.bt.every + ' as needed' + (T.iv ? ' (IV)' : ' (oral)') + '. If more than 2–3 breakthrough doses a day are needed, add them into the scheduled total.',
+      'Full why: equal-dose tables come from small studies; people differ. Tolerance to one opioid does not fully transfer to another (incomplete cross-tolerance), so the calculated dose can overdose a patient whose pain is controlled.'
+    ]), ['FF36 (expert practice)', 'FF20 breakthrough (expert practice)']);
+    h += '</div>';
+  }
+
+  if (R.mode === 'patch'){
+    h += '<div class="card" id="r-main"><p class="label">Start · fentanyl patch</p>';
+    if (R.block === 'tol'){
+      h += '<p class="head bad">Not opioid-tolerant: do not start a patch</p><p class="sub">Tolerance share ' + esc(fmt(Math.round(R.tolIdx * 100) / 100)) + (i.wk ? '' : ' · tick "a week or longer" if true') + '</p>' + guard('The patch is only for patients on at least 60 mg oral morphine a day (or equal) for a week or longer. Use an oral or IV opioid instead.', true) + why(WHY.tol) + more(['Thresholds per day: oral morphine 60 mg, oxycodone 30 mg, hydromorphone 8 mg, oxymorphone 25 mg, hydrocodone 60 mg; patch 25 mcg/h.'], ['Duragesic label']);
+    } else if (R.block === 'high'){
+      h += '<p class="head bad">Over 1,124 mg oral morphine a day</p>' + guard('Beyond the label table. Get palliative care or a pain pharmacist.', true) + why(WHY.patch) + more([], ['Duragesic label Table 2']);
+    } else {
+      h += '<p class="big">' + esc(pr(R.patchRate)) + ' mcg/h</p><p class="sub">Change every 72 hours · from oral morphine equivalent ' + esc(fmt(r1(R.ome))) + ' mg a day' + (R.patchRate !== R.patchFull ? ' · half of ' + R.patchFull + ' mcg/h for kidney or liver impairment' : '') + '</p>';
+      h += '<div class="nums"><div class="num"><span>Breakthrough</span><b>' + esc(fmt(R.bt.lo) + (R.bt.hi !== R.bt.lo ? '–' + fmt(R.bt.hi) : '')) + ' mg</b></div><div class="num"><span>Oral morphine</span><b>q2h prn</b></div><div class="num"><span>First change</span><b>day 3+</b></div></div>';
+      h += guard('No extra cross-tolerance cut: the label table already underestimates. Stop all other around-the-clock opioids when the patch goes on; levels take 18–36 hours, so keep the breakthrough dose.');
+      h += guard('Heat (heating pads, hot baths, saunas) and fever increase absorption. Severe kidney or liver impairment: avoid the patch.');
+      h += guards(i, R);
+      h += why(WHY.patch) + chips([['patch', 'on'], ['tol', 'patch']]);
+      h += more(['Oral morphine equivalent ' + fmt(r1(R.ome)) + ' mg a day → label Table 2 → ' + R.patchFull + ' mcg/h.' + (R.patchRate !== R.patchFull ? ' Half dose for mild to moderate kidney or liver impairment (label).' : ''),
+        'The label\'s Table 1 for named drugs runs higher than this route (for example oxycodone 120 mg a day reads 75 mcg/h there, 50 mcg/h here); the tool takes the lower, as the label prefers to underestimate.',
+        'Patch strengths: 12, 25, 50, 75, 100 mcg/h; 37.5, 62.5 and 87.5 exist as generics. Judge increases after two 3-day patches.',
+        'Breakthrough (expert practice): 10–15% of half the prior oral morphine equivalent, as oral morphine or an equal immediate-release opioid, every 2 hours as needed.'], ['Duragesic label 2022', 'FF2 2025']);
+    }
+    h += '</div>';
+  }
+
+  if (R.mode === 'mtd'){
+    h += '<div class="card" id="r-main"><p class="label">Start · methadone</p>';
+    if (R.block === 'high'){
+      h += '<p class="head bad">Over 1,000 mg oral morphine a day</p>' + guard('The label gives under 5% with no safe number. Specialist only.', true) + why(WHY.mtd) + more([], ['Methadone label Table 1']);
+    } else {
+      if (R.block === 'qt') h += guard('QTc 450 ms or more, or QT-prolonging drugs: consider another opioid. Do not start methadone if QTc is over 500 ms.', true);
+      h += '<p class="big">' + esc(fmt(R.per)) + ' mg ' + esc(R.freq) + '</p><p class="sub">' + esc(fmt(R.daily)) + ' mg a day · label range ' + esc(fmt(r1(R.lo))) + '–' + esc(fmt(r1(R.hi))) + ' mg a day (' + Math.round(R.band[2] * 100) + '–' + Math.round(R.band[3] * 100) + '% of ' + esc(fmt(r1(R.ome))) + ' mg oral morphine)</p>';
+      h += '<div class="nums"><div class="num"><span>Breakthrough</span><b>' + esc(fmt(R.bt.lo) + (R.bt.hi !== R.bt.lo ? '–' + fmt(R.bt.hi) : '')) + ' mg</b></div><div class="num"><span>Oral morphine</span><b>q2h prn</b></div><div class="num"><span>Next change</span><b>≥5–7 days</b></div></div>';
+      h += guard('Deaths have occurred during conversion to methadone. Involve palliative care or a pain pharmacist. Stop the other around-the-clock opioids; raise by no more than 10 mg a day every 5–7 days.', true);
+      h += guard('ECG before starting (QTc over 500 ms: do not start), again at 2–4 weeks and at 30–40 and 100 mg a day. Check every new drug for interactions.');
+      h += guards(i, R);
+      h += why(WHY.mtd) + chips([['mtd', 'label'], ['tol', 'mtd']]);
+      h += more(['Start = the lower of the label table\'s low end (' + fmt(r1(R.lo)) + ' mg) and 30 mg a day (APS/CPDD: no higher than 30–40 mg a day), divided every 8 hours and rounded down to 2.5 mg.' + (R.naive ? ' The result is under 2.5 mg every 8 hours, so the label\'s opioid-naive start of 2.5 mg every 12 hours is shown.' : ''),
+        'Fast Fact #75 ratio for comparison: ' + fmt(r1(R.ff75)) + ' mg a day before its own further cut. Tables disagree.',
+        'Peak respiratory depression comes later and lasts longer than pain relief; half-life 8–59 hours. Watch closely for the first week and after each increase.',
+        'Breakthrough (expert practice): an immediate-release opioid, not methadone; 10–15% of half the prior oral morphine equivalent, every 2 hours as needed.'], ['Methadone label Table 1', 'APS 2014: start low (strong, moderate)', 'APS 2014: ECG/QTc (strong or weak, low)']);
+    }
+    h += '</div>';
+  }
+
+  if (R.mode === 'iv2patch'){
+    h += card('r-main', 'Start · fentanyl patch from IV fentanyl', (R.patchRate ? '<p class="big">' + esc(pr(R.patchRate)) + ' mcg/h patch</p>' : '<p class="head wn">Infusion under 12 mcg/h: no patch</p>') + '<p class="sub">1:1 with the infusion of ' + esc(fmt(R.rate)) + ' mcg/h; nearest available strength at or below</p>' +
+      guard('Keep the infusion 6 hours after the patch goes on, then halve it for 6 hours, then stop. Keep IV as-needed doses for the first 24 hours.') + guards(i, R) +
+      why('Patch levels take 18–36 hours to build, so the infusion overlaps while the depot fills.') + chips([['patch', 'on']]) +
+      more(['Kornick 2001: 1:1 conversion with a two-step taper over 12 hours in 15 inpatients; Fast Fact #2: continue the infusion at least 6 hours.', 'Use the nearest strength at or below the infusion rate (12, 25, 37.5, 50, 62.5, 75, 87.5, 100 mcg/h).'], ['Kornick 2001 (case series)', 'FF2 2025']));
+  }
+
+  if (R.mode === 'patch2iv'){
+    h += card('r-main', 'Start · IV fentanyl from a patch', '<p class="big">' + esc(fmt(R.rate)) + ' mcg/h IV</p><p class="sub">1:1 with the patch, in a monitored setting</p>' +
+      guard('Remove the patch; the skin keeps releasing fentanyl for at least 24 hours, so start the infusion low and titrate with monitoring.') + guards(i, R) +
+      why(WHY.fromPatch) + chips([['patch', 'off']]) +
+      more(['Kornick 2003: 1:1 transdermal to IV in 9 patients in pain crises (specialist, monitored).'], ['Kornick 2003 (case series)']));
+  }
+
+  if (R.mode === 'none'){
+    var ns = naiveStart(T), lead;
+    if (R.why === 'fromPatch') lead = 'From a patch: no table runs backwards';
+    else if (R.why === 'fromMtd') lead = 'From methadone: no safe ratio';
+    else if (R.why === 'fromFiv') lead = 'From IV fentanyl: no ratio here except to a patch';
+    else if (R.why === 'toFiv') lead = 'To IV fentanyl: only from a patch here';
+    else lead = 'No conversion ratio in this tool\'s sources';
+    var body = '<p class="head wn">' + esc(lead) + '</p>';
+    if (T.drug === 'mtd' || T.patch) body += '<p class="sub">Starting ' + esc(T.s) + ' from this regimen needs a specialist.</p>';
+    else if (ns) body += '<p class="big">' + esc(ns.lo === ns.hi ? fmt(ns.lo) : fmt(ns.lo) + '–' + fmt(ns.hi)) + ' mg every 4 hours as needed</p><p class="sub">Start ' + esc(T.s) + ' as if opioid-naive (5–10 MME a dose) and titrate quickly</p>';
+    else body += '<p class="sub">Use your institution\'s opioid-naive IV dose and titrate with monitoring.</p>';
+    if (R.why === 'fromPatch') body += guard('Remove the patch. Fentanyl keeps coming for at least 24 hours (levels halve in 20–27 hours), so start low, give as-needed doses, and reassess often. Ask pharmacy or palliative care.');
+    else if (R.why === 'fromMtd') body += guard('Methadone persists for days (half-life 8–59 hours). Do not use the methadone table backwards. Ask palliative care or a pain pharmacist.');
+    else if (R.why === 'fromFiv') body += guard('Options: convert the infusion to a patch 1:1 first, or start the new opioid low and titrate. Ask pharmacy or palliative care.');
+    else if (R.why === 'noRatio') body += guard('Higher current doses mean the opioid-naive start will undertreat at first: use as-needed doses and reassess within hours.');
+    body += guards(i, R);
+    body += why(R.why === 'fromPatch' ? WHY.fromPatch : R.why === 'fromMtd' ? WHY.fromMtd : WHY.noRatio);
+    body += chips(R.why === 'fromPatch' ? [['patch', 'off']] : R.why === 'fromMtd' ? [['mtd', 'label']] : [['currency', 'mme']]);
+    body += more(['Opioid-naive start (CDC 2022): a single dose of about 5–10 MME, or 20–30 MME a day, converted with the CDC factors for the new drug. This is a starting point, not an equal dose.',
+      'The CDC MME factors estimate overdose risk; CDC says not to use them to convert between opioids.'], ['CDC 2022', 'Duragesic label', 'Methadone label']);
+    h += card('r-main', 'Start · ' + T.s, body);
+  }
+
+  h += mmeCard(i, R);
+  return h;
+}
+function guards(i, R){
+  var T = R.T, g = '';
+  if (i.renal && (T.drug === 'morphine')) g += guard('eGFR under 30: morphine metabolites build up. Prefer fentanyl or methadone, or hydromorphone with caution; minimize long-acting morphine.', true);
+  if (i.renal && (T.drug === 'hm' || T.drug === 'oxy')) g += guard('eGFR under 30: ' + (T.drug === 'hm' ? 'hydromorphone also needs caution (may be preferable to morphine; no clear consensus).' : 'oxycodone accumulates: lower the dose or lengthen the interval.'));
+  if (i.renal && R.rows.some(function(r){ return r.d === 'cod'; })) g += guard('Codeine should be avoided when eGFR is under 30.');
+  if (T.drug === 'hc') g += guard('Most hydrocodone tablets contain acetaminophen: count it toward the daily acetaminophen maximum.');
+  if (i.benzo) g += guard('Opioid plus benzodiazepine: use particular caution and offer naloxone.');
+  return g;
+}
+function mmeCard(i, R){
+  var T = R.T, now = R.mme, nw = R.newMme;
+  if (R.mode === 'patch' && R.patchRate && !R.block) nw = R.patchRate * 2.4;
+  var trig = [];
+  if (nw != null && nw >= 50) trig.push('new dose 50 MME a day or more');
+  if (i.benzo) trig.push('benzodiazepine'); if (i.osa) trig.push('sleep-disordered breathing'); if (i.od) trig.push('past overdose or substance use disorder');
+  var head = trig.length ? 'Offer naloxone' : 'Naloxone: consider';
+  var b = '<p class="head' + (trig.length ? ' wn' : '') + '">' + esc(head) + '</p>';
+  b += '<p class="sub">' + (trig.length ? esc(trig.join(' · ')) : 'No added risk ticked; CDC still suggests offering naloxone when prescribing opioids.') + '</p>';
+  b += '<div class="nums"><div class="num"><span>MME now</span><b>' + esc(R.mmeIV && now === 0 ? 'IV only' : fmt(r1(now))) + (R.mmeIV && now > 0 ? '+' : '') + '</b></div><div class="num' + (nw >= 50 ? ' hot' : '') + '"><span>MME new</span><b>' + esc(nw != null ? fmt(r1(nw)) : '–') + '</b></div><div class="num"><span>Pause at</span><b>50</b></div></div>';
+  b += why(trig.length ? 'Overdose risk rises with dose and with anything else that slows breathing.' : '');
+  b += more(['MME uses the CDC 2022 factors for oral and transdermal opioids; IV doses have no CDC factor' + (R.mmeIV ? ' (IV and unlisted doses are left out of "now", marked +)' : '') + '. MME is for risk, not for switching.',
+    'Before raising the total to 50 MME a day or more, pause and reassess benefits and risks. Offer naloxone particularly with a history of overdose or substance use disorder, sleep-disordered breathing, 50 MME a day or more, a benzodiazepine, or a return to a dose they have lost tolerance to.',
+    'CDC applies at hospital discharge but not to cancer pain, sickle cell disease, palliative or end-of-life care.'], ['CDC Rec 8: A, 4', 'CDC Rec 4: A, 3']);
+  return card('r-mme', 'Risk · MME and naloxone', b);
+}
+function render(){ $('out').innerHTML = build(read()); }
+document.addEventListener('click', function(e){
+  var c = e.target.closest && e.target.closest('[data-fig]'); if (c){ openSheet(c.getAttribute('data-fig'), c.getAttribute('data-state')); return; }
+});
+
+/* ---------- reference tables ---------- */
+$('eqbody').innerHTML = [['Morphine oral', '25 mg', '1'], ['Morphine IV', '10 mg', 'none (IV)'], ['Hydromorphone oral', '5 mg', '5'], ['Hydromorphone IV', '2 mg', 'none (IV)'], ['Oxycodone oral', '20 mg', '1.5'], ['Hydrocodone oral', '25 mg', '1'], ['Oxymorphone oral', 'not converted', '3'], ['Codeine', 'not converted', '0.15'], ['Tramadol', 'not converted', '0.2'], ['Tapentadol', 'not converted', '0.4'], ['Methadone', 'see methadone', '4.7'], ['Fentanyl patch', 'see patch', '2.4 per mcg/h']].map(function(r){ return '<tr><td>' + esc(r[0]) + '</td><td class="mono">' + esc(r[1]) + '</td><td class="mono">' + esc(r[2]) + '</td></tr>'; }).join('');
+$('patchbody').innerHTML = PATCH.map(function(r){ return '<tr><td class="mono">' + r[0] + '–' + r[1] + '</td><td class="mono">' + r[2] + '</td></tr>'; }).join('');
+$('mtdbody').innerHTML = MTD.map(function(r){ return '<tr><td class="mono">' + esc(r[4]) + '</td><td class="mono">' + Math.round(r[2] * 100) + '–' + Math.round(r[3] * 100) + '%</td></tr>'; }).join('') + '<tr><td class="mono">over 1,000</td><td class="mono">under 5% · specialist</td></tr>';
+
+/* ---------- tabs ---------- */
+var tabs = [['t-tool','p-tool'],['t-learn','p-learn'],['t-ref','p-ref'],['t-prac','p-prac']];
+function show(t){ tabs.forEach(function(p){ var on = p[0] === t; $(p[0]).setAttribute('aria-selected', String(on)); $(p[1]).classList.toggle('on', on); }); }
+tabs.forEach(function(p){ $(p[0]).addEventListener('click', function(){ show(p[0]); }); });
+function fromHash(){ var id = location.hash.slice(1); if (!id) return; var el = $(id); if (!el) return; var pan = el.closest('.panel'); if (pan) tabs.forEach(function(p){ if (p[1] === pan.id) show(p[0]); }); el.scrollIntoView(); }
+window.addEventListener('hashchange', fromHash);
+
+/* ---------- narrowing ---------- */
+var nwSel = {};
+function drawNarrow(){
+  $('nw-results').innerHTML = RESULTS.map(function(r){ return '<button class="sbtn" data-r="' + r[0] + '" aria-pressed="' + !!nwSel[r[0]] + '">' + esc(r[1]) + '</button>'; }).join('');
+  var any = Object.keys(nwSel).length, rows = narrow(nwSel), ord = {fav: 0, 'in': 1, less: 2};
+  if (!any) rows.forEach(function(c){ c.st = 'in'; c.why = ''; });
+  rows.sort(function(a, b){ return ord[a.st] - ord[b.st]; });
+  $('nw-causes').innerHTML = rows.map(function(c){ return '<div class="cause ' + c.st + '"><span>' + esc(c.name) + '</span><small>' + esc(c.st === 'in' ? 'still possible' : (c.st === 'less' ? 'less likely: ' : 'favoured: ') + c.why) + '</small></div>'; }).join('');
+  $('nw-next').innerHTML = '<b>Next:</b> ' + esc(narrowNext(nwSel));
+}
+$('nw-results').addEventListener('click', function(e){
+  var r = e.target.getAttribute('data-r'); if (!r) return;
+  if (nwSel[r]) delete nwSel[r]; else nwSel[r] = 1;
+  var left = $('nw-results').scrollLeft; drawNarrow(); $('nw-results').scrollLeft = left;
+});
+drawNarrow();
+
+/* ---------- Learn ---------- */
+document.querySelectorAll('[data-figure]').forEach(function(hst){ mountFig(hst, hst.getAttribute('data-figure'), hst.getAttribute('data-state')); });
+(function(){
+  var chaps = [].slice.call(document.querySelectorAll('.chap'));
+  $('pills').innerHTML = chaps.map(function(c, n){ return '<button class="pill" data-go="' + c.id + '" aria-current="' + (n === 0) + '">' + (n + 1) + ' ' + esc(c.getAttribute('data-pill')) + '</button>'; }).join('');
+  $('pills').addEventListener('click', function(e){ var g = e.target.getAttribute('data-go'); if (g) $(g).scrollIntoView(); });
+  function mark(id){ [].forEach.call($('pills').children, function(b){ var on = b.getAttribute('data-go') === id; b.setAttribute('aria-current', String(on)); if (on) $('pills').scrollLeft = Math.max(0, b.offsetLeft - 60); }); }
+  if ('IntersectionObserver' in window){
+    var io = new IntersectionObserver(function(es){ es.forEach(function(en){ if (en.isIntersecting) mark(en.target.id); }); }, {rootMargin: '-30% 0px -60% 0px'});
+    chaps.forEach(function(c){ io.observe(c); });
+  }
+  $('go-prac').addEventListener('click', function(){ show('t-prac'); window.scrollTo(0, 0); });
+})();
+
+/* ---------- Practice: cases run through the same engine ---------- */
+var CASES = [
+  {t: 'Morphine to oral hydromorphone', s: 'Age 54, cancer pain well controlled on morphine ER 90 mg every 12 hours, no as-needed doses. New nausea on morphine; team wants oral hydromorphone.', q: 'Starting dose?', i: {rows: [{d: 'mpo', v: 180}], to: 'hpo', wk: true}, p: '180 mg oral morphine ÷ 5 = 36 mg hydromorphone; 50% for a new drug = 18 mg a day: 3 mg every 4 hours, breakthrough 2–2.5 mg every 2 hours.'},
+  {t: 'NPO: morphine by mouth to IV', s: 'Same patient, now NPO after surgery; staying on morphine.', q: 'IV dose?', i: {rows: [{d: 'mpo', v: 180}], to: 'miv', wk: true}, p: '180 ÷ 2.5 = 72 mg IV a day; 75% for a route change = 54 mg: 9 mg every 4 hours, or 2 mg/h only where monitored.'},
+  {t: 'Oxycodone to IV hydromorphone in an older patient', s: 'Age 78, oxycodone 10 mg every 4 hours (60 mg a day) after a hip fracture; now vomiting and NPO.', q: 'IV hydromorphone dose?', i: {rows: [{d: 'opo', v: 60}], to: 'hiv', wk: true, old: true}, p: '60 × 1.25 = 75 mg oral morphine ÷ 12.5 = 6 mg IV hydromorphone; 50% = 3 mg a day: 0.5 mg every 4 hours; breakthrough 0.3–0.4 mg every hour.'},
+  {t: 'Oxycodone to a patch', s: 'Age 60, metastatic cancer, oxycodone 120 mg a day for a month; trouble swallowing.', q: 'Patch strength?', i: {rows: [{d: 'opo', v: 120}], to: 'ftd', wk: true}, p: '120 × 1.25 = 150 mg oral morphine → 50 mcg/h (label Table 2). Stop the oxycodone when it goes on; breakthrough oral morphine 7.5–10 mg every 2 hours.'},
+  {t: 'Morphine to methadone', s: 'Age 66, morphine 200 mg a day with rising doses and neuropathic pain; palliative care suggests methadone. QTc 430 ms.', q: 'Starting methadone?', i: {rows: [{d: 'mpo', v: 200}], to: 'mtd', wk: true}, p: 'Label 10–20% = 20–40 mg a day; start the lower end, capped at 30: 20 mg a day → 5 mg every 8 hours (rounded down). ECG follow-up; no increase for 5–7 days.'},
+  {t: 'Going home off a patch', s: 'Age 70, fentanyl patch 50 mcg/h; wants oral oxycodone at discharge.', q: 'Oxycodone dose?', i: {rows: [{d: 'ftd', v: 50}], to: 'opo', wk: true}, p: 'No table runs backwards. Remove the patch, start oxycodone low (5 mg every 4 hours as needed) and titrate; fentanyl keeps coming for at least 24 hours. Get pharmacy or palliative help.'},
+  {t: 'Tramadol and lorazepam', s: 'Age 45, tramadol 50 mg every 6 hours (200 mg a day) plus lorazepam at night. Pain uncontrolled after surgery; switching to oxycodone.', q: 'Dose and risk?', i: {rows: [{d: 'tram', v: 200}], to: 'opo', wk: true, unc: true, benzo: true}, p: 'No ratio: start oxycodone 5 mg every 4 hours as needed and titrate. 40 MME now; offer naloxone because of the benzodiazepine.'},
+  {t: 'IV to oral hydromorphone with kidney failure', s: 'Age 59, eGFR 25. IV hydromorphone 6 mg over the last 24 hours, pain controlled; now eating.', q: 'Oral dose?', i: {rows: [{d: 'hiv', v: 6}], to: 'hpo', wk: true, renal: true}, p: '6 × 12.5 = 75 mg oral morphine ÷ 5 = 15 mg; same drug, 75% = 11.25 mg a day: 1.5 mg every 4 hours (rounded down). Hydromorphone still needs caution at eGFR under 30.'}
+];
+$('practice').innerHTML = CASES.map(function(c, n){
+  return '<div class="card case"><p class="label">Case ' + (n + 1) + '</p><h2>' + esc(c.t) + '</h2><p>' + esc(c.s) + '</p><p><b>' + esc(c.q) + '</b></p><div class="row"><button class="btn" data-ans="' + n + '">Show the answer</button><button class="btn ghost" data-load="' + n + '">Open in the tool</button></div><div class="ans" id="ans' + n + '" hidden></div></div>';
+}).join('');
+$('practice').addEventListener('click', function(e){
+  var a = e.target.getAttribute('data-ans'), l = e.target.getAttribute('data-load');
+  if (a != null){ var c = CASES[a]; var box = $('ans' + a); box.innerHTML = '<p>' + esc(c.p) + '</p>' + build(c.i).replace(/ id="[^"]*"/g, ''); box.hidden = false; e.target.hidden = true; }
+  if (l != null) load(CASES[l].i);
+});
+function load(i){
+  rows = i.rows.map(function(r){ return {d: r.d, v: String(r.v)}; });
+  ticked = {}; TICKS.forEach(function(t){ if (i[t[0]]) ticked[t[0]] = true; });
+  document.querySelectorAll('#ticks input').forEach(function(x){ x.checked = !!ticked[x.getAttribute('data-k')]; });
+  $('tgt').value = i.to; drawRows(); render(); show('t-tool'); window.scrollTo(0, 0);
+}
+drawRows();
+fromHash();
+})();
+</script>
+</body>
+</html>
