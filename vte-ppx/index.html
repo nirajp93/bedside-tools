@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VTE prophylaxis · bedside.tools</title>
+<meta name="description" content="VTE prophylaxis for medical inpatients: Padua, IMPROVE clot and bleeding scores, then the drug and dose, compression, or nothing, with the reasoning in diagrams.">
+<script src="/theme.js"></script>
+<style>
+:root{--bg:#FBFBFA;--card:#FFFFFF;--ink:#111113;--muted:#55555D;--line:#ECECEE;--accent:#2B4BDB;--warn:#9A3B00;--warnbg:#FFF6EC}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5}
+.mono{font-family:var(--mono)}
+.wrap{max-width:720px;margin:0 auto;padding:20px 16px 48px}
+a{color:var(--accent)}
+.back{font-size:14px;text-decoration:none;display:inline-block;min-height:44px;line-height:44px}
+h1{font-size:26px;margin:4px 0 4px;letter-spacing:-.01em}
+.purpose{color:var(--muted);margin:0 0 20px}
+.tabs{display:flex;gap:6px;margin-bottom:16px}
+.tab{flex:1;min-width:0;min-height:44px;border:1px solid var(--line);background:var(--card);border-radius:14px;padding:0 4px;font:inherit;font-size:15px;font-weight:600;color:var(--muted);cursor:pointer}
+.tab[aria-selected="true"]{border-color:var(--accent);color:var(--accent)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
+.label{font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+.grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.grid2{grid-template-columns:1fr 1fr}
+.field{display:flex;flex-direction:column;justify-content:flex-end}
+.field label{display:block;font-size:13px;color:var(--muted);margin-bottom:4px}
+.field input,.field select{width:100%;min-height:44px;border:1px solid var(--line);border-radius:10px;padding:8px 10px;font:inherit;font-family:var(--mono);background:var(--card);color:var(--ink)}
+.field input:focus,.field select:focus,.tab:focus-visible,.chk:focus-within,button:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.checks{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.chk{display:flex;align-items:center;gap:10px;min-height:44px;border:1px solid var(--line);border-radius:10px;padding:6px 10px;font-size:14px;cursor:pointer}
+.chk input{width:20px;height:20px;accent-color:var(--accent);flex:none}
+.card h2{font-size:18px;margin:0 0 2px}
+.head{font-family:var(--mono);font-size:17px;font-weight:600;margin:6px 0 4px;overflow-wrap:anywhere}
+.head.bad{color:var(--bad)}.head.okc{color:var(--ok)}
+.sub{font-size:14px;color:var(--muted);margin:0}
+.card ul{margin:6px 0 0;padding-left:20px}
+.card li{margin-bottom:4px}
+.guard{border-left:3px solid var(--warn);background:var(--warnbg);padding:8px 10px;border-radius:0 10px 10px 0;margin-top:8px;font-size:14.5px}
+.tier{display:inline-block;font-family:var(--mono);font-size:11px;border:1px solid var(--line);border-radius:999px;padding:2px 8px;color:var(--muted);margin:6px 6px 0 0}
+details{margin-top:10px;border-top:1px solid var(--line);padding-top:8px}
+.whyline{margin:10px 0 0;font-size:14.5px;color:var(--muted)}
+.whyline b{color:var(--ink);font-weight:600}
+summary{cursor:pointer;color:var(--accent);font-weight:600;min-height:44px;line-height:44px}
+details p{margin:0 0 8px;font-size:15px}
+.empty{color:var(--muted)}
+.btn{min-height:44px;border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);border-radius:10px;padding:8px 14px;font:inherit;font-weight:600;cursor:pointer}
+.btn.ghost{background:var(--card);color:var(--accent)}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.note{font-size:14px;color:var(--muted)}
+.tl{position:relative;padding-left:26px}
+.tl:before{content:"";position:absolute;left:8px;top:8px;bottom:8px;width:2px;background:var(--line)}
+.st{position:relative;padding:6px 0 10px}
+.st:before{content:"";position:absolute;left:-24px;top:11px;width:12px;height:12px;border-radius:50%;background:var(--card);border:2px solid var(--muted)}
+.st.now:before{background:var(--accent);border-color:var(--accent)}
+.st .when{font-family:var(--mono);font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+.st b{display:block}
+.st .dose{font-family:var(--mono);font-size:14.5px;display:block;overflow-wrap:anywhere}
+.st small{color:var(--muted);font-size:13.5px;display:block}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:6px 6px 6px 0;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:var(--mono);font-size:11.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);font-weight:500}
+td.mono{font-size:13px}
+.tw{overflow-x:auto}
+.case h2{font-size:17px}
+.ans{margin-top:10px;border-top:1px solid var(--line);padding-top:10px}
+footer{margin-top:28px;font-size:13.5px;color:var(--muted)}
+footer p{margin:0 0 8px}
+.panel{display:none}.panel.on{display:block}
+.fig{display:block;width:100%;max-width:460px;height:auto;margin:0 auto}
+.states{display:flex;gap:6px;overflow-x:auto;margin:10px -16px;padding:2px 16px 6px;scrollbar-width:none}
+.states::-webkit-scrollbar{display:none}
+.states.wrapit{flex-wrap:wrap;overflow:visible;margin:10px 0;padding:0}
+.sbtn{flex:none;min-height:44px;min-width:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--ink);font:inherit;font-size:14px;cursor:pointer;white-space:nowrap}
+.sbtn[aria-pressed="true"]{border-color:var(--accent);color:var(--accent);font-weight:600}
+.line1{font-size:15px;margin:10px 0 0}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.chip{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--fill);color:var(--ink);font:inherit;font-size:14px;cursor:pointer}
+.chip svg{flex:none;color:var(--accent)}
+.scrim{position:fixed;inset:0;background:var(--scrim);z-index:20}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:21;max-height:90vh;overflow-y:auto;background:var(--card);border:1px solid var(--line);border-bottom:0;border-radius:20px 20px 0 0;padding:8px 16px 24px;max-width:560px;margin:0 auto}
+.sheethead{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.sheethead h2{font-size:18px;margin:0}
+.xbtn{min-height:44px;min-width:44px;border:0;background:transparent;color:var(--accent);font:inherit;font-weight:600;cursor:pointer}
+.pills{position:sticky;top:0;z-index:5;background:var(--bg);display:flex;gap:6px;overflow-x:auto;margin:0 -16px 12px;padding:8px 16px;border-bottom:1px solid var(--line);scrollbar-width:none}
+.pills::-webkit-scrollbar{display:none}
+.pill{flex:none;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--muted);font:inherit;font-size:14px;cursor:pointer;white-space:nowrap}
+.pill[aria-current="true"]{border-color:var(--accent);color:var(--accent);font-weight:600}
+.chap{scroll-margin-top:70px}
+.cause{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:8px 0;border-top:1px solid var(--line);font-size:15px}
+.cause small{color:var(--muted);font-size:13px;text-align:right;flex:0 1 58%}
+.cause.out span{color:var(--muted);text-decoration:line-through}
+.cause.out,.cause.less{opacity:.6}
+.cause.fav span{font-weight:700}
+.cause.fav span:before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--accent);margin-right:8px}
+.trial{border-left:3px solid var(--accent);padding-left:12px}
+.trial p{margin:0 0 6px;font-size:15px}
+.trial .k{font-family:var(--mono);font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);display:block}
+.badge{display:inline-block;font-family:var(--mono);font-size:12px;border-radius:999px;padding:2px 10px;margin:4px 6px 0 0;border:1px solid var(--line);color:var(--muted)}
+.badge.hi{border-color:var(--warn);color:var(--warn);background:var(--warnbg)}
+.badge.lo{border-color:var(--ok);color:var(--ok);background:var(--okbg)}
+.score{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:8px 0;border-top:1px solid var(--line)}
+.score b{font-family:var(--mono);font-size:15px}
+.score small{color:var(--muted);font-size:13px;text-align:right}
+.chk .pts{margin-left:auto;font-family:var(--mono);font-size:12px;color:var(--muted)}
+.tap{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+@media (min-width:900px){
+  .wrap{max-width:1040px}
+  #p-tool.on{display:grid;grid-template-columns:400px minmax(0,1fr);gap:20px;align-items:start}
+  .refgrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;align-items:start}
+  .refgrid .card{margin-bottom:0}
+  #p-learn{max-width:720px;margin:0 auto}
+}
+@media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="/">← bedside.tools</a>
+<h1>VTE prophylaxis</h1>
+<p class="purpose">Medical inpatients: clot risk, bleeding risk, then the drug and dose, compression, or nothing.</p>
+
+<div class="tabs" role="tablist">
+  <button class="tab" role="tab" id="t-tool" aria-selected="true" aria-controls="p-tool">Assess</button>
+  <button class="tab" role="tab" id="t-ag" aria-selected="false" aria-controls="p-ag">Agents</button>
+  <button class="tab" role="tab" id="t-learn" aria-selected="false" aria-controls="p-learn">Learn</button>
+  <button class="tab" role="tab" id="t-prac" aria-selected="false" aria-controls="p-prac">Practice</button>
+</div>
+
+<div class="panel on" id="p-tool" role="tabpanel" aria-labelledby="t-tool">
+  <div id="inputs">
+  <div class="card" id="patient">
+    <p class="label">Patient</p>
+    <div class="states wrapit" id="setseg" role="group" aria-label="Setting"></div>
+    <p class="note" id="setnote" style="margin:0"></p>
+    <div class="states wrapit" id="sexseg" role="group" aria-label="Sex"></div>
+    <div class="grid" id="nums">
+      <div class="field"><label for="age">Age</label><input id="age" inputmode="numeric" autocomplete="off"></div>
+      <div class="field"><label for="wt">Weight (kg)</label><input id="wt" inputmode="decimal" autocomplete="off"></div>
+      <div class="field"><label for="bmi">BMI</label><input id="bmi" inputmode="decimal" autocomplete="off"></div>
+      <div class="field"><label for="crcl">CrCl (mL/min)</label><input id="crcl" inputmode="decimal" autocomplete="off"></div>
+      <div class="field"><label for="plt">Platelets (×10³/µL)</label><input id="plt" inputmode="numeric" autocomplete="off"></div>
+    </div>
+  </div>
+  <div class="card" id="vte-risk">
+    <p class="label">Clot risk · Padua and IMPROVE</p>
+    <p class="sub">Age, BMI and an ICU stay are scored from above.</p>
+    <div class="checks" id="vteticks"></div>
+  </div>
+  <div class="card" id="bleed-risk">
+    <p class="label">Bleeding risk · IMPROVE</p>
+    <p class="sub">Age, sex, CrCl, platelets and an ICU stay are scored from above.</p>
+    <div class="checks" id="bleedticks"></div>
+  </div>
+  <div class="card" id="modifiers">
+    <p class="label">Changes the plan</p>
+    <div class="checks" id="modticks" style="margin-top:0"></div>
+  </div>
+  </div>
+  <div id="out"></div>
+</div>
+
+<div class="panel" id="p-ag" role="tabpanel" aria-labelledby="t-ag">
+  <div class="card" id="fit">
+    <p class="label">Before you order</p>
+    <h2>Which option fits</h2>
+    <p class="sub">Send a blood count (platelets) and a creatinine for CrCl, and get a weight and BMI. An INR only if liver disease is suspected. Then tap what you found: options that no longer fit fade, each with the reason.</p>
+    <div class="states" id="fit-feats" role="group" aria-label="Patient features"></div>
+    <div id="fit-agents"></div>
+    <p class="line1" id="fit-next"></p>
+  </div>
+  <div class="refgrid" id="doses"></div>
+</div>
+
+<div class="panel" id="p-learn" role="tabpanel" aria-labelledby="t-learn">
+  <div class="pills" id="pills"></div>
+  <div class="card chap" id="learn-why" data-pill="Why clots"><p class="label">1 · The problem</p><h2>Why patients clot in hospital</h2><p class="sub">Lying still empties the calf pump; illness adds inflammation and a sticky blood. Pick a state.</p><div data-figure="pump"></div></div>
+  <div class="card chap" id="learn-balance" data-pill="Two risks"><p class="label">2 · The decision</p><h2>Two risks, four answers</h2><p class="sub">Clot risk decides whether to protect; bleeding risk decides how.</p><div data-figure="balance"></div></div>
+  <div class="card chap" id="learn-padua" data-pill="Padua"><p class="label">3 · Clot risk</p><h2>Count to four</h2><p class="sub">Tap what applies. Four or more is at risk.</p><div class="tap" id="padua-tap"></div><p class="head" id="padua-sum"></p><p class="line1" id="padua-line"></p></div>
+  <div class="card chap" id="learn-bleed" data-pill="Bleeding"><p class="label">4 · Bleeding risk</p><h2>Three factors outweigh the rest</h2><p>An active stomach or duodenal ulcer, bleeding in the 3 months before admission, and platelets below 50 each carried an odds ratio over 3 for bleeding in hospital. CHEST counts any one of them, or several lesser factors together, as too high a risk for an anticoagulant.</p><p class="note">The IMPROVE bleeding score adds them up; 7 or more marked the 10% of patients who had over half the major bleeds. It was never tested as a rule for withholding prophylaxis, so this tool shows it as a caution, not a stop.</p></div>
+  <div class="card chap" id="learn-drugs" data-pill="The drugs"><p class="label">5 · Mechanism</p><h2>Where each drug acts</h2><div data-figure="drugs"></div></div>
+  <div class="card chap" id="learn-comp" data-pill="Compression"><p class="label">6 · Without a drug</p><h2>Squeezing the calf</h2><p class="sub">Compression replaces the calf pump. Pumps helped after stroke; stockings did not.</p><div data-figure="pump" data-state="ipc"></div></div>
+  <div class="card chap" id="learn-kidney" data-pill="Kidneys"><p class="label">7 · Dosing</p><h2>Enoxaparin and the kidney</h2><div data-figure="kidney"></div></div>
+  <div class="card chap" id="learn-extend" data-pill="Stop at discharge"><p class="label">8 · Duration</p><h2>Why prophylaxis stops at discharge</h2><p class="sub">Four trials gave a tablet for about a month after discharge. Pick one.</p><div data-figure="extend"></div></div>
+  <div class="card chap" id="trials" data-pill="Trials"><p class="label">9 · Trials</p><h2>The trials behind the practice</h2><div id="trialbox"></div><div class="row"><button class="btn" id="go-prac">Try the practice cases</button></div></div>
+</div>
+
+<div class="panel" id="p-prac" role="tabpanel" aria-labelledby="t-prac">
+  <div id="practice"></div>
+</div>
+
+<div class="scrim" id="scrim" hidden></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-t" hidden>
+  <div class="sheethead"><h2 id="sheet-t"></h2><button class="xbtn" id="sheet-x">Close</button></div>
+  <div id="sheet-b"></div>
+</div>
+
+<footer>
+  <p><strong>For education only. Not a substitute for clinical judgment.</strong> For adults admitted with a medical illness; surgical, trauma, obstetric and pediatric patients need their own guidance. Built to national guidance and FDA labels; formularies, order sets and dose rounding vary, so adjust to your institution. Rows marked expert practice are not from a graded guideline. Evidence tiers are shown as strength and certainty (ASH, GRADE), grade (CHEST) or class and level (AHA/ASA).</p>
+  <p>Privacy: everything runs in your browser. Nothing you enter is sent anywhere or stored, and there are no analytics. Do not enter names, record numbers, or dates of birth.</p>
+  <p class="mono">Last reviewed: 2026-11-19</p>
+  <p><strong>Sources:</strong> Schünemann HJ et al., ASH 2018 guidelines for management of VTE: prophylaxis for hospitalized and nonhospitalized medical patients, Blood Adv 2018;2:3198 (reviewed by ASH in 2022 and kept) · Kahn SR et al., Prevention of VTE in nonsurgical patients, CHEST 9th edition, Chest 2012;141(2 Suppl):e195S · Barbar S et al., Padua Prediction Score, J Thromb Haemost 2010;8:2450 · Spyropoulos AC et al., IMPROVE VTE risk model, Chest 2011;140:706 · Decousus H et al., IMPROVE bleeding risk, Chest 2011;139:69 (IMPROVE points as printed in the ASH 2018 guideline, Table 1) · Greenberg SM et al., 2022 AHA/ASA guideline for spontaneous intracerebral hemorrhage, Stroke 2022;53:e282 · Wang TF et al., Thromb Haemost 2014;111:88 (obesity dosing, observational) · Douketis J et al., DIRECT, Arch Intern Med 2008;168:1805 · FDA prescribing information: enoxaparin (Lovenox and generic), Fragmin (2024), Arixtra (2024), heparin sodium (2025), Xarelto (2026) · Trials: Samama MM et al., N Engl J Med 1999;341:793 · Leizorovicz A et al., Circulation 2004;110:874 · Cohen AT et al., BMJ 2006;332:325 · Kakkar AK et al., N Engl J Med 2011;365:2463 · PROTECT Investigators, N Engl J Med 2011;364:1305 · CLOTS Trials Collaboration, Lancet 2009;373:1958 and Lancet 2013;382:516 · Arabi YM et al., N Engl J Med 2019;380:1305 · Cohen AT et al., N Engl J Med 2013;368:513 · Goldhaber SZ et al., N Engl J Med 2011;365:2167 · Cohen AT et al., N Engl J Med 2016;375:534 · Spyropoulos AC et al., N Engl J Med 2018;379:1118 · Diagrams are schematic and drawn for this site.</p>
+</footer>
+</div>
+
+<script id="engine">
+/* Pure decision engine. No DOM access. Units: age years; weight kg; BMI kg/m2; CrCl mL/min; platelets x10^3/uL. */
+var VTE_T = [
+  ['cancer','Active cancer','Metastases, or chemotherapy or radiotherapy in the last 6 months'],
+  ['prevVTE','Previous DVT or PE','Not superficial vein thrombosis'],
+  ['mob3','Bed rest for 3 days or more','Expected; bathroom privileges only'],
+  ['immob7','Immobile 7 days or more','Bed or chair bound, counting days before admission'],
+  ['thromb','Known thrombophilia','Antithrombin, protein C or S deficiency, factor V Leiden, prothrombin mutation, antiphospholipid syndrome'],
+  ['para','Leg paralysis','Leg falls to the bed within 5 seconds but has some effort against gravity'],
+  ['trauma','Trauma or surgery in the last month',''],
+  ['hf','Heart or respiratory failure',''],
+  ['mi','Acute myocardial infarction',''],
+  ['stroke','Acute ischemic stroke',''],
+  ['infect','Acute infection or rheumatologic flare',''],
+  ['hormone','Hormone therapy','Estrogen, progestin, testosterone, tamoxifen']
+];
+var BLEED_T = [
+  ['bleeding','Bleeding now',''],
+  ['ulcer','Active stomach or duodenal ulcer',''],
+  ['bleed3','Bleeding in the 3 months before admission',''],
+  ['liver','Liver failure (INR above 1.5)',''],
+  ['cvc','Central venous catheter',''],
+  ['rheum','Rheumatic disease',''],
+  ['otherbleed','Other major bleeding risk','Recent brain, spine or eye surgery or bleed; dual antiplatelet therapy; coagulopathy; severe uncontrolled hypertension']
+];
+var MOD_T = [
+  ['onac','On a full-dose anticoagulant',''],
+  ['hit','Heparin-induced thrombocytopenia, now or before',''],
+  ['ich','Spontaneous brain hemorrhage this admission','Not traumatic, not subarachnoid'],
+  ['neurax','Epidural or spinal catheter or puncture',''],
+  ['legs','Leg wounds, injury or severe leg ischemia','']
+];
+var SETS = {ward: 'Ward', icu: 'ICU', ltc: 'Long-term care', surg: 'Surgical or trauma'};
+var SETNOTE = {ward: 'Admitted with an acute medical illness.', icu: 'Critically ill medical patient in an intensive care unit.', ltc: 'Chronically ill, nursing home level, with no new acute illness.', surg: 'Outside this tool.'};
+
+function has(i, k){ return !!(i && i[k]); }
+function padua(i){
+  var s = 0, items = [], miss = [];
+  function add(c, p, n){ if (c){ s += p; items.push(n + ' ' + p); } }
+  add(has(i,'cancer'), 3, 'cancer'); add(has(i,'prevVTE'), 3, 'previous VTE'); add(has(i,'mob3'), 3, 'bed rest'); add(has(i,'thromb'), 3, 'thrombophilia');
+  add(has(i,'trauma'), 2, 'trauma or surgery');
+  if (i.age == null) miss.push('age'); else add(i.age >= 70, 1, 'age 70+');
+  add(has(i,'hf'), 1, 'heart or lung failure'); add(has(i,'mi') || has(i,'stroke'), 1, has(i,'stroke') && !has(i,'mi') ? 'stroke' : 'MI or stroke'); add(has(i,'infect'), 1, 'infection');
+  if (i.bmi == null) miss.push('BMI'); else add(i.bmi >= 30, 1, 'BMI 30+');
+  add(has(i,'hormone'), 1, 'hormones');
+  return {score: s, items: items, miss: miss, high: s >= 4};
+}
+function improveVTE(i){
+  var s = 0, items = [], miss = [];
+  function add(c, p, n){ if (c){ s += p; items.push(n + ' ' + p); } }
+  add(has(i,'prevVTE'), 3, 'previous VTE'); add(has(i,'thromb'), 2, 'thrombophilia'); add(has(i,'para'), 2, 'leg paralysis'); add(has(i,'cancer'), 2, 'cancer');
+  add(has(i,'immob7'), 1, 'immobile 7 days'); add(i.set === 'icu', 1, 'ICU');
+  if (i.age == null) miss.push('age'); else add(i.age > 60, 1, 'age over 60');
+  var cat = s >= 4 ? 'high' : s >= 2 ? 'moderate' : 'low';
+  return {score: s, items: items, miss: miss, cat: cat, rate: {low: '0.5%', moderate: '1.5%', high: '5.7%'}[cat]};
+}
+function improveBleed(i){
+  var s = 0, items = [], miss = [];
+  function add(c, p, n){ if (c){ s += p; items.push(n + ' ' + p); } }
+  add(has(i,'ulcer'), 4.5, 'ulcer'); add(has(i,'bleed3'), 4, 'recent bleeding');
+  if (i.plt == null) miss.push('platelets'); else add(i.plt < 50, 4, 'platelets under 50');
+  if (i.age == null) miss.push('age'); else { add(i.age >= 85, 3.5, 'age 85+'); add(i.age >= 40 && i.age < 85, 1.5, 'age 40–84'); }
+  add(has(i,'liver'), 2.5, 'liver failure');
+  if (i.crcl == null) miss.push('CrCl'); else { add(i.crcl < 30, 2.5, 'kidney function under 30'); add(i.crcl >= 30 && i.crcl < 60, 1, 'kidney function 30–59'); }
+  add(i.set === 'icu', 2.5, 'ICU'); add(has(i,'cvc'), 2, 'central line'); add(has(i,'rheum'), 2, 'rheumatic disease'); add(has(i,'cancer'), 2, 'cancer');
+  if (!i.sex) miss.push('sex'); else add(i.sex === 'm', 1, 'male');
+  return {score: s, items: items, miss: miss, high: s >= 7};
+}
+function hardBleed(i){
+  var r = [];
+  if (has(i,'bleeding')) r.push('Active bleeding');
+  if (has(i,'ulcer')) r.push('An active ulcer');
+  if (has(i,'bleed3')) r.push('Bleeding in the 3 months before admission');
+  if (i.plt != null && i.plt < 50) r.push('A platelet count below 50');
+  if (has(i,'otherbleed')) r.push('A major bleeding risk');
+  return r;
+}
+function lowWeight(i){ return i.wt != null && ((i.sex === 'f' && i.wt < 45) || (i.sex === 'm' && i.wt < 57)); }
+function fmtS(n){ return String(n).replace('.5', '½'); }
+
+function mechPlan(i, reason){
+  var ipcOnly = has(i,'stroke') || has(i,'ich');
+  var o = {kind: 'mech', fig: 'mech'};
+  o.head = ipcOnly ? 'Intermittent pneumatic compression' : 'Intermittent pneumatic compression or graduated stockings';
+  o.sub = 'No anticoagulant for now.';
+  o.steps = [
+    {when: 'Now', now: true, name: ipcOnly ? 'Pneumatic compression on both legs' : 'Pneumatic compression or graduated stockings on both legs', small: ipcOnly ? 'After a stroke use pumps, not stockings.' : 'Either is acceptable; pumps have the stronger trial.'},
+    {when: 'Every day', name: 'Recheck bleeding risk', small: 'When it falls and clot risk persists, switch to an anticoagulant (below) and stop the device.'}
+  ];
+  o.guards = [];
+  if (has(i,'legs')) o.guards.push('Check the legs first: wounds, injury or severe ischemia may rule out pumps and stockings. Stockings caused skin breaks in 5% (vs 1%) of stroke patients in CLOTS 1.');
+  o.tiers = ['CHEST 2012 2.7.1 (1B), 2.7.2 (2C; switch 2B)', 'ASH 2018 rec 7 (conditional, moderate), rec 10 (conditional, very low)'];
+  if (ipcOnly) o.tiers.push('CLOTS 1 and CLOTS 3');
+  o.more = ['Bleeding risk counted here as high: active bleeding, an active ulcer, bleeding in the 3 months before admission, platelets below 50, or another major bleeding risk you ticked. CHEST 2012 also counts several lesser factors together; use the bleeding score below as a guide to that.', 'Do not add a drug to a device, or a device to a drug, routinely: ASH 2018 suggests one or the other (recs 8 and 9, conditional, very low certainty).'];
+  return o;
+}
+function drugPlan(i){
+  var o = {kind: 'drug', fig: 'drug', guards: [], more: [], tiers: []};
+  var bmi40 = i.bmi != null && i.bmi >= 40, ck = i.crcl != null && i.crcl < 30;
+  if (i.plt == null) o.guards.push('Enter the platelet count: below 50 an anticoagulant is held.');
+  if (has(i,'hit')){
+    if ((i.crcl != null && i.crcl < 30) || (i.wt != null && i.wt < 50)){
+      var m = mechPlan(i); m.hitBlock = true; m.sub = 'Heparins are out and fondaparinux is contraindicated (' + (i.crcl != null && i.crcl < 30 ? 'CrCl below 30' : 'weight below 50 kg') + ').';
+      m.guards.unshift('Ask hematology about a non-heparin option. If HIT is active or suspected now, prophylaxis is not enough: it needs a treatment-dose non-heparin anticoagulant (expert practice).');
+      m.tiers.push('Arixtra label 4 (contraindications)', 'expert practice'); return m;
+    }
+    o.agent = 'fonda'; o.head = 'Fondaparinux 2.5 mg SC once daily';
+    o.sub = 'No heparin or LMWH.';
+    o.steps = [{when: 'Daily', now: true, name: 'Fondaparinux', dose: '2.5 mg subcutaneously once daily', small: 'Off label in medical patients in the US; the dose is the surgical prophylaxis dose, tested in medical patients in ARTEMIS.'}];
+    o.guards.push('If HIT is active or suspected now, prophylaxis is not enough: it needs a treatment-dose non-heparin anticoagulant (expert practice).');
+    if (i.crcl == null || i.wt == null) o.guards.push('Fondaparinux is contraindicated with CrCl below 30 or weight below 50 kg. Enter both.');
+    if (has(i,'neurax')) o.guards.push('Spinal or epidural: fondaparinux carries the same spinal hematoma boxed warning. Confirm catheter timing with anesthesia.');
+    o.more.push('The labels contraindicate enoxaparin after immune-mediated HIT within the past 100 days or with circulating antibodies. This tool avoids every heparin after any HIT, a deliberately stricter choice (expert practice).');
+    o.tiers = ['ASH 2018 rec 3: fondaparinux over heparin (conditional, very low)', 'Arixtra label 2, 4', 'HIT choice: expert practice'];
+    return o;
+  }
+  o.agent = 'enox';
+  if (ck){
+    o.head = 'Enoxaparin 30 mg SC once daily';
+    o.steps = [{when: 'Daily', now: true, name: 'Enoxaparin', dose: '30 mg subcutaneously once daily', small: 'Kidney dose for CrCl below 30.'}, {when: 'Or', name: 'Heparin', dose: '5,000 units subcutaneously every 8 to 12 hours', small: 'No kidney adjustment; simpler when kidney function is changing or on dialysis (expert practice).'}];
+    o.tiers.push('Enoxaparin label 2.3 (CrCl below 30)');
+    if (bmi40) o.guards.push('BMI 40 or more with CrCl below 30: no regimen has been tested. Use the kidney dose or heparin 5,000 units every 8 hours, and ask pharmacy (expert practice).');
+  } else if (bmi40){
+    o.head = 'Enoxaparin 40 mg SC twice daily';
+    o.steps = [{when: 'Twice daily', now: true, name: 'Enoxaparin', dose: '40 mg subcutaneously every 12 hours', small: 'Higher dose for BMI 40 or more (expert practice).'}, {when: 'Or', name: 'Heparin', dose: '7,500 units subcutaneously every 8 hours', small: 'Expert practice.'}];
+    o.tiers.push('Obesity dose: expert practice; Wang 2014, observational');
+    o.more.push('The enoxaparin label says there is no consensus on dose adjustment in obesity. The higher doses come from one retrospective cohort of mixed medical and surgical inpatients weighing over 100 kg with a BMI of 40 or more: symptomatic VTE 0.77% on high doses vs 1.48% on standard doses (OR 0.52, P = 0.050), with no more bleeding.');
+  } else {
+    o.head = 'Enoxaparin 40 mg SC once daily';
+    o.steps = [{when: 'Daily', now: true, name: 'Enoxaparin', dose: '40 mg subcutaneously once daily'}, {when: 'Or', name: 'Heparin', dose: '5,000 units subcutaneously every 8 or 12 hours', small: 'Dalteparin 5,000 units daily is another LMWH.'}];
+    if (i.crcl == null) o.guards.push('Enter CrCl: below 30 the enoxaparin dose is 30 mg once daily.');
+  }
+  o.sub = i.set === 'icu' ? 'LMWH is suggested over heparin in the ICU as well.' : 'LMWH is suggested over heparin.';
+  if (lowWeight(i)) o.guards.push('Low weight: a 40 mg dose gives ' + (i.sex === 'f' ? '52%' : '27%') + ' more exposure in ' + (i.sex === 'f' ? 'women under 45 kg' : 'men under 57 kg') + '. The label keeps the dose and says to watch closely for bleeding.');
+  if (has(i,'neurax')) o.guards.push(bmi40 && !ck ? 'Spinal or epidural: 40 mg twice daily is not one of the label\'s lower doses, so many wait at least 24 hours after a dose before placing or removing a catheter (expert practice); next dose at least 4 hours after removal (label 5.1). Confirm with anesthesia.' : (ck ? 'Spinal or epidural: with CrCl below 30 the label says to consider doubling the wait, to at least 24 hours after a prophylaxis dose before placing or removing a catheter; next dose at least 4 hours after removal (label 5.1). Confirm with anesthesia.' : 'Spinal or epidural: place or remove a catheter at least 12 hours after an enoxaparin prophylaxis dose; next dose at least 4 hours after removal (label 5.1). Heparin timing: confirm with anesthesia.'));
+  o.tiers.unshift(i.set === 'icu' ? 'ASH 2018 rec 4: heparin or LMWH (strong, moderate); rec 5: LMWH over heparin (conditional, moderate)' : 'CHEST 2012 2.3 (1B); ASH 2018 rec 1 (conditional, low), rec 2: LMWH over heparin (conditional, low)');
+  o.tiers.push('No DOAC in hospital: ASH 2018 rec 11 (strong, moderate)');
+  o.more.push('Alternatives: heparin 5,000 units every 8 or 12 hours; dalteparin 5,000 units once daily (label); fondaparinux 2.5 mg once daily (no US indication in medical patients; contraindicated with CrCl below 30 or weight below 50 kg).');
+  o.more.push('Watch the platelet count. Stop the drug and think of HIT if platelets fall below 100,000 (labels) or fall by half or more 5 to 10 days after starting (expert practice).');
+  return o;
+}
+
+function decide(i){
+  var o = {pad: padua(i), imp: improveVTE(i), bl: improveBleed(i)};
+  if (!i.set){ o.kind = 'empty'; return o; }
+  var hb = hardBleed(i), plan;
+  if (i.set === 'surg'){ o.kind = 'surg'; return o; }
+  if (has(i,'onac') && !has(i,'ich') && !has(i,'bleeding')){
+    plan = {kind: 'onac', fig: null, head: 'No added prophylaxis', sub: 'The full-dose anticoagulant already covers it.', steps: [{when: 'If it is held', now: true, name: 'Reassess', small: 'For a procedure or bleeding, run this again: prophylaxis or compression may be needed while it is off.'}], guards: [], tiers: ['Expert practice'], more: [],
+      why: 'A full-dose anticoagulant already prevents clots; a prophylactic dose on top adds bleeding, not protection.'};
+  } else if (has(i,'ich')){
+    plan = mechPlan(i); plan.kind = 'ich';
+    plan.sub = 'For patients who are not walking after a spontaneous brain hemorrhage.';
+    var dpi = drugPlan(i), ckI = i.crcl != null && i.crcl < 30;
+    plan.steps = [{when: 'From the day of diagnosis', now: true, name: 'Pneumatic compression on both legs', small: 'Not stockings alone.'}];
+    plan.tiers = ['AHA/ASA 2022 ICH: compression (1, B-R); low-dose heparin or LMWH (2a, C-LD); start at 24–48 h (2b, C-LD); stockings alone (3: No Benefit, B-R)'];
+    plan.more = ['Traumatic brain bleeds, subarachnoid hemorrhage and recent neurosurgery are not covered by this rule: tick "Other major bleeding risk" and ask the specialist team.'];
+    if (hb.length || dpi.kind !== 'drug'){
+      var whyNo = hb.length ? hb[0] : 'HIT, with fondaparinux contraindicated by ' + (ckI ? 'CrCl below 30' : 'weight below 50 kg');
+      plan.head = 'Pneumatic compression; no anticoagulant yet';
+      plan.steps.push({when: '24 to 48 hours from onset', name: 'No anticoagulant yet', small: whyNo + ': keep compression and ask the specialist team when a drug is safe.'});
+      plan.why = 'Hematoma growth is the early danger, and a drug is ruled out for now (' + (whyNo.indexOf('HIT') === 0 ? whyNo : whyNo.charAt(0).toLowerCase() + whyNo.slice(1)) + '), so compression carries the protection.';
+      if (dpi.hitBlock) plan.guards = plan.guards.concat(dpi.guards.filter(function(g){ return g.indexOf('HIT is active') >= 0 || g.indexOf('hematology') >= 0; }));
+    } else {
+      plan.head = 'Pneumatic compression now; a low-dose anticoagulant from 24 to 48 hours';
+      var dname = dpi.agent === 'fonda' ? 'fondaparinux 2.5 mg SC once daily' : (ckI ? 'enoxaparin 30 mg SC once daily' : 'enoxaparin 40 mg SC once daily') + ', or heparin 5,000 units SC every 8 to 12 hours';
+      plan.steps.push({when: '24 to 48 hours from onset', name: 'Consider ' + dname, small: 'If the bleed is stable on repeat imaging; agree it with neurology or neurosurgery.' + (dpi.agent === 'fonda' ? ' Fondaparinux here is expert practice: the guideline names heparin and LMWH.' : '') + (i.bmi != null && i.bmi >= 40 && dpi.agent !== 'fonda' ? ' Standard dose after a brain bleed even at BMI 40 or more (expert practice).' : '')});
+      if (dpi.agent === 'fonda') plan.tiers.push('fondaparinux after HIT: expert practice');
+      plan.guards = plan.guards.concat(dpi.guards.filter(function(g){ return g.indexOf('twice daily') < 0 && g.indexOf('BMI 40') < 0; }));
+      if (has(i,'neurax') && dpi.agent === 'enox' && !ckI && i.bmi != null && i.bmi >= 40) plan.guards.push('Spinal or epidural: place or remove a catheter at least 12 hours after an enoxaparin prophylaxis dose; next dose at least 4 hours after removal (label 5.1). Heparin timing: confirm with anesthesia.');
+      plan.why = 'Hematoma growth is the early danger, so compression starts now and a low-dose anticoagulant waits 24 to 48 hours.';
+    }
+  } else if (i.set === 'ltc'){
+    plan = {kind: 'none', fig: 'low', head: 'No routine prophylaxis', sub: 'Chronically ill, with no new acute illness.', steps: [{when: 'If that changes', now: true, name: 'Treat as a ward patient', small: 'A new acute illness, a hospital transfer or a new period of bed rest: pick Ward and score again.'}], guards: [], tiers: ['ASH 2018 rec 15 (conditional, very low)'], more: [],
+      why: 'Without a new acute illness, prophylaxis showed no net benefit in chronically ill patients.'};
+  } else {
+    var atRisk = i.set === 'icu' || o.pad.high;
+    if (!atRisk){
+      plan = {kind: 'none', fig: 'low', head: 'No prophylaxis: keep the patient walking', sub: 'Neither a drug nor a device.', steps: [{when: 'Every day', now: true, name: 'Rescore', small: 'New bed rest, a new infection or an ICU transfer can tip the score to 4.'}], guards: [], tiers: ['CHEST 2012 2.4: no drug or device at low risk (1B)'], more: [],
+        why: 'Padua ' + o.pad.score + ': below 4, only 0.3% had a clot within 90 days without prophylaxis, so injections would add bleeding without benefit.'};
+      if (o.pad.miss.length) plan.guards.push('Not entered: ' + o.pad.miss.join(' and ') + '. Each adds a point when present.');
+      if (o.imp.score >= 4){ plan.head = 'Padua says no prophylaxis; IMPROVE says high risk'; plan.sub = 'The two scores disagree: decide at the bedside.'; plan.kind = 'split'; plan.fig = null; plan.why = 'Padua ' + o.pad.score + ' is below 4, where 0.3% clotted without prophylaxis, but IMPROVE ' + o.imp.score + ' carried 5.7% at 3 months; the scores weigh different risk factors.'; }
+      if (o.imp.score >= 2) plan.guards.push('The IMPROVE score is ' + o.imp.score + ' (' + o.imp.cat + ' risk, ' + o.imp.rate + ' at 3 months). ASH notes prophylaxis is indicated at 2 or more.' + (o.imp.score >= 4 ? '' : ' The two scores disagree here: use judgment.'));
+    } else if (hb.length){
+      plan = mechPlan(i);
+      plan.why = hb[0] + ' makes an anticoagulant riskier than the clot it prevents; leg compression protects without causing bleeding.';
+      var dp = drugPlan(i); plan.steps[1].small = 'When it falls and clot risk persists, switch to ' + (dp.kind === 'drug' ? dp.head.charAt(0).toLowerCase() + dp.head.slice(1) : 'an anticoagulant') + ' and stop the device.';
+    } else {
+      plan = drugPlan(i);
+      if (plan.kind === 'mech'){
+        plan.why = 'Any heparin, LMWH included, can set off HIT again, and fondaparinux cannot be used here; compression protects without either.';
+      } else if (has(i,'hit')){
+        plan.why = 'Any heparin, LMWH included, can set off HIT again, so a non-heparin drug is used.';
+      } else if (i.set === 'icu'){
+        plan.why = 'Critical illness alone puts clot risk high enough that heparin or LMWH is recommended for anyone who can take it safely.';
+      } else {
+        plan.why = 'Padua ' + o.pad.score + ' (' + o.pad.items.join(', ') + '): at 4 or more, 11% had a clot within 90 days without prophylaxis and 2.2% with it.';
+      }
+      if (plan.kind === 'drug' && plan.agent === 'enox' && i.crcl != null && i.crcl < 30) plan.why += ' Below CrCl 30 enoxaparin builds up, so the dose drops to 30 mg.';
+      if (plan.kind === 'drug' && o.bl.high) plan.guards.unshift('Bleeding score ' + fmtS(o.bl.score) + ' (7 or more): about 4% had a major bleed in hospital, against 0.4% below 7. The score was not tested as a reason to withhold prophylaxis; weigh it, and recheck daily.');
+    }
+    if (i.set === 'icu' && plan.kind === 'drug') plan.more.push('Do not add pneumatic compression to heparin routinely: in the ICU it did not reduce proximal DVT (3.9% vs 4.2%).');
+  }
+  if (has(i,'onac') && (has(i,'ich') || has(i,'bleeding'))) plan.guards.unshift('On a full-dose anticoagulant and bleeding: stop and reverse it as the bleed requires. This plan assumes it is held.');
+  for (var k in plan) o[k] = plan[k];
+  o.dur = {head: 'Until discharge or fully mobile', steps: ['Stop at discharge, or earlier once walking normally.', 'Do not extend with a tablet after discharge.'],
+    why: 'Extending prophylaxis for about a month after discharge prevented few clots, and two of four large trials showed significantly more bleeding.',
+    more: ['The enoxaparin label gives a usual course of 6 to 11 days; trials ran up to 14.', 'Rivaroxaban 10 mg daily for 31 to 39 days in total is FDA-approved for selected acutely ill patients not at high risk of bleeding (the label excludes bronchiectasis, lung cavities or hemorrhage, active cancer treatment, an ulcer or bleeding in the last 3 months, and dual antiplatelet therapy). ASH recommends against extended DOAC prophylaxis (rec 12, strong). Betrixaban was withdrawn from the US market in 2020 for business reasons.'],
+    tiers: ['ASH 2018 recs 13 and 14 (strong, moderate)', 'CHEST 2012 2.8 (2B)', 'Xarelto label 1.6, 2.1, 5.2']};
+  return o;
+}
+
+/* Which option fits: shared with the Agents tab */
+var OPTS = ['enox','dalte','ufh','fonda','ipc','gcs','doac'];
+var ONAME = {enox: 'Enoxaparin', dalte: 'Dalteparin', ufh: 'Heparin (subcutaneous)', fonda: 'Fondaparinux', ipc: 'Pneumatic compression', gcs: 'Graduated stockings', doac: 'A DOAC in hospital'};
+var BASE = {enox: ['fav','40 mg daily; LMWH is suggested over heparin'], dalte: ['in','5,000 units daily'], ufh: ['in','5,000 units every 8 or 12 hours'], fonda: ['in','2.5 mg daily; no US indication in medical patients'], ipc: ['less','only when no drug is given'], gcs: ['less','only when no drug is given'], doac: ['out','LMWH over DOACs in hospital (ASH, strong)']};
+var FIT = {
+  crcl30: {n: 'CrCl below 30', m: {enox: ['fav','30 mg once daily (label)'], ufh: ['in','no kidney adjustment; simplest if kidney function is changing'], dalte: ['in','label gives no kidney dose; no build-up at 5,000 units in ICU patients (DIRECT)'], fonda: ['out','contraindicated below CrCl 30']}},
+  bmi40: {n: 'BMI 40 or more', m: {enox: ['fav','40 mg twice daily (expert practice)'], ufh: ['in','7,500 units every 8 hours (expert practice)']}},
+  wt50: {n: 'Weight under 50 kg', m: {fonda: ['out','contraindicated under 50 kg'], enox: ['less','more exposure at low weight; watch for bleeding']}},
+  hit: {n: 'HIT, now or before', m: {enox: ['out','a heparin'], dalte: ['out','a heparin'], ufh: ['out','a heparin'], fonda: ['fav','2.5 mg daily; the usual non-heparin choice (expert practice)']}},
+  bleed: {n: 'High bleeding risk', m: {enox: ['out','bleeding risk too high'], dalte: ['out','bleeding risk too high'], ufh: ['out','bleeding risk too high'], fonda: ['out','bleeding risk too high'], ipc: ['fav','until bleeding risk falls'], gcs: ['in','until bleeding risk falls']}},
+  stroke: {n: 'Stroke', m: {gcs: ['out','no benefit and more skin breaks after stroke (CLOTS 1)']}},
+  legs: {n: 'Leg wounds or ischemia', m: {ipc: ['less','may not fit an injured or ischemic leg'], gcs: ['out','skin breaks; avoid on damaged or ischemic legs']}},
+  neurax: {n: 'Spinal or epidural', m: {enox: ['less','12 hours from a prophylaxis dose to catheter placement or removal (label)'], dalte: ['less','time around the catheter (boxed warning)'], fonda: ['less','time around the catheter (boxed warning)'], ufh: ['less','time around the catheter: confirm with anesthesia']}}
+};
+var FITORDER = ['crcl30','bmi40','wt50','hit','bleed','stroke','legs','neurax'];
+var RANK = {'in': 1, fav: 2, less: 3, out: 4};
+function fit(sel){
+  var cur = {}, fromBase = {};
+  OPTS.forEach(function(a){ cur[a] = BASE[a]; fromBase[a] = true; });
+  FITORDER.forEach(function(f){ if (!sel[f]) return; var m = FIT[f].m; Object.keys(m).forEach(function(a){ if (fromBase[a] || RANK[m[a][0]] > RANK[cur[a][0]]){ cur[a] = m[a]; fromBase[a] = false; } }); });
+  return OPTS.map(function(a){ return {a: a, name: ONAME[a], st: cur[a][0], why: cur[a][1]}; });
+}
+function pickFit(rows){ var f = rows.filter(function(r){ return r.st === 'fav'; }); if (!f.length) f = rows.filter(function(r){ return r.st === 'in'; }); if (!f.length){ f = rows.filter(function(r){ return r.st === 'less'; }); var drugs = f.filter(function(r){ return r.a !== 'ipc' && r.a !== 'gcs' && r.a !== 'doac'; }); if (drugs.length) f = drugs; } return f; }
+function featuresOf(i, o){
+  var s = {};
+  if (i.crcl != null && i.crcl < 30) s.crcl30 = 1;
+  if (i.bmi != null && i.bmi >= 40) s.bmi40 = 1;
+  if (i.wt != null && i.wt < 50) s.wt50 = 1;
+  if (has(i,'hit')) s.hit = 1;
+  if (hardBleed(i).length || has(i,'ich')) s.bleed = 1;
+  if (has(i,'stroke') || has(i,'ich')) s.stroke = 1;
+  if (has(i,'legs')) s.legs = 1;
+  if (has(i,'neurax')) s.neurax = 1;
+  return s;
+}
+</script>
+
+<script id="figures">
+/* Figures. Drawn for this site; states follow the engine above. */
+var FS = 'font-family:var(--sans)', FM = 'font-family:var(--mono)';
+function svgOpen(vb, label){ return '<svg viewBox="' + vb + '" role="img" aria-label="' + label + '" class="fig">'; }
+function tx(x, y, t, o){ o = o || {}; return '<text x="' + x + '" y="' + y + '" text-anchor="' + (o.a || 'middle') + '" style="' + (o.sans ? FS : FM) + ';font-size:' + (o.s || 11) + 'px;font-weight:' + (o.w || 400) + ';fill:' + (o.c || 'var(--ink)') + '">' + t + '</text>'; }
+function bx(x, y, w, h, t1, t2, st){
+  var fill = st === 'hot' ? 'var(--warnbg)' : st === 'on' ? 'var(--card)' : 'var(--fill)', stroke = st === 'hot' ? 'var(--warn)' : st === 'on' ? 'var(--accent)' : 'var(--line)';
+  return '<g' + (st === 'dim' ? ' opacity=".4"' : '') + '><rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="10" fill="' + fill + '" stroke="' + stroke + '"' + (st === 'hot' || st === 'on' ? ' stroke-width="2"' : '') + '/>' +
+    tx(x + w / 2, y + (t2 ? h / 2 - 2 : h / 2 + 4), t1, {sans: 1, s: 12, w: 600}) + (t2 ? tx(x + w / 2, y + h / 2 + 12, t2, {s: 10, c: 'var(--muted)'}) : '') + '</g>';
+}
+function mk(p){ return '<defs>' + [['n','var(--muted)'],['a','var(--accent)'],['u','var(--warn)']].map(function(k){ return '<marker id="' + p + k[0] + '" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="' + k[1] + '"/></marker>'; }).join('') + '</defs>'; }
+function ar(d, k, p, w, dash){ var c = k === 'a' ? 'var(--accent)' : k === 'u' ? 'var(--warn)' : 'var(--muted)'; return '<path d="' + d + '" fill="none" stroke="' + c + '" stroke-width="' + (w || 2) + '"' + (dash ? ' stroke-dasharray="5 4"' : '') + ' marker-end="url(#' + p + k + ')"/>'; }
+function bar(x, y0, w, h, st){ return '<rect x="' + x + '" y="' + (y0 - h) + '" width="' + w + '" height="' + Math.max(h, 1) + '" rx="3" fill="' + (st === 'a' ? 'var(--accent)' : st === 'u' ? 'var(--warn)' : 'var(--muted)') + '"' + (st === 'dim' ? ' opacity=".35"' : '') + '/>'; }
+
+var BAL = {
+  low: {n: 'Low clot risk', line: 'Padua below 4: 0.3% had a clot within 90 days without prophylaxis. CHEST recommends neither a drug nor a device (1B).'},
+  drug: {n: 'At risk, bleeding acceptable', line: 'Heparin, LMWH or fondaparinux (CHEST 1B). In the Padua cohort, clots at a score of 4 or more were 11% without prophylaxis and 2.2% with it; a cohort, not a randomized comparison.'},
+  mech: {n: 'At risk, bleeding high', line: 'Compression rather than nothing, then an anticoagulant once bleeding risk falls (CHEST 2C, switch 2B; ASH conditional).'},
+  icu: {n: 'ICU', line: 'Critically ill patients count as at risk without a score: heparin or LMWH unless bleeding risk is too high (ASH, strong).'}
+};
+function balSVG(k){
+  var h = svgOpen('0 0 340 236', 'Clot risk against bleeding risk: ' + BAL[k].n);
+  h += tx(195, 16, 'bleeding risk', {s: 10.5, c: 'var(--muted)'}) + tx(130, 32, 'acceptable', {s: 10.5}) + tx(260, 32, 'too high', {s: 10.5});
+  h += tx(34, 92, 'at risk', {s: 10.5}) + tx(34, 178, 'low', {s: 10.5}) + tx(34, 192, 'clot risk', {s: 9.5, c: 'var(--muted)'});
+  var top = k === 'icu' ? 'on' : null;
+  h += bx(70, 40, 120, 92, 'Heparin or LMWH', 'daily injection', k === 'drug' || k === 'icu' ? 'on' : 'dim');
+  h += bx(200, 40, 120, 92, 'Compression', 'drug when safe', k === 'mech' || k === 'icu' ? 'on' : 'dim');
+  h += bx(70, 144, 250, 56, 'No prophylaxis', 'keep walking', k === 'low' ? 'on' : k === 'icu' ? 'dim' : 'dim');
+  if (top) h += '<rect x="64" y="34" width="262" height="104" rx="14" fill="none" stroke="var(--accent)" stroke-width="2" stroke-dasharray="6 4"/>' + tx(195, 222, 'ICU: always in the top row', {s: 10.5, c: 'var(--accent)', w: 600});
+  return h + '</svg>';
+}
+var DRG = {
+  none: {n: 'No drug', line: 'Factor Xa makes thrombin; thrombin makes fibrin. Antithrombin is the body\'s own brake on both, but on its own it works slowly.'},
+  ufh: {n: 'Heparin', line: 'Heparin binds antithrombin and speeds its inactivation of both thrombin and factor Xa (heparin label 12.1).'},
+  lmwh: {n: 'LMWH', line: 'LMWH works through antithrombin too, but acts mostly on factor Xa: enoxaparin\'s anti-Xa to anti-thrombin ratio is about 14, against about 1 for heparin (label 12.2).'},
+  fonda: {n: 'Fondaparinux', line: 'Fondaparinux binds antithrombin and inhibits factor Xa only; it does not inactivate thrombin (label 12.1). It is not a heparin, which is why it is used after HIT.'},
+  doac: {n: 'Rivaroxaban', line: 'Rivaroxaban blocks factor Xa directly, with no antithrombin (label 12.1). In hospital, LMWH is recommended over DOACs (ASH, strong).'}
+};
+function drugSVG(k, p){
+  var h = svgOpen('0 0 340 214', 'Where ' + DRG[k].n + ' acts') + mk(p);
+  h += bx(10, 24, 96, 44, 'Factor Xa', null, k === 'none' ? null : 'on') + bx(122, 24, 96, 44, 'Thrombin', null, k === 'ufh' || k === 'none' ? (k === 'none' ? null : 'on') : k === 'lmwh' ? null : 'dim') + bx(234, 24, 96, 44, 'Fibrin clot');
+  h += ar('M108 46H118', 'n', p) + ar('M220 46H230', 'n', p);
+  var drugName = k === 'none' ? '' : DRG[k].n;
+  if (k !== 'doac') h += bx(122, 150, 96, 44, 'Antithrombin', null, k === 'none' ? null : 'on');
+  if (k === 'none'){
+    h += ar('M150 148L70 72', 'n', p, 1.5, true) + ar('M176 148L172 72', 'n', p, 1.5, true) + tx(250, 176, 'slow on its own', {s: 10, c: 'var(--muted)', a: 'start'});
+  } else if (k === 'doac'){
+    h += bx(10, 150, 110, 44, drugName, 'direct', 'hot') + ar('M58 148L58 72', 'u', p, 3) + tx(150, 176, 'no antithrombin needed', {s: 10, c: 'var(--muted)', a: 'start'});
+  } else {
+    h += bx(226, 150, 110, 44, drugName, k === 'fonda' ? 'not a heparin' : 'via antithrombin', 'hot') + ar('M224 172H222', 'u', p, 2);
+    h += ar('M150 148L70 72', 'a', p, 3);
+    if (k === 'ufh') h += ar('M176 148L172 72', 'a', p, 3);
+    if (k === 'lmwh') h += ar('M176 148L172 72', 'a', p, 1.2, true) + tx(196, 118, 'weak', {s: 10, c: 'var(--muted)', a: 'start'});
+    if (k === 'fonda') h += tx(196, 118, 'no effect', {s: 10, c: 'var(--muted)', a: 'start'});
+    h += tx(96, 118, 'inhibits', {s: 10, c: 'var(--accent)', a: 'end'});
+  }
+  return h + '</svg>';
+}
+var PMP = {
+  still: {n: 'Lying still', line: 'Lying still stops the calf pump: blood pools behind the vein valves, and illness adds inflammation and a sticky blood (stasis, vessel injury, hypercoagulability).'},
+  walk: {n: 'Walking', line: 'Walking: each calf contraction squeezes the deep veins, and the valves keep blood moving toward the heart.'},
+  ipc: {n: 'Pneumatic pump', line: 'Pneumatic compression: cuffs inflate in cycles to do the calf\'s job. After stroke, proximal DVT fell from 12.1% to 8.5% (CLOTS 3).'},
+  gcs: {n: 'Stockings', line: 'Graduated stockings are tightest at the ankle. After stroke, thigh-length stockings did not reduce DVT (10.0% vs 10.5%) and caused more skin breaks (5% vs 1%) (CLOTS 1).'}
+};
+function pumpSVG(k, p){
+  var h = svgOpen('0 0 340 214', 'Calf vein: ' + PMP[k].n) + mk(p);
+  h += '<path d="M128 14C120 70 112 110 120 150C126 182 132 200 140 204H200C208 200 214 182 220 150C228 110 220 70 212 14Z" fill="var(--fill)" stroke="var(--line)" stroke-width="2"/>';
+  if (k === 'walk') h += '<ellipse cx="140" cy="100" rx="14" ry="40" fill="var(--hrt-muscle)" opacity=".55"/><ellipse cx="200" cy="100" rx="14" ry="40" fill="var(--hrt-muscle)" opacity=".55"/>' + ar('M116 100H146', 'n', p) + ar('M224 100H194', 'n', p);
+  if (k === 'ipc') h += '<rect x="110" y="70" width="120" height="76" rx="12" fill="var(--accent)" opacity=".18" stroke="var(--accent)" stroke-width="2"/>' + ar('M100 108H130', 'a', p, 3) + ar('M240 108H210', 'a', p, 3) + tx(170, 64, 'cuff inflates', {s: 10, c: 'var(--accent)'});
+  if (k === 'gcs') [0, 1, 2].forEach(function(n){ h += '<rect x="' + (118 + n * 2) + '" y="' + (150 - n * 50) + '" width="' + (104 - n * 4) + '" height="48" rx="8" fill="var(--accent)" opacity="' + (0.32 - n * 0.09) + '"/>'; }), h += tx(170, 210, 'tightest at the ankle', {s: 10, c: 'var(--muted)'});
+  h += '<rect x="160" y="20" width="20" height="176" rx="10" fill="var(--card)" stroke="var(--hrt-vein)" stroke-width="2"/>';
+  [70, 130].forEach(function(y){ h += '<path d="M162 ' + (y + 8) + 'L170 ' + y + 'L178 ' + (y + 8) + '" fill="none" stroke="var(--hrt-vein)" stroke-width="2"/>'; });
+  if (k === 'still') h += '<ellipse cx="170" cy="146" rx="7" ry="12" fill="var(--bad)" opacity=".8"/>' + tx(108, 144, 'clot behind', {s: 10, c: 'var(--bad)', a: 'end'}) + tx(108, 157, 'a valve', {s: 10, c: 'var(--bad)', a: 'end'}) + tx(228, 60, 'no flow', {s: 10, c: 'var(--muted)', a: 'start'});
+  else h += ar('M170 186V36', 'a', p, 3) + tx(226, 40, 'toward the heart', {s: 10, c: 'var(--accent)', a: 'start'});
+  h += tx(60, 40, 'deep vein', {s: 10, c: 'var(--muted)'}) + '<path d="M84 40H158" stroke="var(--line)"/>';
+  return h + '</svg>';
+}
+var KID = {
+  ok: {n: 'CrCl 30 or more', line: 'With CrCl 30 or more the enoxaparin prophylaxis dose is 40 mg once daily, with no adjustment.'},
+  low: {n: 'CrCl below 30', line: 'Below CrCl 30, enoxaparin exposure is significantly increased (label 8.7), so the prophylaxis dose drops to 30 mg once daily (label 2.3). The heparin label gives no kidney adjustment.'}
+};
+function kidSVG(k){
+  var h = svgOpen('0 0 340 200', 'Enoxaparin exposure, ' + KID[k].n), y0 = 150;
+  h += '<path d="M30 ' + y0 + 'H320" stroke="var(--line)" stroke-width="2"/>';
+  h += bar(50, y0, 60, 60, k === 'ok' ? 'a' : 'dim') + bar(140, y0, 60, 104, k === 'low' ? 'u' : 'dim') + bar(230, y0, 60, 66, k === 'low' ? 'a' : 'dim');
+  h += '<path d="M40 90H310" stroke="var(--muted)" stroke-dasharray="4 4"/>' + tx(312, 86, 'usual', {s: 9.5, c: 'var(--muted)', a: 'end'});
+  h += tx(80, 168, '40 mg', {s: 11, w: 600}) + tx(80, 182, 'CrCl 30+', {s: 10, c: 'var(--muted)'}) + tx(170, 168, '40 mg', {s: 11, w: 600}) + tx(170, 182, 'CrCl under 30', {s: 10, c: 'var(--muted)'}) + tx(260, 168, '30 mg', {s: 11, w: 600}) + tx(260, 182, 'CrCl under 30', {s: 10, c: 'var(--muted)'});
+  h += tx(170, 18, 'drug exposure (schematic)', {s: 10.5, c: 'var(--muted)'});
+  return h + '</svg>';
+}
+var EXT = {
+  magellan: {n: 'MAGELLAN', ext: 'rivaroxaban 35 d', std: 'enoxaparin 10 d', c: [4.4, 5.7], b: [4.1, 1.7], cl: 'VTE by day 35', bl: 'major or relevant bleeding', line: '8,101 patients. Fewer clots by day 35 (4.4% vs 5.7%), but more than twice the major or clinically relevant bleeding (4.1% vs 1.7%).'},
+  adopt: {n: 'ADOPT', ext: 'apixaban 30 d', std: 'enoxaparin 6–14 d', c: [2.71, 3.06], b: [0.47, 0.19], cl: 'VTE by day 30', bl: 'major bleeding', line: '6,528 patients. No fewer clots (2.71% vs 3.06%, not significant) and more major bleeding (0.47% vs 0.19%).'},
+  apex: {n: 'APEX', ext: 'betrixaban 35–42 d', std: 'enoxaparin 10 d', c: [6.9, 8.5], b: [0.7, 0.6], cl: 'VTE, cohort 1', bl: 'major bleeding, all', line: '7,513 patients. Clots 6.9% vs 8.5% in the first cohort, just missing significance (P = 0.054); major bleeding 0.7% vs 0.6% overall. Betrixaban is no longer sold in the US.'},
+  mariner: {n: 'MARINER', ext: 'rivaroxaban 45 d', std: 'placebo', c: [0.83, 1.10], b: [0.28, 0.15], lab: ['0.83', '1.10', '0.28', '0.15'], cl: 'symptomatic VTE or VTE death', bl: 'major bleeding', line: '12,024 patients picked by IMPROVE score and D-dimer, treated after discharge. 0.83% vs 1.10%, not significant (P = 0.14); major bleeding 0.28% vs 0.15%.'}
+};
+function extSVG(k){
+  var d = EXT[k], mx = Math.max(d.c[0], d.c[1], d.b[0], d.b[1]), y0 = 150, sc = 104 / mx;
+  var h = svgOpen('0 0 340 214', d.n + ': extended against standard prophylaxis');
+  h += '<path d="M20 ' + y0 + 'H320" stroke="var(--line)" stroke-width="2"/>';
+  [[d.c, 40, d.cl], [d.b, 190, d.bl]].forEach(function(g){
+    h += bar(g[1], y0, 46, g[0][0] * sc, 'a') + bar(g[1] + 56, y0, 46, g[0][1] * sc, 'n');
+    var L = function(v){ return (d.lab ? d.lab[[d.c[0], d.c[1], d.b[0], d.b[1]].indexOf(v)] : v) + '%'; };
+    h += tx(g[1] + 23, y0 - g[0][0] * sc - 6, L(g[0][0]), {s: 11, w: 600}) + tx(g[1] + 79, y0 - g[0][1] * sc - 6, L(g[0][1]), {s: 11, w: 600});
+    h += tx(g[1] + 51, y0 + 18, g[2], {s: 10, c: 'var(--muted)'});
+  });
+  h += '<rect x="40" y="192" width="12" height="12" rx="3" fill="var(--accent)"/>' + tx(58, 202, d.ext, {s: 10.5, a: 'start'}) + '<rect x="190" y="192" width="12" height="12" rx="3" fill="var(--muted)"/>' + tx(208, 202, d.std, {s: 10.5, a: 'start'});
+  return h + '</svg>';
+}
+var FIGS = {
+  balance: {t: 'Two risks, four answers', states: ['low','drug','mech','icu'], data: BAL, svg: balSVG},
+  drugs: {t: 'Where each drug acts', states: ['none','ufh','lmwh','fonda','doac'], data: DRG, svg: drugSVG},
+  pump: {t: 'The calf pump and compression', states: ['still','walk','ipc','gcs'], data: PMP, svg: pumpSVG},
+  kidney: {t: 'Enoxaparin and the kidney', states: ['ok','low'], data: KID, svg: kidSVG},
+  extend: {t: 'Extending after discharge', states: ['magellan','adopt','apex','mariner'], data: EXT, svg: extSVG}
+};
+
+var TRIALS = [
+  {q: 'Does LMWH prevent clots in medical inpatients?', d: 'MEDENOX: double-blind, 1102 acutely ill patients over 40, mostly not in the ICU; enoxaparin 40 mg or 20 mg daily against placebo for 6 to 14 days; venography-based endpoint.', r: 'VTE by day 14: 5.5% with 40 mg vs 14.9% with placebo (RR 0.37); 20 mg no better than placebo (15.0%). Deaths by day 110 not different.', c: 'Set 40 mg once daily as the medical prophylaxis dose. Most of the clots prevented were found by screening, not symptoms.', cite: 'Samama MM et al. N Engl J Med 1999;341:793', doi: '10.1056/NEJM199909093411103'},
+  {q: 'Does dalteparin do the same?', d: 'PREVENT (dalteparin): double-blind, 3706 acutely ill patients; dalteparin 5,000 units daily against placebo for 14 days, followed to day 90.', r: 'VTE by day 21: 2.77% vs 4.96% (RR 0.55, 95% CI 0.38–0.80). Major bleeding 0.49% vs 0.16%.', c: 'Confirmed a second LMWH; basis of the Fragmin medical-patient indication.', cite: 'Leizorovicz A et al. Circulation 2004;110:874', doi: '10.1161/01.CIR.0000138928.83266.24'},
+  {q: 'And fondaparinux?', d: 'ARTEMIS: double-blind, 849 medical patients aged 60 or more with heart failure, lung disease or infection, expected in bed 4 days or more; fondaparinux 2.5 mg daily against placebo for 6 to 14 days.', r: 'VTE 5.6% vs 10.5% (relative reduction 46.7%). Symptomatic VTE 0 vs 5. Major bleeding 0.2% in each group.', c: 'The basis for fondaparinux in medical patients, including after HIT; it has no US label for this use.', cite: 'Cohen AT et al. BMJ 2006;332:325', doi: '10.1136/bmj.38733.466748.7C'},
+  {q: 'Does prophylaxis save lives?', d: 'LIFENOX: double-blind, 8307 acutely ill patients in seven countries, all wearing stockings; enoxaparin 40 mg daily against placebo for about 10 days.', r: 'Death by day 30: 4.9% vs 4.8% (RR 1.0, 0.8–1.2). Major bleeding 0.4% vs 0.3%.', c: 'Prophylaxis prevents clots, not deaths. One reason the ASH recommendation for ward patients is conditional.', cite: 'Kakkar AK et al. N Engl J Med 2011;365:2463', doi: '10.1056/NEJMoa1111288'},
+  {q: 'In the ICU, LMWH or heparin?', d: 'PROTECT: 3764 critically ill patients; dalteparin 5,000 units daily against heparin 5,000 units twice daily.', r: 'Proximal DVT 5.1% vs 5.8% (HR 0.92, not different). Pulmonary embolism 1.3% vs 2.3% (HR 0.51). Major bleeding not different; HIT less often with dalteparin (per protocol).', c: 'Behind the suggestion to prefer LMWH over heparin in the ICU.', cite: 'PROTECT Investigators. N Engl J Med 2011;364:1305', doi: '10.1056/NEJMoa1014475'},
+  {q: 'Do stockings work after a stroke?', d: 'CLOTS 1: 2518 immobile patients within a week of stroke; thigh-length graduated stockings against none; ultrasound screening.', r: 'Proximal DVT 10.0% vs 10.5%, not different. Skin breaks, ulcers, blisters or necrosis 5% vs 1%.', c: 'Ended the routine use of stockings after stroke.', cite: 'CLOTS Trials Collaboration. Lancet 2009;373:1958', doi: '10.1016/S0140-6736(09)60941-7'},
+  {q: 'Do pneumatic pumps work after a stroke?', d: 'CLOTS 3: 2876 immobile stroke patients; pneumatic compression against none, for 30 days or until walking.', r: 'Proximal DVT 8.5% vs 12.1% (absolute reduction 3.6%). Skin breaks 3% vs 1%.', c: 'Made pumps the device of choice after stroke and when anticoagulants cannot be used.', cite: 'CLOTS Trials Collaboration. Lancet 2013;382:516', doi: '10.1016/S0140-6736(13)61050-8'},
+  {q: 'Should ICU patients on heparin also get pumps?', d: 'PREVENT (pumps in the ICU): 2003 ICU patients already on heparin or LMWH; pneumatic compression for 18 hours a day or more, against none; twice-weekly ultrasound.', r: 'New proximal DVT 3.9% vs 4.2% (RR 0.93, 0.60–1.44). Death at 90 days 26.1% vs 26.7%.', c: 'No reason to add a device to a drug routinely.', cite: 'Arabi YM et al. N Engl J Med 2019;380:1305', doi: '10.1056/NEJMoa1816150'},
+  {q: 'Should prophylaxis continue after discharge?', d: 'MAGELLAN: double-blind, 8101 acutely ill patients; rivaroxaban 10 mg daily for 35 days against enoxaparin 40 mg daily for 10 days.', r: 'VTE by day 35: 4.4% vs 5.7% (RR 0.77). Major or clinically relevant bleeding 4.1% vs 1.7%.', c: 'Fewer clots bought with more bleeding; ASH recommends against extending.', cite: 'Cohen AT et al. N Engl J Med 2013;368:513', doi: '10.1056/NEJMoa1111096'},
+  {q: 'Would apixaban do better?', d: 'ADOPT: double-blind, 6528 medically ill patients; apixaban 2.5 mg twice daily for 30 days against enoxaparin for 6 to 14 days.', r: 'VTE by day 30: 2.71% vs 3.06% (RR 0.87, not different). Major bleeding 0.47% vs 0.19% (RR 2.58).', c: 'No net gain from extending with apixaban.', cite: 'Goldhaber SZ et al. N Engl J Med 2011;365:2167', doi: '10.1056/NEJMoa1110899'},
+  {q: 'What about selecting patients by D-dimer?', d: 'APEX: double-blind, 7513 patients; betrixaban for 35 to 42 days against enoxaparin for 10 days, tested in cohorts starting with a raised D-dimer.', r: 'First cohort: 6.9% vs 8.5% (RR 0.81, P = 0.054), so the later cohorts were exploratory. Major bleeding 0.7% vs 0.6% overall.', c: 'Betrixaban was approved, then withdrawn from the US market in 2020 for business reasons.', cite: 'Cohen AT et al. N Engl J Med 2016;375:534', doi: '10.1056/NEJMoa1601747'},
+  {q: 'Does a tablet after discharge help high-risk patients?', d: 'MARINER: double-blind, 12,024 patients with a modified IMPROVE score of 4 or more, or 2 to 3 with a D-dimer over twice normal; rivaroxaban 10 mg daily against placebo for 45 days after discharge.', r: 'Symptomatic VTE or VTE death 0.83% vs 1.10% (HR 0.76, P = 0.14). Major bleeding 0.28% vs 0.15%.', c: 'Even well-chosen patients gained little. The same rivaroxaban dose is FDA-approved for extended use from admission.', cite: 'Spyropoulos AC et al. N Engl J Med 2018;379:1118', doi: '10.1056/NEJMoa1805090'}
+];
+
+var DOSES = [
+  {id: 'dose-enox', t: 'Enoxaparin (LMWH)', rows: [['Usual', '40 mg SC once daily'], ['CrCl below 30', '30 mg SC once daily'], ['BMI 40 or more', '40 mg SC twice daily (expert practice)'], ['Low weight', 'Unchanged; watch for bleeding (women under 45 kg, men under 57 kg)'], ['Course', 'Usually 6 to 11 days, to discharge']], n: 'LMWH is suggested over heparin (ASH, conditional). Neuraxial: 12 hours from a prophylaxis dose to catheter placement or removal; 24 hours after higher doses or with CrCl below 30 (label 5.1).'},
+  {id: 'dose-ufh', t: 'Heparin (subcutaneous)', rows: [['Usual', '5,000 units SC every 8 or 12 hours'], ['BMI 40 or more', '7,500 units SC every 8 hours (expert practice)'], ['Kidney', 'No adjustment in the label']], n: 'Its label gives a surgical regimen (5,000 units every 8 to 12 hours); the medical-patient regimens come from CHEST 2012 (1B).'},
+  {id: 'dose-dalte', t: 'Dalteparin (LMWH)', rows: [['Usual', '5,000 units SC once daily'], ['Course', '12 to 14 days in trials'], ['Kidney', 'No prophylaxis dose change in the label']], n: 'In ICU patients with CrCl below 30, 5,000 units daily did not build up (DIRECT). Dialysis needing anticoagulation (such as continuous filtration) was excluded.'},
+  {id: 'dose-fonda', t: 'Fondaparinux', rows: [['Usual', '2.5 mg SC once daily'], ['Do not use', 'CrCl below 30; weight under 50 kg'], ['Use for', 'History of HIT (expert practice)']], n: 'No US indication in medical patients; suggested over heparin by ASH (conditional, very low certainty), tested in ARTEMIS.'},
+  {id: 'dose-mech', t: 'Compression', rows: [['When', 'Only when no anticoagulant is given'], ['Pumps', 'Preferred after stroke (CLOTS 3)'], ['Stockings', 'Not after stroke (CLOTS 1); check the skin']], n: 'ASH suggests either pumps or stockings when compression is used (conditional, very low certainty), and one form of prophylaxis rather than both.'},
+  {id: 'dose-doac', t: 'Rivaroxaban, extended', rows: [['Label', '10 mg daily, in hospital and after, 31 to 39 days in total'], ['Not for', 'Bronchiectasis, lung cavities or hemorrhage, active cancer treatment, ulcer or bleeding in the last 3 months, dual antiplatelets'], ['Kidney', 'Avoid below CrCl 15']], n: 'FDA-approved, but ASH recommends LMWH in hospital only over in-hospital plus extended DOAC (strong, moderate certainty).'}
+];
+</script>
+
+<script>
+(function(){
+var $ = function(id){ return document.getElementById(id); };
+function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+var st = {set: null, sex: null, t: {}};
+var NUMS = ['age','wt','bmi','crcl','plt'];
+function read(){
+  var i = {set: st.set, sex: st.sex};
+  NUMS.forEach(function(k){ var v = parseFloat($(k).value); i[k] = isFinite(v) && v >= 0 ? v : null; });
+  Object.keys(st.t).forEach(function(k){ if (st.t[k]) i[k] = true; });
+  return i;
+}
+function seg(host, list, cur){ host.innerHTML = list.map(function(c){ return '<button class="sbtn" data-v="' + c[0] + '" aria-pressed="' + (c[0] === cur) + '">' + c[1] + '</button>'; }).join(''); }
+function ticks(host, list){ host.innerHTML = list.map(function(t){ return '<label class="chk"' + (t[2] ? ' title="' + esc(t[2]) + '"' : '') + '><input type="checkbox" data-k="' + t[0] + '"' + (st.t[t[0]] ? ' checked' : '') + '><span>' + esc(t[1]) + '</span></label>'; }).join('');
+  var defs = list.filter(function(t){ return t[2]; }); if (host.nextElementSibling && host.nextElementSibling.className === 'note defs') host.parentNode.removeChild(host.nextElementSibling);
+  if (defs.length){ var n = document.createElement('p'); n.className = 'note defs'; n.style.margin = '10px 0 0'; n.innerHTML = defs.map(function(t){ return '<b>' + esc(t[1]) + ':</b> ' + esc(t[2]) + '.'; }).join(' '); host.parentNode.insertBefore(n, host.nextSibling); } }
+function drawInputs(){
+  seg($('setseg'), Object.keys(SETS).map(function(k){ return [k, SETS[k]]; }), st.set);
+  seg($('sexseg'), [['f','Female'],['m','Male']], st.sex);
+  $('setnote').textContent = st.set ? SETNOTE[st.set] : 'Pick where the patient is.';
+  ticks($('vteticks'), VTE_T); ticks($('bleedticks'), BLEED_T); ticks($('modticks'), MOD_T);
+}
+$('setseg').addEventListener('click', function(e){ var v = e.target.getAttribute('data-v'); if (v){ st.set = v; drawInputs(); render(); } });
+$('sexseg').addEventListener('click', function(e){ var v = e.target.getAttribute('data-v'); if (v){ st.sex = st.sex === v ? null : v; drawInputs(); render(); } });
+['vteticks','bleedticks','modticks'].forEach(function(id){ $(id).addEventListener('change', function(e){ var k = e.target.getAttribute('data-k'); if (k){ st.t[k] = e.target.checked; render(); } }); });
+NUMS.forEach(function(k){ $(k).addEventListener('input', render); });
+
+function steps(list){ return '<div class="tl">' + list.map(function(s){ return '<div class="st' + (s.now ? ' now' : '') + '"><span class="when">' + esc(s.when) + '</span><b>' + esc(s.name) + '</b>' + (s.dose ? '<span class="dose">' + esc(s.dose) + '</span>' : '') + (s.small ? '<small>' + esc(s.small) + '</small>' : '') + '</div>'; }).join('') + '</div>'; }
+function guards(list){ return (list || []).map(function(g){ return '<div class="guard">' + esc(g) + '</div>'; }).join(''); }
+function tiers(list){ return (list || []).map(function(t){ return '<span class="tier">' + esc(t) + '</span>'; }).join(''); }
+function paras(list){ return (list || []).map(function(m){ return '<p>' + esc(m) + '</p>'; }).join(''); }
+function answerCard(o, i){
+  var lab = o.kind === 'drug' ? 'Prophylaxis · drug and dose' : o.kind === 'mech' || o.kind === 'ich' ? 'Prophylaxis · no anticoagulant now' : 'Prophylaxis';
+  var h = '<div class="card" id="answer"><p class="label">' + lab + '</p><p class="head' + (o.kind === 'none' || o.kind === 'onac' ? ' okc' : '') + '">' + esc(o.head) + '</p>' + (o.sub ? '<p class="sub">' + esc(o.sub) + '</p>' : '') + steps(o.steps) + guards(o.guards);
+  h += '<p class="whyline"><b>Why:</b> ' + esc(o.why) + '</p>';
+  var c = '';
+  if (o.fig) c += chip('balance', o.fig === 'mech' ? 'mech' : o.fig === 'low' ? 'low' : i.set === 'icu' ? 'icu' : 'drug');
+  if (o.kind === 'drug') c += chip('drugs', o.agent === 'fonda' ? 'fonda' : 'lmwh');
+  if (o.kind === 'mech' || o.kind === 'ich') c += chip('pump', has(i, 'stroke') || has(i, 'ich') ? 'ipc' : 'still');
+  if (o.kind === 'drug' && o.agent === 'enox' && i.crcl != null && i.crcl < 30) c += chip('kidney', 'low');
+  if (c) h += '<div class="chips">' + c + '</div>';
+  if (o.kind === 'drug' || o.kind === 'mech') h += '<div class="row"><button class="btn ghost" data-fit="' + esc(JSON.stringify(featuresOf(i, o))) + '">See every option</button></div>';
+  return h + '<details><summary>More</summary>' + paras(o.more) + tiers(o.tiers) + '</details></div>';
+}
+function badge(t, cls){ return '<span class="badge ' + (cls || '') + '">' + esc(t) + '</span>'; }
+function scoresCard(o, i){
+  var p = o.pad, v = o.imp, b = o.bl;
+  var miss = [];
+  [p.miss, v.miss, b.miss].forEach(function(m){ m.forEach(function(x){ if (miss.indexOf(x) < 0) miss.push(x); }); });
+  var h = '<div class="card" id="scores"><p class="label">Scores</p>';
+  h += '<div class="score"><span>Padua ' + (i.set === 'ward' ? '' : '<small>(ward decision)</small>') + '</span><b>' + p.score + '</b></div><p class="sub">' + badge(p.high ? 'at risk (4 or more)' : 'low risk (below 4)', p.high ? 'hi' : 'lo') + (p.items.length ? esc(p.items.join(', ')) : '') + '</p>';
+  h += '<div class="score"><span>IMPROVE VTE</span><b>' + v.score + '</b></div><p class="sub">' + badge(v.cat + ' · ' + v.rate + ' at 3 months', v.cat === 'low' ? 'lo' : 'hi') + (v.items.length ? esc(v.items.join(', ')) : '') + '</p>';
+  h += '<div class="score"><span>IMPROVE bleeding</span><b>' + fmtS(b.score) + '</b></div><p class="sub">' + badge(b.high ? '7 or more: high' : 'below 7', b.high ? 'hi' : 'lo') + (b.items.length ? esc(b.items.join(', ')) : '') + '</p>';
+  if (miss.length) h += '<p class="note">Not entered: ' + esc(miss.join(', ')) + '. Missing items score zero.</p>';
+  h += '<details><summary>More</summary><p>Padua (11 items, 0 to 20): 4 or more is at risk. In its cohort of 1180 medical inpatients, VTE within 90 days was 11.0% in high-risk patients without prophylaxis, 2.2% with it, and 0.3% in low-risk patients.</p>' +
+    '<p>IMPROVE VTE (7 items): 0 to 1 low (0.5% at 3 months), 2 to 3 moderate (1.5%), 4 or more high (5.7%). Adding 2 points for a D-dimer at least twice normal (IMPROVEDD) was used to pick patients for the MARINER trial.</p>' +
+    '<p>IMPROVE bleeding: about 90% of patients score below 7, with major bleeding 0.4% and any bleeding 1.5%; at 7 or more, 4.1% and 7.9%. The score uses GFR; this tool uses the CrCl you enter. Its middle age band is 40 to 84 (the ASH table prints 40 to 80).</p>' +
+    tiers(['Barbar 2010', 'Spyropoulos 2011', 'Decousus 2011', 'points as printed in ASH 2018 Table 1']) + '</details></div>';
+  return h;
+}
+function durCard(d){
+  return '<div class="card" id="duration"><p class="label">How long</p><h2>' + esc(d.head) + '</h2><ul>' + d.steps.map(function(s){ return '<li>' + esc(s) + '</li>'; }).join('') + '</ul><p class="whyline"><b>Why:</b> ' + esc(d.why) + '</p><div class="chips">' + chip('extend', 'magellan') + '</div><details><summary>More</summary>' + paras(d.more) + tiers(d.tiers) + '</details></div>';
+}
+function build(i){
+  var o = decide(i);
+  if (o.kind === 'empty') return {o: o, html: '<div class="card empty">Pick where the patient is to start. Then tick what applies: the scores and the plan update as you go.</div>'};
+  if (o.kind === 'surg') return {o: o, html: '<div class="card" id="answer"><p class="label">Outside this tool</p><p class="head">Surgical and trauma patients</p><p>Their clot risk is scored with surgical tools such as Caprini, and prophylaxis follows the ASH 2019 surgical guideline and the surgical team\'s protocol. This tool gives no recommendation for them.</p></div>'};
+  var h = answerCard(o, i);
+  if (o.kind === 'drug' || o.kind === 'mech' || o.kind === 'ich') h += durCard(o.dur);
+  h += scoresCard(o, i);
+  return {o: o, html: h};
+}
+function render(){ $('out').innerHTML = build(read()).html; }
+
+/* Tabs */
+var tabs = [['t-tool','p-tool'],['t-ag','p-ag'],['t-learn','p-learn'],['t-prac','p-prac']];
+function show(t){ tabs.forEach(function(p){ var on = p[0] === t; $(p[0]).setAttribute('aria-selected', String(on)); $(p[1]).classList.toggle('on', on); }); }
+tabs.forEach(function(p){ $(p[0]).addEventListener('click', function(){ show(p[0]); }); });
+function fromHash(){ var id = location.hash.slice(1); if (!id) return; var el = $(id); if (!el) return; var pan = el.closest('.panel'); if (pan) tabs.forEach(function(p){ if (p[1] === pan.id) show(p[0]); }); el.scrollIntoView(); }
+window.addEventListener('hashchange', fromHash);
+
+/* Figures, sheet, chips */
+var ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M7 15l3-4 3 3 2-2 2 3"/></svg>';
+var figN = 0;
+function mountFig(host, id, state){
+  var F = FIGS[id], pre = 'f' + (++figN) + '-';
+  function draw(k){
+    var d = F.data[k];
+    host.innerHTML = '<div class="states" role="group" aria-label="' + esc(F.t) + '">' + F.states.map(function(x){ return '<button class="sbtn" data-k="' + x + '" aria-pressed="' + (x === k) + '">' + esc(F.data[x].n) + '</button>'; }).join('') + '</div>' + F.svg(k, pre) + '<p class="line1">' + esc(d.line) + '</p>';
+    var on = host.querySelector('[aria-pressed="true"]'), row = host.querySelector('.states');
+    if (on && row) row.scrollLeft = Math.max(0, on.offsetLeft - 60);
+  }
+  host.onclick = function(e){ var k = e.target.getAttribute && e.target.getAttribute('data-k'); if (k) draw(k); };
+  draw(state && F.data[state] ? state : F.states[0]);
+}
+function chip(fig, state, label){ return '<button class="chip" data-fig="' + fig + '" data-state="' + (state || '') + '">' + ICON + esc(label || FIGS[fig].t) + '</button>'; }
+var lastFocus = null;
+function openSheet(fig, state){
+  lastFocus = document.activeElement;
+  $('sheet-t').textContent = FIGS[fig].t;
+  mountFig($('sheet-b'), fig, state);
+  $('scrim').hidden = false; $('sheet').hidden = false; $('sheet').scrollTop = 0; $('sheet-x').focus();
+}
+function closeSheet(){ if ($('sheet').hidden) return; $('scrim').hidden = true; $('sheet').hidden = true; if (lastFocus && lastFocus.focus) lastFocus.focus(); }
+$('sheet-x').addEventListener('click', closeSheet); $('scrim').addEventListener('click', closeSheet);
+document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeSheet(); });
+document.addEventListener('click', function(e){
+  var c = e.target.closest && e.target.closest('[data-fig]'); if (c){ openSheet(c.getAttribute('data-fig'), c.getAttribute('data-state')); return; }
+  var n = e.target.closest && e.target.closest('[data-fit]'); if (n){ fitSel = JSON.parse(n.getAttribute('data-fit')); drawFit(); show('t-ag'); $('fit').scrollIntoView(); }
+});
+document.querySelectorAll('[data-figure]').forEach(function(h){ mountFig(h, h.getAttribute('data-figure'), h.getAttribute('data-state')); });
+
+/* Which option fits */
+var fitSel = {};
+function drawFit(){
+  $('fit-feats').innerHTML = FITORDER.map(function(f){ return '<button class="sbtn" data-f="' + f + '" aria-pressed="' + !!fitSel[f] + '">' + esc(FIT[f].n) + '</button>'; }).join('');
+  var rows = fit(fitSel), ord = {fav: 0, 'in': 1, less: 2, out: 3}, best = pickFit(rows);
+  var sorted = rows.slice().sort(function(a, b){ return ord[a.st] - ord[b.st]; });
+  $('fit-agents').innerHTML = sorted.map(function(r){ return '<div class="cause ' + r.st + '"><span>' + esc(r.name) + '</span><small>' + esc((r.st === 'in' ? 'fits: ' : r.st === 'fav' ? 'preferred: ' : r.st === 'less' ? 'caution: ' : 'avoid: ') + r.why) + '</small></div>'; }).join('');
+  $('fit-next').innerHTML = '<b>Fits best:</b> ' + esc(best.map(function(r){ return r.name; }).join(' or ')) + '.';
+}
+$('fit-feats').addEventListener('click', function(e){
+  var f = e.target.getAttribute('data-f'); if (!f) return;
+  if (fitSel[f]) delete fitSel[f]; else fitSel[f] = 1;
+  var left = $('fit-feats').scrollLeft; drawFit(); $('fit-feats').scrollLeft = left;
+});
+drawFit();
+$('doses').innerHTML = DOSES.map(function(d){ return '<div class="card" id="' + d.id + '"><p class="label">Agent</p><h2>' + esc(d.t) + '</h2><div class="tw"><table><tbody>' + d.rows.map(function(r){ return '<tr><th scope="row">' + esc(r[0]) + '</th><td>' + esc(r[1]) + '</td></tr>'; }).join('') + '</tbody></table></div><p class="note">' + esc(d.n) + '</p></div>'; }).join('');
+
+/* Learn tab */
+(function(){
+  var chaps = [].slice.call(document.querySelectorAll('.chap'));
+  $('pills').innerHTML = chaps.map(function(c, n){ return '<button class="pill" data-go="' + c.id + '" aria-current="' + (n === 0) + '">' + (n + 1) + ' ' + esc(c.getAttribute('data-pill')) + '</button>'; }).join('');
+  $('pills').addEventListener('click', function(e){ var g = e.target.getAttribute('data-go'); if (g) $(g).scrollIntoView(); });
+  function mark(id){ [].forEach.call($('pills').children, function(b){ var on = b.getAttribute('data-go') === id; b.setAttribute('aria-current', String(on)); if (on) $('pills').scrollLeft = Math.max(0, b.offsetLeft - 60); }); }
+  if ('IntersectionObserver' in window){
+    var io = new IntersectionObserver(function(es){ es.forEach(function(en){ if (en.isIntersecting) mark(en.target.id); }); }, {rootMargin: '-30% 0px -60% 0px'});
+    chaps.forEach(function(c){ io.observe(c); });
+  }
+  var PT = [['cancer','Active cancer',3],['prevVTE','Previous VTE',3],['mob3','Bed rest 3+ days',3],['thromb','Thrombophilia',3],['trauma','Trauma or surgery',2],['age','Age 70+',1],['hf','Heart or lung failure',1],['mi','MI or stroke',1],['infect','Infection',1],['bmi','BMI 30+',1],['hormone','Hormones',1]], on = {};
+  function drawTap(){
+    var s = 0; PT.forEach(function(p){ if (on[p[0]]) s += p[2]; });
+    $('padua-tap').innerHTML = PT.map(function(p){ return '<button class="sbtn" data-p="' + p[0] + '" aria-pressed="' + !!on[p[0]] + '">' + esc(p[1]) + ' +' + p[2] + '</button>'; }).join('');
+    $('padua-sum').textContent = 'Padua ' + s + (s >= 4 ? ' · at risk' : ' · low risk');
+    $('padua-line').textContent = s >= 4 ? 'At 4 or more, 11% had a clot within 90 days without prophylaxis. Check bleeding risk next.' : 'Below 4, 0.3% had a clot within 90 days without prophylaxis: no drug and no device, just keep walking.';
+  }
+  $('padua-tap').addEventListener('click', function(e){ var k = e.target.getAttribute('data-p'); if (k){ on[k] = !on[k]; drawTap(); } });
+  drawTap();
+  $('trialbox').innerHTML = TRIALS.map(function(t){ return '<div class="trial" style="margin-top:14px"><p><b>' + esc(t.q) + '</b></p><p><span class="k">Design</span>' + esc(t.d) + '</p><p><span class="k">Result</span>' + esc(t.r) + '</p><p><span class="k">What it changed</span>' + esc(t.c) + '</p><p class="mono" style="font-size:13px"><a href="https://doi.org/' + t.doi + '" rel="noopener">' + esc(t.cite) + '</a></p></div>'; }).join('');
+  $('go-prac').addEventListener('click', function(){ show('t-prac'); window.scrollTo(0, 0); });
+})();
+
+/* Practice: cases run through the same engine */
+var CASES = [
+  {t: 'Pneumonia at 78', s: 'Ward. Woman, 78, 62 kg, BMI 24, CrCl 48, platelets 210. Community-acquired pneumonia on oxygen, with heart failure; expected in bed for several days.', q: 'Prophylaxis, and what?', i: {set:'ward', sex:'f', age:78, wt:62, bmi:24, crcl:48, plt:210, infect:true, hf:true, mob3:true}, p: 'Padua 6 (bed rest 3, age 1, heart failure 1, infection 1). Bleeding risk acceptable: enoxaparin 40 mg daily until she is walking or discharged.'},
+  {t: 'Cellulitis, walking the halls', s: 'Ward. Man, 45, 88 kg, BMI 27, CrCl 110, platelets 260. Leg cellulitis on IV antibiotics; walking independently.', q: 'Does he need anything?', i: {set:'ward', sex:'m', age:45, wt:88, bmi:27, crcl:110, plt:260, infect:true}, p: 'Padua 1. No drug and no device: the clot risk is too low for either to help.'},
+  {t: 'Melena last month, now COPD', s: 'Ward. Man, 72, 70 kg, BMI 23, CrCl 65, platelets 190. COPD exacerbation, on bed rest. Admitted 5 weeks ago with a bleeding duodenal ulcer.', q: 'Heparin?', i: {set:'ward', sex:'m', age:72, wt:70, bmi:23, crcl:65, plt:190, hf:true, mob3:true, bleed3:true}, p: 'Padua 5: at risk. But bleeding in the 3 months before admission puts bleeding risk too high: pneumatic compression or stockings, and switch to enoxaparin when that risk has passed.'},
+  {t: 'Septic shock with failing kidneys', s: 'ICU. Woman, 66, 75 kg, BMI 28, CrCl 22, platelets 140. Urosepsis on norepinephrine; central line in place.', q: 'Which drug and what dose?', i: {set:'icu', sex:'f', age:66, wt:75, bmi:28, crcl:22, plt:140, cvc:true, infect:true}, p: 'Critically ill: at risk without a score. No hard bar to an anticoagulant, though the bleeding score is high (8½), so weigh it daily. CrCl below 30: enoxaparin 30 mg once daily, or heparin 5,000 units every 8 to 12 hours.'},
+  {t: 'BMI 48 and short of breath', s: 'Ward. Woman, 54, 135 kg, BMI 48, CrCl 95, platelets 300. Obesity hypoventilation with hypercapnic respiratory failure, on bed rest.', q: 'Is 40 mg once daily enough?', i: {set:'ward', sex:'f', age:54, wt:135, bmi:48, crcl:95, plt:300, hf:true, mob3:true}, p: 'Padua 5. Many centers give enoxaparin 40 mg twice daily (or heparin 7,500 units every 8 hours) at BMI 40 or more; this is expert practice from observational data, not a label dose.'},
+  {t: 'HIT two years ago, now metastatic cancer', s: 'Ward. Man, 63, 68 kg, BMI 22, CrCl 70, platelets 180. Metastatic lung cancer with pneumonia, on bed rest. HIT after cardiac surgery two years ago.', q: 'What can he have?', i: {set:'ward', sex:'m', age:63, wt:68, bmi:22, crcl:70, plt:180, cancer:true, infect:true, mob3:true, hit:true}, p: 'Padua 7. No heparin or LMWH after HIT: fondaparinux 2.5 mg daily, which is off label in medical patients.'},
+  {t: 'Stroke with low platelets', s: 'Ward. Man, 80, 72 kg, BMI 25, CrCl 50, platelets 42. Acute ischemic stroke with a dense weakness; cannot walk.', q: 'Drug, stockings or pumps?', i: {set:'ward', sex:'m', age:80, wt:72, bmi:25, crcl:50, plt:42, stroke:true, mob3:true}, p: 'Padua 5: at risk. Platelets below 50 rule out an anticoagulant for now. After stroke, pumps work and stockings do not: pneumatic compression.'},
+  {t: 'Already on apixaban', s: 'Ward. Woman, 82, 58 kg, BMI 22, CrCl 40. Atrial fibrillation on apixaban 5 mg twice daily; admitted with a urinary infection, in bed.', q: 'Add enoxaparin?', i: {set:'ward', sex:'f', age:82, wt:58, bmi:22, crcl:40, plt:200, infect:true, mob3:true, onac:true}, p: 'No. The full-dose anticoagulant already covers her; if it is held, reassess.'}
+];
+function rng(seed){ var a = seed >>> 0; return function(){ a |= 0; a = a + 0x6D2B79F5 | 0; var t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+(function(){
+  var d = new Date(); var rnd = rng(d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate());
+  var order = CASES.map(function(c, n){ return n; });
+  for (var k = order.length - 1; k > 0; k--){ var j = Math.floor(rnd() * (k + 1)); var t = order[k]; order[k] = order[j]; order[j] = t; }
+  $('practice').innerHTML = order.map(function(n, pos){ var c = CASES[n];
+    return '<div class="card case"><p class="label">Case ' + (pos + 1) + '</p><h2>' + esc(c.t) + '</h2><p>' + esc(c.s) + '</p><p><b>' + esc(c.q) + '</b></p><div class="row"><button class="btn" data-ans="' + n + '">Show the answer</button><button class="btn ghost" data-load="' + n + '">Open in the tool</button></div><div class="ans" id="ans' + n + '" hidden></div></div>';
+  }).join('');
+})();
+$('practice').addEventListener('click', function(e){
+  var a = e.target.getAttribute('data-ans'), l = e.target.getAttribute('data-load');
+  if (a != null){ var c = CASES[a]; var box = $('ans' + a); var b = build(c.i); box.innerHTML = '<p>' + esc(c.p) + '</p>' + b.html.replace(/ id="[^"]*"/g, ''); box.hidden = false; e.target.hidden = true; }
+  if (l != null){ var c2 = CASES[l]; NUMS.forEach(function(k){ $(k).value = c2.i[k] != null ? c2.i[k] : ''; }); st = {set: c2.i.set, sex: c2.i.sex || null, t: {}}; Object.keys(c2.i).forEach(function(k){ if (c2.i[k] === true) st.t[k] = true; }); drawInputs(); render(); show('t-tool'); window.scrollTo(0, 0); }
+});
+drawInputs(); render(); fromHash();
+})();
+</script>
+</body>
+</html>
