@@ -303,6 +303,7 @@ function mechPlan(i, reason){
 function drugPlan(i){
   var o = {kind: 'drug', fig: 'drug', guards: [], more: [], tiers: []};
   var bmi40 = i.bmi != null && i.bmi >= 40, ck = i.crcl != null && i.crcl < 30;
+  if (i.plt == null) o.guards.push('Enter the platelet count: below 50 an anticoagulant is held.');
   if (has(i,'hit')){
     if ((i.crcl != null && i.crcl < 30) || (i.wt != null && i.wt < 50)){
       var m = mechPlan(i); m.hitBlock = true; m.sub = 'Heparins are out and fondaparinux is contraindicated (' + (i.crcl != null && i.crcl < 30 ? 'CrCl below 30' : 'weight below 50 kg') + ').';
@@ -314,6 +315,7 @@ function drugPlan(i){
     o.steps = [{when: 'Daily', now: true, name: 'Fondaparinux', dose: '2.5 mg subcutaneously once daily', small: 'Off label in medical patients in the US; the dose is the surgical prophylaxis dose, tested in medical patients in ARTEMIS.'}];
     o.guards.push('If HIT is active or suspected now, prophylaxis is not enough: it needs a treatment-dose non-heparin anticoagulant (expert practice).');
     if (i.crcl == null || i.wt == null) o.guards.push('Fondaparinux is contraindicated with CrCl below 30 or weight below 50 kg. Enter both.');
+    if (has(i,'neurax')) o.guards.push('Spinal or epidural: fondaparinux carries the same spinal hematoma boxed warning. Confirm catheter timing with anesthesia.');
     o.more.push('The labels contraindicate enoxaparin after immune-mediated HIT within the past 100 days or with circulating antibodies. This tool avoids every heparin after any HIT, a deliberately stricter choice (expert practice).');
     o.tiers = ['ASH 2018 rec 3: fondaparinux over heparin (conditional, very low)', 'Arixtra label 2, 4', 'HIT choice: expert practice'];
     return o;
@@ -336,7 +338,7 @@ function drugPlan(i){
   }
   o.sub = i.set === 'icu' ? 'LMWH is suggested over heparin in the ICU as well.' : 'LMWH is suggested over heparin.';
   if (lowWeight(i)) o.guards.push('Low weight: a 40 mg dose gives ' + (i.sex === 'f' ? '52%' : '27%') + ' more exposure in ' + (i.sex === 'f' ? 'women under 45 kg' : 'men under 57 kg') + '. The label keeps the dose and says to watch closely for bleeding.');
-  if (has(i,'neurax')) o.guards.push(bmi40 && !ck ? 'Spinal or epidural: 40 mg twice daily is a higher dose, so place or remove a catheter at least 24 hours after a dose (label); next dose at least 4 hours after removal. Confirm with anesthesia.' : 'Spinal or epidural: place or remove a catheter at least 12 hours after an enoxaparin prophylaxis dose; next dose at least 4 hours after removal (boxed warning). Heparin timing: confirm with anesthesia.');
+  if (has(i,'neurax')) o.guards.push(bmi40 && !ck ? 'Spinal or epidural: 40 mg twice daily is not one of the label\'s lower doses, so many wait at least 24 hours after a dose before placing or removing a catheter (expert practice); next dose at least 4 hours after removal (label 5.1). Confirm with anesthesia.' : (ck ? 'Spinal or epidural: with CrCl below 30 the label says to consider doubling the wait, to at least 24 hours after a prophylaxis dose before placing or removing a catheter; next dose at least 4 hours after removal (label 5.1). Confirm with anesthesia.' : 'Spinal or epidural: place or remove a catheter at least 12 hours after an enoxaparin prophylaxis dose; next dose at least 4 hours after removal (label 5.1). Heparin timing: confirm with anesthesia.'));
   o.tiers.unshift(i.set === 'icu' ? 'ASH 2018 rec 4: heparin or LMWH (strong, moderate); rec 5: LMWH over heparin (conditional, moderate)' : 'CHEST 2012 2.3 (1B); ASH 2018 rec 1 (conditional, low), rec 2: LMWH over heparin (conditional, low)');
   o.tiers.push('No DOAC in hospital: ASH 2018 rec 11 (strong, moderate)');
   o.more.push('Alternatives: heparin 5,000 units every 8 or 12 hours; dalteparin 5,000 units once daily (label); fondaparinux 2.5 mg once daily (no US indication in medical patients; contraindicated with CrCl below 30 or weight below 50 kg).');
@@ -349,26 +351,42 @@ function decide(i){
   if (!i.set){ o.kind = 'empty'; return o; }
   var hb = hardBleed(i), plan;
   if (i.set === 'surg'){ o.kind = 'surg'; return o; }
-  if (has(i,'onac')){
-    plan = {kind: 'onac', fig: null, head: 'No added prophylaxis', sub: 'The full-dose anticoagulant already covers it.', steps: [{when: 'If it is held', now: true, name: 'Reassess', small: 'For a procedure or bleeding, run this again: prophylaxis or compression may be needed while it is off.'}], guards: [], tiers: ['Expert practice', 'ASH 2018 rec 12 remark: patients already on a DOAC'], more: [],
+  if (has(i,'onac') && !has(i,'ich') && !has(i,'bleeding')){
+    plan = {kind: 'onac', fig: null, head: 'No added prophylaxis', sub: 'The full-dose anticoagulant already covers it.', steps: [{when: 'If it is held', now: true, name: 'Reassess', small: 'For a procedure or bleeding, run this again: prophylaxis or compression may be needed while it is off.'}], guards: [], tiers: ['Expert practice'], more: [],
       why: 'A full-dose anticoagulant already prevents clots; a prophylactic dose on top adds bleeding, not protection.'};
+  } else if (has(i,'ich')){
+    plan = mechPlan(i); plan.kind = 'ich';
+    plan.sub = 'For patients who are not walking after a spontaneous brain hemorrhage.';
+    var dpi = drugPlan(i), ckI = i.crcl != null && i.crcl < 30;
+    plan.steps = [{when: 'From the day of diagnosis', now: true, name: 'Pneumatic compression on both legs', small: 'Not stockings alone.'}];
+    plan.tiers = ['AHA/ASA 2022 ICH: compression (1, B-R); low-dose heparin or LMWH (2a, C-LD); start at 24–48 h (2b, C-LD); stockings alone (3: No Benefit, B-R)'];
+    plan.more = ['Traumatic brain bleeds, subarachnoid hemorrhage and recent neurosurgery are not covered by this rule: tick "Other major bleeding risk" and ask the specialist team.'];
+    if (hb.length || dpi.kind !== 'drug'){
+      var whyNo = hb.length ? hb[0] : 'HIT, with fondaparinux contraindicated by ' + (ckI ? 'CrCl below 30' : 'weight below 50 kg');
+      plan.head = 'Pneumatic compression; no anticoagulant yet';
+      plan.steps.push({when: '24 to 48 hours from onset', name: 'No anticoagulant yet', small: whyNo + ': keep compression and ask the specialist team when a drug is safe.'});
+      plan.why = 'Hematoma growth is the early danger, and a drug is ruled out for now (' + (whyNo.indexOf('HIT') === 0 ? whyNo : whyNo.charAt(0).toLowerCase() + whyNo.slice(1)) + '), so compression carries the protection.';
+      if (dpi.hitBlock) plan.guards = plan.guards.concat(dpi.guards.filter(function(g){ return g.indexOf('HIT is active') >= 0 || g.indexOf('hematology') >= 0; }));
+    } else {
+      plan.head = 'Pneumatic compression now; a low-dose anticoagulant from 24 to 48 hours';
+      var dname = dpi.agent === 'fonda' ? 'fondaparinux 2.5 mg SC once daily' : (ckI ? 'enoxaparin 30 mg SC once daily' : 'enoxaparin 40 mg SC once daily') + ', or heparin 5,000 units SC every 8 to 12 hours';
+      plan.steps.push({when: '24 to 48 hours from onset', name: 'Consider ' + dname, small: 'If the bleed is stable on repeat imaging; agree it with neurology or neurosurgery.' + (dpi.agent === 'fonda' ? ' Fondaparinux here is expert practice: the guideline names heparin and LMWH.' : '') + (i.bmi != null && i.bmi >= 40 && dpi.agent !== 'fonda' ? ' Standard dose after a brain bleed even at BMI 40 or more (expert practice).' : '')});
+      if (dpi.agent === 'fonda') plan.tiers.push('fondaparinux after HIT: expert practice');
+      plan.guards = plan.guards.concat(dpi.guards.filter(function(g){ return g.indexOf('twice daily') < 0 && g.indexOf('BMI 40') < 0; }));
+      if (has(i,'neurax') && dpi.agent === 'enox' && !ckI && i.bmi != null && i.bmi >= 40) plan.guards.push('Spinal or epidural: place or remove a catheter at least 12 hours after an enoxaparin prophylaxis dose; next dose at least 4 hours after removal (label 5.1). Heparin timing: confirm with anesthesia.');
+      plan.why = 'Hematoma growth is the early danger, so compression starts now and a low-dose anticoagulant waits 24 to 48 hours.';
+    }
   } else if (i.set === 'ltc'){
     plan = {kind: 'none', fig: 'low', head: 'No routine prophylaxis', sub: 'Chronically ill, with no new acute illness.', steps: [{when: 'If that changes', now: true, name: 'Treat as a ward patient', small: 'A new acute illness, a hospital transfer or a new period of bed rest: pick Ward and score again.'}], guards: [], tiers: ['ASH 2018 rec 15 (conditional, very low)'], more: [],
       why: 'Without a new acute illness, prophylaxis showed no net benefit in chronically ill patients.'};
-  } else if (has(i,'ich')){
-    plan = mechPlan(i); plan.kind = 'ich'; plan.head = 'Pneumatic compression now; low-dose heparin from 24 to 48 hours';
-    plan.sub = 'For patients who are not walking after a spontaneous brain hemorrhage.';
-    plan.steps = [{when: 'From the day of diagnosis', now: true, name: 'Pneumatic compression on both legs', small: 'Not stockings alone.'}, {when: '24 to 48 hours from onset', name: 'Consider heparin 5,000 units SC every 8 to 12 hours or enoxaparin 40 mg daily', small: 'If the bleed is stable on repeat imaging; agree it with neurology or neurosurgery.'}];
-    plan.tiers = ['AHA/ASA 2022 ICH: compression (1, B-R); low-dose heparin or LMWH (2a, C-LD); start at 24–48 h (2b, C-LD); stockings alone (3: No Benefit, B-R)'];
-    plan.more = ['Traumatic brain bleeds, subarachnoid hemorrhage and recent neurosurgery are not covered by this rule: tick "Other major bleeding risk" and ask the specialist team.'];
-    plan.why = 'Hematoma growth is the early danger, so compression starts now and a low heparin dose waits 24 to 48 hours.';
   } else {
     var atRisk = i.set === 'icu' || o.pad.high;
     if (!atRisk){
       plan = {kind: 'none', fig: 'low', head: 'No prophylaxis: keep the patient walking', sub: 'Neither a drug nor a device.', steps: [{when: 'Every day', now: true, name: 'Rescore', small: 'New bed rest, a new infection or an ICU transfer can tip the score to 4.'}], guards: [], tiers: ['CHEST 2012 2.4: no drug or device at low risk (1B)'], more: [],
         why: 'Padua ' + o.pad.score + ': below 4, only 0.3% had a clot within 90 days without prophylaxis, so injections would add bleeding without benefit.'};
       if (o.pad.miss.length) plan.guards.push('Not entered: ' + o.pad.miss.join(' and ') + '. Each adds a point when present.');
-      if (o.imp.score >= 2) plan.guards.push('The IMPROVE score is ' + o.imp.score + ' (' + o.imp.cat + ' risk, ' + o.imp.rate + ' at 3 months). ASH notes prophylaxis is indicated at 2 or more. The two scores disagree here: use judgment.');
+      if (o.imp.score >= 4){ plan.head = 'Padua says no prophylaxis; IMPROVE says high risk'; plan.sub = 'The two scores disagree: decide at the bedside.'; plan.kind = 'split'; plan.fig = null; plan.why = 'Padua ' + o.pad.score + ' is below 4, where 0.3% clotted without prophylaxis, but IMPROVE ' + o.imp.score + ' carried 5.7% at 3 months; the scores weigh different risk factors.'; }
+      if (o.imp.score >= 2) plan.guards.push('The IMPROVE score is ' + o.imp.score + ' (' + o.imp.cat + ' risk, ' + o.imp.rate + ' at 3 months). ASH notes prophylaxis is indicated at 2 or more.' + (o.imp.score >= 4 ? '' : ' The two scores disagree here: use judgment.'));
     } else if (hb.length){
       plan = mechPlan(i);
       plan.why = hb[0] + ' makes an anticoagulant riskier than the clot it prevents; leg compression protects without causing bleeding.';
@@ -389,6 +407,7 @@ function decide(i){
     }
     if (i.set === 'icu' && plan.kind === 'drug') plan.more.push('Do not add pneumatic compression to heparin routinely: in the ICU it did not reduce proximal DVT (3.9% vs 4.2%).');
   }
+  if (has(i,'onac') && (has(i,'ich') || has(i,'bleeding'))) plan.guards.unshift('On a full-dose anticoagulant and bleeding: stop and reverse it as the bleed requires. This plan assumes it is held.');
   for (var k in plan) o[k] = plan[k];
   o.dur = {head: 'Until discharge or fully mobile', steps: ['Stop at discharge, or earlier once walking normally.', 'Do not extend with a tablet after discharge.'],
     why: 'Extending prophylaxis for about a month after discharge prevented few clots, and two of four large trials showed significantly more bleeding.',
@@ -402,7 +421,7 @@ var OPTS = ['enox','dalte','ufh','fonda','ipc','gcs','doac'];
 var ONAME = {enox: 'Enoxaparin', dalte: 'Dalteparin', ufh: 'Heparin (subcutaneous)', fonda: 'Fondaparinux', ipc: 'Pneumatic compression', gcs: 'Graduated stockings', doac: 'A DOAC in hospital'};
 var BASE = {enox: ['fav','40 mg daily; LMWH is suggested over heparin'], dalte: ['in','5,000 units daily'], ufh: ['in','5,000 units every 8 or 12 hours'], fonda: ['in','2.5 mg daily; no US indication in medical patients'], ipc: ['less','only when no drug is given'], gcs: ['less','only when no drug is given'], doac: ['out','LMWH over DOACs in hospital (ASH, strong)']};
 var FIT = {
-  crcl30: {n: 'CrCl below 30', m: {enox: ['fav','30 mg once daily (label)'], ufh: ['in','no kidney adjustment; simplest if kidney function is changing'], dalte: ['in','label gives no kidney dose; no build-up at 5,000 units in ICU patients (DIRECT); dialysis not studied'], fonda: ['out','contraindicated below CrCl 30']}},
+  crcl30: {n: 'CrCl below 30', m: {enox: ['fav','30 mg once daily (label)'], ufh: ['in','no kidney adjustment; simplest if kidney function is changing'], dalte: ['in','label gives no kidney dose; no build-up at 5,000 units in ICU patients (DIRECT)'], fonda: ['out','contraindicated below CrCl 30']}},
   bmi40: {n: 'BMI 40 or more', m: {enox: ['fav','40 mg twice daily (expert practice)'], ufh: ['in','7,500 units every 8 hours (expert practice)']}},
   wt50: {n: 'Weight under 50 kg', m: {fonda: ['out','contraindicated under 50 kg'], enox: ['less','more exposure at low weight; watch for bleeding']}},
   hit: {n: 'HIT, now or before', m: {enox: ['out','a heparin'], dalte: ['out','a heparin'], ufh: ['out','a heparin'], fonda: ['fav','2.5 mg daily; the usual non-heparin choice (expert practice)']}},
@@ -419,7 +438,7 @@ function fit(sel){
   FITORDER.forEach(function(f){ if (!sel[f]) return; var m = FIT[f].m; Object.keys(m).forEach(function(a){ if (fromBase[a] || RANK[m[a][0]] > RANK[cur[a][0]]){ cur[a] = m[a]; fromBase[a] = false; } }); });
   return OPTS.map(function(a){ return {a: a, name: ONAME[a], st: cur[a][0], why: cur[a][1]}; });
 }
-function pickFit(rows){ var f = rows.filter(function(r){ return r.st === 'fav'; }); return f.length ? f : rows.filter(function(r){ return r.st === 'in'; }); }
+function pickFit(rows){ var f = rows.filter(function(r){ return r.st === 'fav'; }); if (!f.length) f = rows.filter(function(r){ return r.st === 'in'; }); if (!f.length){ f = rows.filter(function(r){ return r.st === 'less'; }); var drugs = f.filter(function(r){ return r.a !== 'ipc' && r.a !== 'gcs' && r.a !== 'doac'; }); if (drugs.length) f = drugs; } return f; }
 function featuresOf(i, o){
   var s = {};
   if (i.crcl != null && i.crcl < 30) s.crcl30 = 1;
@@ -569,7 +588,7 @@ var TRIALS = [
 var DOSES = [
   {id: 'dose-enox', t: 'Enoxaparin (LMWH)', rows: [['Usual', '40 mg SC once daily'], ['CrCl below 30', '30 mg SC once daily'], ['BMI 40 or more', '40 mg SC twice daily (expert practice)'], ['Low weight', 'Unchanged; watch for bleeding (women under 45 kg, men under 57 kg)'], ['Course', 'Usually 6 to 11 days, to discharge']], n: 'LMWH is suggested over heparin (ASH, conditional). Neuraxial: 12 hours from a prophylaxis dose to catheter placement or removal; 24 hours after higher doses.'},
   {id: 'dose-ufh', t: 'Heparin (subcutaneous)', rows: [['Usual', '5,000 units SC every 8 or 12 hours'], ['BMI 40 or more', '7,500 units SC every 8 hours (expert practice)'], ['Kidney', 'No adjustment in the label']], n: 'Its label gives a surgical regimen (5,000 units every 8 to 12 hours); the medical-patient regimens come from CHEST 2012 (1B).'},
-  {id: 'dose-dalte', t: 'Dalteparin (LMWH)', rows: [['Usual', '5,000 units SC once daily'], ['Course', '12 to 14 days in trials'], ['Kidney', 'No prophylaxis dose change in the label']], n: 'In ICU patients with CrCl below 30, 5,000 units daily did not build up (DIRECT). Dialysis was not studied.'},
+  {id: 'dose-dalte', t: 'Dalteparin (LMWH)', rows: [['Usual', '5,000 units SC once daily'], ['Course', '12 to 14 days in trials'], ['Kidney', 'No prophylaxis dose change in the label']], n: 'In ICU patients with CrCl below 30, 5,000 units daily did not build up (DIRECT). Dialysis needing anticoagulation (such as continuous filtration) was excluded.'},
   {id: 'dose-fonda', t: 'Fondaparinux', rows: [['Usual', '2.5 mg SC once daily'], ['Do not use', 'CrCl below 30; weight under 50 kg'], ['Use for', 'History of HIT (expert practice)']], n: 'No US indication in medical patients; suggested over heparin by ASH (conditional, very low certainty), tested in ARTEMIS.'},
   {id: 'dose-mech', t: 'Compression', rows: [['When', 'Only when no anticoagulant is given'], ['Pumps', 'Preferred after stroke (CLOTS 3)'], ['Stockings', 'Not after stroke (CLOTS 1); check the skin']], n: 'ASH suggests either pumps or stockings when compression is used (conditional, very low certainty), and one form of prophylaxis rather than both.'},
   {id: 'dose-doac', t: 'Rivaroxaban, extended', rows: [['Label', '10 mg daily, in hospital and after, 31 to 39 days in total'], ['Not for', 'Bronchiectasis, lung cavities or hemorrhage, active cancer treatment, ulcer or bleeding in the last 3 months, dual antiplatelets'], ['Kidney', 'Avoid below CrCl 15']], n: 'FDA-approved, but ASH recommends LMWH in hospital only over in-hospital plus extended DOAC (strong, moderate certainty).'}
@@ -612,7 +631,7 @@ function answerCard(o, i){
   var h = '<div class="card" id="answer"><p class="label">' + lab + '</p><p class="head' + (o.kind === 'none' || o.kind === 'onac' ? ' okc' : '') + '">' + esc(o.head) + '</p>' + (o.sub ? '<p class="sub">' + esc(o.sub) + '</p>' : '') + steps(o.steps) + guards(o.guards);
   h += '<p class="whyline"><b>Why:</b> ' + esc(o.why) + '</p>';
   var c = '';
-  if (o.fig) c += chip('balance', i.set === 'icu' && o.kind !== 'none' ? 'icu' : o.fig === 'mech' ? 'mech' : o.fig === 'low' ? 'low' : 'drug');
+  if (o.fig) c += chip('balance', o.fig === 'mech' ? 'mech' : o.fig === 'low' ? 'low' : i.set === 'icu' ? 'icu' : 'drug');
   if (o.kind === 'drug') c += chip('drugs', o.agent === 'fonda' ? 'fonda' : 'lmwh');
   if (o.kind === 'mech' || o.kind === 'ich') c += chip('pump', has(i, 'stroke') || has(i, 'ich') ? 'ipc' : 'still');
   if (o.kind === 'drug' && o.agent === 'enox' && i.crcl != null && i.crcl < 30) c += chip('kidney', 'low');
@@ -733,7 +752,7 @@ var CASES = [
   {t: 'Pneumonia at 78', s: 'Ward. Woman, 78, 62 kg, BMI 24, CrCl 48, platelets 210. Community-acquired pneumonia on oxygen, with heart failure; expected in bed for several days.', q: 'Prophylaxis, and what?', i: {set:'ward', sex:'f', age:78, wt:62, bmi:24, crcl:48, plt:210, infect:true, hf:true, mob3:true}, p: 'Padua 6 (bed rest 3, age 1, heart failure 1, infection 1). Bleeding risk acceptable: enoxaparin 40 mg daily until she is walking or discharged.'},
   {t: 'Cellulitis, walking the halls', s: 'Ward. Man, 45, 88 kg, BMI 27, CrCl 110, platelets 260. Leg cellulitis on IV antibiotics; walking independently.', q: 'Does he need anything?', i: {set:'ward', sex:'m', age:45, wt:88, bmi:27, crcl:110, plt:260, infect:true}, p: 'Padua 1. No drug and no device: the clot risk is too low for either to help.'},
   {t: 'Melena last month, now COPD', s: 'Ward. Man, 72, 70 kg, BMI 23, CrCl 65, platelets 190. COPD exacerbation, on bed rest. Admitted 5 weeks ago with a bleeding duodenal ulcer.', q: 'Heparin?', i: {set:'ward', sex:'m', age:72, wt:70, bmi:23, crcl:65, plt:190, hf:true, mob3:true, bleed3:true}, p: 'Padua 5: at risk. But bleeding in the 3 months before admission puts bleeding risk too high: pneumatic compression or stockings, and switch to enoxaparin when that risk has passed.'},
-  {t: 'Septic shock with failing kidneys', s: 'ICU. Woman, 66, 75 kg, BMI 28, CrCl 22, platelets 140. Urosepsis on norepinephrine; central line in place.', q: 'Which drug and what dose?', i: {set:'icu', sex:'f', age:66, wt:75, bmi:28, crcl:22, plt:140, cvc:true, infect:true}, p: 'Critically ill: at risk without a score. Bleeding risk acceptable. CrCl below 30: enoxaparin 30 mg once daily, or heparin 5,000 units every 8 to 12 hours.'},
+  {t: 'Septic shock with failing kidneys', s: 'ICU. Woman, 66, 75 kg, BMI 28, CrCl 22, platelets 140. Urosepsis on norepinephrine; central line in place.', q: 'Which drug and what dose?', i: {set:'icu', sex:'f', age:66, wt:75, bmi:28, crcl:22, plt:140, cvc:true, infect:true}, p: 'Critically ill: at risk without a score. No hard bar to an anticoagulant, though the bleeding score is high (8½), so weigh it daily. CrCl below 30: enoxaparin 30 mg once daily, or heparin 5,000 units every 8 to 12 hours.'},
   {t: 'BMI 48 and short of breath', s: 'Ward. Woman, 54, 135 kg, BMI 48, CrCl 95, platelets 300. Obesity hypoventilation with hypercapnic respiratory failure, on bed rest.', q: 'Is 40 mg once daily enough?', i: {set:'ward', sex:'f', age:54, wt:135, bmi:48, crcl:95, plt:300, hf:true, mob3:true}, p: 'Padua 5. Many centers give enoxaparin 40 mg twice daily (or heparin 7,500 units every 8 hours) at BMI 40 or more; this is expert practice from observational data, not a label dose.'},
   {t: 'HIT two years ago, now metastatic cancer', s: 'Ward. Man, 63, 68 kg, BMI 22, CrCl 70, platelets 180. Metastatic lung cancer with pneumonia, on bed rest. HIT after cardiac surgery two years ago.', q: 'What can he have?', i: {set:'ward', sex:'m', age:63, wt:68, bmi:22, crcl:70, plt:180, cancer:true, infect:true, mob3:true, hit:true}, p: 'Padua 7. No heparin or LMWH after HIT: fondaparinux 2.5 mg daily, which is off label in medical patients.'},
   {t: 'Stroke with low platelets', s: 'Ward. Man, 80, 72 kg, BMI 25, CrCl 50, platelets 42. Acute ischemic stroke with a dense weakness; cannot walk.', q: 'Drug, stockings or pumps?', i: {set:'ward', sex:'m', age:80, wt:72, bmi:25, crcl:50, plt:42, stroke:true, mob3:true}, p: 'Padua 5: at risk. Platelets below 50 rule out an anticoagulant for now. After stroke, pumps work and stockings do not: pneumatic compression.'},
@@ -753,7 +772,6 @@ $('practice').addEventListener('click', function(e){
   if (a != null){ var c = CASES[a]; var box = $('ans' + a); var b = build(c.i); box.innerHTML = '<p>' + esc(c.p) + '</p>' + b.html.replace(/ id="[^"]*"/g, ''); box.hidden = false; e.target.hidden = true; }
   if (l != null){ var c2 = CASES[l]; NUMS.forEach(function(k){ $(k).value = c2.i[k] != null ? c2.i[k] : ''; }); st = {set: c2.i.set, sex: c2.i.sex || null, t: {}}; Object.keys(c2.i).forEach(function(k){ if (c2.i[k] === true) st.t[k] = true; }); drawInputs(); render(); show('t-tool'); window.scrollTo(0, 0); }
 });
-window.VTEPPX = {build: build, decide: decide};
 drawInputs(); render(); fromHash();
 })();
 </script>
