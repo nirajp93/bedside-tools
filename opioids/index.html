@@ -8,7 +8,6 @@
 <script src="/theme.js"></script>
 <style>
 :root{--bg:#FBFBFA;--card:#FFFFFF;--ink:#111113;--muted:#55555D;--line:#ECECEE;--accent:#2B4BDB;--warn:#9A3B00;--warnbg:#FFF6EC}
-:root{--bg:#FBFBFA;--card:#FFFFFF;--ink:#111113;--muted:#55555D;--line:#ECECEE;--accent:#2B4BDB;--warn:#9A3B00;--warnbg:#FFF6EC}
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5}
@@ -337,7 +336,7 @@ function fmt(x){ if (x == null || !isFinite(x)) return '–'; var r = Math.round
 function r1(x){ return x >= 100 ? Math.round(x) : x >= 10 ? Math.round(x * 2) / 2 : Math.round(x * 100) / 100; }
 
 function patchFor(ome){ if (ome < 60) return 0; for (var k = 0; k < PATCH.length; k++){ var next = k + 1 < PATCH.length ? PATCH[k + 1][0] : 1125; if (ome < next) return PATCH[k][2]; } return null; }
-function mtdBand(ome){ for (var k = 0; k < MTD.length; k++) if (ome < MTD[k][1]) return MTD[k]; return null; }
+function mtdBand(ome){ for (var k = 0; k < MTD.length; k++) if (ome < MTD[k][1] || (k === MTD.length - 1 && ome <= MTD[k][1])) return MTD[k]; return null; }
 function ff75(ome){ for (var k = 0; k < FF75.length; k++) if (ome <= FF75[k][0]) return FF75[k][1]; }
 
 /* i = {rows:[{d,v}], to, wk, unc, old, se, renal, liver, benzo, osa, od, qt} */
@@ -357,7 +356,7 @@ function compute(i){
   R.tolerant = tolIdx >= 1 && !!i.wk;
   var flags = [];
   if (i.old) flags.push('older or frail'); if (i.se) flags.push('prior opioid side effects'); if (i.renal) flags.push('eGFR under 30');
-  if (i.liver) flags.push('liver impairment'); if (i.benzo) flags.push('benzodiazepine'); if (i.osa) flags.push('sleep apnea');
+  if (i.liver) flags.push('liver impairment'); if (i.benzo) flags.push('benzodiazepine'); if (i.osa) flags.push('sleep apnea'); if (i.od) flags.push('past overdose or substance use disorder');
   R.flags = flags;
   var kinds = {}; rows.forEach(function(r){ kinds[r.d] = 1; });
   var only = rows.length === 1 ? rows[0].d : null;
@@ -372,7 +371,7 @@ function compute(i){
   if (has('ftd')){ R.mode = 'none'; R.why = 'fromPatch'; return R; }
   if (has('mtd')){ R.mode = 'none'; R.why = 'fromMtd'; return R; }
   if (has('fiv')){
-    if (only === 'fiv' && i.to === 'ftd'){ R.mode = 'iv2patch'; R.rate = rows[0].v; var best = 0; [12.5, 25, 37.5, 50, 62.5, 75, 87.5, 100].forEach(function(x){ if (x <= R.rate) best = x; }); if (R.rate > 100) best = down(R.rate, 12.5); R.patchRate = best; return R; }
+    if (only === 'fiv' && i.to === 'ftd'){ R.mode = 'iv2patch'; R.rate = rows[0].v; var best = 0; [12.5, 25, 37.5, 50, 75, 100].forEach(function(x){ if (x <= R.rate) best = x; }); if (R.rate > 100) best = down(R.rate, 25); R.patchRate = best; return R; }
     R.mode = 'none'; R.why = 'fromFiv'; return R;
   }
   if (nr){ R.mode = 'none'; R.why = 'noRatio'; return R; }
@@ -383,7 +382,8 @@ function compute(i){
     if (!R.tolerant){ R.block = 'tol'; return R; }
     if (ome > 1124){ R.block = 'high'; return R; }
     var p = patchFor(ome); R.patchFull = p;
-    R.patchRate = (i.liver || i.renal) ? p / 2 : p;
+    if (i.renal){ R.block = 'renal'; return R; }
+    R.patchRate = i.liver ? p / 2 : p;
     R.bt = btFromPrior(ome);
     return R;
   }
@@ -391,6 +391,7 @@ function compute(i){
     R.mode = 'mtd';
     if (ome > 1000){ R.block = 'high'; return R; }
     if (i.qt){ R.block = 'qt'; }
+    if (!R.tolerant){ R.mode = 'mtd'; R.untol = true; R.per = 2.5; R.freq = 'every 8 to 12 hours'; R.daily = 7.5; R.newMme = 7.5 * DR.mtd.mme; return R; }
     var b = mtdBand(ome); R.band = b;
     R.lo = ome * b[2]; R.hi = ome * b[3];
     R.start = Math.min(R.lo, 30);
@@ -408,12 +409,13 @@ function compute(i){
   var sameDrug = rows.every(function(r){ return DR[r.d].drug === T.drug; });
   R.route = sameDrug;
   var blockHigh = flags.length > 0;
-  if (sameDrug){ R.pct = 0.75; }
+  if (sameDrug){ R.pct = (i.renal && T.drug !== 'fent') ? 0.5 : 0.75; }
   else { R.pct = (i.unc && !blockHigh) ? 0.75 : 0.5; }
   R.daily = R.calc * R.pct;
   R.per = down(R.daily / 6, T.step);
   if (R.per < T.step){ R.per = T.step; R.tiny = true; }
   if (T.iv) R.hr = down(R.daily / 24, T.hstep);
+  if (T.iv && R.hr < T.hstep) R.hr = null;
   R.btLo = R.daily * 0.10; R.btHi = R.daily * 0.15;
   var bl = Math.ceil(R.btLo / T.step - 1e-9) * T.step, bh = down(R.btHi, T.step);
   if (bl > bh) { bl = bh = Math.max(T.step, near((R.btLo + R.btHi) / 2, T.step)); }
@@ -439,7 +441,7 @@ function naiveStart(T){
 var RESULTS = [
   ['rr', 'Slow breathing, pinpoint pupils', ''],
   ['mtd', 'Started methadone in the last days', ''],
-  ['kid', 'eGFR under 30 on morphine, codeine or hydromorphone', ''],
+  ['kid', 'eGFR under 30 on morphine, codeine, hydromorphone or oxycodone', ''],
   ['heat', 'Fever or heat on a patch', ''],
   ['bzd', 'Taking a benzodiazepine', ''],
   ['wd', 'Yawning, sweating, runny nose, diarrhea, pain up', '']
@@ -457,7 +459,7 @@ function narrow(sel){
   CAUSES.forEach(function(c){ st[c[0]] = 'in'; why[c[0]] = ''; });
   function set(k, s, w){ if (st[k] === 'fav' && s === 'less') return; if (st[k] === 'less' && s === 'fav'){ st[k] = 'in'; why[k] = w; return; } st[k] = s; why[k] = w; }
   if (sel.rr){ set('excess', 'fav', 'classic opioid toxicity'); set('wd', 'less', 'withdrawal does not slow breathing'); }
-  if (sel.mtd){ set('mtdacc', 'fav', 'peak respiratory depression lags pain relief; half-life up to 59 h'); }
+  if (sel.mtd){ set('mtdacc', 'fav', 'peak respiratory depression lags pain relief; half-life 8–59 h, up to 190 h reported'); }
   else set('mtdacc', 'less', 'no recent methadone start');
   if (sel.kid){ set('metab', 'fav', 'active metabolites cleared by the kidney'); } else set('metab', 'less', 'kidney function not low');
   if (sel.heat){ set('heat', 'fav', 'heat and fever raise fentanyl absorption'); } else set('heat', 'less', 'no patch heat or fever');
@@ -574,7 +576,7 @@ function mtdSVG(k){
   return h + '</svg>';
 }
 var PF = {
-  on: {n: 'Putting it on', line: 'Levels rise slowly: therapeutic only after 18–36 hours, peak 20–72 hours, steady by the end of the second 3-day patch. Do not raise the dose before 3 days.'},
+  on: {n: 'Putting it on', line: 'Levels rise slowly: therapeutic only after 18–36 hours (Fast Fact #2), peak 20–72 hours, steady by the end of the second 3-day patch. Do not raise the dose before 3 days.'},
   off: {n: 'Taking it off', line: 'The skin depot keeps releasing drug for at least 24 hours; levels fall by about half in 20–27 hours. Start the next opioid low and use breakthrough doses.'}
 };
 function patchSVG(k){
@@ -642,6 +644,7 @@ var WHY = {
   noRatio: 'No ratio in this tool\'s sources runs this way, so start the new opioid as if opioid-naive and titrate quickly with breakthrough doses.',
   fromPatch: 'The skin keeps releasing fentanyl for at least a day after removal, and the patch tables cannot be run backwards.',
   fromMtd: 'Methadone lingers for days and its ratio depends on dose, so there is no safe table away from it.',
+  special: 'A patch or methadone can only be started safely by converting from a known dose the patient tolerates; without a ratio, that number does not exist.',
   tol: 'The patch is only for opioid-tolerant patients; in anyone else the first patch can stop breathing.'
 };
 
@@ -653,24 +656,24 @@ function build(i){
   if (R.mode === 'same') return card('r-main', 'No conversion', '<p class="head">Same opioid and route</p><p class="sub">Pick a different opioid or route.</p>');
 
   if (R.mode === 'ratio'){
-    var per = T.iv ? fmt(R.per) + ' mg IV every 4 hours' : fmt(R.per) + ' mg every 4 hours';
+    var per = fmt(R.per) + ' mg' + (T.iv ? ' IV' : '') + ' every 4 hours' + (R.tiny ? ' as needed only' : '');
     h += '<div class="card" id="r-main"><p class="label">Start · ' + esc(T.s) + '</p>';
     h += '<p class="big">' + esc(per) + '</p>';
-    if (T.iv) h += '<p class="sub">or ' + esc(fmt(R.hr)) + ' mg/h as an infusion or PCA basal rate only where monitored</p>';
+    if (T.iv && R.hr != null && !R.tiny) h += '<p class="sub">or ' + esc(fmt(R.hr)) + ' mg/h as an infusion or PCA basal rate only where monitored</p>';
     h += '<p class="sub">New total ' + esc(fmt(r1(R.daily))) + ' mg a day: ' + Math.round(R.pct * 100) + '% of the calculated ' + esc(fmt(r1(R.calc))) + ' mg</p>';
     h += '<div class="nums"><div class="num"><span>Breakthrough</span><b>' + esc(R.bt.lo === R.bt.hi ? fmt(R.bt.lo) : fmt(R.bt.lo) + '–' + fmt(R.bt.hi)) + ' mg</b></div><div class="num"><span>As needed</span><b>' + esc(R.bt.every.replace('every ', 'q')) + '</b></div><div class="num"><span>Oral morphine</span><b>' + esc(fmt(r1(R.ome))) + ' mg</b></div></div>';
-    h += guard('Cross-tolerance cut applied: ' + Math.round((1 - R.pct) * 100) + '% off the calculated dose' + (R.route ? ' (same drug, route change).' : (R.pct === 0.5 ? (R.flags.length ? ' (' + R.flags.join(', ') + ').' : ' (default for a new drug).') : ' (pain uncontrolled, no risk ticked).')) + ' Reassess within 24 hours.');
-    if (R.tiny) h += guard('The calculated dose is below the smallest practical dose; the smallest step is shown. Consider as-needed dosing only.');
+    h += guard('Cross-tolerance cut applied: ' + Math.round((1 - R.pct) * 100) + '% off the calculated dose' + (R.route ? (R.pct === 0.5 ? ' (same drug, route change; deeper cut for eGFR under 30).' : ' (same drug, route change).') : (R.pct === 0.5 ? (R.flags.length ? ' (' + R.flags.join(', ') + ').' : ' (default for a new drug).') : ' (pain uncontrolled, no risk ticked).')) + ' Reassess within 24 hours.');
+    if (R.tiny) h += guard('The calculated dose is below the smallest practical dose, so no scheduled dose is shown: give the smallest step only as needed and reassess.');
     h += guards(i, R);
-    var w = R.route ? WHY.route : (i.renal ? WHY.renal : WHY.drug);
+    var w = i.renal ? WHY.renal : R.route ? WHY.route : WHY.drug;
     h += why(w);
     h += chips([['tol', R.route ? 'route' : 'drug'], ['currency', 'eq']]);
     var steps = R.rows.map(function(r){ var D = DR[r.d]; return D.n + ' ' + fmt(r.v) + ' mg/day × ' + D.ome + ' = ' + fmt(r1(r.v * D.ome)) + ' mg oral morphine'; });
     h += more(steps.concat([
       'Total oral morphine equivalent ' + fmt(r1(R.ome)) + ' mg ÷ ' + T.ome + ' = ' + fmt(r1(R.calc)) + ' mg ' + T.s + ' a day (calculated).',
-      R.route ? 'Route change of the same drug: start at about 75% (Fast Fact #36 worked example).' : 'New drug: start at 50–75% of the calculated dose: ' + fmt(r1(R.calc * 0.5)) + '–' + fmt(r1(R.calc * 0.75)) + ' mg a day. The tool uses 50% unless pain is uncontrolled and none of age, side effects, kidneys, liver, benzodiazepine or sleep apnea is ticked.',
+      R.route ? 'Route change of the same drug: start at about 75% (Fast Fact #36 worked example); 50% when eGFR is under 30 (expert practice; Fast Fact #161 cites 25–50% cuts for morphine, hydromorphone and oxycodone in kidney failure).' : 'New drug: start at 50–75% of the calculated dose: ' + fmt(r1(R.calc * 0.5)) + '–' + fmt(r1(R.calc * 0.75)) + ' mg a day. The tool uses 50% unless pain is uncontrolled and none of age, side effects, kidneys, liver, benzodiazepine or sleep apnea is ticked.',
       'Divided every 4 hours and rounded down to a practical dose. Long-acting forms: once the dose is stable, give the same daily total split as the product directs.',
-      'Breakthrough: 10–15% of the new daily total, ' + R.bt.every + ' as needed' + (T.iv ? ' (IV)' : ' (oral)') + '. If more than 2–3 breakthrough doses a day are needed, add them into the scheduled total.',
+      'Breakthrough: 10–15% of the new daily total, ' + R.bt.every + ' as needed' + (T.iv ? ' (IV)' : ' (oral)') + '. If breakthrough doses are used regularly, recalculate the daily total including them (expert practice).',
       'Full why: equal-dose tables come from small studies; people differ. Tolerance to one opioid does not fully transfer to another (incomplete cross-tolerance), so the calculated dose can overdose a patient whose pain is controlled.'
     ]), ['FF36 (expert practice)', 'FF20 breakthrough (expert practice)']);
     h += '</div>';
@@ -678,8 +681,10 @@ function build(i){
 
   if (R.mode === 'patch'){
     h += '<div class="card" id="r-main"><p class="label">Start · fentanyl patch</p>';
-    if (R.block === 'tol'){
-      h += '<p class="head bad">Not opioid-tolerant: do not start a patch</p><p class="sub">Tolerance share ' + esc(fmt(Math.round(R.tolIdx * 100) / 100)) + (i.wk ? '' : ' · tick "a week or longer" if true') + '</p>' + guard('The patch is only for patients on at least 60 mg oral morphine a day (or equal) for a week or longer. Use an oral or IV opioid instead.', true) + why(WHY.tol) + more(['Thresholds per day: oral morphine 60 mg, oxycodone 30 mg, hydromorphone 8 mg, oxymorphone 25 mg, hydrocodone 60 mg; patch 25 mcg/h.'], ['Duragesic label']);
+    if (R.block === 'renal'){
+      h += '<p class="head bad">eGFR under 30: the patch label says avoid in severe kidney impairment</p>' + guard('Fast Fact #161 calls fentanyl relatively safe in kidney failure, but the label is stricter. Decide with palliative care or a pharmacist; if used, the label starts at half dose in mild to moderate impairment.', true) + why(WHY.renal) + more(['Duragesic label 2.6: avoid in severe renal impairment; half the usual dose in mild to moderate.'], ['Duragesic label', 'FF161']);
+    } else if (R.block === 'tol'){
+      h += '<p class="head bad">Not opioid-tolerant: do not start a patch</p><p class="sub">Tolerance share ' + esc(fmt(Math.round(R.tolIdx * 100) / 100)) + (i.wk ? '' : ' · tick "a week or longer" if true') + '</p>' + guard('The patch is only for patients on at least 60 mg oral morphine a day (or equal) for a week or longer. Use an oral or IV opioid instead.', true) + why(WHY.tol) + more(['Thresholds per day: oral morphine 60 mg, oxycodone 30 mg, hydromorphone 8 mg, oxymorphone 25 mg, hydrocodone 60 mg; patch 25 mcg/h. Codeine 150 mg and methadone 20 mg a day count as one share (the label\'s lowest row for a 25 mcg/h patch); IV fentanyl counts 1:1 with the patch.'], ['Duragesic label']);
     } else if (R.block === 'high'){
       h += '<p class="head bad">Over 1,124 mg oral morphine a day</p>' + guard('Beyond the label table. Get palliative care or a pain pharmacist.', true) + why(WHY.patch) + more([], ['Duragesic label Table 2']);
     } else {
@@ -691,7 +696,7 @@ function build(i){
       h += why(WHY.patch) + chips([['patch', 'on'], ['tol', 'patch']]);
       h += more(['Oral morphine equivalent ' + fmt(r1(R.ome)) + ' mg a day → label Table 2 → ' + R.patchFull + ' mcg/h.' + (R.patchRate !== R.patchFull ? ' Half dose for mild to moderate kidney or liver impairment (label).' : ''),
         'The label\'s Table 1 for named drugs runs higher than this route (for example oxycodone 120 mg a day reads 75 mcg/h there, 50 mcg/h here); the tool takes the lower, as the label prefers to underestimate.',
-        'Patch strengths: 12, 25, 50, 75, 100 mcg/h; 37.5, 62.5 and 87.5 exist as generics. Judge increases after two 3-day patches.',
+        'Patch strengths: 12, 25, 50, 75 and 100 mcg/h; 37.5 mcg/h as a generic only. Judge increases after two 3-day patches.',
         'Breakthrough (expert practice): 10–15% of half the prior oral morphine equivalent, as oral morphine or an equal immediate-release opioid, every 2 hours as needed.'], ['Duragesic label 2022', 'FF2 2025']);
     }
     h += '</div>';
@@ -702,6 +707,10 @@ function build(i){
     if (R.block === 'high'){
       h += '<p class="head bad">Over 1,000 mg oral morphine a day</p>' + guard('The label gives under 5% with no safe number. Specialist only.', true) + why(WHY.mtd) + more([], ['Methadone label Table 1']);
     } else {
+      if (R.untol){
+        h += '<p class="head wn">Not opioid-tolerant: use the opioid-naive start</p><p class="big">2.5 mg every 8 to 12 hours</p>' + guard('The conversion table is for patients already tolerant to another opioid. Methadone for pain is a specialist decision; ECG first.', true) + guards(i, R) + why(WHY.mtd) + chips([['mtd', 'label']]) + more(['Label: opioid-naive start 2.5 mg every 8 to 12 hours; changes no more often than every 3–5 days (APS: every 5–7 days).'], ['Methadone label', 'APS 2014']);
+        h += '</div>' + mmeCard(i, R); return h;
+      }
       if (R.block === 'qt') h += guard('QTc 450 ms or more, or QT-prolonging drugs: consider another opioid. Do not start methadone if QTc is over 500 ms.', true);
       h += '<p class="big">' + esc(fmt(R.per)) + ' mg ' + esc(R.freq) + '</p><p class="sub">' + esc(fmt(R.daily)) + ' mg a day · label range ' + esc(fmt(r1(R.lo))) + '–' + esc(fmt(r1(R.hi))) + ' mg a day (' + Math.round(R.band[2] * 100) + '–' + Math.round(R.band[3] * 100) + '% of ' + esc(fmt(r1(R.ome))) + ' mg oral morphine)</p>';
       h += '<div class="nums"><div class="num"><span>Breakthrough</span><b>' + esc(fmt(R.bt.lo) + (R.bt.hi !== R.bt.lo ? '–' + fmt(R.bt.hi) : '')) + ' mg</b></div><div class="num"><span>Oral morphine</span><b>q2h prn</b></div><div class="num"><span>Next change</span><b>≥5–7 days</b></div></div>';
@@ -721,12 +730,12 @@ function build(i){
     h += card('r-main', 'Start · fentanyl patch from IV fentanyl', (R.patchRate ? '<p class="big">' + esc(pr(R.patchRate)) + ' mcg/h patch</p>' : '<p class="head wn">Infusion under 12 mcg/h: no patch</p>') + '<p class="sub">1:1 with the infusion of ' + esc(fmt(R.rate)) + ' mcg/h; nearest available strength at or below</p>' +
       guard('Keep the infusion 6 hours after the patch goes on, then halve it for 6 hours, then stop. Keep IV as-needed doses for the first 24 hours.') + guards(i, R) +
       why('Patch levels take 18–36 hours to build, so the infusion overlaps while the depot fills.') + chips([['patch', 'on']]) +
-      more(['Kornick 2001: 1:1 conversion with a two-step taper over 12 hours in 15 inpatients; Fast Fact #2: continue the infusion at least 6 hours.', 'Use the nearest strength at or below the infusion rate (12, 25, 37.5, 50, 62.5, 75, 87.5, 100 mcg/h).'], ['Kornick 2001 (case series)', 'FF2 2025']));
+      more(['Kornick 2001: 1:1 conversion with a two-step taper over 12 hours in 15 inpatients; Fast Fact #2: continue the infusion at least 6 hours.', 'Use the nearest strength at or below the infusion rate (12, 25, 37.5, 50, 75, 100 mcg/h; combine patches above 100).'], ['Kornick 2001 (case series)', 'FF2 2025']));
   }
 
   if (R.mode === 'patch2iv'){
     h += card('r-main', 'Start · IV fentanyl from a patch', '<p class="big">' + esc(fmt(R.rate)) + ' mcg/h IV</p><p class="sub">1:1 with the patch, in a monitored setting</p>' +
-      guard('Remove the patch; the skin keeps releasing fentanyl for at least 24 hours, so start the infusion low and titrate with monitoring.') + guards(i, R) +
+      guard('Start the infusion 1:1 when the patch comes off, only in a monitored setting. The skin depot keeps adding drug for about a day, so watch sedation and breathing and titrate.') + guards(i, R) +
       why(WHY.fromPatch) + chips([['patch', 'off']]) +
       more(['Kornick 2003: 1:1 transdermal to IV in 9 patients in pain crises (specialist, monitored).'], ['Kornick 2003 (case series)']));
   }
@@ -739,7 +748,7 @@ function build(i){
     else if (R.why === 'toFiv') lead = 'To IV fentanyl: only from a patch here';
     else lead = 'No conversion ratio in this tool\'s sources';
     var body = '<p class="head wn">' + esc(lead) + '</p>';
-    if (T.drug === 'mtd' || T.patch) body += '<p class="sub">Starting ' + esc(T.s) + ' from this regimen needs a specialist.</p>';
+    if (T.drug === 'mtd' || T.patch) body += '<p class="sub">Starting ' + esc(T.s) + ' from this regimen needs a specialist: these start only by conversion from a known, tolerant dose.</p>';
     else if (ns) body += '<p class="big">' + esc(ns.lo === ns.hi ? fmt(ns.lo) : fmt(ns.lo) + '–' + fmt(ns.hi)) + ' mg every 4 hours as needed</p><p class="sub">Start ' + esc(T.s) + ' as if opioid-naive (5–10 MME a dose) and titrate quickly</p>';
     else body += '<p class="sub">Use your institution\'s opioid-naive IV dose and titrate with monitoring.</p>';
     if (R.why === 'fromPatch') body += guard('Remove the patch. Fentanyl keeps coming for at least 24 hours (levels halve in 20–27 hours), so start low, give as-needed doses, and reassess often. Ask pharmacy or palliative care.');
@@ -747,7 +756,7 @@ function build(i){
     else if (R.why === 'fromFiv') body += guard('Options: convert the infusion to a patch 1:1 first, or start the new opioid low and titrate. Ask pharmacy or palliative care.');
     else if (R.why === 'noRatio') body += guard('Higher current doses mean the opioid-naive start will undertreat at first: use as-needed doses and reassess within hours.');
     body += guards(i, R);
-    body += why(R.why === 'fromPatch' ? WHY.fromPatch : R.why === 'fromMtd' ? WHY.fromMtd : WHY.noRatio);
+    body += why((T.drug === 'mtd' || T.patch) ? WHY.special : R.why === 'fromPatch' ? WHY.fromPatch : R.why === 'fromMtd' ? WHY.fromMtd : WHY.noRatio);
     body += chips(R.why === 'fromPatch' ? [['patch', 'off']] : R.why === 'fromMtd' ? [['mtd', 'label']] : [['currency', 'mme']]);
     body += more(['Opioid-naive start (CDC 2022): a single dose of about 5–10 MME, or 20–30 MME a day, converted with the CDC factors for the new drug. This is a starting point, not an equal dose.',
       'The CDC MME factors estimate overdose risk; CDC says not to use them to convert between opioids.'], ['CDC 2022', 'Duragesic label', 'Methadone label']);
@@ -836,10 +845,10 @@ var CASES = [
   {t: 'NPO: morphine by mouth to IV', s: 'Same patient, now NPO after surgery; staying on morphine.', q: 'IV dose?', i: {rows: [{d: 'mpo', v: 180}], to: 'miv', wk: true}, p: '180 ÷ 2.5 = 72 mg IV a day; 75% for a route change = 54 mg: 9 mg every 4 hours, or 2 mg/h only where monitored.'},
   {t: 'Oxycodone to IV hydromorphone in an older patient', s: 'Age 78, oxycodone 10 mg every 4 hours (60 mg a day) after a hip fracture; now vomiting and NPO.', q: 'IV hydromorphone dose?', i: {rows: [{d: 'opo', v: 60}], to: 'hiv', wk: true, old: true}, p: '60 × 1.25 = 75 mg oral morphine ÷ 12.5 = 6 mg IV hydromorphone; 50% = 3 mg a day: 0.5 mg every 4 hours; breakthrough 0.3–0.4 mg every hour.'},
   {t: 'Oxycodone to a patch', s: 'Age 60, metastatic cancer, oxycodone 120 mg a day for a month; trouble swallowing.', q: 'Patch strength?', i: {rows: [{d: 'opo', v: 120}], to: 'ftd', wk: true}, p: '120 × 1.25 = 150 mg oral morphine → 50 mcg/h (label Table 2). Stop the oxycodone when it goes on; breakthrough oral morphine 7.5–10 mg every 2 hours.'},
-  {t: 'Morphine to methadone', s: 'Age 66, morphine 200 mg a day with rising doses and neuropathic pain; palliative care suggests methadone. QTc 430 ms.', q: 'Starting methadone?', i: {rows: [{d: 'mpo', v: 200}], to: 'mtd', wk: true}, p: 'Label 10–20% = 20–40 mg a day; start the lower end, capped at 30: 20 mg a day → 5 mg every 8 hours (rounded down). ECG follow-up; no increase for 5–7 days.'},
+  {t: 'Morphine to methadone', s: 'Age 66, morphine 200 mg a day with rising doses and neuropathic pain; palliative care suggests methadone. QTc 430 ms.', q: 'Starting methadone?', i: {rows: [{d: 'mpo', v: 200}], to: 'mtd', wk: true}, p: 'Label 10–20% = 20–40 mg a day; start the lower end, capped at 30: 20 mg a day ÷ 3 = 6.7, rounded down to 5 mg every 8 hours (15 mg a day). ECG follow-up; no increase for 5–7 days.'},
   {t: 'Going home off a patch', s: 'Age 70, fentanyl patch 50 mcg/h; wants oral oxycodone at discharge.', q: 'Oxycodone dose?', i: {rows: [{d: 'ftd', v: 50}], to: 'opo', wk: true}, p: 'No table runs backwards. Remove the patch, start oxycodone low (5 mg every 4 hours as needed) and titrate; fentanyl keeps coming for at least 24 hours. Get pharmacy or palliative help.'},
   {t: 'Tramadol and lorazepam', s: 'Age 45, tramadol 50 mg every 6 hours (200 mg a day) plus lorazepam at night. Pain uncontrolled after surgery; switching to oxycodone.', q: 'Dose and risk?', i: {rows: [{d: 'tram', v: 200}], to: 'opo', wk: true, unc: true, benzo: true}, p: 'No ratio: start oxycodone 5 mg every 4 hours as needed and titrate. 40 MME now; offer naloxone because of the benzodiazepine.'},
-  {t: 'IV to oral hydromorphone with kidney failure', s: 'Age 59, eGFR 25. IV hydromorphone 6 mg over the last 24 hours, pain controlled; now eating.', q: 'Oral dose?', i: {rows: [{d: 'hiv', v: 6}], to: 'hpo', wk: true, renal: true}, p: '6 × 12.5 = 75 mg oral morphine ÷ 5 = 15 mg; same drug, 75% = 11.25 mg a day: 1.5 mg every 4 hours (rounded down). Hydromorphone still needs caution at eGFR under 30.'}
+  {t: 'IV to oral hydromorphone with kidney failure', s: 'Age 59, eGFR 25. IV hydromorphone 6 mg over the last 24 hours, pain controlled; now eating.', q: 'Oral dose?', i: {rows: [{d: 'hiv', v: 6}], to: 'hpo', wk: true, renal: true}, p: '6 × 12.5 = 75 mg oral morphine ÷ 5 = 15 mg; same drug, but eGFR under 30, so 50% = 7.5 mg a day: 1 mg every 4 hours (rounded down). Hydromorphone still needs caution at eGFR under 30.'}
 ];
 $('practice').innerHTML = CASES.map(function(c, n){
   return '<div class="card case"><p class="label">Case ' + (n + 1) + '</p><h2>' + esc(c.t) + '</h2><p>' + esc(c.s) + '</p><p><b>' + esc(c.q) + '</b></p><div class="row"><button class="btn" data-ans="' + n + '">Show the answer</button><button class="btn ghost" data-load="' + n + '">Open in the tool</button></div><div class="ans" id="ans' + n + '" hidden></div></div>';
