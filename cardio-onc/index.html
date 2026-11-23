@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cardio-oncology · bedside.tools</title>
+<meta name="description" content="Baseline HFA-ICOS risk, heart surveillance by cancer regimen, grading of cancer therapy-related cardiac dysfunction with the next step, and checkpoint inhibitor myocarditis, with the reasoning in diagrams.">
+<script src="/theme.js"></script>
+<style>
+:root{--bg:#FBFBFA;--card:#FFFFFF;--ink:#111113;--muted:#55555D;--line:#ECECEE;--accent:#2B4BDB;--warn:#9A3B00;--warnbg:#FFF6EC}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5}
+.mono{font-family:var(--mono)}
+.wrap{max-width:720px;margin:0 auto;padding:20px 16px 48px}
+a{color:var(--accent)}
+.back{font-size:14px;text-decoration:none;display:inline-block;min-height:44px;line-height:44px}
+h1{font-size:26px;margin:4px 0 4px;letter-spacing:-.01em}
+.purpose{color:var(--muted);margin:0 0 20px}
+.tabs{display:flex;gap:6px;margin-bottom:16px}
+.tab{flex:1;min-width:0;min-height:44px;border:1px solid var(--line);background:var(--card);border-radius:14px;padding:0 4px;font:inherit;font-size:15px;font-weight:600;color:var(--muted);cursor:pointer}
+.tab[aria-selected="true"]{border-color:var(--accent);color:var(--accent)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
+.label{font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px}
+.field{display:flex;flex-direction:column;justify-content:flex-end}
+.field label{display:block;font-size:13px;color:var(--muted);margin-bottom:4px}
+.field input,.field select{width:100%;min-height:44px;border:1px solid var(--line);border-radius:10px;padding:8px 10px;font:inherit;font-family:var(--mono);background:var(--card);color:var(--ink)}
+.field input:focus,.field select:focus,.tab:focus-visible,.chk:focus-within,button:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.checks{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.chk{display:flex;align-items:center;gap:10px;min-height:44px;border:1px solid var(--line);border-radius:10px;padding:6px 10px;font-size:14px;cursor:pointer}
+.chk input{width:20px;height:20px;accent-color:var(--accent);flex:none}
+.grp{font-family:var(--mono);font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin:14px 0 0}
+.card h2{font-size:18px;margin:0 0 2px}
+.head{font-family:var(--mono);font-size:17px;font-weight:600;margin:6px 0 4px;overflow-wrap:anywhere}
+.head.bad{color:var(--bad)}.head.okc{color:var(--ok)}.head.wn{color:var(--warn)}
+.sub{font-size:14px;color:var(--muted);margin:0}
+.q{font-size:14px;margin:12px 0 0;font-weight:600}
+.card ul{margin:6px 0 0;padding-left:20px}
+.card li{margin-bottom:4px}
+.guard{border-left:3px solid var(--warn);background:var(--warnbg);padding:8px 10px;border-radius:0 10px 10px 0;margin-top:8px;font-size:14.5px}
+.tier{display:inline-block;font-family:var(--mono);font-size:11px;border:1px solid var(--line);border-radius:999px;padding:2px 8px;color:var(--muted);margin:6px 6px 0 0}
+details{margin-top:10px;border-top:1px solid var(--line);padding-top:8px}
+.whyline{margin:10px 0 0;font-size:14.5px;color:var(--muted)}
+.whyline b{color:var(--ink);font-weight:600}
+summary{cursor:pointer;color:var(--accent);font-weight:600;min-height:44px;line-height:44px}
+details p{margin:0 0 8px;font-size:15px}
+.empty{color:var(--muted)}
+.btn{min-height:44px;border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);border-radius:10px;padding:8px 14px;font:inherit;font-weight:600;cursor:pointer}
+.btn.ghost{background:var(--card);color:var(--accent)}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.note{font-size:14px;color:var(--muted)}
+.tl{position:relative;padding-left:26px;margin-top:6px}
+.tl:before{content:"";position:absolute;left:8px;top:8px;bottom:8px;width:2px;background:var(--line)}
+.st{position:relative;padding:6px 0 10px}
+.st:before{content:"";position:absolute;left:-24px;top:11px;width:12px;height:12px;border-radius:50%;background:var(--card);border:2px solid var(--muted)}
+.st.now:before{background:var(--accent);border-color:var(--accent)}
+.st .when{font-family:var(--mono);font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+.st b{display:block}
+.st small{color:var(--muted);font-size:13.5px;display:block}
+.st .tier{margin-top:4px}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:6px 6px 6px 0;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:var(--mono);font-size:11.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);font-weight:500}
+td.mono{font-size:13px;white-space:nowrap}
+.tw{overflow-x:auto}
+.case h2{font-size:17px}
+.ans{margin-top:10px;border-top:1px solid var(--line);padding-top:10px}
+footer{margin-top:28px;font-size:13.5px;color:var(--muted)}
+footer p{margin:0 0 8px}
+.panel{display:none}.panel.on{display:block}
+.fig{display:block;width:100%;max-width:460px;height:auto;margin:0 auto}
+.states{display:flex;gap:6px;overflow-x:auto;margin:10px -16px;padding:2px 16px 6px;scrollbar-width:none}
+.states::-webkit-scrollbar{display:none}
+.states.wrapit{flex-wrap:wrap;overflow:visible;margin:10px 0 0;padding:0}
+.sbtn{flex:none;min-height:44px;min-width:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--ink);font:inherit;font-size:14px;cursor:pointer;white-space:nowrap}
+.sbtn[aria-pressed="true"]{border-color:var(--accent);color:var(--accent);font-weight:600}
+.line1{font-size:15px;margin:10px 0 0}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.chip{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--fill);color:var(--ink);font:inherit;font-size:14px;cursor:pointer}
+.chip svg{flex:none;color:var(--accent)}
+.scrim{position:fixed;inset:0;background:var(--scrim);z-index:20}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:21;max-height:90vh;overflow-y:auto;background:var(--card);border:1px solid var(--line);border-bottom:0;border-radius:20px 20px 0 0;padding:8px 16px 24px;max-width:560px;margin:0 auto}
+.sheethead{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.sheethead h2{font-size:18px;margin:0}
+.xbtn{min-height:44px;min-width:44px;border:0;background:transparent;color:var(--accent);font:inherit;font-weight:600;cursor:pointer}
+.pills{position:sticky;top:0;z-index:5;background:var(--bg);display:flex;gap:6px;overflow-x:auto;margin:0 -16px 12px;padding:8px 16px;border-bottom:1px solid var(--line);scrollbar-width:none}
+.pills::-webkit-scrollbar{display:none}
+.pill{flex:none;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--muted);font:inherit;font-size:14px;cursor:pointer;white-space:nowrap}
+.pill[aria-current="true"]{border-color:var(--accent);color:var(--accent);font-weight:600}
+.chap{scroll-margin-top:70px}
+.cause{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:8px 0;border-top:1px solid var(--line);font-size:15px}
+.cause small{color:var(--muted);font-size:13px;text-align:right;flex:0 1 58%}
+.cause.out span{color:var(--muted);text-decoration:line-through}
+.cause.out,.cause.less{opacity:.6}
+.cause.fav span{font-weight:700}
+.cause.fav span:before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--accent);margin-right:8px}
+.trial{border-left:3px solid var(--accent);padding-left:12px}
+.trial p{margin:0 0 6px;font-size:15px}
+.trial .k{font-family:var(--mono);font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);display:block}
+.badge{display:inline-block;font-family:var(--mono);font-size:12px;border-radius:999px;padding:2px 10px;margin:4px 6px 0 0;border:1px solid var(--line);color:var(--muted)}
+.badge.hi{border-color:var(--warn);color:var(--warn);background:var(--warnbg)}
+.badge.vh{border-color:var(--bad);color:var(--bad);background:var(--badbg)}
+.badge.lo{border-color:var(--ok);color:var(--ok);background:var(--okbg)}
+.score{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:8px 0;border-top:1px solid var(--line)}
+.score b{font-family:var(--mono);font-size:15px}
+.score small{color:var(--muted);font-size:13px;text-align:right}
+.qn{font-size:14px;color:var(--muted);margin:12px 0 0}
+input[type=range]{width:100%;min-height:44px;accent-color:var(--accent)}
+.plate{margin:12px 0 4px}
+.plate img{display:block;width:100%;height:auto;border-radius:10px;border:1px solid var(--line)}
+.plate figcaption{font-size:12px;color:var(--muted);margin-top:4px}
+@media (max-width:420px){.checks{grid-template-columns:1fr}}
+@media (min-width:900px){
+  .wrap{max-width:1040px}
+  #p-plan.on,#p-check.on{display:grid;grid-template-columns:420px minmax(0,1fr);gap:20px;align-items:start}
+  #p-learn,#p-prac{max-width:720px;margin:0 auto}
+}
+@media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="/">← bedside.tools</a>
+<h1>Cardio-oncology</h1>
+<p class="purpose">Heart risk before cancer treatment, what to check and when for each regimen, and what to do when the echo, strain or troponin changes.</p>
+
+<div class="tabs" role="tablist">
+  <button class="tab" role="tab" id="t-plan" aria-selected="true" aria-controls="p-plan">Plan</button>
+  <button class="tab" role="tab" id="t-check" aria-selected="false" aria-controls="p-check">Results</button>
+  <button class="tab" role="tab" id="t-learn" aria-selected="false" aria-controls="p-learn">Learn</button>
+  <button class="tab" role="tab" id="t-prac" aria-selected="false" aria-controls="p-prac">Practice</button>
+</div>
+
+<div class="panel on" id="p-plan" role="tabpanel" aria-labelledby="t-plan">
+  <div>
+  <div class="card" id="regimen">
+    <p class="label">Regimen · tap all that apply</p>
+    <div class="states wrapit" id="regseg" role="group" aria-label="Regimen"></div>
+    <div id="regextra"></div>
+  </div>
+  <div class="card" id="riskfactors">
+    <p class="label">Baseline risk · HFA-ICOS</p>
+    <p class="sub">Used for anthracyclines, HER2-targeted therapy and VEGF inhibitors. Tick what applies; leave the rest.</p>
+    <div class="grid">
+      <div class="field"><label for="age">Age</label><input id="age" inputmode="numeric" autocomplete="off"></div>
+      <div class="field"><label for="lvef">Baseline LVEF %</label><input id="lvef" inputmode="decimal" autocomplete="off" placeholder="if known"></div>
+    </div>
+    <p class="grp">Heart and vessels</p><div class="checks" id="rf-cv"></div>
+    <p class="grp">Baseline blood tests</p><div class="checks" id="rf-bio"></div>
+    <p class="grp">Risk factors</p><div class="checks" id="rf-rf"></div>
+    <p class="grp">Earlier cancer treatment</p><div class="checks" id="rf-tx"></div>
+  </div>
+  <div class="card" id="aftertx">
+    <p class="label">After treatment · survivors</p>
+    <p class="sub">For anthracyclines or chest radiation: sets follow-up after the last dose.</p>
+    <div class="checks" id="rf-after"></div>
+  </div>
+  </div>
+  <div id="plan-out"></div>
+</div>
+
+<div class="panel" id="p-check" role="tabpanel" aria-labelledby="t-check">
+  <div>
+  <div class="card" id="check">
+    <p class="label">On treatment · new result</p>
+    <p class="qn">Agent</p>
+    <div class="states wrapit" id="drugseg" role="group" aria-label="Agent"></div>
+    <p class="qn">Heart failure symptoms</p>
+    <div class="states wrapit" id="symseg" role="group" aria-label="Symptoms"></div>
+    <p class="note" id="symnote" style="margin:8px 0 0"></p>
+    <div class="grid">
+      <div class="field"><label for="ef0">LVEF at baseline %</label><input id="ef0" inputmode="decimal" autocomplete="off"></div>
+      <div class="field"><label for="ef1">LVEF now %</label><input id="ef1" inputmode="decimal" autocomplete="off"></div>
+      <div class="field"><label for="gls0">GLS at baseline %</label><input id="gls0" inputmode="decimal" autocomplete="off" placeholder="e.g. -20"></div>
+      <div class="field"><label for="gls1">GLS now %</label><input id="gls1" inputmode="decimal" autocomplete="off" placeholder="e.g. -16"></div>
+    </div>
+    <div class="checks" id="biochk"></div>
+    <p class="note" style="margin:10px 0 0">A new rise: troponin above the 99th percentile, BNP 35 pg/mL or more, NT-proBNP 125 pg/mL or more, or a clear rise from the patient's own baseline.</p>
+  </div>
+  <div class="card" id="ici">
+    <p class="label">Checkpoint inhibitor · myocarditis</p>
+    <p class="sub">Fill in when the agent is a checkpoint inhibitor and something is new.</p>
+    <div class="checks" id="icichk"></div>
+    <p class="qn">Where things stand</p>
+    <div class="states wrapit" id="icistage" role="group" aria-label="Stage"></div>
+    <div class="grid"><div class="field"><label for="wt">Weight kg (for prednisone)</label><input id="wt" inputmode="decimal" autocomplete="off"></div><div></div></div>
+  </div>
+  </div>
+  <div id="check-out"></div>
+</div>
+
+<div class="panel" id="p-learn" role="tabpanel" aria-labelledby="t-learn">
+  <div class="pills" id="pills"></div>
+  <div class="card chap" id="learn-risk" data-pill="Who"><p class="label">1 · Baseline risk</p><h2>Risk is counted before the first dose</h2><p class="sub">HFA-ICOS sorts factors into very high, high and medium (1 or 2 points). One very-high or high factor sets the level; medium points add up. Tap a level.</p><div data-figure="risk"></div></div>
+  <div class="card chap" id="learn-mech" data-pill="How"><p class="label">2 · Mechanisms</p><h2>Each drug injures a different part</h2><figure class="plate" style="margin-left:0;margin-right:0"><img src="/media/cardio-onc/three-injuries.webp" width="753" height="433" loading="lazy" alt="Three panels. Cardiomyocyte injury: striated heart muscle cells broken into fragments, with small particles scattered around them. Immune infiltration: many round immune cells packed between broken heart muscle fibres. Vascular constriction: a small artery in cross-section with a thick muscular wall and a narrow lumen."><figcaption>Three ways in: muscle cells die or are stunned (anthracyclines, HER2 therapy), T cells invade the muscle (checkpoint inhibitors), arteries tighten (VEGF inhibitors, 5-FU). Created with BioRender.com</figcaption></figure><p class="sub">Muscle, arteries, rhythm or immune attack: what you check follows from what the drug does. Tap a drug.</p><div data-figure="mech"></div></div>
+  <div class="card chap" id="learn-grade" data-pill="Grade"><p class="label">3 · Grading</p><h2>CTRCD: mild, moderate, severe</h2><p class="sub">Baseline LVEF 60%. Drag the LVEF now, and add a strain fall or a biomarker rise. The grade comes from the same rules as the Results tab.</p>
+    <input type="range" id="lg-ef" min="30" max="65" step="1" value="52" aria-label="LVEF now">
+    <div class="states wrapit" id="lg-tog" role="group" aria-label="Other findings"></div>
+    <div id="lg-fig"></div><p class="head" id="lg-head"></p><p class="line1" id="lg-line"></p></div>
+  <div class="card chap" id="learn-gls" data-pill="Strain"><p class="label">4 · Strain</p><h2>Strain falls before the ejection fraction</h2><p class="sub">Global longitudinal strain is negative: about -20% is normal, and closer to zero is worse. What counts is the relative fall from the patient's own baseline. Baseline -20%: drag the value now.</p>
+    <input type="range" id="lgl" min="-22" max="-10" step="0.5" value="-17" aria-label="GLS now">
+    <p class="head" id="lgl-head"></p><p class="line1" id="lgl-line"></p></div>
+  <div class="card chap" id="learn-dose" data-pill="Dose"><p class="label">5 · Cumulative dose</p><h2>Anthracycline injury adds up</h2><p class="sub">Convert any anthracycline to doxorubicin equivalents, then see where it sits on the dose ladder.</p>
+    <div class="grid"><div class="field"><label for="ld-drug">Drug</label><select id="ld-drug"></select></div><div class="field"><label for="ld-dose">Cumulative mg/m²</label><input id="ld-dose" inputmode="decimal" autocomplete="off" value="300"></div></div>
+    <div id="ld-fig"></div><p class="line1" id="ld-line"></p></div>
+  <div class="card chap" id="learn-ici" data-pill="ICI"><p class="label">6 · Narrowing</p><h2>New troponin rise on a checkpoint inhibitor</h2><figure class="plate" style="margin-left:0;margin-right:0"><img src="/media/cardio-onc/ici-myocarditis.webp" width="768" height="429" loading="lazy" alt="Longitudinal section of striated heart muscle fibres. In the centre, many small round lymphocytes infiltrate between fibres that are breaking apart; fibres at the top and bottom edges are intact."><figcaption>What a biopsy shows: lymphocytes infiltrating heart muscle, with muscle cells lost, the tissue definition of ICI myocarditis. Created with BioRender.com</figcaption></figure><p class="sub">Send an ECG, troponin and an echocardiogram first; cardiac MRI next; biopsy only if still unsure. Tap what you found: causes that no longer fit fade, each with the reason.</p><div class="states" id="why-feats" role="group" aria-label="Findings"></div><div id="why-causes"></div></div>
+  <div class="card chap" id="trials" data-pill="Trials"><p class="label">7 · Trials</p><h2>The studies behind the advice</h2><div id="trialbox"></div><div class="row"><button class="btn" id="go-prac">Try the practice cases</button></div></div>
+</div>
+
+<div class="panel" id="p-prac" role="tabpanel" aria-labelledby="t-prac">
+  <div id="practice"></div>
+</div>
+
+<div class="scrim" id="scrim" hidden></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-t" hidden>
+  <div class="sheethead"><h2 id="sheet-t"></h2><button class="xbtn" id="sheet-x">Close</button></div>
+  <div id="sheet-b"></div>
+</div>
+
+<footer>
+  <p><strong>For education only. Not a substitute for clinical judgment.</strong> For adults with cancer. Plans are made with the oncology team; any decision to hold or stop cancer treatment is shared with them. The risk tool covers anthracyclines, HER2-targeted therapy and VEGF inhibitors only. Other regimens (BCR-ABL inhibitors, myeloma therapy, RAF and MEK inhibitors, hormone therapy, CAR-T) are not covered here. Adjust to your institution's cardio-oncology pathway.</p>
+  <p>Privacy: everything runs in your browser. Nothing you enter is sent anywhere or stored, and there are no analytics. Do not enter names, record numbers, or dates of birth.</p>
+  <p class="mono">Last reviewed: 2026-11-22</p>
+  <p><strong>Sources:</strong> Lyon AR et al., 2022 ESC Guidelines on cardio-oncology, Eur Heart J 2022;43:4229 (class and level shown on each step; Tables 3, 4, 5 and 12; Recommendation Tables 5–10, 12, 15, 21, 24–26 and 41) · Lyon AR et al., HFA-ICOS baseline risk proformas, Eur J Heart Fail 2020;22:1945 (expected rates are expert guidance, not validated) · Cardinale D et al., Circulation 2015;131:1981 · Gulati G et al. (PRADA), Eur Heart J 2016;37:1671 · Thavendiranathan P et al. (SUCCOUR), J Am Coll Cardiol 2021;77:392 · Neilan TG et al. (STOP-CA), JAMA 2023;330:528 · Mahmood SS et al., J Am Coll Cardiol 2018;71:1755. Recommendations without a class are from the guideline text ("ESC text") or are expert practice.</p>
+</footer>
+</div>
+
+<script id="engine">
+/* Pure decision engine. No DOM access. */
+var LV = ['low', 'mod', 'high', 'vh'];
+var LVN = {low: 'Low', mod: 'Moderate', high: 'High', vh: 'Very high'};
+var RATE = {low: 'under 2%', mod: '2 to 9%', high: '10 to 19%', vh: '20% or more'};
+var COLS = {ac: 'Anthracycline', her2: 'HER2-targeted', vegf: 'VEGF inhibitor'};
+/* HFA-ICOS factors: [id, label, group, {ac, her2, vegf}] — levels VH, H, M2 (2 points), M1 (1 point). ESC 2022 Table 4; HFA 2020 Tables 2–4. */
+var RF = [
+  ['hf', 'Heart failure, cardiomyopathy or earlier CTRCD', 'cv', {ac: 'VH', her2: 'VH', vegf: 'VH'}],
+  ['trastox', 'Earlier trastuzumab cardiotoxicity', 'tx', {her2: 'VH'}],
+  ['vhd', 'Severe valve disease', 'cv', {ac: 'H', her2: 'H'}],
+  ['mi', 'MI, PCI or CABG', 'cv', {ac: 'H', her2: 'H', vegf: 'VH'}],
+  ['angina', 'Stable angina', 'cv', {ac: 'H', her2: 'H', vegf: 'VH'}],
+  ['art', 'Stroke, TIA or peripheral artery disease', 'cv', {vegf: 'VH'}],
+  ['vte', 'Earlier DVT or PE', 'cv', {vegf: 'H'}],
+  ['arr', 'AF, flutter, VT or VF', 'cv', {her2: 'M2', vegf: 'M2'}],
+  ['qt480', 'QTc 480 ms or more', 'cv', {vegf: 'H'}],
+  ['qtb', 'QTc 450–479 (men) or 460–479 (women)', 'cv', {vegf: 'M2'}],
+  ['trop', 'Troponin above normal', 'bio', {ac: 'M1', her2: 'M2', vegf: 'M1'}],
+  ['np', 'BNP or NT-proBNP above normal', 'bio', {ac: 'M1', her2: 'M2', vegf: 'M1'}],
+  ['htn', 'Hypertension (over 140/90, or treated)', 'rf', {ac: 'M1', her2: 'M1', vegf: 'H'}],
+  ['dm', 'Diabetes (HbA1c over 7%, or treated)', 'rf', {ac: 'M1', her2: 'M1', vegf: 'M1'}],
+  ['ckd', 'eGFR under 60', 'rf', {ac: 'M1', her2: 'M1', vegf: 'M1'}],
+  ['prot', 'Proteinuria', 'rf', {vegf: 'M1'}],
+  ['lip', 'Non-HDL over 145 mg/dL, or treated', 'rf', {vegf: 'M1'}],
+  ['smoke', 'Smoker, now or significant history', 'rf', {ac: 'M1', her2: 'M1', vegf: 'M1'}],
+  ['obese', 'BMI over 30', 'rf', {ac: 'M1', her2: 'M1', vegf: 'M1'}],
+  ['priorac', 'Anthracycline for an earlier cancer', 'tx', {ac: 'H', her2: 'M2', vegf: 'H'}],
+  ['priorrt', 'Radiation to left chest or mediastinum', 'tx', {ac: 'H', her2: 'M2', vegf: 'M1'}],
+  ['nonac', 'Other chemotherapy for an earlier cancer', 'tx', {ac: 'M1'}]
+];
+var PTS = {M1: 1, M2: 2};
+function lvMax(a, b){ return LV.indexOf(a) >= LV.indexOf(b) ? a : b; }
+
+/* HFA-ICOS level for one regimen column. i: {age, lvef, f:{id:true}, regs:{}, acConc} */
+function hfa(col, i){
+  var hits = [];
+  RF.forEach(function(r){ if (i.f[r[0]] && r[3][col]) hits.push({id: r[0], n: r[1], l: r[3][col]}); });
+  if (i.age != null){
+    if (col === 'vegf'){ if (i.age >= 75) hits.push({id: 'age', n: 'Age 75 or over', l: 'H'}); else if (i.age >= 65) hits.push({id: 'age', n: 'Age 65–74', l: 'M1'}); }
+    else { if (i.age >= 80) hits.push({id: 'age', n: 'Age 80 or over', l: 'H'}); else if (i.age >= 65) hits.push({id: 'age', n: 'Age 65–79', l: 'M2'}); }
+  }
+  if (i.lvef != null){ if (i.lvef < 50) hits.push({id: 'lvef', n: 'LVEF under 50%', l: 'H'}); else if (i.lvef < 55) hits.push({id: 'lvef', n: 'LVEF 50–54%', l: 'M2'}); }
+  if (col === 'her2' && i.regs && i.regs.ac) hits.push(i.acConc ? {id: 'acher2', n: 'Anthracycline given with HER2 therapy', l: 'H'} : {id: 'acher2', n: 'Anthracycline before HER2 therapy', l: 'M1'});
+  var pts = 0, top = null, vh = [], hi = [], med = [];
+  hits.forEach(function(h){ if (h.l === 'VH') vh.push(h); else if (h.l === 'H') hi.push(h); else { pts += PTS[h.l]; med.push(h); } });
+  var level = vh.length ? 'vh' : hi.length ? 'high' : pts >= 5 ? 'high' : pts >= 2 ? 'mod' : 'low';
+  var by = vh.length ? 'vh' : hi.length ? 'h' : pts >= 2 ? 'pts' : med.length ? 'one' : 'none';
+  return {col: col, level: level, pts: pts, hits: hits, vh: vh, hi: hi, med: med, by: by};
+}
+
+/* Anthracycline conversion to doxorubicin equivalents. ESC 2022 Table 5 (derived from paediatric survivors; idarubicin from an efficacy ratio). */
+var ANTH = {dox: ['Doxorubicin', 1], epi: ['Epirubicin', 0.8], dauno: ['Daunorubicin', 0.6], mitox: ['Mitoxantrone', 10.5], ida: ['Idarubicin', 5]};
+function doxEq(drug, dose){ if (!ANTH[drug] || dose == null || !(dose >= 0)) return null; return Math.round(dose * ANTH[drug][1]); }
+
+/* Survivor risk after anthracycline and/or chest radiation. ESC 2022 Table 12. mhd: lt5 | 5to15 | 15to25 | gt25 | unk | null */
+function survivor(i, base){
+  var d = i.dox, m = i.mhd, rs = [], lvl = 'low';
+  function set(l, why){ rs.push([l, why]); }
+  var dd = d == null ? 0 : d;
+  if (m === 'gt25') set('vh', 'mean heart dose over 25 Gy');
+  if (m === '15to25' && dd >= 100) set('vh', 'mean heart dose 15–25 Gy with doxorubicin 100 mg/m² or more');
+  if (dd >= 400) set('vh', 'doxorubicin equivalent 400 mg/m² or more');
+  if (base === 'vh') set('vh', 'very high baseline risk');
+  if (base === 'high') set('early', 'high baseline risk');
+  if (dd >= 250 && dd < 400) set('early', 'doxorubicin equivalent 250–399 mg/m²');
+  if (i.f.ctrcd) set('early', 'moderate or severe CTRCD during treatment');
+  if (i.f.hsct) set('early', 'high-risk stem cell transplant');
+  if (m === '15to25' && dd < 100) set('late', 'mean heart dose 15–25 Gy');
+  if (m === '5to15' && dd >= 100) set('late', 'mean heart dose 5–15 Gy with doxorubicin 100 mg/m² or more');
+  if (i.f.cvrf) set('late', 'poorly controlled risk factors');
+  if (m === '5to15' && dd < 100) set('mod', 'mean heart dose 5–15 Gy');
+  if (m === 'lt5' && dd >= 100) set('mod', 'mean heart dose under 5 Gy with doxorubicin 100 mg/m² or more');
+  if (dd >= 100 && dd < 250 && m !== 'lt5') set('mod', 'doxorubicin equivalent 100–249 mg/m²');
+  if (base === 'mod') set('mod', 'moderate baseline risk');
+  var order = ['low', 'mod', 'late', 'early', 'vh'];
+  rs.forEach(function(r){ if (order.indexOf(r[0]) > order.indexOf(lvl)) lvl = r[0]; });
+  return {level: lvl, reasons: rs.filter(function(r){ return r[0] === lvl; }).map(function(r){ return r[1]; }), mhdUnknown: m === 'unk'};
+}
+var SURVN = {low: 'Low', mod: 'Moderate', late: 'Late high', early: 'Early high', vh: 'Very high'};
+
+/* Relative GLS fall, % of baseline (GLS entered with or without the minus sign). */
+function glsFall(b, n){ if (b == null || n == null || !b) return null; var B = Math.abs(b), N = Math.abs(n); return Math.round((B - N) / B * 1000) / 10; }
+
+/* CTRCD grade. ESC 2022 Table 3. i: {sym, ef0, ef1, gls0, gls1, tn, bnp} */
+function grade(i){
+  var gf = glsFall(i.gls0, i.gls1), gls = gf != null && gf > 15, bio = !!(i.tn || i.bnp), drop = (i.ef0 != null && i.ef1 != null) ? Math.round((i.ef0 - i.ef1) * 10) / 10 : null;
+  var o = {gf: gf, gls: gls, bio: bio, drop: drop};
+  if (i.sym && i.sym !== 'none'){ o.kind = 'sym'; o.sev = i.sym; return o; }
+  if (i.ef1 == null){ o.kind = (gls || bio) ? 'noef' : 'need'; return o; }
+  if (drop != null && drop <= 0 && i.ef1 < 50){ o.kind = 'notnew'; return o; }
+  if (i.ef1 < 50 && i.ef0 == null){ o.kind = 'needbase'; return o; }
+  if (i.ef1 < 40){ o.kind = 'asx'; o.sev = 'severe'; o.by = 'lt40'; return o; }
+  if (i.ef1 < 50){
+    if (drop != null && drop >= 10){ o.kind = 'asx'; o.sev = 'moderate'; o.by = 'drop'; return o; }
+    if (gls || bio){ o.kind = 'asx'; o.sev = 'moderate'; o.by = 'drop+'; return o; }
+    o.kind = 'border'; return o;
+  }
+  if (gls || bio){ o.kind = 'asx'; o.sev = 'mild'; o.by = 'mild'; return o; }
+  o.kind = 'none'; return o;
+}
+
+/* Action by grade and agent. ESC 2022 Recommendation Tables 24 (anthracycline) and 25 (HER2). */
+function action(g, drug){
+  var a = {head: '', steps: [], guards: [], tiers: []};
+  var sev = g.sev;
+  if (g.kind === 'sym'){
+    a.steps.push({name: 'Start heart failure therapy', small: 'Guideline-directed therapy as for any HF; diuretics for congestion.', t: drug === 'ac' ? 'I B' : drug === 'her2' ? (sev === 'mild' ? 'I C' : 'I B') : 'Expert practice'});
+    if (drug === 'ac'){
+      if (sev === 'severe' || sev === 'vsevere') a.steps.push({name: 'Stop the anthracycline', t: 'I C'});
+      else if (sev === 'moderate') a.steps.push({name: 'Interrupt the anthracycline', small: 'Restart only after a multidisciplinary discussion.', t: 'I C'});
+      else a.steps.push({name: 'Multidisciplinary decision: continue or interrupt', t: 'I C'});
+    } else if (drug === 'her2'){
+      if (sev === 'mild') a.steps.push({name: 'Multidisciplinary decision: continue or interrupt', t: 'I C'});
+      else a.steps.push({name: 'Interrupt HER2-targeted therapy', small: 'Restart only after a multidisciplinary discussion.', t: 'I C'});
+    } else a.steps.push({name: 'Discuss holding the drug with oncology and cardio-oncology', t: 'Expert practice'});
+    a.head = 'Symptomatic CTRCD, ' + SYM[sev].n.toLowerCase();
+    return a;
+  }
+  a.head = 'Asymptomatic CTRCD, ' + sev;
+  if (drug === 'ac'){
+    if (sev === 'severe' || sev === 'moderate'){
+      a.steps.push({name: 'Interrupt the anthracycline', t: 'I C'});
+      a.steps.push({name: 'Start heart failure therapy', small: 'As in the heart failure guideline, starting with an ACE inhibitor or ARB and a beta-blocker.', t: 'I C'});
+      a.steps.push({name: 'Multidisciplinary decision before restarting', small: 'If restarted: liposomal anthracycline or dexrazoxane may be considered (IIb C each).', t: 'I C'});
+    } else {
+      a.steps.push({name: 'Continue the anthracycline', small: 'Closer imaging and biomarkers.', t: 'I C'});
+      if (g.gls) a.steps.push({name: 'ACE inhibitor or ARB and/or beta-blocker', small: 'For the strain fall. Avoid low blood pressure.', t: 'IIa B'});
+      if (g.tn && !g.gls) a.steps.push({name: 'ACE inhibitor or ARB and/or beta-blocker', small: 'For the troponin rise.', t: 'IIa B'});
+      if (g.bnpOnly) a.steps.push({name: 'ACE inhibitor or ARB and/or beta-blocker may be considered', small: 'For a natriuretic peptide rise alone.', t: 'IIb C'});
+    }
+  } else if (drug === 'her2'){
+    if (sev === 'severe'){
+      a.steps.push({name: 'Interrupt HER2-targeted therapy', t: 'I C'});
+      a.steps.push({name: 'Start heart failure therapy', t: 'I C'});
+      a.steps.push({name: 'Multidisciplinary decision before restarting', small: 'After recovery to LVEF 40% or more: echo and biomarkers every 2 cycles for the first 4 cycles (ESC text).', t: 'I C'});
+    } else if (sev === 'moderate'){
+      a.steps.push({name: 'Continue HER2-targeted therapy', small: 'Unlike an anthracycline: HER2 injury is usually reversible. Closer monitoring.', t: 'IIa B'});
+      a.steps.push({name: 'Start ACE inhibitor or ARB and beta-blocker', t: 'I C'});
+    } else {
+      a.steps.push({name: 'Continue HER2-targeted therapy', t: 'I C'});
+      a.steps.push({name: 'ACE inhibitor or ARB and/or beta-blocker', small: 'For the strain fall or biomarker rise.', t: 'IIa B'});
+    }
+  } else {
+    if (sev === 'mild') a.steps.push({name: 'Usually continue; consider ACE inhibitor or ARB and/or beta-blocker', t: 'Expert practice'});
+    else a.steps.push({name: 'Heart failure therapy, and discuss holding the drug with oncology', t: 'Expert practice'});
+    a.guards.push('The guideline grades CTRCD the same way for every drug, but its continue-or-hold tables are written for anthracyclines and HER2 therapy only.');
+  }
+  return a;
+}
+var SYM = {
+  none: {n: 'None'},
+  mild: {n: 'Mild', d: 'Mild symptoms, no change in therapy needed.'},
+  moderate: {n: 'Moderate', d: 'Needs more diuretic or HF therapy as an outpatient.'},
+  severe: {n: 'Severe', d: 'Admitted for heart failure.'},
+  vsevere: {n: 'Very severe', d: 'Needs inotropes or mechanical support, or transplant is being considered.'}
+};
+
+/* Checkpoint inhibitor myocarditis. ESC 2022 Table 3, Recommendation Table 26, Figure 28. */
+function iciPlan(i){
+  var o = {kind: null, steps: [], guards: [], more: []};
+  var any = i.tn || i.ecg || i.symp || i.unstable || i.stage !== 'none';
+  if (!any) return null;
+  if (i.unstable) o.guards.push('Fulminant features (shock, heart failure needing ventilation, complete or high-grade block, ventricular arrhythmia): ICU, a single dose of IV methylprednisolone before the diagnosis is confirmed (IIa C), and full cardiovascular support including mechanical support (I C).');
+  if (i.stage === 'none'){
+    o.kind = 'suspect';
+    o.head = 'Suspected ICI myocarditis';
+    o.steps.push({when: 'Now', name: 'Hold the checkpoint inhibitor', small: 'Until myocarditis is confirmed or excluded.', t: 'I C', now: true});
+    o.steps.push({when: 'Now', name: 'Admit with continuous ECG monitoring', small: 'Watch for AV block and fast arrhythmias.', t: 'I C'});
+    o.steps.push({when: 'First day', name: 'ECG, troponin, echocardiogram and cardiac MRI', small: 'Exclude ACS (angiography if needed) and infection.', t: 'I B'});
+    o.steps.push({when: 'If unsure', name: 'Endomyocardial biopsy', small: 'When the diagnosis is still in doubt, especially if unstable or MRI is not possible.', t: 'IIa C'});
+    o.steps.push({when: 'Once likely', name: 'Start IV methylprednisolone', small: 'ESC text: as soon as the diagnosis is considered likely; do not wait for a biopsy. Mark "Confirmed" above for the dose.'});
+    o.more.push('Diagnosis: a new troponin rise plus one major criterion (cardiac MRI meeting the modified Lake Louise criteria) or two minor criteria (a clinical syndrome; ventricular arrhythmia or new conduction disease; a fall in LV function without a Takotsubo pattern; another immune-related effect, especially myositis or myasthenia; a suggestive MRI).');
+    o.more.push('High-dose steroids are recommended for confirmed myocarditis (I C), and a single IV dose before confirmation should be considered when the patient is unstable (IIa C). The guideline text advises starting as soon as the diagnosis is considered likely.');
+  } else if (i.stage === 'conf'){
+    o.kind = 'conf';
+    o.head = 'Confirmed ICI myocarditis: high-dose steroids';
+    o.steps.push({when: 'Now', name: 'Methylprednisolone 500–1000 mg IV once daily', small: 'For the first 3 to 5 days (at least 3). Keep the checkpoint inhibitor interrupted (I C).', t: 'I C', now: true});
+    o.steps.push({when: 'Day 3', name: 'Check the response', small: 'Troponin down more than 50% from peak, and LV dysfunction, AV block and arrhythmias resolved?', t: 'I C'});
+    o.steps.push({when: 'Then', name: 'Oral steroid and taper', small: 'Pick the day-3 answer above to see the dose.', t: 'IIa C'});
+  } else if (i.stage === 'better'){
+    o.kind = 'better';
+    var dose = i.wt ? Math.min(80, Math.round(i.wt)) : null;
+    o.head = 'Responding: switch to oral steroid' + (dose ? ', ' + dose + ' mg a day' : '');
+    o.steps.push({when: 'Now', name: 'Prednisone 1 mg/kg a day, up to 80 mg' + (dose ? ' (' + dose + ' mg)' : ''), small: 'ESC names prednisolone; prednisone is the usual US equivalent at the same dose.', t: 'IIa C', now: true});
+    o.steps.push({when: 'Weekly', name: 'Taper by about 10 mg a week', small: 'With symptoms, ECG and troponin checked as you go (ESC text).'});
+    o.steps.push({when: 'At 20 mg', name: 'Reassess LV function and troponin', small: 'Then 5 mg a week down to 5 mg a day, then 1 mg steps (ESC text).'});
+    o.steps.push({when: 'Later', name: 'Restarting a checkpoint inhibitor', small: 'Only after a multidisciplinary discussion, and only after uncomplicated myocarditis.', t: 'I C'});
+  } else if (i.stage === 'refr'){
+    o.kind = 'refr';
+    o.head = 'Steroid-refractory ICI myocarditis';
+    o.steps.push({when: 'Now', name: 'Add second-line immunosuppression', small: 'Refractory: troponin down less than 50% after 3 days of IV methylprednisolone, or AV block, ventricular arrhythmia or LV dysfunction persists. No single agent is recommended; choose with cardio-oncology and the immune-toxicity team.', t: 'IIa C', now: true});
+    o.steps.push({when: 'Now', name: 'Continue high-dose steroids and monitoring', t: 'I C'});
+    o.guards.push('Caution with infliximab in steroid-refractory myocarditis and heart failure (ESC text).');
+    o.more.push('Agents studied in case series: mycophenolate, antithymocyte globulin, IVIG, plasma exchange, tocilizumab, abatacept, alemtuzumab, tofacitinib (ESC text: not enough data to recommend one).');
+  }
+  return o;
+}
+
+/* Surveillance by regimen. ESC 2022 Recommendation Tables 7, 8, 9, 10, 12, 15, 21. */
+function surv(reg, lvl, i){
+  var s = [], hv = lvl === 'high' || lvl === 'vh';
+  var big = i.dox != null && i.dox >= 250;
+  if (reg === 'ac'){
+    s.push({when: 'Before', name: 'Echocardiogram', t: 'I B'});
+    s.push({when: 'Before', name: 'Troponin and natriuretic peptide', t: hv ? 'I B' : 'IIa C'});
+    if (hv){
+      s.push({when: 'During', name: 'Echo every 2 cycles', t: 'I C'});
+      s.push({when: 'During', name: 'Troponin and NP before every cycle', t: 'I B'});
+      s.push({when: 'After', name: 'Echo within 3 months of the last dose', t: 'I C'});
+      s.push({when: 'After', name: 'Troponin and NP at 3 and 12 months', t: 'I B'});
+    } else if (lvl === 'mod'){
+      s.push({when: 'During', name: 'Troponin and NP every 2 cycles', t: 'IIa C'});
+      s.push({when: 'During', name: 'Extra echo once the cumulative dose reaches 250 mg/m²' + (big ? ' (this plan does)' : ''), t: 'IIa C'});
+      s.push({when: 'After', name: 'Troponin and NP within 3 months', t: 'IIa C'});
+    } else {
+      s.push({when: 'During', name: 'Troponin and NP every 2 cycles ' + (big ? 'should be considered' : 'may be considered'), t: big ? 'IIa C (dose 250 or more)' : 'IIb C'});
+      s.push({when: 'During', name: 'Extra echo once the cumulative dose reaches 250 mg/m²' + (big ? ' (this plan does)' : ''), t: 'IIb C'});
+      if (big) s.push({when: 'After', name: 'Troponin and NP within 3 months', t: 'IIa C'});
+    }
+    s.push({when: 'After', name: 'Echo within 12 months of the last dose', t: 'I B'});
+  }
+  if (reg === 'her2'){
+    s.push({when: 'Before', name: 'Echocardiogram', t: 'I B'});
+    s.push({when: 'Before', name: 'Troponin and natriuretic peptide' + (hv ? '' : ' may be considered'), t: hv ? 'I C' : 'IIb C'});
+    if (!hv && i.regs.ac) s.push({when: 'Before', name: 'Baseline troponin after the anthracycline, before HER2 therapy', t: 'IIa A'});
+    if (i.her2set === 'met'){
+      s.push({when: 'During', name: 'Echo every 3 months for the first year', small: 'Then every 6 months if well and unchanged.', t: 'I C'});
+    } else {
+      s.push({when: 'During', name: 'Echo every 3 months', small: lvl === 'low' ? 'Low risk with a normal 3-month echo: every 4 months may be considered (IIb C).' : '', t: 'I B'});
+    }
+    if (hv) s.push({when: 'During', name: i.her2set === 'met' ? 'More frequent echo may be considered' : 'More frequent echo should be considered', t: i.her2set === 'met' ? 'IIb C' : 'IIa C'});
+    s.push({when: 'During', name: hv ? 'Troponin and NP every 2–3 cycles' : 'Troponin and NP every 3 months may be considered', t: hv ? 'IIa C' : 'IIb C'});
+    if (i.her2set !== 'met') s.push({when: 'After', name: 'Echo within 12 months of the last dose', t: 'I B'});
+    s.push({when: 'After', name: hv ? 'Troponin and NP at 3 and 12 months' : 'Troponin and NP at 12 months may be considered', t: hv ? 'IIa C' : 'IIb C'});
+  }
+  if (reg === 'ici'){
+    var ih = i.iciHigh;
+    s.push({when: 'Before', name: 'ECG, troponin and natriuretic peptide', t: 'I B'});
+    s.push({when: 'Before', name: ih ? 'Echocardiogram' : 'Echocardiogram may be considered', small: ih ? 'High risk: ' + i.iciWhy.join(', ') + '.' : '', t: ih ? 'I B' : 'IIb C'});
+    s.push({when: 'During', name: 'ECG and troponin before doses 2, 3 and 4', small: 'If normal, then every 3 doses until treatment ends.', t: 'IIa B'});
+    s.push({when: 'Long term', name: 'Over 12 months of treatment: heart review every 6–12 months', small: 'Examination, blood pressure, NP, lipids, HbA1c, ECG.', t: ih ? 'I C' : 'IIb C'});
+  }
+  if (reg === 'vegf'){
+    s.push({when: 'Every visit', name: 'Blood pressure', t: 'I C'});
+    s.push({when: 'At home', name: 'Daily BP in the first cycle and after each dose increase; then every 2–3 weeks', t: 'I C'});
+    s.push({when: 'Before', name: hv ? 'Echocardiogram' : 'Echocardiogram should be considered', t: hv ? 'I C' : 'IIa C'});
+    if (hv){
+      s.push({when: 'During', name: 'Echo every 3 months in the first year', t: 'IIa C'});
+      s.push({when: 'During', name: 'NP at baseline, 4 weeks, then every 3 months', t: 'IIa C'});
+    } else if (lvl === 'mod'){
+      s.push({when: 'During', name: 'Echo every 4 months in the first year may be considered', t: 'IIb C'});
+      s.push({when: 'During', name: 'NP at baseline, then every 4 months may be considered', t: 'IIb C'});
+    }
+    if (i.f.qt480 || i.f.qtb || i.f.qtrisk) s.push({when: 'During', name: 'ECG with QTc monthly for 3 months, then every 3–6 months', small: 'Moderate or high risk of QT prolongation.', t: 'I C'});
+  }
+  if (reg === 'btk'){
+    s.push({when: 'Every visit', name: 'Blood pressure', t: 'I B'});
+    s.push({when: 'Every visit', name: 'Pulse or rhythm strip for atrial fibrillation', t: 'I C'});
+    s.push({when: 'At home', name: 'Weekly BP for 3 months, then monthly', t: 'IIa C'});
+    s.push({when: 'Before', name: 'Echocardiogram if high cardiovascular risk', t: 'I C'});
+    s.push({when: 'If AF', name: 'Echocardiogram', small: 'Rate control: a beta-blocker is preferred; avoid diltiazem and verapamil where possible (ESC text). Anticoagulation by CHA2DS2-VASc, weighing ibrutinib\'s bleeding risk and drug interactions with oncology.', t: 'I C'});
+  }
+  if (reg === 'fp'){
+    s.push({when: 'Before', name: 'Cardiovascular risk: BP, ECG, lipids, HbA1c, 10-year risk score', t: 'I C'});
+    s.push({when: 'Before', name: 'Echocardiogram if there is known symptomatic heart disease', t: 'I C'});
+    s.push({when: 'Before', name: 'Screening for coronary disease may be considered if high risk', t: 'IIb C'});
+    s.push({when: 'During', name: 'Ask about chest pain at every infusion', small: 'Vasospasm: chest pain, often at rest, with ischaemic ECG changes.'});
+  }
+  if (reg === 'rt'){
+    s.push({when: 'Before', name: 'Cardiovascular risk assessment with a 10-year risk score', t: 'I B'});
+    s.push({when: 'Before', name: 'Echocardiogram if there is known heart disease', t: 'IIa C'});
+    s.push({when: 'After', name: 'Follow-up set by the survivor risk below', small: 'Ask radiation oncology for the mean heart dose.'});
+  }
+  return s;
+}
+var REGS = [['ac', 'Anthracycline'], ['her2', 'HER2-targeted'], ['ici', 'Checkpoint inhibitor'], ['vegf', 'VEGF inhibitor'], ['btk', 'BTK inhibitor'], ['fp', '5-FU or capecitabine'], ['rt', 'Chest radiation']];
+var REGN = {ac: 'Anthracycline', her2: 'HER2-targeted therapy', ici: 'Checkpoint inhibitor', vegf: 'VEGF inhibitor', btk: 'BTK inhibitor', fp: 'Fluoropyrimidine (5-FU, capecitabine)', rt: 'Radiation to a field including the heart'};
+
+/* Whole plan. */
+function plan(i){
+  var o = {cols: [], cards: []};
+  ['ac', 'her2', 'vegf'].forEach(function(c){ if (i.regs[c]) o.cols.push(hfa(c, i)); });
+  var top = null; o.cols.forEach(function(r){ if (!top || LV.indexOf(r.level) > LV.indexOf(top.level)) top = r; });
+  o.top = top;
+  var why = [];
+  ['hf', 'mi', 'angina', 'vhd', 'art'].forEach(function(k){ if (i.f[k]) why.push(RF.filter(function(r){ return r[0] === k; })[0][1].toLowerCase()); });
+  if (i.f.arr) why.push('arrhythmia');
+  i.iciHigh = !!(i.f.dual || i.f.irae || i.regs.ac || i.regs.her2 || i.regs.vegf || why.length);
+  i.iciWhy = [];
+  if (i.f.dual) i.iciWhy.push('dual checkpoint inhibitors');
+  if (i.regs.ac || i.regs.her2 || i.regs.vegf) i.iciWhy.push('combined with another cardiotoxic drug');
+  if (i.f.irae) i.iciWhy.push('earlier immune-related side effect');
+  if (why.length) i.iciWhy.push('known heart disease');
+  REGS.forEach(function(r){ if (i.regs[r[0]]){ var col = o.cols.filter(function(c){ return c.col === r[0]; })[0]; o.cards.push({reg: r[0], lvl: col ? col.level : null, steps: surv(r[0], col ? col.level : null, i)}); } });
+  if (i.regs.ac || i.regs.rt){ var acl = o.cols.filter(function(c){ return c.col === 'ac'; })[0]; o.surv = survivor(i, acl ? acl.level : null); }
+  return o;
+}
+
+/* Why line for the risk card: from the factor that set the level. */
+function riskWhy(r){
+  if (r.by === 'vh') return r.vh[0].n + ' is a very-high factor: one is enough.';
+  if (r.by === 'h') return r.hi[0].n + ' is a high factor: one is enough' + (r.pts ? ', whatever the medium points.' : '.');
+  if (r.by === 'pts') return 'Medium factors add to ' + r.pts + ' point' + (r.pts === 1 ? '' : 's') + ' (' + r.med.map(function(h){ return h.n.toLowerCase() + ' ' + PTS[h.l]; }).join(', ') + '); ' + (r.pts >= 5 ? '5 or more is high.' : '2 to 4 is moderate.');
+  if (r.by === 'one') return 'A single 1-point factor (' + r.med[0].n.toLowerCase() + ') still counts as low risk.';
+  return null;
+}
+</script>
+
+<script>
+(function(){
+var $ = function(id){ return document.getElementById(id); };
+function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+var FS = 'font-family:var(--sans)', FM = 'font-family:var(--mono)';
+function num(id){ var v = parseFloat(String($(id).value).replace(',', '.')); return isFinite(v) ? v : null; }
+
+/* ---------- Plan tab ---------- */
+var P = {regs: {ac: false}, her2set: 'early', acDrug: 'dox', mhd: null, f: {}};
+var AFTER = [['ctrcd', 'Moderate or severe CTRCD during treatment'], ['hsct', 'High-risk stem cell transplant'], ['cvrf', 'Risk factors poorly controlled']];
+function readPlan(){
+  var age = num('age'), lvef = num('lvef');
+  var dose = $('acdose') ? num('acdose') : null;
+  return {regs: P.regs, her2set: P.her2set, acConc: !!P.f.conc, f: P.f, age: age != null && age > 0 && age < 120 ? age : null, lvef: lvef != null && lvef > 5 && lvef < 90 ? lvef : null, dox: P.regs.ac ? doxEq(P.acDrug, dose) : null, mhd: P.regs.rt ? P.mhd : null};
+}
+function seg(host, list, cur){ host.innerHTML = list.map(function(c){ var on = typeof cur === 'object' && cur ? !!cur[c[0]] : String(c[0]) === String(cur); return '<button class="sbtn" data-v="' + c[0] + '" aria-pressed="' + on + '">' + esc(c[1]) + '</button>'; }).join(''); }
+function ticks(host, list, store){ host.innerHTML = list.map(function(t){ return '<label class="chk"><input type="checkbox" data-k="' + t[0] + '"' + (store[t[0]] ? ' checked' : '') + '><span>' + esc(t[1]) + '</span></label>'; }).join(''); }
+function drawPlanInputs(){
+  seg($('regseg'), REGS, P.regs);
+  var h = '';
+  if (P.regs.ac){
+    h += '<p class="qn">Anthracycline and planned cumulative dose</p><div class="grid"><div class="field"><label for="acdrug">Drug</label><select id="acdrug">' + Object.keys(ANTH).map(function(k){ return '<option value="' + k + '"' + (k === P.acDrug ? ' selected' : '') + '>' + ANTH[k][0] + '</option>'; }).join('') + '</select></div><div class="field"><label for="acdose">Cumulative mg/m²</label><input id="acdose" inputmode="decimal" autocomplete="off" value="' + esc(P.acDose || '') + '" placeholder="e.g. 240"></div></div><p class="note" id="acnote" style="margin:8px 0 0"></p>';
+  }
+  if (P.regs.her2) h += '<p class="qn">HER2 setting</p><div class="states wrapit" id="her2seg" role="group" aria-label="HER2 setting"></div>' + (P.regs.ac ? '<div class="checks"><label class="chk"><input type="checkbox" data-k="conc"' + (P.f.conc ? ' checked' : '') + '><span>Anthracycline and HER2 therapy given together</span></label></div>' : '');
+  if (P.regs.ici) h += '<p class="qn">Checkpoint inhibitor</p><div class="checks"><label class="chk"><input type="checkbox" data-k="dual"' + (P.f.dual ? ' checked' : '') + '><span>Two checkpoint inhibitors</span></label><label class="chk"><input type="checkbox" data-k="irae"' + (P.f.irae ? ' checked' : '') + '><span>Earlier immune-related side effect</span></label></div>';
+  if (P.regs.vegf) h += '<p class="qn">VEGF inhibitor</p><div class="checks"><label class="chk"><input type="checkbox" data-k="qtrisk"' + (P.f.qtrisk ? ' checked' : '') + '><span>Other QT risk (QT drugs, low K or Mg)</span></label></div>';
+  if (P.regs.rt) h += '<p class="qn">Mean heart dose (ask radiation oncology)</p><div class="states wrapit" id="mhdseg" role="group" aria-label="Mean heart dose"></div>';
+  $('regextra').innerHTML = h;
+  if (P.regs.her2) seg($('her2seg'), [['early', 'Early (before or after surgery)'], ['met', 'Metastatic']], P.her2set);
+  if (P.regs.rt) seg($('mhdseg'), [['lt5', 'Under 5 Gy'], ['5to15', '5–15 Gy'], ['15to25', '15–25 Gy'], ['gt25', 'Over 25 Gy'], ['unk', 'Not known']], P.mhd);
+  ticks($('rf-cv'), RF.filter(function(r){ return r[2] === 'cv'; }), P.f);
+  ticks($('rf-bio'), RF.filter(function(r){ return r[2] === 'bio'; }), P.f);
+  ticks($('rf-rf'), RF.filter(function(r){ return r[2] === 'rf'; }), P.f);
+  ticks($('rf-tx'), RF.filter(function(r){ return r[2] === 'tx'; }), P.f);
+  ticks($('rf-after'), AFTER, P.f);
+  if ($('acdrug')){ $('acdrug').onchange = function(){ P.acDrug = this.value; renderPlan(); }; $('acdose').oninput = function(){ P.acDose = this.value; renderPlan(); }; }
+}
+$('regseg').addEventListener('click', function(e){ var b = e.target.closest('[data-v]'); if (!b) return; var k = b.getAttribute('data-v'); P.regs[k] = !P.regs[k]; drawPlanInputs(); renderPlan(); });
+$('regextra').addEventListener('click', function(e){ var b = e.target.closest('[data-v]'); if (!b) return; var host = b.parentNode.id, v = b.getAttribute('data-v'); if (host === 'her2seg') P.her2set = v; if (host === 'mhdseg') P.mhd = P.mhd === v ? null : v; drawPlanInputs(); renderPlan(); });
+['regextra', 'riskfactors', 'aftertx'].forEach(function(id){ $(id).addEventListener('change', function(e){ var k = e.target.getAttribute && e.target.getAttribute('data-k'); if (k){ P.f[k] = e.target.checked; renderPlan(); } }); });
+['age', 'lvef'].forEach(function(k){ $(k).addEventListener('input', renderPlan); });
+
+function steps(list){ return '<div class="tl">' + list.map(function(s){ return '<div class="st' + (s.now ? ' now' : '') + '">' + (s.when ? '<span class="when">' + esc(s.when) + '</span>' : '') + '<b>' + esc(s.name) + '</b>' + (s.small ? '<small>' + esc(s.small) + '</small>' : '') + (s.t ? '<span class="tier">' + esc(s.t) + '</span>' : '') + '</div>'; }).join('') + '</div>'; }
+function guards(list){ return (list || []).map(function(g){ return '<div class="guard">' + esc(g) + '</div>'; }).join(''); }
+function paras(list){ return (list || []).map(function(m){ return '<p>' + esc(m) + '</p>'; }).join(''); }
+function badge(t, cls){ return '<span class="badge ' + (cls || '') + '">' + esc(t) + '</span>'; }
+function lvCls(l){ return l === 'vh' ? 'vh' : l === 'high' ? 'hi' : l === 'low' ? 'lo' : ''; }
+function card(id, label, head, cls, body, why, chips, more){
+  var h = '<div class="card" id="' + id + '"><p class="label">' + esc(label) + '</p>' + (head ? '<p class="head' + (cls ? ' ' + cls : '') + '">' + esc(head) + '</p>' : '') + body;
+  if (why) h += '<p class="whyline"><b>Why:</b> ' + esc(why) + '</p>';
+  if (chips && chips.length) h += '<div class="chips">' + chips.join('') + '</div>';
+  if (more) h += '<details><summary>More</summary>' + more + '</details>';
+  return h + '</div>';
+}
+var MECHWHY = {
+  ac: 'Anthracyclines damage heart muscle cells directly, and the damage adds up with each dose: it is found early by watching for a fall in strain, troponin or LVEF.',
+  her2: 'HER2 is a survival signal for stressed heart muscle; blocking it weakens contraction, usually reversibly, so the echo is repeated every 3 months.',
+  ici: 'Checkpoint inhibitors release T cells that can attack heart muscle, usually in the first weeks: an early troponin and ECG catch it.',
+  vegf: 'VEGF inhibitors tighten and thin small arteries, so blood pressure rises within days: it is checked at every visit and at home.',
+  btk: 'BTK inhibitors, especially ibrutinib, bring on atrial fibrillation and high blood pressure: feel the pulse and check BP at every visit.',
+  fp: '5-FU and capecitabine can make coronary arteries spasm during the infusion: chest pain on treatment is ischaemia until shown otherwise.',
+  rt: 'Radiation scars arteries, valves, pericardium and muscle over years: the risk shows 5 to 10 years later, so follow-up runs long after treatment.'
+};
+function renderPlan(){
+  var i = readPlan(), o = plan(i), h = '';
+  if ($('acnote')) $('acnote').textContent = i.dox != null ? 'Doxorubicin equivalent: ' + i.dox + ' mg/m²' + (i.dox >= 250 ? '. At 250 or more, higher risk (ESC text).' : '.') : 'Enter the dose to convert it to doxorubicin equivalents.';
+  if (!Object.keys(P.regs).some(function(k){ return P.regs[k]; })){ $('plan-out').innerHTML = '<div class="card empty" id="answer">Pick the regimen to start. Risk, the check-up schedule and prevention update as you tick.</div>'; return; }
+  if (o.cols.length){
+    var t = o.top, rw = riskWhy(t);
+    var body = '<p class="sub">' + o.cols.map(function(r){ return badge(COLS[r.col] + ': ' + LVN[r.level], lvCls(r.level)); }).join('') + '</p>';
+    body += '<p class="sub" style="margin-top:6px">Expected cardiovascular toxicity at this level: ' + RATE[t.level] + ' (expert guidance).</p>';
+    if (i.lvef == null) body += '<p class="note">No baseline LVEF entered: an LVEF under 55% adds risk, so the echo comes first.</p>';
+    var more = o.cols.map(function(r){ return '<p><b>' + COLS[r.col] + ':</b> ' + (r.hits.length ? esc(r.hits.map(function(x){ return x.n + ' (' + (x.l === 'VH' ? 'very high' : x.l === 'H' ? 'high' : x.l === 'M2' ? '2 points' : '1 point') + ')'; }).join('; ')) : 'no factors ticked') + '. ' + LVN[r.level] + '.</p>'; }).join('');
+    more += '<p>Rules: any very-high factor makes very high; any high factor makes high; otherwise medium points add, 2 to 4 moderate and 5 or more high. One 1-point factor alone is low. The factors and their weights differ by drug class (HFA-ICOS 2020; ESC 2022 Table 4).</p><span class="tier">HFA-ICOS proforma · ESC 2022 Table 4</span>';
+    h += card('answer', 'Baseline risk', LVN[t.level] + ' risk' + (o.cols.length > 1 ? ' (' + COLS[t.col].toLowerCase() + ')' : ''), t.level === 'vh' ? 'bad' : t.level === 'high' ? 'wn' : t.level === 'low' ? 'okc' : '', body, rw, [chip('risk', t.level)], more);
+  } else {
+    h += card('answer', 'Baseline risk', 'No HFA-ICOS score for this regimen', '', '<p class="sub">The risk proformas cover anthracyclines, HER2-targeted therapy and VEGF inhibitors. For the others, use the drug-specific checks below and ordinary cardiovascular risk.</p>', null, null, null);
+  }
+  o.cards.forEach(function(c){
+    var lv = c.lvl, label = REGN[c.reg] + (lv ? ' · ' + LVN[lv].toLowerCase() + ' risk' : '');
+    var gs = [], chs = [chip('mech', c.reg, 'How it injures the heart')];
+    if (c.reg === 'ac') chs.push(chip('dose', i.dox != null ? (i.dox >= 400 ? 'd400' : i.dox >= 250 ? 'd250' : i.dox >= 100 ? 'd100' : 'd0') : 'd250', 'Cumulative dose ladder'));
+    if (c.reg === 'btk') gs.push('Ibrutinib: hold it for dual antiplatelet therapy, and 3 to 7 days before invasive procedures, because of bleeding risk (ESC text).');
+    if (c.reg === 'fp') gs.push('Chest pain during an infusion: stop the infusion, get an ECG and troponin, and treat as possible ACS. Rechallenge only if there is no alternative, after severe coronary disease has been excluded, in a monitored unit, with nitrate and calcium-channel blocker cover (ESC text).');
+    if (c.reg === 'ici') gs.push('Myocarditis comes early, usually in the first weeks: new chest pain, breathlessness, palpitations, syncope, muscle weakness, ptosis or double vision, or a new troponin rise or ECG change, means hold the drug and check (Results tab).');
+    var link = c.reg === 'btk' ? '<div class="row"><a class="btn ghost" href="/afib/" style="text-decoration:none;display:inline-flex;align-items:center">Atrial fibrillation tool</a></div>' : '';
+    h += card('surv-' + c.reg, label, null, '', guards(gs) + steps(c.steps) + link, MECHWHY[c.reg], chs, null);
+  });
+  var prev = [], hv = o.cols.some(function(r){ return (r.col === 'ac' || r.col === 'her2') && (r.level === 'high' || r.level === 'vh'); }), hvt = o.cols.some(function(r){ return r.col === 'vegf' && (r.level === 'high' || r.level === 'vh'); });
+  prev.push({name: 'Treat blood pressure, lipids, diabetes and smoking before, during and after', t: 'I C'});
+  if (hv) prev.push({name: 'ACE inhibitor or ARB plus beta-blocker', small: 'Carvedilol is the preferred beta-blocker if there is no contraindication.', t: 'IIa B'});
+  else if (hvt) prev.push({name: 'ACE inhibitor or ARB plus beta-blocker', small: 'High risk on a targeted therapy that can cause heart failure.', t: 'IIa C'});
+  if (hv || hvt) prev.push({name: 'Statin', t: 'IIa B'});
+  var acl = o.cols.filter(function(r){ return r.col === 'ac'; })[0];
+  if (acl && (acl.level === 'high' || acl.level === 'vh')) prev.push({name: 'Ask oncology about dexrazoxane or a liposomal anthracycline', small: 'ESC recommends either at high or very high risk. The US label for dexrazoxane is narrower: after 300 mg/m² of doxorubicin.', t: 'IIa B'});
+  var pwhy = hv ? 'Candesartan blunted the fall in LVEF in PRADA (metoprolol did not), and atorvastatin did in STOP-CA; the guideline reserves these for high or very high risk.' : null;
+  h += card('prevent', 'Prevention', hv || hvt ? 'Add heart protection' : 'Risk-factor control', '', steps(prev), pwhy, null, '<p>Trials of ACE inhibitors, ARBs, beta-blockers and MRAs show a smaller fall in LVEF but no difference in overt heart failure, so they are reserved for higher risk. STOP-CA (atorvastatin 40 mg, lymphoma) was published after the 2022 guideline.</p>');
+  if (o.surv){
+    var sv = o.surv, ss = [];
+    ss.push({when: 'Every year', name: 'Cardiovascular risk review with ECG and natriuretic peptide', t: 'I B'});
+    ss.push({when: 'At 5 years', name: 'Re-stratify risk to plan long-term follow-up', t: 'I C'});
+    if (sv.level === 'vh' || sv.level === 'early') ss.push({when: 'Echo', name: 'At 1, 3 and 5 years after treatment, then every 5 years', t: 'IIa C'});
+    else if (sv.level === 'late') ss.push({when: 'Echo', name: 'From 5 years after ' + (P.regs.rt && P.mhd && P.mhd !== 'unk' ? 'radiation' : 'treatment') + ', then every 5 years', t: 'IIa C'});
+    else if (sv.level === 'mod') ss.push({when: 'Echo', name: 'Every 5 years may be considered', t: 'IIb C'});
+    else ss.push({when: 'Echo', name: 'No routine echo if the end-of-treatment check is normal'});
+    if (i.mhd === '15to25' || i.mhd === 'gt25') ss.push({when: 'Coronaries', name: 'Non-invasive screening every 5–10 years, from 5 years after radiation', small: 'Functional imaging or CT coronary angiography.', t: 'IIa C'});
+    var sg = sv.mhdUnknown ? ['Mean heart dose not known: the radiation is not counted, so the risk may be higher than shown. Ask radiation oncology for the dose.'] : [];
+    if (P.regs.rt && !P.mhd) sg.push('Pick the mean heart dose to include the radiation.');
+    h += card('survivor', 'After treatment · survivor risk', SURVN[sv.level] + ' risk', sv.level === 'vh' ? 'bad' : sv.level === 'early' || sv.level === 'late' ? 'wn' : '', guards(sg) + steps(ss), sv.reasons.length ? 'Set by ' + sv.reasons.join(' and ') + '.' : null, null, '<p>ESC 2022 Table 12: very high = mean heart dose over 25 Gy, or 15–25 Gy with doxorubicin 100 mg/m² or more, or doxorubicin 400 or more, or very high baseline risk. Early high (first 5 years) = high baseline risk, doxorubicin 250–399, moderate or severe CTRCD in treatment, or high-risk transplant. Late high = 15–25 Gy, or 5–15 Gy with doxorubicin 100 or more, or poorly controlled risk factors. Moderate = 5–15 Gy, under 5 Gy with doxorubicin 100 or more, doxorubicin 100–249, or moderate baseline risk. Low otherwise, with a normal end-of-treatment assessment.</p><p>Carotid ultrasound every 5 years after head and neck radiation, and renal artery ultrasound after abdominal radiation with rising creatinine or blood pressure, should also be considered (IIa C).</p>');
+  }
+  $('plan-out').innerHTML = h;
+}
+
+/* ---------- Results tab ---------- */
+var C = {drug: 'ac', sym: 'none', t: {}, stage: 'none'};
+var BIO = [['tn', 'New troponin rise'], ['bnp', 'New BNP or NT-proBNP rise']];
+var ICICHK = [['symp', 'New symptoms (chest pain, dyspnoea, palpitations, syncope, myalgia, ptosis)'], ['ecg', 'New ECG change: AV block, bundle branch block, arrhythmia'], ['unstable', 'Unstable: shock, ventilation, high-grade block or VT']];
+function readCheck(){ return {drug: C.drug, sym: C.sym, ef0: num('ef0'), ef1: num('ef1'), gls0: num('gls0'), gls1: num('gls1'), tn: !!C.t.tn, bnp: !!C.t.bnp, ecg: !!C.t.ecg, symp: !!C.t.symp, unstable: !!C.t.unstable, stage: C.stage, wt: num('wt')}; }
+function drawCheckInputs(){
+  seg($('drugseg'), [['ac', 'Anthracycline'], ['her2', 'HER2-targeted'], ['ici', 'Checkpoint inhibitor'], ['other', 'Other']], C.drug);
+  seg($('symseg'), Object.keys(SYM).map(function(k){ return [k, SYM[k].n]; }), C.sym);
+  $('symnote').textContent = C.sym !== 'none' ? SYM[C.sym].d : 'Symptomatic CTRCD is graded by what the heart failure needs, not by the LVEF.';
+  ticks($('biochk'), BIO, C.t);
+  ticks($('icichk'), ICICHK, C.t);
+  seg($('icistage'), [['none', 'Suspected'], ['conf', 'Confirmed'], ['better', 'Day 3: improving'], ['refr', 'Day 3: not improving']], C.stage);
+}
+$('drugseg').addEventListener('click', function(e){ var b = e.target.closest('[data-v]'); if (!b) return; C.drug = b.getAttribute('data-v'); drawCheckInputs(); renderCheck(); });
+$('symseg').addEventListener('click', function(e){ var b = e.target.closest('[data-v]'); if (!b) return; C.sym = b.getAttribute('data-v'); drawCheckInputs(); renderCheck(); });
+$('icistage').addEventListener('click', function(e){ var b = e.target.closest('[data-v]'); if (!b) return; C.stage = b.getAttribute('data-v'); if (C.drug !== 'ici') C.drug = 'ici'; drawCheckInputs(); renderCheck(); });
+['biochk', 'icichk'].forEach(function(id){ $(id).addEventListener('change', function(e){ var k = e.target.getAttribute('data-k'); if (k){ C.t[k] = e.target.checked; if (id === 'icichk' && e.target.checked) C.drug = 'ici'; drawCheckInputs(); renderCheck(); } }); });
+['ef0', 'ef1', 'gls0', 'gls1', 'wt'].forEach(function(k){ $(k).addEventListener('input', renderCheck); });
+
+var GWHY = {
+  lt40: 'A new fall to an LVEF under 40% is severe CTRCD, however large the fall.',
+  drop: 'A fall of 10 points or more into the 40s is moderate CTRCD, even without symptoms.',
+  'drop+': 'An LVEF in the 40s that fell less than 10 points is moderate only because strain or a biomarker also moved.',
+  mild: 'The LVEF is still 50% or more; the strain fall or biomarker rise is the early warning that makes this mild CTRCD.'
+};
+function gradeState(g){ return g.sev === 'severe' ? 'severe' : g.sev === 'moderate' ? 'moderate' : 'mild'; }
+function renderCheck(){
+  var i = readCheck(), g = grade(i), h = '';
+  var ip = i.drug === 'ici' ? iciPlan(i) : null;
+  if (ip){
+    h += card('ici-out', 'Checkpoint inhibitor myocarditis', ip.head, ip.kind === 'better' ? 'wn' : 'bad', guards(ip.guards) + steps(ip.steps), ip.kind === 'suspect' ? 'ICI myocarditis comes early and can turn to heart block or shock within days; in one registry 46% had a major cardiac event, and 38% of those had a normal LVEF.' : ip.kind === 'refr' ? 'A troponin that will not fall means the immune attack is still going.' : 'In an early multicentre registry, lower steroid doses went with higher residual troponin and more major cardiac events.', [chip('mech', 'ici', 'How it injures the heart')], paras(ip.more) + '<span class="tier">ESC 2022 Table 3, Recommendation Table 26, Figure 28</span>');
+  }
+  var gf = g.gf != null ? '<div class="score"><span>GLS relative fall</span><b>' + g.gf + '%</b></div>' : '';
+  var df = g.drop != null ? '<div class="score"><span>LVEF change</span><b>' + (g.drop > 0 ? '−' + g.drop : '+' + Math.abs(g.drop)) + ' points</b></div>' : '';
+  if (g.kind === 'need' && !ip){ h += '<div class="card empty" id="grade">Enter the LVEF now (and the baseline), strain if you have it, and any biomarker rise. Grade and next step appear here.</div>'; }
+  else if (g.kind === 'need'){ }
+  else if (g.kind === 'none'){ h += card('grade', 'CTRCD grade', 'No CTRCD', 'okc', df + gf, null, null, null) ; }
+  else if (g.kind === 'noef'){ h += card('grade', 'CTRCD grade', 'Needs an LVEF', 'wn', gf + '<p class="sub">A strain fall or biomarker rise is graded against the LVEF: get the echo.</p>', null, null, null); }
+  else if (g.kind === 'needbase'){ h += card('grade', 'CTRCD grade', 'LVEF under 50%: enter the baseline', 'wn', gf + '<p class="sub">CTRCD is a new fall from the patient\'s own baseline: under 40% is severe; 40–49% is moderate with a fall of 10 points or more, or a smaller fall plus a strain or biomarker change. Find the pre-treatment echo; meanwhile manage a low LVEF as heart failure with reduced EF and discuss with cardio-oncology.</p>', null, null, null); }
+  else if (g.kind === 'border'){ h += card('grade', 'CTRCD grade', 'Below normal, criteria not met', 'wn', df + gf + '<p class="sub">LVEF 40–49% with a fall under 10 points and no strain or biomarker change. Repeat imaging and review with cardio-oncology.</p>', null, null, null); }
+  else if (g.kind === 'notnew'){ h += card('grade', 'CTRCD grade', 'Low, but not a new fall', 'wn', df + '<p class="sub">CTRCD means a new reduction from baseline. Manage the low LVEF as heart failure with reduced EF.</p>', null, null, null); }
+  else {
+    var gg = {sev: g.sev, gls: g.gls, tn: i.tn, bnpOnly: i.bnp && !i.tn && !g.gls};
+    var a = action(gg, i.drug);
+    var why = g.kind === 'sym' ? 'Symptomatic CTRCD is graded by what the heart failure needs; treat it as heart failure whatever the LVEF.' : GWHY[g.by];
+    var more = '<p>ESC 2022 Table 3. Asymptomatic: severe = new LVEF under 40%; moderate = LVEF 40–49% with a fall of 10 points or more, or a smaller fall plus a relative strain fall over 15% or a new biomarker rise; mild = LVEF 50% or more with a relative strain fall over 15% and/or a new biomarker rise. Symptomatic: mild, moderate (outpatient intensification), severe (admission), very severe (inotropes, mechanical support or transplant).</p>';
+    if (i.drug === 'ac' && (g.sev === 'vsevere')) more += '<p>Very severe is listed with severe for stopping the anthracycline.</p>';
+    h += card('grade', 'CTRCD grade · ' + {ac: 'anthracycline', her2: 'HER2-targeted', ici: 'checkpoint inhibitor', other: 'other agent'}[i.drug], a.head, g.sev === 'mild' ? 'wn' : 'bad', df + gf + guards(a.guards) + steps(a.steps), why, (g.kind === 'sym' ? null : [chip('grade', gradeState(g))]), more + '<span class="tier">Recommendation Table ' + (i.drug === 'her2' ? '25' : '24') + '</span>');
+  }
+  $('check-out').innerHTML = h;
+}
+
+/* ---------- Tabs ---------- */
+var tabs = [['t-plan','p-plan'],['t-check','p-check'],['t-learn','p-learn'],['t-prac','p-prac']];
+function show(t){ tabs.forEach(function(p){ var on = p[0] === t; $(p[0]).setAttribute('aria-selected', String(on)); $(p[1]).classList.toggle('on', on); }); }
+tabs.forEach(function(p){ $(p[0]).addEventListener('click', function(){ show(p[0]); }); });
+function fromHash(){ var id = location.hash.slice(1); if (!id) return; var el = $(id); if (!el) return; var pan = el.closest('.panel'); if (pan) tabs.forEach(function(p){ if (p[1] === pan.id) show(p[0]); }); el.scrollIntoView(); }
+window.addEventListener('hashchange', fromHash);
+
+/* ---------- SVG helpers ---------- */
+function svgOpen(vb, label){ return '<svg viewBox="' + vb + '" role="img" aria-label="' + esc(label) + '" class="fig">'; }
+function tx(x, y, t, o){ o = o || {}; return '<text x="' + x + '" y="' + y + '" text-anchor="' + (o.a || 'middle') + '" style="' + (o.sans ? FS : FM) + ';font-size:' + (o.s || 11) + 'px;font-weight:' + (o.w || 400) + ';fill:' + (o.c || 'var(--ink)') + '">' + t + '</text>'; }
+function bx(x, y, w, h, t1, t2, stt){
+  var fill = stt === 'hot' ? 'var(--warnbg)' : stt === 'on' ? 'var(--card)' : stt === 'bad' ? 'var(--badbg)' : 'var(--fill)', stroke = stt === 'hot' ? 'var(--warn)' : stt === 'on' ? 'var(--accent)' : stt === 'bad' ? 'var(--bad)' : 'var(--line)';
+  return '<g' + (stt === 'dim' ? ' opacity=".4"' : '') + '><rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="10" fill="' + fill + '" stroke="' + stroke + '"' + (stt && stt !== 'dim' ? ' stroke-width="2"' : '') + '/>' +
+    tx(x + w / 2, y + (t2 ? h / 2 - 2 : h / 2 + 4), t1, {sans: 1, s: 12, w: 600}) + (t2 ? tx(x + w / 2, y + h / 2 + 12, t2, {s: 10, c: 'var(--muted)'}) : '') + '</g>';
+}
+function mk(p){ return '<defs><marker id="' + p + 'a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--accent)"/></marker></defs>'; }
+function ar(x1, y1, x2, y2, p){ return '<path d="M' + x1 + ' ' + y1 + 'L' + x2 + ' ' + y2 + '" fill="none" stroke="var(--accent)" stroke-width="2" marker-end="url(#' + p + 'a)"/>'; }
+
+/* Risk ladder: four levels with expected CTRCD. */
+var RISKD = {low: {n: 'Low', line: 'No factors, or one 1-point factor. Expected CTRCD under 2%.'}, mod: {n: 'Moderate', line: 'Medium factors totalling 2 to 4 points. Expected 2 to 9%.'}, high: {n: 'High', line: 'Any high factor, or medium points 5 or more. Expected 10 to 19%.'}, vh: {n: 'Very high', line: 'Any very-high factor, such as earlier heart failure or CTRCD. Expected 20% or more.'}};
+function riskSVG(k, p){
+  var s = svgOpen('0 0 340 210', 'Risk ladder, ' + RISKD[k].n), xs = [10, 92, 174, 256], ys = [150, 112, 74, 36];
+  LV.forEach(function(l, n){ var on = l === k; s += '<rect x="' + xs[n] + '" y="' + ys[n] + '" width="74" height="' + (190 - ys[n]) + '" rx="8" fill="' + (on ? (l === 'vh' ? 'var(--badbg)' : l === 'high' ? 'var(--warnbg)' : l === 'low' ? 'var(--okbg)' : 'var(--fill)') : 'var(--fill)') + '" stroke="' + (on ? (l === 'vh' ? 'var(--bad)' : l === 'high' ? 'var(--warn)' : l === 'low' ? 'var(--ok)' : 'var(--accent)') : 'var(--line)') + '" stroke-width="' + (on ? 2 : 1) + '"/>' + tx(xs[n] + 37, ys[n] + 18, RISKD[l].n, {sans: 1, s: 11.5, w: on ? 700 : 500}) + tx(xs[n] + 37, ys[n] + 34, RATE[l], {s: 10, c: 'var(--muted)'}); });
+  s += tx(170, 205, 'Expected CV toxicity by level (HFA-ICOS, expert guidance)', {s: 10, c: 'var(--muted)'});
+  return s + '</svg>';
+}
+
+/* Mechanism map: target, then three-step chain. */
+var MECH = {
+  ac: {n: 'Anthracycline', z: 'muscle', c: ['Topoisomerase IIβ and free radicals', 'Heart muscle cells die', 'Dose-dependent, often lasting'], line: 'Damage starts with the first dose and adds up; most CTRCD shows in the first year.'},
+  her2: {n: 'HER2', z: 'muscle', c: ['HER2 survival signal blocked', 'Muscle cells stunned, not killed', 'Usually recovers off drug'], line: 'Why moderate CTRCD on HER2 therapy can often continue with ACE inhibitor or ARB plus beta-blocker.'},
+  ici: {n: 'Checkpoint', z: 'immune', c: ['Brakes on T cells released', 'T cells infiltrate heart muscle', 'Myocarditis, block, VT'], line: 'Often with myositis or myasthenia; median onset about a month after starting.'},
+  vegf: {n: 'VEGF', z: 'vessel', c: ['Less nitric oxide, fewer capillaries', 'Arteries tighten', 'Hypertension, HF, clots'], line: 'Blood pressure rises within days: home BP is the main test.'},
+  btk: {n: 'BTK', z: 'rhythm', c: ['Off-target kinase effects', 'Atrial remodelling, platelet effects', 'AF, hypertension, bleeding'], line: 'Seen especially with ibrutinib; its bleeding risk shapes anticoagulation.'},
+  fp: {n: '5-FU', z: 'vessel', c: ['Coronary smooth muscle spasm', 'Ischaemia during infusion', 'Chest pain, ECG changes'], line: 'During treatment, often at rest. Stop the infusion and treat as possible ACS.'},
+  rt: {n: 'Radiation', z: 'all', c: ['Endothelial injury and fibrosis', 'Arteries, valves, pericardium, muscle', 'CAD and valve disease years later'], line: 'Risk scales with mean heart dose; screening starts 5 years out.'}
+};
+var MECHZ = {muscle: 'Heart muscle', immune: 'Immune attack on muscle', vessel: 'Arteries', rhythm: 'Atria and rhythm', all: 'Every layer'};
+function mechSVG(k, p){
+  var d = MECH[k], s = svgOpen('0 0 340 250', 'How ' + d.n + ' injures the heart') + mk(p);
+  var z = d.z;
+  function on(zz){ return z === 'all' || z === zz || (zz === 'muscle' && z === 'immune'); }
+  /* simple heart: ventricles, atria, coronary artery, pericardium */
+  s += '<path d="M70 70 C 70 40, 110 30, 125 55 C 140 30, 180 40, 180 70 C 180 110, 140 140, 125 165 C 110 140, 70 110, 70 70Z" fill="none" stroke="' + (z === 'all' ? 'var(--warn)' : 'var(--line)') + '" stroke-width="' + (z === 'all' ? 3 : 1) + '" transform="translate(-2,-4) scale(1.02)"/>';
+  s += '<path d="M70 70 C 70 40, 110 30, 125 55 C 140 30, 180 40, 180 70 C 180 110, 140 140, 125 165 C 110 140, 70 110, 70 70Z" fill="' + (on('muscle') ? 'var(--hrt-muscle)' : 'var(--fill)') + '" stroke="var(--muted)"/>';
+  s += '<ellipse cx="98" cy="62" rx="16" ry="12" fill="' + (on('rhythm') ? 'var(--hrt-node)' : 'var(--card)') + '" stroke="var(--muted)"/><ellipse cx="152" cy="62" rx="16" ry="12" fill="' + (on('rhythm') ? 'var(--hrt-node)' : 'var(--card)') + '" stroke="var(--muted)"/>';
+  s += '<path d="M125 58 C 120 85, 112 110, 118 140" fill="none" stroke="' + (on('vessel') ? 'var(--bad)' : 'var(--hrt-art)') + '" stroke-width="' + (on('vessel') ? 5 : 3) + '" stroke-linecap="round"/>';
+  if (z === 'immune') [[95, 100], [140, 110], [110, 125], [150, 88], [88, 82]].forEach(function(c){ s += '<circle cx="' + c[0] + '" cy="' + c[1] + '" r="6" fill="var(--accent)" stroke="var(--card)"/>'; });
+  s += tx(125, 190, MECHZ[z], {s: 11.5, w: 700, c: 'var(--ink)'});
+  s += tx(125, 207, 'ovals: atria · red line: coronary artery', {s: 9.5, c: 'var(--muted)'});
+  var y = 14;
+  d.c.forEach(function(t, n){ s += bx(198, y + n * 62, 138, 44, t.length > 20 ? t.slice(0, t.lastIndexOf(' ', 20)) : t, t.length > 20 ? t.slice(t.lastIndexOf(' ', 20) + 1) : '', n === 2 ? 'hot' : 'on'); if (n < 2) s += ar(267, y + n * 62 + 46, 267, y + n * 62 + 58, p); });
+  s += tx(170, 240, 'Tap a drug: the highlighted part is its target', {s: 10, c: 'var(--muted)'});
+  return s + '</svg>';
+}
+
+/* CTRCD ladder: LVEF bands. state = mild | moderate | severe */
+var GRD = {mild: {n: 'Mild', line: 'LVEF 50% or more, plus a relative strain fall over 15% and/or a new troponin or NP rise. Anthracycline: continue. HER2: continue.'}, moderate: {n: 'Moderate', line: 'LVEF 40–49% with a fall of 10 points or more, or a smaller fall plus strain or biomarker change. Anthracycline: interrupt. HER2: continue with ACE inhibitor or ARB and beta-blocker.'}, severe: {n: 'Severe', line: 'New LVEF under 40%. Interrupt either drug and start heart failure therapy.'}};
+function gradeSVG(k, p, ef){
+  var s = svgOpen('0 0 340 150', 'LVEF bands for CTRCD grade'), X0 = 20, W = 300;
+  function px(v){ return X0 + (v - 25) / 45 * W; }
+  [['severe', 25, 40], ['moderate', 40, 50], ['mild', 50, 70]].forEach(function(b){ var on = b[0] === k; s += '<rect x="' + px(b[1]) + '" y="40" width="' + (px(b[2]) - px(b[1])) + '" height="44" fill="' + (on ? (b[0] === 'severe' ? 'var(--badbg)' : 'var(--warnbg)') : 'var(--fill)') + '" stroke="' + (on ? (b[0] === 'severe' ? 'var(--bad)' : 'var(--warn)') : 'var(--line)') + '" stroke-width="' + (on ? 2 : 1) + '"/>' + tx((px(b[1]) + px(b[2])) / 2, 67, GRD[b[0]].n, {sans: 1, s: 12, w: on ? 700 : 500}); });
+  [25, 40, 50, 60, 70].forEach(function(v){ s += tx(px(v), 102, v + '%', {s: 10, c: 'var(--muted)'}); });
+  s += tx(px(60), 32, 'baseline 60', {s: 10, c: 'var(--muted)'}) + '<line x1="' + px(60) + '" y1="36" x2="' + px(60) + '" y2="88" stroke="var(--muted)" stroke-dasharray="3 3"/>';
+  if (ef != null){ s += '<path d="M' + px(ef) + ' 92 l-6 10 h12z" fill="var(--accent)"/>' + tx(px(ef), 120, 'now ' + ef, {s: 11, w: 700, c: 'var(--accent)'}); }
+  s += tx(170, 142, 'Mild needs strain or biomarker change; moderate 40–49 needs a 10-point fall or one of them', {s: 9, c: 'var(--muted)'});
+  return s + '</svg>';
+}
+
+/* Dose ladder: doxorubicin equivalents. */
+var DOSE = {d0: {n: 'Under 100', line: 'Low survivor risk on dose alone.'}, d100: {n: '100–249', line: 'Moderate survivor risk; with chest radiation it rises.'}, d250: {n: '250–399', line: 'Higher risk during treatment (ESC text): extra echo for low and moderate risk; early high survivor risk.'}, d400: {n: '400 or more', line: 'Very high survivor risk.'}};
+function doseSVG(k, p, val){
+  var s = svgOpen('0 0 340 120', 'Cumulative doxorubicin-equivalent dose ladder'), X0 = 16, W = 308;
+  function px(v){ return X0 + Math.min(v, 500) / 500 * W; }
+  [['d0', 0, 100], ['d100', 100, 250], ['d250', 250, 400], ['d400', 400, 500]].forEach(function(b){ var on = b[0] === k; s += '<rect x="' + px(b[1]) + '" y="30" width="' + (px(b[2]) - px(b[1])) + '" height="36" fill="' + (on ? (b[0] === 'd400' ? 'var(--badbg)' : b[0] === 'd0' ? 'var(--okbg)' : 'var(--warnbg)') : 'var(--fill)') + '" stroke="' + (on ? 'var(--accent)' : 'var(--line)') + '" stroke-width="' + (on ? 2 : 1) + '"/>' + tx((px(b[1]) + px(b[2])) / 2, 53, DOSE[b[0]].n, {s: 10.5, w: on ? 700 : 400}); });
+  [0, 100, 250, 400].forEach(function(v){ s += tx(px(v), 82, String(v), {s: 10, c: 'var(--muted)'}); });
+  if (val != null) s += '<path d="M' + px(val) + ' 26 l-6 -10 h12z" fill="var(--accent)"/>' + tx(Math.min(px(val), 300), 12, val + ' mg/m²', {s: 10.5, w: 700, c: 'var(--accent)'});
+  s += tx(170, 108, 'Doxorubicin-equivalent mg/m² (ESC Table 5 and Table 12)', {s: 10, c: 'var(--muted)'});
+  return s + '</svg>';
+}
+
+var FIGS = {
+  risk: {t: 'Baseline risk levels', states: LV, data: RISKD, svg: riskSVG},
+  mech: {t: 'How each drug injures the heart', states: ['ac', 'her2', 'ici', 'vegf', 'btk', 'fp', 'rt'], data: MECH, svg: mechSVG},
+  grade: {t: 'CTRCD grade by LVEF', states: ['mild', 'moderate', 'severe'], data: GRD, svg: function(k, p){ return gradeSVG(k, p, null); }},
+  dose: {t: 'Cumulative anthracycline dose', states: ['d0', 'd100', 'd250', 'd400'], data: DOSE, svg: function(k, p){ return doseSVG(k, p, null); }}
+};
+var ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M7 15l3-4 3 3 2-2 2 3"/></svg>';
+var figN = 0;
+function mountFig(host, id, state){
+  var F = FIGS[id], pre = 'f' + (++figN) + '-';
+  function draw(k){
+    var d = F.data[k];
+    host.innerHTML = '<div class="states" role="group" aria-label="' + esc(F.t) + '">' + F.states.map(function(x){ return '<button class="sbtn" data-k="' + x + '" aria-pressed="' + (x === k) + '">' + esc(F.data[x].n) + '</button>'; }).join('') + '</div>' + F.svg(k, pre) + '<p class="line1">' + esc(d.line) + '</p>';
+  }
+  host.onclick = function(e){ var b = e.target.closest && e.target.closest('[data-k]'); if (b) draw(b.getAttribute('data-k')); };
+  draw(state && F.data[state] ? state : F.states[0]);
+}
+function chip(fig, state, label){ return '<button class="chip" data-fig="' + fig + '" data-state="' + (state || '') + '">' + ICON + esc(label || FIGS[fig].t) + '</button>'; }
+var lastFocus = null;
+function openSheet(fig, state){
+  lastFocus = document.activeElement;
+  $('sheet-t').textContent = FIGS[fig].t;
+  mountFig($('sheet-b'), fig, state);
+  $('scrim').hidden = false; $('sheet').hidden = false; $('sheet').scrollTop = 0; $('sheet-x').focus();
+}
+function closeSheet(){ if ($('sheet').hidden) return; $('scrim').hidden = true; $('sheet').hidden = true; if (lastFocus && lastFocus.focus) lastFocus.focus(); }
+$('sheet-x').addEventListener('click', closeSheet); $('scrim').addEventListener('click', closeSheet);
+document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeSheet(); });
+document.addEventListener('click', function(e){ var c = e.target.closest && e.target.closest('[data-fig]'); if (c) openSheet(c.getAttribute('data-fig'), c.getAttribute('data-state')); });
+
+/* ---------- Learn ---------- */
+var LG = {gls: false, bio: false};
+function drawLG(){
+  var ef = +$('lg-ef').value;
+  seg($('lg-tog'), [['gls', 'Strain fall over 15%'], ['bio', 'Troponin or NP rise']], LG);
+  var g = grade({sym: 'none', ef0: 60, ef1: ef, gls0: -20, gls1: LG.gls ? -16 : -20, tn: LG.bio, bnp: false});
+  var st = g.kind === 'asx' ? gradeState(g) : ef < 50 ? 'moderate' : 'mild';
+  $('lg-fig').innerHTML = gradeSVG(g.kind === 'asx' ? st : '', 'lg', ef);
+  $('lg-head').textContent = g.kind === 'asx' ? 'LVEF ' + ef + '%: ' + g.sev + ' CTRCD' : g.kind === 'none' ? 'LVEF ' + ef + '%: no CTRCD' : 'LVEF ' + ef + '%: below normal, criteria not met';
+  $('lg-line').textContent = g.kind === 'asx' ? GWHY[g.by] : g.kind === 'none' ? 'An LVEF of 50% or more with no strain or biomarker change is not CTRCD.' : 'In the 40s with a fall under 10 points, it takes a strain or biomarker change to call it moderate.';
+}
+$('lg-ef').addEventListener('input', drawLG);
+$('lg-tog').addEventListener('click', function(e){ var b = e.target.closest('[data-v]'); if (!b) return; var k = b.getAttribute('data-v'); LG[k] = !LG[k]; drawLG(); });
+function drawGLS(){
+  var v = +$('lgl').value, f = glsFall(-20, v);
+  $('lgl-head').textContent = 'GLS ' + v + '%: relative fall ' + f + '%';
+  $('lgl-line').textContent = f > 15 ? 'Over 15%: a significant fall. With LVEF still 50% or more, that is mild CTRCD.' : f > 0 ? '15% or less: within measurement variation. Same machine and reader next time.' : 'No fall.';
+}
+$('lgl').addEventListener('input', drawGLS);
+$('ld-drug').innerHTML = Object.keys(ANTH).map(function(k){ return '<option value="' + k + '">' + ANTH[k][0] + ' (× ' + ANTH[k][1] + ')</option>'; }).join('');
+function drawLD(){
+  var v = doxEq($('ld-drug').value, num('ld-dose'));
+  var k = v == null ? 'd0' : v >= 400 ? 'd400' : v >= 250 ? 'd250' : v >= 100 ? 'd100' : 'd0';
+  $('ld-fig').innerHTML = doseSVG(k, 'ld', v);
+  $('ld-line').textContent = v == null ? 'Enter a dose.' : v + ' mg/m² doxorubicin equivalent. ' + DOSE[k].line + ($('ld-drug').value === 'ida' ? ' Idarubicin\'s factor comes from an efficacy ratio, not heart data.' : '') + ' Factors come from studies of childhood cancer survivors.';
+}
+$('ld-drug').addEventListener('change', drawLD); $('ld-dose').addEventListener('input', drawLD);
+
+/* Narrowing workup: new troponin rise on a checkpoint inhibitor */
+var CAUSES = [['ici', 'ICI myocarditis'], ['acs', 'Acute coronary syndrome'], ['tts', 'Takotsubo'], ['viral', 'Viral myocarditis']];
+var FEATS = [
+  ['block', 'New AV block or VT', {ici: ['fav', 'A minor criterion; conduction disease is typical']}],
+  ['myo', 'Myositis or myasthenia', {ici: ['fav', 'Another immune-related effect: a minor criterion'], viral: ['less', 'Overlap myositis points to the drug']}],
+  ['terr', 'Regional wall motion + ischaemic ECG', {acs: ['fav', 'Fits a coronary territory: exclude ACS first'], tts: ['less', 'Takotsubo spans territories']}],
+  ['apical', 'Apical ballooning', {tts: ['fav', 'The Takotsubo pattern'], ici: ['less', 'An LV fall counts as a minor criterion only without a Takotsubo pattern']}],
+  ['cors', 'Normal coronary angiogram', {acs: ['out', 'No culprit lesion']}],
+  ['cmr', 'MRI: modified Lake Louise positive', {ici: ['fav', 'The major criterion'], viral: ['fav', 'Also fits; timing and other irAEs separate them'], acs: ['out', 'Myocarditis pattern, not infarct'], tts: ['less', 'Oedema can occur, but not non-ischaemic scar']}],
+  ['virus', 'Recent viral illness, positive PCR', {viral: ['fav', 'Must be excluded before calling it ICI myocarditis']}]
+];
+var WF = {};
+function drawWhy(){
+  $('why-feats').innerHTML = FEATS.map(function(f){ return '<button class="sbtn" data-w="' + f[0] + '" aria-pressed="' + !!WF[f[0]] + '">' + esc(f[1]) + '</button>'; }).join('');
+  $('why-causes').innerHTML = CAUSES.map(function(c){
+    var st = '', why = '';
+    FEATS.forEach(function(f){ if (WF[f[0]] && f[2][c[0]]){ var e = f[2][c[0]]; if (e[0] === 'out' || (e[0] === 'less' && st !== 'out') || (e[0] === 'fav' && !st)) { st = e[0]; why = e[1]; } } });
+    return '<div class="cause ' + st + '"><span>' + esc(c[1]) + '</span><small>' + esc(why || (Object.keys(WF).some(function(k){ return WF[k]; }) ? 'Not changed by this' : '')) + '</small></div>';
+  }).join('');
+}
+$('why-feats').addEventListener('click', function(e){ var b = e.target.closest('[data-w]'); if (!b) return; var k = b.getAttribute('data-w'); WF[k] = !WF[k]; drawWhy(); });
+
+var TRIALS = [
+  {q: 'When does anthracycline cardiotoxicity appear, and does it recover?', d: 'Prospective cohort, 2,625 patients on anthracyclines, echo every 3 months in the first year; median follow-up 5.2 years.', r: 'CTRCD in 9%; 98% of cases within the first year (median 3.5 months after chemotherapy). With heart failure therapy, 71% recovered partly and 11% fully.', c: 'The basis for an echo within 12 months of the last dose. Observational, single centre; it defined CTRCD as a fall of more than 10 points to under 50%, not the 2022 grades.', cite: 'Cardinale D et al., Circulation 2015;131:1981', doi: '10.1161/CIRCULATIONAHA.114.013777'},
+  {q: 'PRADA: does candesartan or metoprolol protect the heart?', d: 'Randomised 2 × 2, double-blind, 130 women with early breast cancer on anthracycline, with or without trastuzumab and radiation; LVEF by cardiac MRI.', r: 'LVEF fell 0.8 points with candesartan versus 2.6 with placebo (P = 0.026); metoprolol had no effect.', c: 'Supports an ACE inhibitor or ARB at high risk. Small trial, surrogate end point, low-risk patients.', cite: 'Gulati G et al., Eur Heart J 2016;37:1671', doi: '10.1093/eurheartj/ehw022'},
+  {q: 'SUCCOUR: should strain, not LVEF, trigger protection?', d: 'Randomised, 331 anthracycline-treated patients with another heart failure risk factor: start protection at a 12% relative strain fall, or at an absolute LVEF fall of more than 10%.', r: 'No difference in the primary change in LVEF at 1 year, but fewer met CTRCD criteria with strain guidance (5.8% versus 13.7%).', c: 'Why strain belongs in surveillance. Primary end point neutral.', cite: 'Thavendiranathan P et al., J Am Coll Cardiol 2021;77:392', doi: '10.1016/j.jacc.2020.11.020'},
+  {q: 'STOP-CA: does atorvastatin prevent anthracycline dysfunction?', d: 'Double-blind randomised, 300 patients with lymphoma, atorvastatin 40 mg or placebo for 12 months.', r: 'An LVEF fall of 10 points or more to under 55%: 9% versus 22% (P = .002). Heart failure 3% versus 6%, not significant.', c: 'Supports a statin at high risk. Surrogate end point; published after the 2022 guideline.', cite: 'Neilan TG et al., JAMA 2023;330:528', doi: '10.1001/jama.2023.11887'},
+  {q: 'What does ICI myocarditis look like?', d: 'Multicentre registry, 35 cases compared with 105 ICI-treated controls.', r: 'Prevalence 1.14%; median onset 34 days. Major cardiac events in 46%, 38% of them with a normal LVEF. Combination ICI 34% versus 2% in controls. Lower steroid doses went with more events.', c: 'Why troponin and ECG are checked early and why steroid doses are high. Observational, small.', cite: 'Mahmood SS et al., J Am Coll Cardiol 2018;71:1755', doi: '10.1016/j.jacc.2018.02.037'}
+];
+(function(){
+  var chaps = [].slice.call(document.querySelectorAll('.chap'));
+  $('pills').innerHTML = chaps.map(function(c, n){ return '<button class="pill" data-go="' + c.id + '" aria-current="' + (n === 0) + '">' + (n + 1) + ' ' + esc(c.getAttribute('data-pill')) + '</button>'; }).join('');
+  $('pills').addEventListener('click', function(e){ var g = e.target.getAttribute('data-go'); if (g) $(g).scrollIntoView(); });
+  function mark(id){ [].forEach.call($('pills').children, function(b){ var on = b.getAttribute('data-go') === id; b.setAttribute('aria-current', String(on)); if (on) $('pills').scrollLeft = Math.max(0, b.offsetLeft - 60); }); }
+  if ('IntersectionObserver' in window){ var io = new IntersectionObserver(function(es){ es.forEach(function(en){ if (en.isIntersecting) mark(en.target.id); }); }, {rootMargin: '-30% 0px -60% 0px'}); chaps.forEach(function(c){ io.observe(c); }); }
+  $('trialbox').innerHTML = TRIALS.map(function(t){ return '<div class="trial" style="margin-top:14px"><p><b>' + esc(t.q) + '</b></p><p><span class="k">Design</span>' + esc(t.d) + '</p><p><span class="k">Result</span>' + esc(t.r) + '</p><p><span class="k">What it changed</span>' + esc(t.c) + '</p><p class="mono" style="font-size:13px"><a href="https://doi.org/' + t.doi + '" rel="noopener">' + esc(t.cite) + '</a></p></div>'; }).join('');
+  $('go-prac').addEventListener('click', function(){ show('t-prac'); window.scrollTo(0, 0); });
+})();
+document.querySelectorAll('[data-figure]').forEach(function(h){ mountFig(h, h.getAttribute('data-figure'), h.getAttribute('data-state')); });
+
+/* ---------- Practice: cases run through the same engine ---------- */
+function pin(o){ var f = {}; (o.f || []).forEach(function(k){ f[k] = true; }); return {regs: o.regs, her2set: o.her2set || 'early', acConc: false, f: f, age: o.age || null, lvef: o.lvef || null, dox: o.dox || null, mhd: o.mhd || null}; }
+var CASES = [
+  {t: 'Before doxorubicin', s: 'Woman, 68, breast cancer, about to start doxorubicin. Treated hypertension and diabetes. LVEF 60%.', q: 'Baseline risk?', type: 'risk', i: {regs: {ac: true}, age: 68, lvef: 60, f: ['htn', 'dm']}, opts: ['low', 'mod', 'high', 'vh'], p: 'Age 65–79 is 2 points, hypertension 1, diabetes 1: 4 points, moderate. Troponin and NP every 2 cycles; extra echo at 250 mg/m².'},
+  {t: 'Breast cancer a second time', s: 'Woman, 55, starting trastuzumab for early breast cancer. Doxorubicin for breast cancer 12 years ago; trastuzumab then dropped her LVEF and was stopped.', q: 'Baseline risk for HER2 therapy?', type: 'risk', i: {regs: {her2: true}, age: 55, lvef: 58, f: ['trastox', 'priorac']}, opts: ['low', 'mod', 'high', 'vh'], p: 'Earlier trastuzumab cardiotoxicity is a very-high factor on its own. Cardio-oncology review before starting, and echo every 3 months.'},
+  {t: 'LVEF 55 to 45 on trastuzumab', s: 'Woman, 49, cycle 8 of adjuvant trastuzumab. No symptoms. LVEF 55% at baseline, 45% now.', q: 'What next?', type: 'act', ci: {drug: 'her2', sym: 'none', ef0: 55, ef1: 45}, opts: [['cont', 'Continue, add ACE-I/ARB + beta-blocker'], ['hold', 'Interrupt and start HF therapy'], ['stop', 'Stop for good']], a: 'cont', p: 'Moderate CTRCD (a 10-point fall into the 40s). On HER2 therapy: continue (IIa B) with ACE inhibitor or ARB plus beta-blocker (I C). On an anthracycline the same numbers would mean interrupt.'},
+  {t: 'Strain falls on doxorubicin', s: 'Man, 58, lymphoma, cycle 4 of doxorubicin. LVEF 61% then 57%. GLS -21% then -17%. No symptoms.', q: 'What next?', type: 'act', ci: {drug: 'ac', sym: 'none', ef0: 61, ef1: 57, gls0: -21, gls1: -17}, opts: [['cont', 'Continue, consider ACE-I/ARB and/or beta-blocker'], ['hold', 'Interrupt and start HF therapy'], ['none', 'Nothing: LVEF is normal']], a: 'cont', p: 'Strain fell 19% relative: mild CTRCD with LVEF 50% or more. Continue the anthracycline (I C) and consider cardioprotection (IIa B).'},
+  {t: 'LVEF 38 on doxorubicin', s: 'Woman, 62, cycle 5 of doxorubicin, no symptoms. LVEF 58% then 38%.', q: 'What next?', type: 'act', ci: {drug: 'ac', sym: 'none', ef0: 58, ef1: 38}, opts: [['cont', 'Continue with closer imaging'], ['hold', 'Interrupt and start HF therapy'], ['none', 'Nothing: no symptoms']], a: 'hold', p: 'Severe asymptomatic CTRCD (under 40%). Interrupt the anthracycline and start heart failure therapy (I C); restart only after a multidisciplinary decision.'},
+  {t: 'Three weeks into nivolumab and ipilimumab', s: 'Man, 71, melanoma. Before dose 2: troponin newly high, new right bundle branch block, mild leg weakness. Blood pressure normal.', q: 'First step?', type: 'ici', ci: {drug: 'ici', sym: 'none', tn: true, ecg: true, symp: true, stage: 'none'}, opts: [['hold', 'Hold the ICI, admit on monitor, echo and MRI'], ['go', 'Give dose 2 and repeat troponin'], ['ster', 'Start oral prednisone at home']], a: 'hold', p: 'Suspected ICI myocarditis: hold the drug (I C), continuous ECG monitoring (I C), ECG, troponin, echo and cardiac MRI (I B). Dual checkpoint therapy is the strongest risk factor.'}
+];
+(function(){
+  $('practice').innerHTML = CASES.map(function(c, n){
+    var opts = c.type === 'risk' ? c.opts.map(function(l){ return [l, LVN[l]]; }) : c.opts;
+    return '<div class="card case" id="' + (n ? 'case' + n : 'practice-cases') + '"><p class="label">Case ' + (n + 1) + '</p><h2>' + esc(c.t) + '</h2><p>' + esc(c.s) + '</p><p><b>' + esc(c.q) + '</b></p><div class="row" data-case="' + n + '">' + opts.map(function(o){ return '<button class="btn ghost" data-z="' + o[0] + '">' + esc(o[1]) + '</button>'; }).join('') + '</div><div class="ans" id="ans' + n + '" hidden></div></div>';
+  }).join('');
+})();
+function caseAnswer(c){
+  if (c.type === 'risk'){ var o = plan(pin(c.i)); return o.top.level; }
+  if (c.type === 'ici'){ var ip = iciPlan(c.ci); return ip && ip.kind === 'suspect' ? 'hold' : 'go'; }
+  var g = grade(c.ci); if (g.kind !== 'asx') return 'none';
+  var a = action({sev: g.sev, gls: g.gls, tn: c.ci.tn, bnpOnly: false}, c.ci.drug);
+  return /^Interrupt/.test(a.steps[0].name) ? 'hold' : /^Stop/.test(a.steps[0].name) ? 'stop' : 'cont';
+}
+$('practice').addEventListener('click', function(e){
+  var b = e.target.closest('[data-z]'); if (!b) return;
+  var n = +b.parentNode.getAttribute('data-case'), c = CASES[n], z = caseAnswer(c);
+  var lab = c.type === 'risk' ? LVN[z] : (c.opts.filter(function(o){ return o[0] === z; })[0] || [z, z])[1];
+  var box = $('ans' + n); box.innerHTML = '<p><b>' + (b.getAttribute('data-z') === z ? 'Right: ' : 'The tool says: ') + esc(lab) + '.</b> ' + esc(c.p) + '</p>'; box.hidden = false;
+});
+window.__cases = CASES; window.__caseAnswer = caseAnswer; window.__pin = pin;
+
+drawPlanInputs(); renderPlan(); drawCheckInputs(); renderCheck(); drawLG(); drawGLS(); drawLD(); drawWhy(); fromHash();
+})();
+</script>
+</body>
+</html>
