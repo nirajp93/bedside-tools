@@ -125,6 +125,18 @@ footer p{margin:0 0 8px}
 .rx{border-top:1px solid var(--line);padding:8px 0}
 .rx b{display:block;font-size:13px;font-family:var(--mono);letter-spacing:.04em;text-transform:uppercase;color:var(--muted);font-weight:500}
 @media (max-width:420px){.dgrid{grid-template-columns:repeat(2,minmax(0,1fr))}.sit{grid-template-columns:1fr}}
+.deeper{margin-top:14px;border-top:1px solid var(--line)}
+.deeper>summary{min-height:44px;display:flex;align-items:center;gap:8px;color:var(--accent);font-weight:600;font-size:15px;cursor:pointer;list-style:none}
+.deeper>summary::-webkit-details-marker{display:none}
+.deeper>summary::before{content:"+";font-family:var(--mono);font-size:18px;line-height:1;width:14px;text-align:center}
+.deeper[open]>summary::before{content:"\2212"}
+.deeper>summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.deeper .dpx{border:1px solid var(--line);border-radius:12px;padding:2px 12px;background:var(--card);text-align:left}
+.deeper .dpx>div{padding:10px 0;border-top:1px solid var(--line)}
+.deeper .dpx>div:first-child{border-top:0}
+.deeper .dl{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500;margin:0 0 3px}
+.deeper p{font-size:15px;line-height:1.45;color:var(--ink);margin:0 0 4px}
+.deeper p:last-child{margin-bottom:0}
 </style>
 </head>
 <body>
@@ -852,6 +864,13 @@ function load(i){
   touched = true; render(); show('t-tool'); window.scrollTo(0, 0);
 }
 fromHash();
+})();
+</script>
+<script id="deeper-data">
+/* Go deeper: mechanism, rationale and the common trap for each Learn chapter. Text only; no doses or thresholds beyond the tool's own. */
+(function(){ var D = {"learn-axis": [["Mechanism", "The hypothalamus releases CRH, the pituitary releases ACTH, and the adrenal makes cortisol, which feeds back to restrain both. A glucocorticoid given as a drug applies the same brake. ACTH is also what keeps the cortisol-making layer of the adrenal alive, so with ACTH suppressed for weeks that layer shrinks. The salt-retaining hormone, aldosterone, is controlled by the renin-angiotensin system and is spared."], ["Why it matters", "So adrenal insufficiency caused by steroids looks different from primary adrenal failure: no high potassium and no darkening of the skin. The danger is hypotension, because blood vessels need cortisol to respond to catecholamines."], ["Common trap", "Any route can suppress the axis: high-dose inhaled steroids, joint injections, potent creams, and above all an ordinary steroid combined with a drug that blocks its metabolism."]], "learn-potency": [["Mechanism", "The steroids differ in three independent properties: anti-inflammatory strength, salt-retaining effect, and how long the action lasts in tissue. Hydrocortisone is the body's own cortisol: weak, short, with some salt retention. Dexamethasone is strong, long-acting and has no salt-retaining effect."], ["Why it matters", "The choice follows the need. Replacing what the adrenal should make calls for hydrocortisone. Suppressing inflammation calls for prednisone or methylprednisolone. Long-acting steroids, and doses taken in the evening, suppress the axis more."], ["Common trap", "Hydrocortisone is measured by a cortisol assay; dexamethasone is not. That is why dexamethasone can be given before an ACTH stimulation test without spoiling it."]], "learn-stress": [["Mechanism", "Illness, injury and surgery normally raise cortisol output several-fold. Cortisol maintains vessel tone and blood glucose under stress. A suppressed axis cannot mount that rise, and the result is an adrenal crisis: low blood pressure that does not respond to fluid or vasopressors."], ["Why it matters", "The dose is matched to the size of the stress. Too little is dangerous; a few days of too much costs very little."], ["Common trap", "A patient who is vomiting cannot absorb an oral stress dose. That is the moment for an injection, not for doubling the tablets."]], "learn-taper": [["Mechanism", "When the drug is withdrawn, the hypothalamus and pituitary recover first and ACTH rises above normal. The adrenal layer that had shrunk regrows more slowly under that stimulus."], ["Why it matters", "Above the body's normal output, the pace of a taper is limited by the disease flaring, so the steps can be large. Near normal output it is limited by adrenal recovery, so the steps are small and slow. A morning cortisol shows whether the adrenal has recovered."], ["Common trap", "Aches, fatigue and low mood during a taper can occur with a recovered axis: steroid withdrawal. It feels like adrenal insufficiency but the cortisol is adequate, and testing tells them apart."]]};
+  function add(){ Object.keys(D).forEach(function(id){ var c = document.getElementById(id); if (!c || c.querySelector(":scope > .deeper")) return; var host = c.matches(".card,.lsec,section,.chap") ? c : (c.nextElementSibling && c.nextElementSibling.matches(".card") ? c.nextElementSibling : c.parentElement); if (host.querySelector(":scope > .deeper")) return; var d = document.createElement("details"); d.className = "deeper"; d.innerHTML = "<summary>Go deeper: mechanism and rationale</summary><div class=\"dpx\">" + D[id].map(function(r){ return "<div><span class=\"dl\">" + r[0] + "</span><p>" + r[1] + "</p></div>"; }).join("") + "</div>"; var last = host.querySelector(":scope > .row"); if (last) host.insertBefore(d, last); else host.appendChild(d); }); }
+  add(); document.addEventListener("click", function(){ setTimeout(add, 0); });
 })();
 </script>
 </body>

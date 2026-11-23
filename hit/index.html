@@ -149,6 +149,18 @@ input[type=range]{width:100%;min-height:44px;accent-color:var(--accent)}
 .dp .dl{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500;margin:0 0 3px}
 .dp p{font-size:15px;line-height:1.45;color:var(--ink);margin:0 0 4px}
 .dp p:last-child{margin-bottom:0}
+.deeper{margin-top:14px;border-top:1px solid var(--line)}
+.deeper>summary{min-height:44px;display:flex;align-items:center;gap:8px;color:var(--accent);font-weight:600;font-size:15px;cursor:pointer;list-style:none}
+.deeper>summary::-webkit-details-marker{display:none}
+.deeper>summary::before{content:"+";font-family:var(--mono);font-size:18px;line-height:1;width:14px;text-align:center}
+.deeper[open]>summary::before{content:"\2212"}
+.deeper>summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.deeper .dpx{border:1px solid var(--line);border-radius:12px;padding:2px 12px;background:var(--card);text-align:left}
+.deeper .dpx>div{padding:10px 0;border-top:1px solid var(--line)}
+.deeper .dpx>div:first-child{border-top:0}
+.deeper .dl{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500;margin:0 0 3px}
+.deeper p{font-size:15px;line-height:1.45;color:var(--ink);margin:0 0 4px}
+.deeper p:last-child{margin-bottom:0}
 </style>
 <script>function dpHtml(rows){ return rows.map(function(r){ return '<div><span class="dl">' + r[0] + '</span>' + r[1] + '</div>'; }).join(''); }</script>
 </head>
@@ -901,6 +913,13 @@ $('practice').addEventListener('click', function(e){
 });
 window.__cases = CASES; window.__caseIn = caseIn;
 drawStatic(); drawInputs(); render(); fromHash();
+})();
+</script>
+<script id="deeper-data">
+/* Go deeper: mechanism, rationale and the common trap for each Learn chapter. Text only; no doses or thresholds beyond the tool's own. */
+(function(){ var D = {"learn-mech": [["Mechanism", "PF4 is a positively charged protein released from platelets. Heparin, a long negative chain, wraps around it, and the complex exposes a new surface. IgG binds there, and the resulting immune complexes cross-link Fc receptors on platelets. The platelets activate, shed procoagulant particles and release more PF4; monocytes and the vessel lining join in and thrombin is generated."], ["Why it matters", "This is why the platelet count falls while the patient clots instead of bleeding. It is also why unfractionated heparin carries more risk than low-molecular-weight heparin (longer chains form complexes more readily) and surgical patients more than medical ones (more PF4 is released)."], ["Common trap", "Heparin in line flushes and on coated catheters counts as exposure. A platelet transfusion for the number alone feeds the process."]], "learn-timing": [["Mechanism", "A new IgG response takes five to ten days to build. If heparin was given recently, antibody is still circulating and the count can fall within a day of re-exposure. The antibody is short-lived and the immune system keeps little memory of it."], ["Why it matters", "Timing is the most discriminating part of the 4Ts. A fall on day two in a patient never exposed before is something else."], ["Common trap", "After cardiac surgery the count normally dips and recovers. HIT shows as a second fall after that recovery. Rarely HIT begins days after heparin has already been stopped."]], "learn-4ts": [["Mechanism", "Each of the four items scores a feature of the mechanism: how far the count fell, when, whether there is new clotting, and whether something else explains it. HIT typically causes a large fall but seldom a very low count, and it clots; a profound thrombocytopenia with bleeding suggests another cause."], ["Why it matters", "A low score makes HIT very unlikely, so testing is not needed. Testing low-probability patients mostly produces false positives, each of which leads to an unnecessary switch of anticoagulant."], ["Common trap", "Scores drift upward when information is missing, and intensive care patients have many other reasons for a low count. Score it carefully before sending the test."]], "learn-treat": [["Mechanism", "Stopping heparin removes the trigger but not the antibody, which keeps activating platelets for days to weeks. Thrombin generation continues and the risk of clotting stays high. Warfarin started early lowers protein C, a natural anticoagulant with a short life, before it lowers the clotting factors, tipping the small vessels toward thrombosis."], ["Why it matters", "This is why a non-heparin anticoagulant at a treatment dose is needed even when no clot has been found, and why warfarin waits until the platelets have recovered."], ["Common trap", "A prophylactic dose of the alternative is not enough. Argatroban raises the INR on its own, which complicates the later change to warfarin."]], "learn-phases": [["Mechanism", "After heparin stops, the platelet count recovers first. The functional assay turns negative over weeks and the immunoassay over months. Once the antibody has gone, re-exposure does not cause immediate HIT, because a new response would again take days to form."], ["Why it matters", "That window is what allows a brief, planned heparin exposure for cardiac surgery in a patient with remote HIT, when no alternative is as well proven."], ["Common trap", "Recording a lifelong allergy with no phase attached, or the reverse: continuing heparin after such an operation. The exposure is limited to the operation itself."]]};
+  function add(){ Object.keys(D).forEach(function(id){ var c = document.getElementById(id); if (!c || c.querySelector(":scope > .deeper")) return; var host = c.matches(".card,.lsec,section,.chap") ? c : (c.nextElementSibling && c.nextElementSibling.matches(".card") ? c.nextElementSibling : c.parentElement); if (host.querySelector(":scope > .deeper")) return; var d = document.createElement("details"); d.className = "deeper"; d.innerHTML = "<summary>Go deeper: mechanism and rationale</summary><div class=\"dpx\">" + D[id].map(function(r){ return "<div><span class=\"dl\">" + r[0] + "</span><p>" + r[1] + "</p></div>"; }).join("") + "</div>"; var last = host.querySelector(":scope > .row"); if (last) host.insertBefore(d, last); else host.appendChild(d); }); }
+  add(); document.addEventListener("click", function(){ setTimeout(add, 0); });
 })();
 </script>
 </body>

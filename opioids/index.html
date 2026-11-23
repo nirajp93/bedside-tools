@@ -134,6 +134,18 @@ footer p{margin:0 0 8px}
 .step{display:grid;grid-template-columns:auto 1fr;gap:2px 10px;border-top:1px solid var(--line);padding:6px 0;font-size:14.5px}
 .step b{font-family:var(--mono);font-size:13px;color:var(--muted);font-weight:500}
 @media (max-width:420px){.orow{grid-template-columns:1fr 1fr}.orow .field:first-child{grid-column:1 / -1}}
+.deeper{margin-top:14px;border-top:1px solid var(--line)}
+.deeper>summary{min-height:44px;display:flex;align-items:center;gap:8px;color:var(--accent);font-weight:600;font-size:15px;cursor:pointer;list-style:none}
+.deeper>summary::-webkit-details-marker{display:none}
+.deeper>summary::before{content:"+";font-family:var(--mono);font-size:18px;line-height:1;width:14px;text-align:center}
+.deeper[open]>summary::before{content:"\2212"}
+.deeper>summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.deeper .dpx{border:1px solid var(--line);border-radius:12px;padding:2px 12px;background:var(--card);text-align:left}
+.deeper .dpx>div{padding:10px 0;border-top:1px solid var(--line)}
+.deeper .dpx>div:first-child{border-top:0}
+.deeper .dl{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500;margin:0 0 3px}
+.deeper p{font-size:15px;line-height:1.45;color:var(--ink);margin:0 0 4px}
+.deeper p:last-child{margin-bottom:0}
 </style>
 </head>
 <body>
@@ -867,6 +879,13 @@ function load(i){
 }
 drawRows();
 fromHash();
+})();
+</script>
+<script id="deeper-data">
+/* Go deeper: mechanism, rationale and the common trap for each Learn chapter. Text only; no doses or thresholds beyond the tool's own. */
+(function(){ var D = {"learn-currency": [["Mechanism", "Opioids differ in how strongly they activate the mu receptor and in how much of an oral dose survives the liver on its first pass. That second factor is why the oral and IV doses of the same drug differ."], ["Why it matters", "A common unit makes it possible to total a regimen of several drugs and to plan a switch. Each ratio is an average across people, so it gives a starting point for titration, not an exact equivalent."], ["Common trap", "Ratios are not always the same in both directions, and they differ between published tables. Tramadol, buprenorphine and methadone do not behave like the others and do not fit a simple conversion."]], "learn-tol": [["Mechanism", "With repeated exposure the mu receptor becomes less responsive to the drug in use. Different opioids engage the receptor and its signalling somewhat differently, so the tolerance built up to one applies only in part to another."], ["Why it matters", "This is the reason for cutting the calculated dose when rotating and covering the gap with breakthrough doses: the patient may be much more sensitive to the new drug than the arithmetic predicts."], ["Common trap", "Tolerance to respiratory depression fades within days of stopping. A patient restarted at the old dose after a hospital stay, a period of abstinence or a missed week is at high risk of overdose."]], "learn-mtd": [["Mechanism", "Methadone acts on the mu receptor and also blocks the NMDA receptor, which is involved in tolerance. In a patient highly tolerant to other opioids it is therefore relatively more potent. It also lasts in the body far longer than its pain relief lasts, so it accumulates over days."], ["Why it matters", "The conversion ratio changes with the previous dose, and the full effect of a dose change is not seen for several days."], ["Common trap", "Raising the dose daily because the pain is not yet controlled. The earlier doses are still accumulating, and the overdose arrives days later. Methadone also prolongs the QT and has many drug interactions."]], "learn-patch": [["Mechanism", "Fentanyl dissolves readily in fat. Under a patch it first builds a reservoir in the skin and only then reaches the blood, so the level climbs slowly. After the patch is removed the reservoir keeps releasing drug for many hours."], ["Why it matters", "A patch is therefore unsuitable for acute pain or for a patient who has not been taking opioids. When starting, short-acting cover is needed until the level arrives; when stopping, the next opioid is introduced gradually while the reservoir empties."], ["Common trap", "Heat increases absorption: a fever, a heating pad or a hot bath over the patch can cause an overdose. Very little fat under the skin can make absorption poor and unpredictable."]]};
+  function add(){ Object.keys(D).forEach(function(id){ var c = document.getElementById(id); if (!c || c.querySelector(":scope > .deeper")) return; var host = c.matches(".card,.lsec,section,.chap") ? c : (c.nextElementSibling && c.nextElementSibling.matches(".card") ? c.nextElementSibling : c.parentElement); if (host.querySelector(":scope > .deeper")) return; var d = document.createElement("details"); d.className = "deeper"; d.innerHTML = "<summary>Go deeper: mechanism and rationale</summary><div class=\"dpx\">" + D[id].map(function(r){ return "<div><span class=\"dl\">" + r[0] + "</span><p>" + r[1] + "</p></div>"; }).join("") + "</div>"; var last = host.querySelector(":scope > .row"); if (last) host.insertBefore(d, last); else host.appendChild(d); }); }
+  add(); document.addEventListener("click", function(){ setTimeout(add, 0); });
 })();
 </script>
 </body>
