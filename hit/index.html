@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Suspected HIT · bedside.tools</title>
+<meta name="description" content="Suspected heparin-induced thrombocytopenia: the 4Ts score, whether to test and stop heparin, which non-heparin anticoagulant and dose, warfarin transition and duration, with the reasoning in diagrams.">
+<script src="/theme.js"></script>
+<style>
+:root{--bg:#FBFBFA;--card:#FFFFFF;--ink:#111113;--muted:#55555D;--line:#ECECEE;--accent:#2B4BDB;--warn:#9A3B00;--warnbg:#FFF6EC}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5}
+.mono{font-family:var(--mono)}
+.wrap{max-width:720px;margin:0 auto;padding:20px 16px 48px}
+a{color:var(--accent)}
+.back{font-size:14px;text-decoration:none;display:inline-block;min-height:44px;line-height:44px}
+h1{font-size:26px;margin:4px 0 4px;letter-spacing:-.01em}
+.purpose{color:var(--muted);margin:0 0 20px}
+.tabs{display:flex;gap:6px;margin-bottom:16px}
+.tab{flex:1;min-width:0;min-height:44px;border:1px solid var(--line);background:var(--card);border-radius:14px;padding:0 4px;font:inherit;font-size:15px;font-weight:600;color:var(--muted);cursor:pointer}
+.tab[aria-selected="true"]{border-color:var(--accent);color:var(--accent)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
+.label{font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px}
+.field{display:flex;flex-direction:column;justify-content:flex-end}
+.field label{display:block;font-size:13px;color:var(--muted);margin-bottom:4px}
+.field input,.field select{width:100%;min-height:44px;border:1px solid var(--line);border-radius:10px;padding:8px 10px;font:inherit;font-family:var(--mono);background:var(--card);color:var(--ink)}
+.field input:focus,.field select:focus,.tab:focus-visible,.chk:focus-within,button:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.checks{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.chk{display:flex;align-items:center;gap:10px;min-height:44px;border:1px solid var(--line);border-radius:10px;padding:6px 10px;font-size:14px;cursor:pointer}
+.chk input{width:20px;height:20px;accent-color:var(--accent);flex:none}
+.card h2{font-size:18px;margin:0 0 2px}
+.head{font-family:var(--mono);font-size:17px;font-weight:600;margin:6px 0 4px;overflow-wrap:anywhere}
+.head.bad{color:var(--bad)}.head.okc{color:var(--ok)}.head.wn{color:var(--warn)}
+.sub{font-size:14px;color:var(--muted);margin:0}
+.q{font-size:14px;margin:12px 0 0;font-weight:600}
+.card ul{margin:6px 0 0;padding-left:20px}
+.card li{margin-bottom:4px}
+.guard{border-left:3px solid var(--warn);background:var(--warnbg);padding:8px 10px;border-radius:0 10px 10px 0;margin-top:8px;font-size:14.5px}
+.tier{display:inline-block;font-family:var(--mono);font-size:11px;border:1px solid var(--line);border-radius:999px;padding:2px 8px;color:var(--muted);margin:6px 6px 0 0}
+details{margin-top:10px;border-top:1px solid var(--line);padding-top:8px}
+.whyline{margin:10px 0 0;font-size:14.5px;color:var(--muted)}
+.whyline b{color:var(--ink);font-weight:600}
+summary{cursor:pointer;color:var(--accent);font-weight:600;min-height:44px;line-height:44px}
+details p{margin:0 0 8px;font-size:15px}
+.empty{color:var(--muted)}
+.btn{min-height:44px;border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);border-radius:10px;padding:8px 14px;font:inherit;font-weight:600;cursor:pointer}
+.btn.ghost{background:var(--card);color:var(--accent)}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.note{font-size:14px;color:var(--muted)}
+.tl{position:relative;padding-left:26px;margin-top:6px}
+.tl:before{content:"";position:absolute;left:8px;top:8px;bottom:8px;width:2px;background:var(--line)}
+.st{position:relative;padding:6px 0 10px}
+.st:before{content:"";position:absolute;left:-24px;top:11px;width:12px;height:12px;border-radius:50%;background:var(--card);border:2px solid var(--muted)}
+.st.now:before{background:var(--accent);border-color:var(--accent)}
+.st .when{font-family:var(--mono);font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+.st b{display:block}
+.st small{color:var(--muted);font-size:13.5px;display:block}
+.st .tier{margin-top:4px}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:6px 6px 6px 0;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:var(--mono);font-size:11.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);font-weight:500}
+td.mono{font-size:13px;white-space:nowrap}
+tr.sel td{font-weight:700}
+.tw{overflow-x:auto}
+.case h2{font-size:17px}
+.ans{margin-top:10px;border-top:1px solid var(--line);padding-top:10px}
+footer{margin-top:28px;font-size:13.5px;color:var(--muted)}
+footer p{margin:0 0 8px}
+.panel{display:none}.panel.on{display:block}
+.fig{display:block;width:100%;max-width:460px;height:auto;margin:0 auto}
+.states{display:flex;gap:6px;overflow-x:auto;margin:10px -16px;padding:2px 16px 6px;scrollbar-width:none}
+.states::-webkit-scrollbar{display:none}
+.states.wrapit{flex-wrap:wrap;overflow:visible;margin:10px 0 0;padding:0}
+.sbtn{flex:none;min-height:44px;min-width:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--ink);font:inherit;font-size:14px;cursor:pointer;white-space:nowrap}
+.sbtn[aria-pressed="true"]{border-color:var(--accent);color:var(--accent);font-weight:600}
+.line1{font-size:15px;margin:10px 0 0}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.chip{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--fill);color:var(--ink);font:inherit;font-size:14px;cursor:pointer}
+.chip svg{flex:none;color:var(--accent)}
+.scrim{position:fixed;inset:0;background:var(--scrim);z-index:20}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:21;max-height:90vh;overflow-y:auto;background:var(--card);border:1px solid var(--line);border-bottom:0;border-radius:20px 20px 0 0;padding:8px 16px 24px;max-width:560px;margin:0 auto}
+.sheethead{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.sheethead h2{font-size:18px;margin:0}
+.xbtn{min-height:44px;min-width:44px;border:0;background:transparent;color:var(--accent);font:inherit;font-weight:600;cursor:pointer}
+.pills{position:sticky;top:0;z-index:5;background:var(--bg);display:flex;gap:6px;overflow-x:auto;margin:0 -16px 12px;padding:8px 16px;border-bottom:1px solid var(--line);scrollbar-width:none}
+.pills::-webkit-scrollbar{display:none}
+.pill{flex:none;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--muted);font:inherit;font-size:14px;cursor:pointer;white-space:nowrap}
+.pill[aria-current="true"]{border-color:var(--accent);color:var(--accent);font-weight:600}
+.chap{scroll-margin-top:70px}
+.cause{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:8px 0;border-top:1px solid var(--line);font-size:15px}
+.cause small{color:var(--muted);font-size:13px;text-align:right;flex:0 1 58%}
+.cause.out span{color:var(--muted);text-decoration:line-through}
+.cause.out,.cause.less{opacity:.6}
+.cause.fav span{font-weight:700}
+.cause.fav span:before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--accent);margin-right:8px}
+.trial{border-left:3px solid var(--accent);padding-left:12px}
+.trial p{margin:0 0 6px;font-size:15px}
+.trial .k{font-family:var(--mono);font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);display:block}
+.badge{display:inline-block;font-family:var(--mono);font-size:12px;border-radius:999px;padding:2px 10px;margin:4px 6px 0 0;border:1px solid var(--line);color:var(--muted)}
+.badge.hi{border-color:var(--warn);color:var(--warn);background:var(--warnbg)}
+.badge.lo{border-color:var(--ok);color:var(--ok);background:var(--okbg)}
+.score{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:8px 0;border-top:1px solid var(--line)}
+.score b{font-family:var(--mono);font-size:15px}
+.score small{color:var(--muted);font-size:13px;text-align:right}
+.tap{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.qn{font-size:14px;color:var(--muted);margin:12px 0 0}
+.plate{margin:12px 0 4px}
+.plate img{display:block;width:100%;height:auto;border-radius:10px;border:1px solid var(--line)}
+.plate figcaption{font-size:12px;color:var(--muted);margin-top:4px}
+@media (min-width:900px){
+  .wrap{max-width:1040px}
+  #p-tool.on{display:grid;grid-template-columns:420px minmax(0,1fr);gap:20px;align-items:start}
+  .refgrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;align-items:start}
+  .refgrid .card{margin-bottom:0}
+  #p-learn{max-width:720px;margin:0 auto}
+}
+@media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+.opts{display:grid;gap:6px;margin-top:8px}
+.opt{display:flex;justify-content:space-between;align-items:center;gap:10px;min-height:44px;padding:6px 12px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);font:inherit;font-size:14px;text-align:left;cursor:pointer}
+.opt[aria-pressed="true"]{border-color:var(--accent);color:var(--accent);font-weight:600}
+.opt .pt{font-family:var(--mono);font-size:13px;color:var(--muted);flex:none}
+.opt[aria-pressed="true"] .pt{color:var(--accent)}
+.opts.auto .opt:not([aria-pressed="true"]){opacity:.55}
+.checks.one{grid-template-columns:1fr}
+.qn b{color:var(--ink)}
+.drug{padding:10px 0;border-top:1px solid var(--line)}
+.drug:first-child{border-top:0;padding-top:0}
+.drug p{margin:0 0 4px}
+.drug .dd{font-size:14px;font-weight:600}
+.drug.sel .dn b{color:var(--accent)}
+.drug.sel{border-left:3px solid var(--accent);padding-left:10px}
+.drug.bad .dd{text-decoration:line-through;color:var(--muted)}
+.refgrid .card ul{padding-left:18px}
+.refgrid .card li{font-size:14.5px}
+input[type=range]{width:100%;min-height:44px;accent-color:var(--accent)}
+@media (min-width:900px){
+  #p-treat.on{display:grid;grid-template-columns:420px minmax(0,1fr);gap:20px;align-items:start}
+  #p-treat .refgrid{grid-column:1/-1}
+  #p-treat #tout .card{margin-bottom:0}
+}
+@media (max-width:420px){.checks{grid-template-columns:1fr}}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="/">← bedside.tools</a>
+<h1>Suspected HIT</h1>
+<p class="purpose">Platelets falling on heparin: the 4Ts score, whether to test and stop heparin, which non-heparin anticoagulant and dose, and what not to do.</p>
+
+<div class="tabs" role="tablist">
+  <button class="tab" role="tab" id="t-tool" aria-selected="true" aria-controls="p-tool">Assess</button>
+  <button class="tab" role="tab" id="t-treat" aria-selected="false" aria-controls="p-treat">Treat</button>
+  <button class="tab" role="tab" id="t-learn" aria-selected="false" aria-controls="p-learn">Learn</button>
+  <button class="tab" role="tab" id="t-prac" aria-selected="false" aria-controls="p-prac">Practice</button>
+</div>
+
+<div class="panel on" id="p-tool" role="tabpanel" aria-labelledby="t-tool">
+  <div id="inputs">
+  <div class="card" id="fourts">
+    <p class="label">4Ts score</p>
+    <p class="qn" id="thrombocytopenia"><b>Thrombocytopenia.</b> Enter the counts (×10⁹/L), or tap a row.</p>
+    <div class="grid">
+      <div class="field"><label for="peak">Highest count before the fall</label><input id="peak" inputmode="numeric" autocomplete="off" placeholder="e.g. 240"></div>
+      <div class="field"><label for="nadir">Lowest count since</label><input id="nadir" inputmode="numeric" autocomplete="off" placeholder="e.g. 85"></div>
+    </div>
+    <div class="checks one" id="opticks"></div>
+    <div class="opts" id="pltseg" role="group" aria-label="Thrombocytopenia"></div>
+    <p class="note" id="pltnote"></p>
+    <p class="qn" id="timing"><b>Timing</b> of the fall. Day 0 is the first day of heparin; time it from the start of the fall.</p>
+    <div class="opts" id="timseg" role="group" aria-label="Timing"></div>
+    <p class="qn" id="thrombosis"><b>Thrombosis</b> or other sequelae</p>
+    <div class="opts" id="thrseg" role="group" aria-label="Thrombosis"></div>
+    <p class="qn" id="other"><b>Other</b> cause for the low platelets (sepsis, DIC, other drugs, bleeding, surgery)</p>
+    <div class="opts" id="othseg" role="group" aria-label="Other causes"></div>
+  </div>
+  <div class="card" id="context">
+    <p class="label">Patient and tests</p>
+    <div class="checks" id="ctxticks"></div>
+    <p class="qn" id="assays">PF4 immunoassay (ELISA or other)</p>
+    <div class="states wrapit" id="immseg" role="group" aria-label="Immunoassay"></div>
+    <div class="grid" id="odrow"><div class="field"><label for="od">Optical density, if reported</label><input id="od" inputmode="decimal" autocomplete="off" placeholder="e.g. 1.6"></div><div></div></div>
+    <p class="qn">Functional assay (for example serotonin release)</p>
+    <div class="states wrapit" id="funseg" role="group" aria-label="Functional assay"></div>
+  </div>
+  </div>
+  <div id="out"></div>
+</div>
+
+<div class="panel" id="p-treat" role="tabpanel" aria-labelledby="t-treat">
+  <div id="tinputs">
+  <div class="card" id="patient">
+    <p class="label">For the drug and dose</p>
+    <div class="grid">
+      <div class="field"><label for="wt">Weight (kg)</label><input id="wt" inputmode="decimal" autocomplete="off"></div>
+      <div class="field"><label for="crcl">Creatinine clearance (mL/min)</label><input id="crcl" inputmode="decimal" autocomplete="off"></div>
+      <div class="field"><label for="pltnow">Platelets now (×10⁹/L)</label><input id="pltnow" inputmode="numeric" autocomplete="off"></div>
+      <div class="field"><label for="liver">Liver</label><select id="liver"><option value="none">Normal</option><option value="bil">Bilirubin over 1.5</option><option value="cp">Child-Pugh B or C</option></select></div>
+    </div>
+    <div class="checks" id="trticks"></div>
+  </div>
+  </div>
+  <div id="tout"></div>
+  <div class="refgrid">
+    <div class="card" id="doses"><p class="label">Every option</p><h2>Agents and doses</h2><div id="dosetable"></div></div>
+    <div class="card" id="warfarin"><p class="label">After the count recovers</p><h2>Moving to warfarin</h2><div id="warfbox"></div></div>
+    <div class="card" id="duration"><p class="label">How long</p><h2>Duration</h2><div id="durbox"></div></div>
+    <div class="card" id="past"><p class="label">History of HIT</p><h2>Past HIT, surgery, PCI, dialysis</h2><div id="pastbox"></div></div>
+    <div class="card" id="monitor"><p class="label">Prevention</p><h2>Who needs platelet counts on heparin</h2><div id="monbox"></div></div>
+  </div>
+</div>
+
+<div class="panel" id="p-learn" role="tabpanel" aria-labelledby="t-learn">
+  <div class="pills" id="pills"></div>
+  <div class="card chap" id="learn-mech" data-pill="Mechanism"><p class="label">1 · Mechanism</p><h2>An antibody turns heparin against platelets</h2><figure class="plate" style="margin-left:0;margin-right:0"><img src="/media/hit/mechanism.webp" width="957" height="277" loading="lazy" alt="Three panels. A smooth round platelet without a nucleus releases small PF4 spheres that long heparin chains gather into a large cluster. Y-shaped IgG antibodies coat the cluster. Antibodies and PF4 sit on spiky activated platelets that clump and shed microparticles beside a vein holding a fibrin clot with trapped red cells."><figcaption>PF4 and heparin form a complex, IgG coats it, platelets fire and the blood clots. Created with BioRender.com</figcaption></figure>
+<p class="sub">Step through it: each tap is one link in the chain.</p><div data-figure="mech"></div></div>
+  <div class="card chap" id="learn-timing" data-pill="Timing"><p class="label">2 · Timing</p><h2>The fall comes on day 5 to 10</h2><p class="sub">The immune response takes days. A fall that starts sooner needs a recent exposure. Pick a pattern.</p><div data-figure="time"></div></div>
+  <div class="card chap" id="learn-4ts" data-pill="4Ts"><p class="label">3 · Pretest probability</p><h2>The 4Ts score</h2><p class="sub">Tap a score for each item: the band and what it means update below.</p><div id="t4-tap"></div><p class="head" id="t4-sum"></p><p class="line1" id="t4-line"></p><div data-figure="ladder" id="t4-ladder"></div></div>
+  <div class="card chap" id="learn-test" data-pill="Tests"><p class="label">4 · The tests</p><h2>Reading the immunoassay</h2><p class="sub">The immunoassay finds the antibody, but many antibodies cannot activate platelets. The higher the optical density, the likelier a functional assay is positive. Drag it.</p><div class="field" style="margin-top:10px"><label for="odslide">Optical density</label><input type="range" id="odslide" min="0" max="3" step="0.1" value="0.6"></div><div id="odfig"></div></div>
+  <div class="card chap" id="narrow" data-pill="Why low?"><p class="label">5 · Narrowing</p><h2>Why are the platelets low?</h2><p class="sub">First: a repeat count in a citrate tube if clumping is possible, a smear, PT/INR and fibrinogen. Then, only if the 4Ts is 4 or more: the immunoassay. Tap what you found: causes that no longer fit fade, each with the reason.</p><div class="states wrapit" id="why-feats" role="group" aria-label="Findings"></div><div id="why-causes"></div></div>
+  <div class="card chap" id="learn-treat" data-pill="Treat"><p class="label">6 · Treatment</p><h2>Treat the clot risk, not the count</h2><figure class="plate" style="margin-left:0;margin-right:0"><img src="/media/hit/clot-signs.webp" width="972" height="473" loading="lazy" alt="Three panels. A lower leg with a cut-away window showing a deep calf vein blocked by a dark red clot. Abdominal skin with a black necrotic patch ringed in red. A foot with purple-black toes and forefoot while the leg above is normal in colour."><figcaption>What HIT does: deep vein thrombosis, skin necrosis at injection sites, and venous limb gangrene after early warfarin. Created with BioRender.com</figcaption></figure>
+<p class="sub">Stopping heparin is not enough, and two reflexes make it worse. Tap each.</p><div data-figure="treat"></div></div>
+  <div class="card chap" id="learn-phases" data-pill="Afterwards"><p class="label">7 · Afterwards</p><h2>Acute, subacute, remote</h2><p class="sub">The antibody fades over weeks to months. What is safe depends on the phase. Tap one.</p><div data-figure="phase"></div></div>
+  <div class="card chap" id="trials" data-pill="Evidence"><p class="label">8 · Evidence</p><h2>The studies behind it</h2><p class="sub">Randomized trials in HIT are few and small; most evidence is cohorts with historical controls.</p><div id="trialbox"></div><div class="row"><button class="btn" id="go-prac">Try the practice cases</button></div></div>
+</div>
+
+<div class="panel" id="p-prac" role="tabpanel" aria-labelledby="t-prac">
+  <div id="practice"></div>
+</div>
+
+<div class="scrim" id="scrim" hidden></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-t" hidden>
+  <div class="sheethead"><h2 id="sheet-t"></h2><button class="xbtn" id="sheet-x">Close</button></div>
+  <div id="sheet-b"></div>
+</div>
+
+<footer>
+  <p><strong>For education only. Not a substitute for clinical judgment.</strong> For adults with suspected heparin-induced thrombocytopenia. Out of scope: pregnancy, children, ECMO and ventricular assist device circuits. Argatroban is labeled in the US for HIT; bivalirudin only for PCI in patients with HIT; fondaparinux and the direct oral anticoagulants are used off-label. Danaparoid, named in the ASH guideline, is not available in the US. Assays and their cutoffs differ by laboratory, and heparin-containing products and infusion concentrations differ by hospital: adjust to your institution, and involve hematology and pharmacy. Evidence tiers are shown as ASH strength and certainty, CHEST grade, the drug label, or "expert practice" for choices made for this tool.</p>
+  <p>Privacy: everything runs in your browser. Nothing you enter is sent anywhere or stored, and there are no analytics. Do not enter names, record numbers, or dates of birth.</p>
+  <p class="mono">Last reviewed: 2026-11-23</p>
+  <p><strong>Sources:</strong> Cuker A et al., American Society of Hematology 2018 guidelines for management of venous thromboembolism: heparin-induced thrombocytopenia, Blood Adv 2018;2:3360 (reviewed by ASH in 2022 and kept; recommendation numbers, strength and certainty shown) · Linkins LA et al., Treatment and prevention of HIT, Antithrombotic Therapy and Prevention of Thrombosis, 9th ed (ACCP), Chest 2012;141(2 Suppl):e495S (grades shown) · Lo GK et al., 4Ts score, J Thromb Haemost 2006;4:759 · Cuker A et al., 4Ts meta-analysis, Blood 2012;120:4160 · Warkentin TE, Linkins LA, J Thromb Haemost 2010;8:1483 · Warkentin TE et al., optical density and the serotonin release assay, J Thromb Haemost 2008;6:1304 · Warkentin TE, Kelton JG, N Engl J Med 2001;344:1286 and Ann Intern Med 2001;135:502 · US prescribing information: argatroban (Fresenius Kabi, 2026), bivalirudin, fondaparinux, rivaroxaban (Xarelto, 2026), apixaban (Eliquis, 2025), dabigatran (Pradaxa, 2025), warfarin, enoxaparin, Kcentra · Trials and cohorts: Warkentin TE et al., N Engl J Med 1995;332:1330 · Warkentin TE, Kelton JG, Am J Med 1996;101:502 · Lewis BE et al., Circulation 2001;103:1838 · Linkins LA et al., J Thromb Haemost 2016;14:1206 · Warkentin TE et al., Blood 2017;130:1104 · Diagrams are schematic and drawn for this site; illustrations created with BioRender.com.</p>
+</footer>
+</div>
+<script id="engine">
+/* Pure decision engine. No DOM access. Platelets in x10^9/L. */
+var PLT = [
+  [2, 'p2', 'Fall over 50% and lowest 20 or more'],
+  [1, 'p1', 'Fall 30–50%, or lowest 10–19'],
+  [0, 'p0', 'Fall under 30%, or lowest under 10']
+];
+var TIM = {
+  d510: [2, 'Clear onset on day 5–10'],
+  rapid30: [2, 'Fell within 1 day; heparin in the past 30 days'],
+  unclear: [1, 'Fits day 5–10 but not clear (missing counts)'],
+  late: [1, 'Onset after day 10'],
+  rapid100: [1, 'Fell within 1 day; heparin 30–100 days ago'],
+  early: [0, 'Fell before day 4, no recent heparin']
+};
+var THR = {
+  newclot: [2, 'New clot, confirmed'],
+  necrosis: [2, 'Skin necrosis at heparin injection sites'],
+  systemic: [2, 'Acute reaction after an IV heparin bolus'],
+  prog: [1, 'Clot progressing or recurring'],
+  red: [1, 'Red (not necrotic) skin lesions at injection sites'],
+  susp: [1, 'Clot suspected, not proven'],
+  none: [0, 'None']
+};
+var OTH = {none: [2, 'None apparent'], possible: [1, 'Possible'], definite: [0, 'Definite']};
+
+/* Thrombocytopenia points from counts. Lo 2006 Table 1; cells that match two rows take the higher (expert reading). A fall caused by surgery within 3 days scores at most 1. */
+function pltPoints(peak, nadir, postop){
+  if (!(peak > 0) || !(nadir >= 0) || nadir > peak) return null;
+  var fall = (peak - nadir) / peak * 100, pts;
+  if (fall > 50 && nadir >= 20) pts = 2;
+  else if ((fall >= 30 && fall <= 50) || (nadir >= 10 && nadir < 20)) pts = 1;
+  else pts = 0;
+  var capped = false;
+  if (postop && pts === 2){ pts = 1; capped = true; }
+  return {pts: pts, fall: fall, nadir: nadir, capped: capped};
+}
+
+function score(i){
+  var p = {}, miss = [];
+  var pc = pltPoints(i.peak, i.nadir, i.postop);
+  if (pc) p.plt = pc.pts; else if (i.plt != null) p.plt = i.postop && i.plt === 2 ? 1 : i.plt; else miss.push('thrombocytopenia');
+  if (i.tim && TIM[i.tim]) p.tim = TIM[i.tim][0]; else miss.push('timing');
+  if (i.thr && THR[i.thr]) p.thr = THR[i.thr][0]; else miss.push('thrombosis');
+  if (i.oth && OTH[i.oth]) p.oth = OTH[i.oth][0]; else miss.push('other causes');
+  var sum = 0; Object.keys(p).forEach(function(k){ sum += p[k]; });
+  var min = sum, max = sum + 2 * miss.length;
+  var band = max <= 3 ? 'low' : min >= 6 ? 'high' : (!miss.length ? (sum >= 6 ? 'high' : sum >= 4 ? 'mid' : 'low') : (min >= 4 && max <= 5 ? 'mid' : null));
+  return {pts: p, pc: pc, sum: sum, min: min, max: max, miss: miss, full: !miss.length, band: band};
+}
+
+var PROB = {
+  low: {n: '0–3 · low', v: 'Negative predictive value 0.998 (95% CI 0.970–1.000)'},
+  mid: {n: '4–5 · intermediate', v: 'Positive predictive value 0.14 (0.09–0.22)'},
+  high: {n: '6–8 · high', v: 'Positive predictive value 0.64 (0.40–0.82)'}
+};
+var WHY = {
+  low: 'A low 4Ts score rules HIT out reliably: in pooled studies the negative predictive value was 0.998.',
+  mid: 'Only about 1 in 7 intermediate scores turn out to be HIT, but stopping heparin while you wait protects the one who has it.',
+  high: 'About two in three high scores are HIT. In an older series, about half of patients with confirmed isolated HIT whose heparin was simply stopped had a clot within 30 days.',
+  neg: 'The immunoassay is very sensitive, so a negative result makes HIT very unlikely and heparin can be used again if needed.',
+  pos: 'The antibody is present, but the immunoassay over-calls HIT; the functional assay shows whether the antibody activates platelets. Treatment continues meanwhile.',
+  conf: 'Both assays are positive: the antibody is there and it activates platelets. Acute HIT stays highly prothrombotic until the count recovers.',
+  funneg: 'A negative functional assay makes HIT unlikely, more so when the optical density is low, though functional assays can miss some cases.',
+  par: 'An IV agent with a short half-life can be stopped within hours if bleeding starts or a procedure comes up.',
+  parRenal: 'Argatroban is cleared by the liver, so kidney failure does not change its dose.',
+  parLiver: 'Argatroban is cleared by the liver; bivalirudin is broken down in the blood and partly cleared by the kidney.',
+  oral: 'For a stable patient at average bleeding risk, fondaparinux or a DOAC is a reasonable option that avoids an infusion and aPTT checks.',
+  proph: 'With a high bleeding risk and only a 1 in 7 chance of HIT, a prophylactic intensity protects against clots while the test is pending, and a short-acting IV agent can be stopped within hours.'
+};
+
+/* OD bands: Warkentin 2008 (one laboratory, two assays). */
+function odBand(od){
+  if (od == null || !(od >= 0)) return null;
+  if (od < 0.4) return {k: 'neg', n: 'Below 0.40: negative', p: 'Negative at the usual cutoff.'};
+  if (od < 1.0) return {k: 'weak', n: '0.40 to under 1.00: weak positive', p: '5% or less had a strong-positive serotonin release assay.'};
+  if (od < 1.4) return {k: 'mod', n: '1.00 to under 1.40', p: 'Under 50% had a strong-positive serotonin release assay.'};
+  if (od < 2.0) return {k: 'strong', n: '1.40 to under 2.00', p: '50% or more had a strong-positive serotonin release assay.'};
+  return {k: 'vstrong', n: '2.00 or more: strong positive', p: 'About 90% had a strong-positive serotonin release assay.'};
+}
+
+/* Assess: probability, action, guards */
+function assess(i){
+  var s = score(i), o = {s: s, guards: [], steps: [], tiers: [], more: [], chips: []};
+  o.od = odBand(i.od);
+  if (!s.band){
+    o.kind = s.miss.length === 4 ? 'empty' : 'part';
+    o.head = s.miss.length === 4 ? 'Start with the 4Ts' : 'Score so far ' + s.min + ' to ' + s.max + ': finish it';
+    o.sub = 'Still to score: ' + s.miss.join(', ') + '. If information is missing, err toward the higher score and reassess often (ASH 2.1 remark).';
+    return o;
+  }
+  o.band = s.band;
+  o.hitt = i.thr === 'newclot' || i.thr === 'prog';
+  if (s.band === 'low'){
+    o.kind = 'low';
+    o.head = 'HIT unlikely: keep heparin, do not test';
+    o.sub = 'Look for another cause, and rescore if the picture changes (a new clot, a further fall).';
+    o.steps = [
+      {when: 'Now', name: 'No HIT laboratory testing', t: 'ASH 2.2 · strong, moderate', now: 1},
+      {when: 'Now', name: 'Do not stop heparin or start an alternative for HIT', t: 'ASH 2.3 · strong, moderate'},
+      {when: 'Today', name: 'Find the other cause: repeat count in a citrate tube, smear, PT/INR, fibrinogen, medication review', t: 'expert practice'}
+    ];
+    if (i.imm === 'pos' || i.imm === 'pending') o.guards.push('An immunoassay was sent despite a low score. A positive result with a low score is usually a false positive (the antibody without the disease); rescore carefully before acting on it, and involve hematology.');
+    o.why = WHY.low;
+    o.more = ['ASH remark: testing may still be reasonable when the score is uncertain because information is missing. A low score is 0 to 3 of 8.'];
+    o.tiers = ['ASH 2.1 · 4Ts over gestalt · strong, moderate'];
+    o.chips = [['ladder', 'low'], ['time', i.tim === 'early' ? 'early' : 'typical']];
+    return o;
+  }
+  /* intermediate or high */
+  var proph = s.band === 'mid' && !i.ind && i.bleed && i.imm !== 'pos';
+  o.intensity = proph ? 'proph' : 'ther';
+  if (i.imm === 'neg'){
+    o.kind = 'neg';
+    o.head = 'Immunoassay negative: HIT very unlikely';
+    o.sub = 'Stop the non-heparin anticoagulant and restart heparin if it is still indicated.';
+    o.steps = [{when: 'Now', name: 'Stop the alternative; resume heparin if indicated', t: s.band === 'high' ? 'ASH 2.8 · strong, moderate' : 'ASH 2.7 · strong, moderate', now: 1}];
+    if (s.band === 'high') o.guards.push('High score with a negative immunoassay: false negatives are rare. If suspicion stays high, rescore with fresh eyes and consider repeating or using a different assay before restarting heparin (ASH 2.8 remark).');
+    o.why = WHY.neg;
+    o.tiers = ['ASH 2.7 / 2.8'];
+    o.chips = [['ladder', s.band]];
+    return o;
+  }
+  if (i.imm === 'pos' && i.fun === 'neg'){
+    o.kind = 'funneg';
+    o.head = 'Functional assay negative: HIT unlikely';
+    o.sub = 'Decide with hematology whether to stop the alternative and restart heparin. Keep avoiding heparin until then.';
+    o.steps = [{when: 'Today', name: 'Review with hematology: score, optical density, functional assay', t: 'expert practice', now: 1}];
+    if (o.od && (o.od.k === 'strong' || o.od.k === 'vstrong')) o.guards.push('The optical density is high (1.40 or more). A negative functional assay with a strong immunoassay is unusual: ask whether the functional assay should be repeated.');
+    o.why = WHY.funneg;
+    o.tiers = ['Expert practice (ASH makes no recommendation for this combination)'];
+    o.chips = [['od', o.od ? o.od.k : 'weak']];
+    return o;
+  }
+  var confirmed = i.imm === 'pos';
+  o.kind = confirmed ? (i.fun === 'pos' ? 'conf' : 'pos') : s.band;
+  o.head = i.fun === 'pos' && confirmed ? 'HIT confirmed: treat as acute HIT' : confirmed ? 'Immunoassay positive: keep treating as HIT' : 'Stop all heparin now and start an alternative';
+  o.sub = proph && !confirmed ? 'High bleeding risk and no other reason for full anticoagulation: a prophylactic dose of a non-heparin anticoagulant while the immunoassay is pending.' : 'A non-heparin anticoagulant at full (therapeutic) dose. The Treat tab picks the drug and dose.';
+  o.steps.push({when: 'Now', name: 'Stop every heparin: infusions, LMWH, flushes, heparin locks, heparin-coated catheters', t: s.band === 'high' ? 'ASH 2.6 · strong, moderate; CHEST 2012' : (i.ind ? 'ASH 2.5.a · strong, moderate; CHEST 2012' : 'ASH 2.4.a · strong, moderate; CHEST 2012'), now: !confirmed});
+  if (!confirmed) o.steps.push({when: 'Now', name: proph ? 'Start a non-heparin anticoagulant at prophylactic intensity' : 'Start a non-heparin anticoagulant at therapeutic intensity', t: s.band === 'high' ? 'ASH 2.6 · strong, moderate' : i.ind ? 'ASH 2.5.b · conditional, moderate' : proph ? 'ASH 2.4.b · conditional, moderate' : 'ASH 2.4.b · conditional, moderate (therapeutic unless bleeding risk is high)'});
+  if (!confirmed) o.steps.push({when: 'Now', name: i.imm === 'pending' ? 'Immunoassay sent: wait for it on the alternative' : 'Send a PF4 immunoassay', t: 'ASH 2.1 · strong, moderate'});
+  if (confirmed){
+    o.steps.push({when: 'Now', name: 'Non-heparin anticoagulant at therapeutic intensity (move up if it was prophylactic); keep avoiding heparin', t: s.band === 'high' ? 'ASH 2.10 · strong, moderate' : 'ASH 2.9 · strong, moderate', now: 1});
+    if (i.fun !== 'pos') o.steps.push({when: 'Next', name: i.fun === 'pending' ? 'Functional assay sent: it confirms whether the antibody activates platelets' : 'Send a functional assay if available (for example serotonin release)', t: 'ASH 2.1 · conditional, moderate'});
+  }
+  o.steps.push({when: confirmed ? 'Today' : 'If positive', name: o.hitt ? 'Clot already found: treat as HIT with thrombosis' : (i.cvc ? 'Ultrasound both legs, and the arm with the central line' : 'Ultrasound both legs to look for a silent DVT'), t: o.hitt ? 'ASH 3.1' : 'ASH 3.7 · conditional, very low'});
+  /* guards: on by default while HIT is suspected or confirmed */
+  o.guards.push('Do not start warfarin until platelets recover (usually 150 or more). Venous limb gangrene and amputation have followed warfarin started during acute HIT.');
+  if (i.warf) o.guards.push('On warfarin now: stop it and give IV vitamin K, alongside the non-heparin anticoagulant (dose per your institution; the guidelines give none).');
+  o.guards.push('No platelet transfusion for the count alone. Consider it only for active bleeding or a high-bleeding-risk procedure.');
+  o.why = confirmed ? (i.fun === 'pos' ? WHY.conf : WHY.pos) : proph ? WHY.proph : WHY[s.band];
+  o.more = [
+    'Also avoid: an IVC filter (ASH 3.4, strong, moderate); adding aspirin or another antiplatelet unless there is another reason for it (ASH 3.3, conditional, low); heparin-containing products such as Kcentra (4-factor PCC), whose label lists HIT as a contraindication.',
+    'The leg ultrasound is a screen for patients without symptoms (ASH 3.7.a). Anyone with leg or arm symptoms gets diagnostic imaging. Arm ultrasound only in a limb with a central venous catheter (ASH 3.7.b).',
+    'Once HIT is diagnosed, the dose is therapeutic, not prophylactic (ASH 3.2, strong, very low).'
+  ];
+  if (o.od) o.more.unshift('Optical density ' + i.od + ': ' + o.od.n + '. In one laboratory\'s series, ' + o.od.p.charAt(0).toLowerCase() + o.od.p.slice(1) + ' Your laboratory\'s assay and cutoffs may differ.');
+  o.tiers = ['ASH 3.5 warfarin · strong, moderate', 'ASH 3.6 platelets · conditional, low', 'Warfarin label 5.6'];
+  o.chips = [['mech', 'clot'], ['ladder', s.band]];
+  if (o.od) o.chips.push(['od', o.od.k]);
+  return o;
+}
+
+/* Treat: agent and dose */
+function argRate(i){
+  if (i.liver === 'cp') return {lo: 0.5, hi: 0.5, why: 'moderate or severe hepatic impairment (label)'};
+  if (i.liver === 'bil' || i.hf) return {lo: 0.5, hi: 1.2, why: i.liver === 'bil' ? 'bilirubin over 1.5 (ASH Table 2)' : 'heart failure, anasarca, multiorgan failure or after cardiac surgery (ASH Table 2; CHEST 2012)'};
+  return {lo: 2, hi: 2, why: 'normal liver function (label)'};
+}
+function mlh(rate, wt){ return Math.round(rate * wt * 60 / 1000 * 10) / 10; }
+function fmt(n){ return String(Math.round(n * 10) / 10); }
+function fondaDose(wt){ return !(wt > 0) ? null : wt < 50 ? 5 : wt <= 100 ? 7.5 : 10; }
+
+function doses(i, hitt){
+  var wt = i.wt > 0 ? i.wt : null, cr = i.crcl >= 0 ? i.crcl : null, r = argRate(i), L = {};
+  L.arg = {n: 'Argatroban', route: 'IV infusion, no bolus', label: 'Labeled for HIT',
+    dose: (r.lo === r.hi ? r.lo : r.lo + ' to ' + r.hi) + ' mcg/kg/min' + (wt ? ' = ' + (r.lo === r.hi ? mlh(r.lo, wt) : mlh(r.lo, wt) + ' to ' + mlh(r.hi, wt)) + ' mL/h at 1 mg/mL' : ''),
+    mon: 'aPTT 2 h after starting and after every change; target 1.5 to 3 times baseline, not over 100 s. Maximum 10 mcg/kg/min. No kidney adjustment.',
+    note: 'Start rate for ' + r.why + '.', t: 'Argatroban label; ASH Table 2'};
+  L.biv = {n: 'Bivalirudin', route: 'IV infusion, no bolus', label: 'Off-label outside PCI',
+    dose: '0.15 mg/kg/h' + (wt ? ' = ' + fmt(0.15 * wt) + ' mg/h' : ''),
+    mon: 'aPTT 1.5 to 2.5 times baseline.',
+    note: 'A lower rate may be appropriate with kidney or liver impairment: agree it with pharmacy. CHEST 2012 gives 0.15 to 0.20 mg/kg/h.', t: 'ASH Table 2; CHEST 2012'};
+  var fd = fondaDose(wt);
+  L.fon = {n: 'Fondaparinux', route: 'Subcutaneous, once daily', label: 'Off-label in HIT',
+    dose: fd ? fd + ' mg once daily' : '5 mg (under 50 kg), 7.5 mg (50 to 100 kg), 10 mg (over 100 kg) once daily',
+    mon: 'No routine monitoring.',
+    note: 'Contraindicated with CrCl under 30; accumulates at 30 to 50.' + (cr != null && cr < 30 ? ' CrCl ' + cr + ': do not use.' : cr != null && cr <= 50 ? ' CrCl ' + cr + ': watch for bleeding.' : ''), t: 'ASH Table 2; fondaparinux label', bad: cr != null && cr < 30};
+  L.riv = {n: 'Rivaroxaban', route: 'Oral, with food', label: 'Off-label in HIT',
+    dose: hitt ? '15 mg twice daily for 3 weeks, then 20 mg once daily' : '15 mg twice daily until platelets recover; then 20 mg once daily if anticoagulation continues',
+    mon: 'No routine monitoring.',
+    note: 'Avoid with CrCl under 15 and in Child-Pugh B or C. In isolated HIT, ASH gives 15 mg twice daily until recovery, then 20 mg once daily if there is a reason to continue (ASH 3.1 remark).' + (cr != null && cr < 15 ? ' CrCl ' + cr + ': avoid.' : ''), t: 'ASH Table 2 and 3.1 remark; Xarelto label', bad: (cr != null && cr < 15) || i.liver === 'cp'};
+  L.api = {n: 'Apixaban', route: 'Oral', label: 'Off-label in HIT',
+    dose: hitt ? '10 mg twice daily for 1 week, then 5 mg twice daily' : '5 mg twice daily until platelets recover',
+    mon: 'No routine monitoring.',
+    note: 'No kidney adjustment in the label (limited data below CrCl 25 and on dialysis). The label gives no dose for Child-Pugh B and does not recommend it in Child-Pugh C.', t: 'ASH Table 2; Eliquis label'};
+  L.dab = {n: 'Dabigatran', route: 'Oral', label: 'Off-label in HIT',
+    dose: hitt ? '150 mg twice daily after at least 5 days of a parenteral non-heparin anticoagulant' : '150 mg twice daily until platelets recover',
+    mon: 'No routine monitoring.',
+    note: 'Not with CrCl 30 or less.' + (cr != null && cr <= 30 ? ' CrCl ' + cr + ': do not use.' : ''), t: 'ASH Table 2; Pradaxa label', bad: cr != null && cr <= 30};
+  return L;
+}
+
+function treat(i){
+  var a = assess(i), o = {a: a, guards: [], more: [], tiers: []};
+  var wt = i.wt > 0 ? i.wt : null, cr = i.crcl >= 0 ? i.crcl : null;
+  var hitt = a.hitt || !!i.clot;
+  o.L = doses(i, hitt); o.hitt = hitt;
+  if (!a.band){ o.kind = 'wait'; o.head = 'Score the 4Ts first'; o.sub = 'The Assess tab decides whether an alternative is needed. Every option and dose is listed below.'; return o; }
+  if (a.kind === 'low'){ o.kind = 'none'; o.head = 'No alternative needed'; o.sub = 'A low 4Ts score: keep heparin if it is indicated. Doses below are for reference.'; return o; }
+  if (a.kind === 'neg' || a.kind === 'funneg'){ o.kind = 'none'; o.head = a.kind === 'neg' ? 'Stop the alternative' : 'Decide with hematology'; o.sub = a.sub; return o; }
+  var renal = (cr != null && cr < 30) || i.dial;
+  var needIV = i.sick || i.bleed || i.proc || i.limb;
+  o.kind = 'pick';
+  if (a.intensity === 'proph'){
+    var fok = (cr == null || cr >= 30) && (wt == null || wt >= 50);
+    o.pick = i.liver === 'cp' ? 'biv' : 'arg';
+    o.head = (o.pick === 'arg' ? 'Argatroban' : 'Bivalirudin') + ' at a lower-intensity target, agreed with hematology';
+    o.sub = 'Prophylactic intensity while the immunoassay is pending; ASH gives no prophylactic dose for the IV agents. If the test is positive, move to the therapeutic dose.';
+    o.alt = fok ? 'Alternative once bleeding risk allows a once-daily drug: fondaparinux 2.5 mg once daily (its prophylaxis dose; needs CrCl 30 or more and weight 50 kg or more; accumulates at CrCl 30 to 50).' : '';
+    if (o.pick === 'biv' && cr != null && cr < 30) o.guards.push('Liver and kidney impairment together: bivalirudin also needs a reduced rate. Decide the agent and target with hematology and pharmacy.');
+    o.why = WHY.proph;
+    o.tiers = ['ASH 2.4.b · conditional, moderate', 'IV agent with high bleeding risk: ASH 3.1 remark', 'Lower-intensity target and fondaparinux 2.5 mg: expert practice'];
+  } else if (needIV || renal){
+    if (i.liver === 'cp' && !renal){ o.pick = 'biv'; o.why = WHY.parLiver; }
+    else { o.pick = 'arg'; o.why = renal ? WHY.parRenal : WHY.par; }
+    if (i.liver === 'cp' && renal) o.guards.push('Liver and kidney impairment together: argatroban needs a reduced dose (0.5 mcg/kg/min) and bivalirudin a reduced rate. Decide the agent and dose with hematology and pharmacy.');
+    var Lp = o.L[o.pick];
+    o.head = Lp.n + ' ' + Lp.dose;
+    o.sub = needIV ? 'An IV agent: ' + [i.sick && 'critically ill', i.bleed && 'high bleeding risk', i.proc && 'procedure likely', i.limb && 'life- or limb-threatening clot'].filter(Boolean).join(', ') + '.' : 'An IV agent because CrCl is under 30' + (i.dial ? ' or on dialysis' : '') + '.';
+    o.alt = o.pick === 'arg' ? (i.liver === 'cp' ? '' : 'Alternative: bivalirudin 0.15 mg/kg/h (off-label).') : 'Alternative: argatroban at 0.5 mcg/kg/min.';
+    if (renal && !needIV) o.alt = 'Oral alternative once stable: apixaban (no kidney adjustment in its label; little data in HIT with kidney failure).';
+    o.tiers = ['ASH 3.1 · conditional, very low (choice among agents)', 'Preference for IV agents in these patients: ASH 3.1 remark'];
+  } else {
+    if (i.liver === 'cp'){ o.pick = 'fon'; if (cr == null) o.guards.push('Enter creatinine clearance: fondaparinux is contraindicated under 30.'); }
+    else o.pick = 'riv';
+    var Lo = o.L[o.pick];
+    o.head = Lo.n + ' ' + Lo.dose;
+    o.sub = 'Stable, average bleeding risk: an oral agent or fondaparinux. Most published experience with a DOAC in HIT is with rivaroxaban.';
+    o.alt = o.pick === 'riv' ? 'Alternatives: fondaparinux (by weight), apixaban, or argatroban if the picture changes.' : 'Rivaroxaban and apixaban are avoided or not recommended with Child-Pugh B or C; argatroban or bivalirudin if the picture changes.';
+    o.why = WHY.oral;
+    o.tiers = ['ASH 3.1 · conditional, very low', 'Rivaroxaban preference: ASH 3.1 remark'];
+    if (cr == null) o.guards.push('Enter creatinine clearance: with CrCl under 30 the tool moves to argatroban.');
+  }
+  if (o.pick === 'arg' && wt == null && a.intensity !== 'proph') o.guards.push('Enter weight to turn the rate into mL/h.');
+  if (o.pick === 'arg' || o.pick === 'biv') o.guards.push('If the baseline aPTT is already long (liver disease, DIC, lupus anticoagulant), aPTT targets are unreliable: involve hematology.');
+  if (!(i.plt2 >= 150)) o.guards.push('No warfarin yet: wait until platelets recover (usually 150 or more).');
+  if (i.warf) o.guards.push('On warfarin at diagnosis: stop it and give IV vitamin K.');
+  o.more = [
+    'ASH names argatroban, bivalirudin, danaparoid (not available in the US), fondaparinux or a DOAC, choosing by drug factors (cost, availability), patient factors (kidney and liver function, bleeding risk, stability) and experience. IV agents suit the critically ill, patients at high bleeding risk and those likely to need a procedure; a parenteral agent may be preferred for life- or limb-threatening clots.',
+    hitt ? 'HIT with thrombosis: DOAC regimens follow venous thromboembolism treatment (ASH Table 2).' : 'Isolated HIT (no clot): DOAC regimens continue until platelets recover; a leg ultrasound decides whether this is truly isolated.',
+    'The DOAC doses in HIT are extrapolated from venous thromboembolism treatment and limited HIT experience (ASH Table 2 footnote). The same contraindications as for VTE apply. Check drug interactions.'
+  ];
+  return o;
+}
+
+function warf(i, pick){
+  var p = i.plt2, ok = p != null && p >= 150;
+  return {ok: ok, p: p,
+    head: p == null ? 'Enter today\'s platelet count' : ok ? 'Platelets ' + p + ': warfarin can start' : 'Platelets ' + p + ': not yet',
+    lines: [
+      'Start only after the count recovers, usually 150 or more (ASH 3.5, strong, moderate; CHEST 3.4.1, 1C). In subacute HIT A a DOAC is preferred to warfarin (ASH 3.9, conditional, moderate).',
+      'Start low: no more than 5 mg, no loading dose (CHEST 3.4.1; argatroban label).',
+      'Overlap with the non-heparin anticoagulant for at least 5 days and until the INR is in range (CHEST 3.5, 1C).',
+      'Argatroban raises the INR on its own. At 2 mcg/kg/min or less: stop argatroban when the INR is over 4 on both drugs, recheck the INR 4 to 6 h later, and restart argatroban if it is below range; repeat daily. Above 2: reduce to 2 first and recheck the INR 4 to 6 h later (argatroban label).'
+    ]};
+}
+function duration(hitt){
+  return hitt ? {head: 'With a clot: 3 months', lines: ['CHEST 2012 suggests 3 months (statement 3.6, ungraded). ASH did not make a recommendation; it notes 3 to 6 months is typical.']}
+    : {head: 'No clot: at least until platelets recover', lines: ['Continue at least until the count recovers (usually 150 or more), and not for 3 months or more unless the count has not recovered (ASH 3.8, conditional, very low).', 'CHEST 2012 suggests 4 weeks (statement 3.6, ungraded). Both assume the leg ultrasound found no clot.']};
+}
+</script>
+<script>
+(function(){
+var $ = function(id){ return document.getElementById(id); };
+function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+var FS = 'font-family:var(--sans)', FM = 'font-family:var(--mono)';
+var st = {plt: null, tim: null, thr: null, oth: null, imm: 'notsent', fun: 'notsent', t: {}};
+var OPT = [['postop', 'The fall began within 3 days of surgery (scores at most 1)']];
+var CTX = [['ind', 'Another reason for full-dose anticoagulation (clot, AF, valve)'], ['bleed', 'High bleeding risk'], ['warf', 'On warfarin now'], ['cvc', 'Central line in an arm or neck vein']];
+var TRT = [['sick', 'Critically ill or unstable'], ['proc', 'Procedure or surgery likely soon'], ['limb', 'Life- or limb-threatening clot'], ['clot', 'Clot found on ultrasound or scan'], ['hf', 'Heart failure, anasarca, multiorgan failure, or after cardiac surgery'], ['dial', 'On dialysis']];
+
+function num(id){ var v = parseFloat($(id).value); return isFinite(v) ? v : null; }
+function read(){
+  var i = {plt: st.plt, tim: st.tim, thr: st.thr, oth: st.oth, imm: st.imm, fun: st.fun,
+    peak: num('peak'), nadir: num('nadir'), od: st.imm === 'pos' ? num('od') : null,
+    wt: num('wt'), crcl: num('crcl'), plt2: num('pltnow'), liver: $('liver').value};
+  Object.keys(st.t).forEach(function(k){ if (st.t[k]) i[k] = true; });
+  return i;
+}
+function opts(host, list, cur){ host.innerHTML = list.map(function(c){ return '<button class="opt" data-v="' + c[0] + '" aria-pressed="' + (String(c[0]) === String(cur)) + '"><span>' + esc(c[2]) + '</span><span class="pt">' + c[1] + '</span></button>'; }).join(''); }
+function seg(host, list, cur){ host.innerHTML = list.map(function(c){ return '<button class="sbtn" data-v="' + c[0] + '" aria-pressed="' + (String(c[0]) === String(cur)) + '">' + esc(c[1]) + '</button>'; }).join(''); }
+function ticks(host, list){ host.innerHTML = list.map(function(t){ return '<label class="chk"><input type="checkbox" data-k="' + t[0] + '"' + (st.t[t[0]] ? ' checked' : '') + '><span>' + esc(t[1]) + '</span></label>'; }).join(''); }
+function mapList(M){ return Object.keys(M).map(function(k){ return [k, M[k][0], M[k][1]]; }); }
+
+function drawInputs(){
+  var i = read(), pc = pltPoints(i.peak, i.nadir, st.t.postop);
+  ticks($('opticks'), OPT);
+  opts($('pltseg'), PLT.map(function(p){ return [p[0], p[0], p[2]]; }), pc ? pc.pts : st.plt);
+  $('pltseg').classList.toggle('auto', !!pc);
+  $('pltnote').innerHTML = pc ? 'Fall ' + (Math.round(pc.fall * 10) / 10) + '%, lowest ' + pc.nadir + ': <b>' + pc.pts + ' point' + (pc.pts === 1 ? '' : 's') + '</b>' + (pc.capped ? ' (capped at 1 after surgery)' : '') + '. Clear a count to tap a row instead.' : (i.peak != null && i.nadir != null && i.nadir > i.peak ? 'The lowest count is above the highest: check the numbers.' : 'Use the count before the fall began, not an admission value from weeks ago.');
+  opts($('timseg'), mapList(TIM), st.tim);
+  opts($('thrseg'), mapList(THR), st.thr);
+  opts($('othseg'), mapList(OTH), st.oth);
+  ticks($('ctxticks'), CTX);
+  seg($('immseg'), [['notsent', 'Not sent'], ['pending', 'Pending'], ['neg', 'Negative'], ['pos', 'Positive']], st.imm);
+  $('odrow').hidden = st.imm !== 'pos';
+  seg($('funseg'), [['notsent', 'Not sent'], ['pending', 'Pending'], ['neg', 'Negative'], ['pos', 'Positive']], st.fun);
+  ticks($('trticks'), TRT);
+}
+function bindOpt(id, key, numeric){ $(id).addEventListener('click', function(e){ var b = e.target.closest('[data-v]'); if (!b) return; var v = b.getAttribute('data-v'); if (numeric){ v = +v; if (pltPoints(num('peak'), num('nadir'), st.t.postop)){ $('peak').value = ''; $('nadir').value = ''; } } st[key] = st[key] === v ? null : v; drawInputs(); render(); }); }
+bindOpt('pltseg', 'plt', true); bindOpt('timseg', 'tim'); bindOpt('thrseg', 'thr'); bindOpt('othseg', 'oth');
+['immseg', 'funseg'].forEach(function(id){ $(id).addEventListener('click', function(e){ var b = e.target.closest('[data-v]'); if (!b) return; st[id === 'immseg' ? 'imm' : 'fun'] = b.getAttribute('data-v'); drawInputs(); render(); }); });
+['opticks', 'ctxticks', 'trticks'].forEach(function(id){ $(id).addEventListener('change', function(e){ var k = e.target.getAttribute('data-k'); if (k){ st.t[k] = e.target.checked; drawInputs(); render(); } }); });
+['peak', 'nadir'].forEach(function(k){ $(k).addEventListener('input', function(){ drawInputs(); render(); }); });
+['od', 'wt', 'crcl', 'pltnow'].forEach(function(k){ $(k).addEventListener('input', render); });
+$('liver').addEventListener('change', render);
+
+function steps(list){ return '<div class="tl">' + list.map(function(s){ return '<div class="st' + (s.now ? ' now' : '') + '"><span class="when">' + esc(s.when) + '</span><b>' + esc(s.name) + '</b>' + (s.small ? '<small>' + esc(s.small) + '</small>' : '') + (s.t ? '<span class="tier">' + esc(s.t) + '</span>' : '') + '</div>'; }).join('') + '</div>'; }
+function guards(list){ return (list || []).map(function(g){ return '<div class="guard">' + esc(g) + '</div>'; }).join(''); }
+function tiers(list){ return (list || []).map(function(t){ return '<span class="tier">' + esc(t) + '</span>'; }).join(''); }
+function paras(list){ return (list || []).map(function(m){ return '<p>' + esc(m) + '</p>'; }).join(''); }
+function badge(t, cls){ return '<span class="badge ' + (cls || '') + '">' + esc(t) + '</span>'; }
+var LAB = {low: 'Low probability', mid: 'Intermediate probability', high: 'High probability', pos: 'Immunoassay positive', conf: 'Confirmed', neg: 'Immunoassay negative', funneg: 'Functional assay negative', part: 'Partly scored', empty: 'Start'};
+
+function answerCard(o){
+  var cls = o.kind === 'low' || o.kind === 'neg' || o.kind === 'funneg' ? ' okc' : o.kind === 'part' || o.kind === 'empty' ? '' : ' bad';
+  var h = '<div class="card" id="answer"><p class="label">' + LAB[o.kind] + '</p><p class="head' + cls + '">' + esc(o.head) + '</p>' + (o.sub ? '<p class="sub">' + esc(o.sub) + '</p>' : '') + guards(o.guards) + (o.steps && o.steps.length ? steps(o.steps) : '');
+  if (o.band && o.band !== 'low' && o.kind !== 'neg' && o.kind !== 'funneg') h += '<div class="row"><button class="btn" data-go-treat="1">Pick the drug and dose</button></div>';
+  if (o.why) h += '<p class="whyline"><b>Why:</b> ' + esc(o.why) + '</p>';
+  if (o.chips && o.chips.length) h += '<div class="chips">' + o.chips.map(function(c){ return chip(c[0], c[1]); }).join('') + '</div>';
+  if ((o.more && o.more.length) || (o.tiers && o.tiers.length)) h += '<details><summary>More</summary>' + paras(o.more) + tiers(o.tiers) + '</details>';
+  return h + '</div>';
+}
+function scoreCard(o, i){
+  var s = o.s, rows = [['Thrombocytopenia', s.pts.plt, s.pc ? 'fall ' + (Math.round(s.pc.fall * 10) / 10) + '%, lowest ' + s.pc.nadir : (i.plt != null ? PLT.filter(function(p){ return p[0] === i.plt; })[0][2] : '')], ['Timing', s.pts.tim, i.tim ? TIM[i.tim][1] : ''], ['Thrombosis', s.pts.thr, i.thr ? THR[i.thr][1] : ''], ['Other causes', s.pts.oth, i.oth ? OTH[i.oth][1] : '']];
+  var h = '<div class="card" id="scorecard"><p class="label">4Ts</p>' + rows.map(function(r){ return '<div class="score"><span>' + r[0] + (r[2] ? '<small class="note" style="display:block">' + esc(r[2]) + '</small>' : '') + '</span><b>' + (r[1] == null ? '–' : r[1]) + '</b></div>'; }).join('');
+  h += '<div class="score"><span><b>Total</b></span><b>' + (s.full ? s.sum : s.min + '–' + s.max) + ' / 8</b></div>';
+  if (s.band) h += '<p class="sub">' + badge(PROB[s.band].n, s.band === 'low' ? 'lo' : 'hi') + '</p><p class="note">' + esc(PROB[s.band].v) + ' (13 studies, 3,068 patients).</p>';
+  h += '<details><summary>More</summary><p>Bands: 0 to 3 low, 4 to 5 intermediate, 6 to 8 high (Lo 2006). The score is only as good as the information behind it: a missed alternative cause or an unrecognized clot changes it by 2 points.</p><p>Counts entered: the tool reads the points from Lo 2006 Table 1. Where a combination fits two rows (a fall under 30% with a lowest count of 10 to 19, or a fall of 30 to 50% with a lowest count under 10), it takes the higher (expert reading; ASH advises erring toward the higher score when information is missing). A fall caused by surgery within the first 3 days scores at most 1 (the Hamilton rule in Lo 2006; Warkentin and Linkins 2010).</p>' + tiers(['ASH 2.1 · strong, moderate', 'Cuker 2012 meta-analysis']) + '</details></div>';
+  return h;
+}
+function treatCard(o){
+  var cls = o.kind === 'none' ? ' okc' : '';
+  var h = '<div class="card" id="pick"><p class="label">' + (o.kind === 'pick' ? (o.a.intensity === 'proph' ? 'Prophylactic intensity' : 'Therapeutic intensity') + ' · ' + (o.hitt ? 'HIT with thrombosis' : 'no clot found') : 'Treatment') + '</p><p class="head' + cls + '">' + esc(o.head) + '</p>' + (o.sub ? '<p class="sub">' + esc(o.sub) + '</p>' : '');
+  if (o.pick && o.L[o.pick] && o.a.intensity !== 'proph'){ var d = o.L[o.pick]; h += '<p class="sub" style="margin-top:6px">' + esc(d.mon) + '</p>'; }
+  if (o.alt) h += '<p class="sub" style="margin-top:6px">' + esc(o.alt) + '</p>';
+  h += guards(o.guards);
+  if (o.why) h += '<p class="whyline"><b>Why:</b> ' + esc(o.why) + '</p>';
+  if (o.kind === 'pick') h += '<div class="chips">' + chip('treat', 'warf') + chip('phase', 'acute') + '</div>';
+  if ((o.more && o.more.length) || (o.tiers && o.tiers.length)) h += '<details><summary>More</summary>' + paras(o.more) + tiers(o.tiers) + '</details>';
+  return h + '</div>';
+}
+function render(){
+  var i = read(), o = assess(i), t = treat(i);
+  $('out').innerHTML = answerCard(o) + (o.kind === 'empty' ? '' : scoreCard(o, i));
+  $('tout').innerHTML = treatCard(t);
+  drawRef(i, t);
+}
+function drawRef(i, t){
+  var L = t.L, keys = ['arg', 'biv', 'fon', 'riv', 'api', 'dab'];
+  $('dosetable').innerHTML = keys.map(function(k){ var d = L[k]; return '<div class="drug' + (t.pick === k || (t.pick === 'fonp' && k === 'fon') ? ' sel' : '') + (d.bad ? ' bad' : '') + '"><p class="dn"><b>' + esc(d.n) + '</b> <span class="note">' + esc(d.route) + ' · ' + esc(d.label) + '</span></p><p class="mono dd">' + esc(d.dose) + '</p><p class="note">' + esc(d.mon) + ' ' + esc(d.note) + '</p><span class="tier">' + esc(d.t) + '</span></div>'; }).join('') +
+    '<p class="note" style="margin-top:10px">Prophylactic intensity (ASH 2.4.b, intermediate score with high bleeding risk): ASH gives no dose. The tool suggests argatroban (or bivalirudin) at a lower target agreed with hematology, or fondaparinux 2.5 mg once daily once a once-daily drug is acceptable (expert practice). Doses above are therapeutic, for ' + (t.hitt ? 'HIT with thrombosis' : 'isolated HIT') + (i.wt > 0 ? ', ' + i.wt + ' kg' : '') + (i.crcl >= 0 ? ', CrCl ' + i.crcl : '') + '.</p>';
+  var w = warf(i);
+  $('warfbox').innerHTML = '<p class="head ' + (w.ok ? 'okc' : 'wn') + '" style="font-size:15px">' + esc(w.head) + '</p><ul>' + w.lines.map(function(l){ return '<li>' + esc(l) + '</li>'; }).join('') + '</ul>';
+  var du = duration(t.hitt);
+  $('durbox').innerHTML = '<p class="head" style="font-size:15px">' + esc(du.head) + '</p><ul>' + du.lines.map(function(l){ return '<li>' + esc(l) + '</li>'; }).join('') + '</ul>';
+}
+window.__assess = assess; window.__treat = treat; window.__score = score;
+
+function drawStatic(){
+$('pastbox').innerHTML = '<ul>' + [
+  '<b>Needs anticoagulation for a clot or prophylaxis later (remote HIT):</b> a non-heparin anticoagulant (apixaban, dabigatran, edoxaban, fondaparinux, rivaroxaban or warfarin), not heparin or LMWH. <span class="tier">ASH 7.1 · strong, very low</span>',
+  '<b>Enoxaparin label:</b> contraindicated with HIT in the past 100 days or while antibodies are present.',
+  '<b>Cardiac surgery in acute HIT or subacute A:</b> delay until subacute B or remote if you can. If not: bivalirudin, or plasma exchange then heparin, or heparin with a potent antiplatelet. <span class="tier">ASH 4.1 · good practice; conditional, low</span>',
+  '<b>Cardiac surgery in subacute B or remote HIT:</b> heparin during the operation only, avoided before and after. <span class="tier">ASH 4.2 · conditional, very low</span>',
+  '<b>PCI:</b> bivalirudin in acute or subacute A (argatroban if not available); in subacute B or remote, bivalirudin over heparin, heparin acceptable. <span class="tier">ASH 5.1, 5.2 · conditional, low / very low</span>',
+  '<b>Dialysis circuit in acute HIT:</b> argatroban or bivalirudin. Later phases, not otherwise anticoagulated: regional citrate. <span class="tier">ASH 6.1, 6.2 · conditional, very low</span>',
+  '<b>Emergency identifier</b> (bracelet or card naming heparin, HIT and the date) for HIT in the past 3 months; not after 3 months. <span class="tier">ASH 8.1 · conditional, very low</span>'
+].map(function(l){ return '<li>' + l + '</li>'; }).join('') + '</ul><div class="chips">' + chip('phase', 'remote') + '</div>';
+$('monbox').innerHTML = '<div class="tw"><table><thead><tr><th>HIT risk</th><th>Example</th><th>Platelet counts</th></tr></thead><tbody>' +
+  '<tr><td class="mono">Over 1%</td><td>UFH after surgery or trauma (highest after cardiac and orthopedic surgery)</td><td>At least every other day, day 4 to 14 or until heparin stops (ASH); every 2 to 3 days (CHEST)</td></tr>' +
+  '<tr><td class="mono">0.1 to 1%</td><td>UFH in medical or obstetric patients; LMWH after surgery or trauma</td><td>Every 2 to 3 days, day 4 to 14 (ASH). CHEST suggests no monitoring under 1%.</td></tr>' +
+  '<tr><td class="mono">Under 0.1%</td><td>LMWH in medical or obstetric patients; fondaparinux</td><td>No routine monitoring (ASH, CHEST)</td></tr></tbody></table></div>' +
+  '<p class="note">Heparin in the past 30 days: start counts on day 0, because a rapid fall is possible. <span class="tier">ASH 1.1.b · conditional, very low</span> <span class="tier">CHEST 2.1.1, 2.1.2 · 2C (table)</span></p>';
+}
+
+/* Tabs */
+var tabs = [['t-tool','p-tool'],['t-treat','p-treat'],['t-learn','p-learn'],['t-prac','p-prac']];
+function show(t){ tabs.forEach(function(p){ var on = p[0] === t; $(p[0]).setAttribute('aria-selected', String(on)); $(p[1]).classList.toggle('on', on); }); }
+tabs.forEach(function(p){ $(p[0]).addEventListener('click', function(){ show(p[0]); }); });
+document.addEventListener('click', function(e){ var g = e.target.closest && e.target.closest('[data-go-treat]'); if (g){ show('t-treat'); window.scrollTo(0, 0); } });
+function fromHash(){ var id = location.hash.slice(1); if (!id) return; var el = $(id); if (!el) return; var pan = el.closest('.panel'); if (pan) tabs.forEach(function(p){ if (p[1] === pan.id) show(p[0]); }); el.scrollIntoView(); }
+window.addEventListener('hashchange', fromHash);
+
+/* SVG helpers */
+function svgOpen(vb, label){ return '<svg viewBox="' + vb + '" role="img" aria-label="' + esc(label) + '" class="fig">'; }
+function tx(x, y, t, o){ o = o || {}; return '<text x="' + x + '" y="' + y + '" text-anchor="' + (o.a || 'middle') + '" style="' + (o.sans ? FS : FM) + ';font-size:' + (o.s || 11) + 'px;font-weight:' + (o.w || 400) + ';fill:' + (o.c || 'var(--ink)') + '">' + t + '</text>'; }
+function bx(x, y, w, h, t1, t2, stt){
+  var fill = stt === 'hot' ? 'var(--warnbg)' : stt === 'on' ? 'var(--card)' : 'var(--fill)', stroke = stt === 'hot' ? 'var(--warn)' : stt === 'on' ? 'var(--accent)' : 'var(--line)';
+  return '<g' + (stt === 'dim' ? ' opacity=".45"' : '') + '><rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="10" fill="' + fill + '" stroke="' + stroke + '"' + (stt === 'hot' || stt === 'on' ? ' stroke-width="2"' : '') + '/>' +
+    tx(x + w / 2, y + (t2 ? h / 2 - 3 : h / 2 + 4), t1, {sans: 1, s: 12, w: 600}) + (t2 ? tx(x + w / 2, y + h / 2 + 12, t2, {s: 10, c: 'var(--muted)'}) : '') + '</g>';
+}
+function mk(p){ return '<defs>' + [['n','var(--muted)'],['a','var(--accent)'],['w','var(--warn)']].map(function(k){ return '<marker id="' + p + k[0] + '" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="' + k[1] + '"/></marker>'; }).join('') + '</defs>'; }
+function ar(d, k, p){ var c = k === 'a' ? 'var(--accent)' : k === 'w' ? 'var(--warn)' : 'var(--muted)'; return '<path d="' + d + '" fill="none" stroke="' + c + '" stroke-width="2" marker-end="url(#' + p + k + ')"/>'; }
+
+/* 1. Mechanism (schematic) */
+var MECH = {
+  pf4: {n: '1 · PF4 meets heparin', line: 'Platelets release platelet factor 4 (PF4). Heparin, a long negatively charged chain, gathers several PF4 molecules into a large complex. Longer chains (unfractionated heparin) do this best, which is why HIT is about ten times commoner with UFH than with LMWH.'},
+  ab: {n: '2 · Antibody', line: 'Some patients make IgG against the PF4–heparin complex. It takes about 5 days, so the fall starts on day 5 to 10, or within a day if antibodies are already there from heparin in the past 100 days.'},
+  fc: {n: '3 · Platelets fire', line: 'The antibody-coated complex binds the platelet\'s Fc receptor (FcγRIIa) and activates it: platelets clump, release more PF4 and shed procoagulant microparticles. The loop feeds itself.'},
+  clot: {n: '4 · Clots, low count', line: 'Thrombin surges. Platelets are used up (usually a moderate fall) while veins and arteries clot. Bleeding is rare: HIT is a clotting disorder, not a bleeding one.'}
+};
+function mechSVG(k, p){
+  var order = ['pf4', 'ab', 'fc', 'clot'], at = order.indexOf(k);
+  function s(n){ return n === at ? 'hot' : n < at ? 'on' : 'dim'; }
+  var h = svgOpen('0 0 340 236', 'HIT mechanism: ' + MECH[k].n) + mk(p);
+  h += bx(8, 10, 150, 52, 'PF4 + heparin', 'large complex', s(0));
+  h += bx(182, 10, 150, 52, 'IgG antibody', 'day 5 onward', s(1));
+  h += bx(182, 92, 150, 52, 'Fc receptor', 'platelet activated', s(2));
+  h += bx(8, 92, 150, 52, 'Thrombin surge', 'microparticles', s(3));
+  h += ar('M160 36H178', at >= 1 ? 'a' : 'n', p) + ar('M257 64V88', at >= 2 ? 'a' : 'n', p) + ar('M180 118H162', at >= 3 ? 'a' : 'n', p);
+  h += ar('M83 146V168', at >= 3 ? 'w' : 'n', p) + ar('M120 146L200 170', at >= 3 ? 'w' : 'n', p);
+  h += bx(8, 172, 150, 52, 'Platelets fall', 'consumed', at >= 3 ? 'hot' : 'dim');
+  h += bx(182, 172, 150, 52, 'Clots', 'venous > arterial', at >= 3 ? 'hot' : 'dim');
+  return h + '</svg>';
+}
+
+/* 2. Timing (schematic platelet curves) */
+var TIME = {
+  typical: {n: 'Typical', line: 'Heparin from day 0. The count holds, then falls from day 5 to 10 by more than half. Stopping heparin and switching lets it recover over about a week. 4Ts timing: 2.', hep: [0, 9], pts: [[0,250],[5,245],[6,200],[8,90],[9,80],[11,120],[14,190],[17,240],[20,250]]},
+  rapid: {n: 'Rapid onset', line: 'Heparin in the past 100 days left antibodies behind: the count falls within a day of restarting. Within 30 days scores 2; 30 to 100 days scores 1. In the classic series the median onset was 10.5 hours.', hep: [0, 4], pts: [[0,240],[0.5,170],[1,110],[2,90],[4,95],[7,150],[10,210],[13,240],[20,245]]},
+  delayed: {n: 'Delayed', line: 'Heparin stopped, patient sent home, then back with a clot and a falling count: in one series this came a mean of 9 days (5 to 19) after the last dose, and it can appear up to 3 weeks later. More heparin makes it worse.', hep: [0, 6], pts: [[0,250],[6,242],[10,238],[11,205],[13,120],[15,80],[17,92],[19,140],[20,165]]},
+  early: {n: 'Early fall', line: 'A fall in the first 1 to 3 days without recent heparin is not HIT: surgery, bypass, bleeding, dilution or sepsis. After surgery the count usually recovers by day 4 to 5; a second fall after that is the warning sign. 4Ts timing: 0.', hep: [0, 9], pts: [[0,240],[1,160],[2,130],[3,135],[5,190],[7,240],[10,270],[14,280],[20,270]]}
+};
+function timeSVG(k, p){
+  var d = TIME[k], X = function(day){ return 44 + day * 14; }, Y = function(v){ return 190 - v * 0.55; };
+  var h = svgOpen('0 0 340 232', 'Platelet count over days: ' + d.n);
+  h += '<line x1="44" y1="190" x2="324" y2="190" stroke="var(--line)"/><line x1="44" y1="30" x2="44" y2="190" stroke="var(--line)"/>';
+  [0, 5, 10, 15, 20].forEach(function(dd){ h += '<line x1="' + X(dd) + '" y1="190" x2="' + X(dd) + '" y2="194" stroke="var(--muted)"/>' + tx(X(dd), 206, dd); });
+  h += tx(184, 222, 'day of heparin', {c: 'var(--muted)', s: 10});
+  [100, 200].forEach(function(v){ h += '<line x1="44" y1="' + Y(v) + '" x2="324" y2="' + Y(v) + '" stroke="var(--line)" stroke-dasharray="2 4"/>' + tx(38, Y(v) + 4, v, {a: 'end', s: 10}); });
+  h += '<rect x="' + X(5) + '" y="30" width="' + (X(10) - X(5)) + '" height="160" fill="var(--fill)"/>' + tx((X(5) + X(10)) / 2, 44, 'day 5–10', {s: 10, c: 'var(--muted)'});
+  h += '<rect x="' + X(d.hep[0]) + '" y="16" width="' + (X(d.hep[1]) - X(d.hep[0])) + '" height="8" rx="4" fill="var(--accent)" opacity=".8"/>' + tx(X(d.hep[1]) + 4, 24, 'heparin', {a: 'start', s: 10, c: 'var(--accent)'});
+  h += '<polyline points="' + d.pts.map(function(q){ return X(q[0]) + ',' + Y(q[1]); }).join(' ') + '" fill="none" stroke="var(--warn)" stroke-width="2.5" stroke-linejoin="round"/>';
+  if (k === 'rapid') h += tx(X(0) + 4, 64, 'antibodies already present', {a: 'start', s: 10, c: 'var(--muted)'});
+  if (k === 'delayed') h += tx(X(10), 64, 'after heparin stopped', {a: 'start', s: 10, c: 'var(--muted)'});
+  return h + '</svg>';
+}
+
+/* 3. Probability ladder */
+var LAD = {
+  low: {n: 'Low 0–3', line: 'Negative predictive value 0.998: do not test, do not stop heparin, find the other cause.'},
+  mid: {n: 'Intermediate 4–5', line: 'Positive predictive value 0.14: stop heparin, start an alternative, send the immunoassay.'},
+  high: {n: 'High 6–8', line: 'Positive predictive value 0.64: stop heparin, start a therapeutic alternative, send the immunoassay.'}
+};
+function ladSVG(k, p){
+  var rows = [['high', '6–8', 'High', 'PPV 0.64'], ['mid', '4–5', 'Intermediate', 'PPV 0.14'], ['low', '0–3', 'Low', 'NPV 0.998']];
+  var h = svgOpen('0 0 340 196', '4Ts probability bands, ' + LAD[k].n) + mk(p);
+  rows.forEach(function(r, n){ var y = 10 + n * 60; h += bx(8, y, 200, 50, r[2] + ' · ' + r[1], r[3], r[0] === k ? 'hot' : 'dim'); h += tx(220, y + 22, r[0] === 'low' ? 'keep heparin' : 'stop heparin', {a: 'start', s: 11, w: r[0] === k ? 600 : 400, c: r[0] === k ? 'var(--ink)' : 'var(--muted)'}) + tx(220, y + 38, r[0] === 'low' ? 'no test' : 'immunoassay', {a: 'start', s: 10, c: 'var(--muted)'}); });
+  return h + '</svg>';
+}
+
+/* 4. Immunoassay OD (Warkentin 2008) */
+var ODS = {
+  neg: {n: 'Under 0.40', line: 'Negative at the usual cutoff. With an intermediate or high 4Ts score, stop the alternative and resume heparin if needed.', x: 0.2},
+  weak: {n: '0.40–0.99', line: 'Weak positive: 5% or less had a strong-positive serotonin release assay. Most of these are antibodies that do not activate platelets.', x: 0.7},
+  mod: {n: '1.00–1.39', line: 'Under half had a strong-positive serotonin release assay. The functional assay decides.', x: 1.2},
+  strong: {n: '1.40–1.99', line: 'Half or more had a strong-positive serotonin release assay.', x: 1.7},
+  vstrong: {n: '2.00 and above', line: 'About 90% had a strong-positive serotonin release assay. With a high 4Ts score this is very likely HIT.', x: 2.5}
+};
+function odSVG(k, p){
+  var X = function(v){ return 20 + v / 3 * 300; }, bands = [[0, 0.4, 'neg'], [0.4, 1.0, 'weak'], [1.0, 1.4, 'mod'], [1.4, 2.0, 'strong'], [2.0, 3.0, 'vstrong']];
+  var pct = {neg: '', weak: '≤5%', mod: '<50%', strong: '≥50%', vstrong: '~90%'};
+  var h = svgOpen('0 0 340 120', 'Immunoassay optical density bands: ' + ODS[k].n);
+  bands.forEach(function(b){ var on = b[2] === k; h += '<rect x="' + X(b[0]) + '" y="30" width="' + (X(b[1]) - X(b[0]) - 2) + '" height="36" rx="6" fill="' + (on ? 'var(--warnbg)' : 'var(--fill)') + '" stroke="' + (on ? 'var(--warn)' : 'var(--line)') + '"' + (on ? ' stroke-width="2"' : '') + '/>' + tx((X(b[0]) + X(b[1])) / 2, 53, pct[b[2]] || 'neg', {s: 11, w: on ? 600 : 400}); });
+  [0, 0.4, 1.0, 1.4, 2.0, 3.0].forEach(function(v){ h += tx(X(v), 84, v.toFixed(1), {s: 10, c: 'var(--muted)'}); });
+  h += tx(170, 104, 'OD units · % with a strong-positive SRA', {s: 10, c: 'var(--muted)'});
+  h += tx(170, 20, 'one laboratory\'s series (2008)', {s: 10, c: 'var(--muted)'});
+  return h + '</svg>';
+}
+
+/* 5. Treatment pitfalls (schematic) */
+var TRT_F = {
+  stop: {n: 'Stopping heparin alone', line: 'In a series of 62 patients with confirmed HIT and no clot, about half (52.8%) had a clot within 30 days when heparin was simply stopped, or swapped for warfarin. The antibody keeps firing for days: an alternative anticoagulant covers that window.'},
+  warf: {n: 'Early warfarin', line: 'Warfarin lowers protein C (an anticoagulant) within a day or two, long before it lowers thrombin. In acute HIT that tips the balance toward microvascular clotting: venous limb gangrene, with a very high INR as the clue. Wait for platelets of 150 or more; if already on warfarin, give vitamin K.'},
+  plt: {n: 'Platelet transfusion', line: 'The count is low because platelets are being activated and consumed, and bleeding is uncommon. ASH suggests no routine platelet transfusion; keep it for active bleeding or a high-risk procedure.'}
+};
+function trtSVG(k, p){
+  var h = svgOpen('0 0 340 190', 'Treatment pitfall: ' + TRT_F[k].n) + mk(p);
+  if (k === 'stop'){
+    h += bx(8, 20, 150, 50, 'Heparin stopped', 'antibody still active', 'on') + ar('M160 45H180', 'w', p) + bx(182, 20, 150, 50, 'No alternative', 'days of activation', 'hot');
+    h += ar('M257 72V96', 'w', p) + bx(140, 100, 192, 60, '~1 in 2 clot', 'within 30 days (1996)', 'hot');
+  } else if (k === 'warf'){
+    h += bx(8, 20, 150, 50, 'Warfarin starts', 'all K-dependent factors', 'on') + ar('M83 72V96', 'w', p) + bx(8, 100, 150, 50, 'Protein C falls', 'first, within days', 'hot');
+    h += bx(182, 20, 150, 50, 'Thrombin', 'still high in HIT', 'hot') + ar('M160 125H180', 'w', p) + bx(182, 100, 150, 60, 'Microvascular clots', 'venous limb gangrene', 'hot');
+  } else {
+    h += bx(8, 20, 150, 50, 'Low count', 'from consumption', 'on') + ar('M160 45H180', 'n', p) + bx(182, 20, 150, 50, 'Bleeding', 'uncommon', 'dim');
+    h += ar('M83 72V96', 'w', p) + bx(8, 100, 324, 50, 'Transfuse only for bleeding or a risky procedure', 'ASH 3.6 · conditional, low', 'on');
+  }
+  return h + '</svg>';
+}
+
+/* 6. Phases (ASH Table 1; Warkentin 2001 medians) */
+var PH = {
+  acute: {n: 'Acute', line: 'Count low, both assays positive. Highly prothrombotic until the count recovers. No heparin; non-heparin anticoagulant at therapeutic dose; delay cardiac surgery if you can.'},
+  subA: {n: 'Subacute A', line: 'Count recovered, functional assay still positive. Still no heparin. A DOAC is preferred over warfarin (ASH 3.9). Delay cardiac surgery if feasible.'},
+  subB: {n: 'Subacute B', line: 'Functional assay negative, immunoassay still positive. Cardiac surgery can use heparin during the operation only (ASH 4.2).'},
+  remote: {n: 'Remote', line: 'Both assays negative: in one series the antibodies became undetectable a median of 50 to 85 days after HIT, depending on the assay. Brief heparin for surgery is possible; for clots or prophylaxis use a non-heparin anticoagulant (ASH 7.1).'}
+};
+function phSVG(k, p){
+  var ord = ['acute', 'subA', 'subB', 'remote'], w = 64, x0 = 82;
+  var h = svgOpen('0 0 352 170', 'Phases of HIT: ' + PH[k].n);
+  ord.forEach(function(q, n){ var x = x0 + n * (w + 4), on = q === k; h += '<rect x="' + x + '" y="20" width="' + w + '" height="44" rx="8" fill="' + (on ? 'var(--warnbg)' : 'var(--fill)') + '" stroke="' + (on ? 'var(--warn)' : 'var(--line)') + '"' + (on ? ' stroke-width="2"' : '') + '/>' + tx(x + w / 2, 39, PH[q].n.split(' ')[0], {sans: 1, s: 11, w: 600}) + (PH[q].n.split(' ')[1] ? tx(x + w / 2, 54, PH[q].n.split(' ')[1], {sans: 1, s: 11, w: 600}) : ''); });
+  var rows = [['Platelets', ['low', 'normal', 'normal', 'normal']], ['Functional', ['+', '+', '−', '−']], ['Immunoassay', ['+', '+', '+', '−']], ['Heparin', ['no', 'no', 'surgery', 'surgery']]];
+  rows.forEach(function(r, m){ var y = 90 + m * 22; h += tx(4, y, r[0], {a: 'start', s: 10, c: 'var(--muted)'}); r[1].forEach(function(v, n){ h += tx(x0 + n * (w + 4) + w / 2, y, v, {s: 11, w: ord[n] === k ? 600 : 400, c: ord[n] === k ? 'var(--ink)' : 'var(--muted)'}); }); });
+  return h + '</svg>';
+}
+
+var FIGS = {
+  mech: {t: 'How HIT works', states: ['pf4', 'ab', 'fc', 'clot'], data: MECH, svg: mechSVG},
+  time: {t: 'When the count falls', states: ['typical', 'rapid', 'delayed', 'early'], data: TIME, svg: timeSVG},
+  ladder: {t: '4Ts probability bands', states: ['low', 'mid', 'high'], data: LAD, svg: ladSVG},
+  od: {t: 'Immunoassay optical density', states: ['neg', 'weak', 'mod', 'strong', 'vstrong'], data: ODS, svg: odSVG},
+  treat: {t: 'Three treatment pitfalls', states: ['stop', 'warf', 'plt'], data: TRT_F, svg: trtSVG},
+  phase: {t: 'Phases of HIT', states: ['acute', 'subA', 'subB', 'remote'], data: PH, svg: phSVG}
+};
+var ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M7 15l3-4 3 3 2-2 2 3"/></svg>';
+var figN = 0;
+function mountFig(host, id, state){
+  var F = FIGS[id], pre = 'f' + (++figN) + '-';
+  function draw(k){
+    var d = F.data[k];
+    host.innerHTML = '<div class="states" role="group" aria-label="' + esc(F.t) + '">' + F.states.map(function(x){ return '<button class="sbtn" data-k="' + x + '" aria-pressed="' + (x === k) + '">' + esc(F.data[x].n) + '</button>'; }).join('') + '</div>' + F.svg(k, pre) + '<p class="line1">' + esc(d.line) + '</p>';
+  }
+  host.onclick = function(e){ var b = e.target.closest && e.target.closest('[data-k]'); if (b) draw(b.getAttribute('data-k')); };
+  draw(state && F.data[state] ? state : F.states[0]);
+}
+function chip(fig, state, label){ return '<button class="chip" data-fig="' + fig + '" data-state="' + (state || '') + '">' + ICON + esc(label || FIGS[fig].t) + '</button>'; }
+var lastFocus = null;
+function openSheet(fig, state){
+  lastFocus = document.activeElement;
+  $('sheet-t').textContent = FIGS[fig].t;
+  mountFig($('sheet-b'), fig, state);
+  $('scrim').hidden = false; $('sheet').hidden = false; $('sheet').scrollTop = 0; $('sheet-x').focus();
+}
+function closeSheet(){ if ($('sheet').hidden) return; $('scrim').hidden = true; $('sheet').hidden = true; if (lastFocus && lastFocus.focus) lastFocus.focus(); }
+$('sheet-x').addEventListener('click', closeSheet); $('scrim').addEventListener('click', closeSheet);
+document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeSheet(); });
+document.addEventListener('click', function(e){ var c = e.target.closest && e.target.closest('[data-fig]'); if (c) openSheet(c.getAttribute('data-fig'), c.getAttribute('data-state')); });
+
+/* Learn: 4Ts tap grid (same score() as the tool) */
+(function(){
+  var on = {plt: null, tim: null, thr: null, oth: null};
+  var items = [['plt', 'Thrombocytopenia', PLT.map(function(p){ return [p[0], p[2]]; }), function(v){ return v; }],
+    ['tim', 'Timing', [['d510', 'Day 5–10, or within 1 day with heparin in 30 days'], ['unclear', 'Unclear, after day 10, or within 1 day with heparin 30–100 days ago'], ['early', 'Before day 4, no recent heparin']]],
+    ['thr', 'Thrombosis', [['newclot', 'New clot, skin necrosis, or reaction to a bolus'], ['susp', 'Progressing, suspected, or red skin lesions'], ['none', 'None']]],
+    ['oth', 'Other cause', [['none', 'None apparent'], ['possible', 'Possible'], ['definite', 'Definite']]]];
+  var pts = {d510: 2, unclear: 1, early: 0, newclot: 2, susp: 1, none: 0, possible: 1, definite: 0};
+  function draw(){
+    $('t4-tap').innerHTML = items.map(function(it){ return '<p class="qn">' + it[1] + '</p><div class="opts" data-h="' + it[0] + '">' + it[2].map(function(c){ var v = c[0], p0 = it[0] === 'plt' ? v : (it[0] === 'oth' ? OTH[v][0] : pts[v]); return '<button class="opt" data-v="' + v + '" aria-pressed="' + (String(on[it[0]]) === String(v)) + '"><span>' + esc(c[1]) + '</span><span class="pt">' + p0 + '</span></button>'; }).join('') + '</div>'; }).join('');
+    var s = score({plt: on.plt, tim: on.tim, thr: on.thr, oth: on.oth});
+    $('t4-sum').textContent = s.full ? 'Score ' + s.sum + ' · ' + PROB[s.band].n.split(' · ')[1] : 'Score ' + s.min + ' to ' + s.max + ' so far';
+    $('t4-line').textContent = s.band ? LAD[s.band].line : 'Tap one row for each item.';
+    if (s.band) mountFig($('t4-ladder'), 'ladder', s.band);
+  }
+  $('t4-tap').addEventListener('click', function(e){ var b = e.target.closest('[data-v]'); if (!b) return; var k = b.parentNode.getAttribute('data-h'), v = b.getAttribute('data-v'); on[k] = k === 'plt' ? +v : v; draw(); });
+  draw();
+})();
+
+/* Learn: OD slider */
+(function(){
+  function draw(){ var v = parseFloat($('odslide').value), b = odBand(v); $('odfig').innerHTML = odSVG(b.k, 'od-') + '<p class="line1"><b class="mono">' + v.toFixed(1) + '</b> · ' + esc(ODS[b.k].line) + '</p>'; }
+  $('odslide').addEventListener('input', draw); draw();
+})();
+
+/* Learn: narrowing workup (expert practice) */
+var CAUSES = [['hit', 'HIT'], ['sepsis', 'Sepsis or DIC'], ['drug', 'Another drug (immune)'], ['surg', 'Surgery, bypass, dilution'], ['pseudo', 'Clumping (pseudothrombocytopenia)'], ['tma', 'TTP or other microangiopathy'], ['liver', 'Liver disease, big spleen'], ['gp', 'GP IIb/IIIa inhibitor']];
+var FEATS = {
+  d510: {n: 'Fall began day 5–10 of heparin', fav: ['hit', 'drug'], out: {surg: 'Post-operative falls start on day 1 to 3 and recover by day 4 to 5.', pseudo: 'Clumping does not follow the heparin calendar.', liver: 'Hypersplenism is chronic, not a new fall.', gp: 'GP IIb/IIIa inhibitors drop the count within hours of starting.'}},
+  early: {n: 'Fell day 1–3 after surgery, now recovering', fav: ['surg'], out: {hit: 'Without heparin in the past 100 days, HIT cannot start this early, and HIT does not recover on heparin.', liver: 'A chronic low count does not fall and recover.'}},
+  clump: {n: 'Clumps on the smear; normal in a citrate tube', fav: ['pseudo'], out: {hit: 'The real count is normal.', sepsis: 'The real count is normal.', drug: 'The real count is normal.', surg: 'The real count is normal.', tma: 'The real count is normal.', liver: 'The real count is normal.', gp: 'The real count is normal (GP IIb/IIIa inhibitors can cause clumping too, but check the citrate count).'}},
+  schist: {n: 'Schistocytes on the smear', fav: ['tma', 'sepsis'], out: {pseudo: 'Fragmented red cells mean a real microangiopathy.'}},
+  coag: {n: 'High INR, low fibrinogen', fav: ['sepsis', 'liver'], out: {pseudo: 'A coagulopathy is real disease.', tma: 'TTP usually leaves the INR and fibrinogen near normal.'}},
+  immneg: {n: 'Immunoassay negative', fav: [], out: {hit: 'The immunoassay is very sensitive: a negative result makes HIT very unlikely.'}},
+  immpos: {n: 'Immunoassay OD 2.0 or more', fav: ['hit'], out: {}}
+};
+(function(){
+  var on = {};
+  function draw(){
+    $('why-feats').innerHTML = Object.keys(FEATS).map(function(k){ return '<button class="sbtn" data-f="' + k + '" aria-pressed="' + !!on[k] + '">' + esc(FEATS[k].n) + '</button>'; }).join('');
+    var out = {}, fav = {};
+    Object.keys(on).forEach(function(k){ if (!on[k]) return; var f = FEATS[k]; Object.keys(f.out).forEach(function(c){ out[c] = f.out[c]; }); f.fav.forEach(function(c){ fav[c] = true; }); });
+    $('why-causes').innerHTML = CAUSES.map(function(c){ var o = out[c[0]]; return '<div class="cause' + (o ? ' out' : fav[c[0]] ? ' fav' : '') + '"><span>' + esc(c[1]) + '</span><small>' + (o ? esc(o) : fav[c[0]] ? 'fits' : '') + '</small></div>'; }).join('') + '<p class="note" style="margin-top:8px">Expert practice. A positive immunoassay with a low 4Ts score is usually an antibody without disease.</p>';
+  }
+  $('why-feats').addEventListener('click', function(e){ var b = e.target.closest('[data-f]'); if (!b) return; var k = b.getAttribute('data-f'); on[k] = !on[k]; if (k === 'immneg' && on[k]) on.immpos = false; if (k === 'immpos' && on[k]) on.immneg = false; draw(); });
+  draw();
+})();
+
+/* Learn: pills and evidence */
+var TRIALS = [
+  {q: '4Ts: does a bedside score sort patients before testing?', d: 'Prospective, two centres (Hamilton, Canada; Greifswald, Germany), 336 patients.', r: 'Antibody positive: low score 1/64 and 0/55; intermediate 8/28 and 11/139; high 8/8 and 9/42.', c: 'The score ASH recommends over gestalt. Positive predictive value depends on who scores it.', cite: 'Lo GK et al., J Thromb Haemost 2006;4:759', doi: '10.1111/j.1538-7836.2006.01787.x'},
+  {q: 'How reliable is a low 4Ts score?', d: 'Meta-analysis of 13 studies, 3,068 patients.', r: 'Low score: negative predictive value 0.998 (0.970–1.000). Positive predictive value 0.14 (intermediate) and 0.64 (high).', c: 'A low score rules HIT out; intermediate and high scores need the test.', cite: 'Cuker A et al., Blood 2012;120:4160', doi: '10.1182/blood-2012-07-443051'},
+  {q: 'Is LMWH safer than UFH?', d: 'Randomized double-blind trial of prophylaxis after hip surgery, 665 patients, daily platelet counts.', r: 'HIT 9/332 with UFH vs 0/333 with LMWH (2.7% vs 0%). 8 of the 9 had a clot.', c: 'Established the lower HIT risk with LMWH and the link between HIT and thrombosis.', cite: 'Warkentin TE et al., N Engl J Med 1995;332:1330', doi: '10.1056/NEJM199505183322003'},
+  {q: 'Is stopping heparin enough in HIT without a clot?', d: 'Cohort of 127 patients with confirmed HIT in one community; 62 recognized with isolated thrombocytopenia.', r: 'Thrombosis within 30 days in 52.8% of the isolated group, whether heparin was simply stopped or replaced with warfarin.', c: 'The reason isolated HIT is treated with an alternative anticoagulant. Older, single-centre, observational.', cite: 'Warkentin TE, Kelton JG, Am J Med 1996;101:502', doi: '10.1016/s0002-9343(96)00258-6'},
+  {q: 'Does argatroban improve outcomes?', d: 'Prospective, non-randomized; 304 patients on argatroban 2 mcg/kg/min (aPTT 1.5–3 times baseline) vs 193 historical controls.', r: 'Death, amputation or new clot at 37 days: 25.6% vs 38.8% in isolated HIT (P=0.014); 43.8% vs 56.5% with thrombosis (P=0.13). Bleeding similar.', c: 'Supports argatroban in HIT. Historical controls, not randomized.', cite: 'Lewis BE et al., Circulation 2001;103:1838', doi: '10.1161/01.cir.103.14.1838'},
+  {q: 'Can rivaroxaban treat HIT?', d: 'Prospective single-arm cohort, 22 patients with suspected or confirmed HIT; 15 mg twice daily, then 20 mg daily to day 30.', r: 'New thrombosis 1 of 22 (4.5%, 95% CI 0–23.5%); one amputation; platelets recovered in 9 of 10 HIT-positive patients.', c: 'With later case series (rivaroxaban: thrombosis 1/46, major bleeding 0/46; Blood 2017), the basis for DOACs in ASH 2018. Small and uncontrolled.', cite: 'Linkins LA et al., J Thromb Haemost 2016;14:1206', doi: '10.1111/jth.13330'}
+];
+(function(){
+  var chaps = [].slice.call(document.querySelectorAll('.chap'));
+  $('pills').innerHTML = chaps.map(function(c, n){ return '<button class="pill" data-go="' + c.id + '" aria-current="' + (n === 0) + '">' + (n + 1) + ' ' + esc(c.getAttribute('data-pill')) + '</button>'; }).join('');
+  $('pills').addEventListener('click', function(e){ var g = e.target.getAttribute('data-go'); if (g) $(g).scrollIntoView(); });
+  function mark(id){ [].forEach.call($('pills').children, function(b){ var on = b.getAttribute('data-go') === id; b.setAttribute('aria-current', String(on)); if (on) $('pills').scrollLeft = Math.max(0, b.offsetLeft - 60); }); }
+  if ('IntersectionObserver' in window){ var io = new IntersectionObserver(function(es){ es.forEach(function(en){ if (en.isIntersecting) mark(en.target.id); }); }, {rootMargin: '-30% 0px -60% 0px'}); chaps.forEach(function(c){ io.observe(c); }); }
+  $('trialbox').innerHTML = TRIALS.map(function(t){ return '<div class="trial" style="margin-top:14px"><p><b>' + esc(t.q) + '</b></p><p><span class="k">Design</span>' + esc(t.d) + '</p><p><span class="k">Result</span>' + esc(t.r) + '</p><p><span class="k">What it changed</span>' + esc(t.c) + '</p><p class="mono" style="font-size:13px"><a href="https://doi.org/' + t.doi + '" rel="noopener">' + esc(t.cite) + '</a></p></div>'; }).join('');
+  $('go-prac').addEventListener('click', function(){ show('t-prac'); window.scrollTo(0, 0); });
+})();
+document.querySelectorAll('[data-figure]').forEach(function(h){ if (h.id !== 't4-ladder') mountFig(h, h.getAttribute('data-figure'), h.getAttribute('data-state')); });
+
+/* Practice: cases run through the same engine */
+var CASES = [
+  {t: 'Day 1 after bypass surgery', s: 'Man, 66, day 1 after coronary bypass on heparin prophylaxis. Platelets 220 before surgery, 110 today. No heparin before this admission. No clots. Bypass and blood loss explain it.', i: {peak: 220, nadir: 110, postop: true, tim: 'early', thr: 'none', oth: 'definite'}, p: 'Low (1 point): a 50% fall right after bypass with no earlier heparin. Keep heparin, do not test. Recheck if it falls again after day 4.'},
+  {t: 'Day 7 on subcutaneous heparin', s: 'Woman, 71, admitted with pneumonia, now improving; heparin 5,000 units twice daily since admission. Platelets 260 on day 4, 90 on day 7. No clots, no new drugs, cultures negative. 80 kg, CrCl 70, average bleeding risk.', i: {peak: 260, nadir: 90, tim: 'd510', thr: 'none', oth: 'none', wt: 80, crcl: 70}, p: 'High (6): stop heparin, start a therapeutic alternative and send the immunoassay. Stable at average bleeding risk: rivaroxaban 15 mg twice daily is a reasonable choice. Ultrasound both legs.'},
+  {t: 'Septic and bleeding', s: 'Man, 58, in the ICU with septic shock and a recent GI bleed; on heparin prophylaxis. Platelets 180 on day 2, 70 on day 6. No clots. Sepsis could explain some of it. 70 kg, CrCl 45, no other reason for anticoagulation.', i: {peak: 180, nadir: 70, tim: 'd510', thr: 'none', oth: 'possible', bleed: true, sick: true, wt: 70, crcl: 45}, p: 'Intermediate (5): stop heparin and send the immunoassay. High bleeding risk and no other indication: a prophylactic-intensity alternative while it is pending (ASH 2.4.b); with a recent bleed, a short-acting IV agent such as argatroban.'},
+  {t: 'Back within two weeks', s: 'Woman, 63, had heparin during a hospital stay 2 weeks ago. Readmitted with a new leg DVT; started on a heparin infusion, and 10 hours later platelets are 100 (230 on arrival). 90 kg, CrCl 20.', i: {peak: 230, nadir: 100, tim: 'rapid30', thr: 'newclot', oth: 'none', wt: 90, crcl: 20, clot: true}, p: 'High (8): rapid-onset HIT with thrombosis. Stop heparin; with CrCl 20, argatroban 2 mcg/kg/min (10.8 mL/h at 1 mg/mL), aPTT at 2 h.'},
+  {t: 'The test comes back negative', s: 'Man, 70, on heparin after a hip fracture repair. Platelets 200 on day 3, 120 on day 8. No clots; possible other cause (a new antibiotic). The intermediate score led to an alternative and an immunoassay, which is negative.', i: {peak: 200, nadir: 120, tim: 'd510', thr: 'none', oth: 'possible', imm: 'neg'}, p: 'Intermediate (4) with a negative immunoassay: stop the alternative and resume heparin if still indicated (ASH 2.7, strong).'},
+  {t: 'Positive, on warfarin, liver disease', s: 'Woman, 55, with cirrhosis (Child-Pugh B), on warfarin for AF, bridged with heparin after a procedure. Platelets 150 to 60 on day 6; new skin necrosis at injection sites; no other cause. Immunoassay positive, OD 2.3. 110 kg, CrCl 60, stable.', i: {peak: 150, nadir: 60, tim: 'd510', thr: 'necrosis', oth: 'none', imm: 'pos', od: 2.3, warf: true, ind: true, liver: 'cp', wt: 110, crcl: 60}, p: 'High (8), immunoassay strongly positive: treat as HIT. Stop warfarin and give IV vitamin K. Rivaroxaban is avoided in Child-Pugh B: fondaparinux 10 mg daily at 110 kg.'},
+  {t: 'Late and lumpy', s: 'Man, 49, on enoxaparin for 12 days. Platelets 240 to 150 starting on day 11; red, non-necrotic lesions at injection sites; a new antibiotic could explain it. On dialysis.', i: {peak: 240, nadir: 150, tim: 'late', thr: 'red', oth: 'possible', dial: true, crcl: 10, wt: 60}, p: 'Intermediate (4): stop enoxaparin and send the immunoassay. On dialysis: argatroban, which needs no kidney adjustment.'}
+];
+var BN = {low: 'Low', mid: 'Intermediate', high: 'High'};
+(function(){
+  $('practice').innerHTML = CASES.map(function(c, n){
+    return '<div class="card case" id="' + (n ? 'case' + n : 'practice') + '"><p class="label">Case ' + (n + 1) + '</p><h2>' + esc(c.t) + '</h2><p>' + esc(c.s) + '</p><p><b>4Ts probability?</b></p><div class="row" data-case="' + n + '">' + ['low', 'mid', 'high'].map(function(z){ return '<button class="btn ghost" data-z="' + z + '">' + BN[z] + '</button>'; }).join('') + '</div><div class="ans" id="ans' + n + '" hidden></div></div>';
+  }).join('');
+})();
+function caseIn(c){ var i = {}, k; for (k in c.i) i[k] = c.i[k]; if (!i.imm) i.imm = 'notsent'; if (!i.fun) i.fun = 'notsent'; if (!i.liver) i.liver = 'none'; return i; }
+$('practice').addEventListener('click', function(e){
+  var b = e.target.closest('[data-z]'); if (b){ var n = +b.parentNode.getAttribute('data-case'), c = CASES[n], i = caseIn(c), o = assess(i), t = treat(i);
+    $('ans' + n).innerHTML = '<p><b>' + (b.getAttribute('data-z') === o.band ? 'Right: ' : 'The tool says: ') + BN[o.band] + ' (' + o.s.sum + ').</b> ' + esc(c.p) + '</p><p class="sub"><b>' + esc(o.head) + '.</b>' + (t.kind === 'pick' ? ' ' + esc(t.head) + '.' : '') + '</p>' + (o.why ? '<p class="sub">' + esc(o.why) + '</p>' : '') + '<div class="row"><button class="btn ghost" data-load="' + n + '">Open in the tool</button></div>'; $('ans' + n).hidden = false; return; }
+  var l = e.target.closest('[data-load]'); if (l){ var c2 = caseIn(CASES[+l.getAttribute('data-load')]);
+    st = {plt: null, tim: c2.tim, thr: c2.thr, oth: c2.oth, imm: c2.imm, fun: c2.fun, t: {}};
+    ['postop', 'ind', 'bleed', 'warf', 'cvc', 'sick', 'proc', 'limb', 'clot', 'hf', 'dial'].forEach(function(k){ if (c2[k]) st.t[k] = true; });
+    $('peak').value = c2.peak; $('nadir').value = c2.nadir; $('od').value = c2.od != null ? c2.od : ''; $('wt').value = c2.wt != null ? c2.wt : ''; $('crcl').value = c2.crcl != null ? c2.crcl : ''; $('pltnow').value = ''; $('liver').value = c2.liver;
+    drawInputs(); render(); show('t-tool'); window.scrollTo(0, 0); }
+});
+window.__cases = CASES; window.__caseIn = caseIn;
+drawStatic(); drawInputs(); render(); fromHash();
+})();
+</script>
+</body>
+</html>
