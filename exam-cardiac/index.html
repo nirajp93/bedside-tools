@@ -78,7 +78,7 @@ details.more ul{padding-left:18px}
 .lr{font-family:var(--mono);font-size:12px;padding:2px 7px;border-radius:6px;background:var(--fill);white-space:nowrap}
 .lr.up{color:var(--bad);background:var(--badbg)}
 .lr.down{color:var(--ok);background:var(--okbg)}
-.tag{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:2px 6px;border-radius:5px;background:var(--fill);color:var(--muted)}
+.tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;padding:2px 6px;border-radius:5px;background:var(--fill);color:var(--muted)}
 .tri{display:inline-grid;grid-auto-flow:column;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--card)}
 .tri button{min-width:46px;min-height:44px;font-size:13px;color:var(--muted);border-left:1px solid var(--line)}
 .tri button:first-child{border-left:0}
@@ -151,7 +151,7 @@ footer p{margin-top:8px}
 .curvecap{font-size:13px;color:var(--muted);margin:4px 0 0}
 .extab{width:100%;border-collapse:collapse;font-size:14px;margin:8px 0}
 .extab th,.extab td{padding:6px;border-bottom:1px solid var(--line);text-align:left}
-.extab th{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:400}
+.extab th{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:400}
 .dp{margin-top:10px;border:1px solid var(--line);border-radius:12px;padding:2px 12px;background:var(--card);text-align:left}
 .dp:empty{display:none}
 .dp>div{padding:10px 0;border-top:1px solid var(--line)}
@@ -392,7 +392,7 @@ function pcgSVG(k,mode){
   var sp=insp?s.split.insp:s.split.exp,g="";
   g+='<line x1="12" y1="'+mid+'" x2="'+(W-12)+'" y2="'+mid+'" stroke="var(--line)" stroke-width="1.5"/>';
   function bar(ms,h,w){return '<rect x="'+(x(ms)-w/2).toFixed(1)+'" y="'+(mid-h)+'" width="'+w+'" height="'+(2*h)+'" rx="2" fill="var(--ink)"/>'}
-  function lab(ms,t){return '<text x="'+x(ms).toFixed(1)+'" y="'+(H-3)+'" text-anchor="middle" style="font-family:var(--mono);font-size:10px" fill="var(--muted)">'+t+'</text>'}
+  function lab(ms,t){return '<text x="'+x(ms).toFixed(1)+'" y="'+(H-3)+'" text-anchor="middle" style="font-family:var(--mono);font-size:10.5px" fill="var(--muted)">'+t+'</text>'}
   var mur=s.mur;
   if(mur){var amp=vals&&s.valsalva?26:18,pts=[];
     for(var ms=mur.start;ms<=mur.end;ms+=8){var u=(ms-mur.start)/(mur.end-mur.start),a;
@@ -404,7 +404,7 @@ function pcgSVG(k,mode){
   if(sp>0){var first=s.split.rev?"P2":"A2",second=s.split.rev?"A2":"P2";g+=bar(320,22,5)+bar(320+sp,16,4)+lab(320-6,first)+lab(320+sp+8,second)}else g+=bar(320,22,5)+lab(320,"S2");
   if(s.s3)g+=bar(470,14,6)+lab(470,"S3");
   if(s.os)g+=bar(400,12,4)+lab(398,"OS");
-  g+='<text x="'+x(160)+'" y="12" text-anchor="middle" style="font-family:var(--mono);font-size:9px" fill="var(--muted)">systole</text><text x="'+x(560)+'" y="12" text-anchor="middle" style="font-family:var(--mono);font-size:9px" fill="var(--muted)">diastole</text>';
+  g+='<text x="'+x(160)+'" y="12" text-anchor="middle" style="font-family:var(--mono);font-size:10.5px" fill="var(--muted)">systole</text><text x="'+x(560)+'" y="12" text-anchor="middle" style="font-family:var(--mono);font-size:10.5px" fill="var(--muted)">diastole</text>';
   return '<svg class="pcg" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Phonocardiogram: '+esc(s.t)+(insp?", inspiration":vals?", Valsalva":"")+'">'+g+'</svg>'}
 var actx=null;
 function ac(){if(!actx){var A=window.AudioContext||window.webkitAudioContext;if(!A)return null;actx=new A()}if(actx.state==="suspended")actx.resume();return actx}
@@ -461,7 +461,7 @@ function jvpWave(state){
   var d="M"+pts.map(function(p){return x(p[0]).toFixed(1)+" "+(base+p[1])}).join(" L");
   var labels={normal:[[30,"a"],[45,"c"],[100,"x"],[150,"v"],[185,"y"]],cannon:[[40,"cannon a"],[150,"v"]],cv:[[130,"large cv"],[190,"y"]],steepy:[[30,"a"],[90,"x"],[170,"steep y"]],tamp:[[30,"a"],[110,"x"],[200,"no y"]],af:[[100,"x"],[150,"v"],[185,"y"]]};
   var lab=labels[state].map(function(l){var p=pts.filter(function(q){return q[0]===l[0]})[0]||[l[0],-40];return '<text x="'+x(l[0]).toFixed(1)+'" y="'+(base+p[1]-8)+'" text-anchor="middle" style="font-family:var(--mono);font-size:11px" fill="var(--ink)">'+l[1]+'</text>'}).join("");
-  return '<svg class="fig" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Jugular venous waveform, '+state+'"><line x1="14" y1="'+base+'" x2="'+(W-14)+'" y2="'+base+'" stroke="var(--line)" stroke-width="1.5"/><path d="'+d+'" fill="none" stroke="var(--hrt-vein)" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>'+lab+'<text x="14" y="'+(H-6)+'" style="font-family:var(--mono);font-size:10px" fill="var(--muted)">S1</text><text x="'+x(150)+'" y="'+(H-6)+'" style="font-family:var(--mono);font-size:10px" fill="var(--muted)">S2</text></svg>'}
+  return '<svg class="fig" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Jugular venous waveform, '+state+'"><line x1="14" y1="'+base+'" x2="'+(W-14)+'" y2="'+base+'" stroke="var(--line)" stroke-width="1.5"/><path d="'+d+'" fill="none" stroke="var(--hrt-vein)" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>'+lab+'<text x="14" y="'+(H-6)+'" style="font-family:var(--mono);font-size:10.5px" fill="var(--muted)">S1</text><text x="'+x(150)+'" y="'+(H-6)+'" style="font-family:var(--mono);font-size:10.5px" fill="var(--muted)">S2</text></svg>'}
 var JVPST={normal:["Normal","a: atrial contraction. c: tricuspid bulging at systole. x: atrial relaxation and descent of the valve ring. v: atrial filling against a closed valve. y: emptying when the valve opens."],
   cannon:["Cannon a wave","Atrium contracts against a closed tricuspid valve: AV dissociation, complete heart block, ventricular tachycardia."],
   cv:["Large cv wave","Tricuspid regurgitation: the ventricle pushes blood back into the atrium in systole, filling in the x descent."],
@@ -473,14 +473,14 @@ var MOVES=[["Breathe in","Raises right-sided return","r"],["Valsalva strain / sq
 var MCOLS=[["AS","as"],["HCM","hcm"],["MR","mr"],["AR","ar"],["Right","rt"]];
 var MDIR={r:{as:"0",hcm:"0",mr:"0",ar:"0",rt:"+"},p:{as:"-",hcm:"+",mr:"-",ar:"-",rt:"-"},s:{as:"+",hcm:"-",mr:"+",ar:"+",rt:"+"},h:{as:"-",hcm:"-",mr:"+",ar:"+",rt:"0"}};
 function figMoves(){var cw=50,rw=118,W=rw+cw*MCOLS.length+8,rh=46,H=30+rh*MOVES.length,g="";
-  MCOLS.forEach(function(c,i){g+='<text x="'+(rw+cw*i+cw/2)+'" y="18" text-anchor="middle" style="font-family:var(--mono);font-size:10px" fill="var(--muted)">'+c[0]+'</text>'});
-  MOVES.forEach(function(m,j){var y=30+rh*j;g+='<line x1="0" y1="'+y+'" x2="'+W+'" y2="'+y+'" stroke="var(--line)"/>';g+='<text x="0" y="'+(y+19)+'" style="font-size:11px" fill="var(--ink)">'+esc(m[0].length>20?m[0].split(" / ")[0]:m[0])+'</text><text x="0" y="'+(y+35)+'" style="font-size:10px" fill="var(--muted)">'+esc(m[1])+'</text>';
+  MCOLS.forEach(function(c,i){g+='<text x="'+(rw+cw*i+cw/2)+'" y="18" text-anchor="middle" style="font-family:var(--mono);font-size:10.5px" fill="var(--muted)">'+c[0]+'</text>'});
+  MOVES.forEach(function(m,j){var y=30+rh*j;g+='<line x1="0" y1="'+y+'" x2="'+W+'" y2="'+y+'" stroke="var(--line)"/>';g+='<text x="0" y="'+(y+19)+'" style="font-size:11px" fill="var(--ink)">'+esc(m[0].length>20?m[0].split(" / ")[0]:m[0])+'</text><text x="0" y="'+(y+35)+'" style="font-size:10.5px" fill="var(--muted)">'+esc(m[1])+'</text>';
     MCOLS.forEach(function(c,i){var d=MDIR[m[2]][c[1]],cx=rw+cw*i+cw/2,cy=y+rh/2;
       if(d==="+")g+='<path d="M'+cx+' '+(cy-10)+' L'+(cx+8)+' '+(cy+6)+' L'+(cx-8)+' '+(cy+6)+' Z" fill="var(--bad)"/>';
       else if(d==="-")g+='<path d="M'+cx+' '+(cy+10)+' L'+(cx+8)+' '+(cy-6)+' L'+(cx-8)+' '+(cy-6)+' Z" fill="var(--ok)"/>';
       else g+='<line x1="'+(cx-7)+'" y1="'+cy+'" x2="'+(cx+7)+'" y2="'+cy+'" stroke="var(--muted)" stroke-width="2"/>'})});
   return '<svg class="fig" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Grid of how each manoeuvre changes each murmur">'+g+'</svg><p class="grid-legend">Red up: louder. Green down: softer. Line: little change. Right: right-sided murmurs such as tricuspid regurgitation. The Valsalva row also covers squat to stand.</p><p class="figtext">The one that breaks the pattern is HCM: anything that shrinks the ventricle (Valsalva, standing) narrows the outflow tract and makes it louder, while every other left-sided murmur gets softer. Handgrip separates regurgitant murmurs (louder) from outflow murmurs (softer). Mitral valve prolapse is the exception in the MR column: less filling moves the click earlier and makes the murmur longer, often louder.</p><p class="note">Directions follow from preload and afterload physiology (McGee 2025; Lembo et al., NEJM 1988). Their accuracy figures are not shown because they have not yet been verified against the primary study.</p>'}
-function figPulsus(){return '<svg class="fig" viewBox="0 0 320 130" role="img" aria-label="Arterial pressure falling with inspiration by more than 10 mmHg"><line x1="20" y1="30" x2="300" y2="30" stroke="var(--muted)" stroke-dasharray="4 4"/><line x1="20" y1="58" x2="300" y2="58" stroke="var(--muted)" stroke-dasharray="4 4"/><text x="300" y="24" text-anchor="end" style="font-family:var(--mono);font-size:10px" fill="var(--muted)">first sounds, expiration only</text><text x="300" y="74" text-anchor="end" style="font-family:var(--mono);font-size:10px" fill="var(--muted)">sounds in every beat</text>'+[0,1,2,3,4,5,6,7].map(function(i){var insp=i>=3&&i<=5,top=insp?52:30,x=34+i*34;return '<path d="M'+x+' 110 L'+(x+6)+' '+top+' L'+(x+16)+' '+(top+20)+' L'+(x+26)+' 110" fill="none" stroke="var(--hrt-art)" stroke-width="2.5" stroke-linejoin="round"/>'}).join("")+'<rect x="128" y="96" width="104" height="22" rx="6" fill="var(--fill)"/><text x="180" y="111" text-anchor="middle" style="font-family:var(--mono);font-size:10px" fill="var(--ink)">inspiration</text></svg><p class="figtext">Inflate the cuff above systolic, then deflate slowly. Note the pressure where you first hear sounds only in expiration, then where you hear them in every beat. The difference is the pulsus paradoxus. Over 10 mmHg in a patient with a known effusion raises the likelihood of tamponade. It can be absent despite tamponade with aortic regurgitation, an atrial septal defect, severe left ventricular dysfunction or positive-pressure ventilation.</p>'}
+function figPulsus(){return '<svg class="fig" viewBox="0 0 320 130" role="img" aria-label="Arterial pressure falling with inspiration by more than 10 mmHg"><line x1="20" y1="30" x2="300" y2="30" stroke="var(--muted)" stroke-dasharray="4 4"/><line x1="20" y1="58" x2="300" y2="58" stroke="var(--muted)" stroke-dasharray="4 4"/><text x="300" y="24" text-anchor="end" style="font-family:var(--mono);font-size:10.5px" fill="var(--muted)">first sounds, expiration only</text><text x="300" y="74" text-anchor="end" style="font-family:var(--mono);font-size:10.5px" fill="var(--muted)">sounds in every beat</text>'+[0,1,2,3,4,5,6,7].map(function(i){var insp=i>=3&&i<=5,top=insp?52:30,x=34+i*34;return '<path d="M'+x+' 110 L'+(x+6)+' '+top+' L'+(x+16)+' '+(top+20)+' L'+(x+26)+' 110" fill="none" stroke="var(--hrt-art)" stroke-width="2.5" stroke-linejoin="round"/>'}).join("")+'<rect x="128" y="96" width="104" height="22" rx="6" fill="var(--fill)"/><text x="180" y="111" text-anchor="middle" style="font-family:var(--mono);font-size:10.5px" fill="var(--ink)">inspiration</text></svg><p class="figtext">Inflate the cuff above systolic, then deflate slowly. Note the pressure where you first hear sounds only in expiration, then where you hear them in every beat. The difference is the pulsus paradoxus. Over 10 mmHg in a patient with a known effusion raises the likelihood of tamponade. It can be absent despite tamponade with aortic regurgitation, an atrial septal defect, severe left ventricular dysfunction or positive-pressure ventilation.</p>'}
 var lastFocus=null,sheetKey=null;
 function openSheet(html){lastFocus=document.activeElement;$("#sheet").innerHTML=html;$("#sheetwrap").hidden=false;var x=$("#sheet .x");if(x)x.focus()}
 function closeSheet(){$("#sheetwrap").hidden=true;$("#sheet").innerHTML="";sheetKey=null;if(playing)stop();if(lastFocus&&lastFocus.focus)lastFocus.focus()}
@@ -531,15 +531,15 @@ function curveHTML(){
  a=d+"L"+X(0)+" "+Y(0)+"Z";
  var dx=X(s),dy=Y(p),right=dx<200,g='<svg class="curve" viewBox="0 0 300 138" role="img" aria-label="Chart of the result against your starting probability. Starting at '+s+' percent gives '+fmt(p)+' percent.">';
  g+='<path d="M'+X(0)+' '+Y(0)+'L'+X(100)+' '+Y(0)+'M'+X(0)+' '+Y(0)+'L'+X(0)+' '+Y(100)+'" stroke="var(--line)" stroke-width="2" fill="none"/>';
- [0,50,100].forEach(function(t){g+='<text x="'+X(t)+'" y="118" text-anchor="middle" style="font-family:var(--mono);font-size:9px" fill="var(--muted)">'+t+'</text><text x="28" y="'+(Y(t)+3)+'" text-anchor="end" style="font-family:var(--mono);font-size:9px" fill="var(--muted)">'+t+'</text>'});
- g+='<text x="'+X(50)+'" y="134" text-anchor="middle" style="font-family:var(--mono);font-size:9px" fill="var(--muted)">your starting probability →</text>';
- g+='<text x="'+(X(0)+4)+'" y="'+(Y(100)+3)+'" style="font-family:var(--mono);font-size:9px" fill="var(--muted)">result ↑</text>';
+ [0,50,100].forEach(function(t){g+='<text x="'+X(t)+'" y="118" text-anchor="middle" style="font-family:var(--mono);font-size:10.5px" fill="var(--muted)">'+t+'</text><text x="28" y="'+(Y(t)+3)+'" text-anchor="end" style="font-family:var(--mono);font-size:10.5px" fill="var(--muted)">'+t+'</text>'});
+ g+='<text x="'+X(50)+'" y="134" text-anchor="middle" style="font-family:var(--mono);font-size:10.5px" fill="var(--muted)">your starting probability →</text>';
+ g+='<text x="'+(X(0)+4)+'" y="'+(Y(100)+3)+'" style="font-family:var(--mono);font-size:10.5px" fill="var(--muted)">result ↑</text>';
  if(has)g+='<path d="'+a+'" fill="var(--accent)" opacity=".12"/>';
  g+='<path d="M'+X(0)+' '+Y(0)+'L'+X(100)+' '+Y(100)+'" stroke="var(--muted)" stroke-width="1.5" stroke-dasharray="2 4" fill="none"/>';
  if(has)g+='<path d="'+d+'" stroke="var(--accent)" stroke-width="2.5" fill="none" stroke-linejoin="round"/>';
  g+='<path d="M'+dx+' '+Y(0)+'L'+dx+' '+dy+'L'+X(0)+' '+dy+'" stroke="var(--ink)" stroke-width="1" stroke-dasharray="3 3" fill="none" opacity=".55"/>';
  g+='<circle cx="'+dx+'" cy="'+dy+'" r="6" fill="var(--accent)" stroke="var(--card)" stroke-width="2.5"/>';
- g+='<text x="'+(right?dx+10:dx-10)+'" y="'+(p>18?dy+14:dy-8)+'" text-anchor="'+(right?"start":"end")+'" style="font-family:var(--mono);font-size:10px;font-weight:600" fill="var(--ink)">'+s+'% → '+fmt(p)+'%</text></svg>';
+ g+='<text x="'+(right?dx+10:dx-10)+'" y="'+(p>18?dy+14:dy-8)+'" text-anchor="'+(right?"start":"end")+'" style="font-family:var(--mono);font-size:10.5px;font-weight:600" fill="var(--ink)">'+s+'% → '+fmt(p)+'%</text></svg>';
  g+='<p class="curvecap">'+(has?'Drag the slider (or the chart) and the dot rides the curve. The further the curve bows from the dotted line, the more these findings tell you.':'No findings marked yet, so the result equals your start (the dotted line). Mark a finding and a curve will bow away from it.')+'</p>';
  return g}
 var renderResultBase=renderResult;

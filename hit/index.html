@@ -161,6 +161,9 @@ input[type=range]{width:100%;min-height:44px;accent-color:var(--accent)}
 .deeper .dl{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500;margin:0 0 3px}
 .deeper p{font-size:15px;line-height:1.45;color:var(--ink);margin:0 0 4px}
 .deeper p:last-child{margin-bottom:0}
+/* cause-fix: ruled-out causes stay readable; the name greys, the reason does not fade */
+.cause.out,.cause.less,.cause.unl{opacity:1}
+.cause.less>span,.cause.unl>span{color:var(--muted)}
 </style>
 <script>function dpHtml(rows){ return rows.map(function(r){ return '<div><span class="dl">' + r[0] + '</span>' + r[1] + '</div>'; }).join(''); }</script>
 </head>
@@ -663,8 +666,8 @@ function svgOpen(vb, label){ return '<svg viewBox="' + vb + '" role="img" aria-l
 function tx(x, y, t, o){ o = o || {}; return '<text x="' + x + '" y="' + y + '" text-anchor="' + (o.a || 'middle') + '" style="' + (o.sans ? FS : FM) + ';font-size:' + (o.s || 11) + 'px;font-weight:' + (o.w || 400) + ';fill:' + (o.c || 'var(--ink)') + '">' + t + '</text>'; }
 function bx(x, y, w, h, t1, t2, stt){
   var fill = stt === 'hot' ? 'var(--warnbg)' : stt === 'on' ? 'var(--card)' : 'var(--fill)', stroke = stt === 'hot' ? 'var(--warn)' : stt === 'on' ? 'var(--accent)' : 'var(--line)';
-  return '<g' + (stt === 'dim' ? ' opacity=".45"' : '') + '><rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="10" fill="' + fill + '" stroke="' + stroke + '"' + (stt === 'hot' || stt === 'on' ? ' stroke-width="2"' : '') + '/>' +
-    tx(x + w / 2, y + (t2 ? h / 2 - 3 : h / 2 + 4), t1, {sans: 1, s: 12, w: 600}) + (t2 ? tx(x + w / 2, y + h / 2 + 12, t2, {s: 10, c: 'var(--muted)'}) : '') + '</g>';
+  return '<g' + (stt === 'dim' ? ' opacity=".62"' : '') + '><rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="10" fill="' + fill + '" stroke="' + stroke + '"' + (stt === 'hot' || stt === 'on' ? ' stroke-width="2"' : '') + '/>' +
+    tx(x + w / 2, y + (t2 ? h / 2 - 3 : h / 2 + 4), t1, {sans: 1, s: 12, w: 600}) + (t2 ? tx(x + w / 2, y + h / 2 + 12, t2, {s: 10.5, c: 'var(--muted)'}) : '') + '</g>';
 }
 function mk(p){ return '<defs>' + [['n','var(--muted)'],['a','var(--accent)'],['w','var(--warn)']].map(function(k){ return '<marker id="' + p + k[0] + '" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="' + k[1] + '"/></marker>'; }).join('') + '</defs>'; }
 function ar(d, k, p){ var c = k === 'a' ? 'var(--accent)' : k === 'w' ? 'var(--warn)' : 'var(--muted)'; return '<path d="' + d + '" fill="none" stroke="' + c + '" stroke-width="2" marker-end="url(#' + p + k + ')"/>'; }
@@ -703,13 +706,13 @@ function timeSVG(k, p){
   var h = svgOpen('0 0 340 232', 'Platelet count over days: ' + d.n);
   h += '<line x1="44" y1="190" x2="324" y2="190" stroke="var(--line)"/><line x1="44" y1="30" x2="44" y2="190" stroke="var(--line)"/>';
   [0, 5, 10, 15, 20].forEach(function(dd){ h += '<line x1="' + X(dd) + '" y1="190" x2="' + X(dd) + '" y2="194" stroke="var(--muted)"/>' + tx(X(dd), 206, dd); });
-  h += tx(184, 222, 'day of heparin', {c: 'var(--muted)', s: 10});
-  [100, 200].forEach(function(v){ h += '<line x1="44" y1="' + Y(v) + '" x2="324" y2="' + Y(v) + '" stroke="var(--line)" stroke-dasharray="2 4"/>' + tx(38, Y(v) + 4, v, {a: 'end', s: 10}); });
-  h += '<rect x="' + X(5) + '" y="30" width="' + (X(10) - X(5)) + '" height="160" fill="var(--fill)"/>' + tx((X(5) + X(10)) / 2, 44, 'day 5–10', {s: 10, c: 'var(--muted)'});
-  h += '<rect x="' + X(d.hep[0]) + '" y="16" width="' + (X(d.hep[1]) - X(d.hep[0])) + '" height="8" rx="4" fill="var(--accent)" opacity=".8"/>' + tx(X(d.hep[1]) + 4, 24, 'heparin', {a: 'start', s: 10, c: 'var(--accent)'});
+  h += tx(184, 222, 'day of heparin', {c: 'var(--muted)', s: 10.5});
+  [100, 200].forEach(function(v){ h += '<line x1="44" y1="' + Y(v) + '" x2="324" y2="' + Y(v) + '" stroke="var(--line)" stroke-dasharray="2 4"/>' + tx(38, Y(v) + 4, v, {a: 'end', s: 10.5}); });
+  h += '<rect x="' + X(5) + '" y="30" width="' + (X(10) - X(5)) + '" height="160" fill="var(--fill)"/>' + tx((X(5) + X(10)) / 2, 44, 'day 5–10', {s: 10.5, c: 'var(--muted)'});
+  h += '<rect x="' + X(d.hep[0]) + '" y="16" width="' + (X(d.hep[1]) - X(d.hep[0])) + '" height="8" rx="4" fill="var(--accent)" opacity=".8"/>' + tx(X(d.hep[1]) + 4, 24, 'heparin', {a: 'start', s: 10.5, c: 'var(--accent)'});
   h += '<polyline points="' + d.pts.map(function(q){ return X(q[0]) + ',' + Y(q[1]); }).join(' ') + '" fill="none" stroke="var(--warn)" stroke-width="2.5" stroke-linejoin="round"/>';
-  if (k === 'rapid') h += tx(X(0) + 4, 64, 'antibodies already present', {a: 'start', s: 10, c: 'var(--muted)'});
-  if (k === 'delayed') h += tx(X(10), 64, 'after heparin stopped', {a: 'start', s: 10, c: 'var(--muted)'});
+  if (k === 'rapid') h += tx(X(0) + 4, 64, 'antibodies already present', {a: 'start', s: 10.5, c: 'var(--muted)'});
+  if (k === 'delayed') h += tx(X(10), 64, 'after heparin stopped', {a: 'start', s: 10.5, c: 'var(--muted)'});
   return h + '</svg>';
 }
 
@@ -722,7 +725,7 @@ var LAD = {
 function ladSVG(k, p){
   var rows = [['high', '6–8', 'High', 'PPV 0.64'], ['mid', '4–5', 'Intermediate', 'PPV 0.14'], ['low', '0–3', 'Low', 'NPV 0.998']];
   var h = svgOpen('0 0 340 196', '4Ts probability bands, ' + LAD[k].n) + mk(p);
-  rows.forEach(function(r, n){ var y = 10 + n * 60; h += bx(8, y, 200, 50, r[2] + ' · ' + r[1], r[3], r[0] === k ? 'hot' : 'dim'); h += tx(220, y + 22, r[0] === 'low' ? 'keep heparin' : 'stop heparin', {a: 'start', s: 11, w: r[0] === k ? 600 : 400, c: r[0] === k ? 'var(--ink)' : 'var(--muted)'}) + tx(220, y + 38, r[0] === 'low' ? 'no test' : 'immunoassay', {a: 'start', s: 10, c: 'var(--muted)'}); });
+  rows.forEach(function(r, n){ var y = 10 + n * 60; h += bx(8, y, 200, 50, r[2] + ' · ' + r[1], r[3], r[0] === k ? 'hot' : 'dim'); h += tx(220, y + 22, r[0] === 'low' ? 'keep heparin' : 'stop heparin', {a: 'start', s: 11, w: r[0] === k ? 600 : 400, c: r[0] === k ? 'var(--ink)' : 'var(--muted)'}) + tx(220, y + 38, r[0] === 'low' ? 'no test' : 'immunoassay', {a: 'start', s: 10.5, c: 'var(--muted)'}); });
   return h + '</svg>';
 }
 
@@ -739,9 +742,9 @@ function odSVG(k, p){
   var pct = {neg: '', weak: '≤5%', mod: '<50%', strong: '≥50%', vstrong: '~90%'};
   var h = svgOpen('0 0 340 120', 'Immunoassay optical density bands: ' + ODS[k].n);
   bands.forEach(function(b){ var on = b[2] === k; h += '<rect x="' + X(b[0]) + '" y="30" width="' + (X(b[1]) - X(b[0]) - 2) + '" height="36" rx="6" fill="' + (on ? 'var(--warnbg)' : 'var(--fill)') + '" stroke="' + (on ? 'var(--warn)' : 'var(--line)') + '"' + (on ? ' stroke-width="2"' : '') + '/>' + tx((X(b[0]) + X(b[1])) / 2, 53, pct[b[2]] || 'neg', {s: 11, w: on ? 600 : 400}); });
-  [0, 0.4, 1.0, 1.4, 2.0, 3.0].forEach(function(v){ h += tx(X(v), 84, v.toFixed(1), {s: 10, c: 'var(--muted)'}); });
-  h += tx(170, 104, 'OD units · % with a strong-positive SRA', {s: 10, c: 'var(--muted)'});
-  h += tx(170, 20, 'one laboratory\'s series (2008)', {s: 10, c: 'var(--muted)'});
+  [0, 0.4, 1.0, 1.4, 2.0, 3.0].forEach(function(v){ h += tx(X(v), 84, v.toFixed(1), {s: 10.5, c: 'var(--muted)'}); });
+  h += tx(170, 104, 'OD units · % with a strong-positive SRA', {s: 10.5, c: 'var(--muted)'});
+  h += tx(170, 20, 'one laboratory\'s series (2008)', {s: 10.5, c: 'var(--muted)'});
   return h + '</svg>';
 }
 
@@ -778,7 +781,7 @@ function phSVG(k, p){
   var h = svgOpen('0 0 352 170', 'Phases of HIT: ' + PH[k].n);
   ord.forEach(function(q, n){ var x = x0 + n * (w + 4), on = q === k; h += '<rect x="' + x + '" y="20" width="' + w + '" height="44" rx="8" fill="' + (on ? 'var(--warnbg)' : 'var(--fill)') + '" stroke="' + (on ? 'var(--warn)' : 'var(--line)') + '"' + (on ? ' stroke-width="2"' : '') + '/>' + tx(x + w / 2, 39, PH[q].n.split(' ')[0], {sans: 1, s: 11, w: 600}) + (PH[q].n.split(' ')[1] ? tx(x + w / 2, 54, PH[q].n.split(' ')[1], {sans: 1, s: 11, w: 600}) : ''); });
   var rows = [['Platelets', ['low', 'normal', 'normal', 'normal']], ['Functional', ['+', '+', '−', '−']], ['Immunoassay', ['+', '+', '+', '−']], ['Heparin', ['no', 'no', 'surgery', 'surgery']]];
-  rows.forEach(function(r, m){ var y = 90 + m * 22; h += tx(4, y, r[0], {a: 'start', s: 10, c: 'var(--muted)'}); r[1].forEach(function(v, n){ h += tx(x0 + n * (w + 4) + w / 2, y, v, {s: 11, w: ord[n] === k ? 600 : 400, c: ord[n] === k ? 'var(--ink)' : 'var(--muted)'}); }); });
+  rows.forEach(function(r, m){ var y = 90 + m * 22; h += tx(4, y, r[0], {a: 'start', s: 10.5, c: 'var(--muted)'}); r[1].forEach(function(v, n){ h += tx(x0 + n * (w + 4) + w / 2, y, v, {s: 11, w: ord[n] === k ? 600 : 400, c: ord[n] === k ? 'var(--ink)' : 'var(--muted)'}); }); });
   return h + '</svg>';
 }
 

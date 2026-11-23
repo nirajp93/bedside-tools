@@ -183,6 +183,9 @@ footer p{margin:0 0 8px}
 .vk-hot:focus-visible,.vk-opt:focus-visible,.vk-cell:focus-visible,.vk-btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 @media (max-width:479px){.vk-hot{width:20px;height:20px;font-size:11px}}
 @media (min-width:900px){.vk-grid{grid-template-columns:repeat(3,1fr)}.vk-hot{width:30px;height:30px}}
+/* cause-fix: ruled-out causes stay readable; the name greys, the reason does not fade */
+.cause.out,.cause.less,.cause.unl{opacity:1}
+.cause.less>span,.cause.unl>span{color:var(--muted)}
 </style>
 </head>
 <body>
@@ -778,9 +781,9 @@ function adhSVG(k, p){
   var h = svgOpen('0 0 340 250', 'ADH and the collecting duct: ' + s.n) + markers(p);
   h += box(8, 8, 150, 44, 'Osmolality sensor', 'osmolality low', s.adh === 'off' ? false : null);
   h += box(182, 8, 150, 44, 'Volume sensor', s.vol === 'd' ? 'filling low' : 'filling normal', s.vol === 'd' ? 'warn' : false);
-  h += arrow('M83 52 L148 92', on ? 'n' : 'd', p, on ? 1.5 : 2) + txt(96, 82, on ? 'overridden' : 'switch off', FM + ';font-size:10px;fill:' + (on ? 'var(--muted)' : 'var(--accent)'), 'end');
-  h += arrow('M257 52 L192 92', s.vol === 'd' ? 'u' : 'n', p, s.vol === 'd' ? 4 : 1.5) + (s.vol === 'd' ? txt(244, 82, 'switch on', FM + ';font-size:10px;fill:var(--warn)', 'start') : '');
-  if (s.adh === 'x') h += txt(318, 112, 'drug, tumor,', FM + ';font-size:10px;fill:var(--bad)', 'end') + txt(318, 124, 'lung, brain', FM + ';font-size:10px;fill:var(--bad)', 'end') + arrow('M262 116 L232 116', 'x', p, 2);
+  h += arrow('M83 52 L148 92', on ? 'n' : 'd', p, on ? 1.5 : 2) + txt(96, 82, on ? 'overridden' : 'switch off', FM + ';font-size:10.5px;fill:' + (on ? 'var(--muted)' : 'var(--accent)'), 'end');
+  h += arrow('M257 52 L192 92', s.vol === 'd' ? 'u' : 'n', p, s.vol === 'd' ? 4 : 1.5) + (s.vol === 'd' ? txt(244, 82, 'switch on', FM + ';font-size:10.5px;fill:var(--warn)', 'start') : '');
+  if (s.adh === 'x') h += txt(318, 112, 'drug, tumor,', FM + ';font-size:10.5px;fill:var(--bad)', 'end') + txt(318, 124, 'lung, brain', FM + ';font-size:10.5px;fill:var(--bad)', 'end') + arrow('M262 116 L232 116', 'x', p, 2);
   h += box(110, 96, 120, 40, on ? 'ADH on' : 'ADH off', s.adh === 'x' ? 'no reason' : on ? 'for volume' : k === 'thz' ? 'or low' : '', s.adh === 'x' ? 'bad' : on ? 'warn' : false);
   h += arrow('M170 136 L170 168', on ? 'u' : 'd', p);
   var duct = k === 'thz' ? 'cannot dilute' : on ? 'water channels open' : 'water channels shut';
@@ -812,13 +815,13 @@ function soluteSVG(k, p){
   var over = s.drink > lo;
   h += '<rect x="' + x0 + '" y="92" width="' + (s.drink * sc) + '" height="22" rx="6" fill="' + (over ? 'var(--bad)' : 'var(--ok)') + '"/>' + txt(x0 + s.drink * sc + 6, 108, s.drink + ' L', FM + ';font-size:11px;fill:var(--ink)', 'start');
   h += txt(x0, 136, 'Solute ' + s.sol + ' mOsm/day; each litre', FM + ';font-size:10.5px;fill:var(--muted)', 'start') + txt(x0, 150, 'needs 50–100 mOsm to carry it out', FM + ';font-size:10.5px;fill:var(--muted)', 'start');
-  h += txt(x0, 166, 'Illustrative numbers', FM + ';font-size:10px;fill:var(--muted)', 'start');
+  h += txt(x0, 166, 'Illustrative numbers', FM + ';font-size:10.5px;fill:var(--muted)', 'start');
   return h + '</svg>';
 }
 function brainSVG(k, p){
   var s = BRAIN[k];
   var h = svgOpen('0 0 340 190', 'Brain cell volume: ' + s.n);
-  h += '<circle cx="110" cy="92" r="62" fill="none" stroke="var(--muted)" stroke-width="3"/>' + txt(110, 172, 'skull', FM + ';font-size:10px;fill:var(--muted)');
+  h += '<circle cx="110" cy="92" r="62" fill="none" stroke="var(--muted)" stroke-width="3"/>' + txt(110, 172, 'skull', FM + ';font-size:10.5px;fill:var(--muted)');
   var col = s.hot === 'bad' ? 'var(--bad)' : s.hot ? 'var(--warn)' : 'var(--accent)';
   h += '<circle cx="110" cy="92" r="' + s.r + '" fill="var(--fill)" stroke="' + col + '" stroke-width="2"' + (k === 'fast' ? ' stroke-dasharray="4 3"' : '') + '/>';
   for (var n = 0; n < s.dots; n++){ var a = n / Math.max(1, s.dots) * Math.PI * 2; h += '<circle cx="' + (110 + Math.cos(a) * s.r * 0.5) + '" cy="' + (92 + Math.sin(a) * s.r * 0.5) + '" r="4" fill="var(--ink)"/>'; }
@@ -833,7 +836,7 @@ function guardSVG(k, p, pt, lim24, lim48){
   h += '<line x1="40" y1="150" x2="320" y2="150" stroke="var(--muted)"/><line x1="40" y1="20" x2="40" y2="150" stroke="var(--muted)"/>';
   [0, 12, 24, 36, 48].forEach(function(t){ h += txt(X(t), 166, t + ' h'); });
   [0, 5, 10, 15, 20].forEach(function(r){ h += txt(34, Y(r) + 4, '+' + r, null, 'end'); });
-  h += '<rect x="' + X(0) + '" y="' + Y(s.g[1]) + '" width="' + (X(24) - X(0)) + '" height="' + (Y(s.g[0]) - Y(s.g[1])) + '" fill="var(--okbg)"/>' + txt(X(12), (Y(s.g[1]) + Y(s.g[0])) / 2 + 4, 'goal by 24 h', FM + ';font-size:10px;fill:var(--ok)');
+  h += '<rect x="' + X(0) + '" y="' + Y(s.g[1]) + '" width="' + (X(24) - X(0)) + '" height="' + (Y(s.g[0]) - Y(s.g[1])) + '" fill="var(--okbg)"/>' + txt(X(12), (Y(s.g[1]) + Y(s.g[0])) / 2 + 4, 'goal by 24 h', FM + ';font-size:10.5px;fill:var(--ok)');
   h += '<path d="M' + X(0) + ' ' + Y(l24) + ' H' + X(24) + ' V' + Y(l48) + ' H' + X(48) + '" fill="none" stroke="var(--bad)" stroke-width="2" stroke-dasharray="6 4"/>';
   h += txt(X(0) + 4, Y(l24) - 5, 'limit +' + l24, FM + ';font-size:10.5px;fill:var(--bad)', 'start') + txt(X(48) - 2, Y(l48) - 5, '+' + l48 + ' by 48 h', FM + ';font-size:10.5px;fill:var(--bad)', 'end');
   if (!pt){

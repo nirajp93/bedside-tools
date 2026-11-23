@@ -106,6 +106,9 @@ footer p{margin:0 0 8px}
   #p-learn{max-width:720px;margin:0 auto}
 }
 @media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+/* cause-fix: ruled-out causes stay readable; the name greys, the reason does not fade */
+.cause.out,.cause.less,.cause.unl{opacity:1}
+.cause.less>span,.cause.unl>span{color:var(--muted)}
 </style>
 </head>
 <body>
@@ -552,8 +555,8 @@ function svgOpen(vb, label){ return '<svg viewBox="' + vb + '" role="img" aria-l
 function tx(x, y, t, o){ o = o || {}; return '<text x="' + x + '" y="' + y + '" text-anchor="' + (o.a || 'middle') + '" style="' + (o.sans ? FS : FM) + ';font-size:' + (o.s || 11) + 'px;font-weight:' + (o.w || 400) + ';fill:' + (o.c || 'var(--ink)') + '">' + t + '</text>'; }
 function bx(x, y, w, h, t1, t2, st){
   var fill = st === 'hot' ? 'var(--warnbg)' : st === 'on' ? 'var(--card)' : 'var(--fill)', stroke = st === 'hot' ? 'var(--warn)' : st === 'on' ? 'var(--accent)' : 'var(--line)';
-  return '<g' + (st === 'dim' ? ' opacity=".4"' : '') + '><rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="10" fill="' + fill + '" stroke="' + stroke + '"' + (st === 'hot' || st === 'on' ? ' stroke-width="2"' : '') + '/>' +
-    tx(x + w / 2, y + (t2 ? h / 2 - 2 : h / 2 + 4), t1, {sans: 1, s: 12, w: 600}) + (t2 ? tx(x + w / 2, y + h / 2 + 12, t2, {s: 10, c: 'var(--muted)'}) : '') + '</g>';
+  return '<g' + (st === 'dim' ? ' opacity=".62"' : '') + '><rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="10" fill="' + fill + '" stroke="' + stroke + '"' + (st === 'hot' || st === 'on' ? ' stroke-width="2"' : '') + '/>' +
+    tx(x + w / 2, y + (t2 ? h / 2 - 2 : h / 2 + 4), t1, {sans: 1, s: 12, w: 600}) + (t2 ? tx(x + w / 2, y + h / 2 + 12, t2, {s: 10.5, c: 'var(--muted)'}) : '') + '</g>';
 }
 function mk(p){ return '<defs>' + [['n','var(--muted)'],['u','var(--warn)'],['x','var(--bad)'],['a','var(--accent)']].map(function(k){ return '<marker id="' + p + k[0] + '" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="' + k[1] + '"/></marker>'; }).join('') + '</defs>'; }
 function ar(d, k, p, w){ var c = k === 'u' ? 'var(--warn)' : k === 'x' ? 'var(--bad)' : k === 'a' ? 'var(--accent)' : 'var(--muted)'; return '<path d="' + d + '" fill="none" stroke="' + c + '" stroke-width="' + (w || (k === 'n' ? 2 : 3)) + '"' + (k === 'x' ? ' stroke-dasharray="5 4"' : '') + ' marker-end="url(#' + p + k + ')"/>'; }
@@ -570,7 +573,7 @@ function phasesSVG(k){
   var xs = [6, 118, 230], names = ['Start', 'To 3–6 months', 'Extended'];
   h += '<path d="M10 30H330" stroke="var(--line)" stroke-width="2"/>';
   xs.forEach(function(x, n){ h += '<circle cx="' + (x + 52) + '" cy="30" r="5" fill="' + (n === 0 ? 'var(--accent)' : 'var(--card)') + '" stroke="var(--accent)" stroke-width="2"/>' + tx(x + 52, 16, names[n], {s: 10.5, c: 'var(--muted)'}) + bx(x, 48, 104, 60, s.b[n][0], s.b[n][1], n === 0 ? 'on' : null); });
-  h += tx(170, 132, 'the first weeks carry the highest risk of recurrence', {s: 10, c: 'var(--muted)'});
+  h += tx(170, 132, 'the first weeks carry the highest risk of recurrence', {s: 10.5, c: 'var(--muted)'});
   return h + '</svg>';
 }
 var CASC = {
@@ -591,8 +594,8 @@ function cascSVG(k, p){
   h += '<path d="M232 126L186 104" fill="none" stroke="' + (s.xa ? 'var(--bad)' : 'var(--line)') + '" stroke-width="' + (s.xa ? 4 : 1.5) + '"/><path d="M232 142L186 170" fill="none" stroke="' + (s.iia ? 'var(--bad)' : 'var(--line)') + '" stroke-width="' + (s.iia ? (s.iia < 1 ? 1.5 : 4) : 1.5) + '"' + (s.iia && s.iia < 1 ? ' stroke-dasharray="4 4"' : '') + '/>';
   if (s.xa) h += blockMark(184, 100);
   if (s.iia === 1) h += blockMark(184, 174);
-  if (s.dxa) h += blockMark(22, 98) + tx(22, 126, 'drug', {s: 10, c: 'var(--bad)', w: 700});
-  if (s.diia) h += blockMark(22, 176) + tx(22, 204, 'drug', {s: 10, c: 'var(--bad)', w: 700});
+  if (s.dxa) h += blockMark(22, 98) + tx(22, 126, 'drug', {s: 10.5, c: 'var(--bad)', w: 700});
+  if (s.diia) h += blockMark(22, 176) + tx(22, 204, 'drug', {s: 10.5, c: 'var(--bad)', w: 700});
   if (s.liver) h += bx(214, 8, 118, 44, 'Liver', 'makes fewer factors', 'hot') + ar('M214 26H186', 'x', p);
   return h + '</svg>';
 }
@@ -605,9 +608,9 @@ var HALF = [['Factor VII', 5, '4–6 h', 0], ['Protein C', 8, '8 h', 1], ['Facto
 function bridgeSVG(k){
   var s = BRIDGE[k], h = svgOpen('0 0 340 228', 'Warfarin and clotting factor levels: ' + s.n);
   HALF.forEach(function(f, n){ var y = 10 + n * 32, frac = Math.pow(0.5, s.t / f[1]), w = Math.max(3, 150 * frac);
-    h += tx(4, y + 15, f[0], {a: 'start', sans: 1, s: 12, w: 600}) + tx(4, y + 27, 'half-life ' + f[2], {a: 'start', s: 9.5, c: 'var(--muted)'});
+    h += tx(4, y + 15, f[0], {a: 'start', sans: 1, s: 12, w: 600}) + tx(4, y + 27, 'half-life ' + f[2], {a: 'start', s: 10.5, c: 'var(--muted)'});
     h += '<rect x="110" y="' + (y + 4) + '" width="150" height="16" rx="4" fill="var(--fill)"/><rect x="110" y="' + (y + 4) + '" width="' + w + '" height="16" rx="4" fill="' + (f[3] ? 'var(--ok)' : 'var(--accent)') + '"/>' + tx(268, y + 16, Math.round(frac * 100) + '%', {a: 'start', s: 11}); });
-  h += tx(170, 221, 'schematic: as if synthesis stopped completely', {s: 9.5, c: 'var(--muted)'});
+  h += tx(170, 221, 'schematic: as if synthesis stopped completely', {s: 10.5, c: 'var(--muted)'});
   return h + '</svg><div class="key" style="display:flex;gap:12px;font-size:12px;color:var(--muted);margin-top:4px"><span><i style="display:inline-block;width:8px;height:8px;border-radius:2px;background:var(--accent);margin-right:4px"></i>clotting factor</span><span><i style="display:inline-block;width:8px;height:8px;border-radius:2px;background:var(--ok);margin-right:4px"></i>natural anticoagulant</span></div>';
 }
 var RV = {
@@ -645,7 +648,7 @@ function recurSVG(k){
   var s = RECUR[k], vals = [['After surgery', 3], ['Nonsurgical trigger', 15], ['Unprovoked', 30]], h = svgOpen('0 0 340 170', 'Recurrence within 5 years of stopping anticoagulation');
   vals.forEach(function(v, n){ var x = 30 + n * 104, bh = v[1] * 3.6, on = n === s.v;
     h += '<rect x="' + x + '" y="' + (130 - bh) + '" width="72" height="' + bh + '" rx="6" fill="' + (on ? 'var(--accent)' : 'var(--line)') + '"/>' + tx(x + 36, 122 - bh, v[1] + '%', {s: 14, w: 700}) + tx(x + 36, 148, v[0], {sans: 1, s: 11.5, w: on ? 700 : 400}); });
-  h += '<path d="M20 130H320" stroke="var(--muted)"/>' + tx(170, 166, 'recurrence within 5 years of stopping', {s: 10, c: 'var(--muted)'});
+  h += '<path d="M20 130H320" stroke="var(--muted)"/>' + tx(170, 166, 'recurrence within 5 years of stopping', {s: 10.5, c: 'var(--muted)'});
   return h + '</svg>';
 }
 var FIGS = {

@@ -180,6 +180,9 @@ footer p{margin:0 0 8px}
 .vk-lab{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 6px}
 .vk-head{font-weight:600;margin:0 0 4px}
 .vk-chip:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+/* cause-fix: ruled-out causes stay readable; the name greys, the reason does not fade */
+.cause.out,.cause.less,.cause.unl{opacity:1}
+.cause.less>span,.cause.unl>span{color:var(--muted)}
 </style>
 </head>
 <body>
@@ -675,8 +678,8 @@ function svgOpen(vb, label){ return '<svg viewBox="' + vb + '" role="img" aria-l
 function tx(x, y, t, o){ o = o || {}; return '<text x="' + x + '" y="' + y + '" text-anchor="' + (o.a || 'middle') + '" style="' + (o.sans ? FS : FM) + ';font-size:' + (o.s || 11) + 'px;font-weight:' + (o.w || 400) + ';fill:' + (o.c || 'var(--ink)') + '">' + t + '</text>'; }
 function bx(x, y, w, h, t1, t2, st){
   var fill = st === 'hot' ? 'var(--warnbg)' : st === 'on' ? 'var(--card)' : 'var(--fill)', stroke = st === 'hot' ? 'var(--warn)' : st === 'on' ? 'var(--accent)' : 'var(--line)';
-  return '<g' + (st === 'dim' ? ' opacity=".45"' : '') + '><rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="10" fill="' + fill + '" stroke="' + stroke + '"' + (st === 'hot' || st === 'on' ? ' stroke-width="2"' : '') + '/>' +
-    tx(x + w / 2, y + (t2 ? h / 2 - 2 : h / 2 + 4), t1, {sans: 1, s: 12, w: 600}) + (t2 ? tx(x + w / 2, y + h / 2 + 12, t2, {s: 9.5, c: 'var(--muted)'}) : '') + '</g>';
+  return '<g' + (st === 'dim' ? ' opacity=".62"' : '') + '><rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="10" fill="' + fill + '" stroke="' + stroke + '"' + (st === 'hot' || st === 'on' ? ' stroke-width="2"' : '') + '/>' +
+    tx(x + w / 2, y + (t2 ? h / 2 - 2 : h / 2 + 4), t1, {sans: 1, s: 12, w: 600}) + (t2 ? tx(x + w / 2, y + h / 2 + 12, t2, {s: 10.5, c: 'var(--muted)'}) : '') + '</g>';
 }
 
 var RKEYS = ['a1','b1','b2','d1','v1','at1','pde','no'];
@@ -688,16 +691,16 @@ function receptSVG(k){
   RKEYS.forEach(function(r, n){
     var col = n % 4, row = Math.floor(n / 4), x = 6 + col * 88, y = 8 + row * 62, v = A.rec[r] || 0;
     s += bx(x, y, 84, 54, RECN[r][0] + (v ? ' ' + '+++'.slice(0, v) : ''), '', v ? 'on' : 'dim');
-    s += '<g' + (v ? '' : ' opacity=".45"') + '>' + tx(x + 42, y + 46, RECN[r][1].length > 16 ? RECN[r][1].slice(0, 15) + '…' : RECN[r][1], {s: 8.5, c: 'var(--muted)'}) + '</g>';
+    s += '<g' + (v ? '' : ' opacity=".62"') + '>' + tx(x + 42, y + 46, RECN[r][1], {sans: 1, s: 10.5, c: 'var(--muted)'}) + '</g>';
   });
-  s += tx(6, 150, 'WHAT IT DOES', {a: 'start', s: 10, c: 'var(--muted)'});
+  s += tx(6, 150, 'WHAT IT DOES', {a: 'start', s: 10.5, c: 'var(--muted)'});
   EFFN.forEach(function(e, n){
     var x = 6 + n * 88, v = A.eff[n], up = v.indexOf('↑') === 0, dn = v.indexOf('↓') === 0, none = v.indexOf('not') === 0;
     s += '<rect x="' + x + '" y="160" width="84" height="64" rx="10" fill="' + (dn ? 'var(--warnbg)' : 'var(--fill)') + '" stroke="' + (dn ? 'var(--warn)' : up ? 'var(--accent)' : 'var(--line)') + '"/>';
     s += tx(x + 42, 180, e, {sans: 1, s: 11.5, w: 600});
-    s += none ? tx(x + 42, 204, 'not listed', {s: 9.5, c: 'var(--muted)'}) : tx(x + 42, 208, v.replace(' or ', ' / '), {s: 16, w: 600, c: dn ? 'var(--warn)' : 'var(--ink)'});
+    s += none ? tx(x + 42, 204, 'not listed', {s: 10.5, c: 'var(--muted)'}) : tx(x + 42, 208, v.replace(' or ', ' / '), {s: 16, w: 600, c: dn ? 'var(--warn)' : 'var(--ink)'});
   });
-  s += tx(180, 246, '+ to +++: strength of effect on that receptor', {s: 9.5, c: 'var(--muted)'});
+  s += tx(180, 246, '+ to +++: strength of effect on that receptor', {s: 10.5, c: 'var(--muted)'});
   return s + '</svg>';
 }
 
@@ -713,7 +716,7 @@ function mapSVG(k){
   var M = MAPD[k], s = svgOpen('0 0 360 150', 'Pressure equals output times resistance: ' + M.n);
   function b(x, id, t){ return bx(x, 34, 100, 50, t, M.note[id] || '', M.hot.indexOf(id) >= 0 ? 'hot' : 'on'); }
   s += b(4, 'fill', 'Filling') + tx(117, 64, '→', {s: 16}) + b(130, 'out', 'Output') + tx(243, 64, '×', {s: 16}) + b(256, 'res', 'Resistance');
-  s += tx(180, 20, 'what fails is outlined', {s: 9.5, c: 'var(--muted)'});
+  s += tx(180, 20, 'what fails is outlined', {s: 10.5, c: 'var(--muted)'});
   s += '<rect x="110" y="104" width="140" height="38" rx="10" fill="var(--fill)" stroke="var(--line)"/>' + tx(180, 127, 'Mean pressure ↓', {sans: 1, s: 12.5, w: 600});
   s += '<path d="M180 86V102" stroke="var(--muted)" stroke-width="2" fill="none"/>';
   return s + '</svg>';
@@ -730,7 +733,7 @@ function ladderSVG(k){
   var rows = [['Norepinephrine','first drug'],['+ Vasopressin','0.03 units/min'],['+ Epinephrine','still below target'],['+ Dobutamine','pressure fine, heart failing']];
   rows.forEach(function(r, n){ s += bx(6, 176 - n * 56, 160 + n * 22, 46, r[0], r[1], L.st[n]); });
   s += bx(246, 64, 108, 102, 'Hydrocortisone', '200 mg a day', L.at >= 2 ? 'on' : 'dim');
-  s += '<g' + (L.at >= 2 ? '' : ' opacity=".45"') + '>' + tx(300, 150, 'if the need persists', {s: 9, c: 'var(--muted)'}) + '</g>';
+  s += '<g' + (L.at >= 2 ? '' : ' opacity=".62"') + '>' + tx(300, 150, 'if the need persists', {s: 10.5, c: 'var(--muted)'}) + '</g>';
   return s + '</svg>';
 }
 

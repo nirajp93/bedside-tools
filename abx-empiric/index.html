@@ -105,7 +105,7 @@ footer p{margin:0 0 8px}
 .tick input{width:20px;height:20px;flex:none;accent-color:var(--accent)}
 .resbox{margin-top:10px;padding:10px 12px;border-radius:10px;background:var(--fill);font-size:14.5px;position:sticky;bottom:-28px}
 .strip{display:grid;grid-template-columns:repeat(9,minmax(0,1fr));gap:4px;margin-top:8px}
-.strip span{display:block;font-size:10px;color:var(--muted);text-align:center;margin-top:3px}
+.strip span{display:block;font-size:10.5px;color:var(--muted);text-align:center;margin-top:3px}
 .fig{display:block;width:100%;max-width:460px;height:auto;margin:0 auto}
 .states{display:flex;gap:6px;overflow-x:auto;margin:10px -16px;padding:2px 16px 6px;scrollbar-width:none}
 .states::-webkit-scrollbar{display:none}
@@ -144,6 +144,9 @@ footer p{margin:0 0 8px}
 .rowb button{min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--ink);font:inherit;font-size:14px;cursor:pointer}
 [hidden]{display:none!important}
 @media (max-width:420px){.pgrid{grid-template-columns:0.8fr 0.8fr 1.5fr}}
+/* cause-fix: ruled-out causes stay readable; the name greys, the reason does not fade */
+.cause.out,.cause.less,.cause.unl{opacity:1}
+.cause.less>span,.cause.unl>span{color:var(--muted)}
 </style>
 </head>
 <body>
@@ -828,9 +831,9 @@ var FS = 'font-family:var(--sans)', FM = 'font-family:var(--mono)';
 function vcol(v){ return v === 'u' ? 'var(--warn)' : v === 'd' ? 'var(--accent)' : v === 'x' ? 'var(--bad)' : 'var(--muted)'; }
 function markers(p){ return '<defs>' + ['n','u','d','x'].map(function(k){ return '<marker id="' + p + k + '" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="' + vcol(k) + '"/></marker>'; }).join('') + '</defs>'; }
 function box(x, y, w, h, t1, t2, hot, dim){
-  return '<g' + (dim ? ' opacity=".45"' : '') + '><rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="10" fill="' + (hot ? 'var(--warnbg)' : 'var(--fill)') + '" stroke="' + (hot ? 'var(--warn)' : 'var(--line)') + '"' + (hot ? ' stroke-width="2"' : '') + '/>' +
+  return '<g' + (dim ? ' opacity=".62"' : '') + '><rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="10" fill="' + (hot ? 'var(--warnbg)' : 'var(--fill)') + '" stroke="' + (hot ? 'var(--warn)' : 'var(--line)') + '"' + (hot ? ' stroke-width="2"' : '') + '/>' +
     '<text x="' + (x + w / 2) + '" y="' + (y + (t2 ? h / 2 - 2 : h / 2 + 4)) + '" text-anchor="middle" style="' + FS + ';font-size:12px;font-weight:600;fill:var(--ink)">' + t1 + '</text>' +
-    (t2 ? '<text x="' + (x + w / 2) + '" y="' + (y + h / 2 + 12) + '" text-anchor="middle" style="' + FM + ';font-size:10px;fill:var(--muted)">' + t2 + '</text>' : '') + '</g>';
+    (t2 ? '<text x="' + (x + w / 2) + '" y="' + (y + h / 2 + 12) + '" text-anchor="middle" style="' + FM + ';font-size:10.5px;fill:var(--muted)">' + t2 + '</text>' : '') + '</g>';
 }
 function svgOpen(vb, label){ return '<svg viewBox="' + vb + '" role="img" aria-label="' + label + '" class="fig">'; }
 function line(d, v, w, p){ return '<path d="' + d + '" fill="none" stroke="' + vcol(v) + '" stroke-width="' + (w || (v === 'u' ? 4 : v === 'd' ? 1.5 : 2)) + '"' + (v === 'd' || v === 'x' ? ' stroke-dasharray="5 4"' : '') + ' marker-end="url(#' + p + (v || 'n') + ')"/>'; }

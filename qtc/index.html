@@ -157,6 +157,9 @@ footer p{margin:0 0 8px}
 .deeper .dl{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500;margin:0 0 3px}
 .deeper p{font-size:15px;line-height:1.45;color:var(--ink);margin:0 0 4px}
 .deeper p:last-child{margin-bottom:0}
+/* cause-fix: ruled-out causes stay readable; the name greys, the reason does not fade */
+.cause.out,.cause.less,.cause.unl{opacity:1}
+.cause.less>span,.cause.unl>span{color:var(--muted)}
 </style>
 <script>function dpHtml(rows){ return rows.map(function(r){ return '<div><span class="dl">' + r[0] + '</span>' + r[1] + '</div>'; }).join(''); }</script>
 </head>
@@ -665,7 +668,7 @@ var AP = {
 function apSVG(k){
   var s = AP[k], p = s.plat, x0 = 40;
   var h = svgOpen('0 0 340 230', 'Ventricular action potential above an ECG beat: ' + s.n);
-  h += tx(8, 18, 'Cell', {a: 'start', s: 10, c: 'var(--muted)'}) + tx(8, 138, 'ECG', {a: 'start', s: 10, c: 'var(--muted)'});
+  h += tx(8, 18, 'Cell', {a: 'start', s: 10.5, c: 'var(--muted)'}) + tx(8, 138, 'ECG', {a: 'start', s: 10.5, c: 'var(--muted)'});
   /* action potential: rest at y 100, peak 26, plateau 40 */
   var endPlat = 150 + p, endRep = 200 + p;
   var ap = 'M' + x0 + ' 100 L' + (x0 + 22) + ' 100 L' + (x0 + 26) + ' 26 L' + (x0 + 34) + ' 40 L' + (x0 + 40) + ' 42 C ' + (x0 + 80) + ' 44 ' + (endPlat - 20) + ' 46 ' + endPlat + ' 52 ';
@@ -673,7 +676,7 @@ function apSVG(k){
   else ap += 'C ' + (endPlat + 22) + ' 64 ' + (endRep - 14) + ' 98 ' + endRep + ' 100 L 330 100';
   h += pth(ap, 'var(--accent)', 2.5);
   if (s.ead) h += '<circle cx="' + (endPlat + 30) + '" cy="58" r="12" fill="none" stroke="var(--bad)" stroke-width="2" stroke-dasharray="3 3"/>' + tx(endPlat + 30, 22, 'EAD', {s: 11, w: 700, c: 'var(--bad)'});
-  h += tx(x0 + 58, 34, 'plateau', {s: 10, c: 'var(--muted)', a: 'start'});
+  h += tx(x0 + 58, 34, 'plateau', {s: 10.5, c: 'var(--muted)', a: 'start'});
   /* ECG: baseline y 180 */
   var tH = s.k ? 10 : 24, tw = 46;
   var tStart = endPlat - 30, tPeak = endPlat + 10, tEnd = endRep + 4;
@@ -681,7 +684,7 @@ function apSVG(k){
   if (s.k) ecg += ' Q ' + (tEnd + 16) + ' 172 ' + (tEnd + 30) + ' 180';
   ecg += ' L 330 180';
   h += '<rect x="30" y="128" width="304" height="72" rx="6" fill="var(--ecg-paper)"/>' + pth(ecg, 'var(--ecg-ink)', 2);
-  if (s.k) h += tx(tEnd + 16, 166, 'U', {s: 10, c: 'var(--muted)'});
+  if (s.k) h += tx(tEnd + 16, 166, 'U', {s: 10.5, c: 'var(--muted)'});
   if (s.ead) h += pth('M' + (endPlat + 30) + ' 180 L' + (endPlat + 34) + ' 150 L' + (endPlat + 40) + ' 196 L' + (endPlat + 44) + ' 180', 'var(--bad)', 2);
   /* QT bracket */
   h += pth('M' + (x0 + 18) + ' 212 L' + (x0 + 18) + ' 220 L' + tEnd + ' 220 L' + tEnd + ' 212', 'var(--muted)', 1.5) + tx((x0 + 18 + tEnd) / 2, 216, '', {}) + tx((x0 + 18 + tEnd) / 2, 228, 'QT ' + (k === 'normal' ? '' : '(longer)'), {s: 11, w: 600});
@@ -709,7 +712,7 @@ function measSVG(k){
   }
   if (k === 'af'){
     h += pth(beat(14, 10, 104) + ' L 150 ' + base + beat(150, 10, 236).replace(/^M/, ' L') + ' L 334 ' + base, 'var(--ecg-ink)', 2);
-    h += tx(70, 30, 'after a short RR', {s: 10, c: 'var(--muted)'}) + tx(212, 30, 'after a long RR', {s: 10, c: 'var(--muted)'});
+    h += tx(70, 30, 'after a short RR', {s: 10.5, c: 'var(--muted)'}) + tx(212, 30, 'after a long RR', {s: 10.5, c: 'var(--muted)'});
     h += pth('M14 132 L104 132', 'var(--accent)', 2) + pth('M150 132 L236 132', 'var(--accent)', 2) + tx(270, 136, 'average', {s: 11, w: 600, c: 'var(--accent)'});
   } else {
     var w = k === 'wide' ? 34 : 12, tEnd = k === 'wide' ? 250 : 226;
@@ -718,7 +721,7 @@ function measSVG(k){
     h += pth('M30 132 L' + tEnd + ' 132', 'var(--accent)', 2) + pth('M30 126 L30 138', 'var(--accent)', 2) + pth('M' + tEnd + ' 126 L' + tEnd + ' 138', 'var(--accent)', 2);
     h += tx((30 + tEnd) / 2, 162, 'QT', {s: 12, w: 700, c: 'var(--accent)'});
     if (k === 'uwave') h += tx(tEnd + 16, 90, 'U', {s: 11, w: 600});
-    if (k === 'wide') h += pth('M30 22 L' + (30 + w + 4) + ' 22', 'var(--warn)', 2) + tx(30 + w + 10, 26, 'wide QRS', {a: 'start', s: 10, c: 'var(--warn)'});
+    if (k === 'wide') h += pth('M30 22 L' + (30 + w + 4) + ' 22', 'var(--warn)', 2) + tx(30 + w + 10, 26, 'wide QRS', {a: 'start', s: 10.5, c: 'var(--warn)'});
   }
   return h + '</svg>';
 }
@@ -738,13 +741,13 @@ function tdpSVG(k){
   if (k === 'ssl'){
     d += sinus(14, 56) + pvc(88) + ' L150 ' + b + sinus(150, 84) + pvc(240) + ' L336 ' + b;
     h += pth(d, 'var(--ecg-ink)', 2);
-    h += tx(100, 26, 'early beat', {s: 10, c: 'var(--muted)'}) + tx(132, 120, 'pause', {s: 10, c: 'var(--muted)'}) + tx(196, 26, 'longer QT', {s: 10, c: 'var(--muted)'}) + tx(256, 26, 'R on T', {s: 10, w: 700, c: 'var(--bad)'});
+    h += tx(100, 26, 'early beat', {s: 10.5, c: 'var(--muted)'}) + tx(132, 120, 'pause', {s: 10.5, c: 'var(--muted)'}) + tx(196, 26, 'longer QT', {s: 10.5, c: 'var(--muted)'}) + tx(256, 26, 'R on T', {s: 10.5, w: 700, c: 'var(--bad)'});
   } else {
     d += sinus(14, 70) + ' L96 ' + b;
     var x = 96;
     for (var n = 0; n < 15; n++){ var amp = 10 + 34 * Math.abs(Math.sin(n / 15 * Math.PI * 1.5 + .4)); var sg = n % 2 ? 1 : -1; d += ' L' + (x + 6) + ' ' + (b + sg * amp) + ' L' + (x + 15) + ' ' + (b - sg * amp * .8); x += 15; }
     d += ' L336 ' + b;
-    h += pth(d, 'var(--ecg-ink)', 2) + tx(220, 24, 'twisting polymorphic VT', {s: 10, w: 700, c: 'var(--bad)'});
+    h += pth(d, 'var(--ecg-ink)', 2) + tx(220, 24, 'twisting polymorphic VT', {s: 10.5, w: 700, c: 'var(--bad)'});
   }
   return h + '</svg>';
 }
@@ -756,11 +759,11 @@ function rateSVG(qt, hr){
   var x = function(v){ return L + (v - 40) / (150 - 40) * (R - L); };
   var lo = 280, hi = 640, y = function(v){ return B - (Math.max(lo, Math.min(hi, v)) - lo) / (hi - lo) * (B - T); };
   var h = svgOpen('0 0 ' + W + ' ' + H, 'Corrected QT across heart rates for a QT of ' + qt + ' ms');
-  [300, 400, 500, 600].forEach(function(v){ h += pth('M' + L + ' ' + y(v) + ' L' + R + ' ' + y(v), 'var(--line)', 1) + tx(L - 4, y(v) + 4, v, {a: 'end', s: 10, c: 'var(--muted)'}); });
-  [40, 60, 85, 100, 150].forEach(function(v){ h += tx(x(v), B + 14, v, {s: 10, c: 'var(--muted)'}); });
-  h += tx((L + R) / 2, B + 30, 'heart rate /min', {s: 10, c: 'var(--muted)'});
+  [300, 400, 500, 600].forEach(function(v){ h += pth('M' + L + ' ' + y(v) + ' L' + R + ' ' + y(v), 'var(--line)', 1) + tx(L - 4, y(v) + 4, v, {a: 'end', s: 10.5, c: 'var(--muted)'}); });
+  [40, 60, 85, 100, 150].forEach(function(v){ h += tx(x(v), B + 14, v, {s: 10.5, c: 'var(--muted)'}); });
+  h += tx((L + R) / 2, B + 30, 'heart rate /min', {s: 10.5, c: 'var(--muted)'});
   h += '<rect x="' + x(60) + '" y="' + T + '" width="' + (x(85) - x(60)) + '" height="' + (B - T) + '" fill="var(--fill)"/>';
-  h += pth('M' + L + ' ' + y(500) + ' L' + R + ' ' + y(500), 'var(--bad)', 1, ' stroke-dasharray="4 4"') + tx(R, y(500) - 4, '500', {a: 'end', s: 10, c: 'var(--bad)'});
+  h += pth('M' + L + ' ' + y(500) + ' L' + R + ' ' + y(500), 'var(--bad)', 1, ' stroke-dasharray="4 4"') + tx(R, y(500) - 4, '500', {a: 'end', s: 10.5, c: 'var(--bad)'});
   var cols = {baz: 'var(--bad)', fri: 'var(--accent)', fra: 'var(--ok)'};
   ['baz', 'fri', 'fra'].forEach(function(k){
     var d = ''; for (var v = 40; v <= 150; v += 2){ var q = FORM[k].f(qt, 60 / v); d += (d ? ' L' : 'M') + x(v).toFixed(1) + ' ' + y(q).toFixed(1); }

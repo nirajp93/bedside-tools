@@ -122,6 +122,9 @@ footer p{margin:0 0 8px}
 .deeper .dl{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500;margin:0 0 3px}
 .deeper p{font-size:15px;line-height:1.45;color:var(--ink);margin:0 0 4px}
 .deeper p:last-child{margin-bottom:0}
+/* cause-fix: ruled-out causes stay readable; the name greys, the reason does not fade */
+.cause.out,.cause.less,.cause.unl{opacity:1}
+.cause.less>span,.cause.unl>span{color:var(--muted)}
 </style>
 </head>
 <body>
@@ -551,12 +554,12 @@ function lagLine(k){ var S = lagSeries(k); if (k === 'drop') return 'Filtration 
 function lagSVG(k, p){
   var S = lagSeries(k), X = function(t){ return 40 + t * 56; }, Y = function(c){ return 170 - c * 36; }, YG = function(g){ return 170 - g * 144; };
   var h = svgOpen('0 0 360 210', 'Creatinine lags behind filtration: ' + LAG[k].n);
-  for (var c = 0; c <= 4; c++) h += '<line x1="40" x2="320" y1="' + Y(c) + '" y2="' + Y(c) + '" stroke="var(--line)"/>' + txt(34, Y(c) + 4, String(c), FM + ';font-size:10px;fill:var(--muted)', 'end');
-  for (var d = 0; d <= 5; d++) h += txt(X(d), 186, 'day ' + d, FM + ';font-size:10px;fill:var(--muted)');
-  h += '<path d="M' + X(-0.3) + ' ' + YG(1) + 'L' + X(0) + ' ' + YG(1) + S.map(function(q){ return 'L' + X(q[0]).toFixed(1) + ' ' + YG(q[2]).toFixed(1); }).join('') + '" fill="none" stroke="var(--muted)" stroke-width="2" stroke-dasharray="5 4"/>' + txt(326, YG(1) + 4, '100%', FM + ';font-size:10px;fill:var(--muted)', 'start') + txt(326, YG(0.25) + 14, '25%', FM + ';font-size:10px;fill:var(--muted)', 'start');
+  for (var c = 0; c <= 4; c++) h += '<line x1="40" x2="320" y1="' + Y(c) + '" y2="' + Y(c) + '" stroke="var(--line)"/>' + txt(34, Y(c) + 4, String(c), FM + ';font-size:10.5px;fill:var(--muted)', 'end');
+  for (var d = 0; d <= 5; d++) h += txt(X(d), 186, 'day ' + d, FM + ';font-size:10.5px;fill:var(--muted)');
+  h += '<path d="M' + X(-0.3) + ' ' + YG(1) + 'L' + X(0) + ' ' + YG(1) + S.map(function(q){ return 'L' + X(q[0]).toFixed(1) + ' ' + YG(q[2]).toFixed(1); }).join('') + '" fill="none" stroke="var(--muted)" stroke-width="2" stroke-dasharray="5 4"/>' + txt(326, YG(1) + 4, '100%', FM + ';font-size:10.5px;fill:var(--muted)', 'start') + txt(326, YG(0.25) + 14, '25%', FM + ';font-size:10.5px;fill:var(--muted)', 'start');
   h += '<path d="' + S.map(function(q, n){ return (n ? 'L' : 'M') + X(q[0]).toFixed(1) + ' ' + Y(q[1]).toFixed(1); }).join('') + '" fill="none" stroke="var(--accent)" stroke-width="3"/>';
-  h += txt(44, 14, 'creatinine, mg/dL (solid) · filtration (dashed)', FM + ';font-size:10px;fill:var(--muted)', 'start');
-  h += txt(186, 204, 'schematic: one-compartment model, numbers illustrative', FM + ';font-size:9.5px;fill:var(--muted)');
+  h += txt(44, 14, 'creatinine, mg/dL (solid) · filtration (dashed)', FM + ';font-size:10.5px;fill:var(--muted)', 'start');
+  h += txt(186, 204, 'schematic: one-compartment model, numbers illustrative', FM + ';font-size:10.5px;fill:var(--muted)');
   return h + '</svg>';
 }
 
@@ -568,17 +571,17 @@ var TUB = {
 function tubSVG(k, p){
   var s = TUB[k], h = svgOpen('0 0 340 230', 'Tubule handling of sodium and urea: ' + s.n) + markers(p);
   var st = function(v){ return v === 'u' ? 'var(--accent)' : v === 'x' ? 'var(--bad)' : 'var(--muted)'; };
-  h += '<circle cx="34" cy="60" r="20" fill="var(--fill)" stroke="var(--muted)"/>' + txt(34, 64, 'glom', FM + ';font-size:10px;fill:var(--ink)');
+  h += '<circle cx="34" cy="60" r="20" fill="var(--fill)" stroke="var(--muted)"/>' + txt(34, 64, 'glom', FM + ';font-size:10.5px;fill:var(--ink)');
   h += '<path d="M54 60H120 Q130 60 130 70 V140 Q130 160 150 160 Q170 160 170 140 V70 Q170 60 180 60 H250 V170 H300" fill="none" stroke="' + (k === 'atn' ? 'var(--bad)' : 'var(--ink)') + '" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" opacity=".18"/>';
   h += '<path d="M54 60H120 Q130 60 130 70 V140 Q130 160 150 160 Q170 160 170 140 V70 Q170 60 180 60 H250 V170 H300" fill="none" stroke="' + (k === 'atn' ? 'var(--bad)' : 'var(--muted)') + '" stroke-width="2"' + (k === 'atn' ? ' stroke-dasharray="6 4"' : '') + '/>';
   h += txt(98, 82, 'proximal'); h += txt(150, 182, 'loop'); h += txt(224, 82, 'distal'); h += txt(282, 188, 'collecting');
   /* reabsorption arrows back to blood (upward) */
-  [[82, 'Na + urea'], [210, 'Na']].forEach(function(a){ h += '<path d="M' + a[0] + ' 56V26" stroke="' + st(s.back) + '" stroke-width="' + (s.back === 'u' ? 3 : 1.5) + '"' + (s.back === 'd' ? ' stroke-dasharray="4 3"' : '') + ' marker-end="url(#' + p + 'a)"/>' + txt(a[0], 18, a[1], FM + ';font-size:10px;fill:var(--ink)'); });
-  h += '<path d="M178 120H206" stroke="' + st(s.loop) + '" stroke-width="' + (s.loop === 'u' ? 3 : 1.5) + '"' + (s.loop !== 'u' ? ' stroke-dasharray="4 3"' : '') + ' marker-end="url(#' + p + 'a)"/>' + txt(212, 124, 'Na', FM + ';font-size:10px;fill:var(--ink)', 'start');
-  if (s.loop === 'x') h += '<path d="M182 112L198 128M198 112L182 128" stroke="var(--bad)" stroke-width="3"/>' + txt(232, 124, 'blocked', FM + ';font-size:10px;fill:var(--bad)', 'start');
-  if (s.cast) h += '<rect x="226" y="96" width="14" height="40" rx="7" fill="var(--warn)" opacity=".7"/>' + txt(232, 150, 'cast', FM + ';font-size:10px;fill:var(--warn)');
-  h += '<rect x="8" y="198" width="160" height="26" rx="8" fill="var(--fill)"/>' + txt(88, 215, 'FENa ' + s.na, FM + ';font-size:10px;fill:var(--ink)');
-  h += '<rect x="174" y="198" width="160" height="26" rx="8" fill="var(--fill)"/>' + txt(254, 215, 'FEUrea ' + s.u, FM + ';font-size:10px;fill:var(--ink)');
+  [[82, 'Na + urea'], [210, 'Na']].forEach(function(a){ h += '<path d="M' + a[0] + ' 56V26" stroke="' + st(s.back) + '" stroke-width="' + (s.back === 'u' ? 3 : 1.5) + '"' + (s.back === 'd' ? ' stroke-dasharray="4 3"' : '') + ' marker-end="url(#' + p + 'a)"/>' + txt(a[0], 18, a[1], FM + ';font-size:10.5px;fill:var(--ink)'); });
+  h += '<path d="M178 120H206" stroke="' + st(s.loop) + '" stroke-width="' + (s.loop === 'u' ? 3 : 1.5) + '"' + (s.loop !== 'u' ? ' stroke-dasharray="4 3"' : '') + ' marker-end="url(#' + p + 'a)"/>' + txt(212, 124, 'Na', FM + ';font-size:10.5px;fill:var(--ink)', 'start');
+  if (s.loop === 'x') h += '<path d="M182 112L198 128M198 112L182 128" stroke="var(--bad)" stroke-width="3"/>' + txt(232, 124, 'blocked', FM + ';font-size:10.5px;fill:var(--bad)', 'start');
+  if (s.cast) h += '<rect x="226" y="96" width="14" height="40" rx="7" fill="var(--warn)" opacity=".7"/>' + txt(232, 150, 'cast', FM + ';font-size:10.5px;fill:var(--warn)');
+  h += '<rect x="8" y="198" width="160" height="26" rx="8" fill="var(--fill)"/>' + txt(88, 215, 'FENa ' + s.na, FM + ';font-size:10.5px;fill:var(--ink)');
+  h += '<rect x="174" y="198" width="160" height="26" rx="8" fill="var(--fill)"/>' + txt(254, 215, 'FEUrea ' + s.u, FM + ';font-size:10.5px;fill:var(--ink)');
   return h + '</svg>';
 }
 
@@ -598,7 +601,7 @@ function sedSVG(k, p){
   if (k === 'wbc'){ var w = ''; for (var q = 0; q < 5; q++){ var cx = 128 + q * 22, cy = q % 2 ? 86 : 74; w += '<circle cx="' + cx + '" cy="' + cy + '" r="10" fill="var(--card)" stroke="var(--accent)"/><circle cx="' + (cx - 3) + '" cy="' + (cy - 2) + '" r="3" fill="var(--accent)"/><circle cx="' + (cx + 3) + '" cy="' + (cy + 2) + '" r="3" fill="var(--accent)"/>'; } h += cast(w); }
   if (k === 'rtec'){ [[130, 64], [186, 92], [214, 58]].forEach(function(c){ h += '<rect x="' + (c[0] - 18) + '" y="' + (c[1] - 14) + '" width="36" height="28" rx="10" fill="var(--card)" stroke="var(--muted)"/><circle cx="' + c[0] + '" cy="' + c[1] + '" r="7" fill="var(--muted)"/>'; }); }
   if (k === 'bland'){ h += txt(170, 84, 'few cells, no casts', FM + ';font-size:11px;fill:var(--muted)'); }
-  h += txt(170, 152, 'drawn for this site, not to scale', FM + ';font-size:9.5px;fill:var(--muted)');
+  h += txt(170, 152, 'drawn for this site, not to scale', FM + ';font-size:10.5px;fill:var(--muted)');
   return h + '</svg>';
 }
 

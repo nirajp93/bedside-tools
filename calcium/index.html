@@ -197,6 +197,9 @@ footer p{margin:0 0 8px}
 .vk-hot:focus-visible,.vk-opt:focus-visible,.vk-cell:focus-visible,.vk-btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 @media (max-width:479px){.vk-hot{width:20px;height:20px;font-size:11px}}
 @media (min-width:900px){.vk-grid{grid-template-columns:repeat(3,1fr)}.vk-hot{width:30px;height:30px}}
+/* cause-fix: ruled-out causes stay readable; the name greys, the reason does not fade */
+.cause.out,.cause.less,.cause.unl{opacity:1}
+.cause.less>span,.cause.unl>span{color:var(--muted)}
 </style>
 </head>
 <body>
@@ -584,9 +587,9 @@ var FS = 'font-family:var(--sans)', FM = 'font-family:var(--mono)';
 function vcol(v){ return v === 'u' ? 'var(--warn)' : v === 'd' ? 'var(--accent)' : v === 'x' ? 'var(--bad)' : 'var(--muted)'; }
 function markers(p){ return '<defs>' + ['n','u','d','x'].map(function(k){ return '<marker id="' + p + k + '" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="' + vcol(k) + '"/></marker>'; }).join('') + '</defs>'; }
 function box(x, y, w, h, t1, t2, hot, dim){
-  return '<g' + (dim ? ' opacity=".45"' : '') + '><rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="10" fill="' + (hot ? 'var(--warnbg)' : 'var(--fill)') + '" stroke="' + (hot ? 'var(--warn)' : 'var(--line)') + '"' + (hot ? ' stroke-width="2"' : '') + '/>' +
+  return '<g' + (dim ? ' opacity=".62"' : '') + '><rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="10" fill="' + (hot ? 'var(--warnbg)' : 'var(--fill)') + '" stroke="' + (hot ? 'var(--warn)' : 'var(--line)') + '"' + (hot ? ' stroke-width="2"' : '') + '/>' +
     '<text x="' + (x + w / 2) + '" y="' + (y + (t2 ? h / 2 - 2 : h / 2 + 4)) + '" text-anchor="middle" style="' + FS + ';font-size:12px;font-weight:600;fill:var(--ink)">' + t1 + '</text>' +
-    (t2 ? '<text x="' + (x + w / 2) + '" y="' + (y + h / 2 + 12) + '" text-anchor="middle" style="' + FM + ';font-size:10px;fill:var(--muted)">' + t2 + '</text>' : '') + '</g>';
+    (t2 ? '<text x="' + (x + w / 2) + '" y="' + (y + h / 2 + 12) + '" text-anchor="middle" style="' + FM + ';font-size:10.5px;fill:var(--muted)">' + t2 + '</text>' : '') + '</g>';
 }
 function svgOpen(vb, label){ return '<svg viewBox="' + vb + '" role="img" aria-label="' + label + '" class="fig">'; }
 function line(d, v, w, p){ return '<path d="' + d + '" fill="none" stroke="' + vcol(v) + '" stroke-width="' + (w || (v === 'u' ? 4 : v === 'd' ? 1.5 : 2)) + '"' + (v === 'd' || v === 'x' ? ' stroke-dasharray="5 4"' : '') + ' marker-end="url(#' + p + (v || 'n') + ')"/>'; }
@@ -600,7 +603,7 @@ function loopSVG(key, p){
   h += line('M94 150 L118 150', a.boneCa, 0, p) + line('M246 150 L222 150', a.kidCa, 0, p);
   h += line('M290 180 L224 262', a.cal, 0, p) + lab(296, 222, 'calcitriol', a.cal);
   h += line('M170 248 L170 178', a.gutCa, 0, p);
-  h += '<path d="M170 126 L170 52" fill="none" stroke="' + vcol(a.fb) + '" stroke-width="2"' + (a.fb ? ' stroke-dasharray="5 4"' : '') + '/><path d="M160 50 H180" stroke="' + vcol(a.fb) + '" stroke-width="3"/><text x="177" y="112" style="' + FM + ';font-size:10px;fill:' + vcol(a.fb) + '">' + (a.fb ? 'ignored ✕' : 'off switch') + '</text>';
+  h += '<path d="M170 126 L170 52" fill="none" stroke="' + vcol(a.fb) + '" stroke-width="2"' + (a.fb ? ' stroke-dasharray="5 4"' : '') + '/><path d="M160 50 H180" stroke="' + vcol(a.fb) + '" stroke-width="3"/><text x="177" y="112" style="' + FM + ';font-size:10.5px;fill:' + vcol(a.fb) + '">' + (a.fb ? 'ignored ✕' : 'off switch') + '</text>';
   h += box(120, 6, 100, 40, 'Parathyroid', null, key === 'phpt' || key === 'fhh');
   h += box(120, 126, 100, 50, 'Blood calcium', LABTXT[s.labs[0]], false);
   h += box(8, 122, 84, 56, 'Bone', 'releases', false) + box(248, 122, 84, 56, 'Kidney', 'saves Ca', key === 'ckd') + box(120, 250, 100, 42, 'Gut', 'absorbs', false);
@@ -648,7 +651,7 @@ function setpSVG(k){
   function pt(x, x0, floor){ var y = floor + (1 - floor) / (1 + Math.exp((x - x0) / 6)); return [40 + x * 2.8, 190 - y * 160]; }
   var h = svgOpen('0 0 340 240', 'PTH against calcium: ' + SETP[k].n);
   h += '<path d="M40 20V190H324" fill="none" stroke="var(--muted)" stroke-width="1.5"/><text x="182" y="226" text-anchor="middle" style="' + FM + ';font-size:11px;fill:var(--muted)">blood calcium →</text><text x="14" y="110" text-anchor="middle" transform="rotate(-90 14 110)" style="' + FM + ';font-size:11px;fill:var(--muted)">PTH →</text>';
-  h += '<rect x="138" y="20" width="56" height="170" fill="var(--fill)"/><text x="166" y="206" text-anchor="middle" style="' + FM + ';font-size:10px;fill:var(--muted)">normal range</text>';
+  h += '<rect x="138" y="20" width="56" height="170" fill="var(--fill)"/><text x="166" y="206" text-anchor="middle" style="' + FM + ';font-size:10.5px;fill:var(--muted)">normal range</text>';
   h += '<path d="' + curve(42, 0.04) + '" fill="none" stroke="var(--muted)" stroke-width="2"' + (k === 'phpt' || k === 'fhh' ? ' stroke-dasharray="4 4"' : '') + '/>';
   var P;
   if (k === 'phpt'){ h += '<path d="' + curve(62, 0.28) + '" fill="none" stroke="var(--warn)" stroke-width="3"/>'; P = pt(72, 62, 0.28); }
@@ -922,7 +925,7 @@ function fork(o){
     '<rect x="104" y="4" width="112" height="30" rx="8" fill="var(--fill)" stroke="var(--line)"/><text x="160" y="24" text-anchor="middle" style="font-family:var(--mono)">' + (hi ? 'High calcium' : 'Low calcium') + '</text>' +
     '<path d="M160 34V50M70 50H250M70 50V64M250 50V64" stroke="var(--muted)" fill="none"/>' + box(8, L, left) + box(188, R, right) +
     '<path d="M250 108V120M184 120H316M184 120V130M250 120V130M316 120V130" stroke="' + (right ? 'var(--accent)' : 'var(--line)') + '" fill="none"/>';
-  [184, 250, 316].forEach(function(x, n){ s += '<text x="' + x + '" y="144" text-anchor="middle" style="font-family:var(--mono)" class="' + (right ? '' : 'dim') + '">' + leaves[n][0] + '</text><text x="' + x + '" y="159" text-anchor="middle" style="font-family:var(--mono);font-size:10px" class="dim">' + leaves[n][1] + '</text>'; });
+  [184, 250, 316].forEach(function(x, n){ s += '<text x="' + x + '" y="144" text-anchor="middle" style="font-family:var(--mono)" class="' + (right ? '' : 'dim') + '">' + leaves[n][0] + '</text><text x="' + x + '" y="159" text-anchor="middle" style="font-family:var(--mono);font-size:10.5px" class="dim">' + leaves[n][1] + '</text>'; });
   return s + '</svg>';
 }
 function workCard(o){

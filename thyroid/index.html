@@ -154,6 +154,9 @@ footer p{margin:0 0 8px}
 .dp .dl{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500;margin:0 0 3px}
 .dp p{font-size:15px;line-height:1.45;color:var(--ink);margin:0 0 4px}
 .dp p:last-child{margin-bottom:0}
+/* cause-fix: ruled-out causes stay readable; the name greys, the reason does not fade */
+.cause.out,.cause.less,.cause.unl{opacity:1}
+.cause.less>span,.cause.unl>span{color:var(--muted)}
 </style>
 <script>function dpHtml(rows){ return rows.map(function(r){ return '<div><span class="dl">' + r[0] + '</span>' + r[1] + '</div>'; }).join(''); }</script>
 </head>
@@ -687,7 +690,7 @@ function figAxis(st){
   '<path d="M162 178 H250 V36 H166" fill="none" stroke="'+hc+'" stroke-width="'+hw+'" stroke-linejoin="round" marker-end="url(#ah)"/>'+
   '<line x1="250" y1="101" x2="166" y2="101" stroke="'+hc+'" stroke-width="'+Math.max(1.4,hw*0.6)+'" stroke-dasharray="4 3" marker-end="url(#ah)"/>'+
   '<text x="258" y="130" font-size="12" fill="'+hc+'">free T4</text><text x="258" y="146" font-size="12" fill="'+hc+'">and T3</text><text x="200" y="94" text-anchor="middle" font-size="10.5" fill="var(--muted)">feedback −</text>';
-  if(a.x==='trab')g+='<circle cx="20" cy="178" r="14" fill="var(--badbg)" stroke="var(--bad)"/><text x="20" y="182" text-anchor="middle" font-size="9" fill="var(--bad)">TRAb</text>';
+  if(a.x==='trab')g+='<circle cx="20" cy="178" r="14" fill="var(--badbg)" stroke="var(--bad)"/><text x="20" y="182" text-anchor="middle" font-size="10.5" fill="var(--bad)">TRAb</text>';
   if(a.x==='nod')g+='<circle cx="140" cy="178" r="9" fill="var(--badbg)" stroke="var(--bad)"/>';
   if(a.x==='leak')g+='<path d="M60 202 l-6 14 M80 202 l-2 16 M100 202 l2 14" stroke="var(--bad)" stroke-width="2" stroke-linecap="round"/><text x="120" y="222" font-size="10.5" fill="var(--bad)">leak</text>';
   if(a.x==='pill')g+='<rect x="268" y="196" width="56" height="24" rx="12" fill="var(--badbg)" stroke="var(--bad)"/><text x="296" y="212" text-anchor="middle" font-size="10.5" fill="var(--bad)">pills</text><line x1="268" y1="200" x2="254" y2="182" stroke="var(--bad)" stroke-width="2" marker-end="url(#ah)"/>';
@@ -702,8 +705,8 @@ function figCurve(st){
   var path='';for(var v=0.4;v<=3.0001;v+=0.05){var t=Math.max(0.01,Math.min(100,1.5*Math.pow(10,-1.6*(v-1.25))));path+=(path?'L':'M')+X(v).toFixed(1)+' '+Y(t).toFixed(1)}
   var g='<svg viewBox="0 0 340 230" role="img" aria-label="TSH falls ten-fold for small rises in free T4">'+
    '<rect x="'+X(0.8)+'" y="20" width="'+(X(1.8)-X(0.8))+'" height="170" fill="var(--fill)"/><rect x="50" y="'+Y(4)+'" width="270" height="'+(Y(0.4)-Y(4))+'" fill="var(--fill)"/>'+
-   [100,10,1,0.1,0.01].map(function(t){return '<line x1="50" x2="320" y1="'+Y(t)+'" y2="'+Y(t)+'" stroke="var(--line)"/><text x="44" y="'+(Y(t)+4)+'" text-anchor="end" font-size="10" fill="var(--muted)">'+t+'</text>'}).join('')+
-   [0.5,1,1.5,2,2.5,3].map(function(v){return '<text x="'+X(v)+'" y="206" text-anchor="middle" font-size="10" fill="var(--muted)">'+v+'</text>'}).join('')+
+   [100,10,1,0.1,0.01].map(function(t){return '<line x1="50" x2="320" y1="'+Y(t)+'" y2="'+Y(t)+'" stroke="var(--line)"/><text x="44" y="'+(Y(t)+4)+'" text-anchor="end" font-size="10.5" fill="var(--muted)">'+t+'</text>'}).join('')+
+   [0.5,1,1.5,2,2.5,3].map(function(v){return '<text x="'+X(v)+'" y="206" text-anchor="middle" font-size="10.5" fill="var(--muted)">'+v+'</text>'}).join('')+
    '<text x="185" y="224" text-anchor="middle" font-size="10.5" fill="var(--muted)">free T4 (ng/dL)</text><text x="12" y="105" font-size="10.5" fill="var(--muted)" transform="rotate(-90 12 105)" text-anchor="middle">TSH, log scale</text>'+
    '<path d="'+path+'" fill="none" stroke="var(--accent)" stroke-width="2.5"/><circle cx="'+X(f)+'" cy="'+Y(tsh)+'" r="6" fill="var(--accent)" stroke="var(--card)" stroke-width="2"/></svg>';
   return '<div class="fig" data-figwrap="curve">'+g+'<div class="sl"><label class="sll" for="curve-sl"><span>free T4 '+f.toFixed(2)+'</span><span>TSH about '+(tsh<0.1?tsh.toFixed(3):tsh<10?tsh.toFixed(2):Math.round(tsh))+'</span></label><input type="range" id="curve-sl" data-figrange="curve" min="0.4" max="3" step="0.05" value="'+f+'"></div><p class="figcap">TSH changes on a log scale for straight-line changes in free T4: doubling free T4 moves TSH about a hundred-fold. That is why TSH leaves its range first (subclinical disease) and why it is the best single screen when the pituitary is normal.</p><p class="figsrc">Illustrative curve; shaded bands are the reference ranges.</p><div class="dp">'+dpHtml([['What is happening',f<0.8?'<p>Free T4 is low. The pituitary senses it (after converting T4 to T3 inside its own cells) and releases far more TSH, which drives the gland to trap iodine and make hormone. If the gland cannot answer, TSH stays high: primary hypothyroidism.</p>':f>1.8?'<p>Free T4 is high. The pituitary shuts TSH release almost completely. A TSH this low with a high free T4 means the thyroid is acting on its own: Graves disease, a toxic nodule, thyroiditis, or too much levothyroxine.</p>':'<p>Inside the reference range, yet TSH still moves several-fold across it. Each person runs at their own set point within the range, so a TSH outside its range with a normal free T4 means free T4 has moved away from that person\'s own normal.</p>'],['Why TSH is the first test','<p>The pituitary amplifies: a small change in free T4 becomes a large change in TSH. TSH therefore leaves its range before free T4 does, which is what "subclinical" means.</p>'],['When the curve does not hold','<p>The curve assumes a working pituitary and a steady state. It fails with pituitary or hypothalamic disease (TSH low or normal with a low free T4), during severe illness, in the weeks after a dose change or thyroiditis (TSH lags by about six weeks), and with assay interference such as biotin.</p>']])+'</div></div>';
@@ -728,10 +731,10 @@ var ITC={subacute:'Subacute: painful, tender gland, high ESR, often after a vira
 function figItis(st){
   var cap=ITC[st]||ITC.subacute;
   var g='<svg viewBox="0 0 340 190" role="img" aria-label="Phases of thyroiditis over time">'+
-   '<rect x="40" y="70" width="290" height="40" fill="var(--fill)"/><text x="334" y="94" text-anchor="end" font-size="10" fill="var(--muted)">normal</text>'+
+   '<rect x="40" y="70" width="290" height="40" fill="var(--fill)"/><text x="334" y="94" text-anchor="end" font-size="10.5" fill="var(--muted)">normal</text>'+
    '<path d="M40 90 C60 90 70 20 100 22 C130 24 130 90 150 100 C170 130 190 150 220 148 C250 146 260 92 330 90" fill="none" stroke="var(--accent)" stroke-width="3"/>'+
    '<text x="96" y="14" text-anchor="middle" font-size="11" fill="var(--bad)">thyrotoxic</text><text x="214" y="172" text-anchor="middle" font-size="11" fill="var(--accent)">hypothyroid</text><text x="300" y="62" text-anchor="middle" font-size="11" fill="var(--ok)">recovery</text>'+
-   '<text x="40" y="186" font-size="10" fill="var(--muted)">weeks</text><text x="330" y="186" text-anchor="end" font-size="10" fill="var(--muted)">months</text></svg>';
+   '<text x="40" y="186" font-size="10.5" fill="var(--muted)">weeks</text><text x="330" y="186" text-anchor="end" font-size="10.5" fill="var(--muted)">months</text></svg>';
   return '<div class="fig" data-figwrap="itis">'+g+segBtns('itis',[['subacute','Subacute'],['painless','Painless'],['postpartum','Postpartum'],['ici','Checkpoint inhibitor'],['ait2','Amiodarone type 2']],st)+'<p class="figcap">Stored hormone leaks out, then the emptied gland underproduces until it heals. '+cap+'</p><p class="figsrc">Shape is schematic; timing varies.</p></div>';
 }
 function figLt4(st){
@@ -739,8 +742,8 @@ function figLt4(st){
   for(var d=0;d<=56;d+=1){var v=stop?Math.pow(0.5,d/7):1-Math.pow(0.5,d/7);var x=40+d/56*280,y=170-v*140;pts+=(pts?'L':'M')+x.toFixed(1)+' '+y.toFixed(1)}
   var mk=stop?7:42,mv=stop?0.5:1-Math.pow(0.5,6),mx=40+mk/56*280,my=170-mv*140;
   var g='<svg viewBox="0 0 340 200" role="img" aria-label="Levothyroxine level over time">'+
-   '<line x1="40" y1="30" x2="320" y2="30" stroke="var(--line)" stroke-dasharray="4 3"/><text x="44" y="24" font-size="10" fill="var(--muted)">steady state</text>'+
-   [0,7,14,21,28,35,42,49,56].map(function(d){return '<text x="'+(40+d/56*280)+'" y="188" text-anchor="middle" font-size="10" fill="var(--muted)">'+(d/7)+'</text>'}).join('')+'<text x="320" y="198" text-anchor="end" font-size="10" fill="var(--muted)">weeks</text>'+
+   '<line x1="40" y1="30" x2="320" y2="30" stroke="var(--line)" stroke-dasharray="4 3"/><text x="44" y="24" font-size="10.5" fill="var(--muted)">steady state</text>'+
+   [0,7,14,21,28,35,42,49,56].map(function(d){return '<text x="'+(40+d/56*280)+'" y="188" text-anchor="middle" font-size="10.5" fill="var(--muted)">'+(d/7)+'</text>'}).join('')+'<text x="320" y="198" text-anchor="end" font-size="10.5" fill="var(--muted)">weeks</text>'+
    '<path d="'+pts+'" fill="none" stroke="var(--accent)" stroke-width="3"/><circle cx="'+mx+'" cy="'+my+'" r="6" fill="var(--accent)" stroke="var(--card)" stroke-width="2"/></svg>';
   return '<div class="fig" data-figwrap="lt4">'+g+segBtns('lt4',[['start','Start or change'],['stop','Stop (NPO)']],stop?'stop':'start')+'<p class="figcap">'+(stop?'With a half-life of about 7 days, levels fall by half in a week, so a few missed days while NPO change little.':'With a half-life of about 7 days, a new dose takes about 6 weeks (five to six half-lives) to settle. Checking TSH sooner reads a moving target.')+'</p><p class="figsrc">Pharmacology; half-life about 7 days (ATA 2014).</p></div>';
 }
@@ -749,7 +752,7 @@ function figPreg(){
   var g='<svg viewBox="0 0 340 196" role="img" aria-label="hCG peaks near week 10 while TSH dips">'+
    '<path d="'+hc+'" fill="none" stroke="var(--bad)" stroke-width="3"/><path d="'+ts+'" fill="none" stroke="var(--accent)" stroke-width="3"/>'+
    '<text x="110" y="34" font-size="11" fill="var(--bad)">hCG</text><text x="300" y="72" font-size="11" fill="var(--accent)">TSH</text>'+
-   [0,10,20,30,40].map(function(w){return '<text x="'+(40+w/40*280)+'" y="184" text-anchor="middle" font-size="10" fill="var(--muted)">'+w+'</text>'}).join('')+'<text x="320" y="196" text-anchor="end" font-size="10" fill="var(--muted)">weeks</text></svg>';
+   [0,10,20,30,40].map(function(w){return '<text x="'+(40+w/40*280)+'" y="184" text-anchor="middle" font-size="10.5" fill="var(--muted)">'+w+'</text>'}).join('')+'<text x="320" y="196" text-anchor="end" font-size="10.5" fill="var(--muted)">weeks</text></svg>';
   return '<div class="fig">'+g+'<p class="figcap">hCG looks enough like TSH to stimulate the TSH receptor. Near its first-trimester peak, TSH dips and free T4 can rise: gestational transient thyrotoxicosis. It is not treated with antithyroid drugs; propranolol for palpitations (ATA 2026).</p><p class="figsrc">Schematic shapes, no units.</p></div>';
 }
 function figAit(){
@@ -763,8 +766,8 @@ function figStorm(st){
    '<text x="90" y="70" text-anchor="middle" font-size="11" fill="var(--muted)">iodine → new hormone</text><text x="90" y="86" text-anchor="middle" font-size="11" fill="'+(early?'var(--bad)':'var(--accent)')+'">'+(early?'more fuel, no block':'blocked: thionamide')+'</text>'+
    '<text x="90" y="124" text-anchor="middle" font-size="11" fill="var(--muted)">stored hormone → blood</text><text x="90" y="140" text-anchor="middle" font-size="11" fill="var(--accent)">blocked: iodine</text>'+
    '<line x1="162" y1="96" x2="210" y2="96" stroke="var(--muted)" stroke-width="2.5" marker-end="url(#ah)"/>'+
-   '<rect x="214" y="70" width="110" height="52" rx="12" fill="var(--fill)" stroke="var(--line)"/><text x="269" y="92" text-anchor="middle" font-size="11" fill="var(--ink)">T4 → T3</text><text x="269" y="108" text-anchor="middle" font-size="10" fill="var(--accent)">PTU, steroid, propranolol</text>'+
-   '<text x="269" y="150" text-anchor="middle" font-size="11" fill="var(--ink)">Heart, brain, fever</text><text x="269" y="166" text-anchor="middle" font-size="10" fill="var(--accent)">beta-blocker</text></svg>';
+   '<rect x="214" y="70" width="110" height="52" rx="12" fill="var(--fill)" stroke="var(--line)"/><text x="269" y="92" text-anchor="middle" font-size="11" fill="var(--ink)">T4 → T3</text><text x="269" y="108" text-anchor="middle" font-size="10.5" fill="var(--accent)">PTU, steroid, propranolol</text>'+
+   '<text x="269" y="150" text-anchor="middle" font-size="11" fill="var(--ink)">Heart, brain, fever</text><text x="269" y="166" text-anchor="middle" font-size="10.5" fill="var(--accent)">beta-blocker</text></svg>';
   return '<div class="fig" data-figwrap="storm">'+g+segBtns('storm',[['right','Thionamide, then iodine'],['iodfirst','Iodine first']],early?'iodfirst':'right')+'<p class="figcap">'+(early?'Iodine given before synthesis is blocked becomes raw material for more hormone. That is why it waits at least an hour.':'Each drug closes a different door: new synthesis, release of stored hormone, conversion to T3, and the effect on tissues.')+'</p><p class="figsrc">ATA 2016; Kopp 2026.</p></div>';
 }
 var FIG={axis:{title:'Pituitary–thyroid loop',f:figAxis,d:'normal'},curve:{title:'Why TSH moves so much',f:figCurve,d:'1.25'},deio:{title:'T4 to T3 conversion',f:figDeio,d:'none'},itis:{title:'Thyroiditis phases',f:figItis,d:'subacute'},lt4:{title:'Levothyroxine timing',f:figLt4,d:'start'},preg:{title:'hCG and TSH in pregnancy',f:figPreg,d:''},ait:{title:'Amiodarone type 1 vs 2',f:figAit,d:''},storm:{title:'Where storm drugs act',f:figStorm,d:'right'}};

@@ -11,7 +11,7 @@
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 html{-webkit-text-size-adjust:100%}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5;padding-bottom:76px}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5;padding-bottom:calc(76px + env(safe-area-inset-bottom))}
 .wrap{max-width:720px;margin:0 auto;padding:0 16px}
 a{color:var(--accent)}
 button{font:inherit;color:inherit}
@@ -258,6 +258,9 @@ footer strong{color:var(--ink)}
 .vk-lab{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 6px}
 .vk-head{font-weight:600;margin:0 0 4px}
 .vk-chip:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+/* cause-fix: ruled-out causes stay readable; the name greys, the reason does not fade */
+.cause.out,.cause.less,.cause.unl{opacity:1}
+.cause.less>span,.cause.unl>span{color:var(--muted)}
 </style>
 </head>
 <body>
@@ -910,9 +913,9 @@ var FS = 'font-family:var(--sans)', FM = 'font-family:var(--mono)';
 function vcol(v){ return v === 'u' ? 'var(--warn)' : v === 'd' ? 'var(--accent)' : v === 'x' ? 'var(--bad)' : 'var(--muted)'; }
 function markers(p){ return '<defs>' + ['n','u','d','x'].map(function(k){ return '<marker id="' + p + k + '" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="' + vcol(k) + '"/></marker>'; }).join('') + '</defs>'; }
 function box(x, y, w, h, t1, t2, hot, dim){
-  return '<g' + (dim ? ' opacity=".45"' : '') + '><rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="10" fill="' + (hot ? 'var(--warnbg)' : 'var(--fill)') + '" stroke="' + (hot ? 'var(--warn)' : 'var(--line)') + '"' + (hot ? ' stroke-width="2"' : '') + '/>' +
+  return '<g' + (dim ? ' opacity=".62"' : '') + '><rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="10" fill="' + (hot ? 'var(--warnbg)' : 'var(--fill)') + '" stroke="' + (hot ? 'var(--warn)' : 'var(--line)') + '"' + (hot ? ' stroke-width="2"' : '') + '/>' +
     '<text x="' + (x + w / 2) + '" y="' + (y + (t2 ? h / 2 - 2 : h / 2 + 4)) + '" text-anchor="middle" style="' + FS + ';font-size:12px;font-weight:600;fill:var(--ink)">' + t1 + '</text>' +
-    (t2 ? '<text x="' + (x + w / 2) + '" y="' + (y + h / 2 + 12) + '" text-anchor="middle" style="' + FM + ';font-size:10px;fill:var(--muted)">' + t2 + '</text>' : '') + '</g>';
+    (t2 ? '<text x="' + (x + w / 2) + '" y="' + (y + h / 2 + 12) + '" text-anchor="middle" style="' + FM + ';font-size:10.5px;fill:var(--muted)">' + t2 + '</text>' : '') + '</g>';
 }
 function svgOpen(vb, label){ return '<svg viewBox="' + vb + '" role="img" aria-label="' + label + '" class="fig">'; }
 function line(d, v, w, p){ return '<path d="' + d + '" fill="none" stroke="' + vcol(v) + '" stroke-width="' + (w || (v === 'u' ? 4 : v === 'd' ? 1.5 : 2)) + '"' + (v === 'd' || v === 'x' ? ' stroke-dasharray="5 4"' : '') + ' marker-end="url(#' + p + (v || 'n') + ')"/>'; }

@@ -117,6 +117,9 @@ footer p{margin:0 0 8px}
   #p-learn{max-width:720px;margin:0 auto}
 }
 @media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+/* cause-fix: ruled-out causes stay readable; the name greys, the reason does not fade */
+.cause.out,.cause.less,.cause.unl{opacity:1}
+.cause.less>span,.cause.unl>span{color:var(--muted)}
 </style>
 </head>
 <body>
@@ -494,8 +497,8 @@ function svgOpen(vb, label){ return '<svg viewBox="' + vb + '" role="img" aria-l
 function tx(x, y, t, o){ o = o || {}; return '<text x="' + x + '" y="' + y + '" text-anchor="' + (o.a || 'middle') + '" style="' + (o.sans ? FS : FM) + ';font-size:' + (o.s || 11) + 'px;font-weight:' + (o.w || 400) + ';fill:' + (o.c || 'var(--ink)') + '">' + t + '</text>'; }
 function bx(x, y, w, h, t1, t2, stt){
   var fill = stt === 'hot' ? 'var(--warnbg)' : stt === 'on' ? 'var(--card)' : 'var(--fill)', stroke = stt === 'hot' ? 'var(--warn)' : stt === 'on' ? 'var(--accent)' : 'var(--line)';
-  return '<g' + (stt === 'dim' ? ' opacity=".4"' : '') + '><rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="10" fill="' + fill + '" stroke="' + stroke + '"' + (stt === 'hot' || stt === 'on' ? ' stroke-width="2"' : '') + '/>' +
-    tx(x + w / 2, y + (t2 ? h / 2 - 2 : h / 2 + 4), t1, {sans: 1, s: 12, w: 600}) + (t2 ? tx(x + w / 2, y + h / 2 + 12, t2, {s: 10, c: 'var(--muted)'}) : '') + '</g>';
+  return '<g' + (stt === 'dim' ? ' opacity=".62"' : '') + '><rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="10" fill="' + fill + '" stroke="' + stroke + '"' + (stt === 'hot' || stt === 'on' ? ' stroke-width="2"' : '') + '/>' +
+    tx(x + w / 2, y + (t2 ? h / 2 - 2 : h / 2 + 4), t1, {sans: 1, s: 12, w: 600}) + (t2 ? tx(x + w / 2, y + h / 2 + 12, t2, {s: 10.5, c: 'var(--muted)'}) : '') + '</g>';
 }
 function mk(p){ return '<defs>' + [['n','var(--muted)'],['a','var(--accent)']].map(function(k){ return '<marker id="' + p + k[0] + '" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="' + k[1] + '"/></marker>'; }).join('') + '</defs>'; }
 function ar(d, k, p){ var c = k === 'a' ? 'var(--accent)' : 'var(--muted)'; return '<path d="' + d + '" fill="none" stroke="' + c + '" stroke-width="2" marker-end="url(#' + p + k + ')"/>'; }
@@ -513,16 +516,16 @@ function kinSVG(k, p){
   function px(t){ return X0 + t / 10 * W; } function py(v){ return Y0 - Math.log(v + 1) / Math.log(181) * H; }
   var h = svgOpen('0 0 340 232', 'Troponin over hours after symptom onset: ' + K.n);
   h += '<line x1="' + X0 + '" y1="' + Y0 + '" x2="' + (X0 + W) + '" y2="' + Y0 + '" stroke="var(--muted)"/><line x1="' + X0 + '" y1="' + Y0 + '" x2="' + X0 + '" y2="' + (Y0 - H - 6) + '" stroke="var(--muted)"/>';
-  [0, 2, 4, 6, 8, 10].forEach(function(t){ h += tx(px(t), Y0 + 16, t + ' h', {s: 10, c: 'var(--muted)'}); });
-  h += tx(X0 + W / 2, Y0 + 30, 'hours since symptom onset', {s: 10, c: 'var(--muted)'});
+  [0, 2, 4, 6, 8, 10].forEach(function(t){ h += tx(px(t), Y0 + 16, t + ' h', {s: 10.5, c: 'var(--muted)'}); });
+  h += tx(X0 + W / 2, Y0 + 30, 'hours since symptom onset', {s: 10.5, c: 'var(--muted)'});
   var lines = [['99th percentile', 20, 'var(--warn)'], ['very low', 5, 'var(--ok)']];
-  lines.forEach(function(l){ var y = py(l[1]); h += '<line x1="' + X0 + '" y1="' + y + '" x2="' + (X0 + W) + '" y2="' + y + '" stroke="' + l[2] + '" stroke-dasharray="5 4"/>' + tx(X0 + W, y - 4, l[0], {a: 'end', s: 10, c: l[2]}); });
+  lines.forEach(function(l){ var y = py(l[1]); h += '<line x1="' + X0 + '" y1="' + y + '" x2="' + (X0 + W) + '" y2="' + y + '" stroke="' + l[2] + '" stroke-dasharray="5 4"/>' + tx(X0 + W, y - 4, l[0], {a: 'end', s: 10.5, c: l[2]}); });
   ['mi', 'chr', 'none'].forEach(function(cv){
     var d = ''; for (var t = 0; t <= 10.01; t += 0.25) d += (t ? 'L' : 'M') + px(t).toFixed(1) + ' ' + py(kinY(cv, t)).toFixed(1);
     h += '<path d="' + d + '" fill="none" stroke="' + (cv === K.curve ? 'var(--accent)' : 'var(--line)') + '" stroke-width="' + (cv === K.curve ? 3 : 2) + '"/>';
   });
-  [K.t0, K.t0 + 1].forEach(function(t, n){ var x = px(t), y = py(kinY(K.curve, t)); h += '<circle cx="' + x + '" cy="' + y + '" r="6" fill="var(--card)" stroke="var(--ink)" stroke-width="2"/>' + tx(x, y - 11, n ? 'draw 2' : 'draw 1', {s: 10, w: 600}); });
-  h += tx(14, Y0 - H / 2, 'troponin', {s: 10, c: 'var(--muted)', a: 'middle'}).replace('<text', '<text transform="rotate(-90 14 ' + (Y0 - H / 2) + ')"');
+  [K.t0, K.t0 + 1].forEach(function(t, n){ var x = px(t), y = py(kinY(K.curve, t)); h += '<circle cx="' + x + '" cy="' + y + '" r="6" fill="var(--card)" stroke="var(--ink)" stroke-width="2"/>' + tx(x, y - 11, n ? 'draw 2' : 'draw 1', {s: 10.5, w: 600}); });
+  h += tx(14, Y0 - H / 2, 'troponin', {s: 10.5, c: 'var(--muted)', a: 'middle'}).replace('<text', '<text transform="rotate(-90 14 ' + (Y0 - H / 2) + ')"');
   return h + '</svg>';
 }
 
@@ -544,11 +547,11 @@ function mapSVG(k, p){
   h += '<rect x="' + X0 + '" y="' + py(c.nd) + '" width="' + (px(c.lo) - X0) + '" height="' + (Y0 - py(c.nd)) + '" fill="' + (oo === 'on' ? 'var(--okbg)' : 'var(--card)') + '" stroke="var(--ok)" stroke-width="2"/>';
   h += tx(px(c.hi) + (X0 + W - px(c.hi)) / 2, Y0 - H / 2, 'rule in', {s: 11, w: 600, c: 'var(--bad)'}) + tx((X0 + px(c.hi)) / 2, Y0 - H + 16, 'rule in (rise)', {s: 11, w: 600, c: 'var(--bad)'}) + tx((X0 + px(c.hi)) / 2 + 20, (py(c.d) + Y0) / 2, 'observe', {s: 11, w: 600, c: 'var(--warn)'});
   h += tx(X0 + 4, py(c.nd) - 6, 'rule out', {a: 'start', s: 10.5, w: 600, c: 'var(--ok)'});
-  h += tx(px(c.lo), Y0 + 14, '<' + c.lo, {s: 10, c: 'var(--muted)'}) + tx(px(c.hi), Y0 + 14, '≥' + c.hi, {s: 10, c: 'var(--muted)'}) + tx(X0 - 6, py(c.nd) + 4, '<' + c.nd, {a: 'end', s: 10, c: 'var(--muted)'}) + tx(X0 - 6, py(c.d) + 4, '≥' + c.d, {a: 'end', s: 10, c: 'var(--muted)'});
-  h += tx(X0 + W / 2, Y0 + 30, 'first value, ng/L (' + a.s + ')', {s: 10, c: 'var(--muted)'});
-  h += tx(12, Y0 - H / 2, 'change in ' + ph, {s: 10, c: 'var(--muted)'}).replace('<text', '<text transform="rotate(-90 12 ' + (Y0 - H / 2) + ')"');
+  h += tx(px(c.lo), Y0 + 14, '<' + c.lo, {s: 10.5, c: 'var(--muted)'}) + tx(px(c.hi), Y0 + 14, '≥' + c.hi, {s: 10.5, c: 'var(--muted)'}) + tx(X0 - 6, py(c.nd) + 4, '<' + c.nd, {a: 'end', s: 10.5, c: 'var(--muted)'}) + tx(X0 - 6, py(c.d) + 4, '≥' + c.d, {a: 'end', s: 10.5, c: 'var(--muted)'});
+  h += tx(X0 + W / 2, Y0 + 30, 'first value, ng/L (' + a.s + ')', {s: 10.5, c: 'var(--muted)'});
+  h += tx(12, Y0 - H / 2, 'change in ' + ph, {s: 10.5, c: 'var(--muted)'}).replace('<text', '<text transform="rotate(-90 12 ' + (Y0 - H / 2) + ')"');
   var al = algo(i);
-  if (al.x0 && al.x1 && al.d && al.c){ var dv = al.d.both ? 0 : al.d.dMin; h += '<circle cx="' + px(al.x0.v) + '" cy="' + py(dv) + '" r="7" fill="var(--accent)" stroke="var(--card)" stroke-width="2"/>' + tx(px(al.x0.v) > X0 + W - 80 ? px(al.x0.v) - 10 : px(al.x0.v) + 10, py(dv) + 18, 'your patient', {a: px(al.x0.v) > X0 + W - 80 ? 'end' : 'start', s: 10, w: 600, c: 'var(--accent)'}); }
+  if (al.x0 && al.x1 && al.d && al.c){ var dv = al.d.both ? 0 : al.d.dMin; h += '<circle cx="' + px(al.x0.v) + '" cy="' + py(dv) + '" r="7" fill="var(--accent)" stroke="var(--card)" stroke-width="2"/>' + tx(px(al.x0.v) > X0 + W - 80 ? px(al.x0.v) - 10 : px(al.x0.v) + 10, py(dv) + 18, 'your patient', {a: px(al.x0.v) > X0 + W - 80 ? 'end' : 'start', s: 10.5, w: 600, c: 'var(--accent)'}); }
   return h + '</svg>';
 }
 
