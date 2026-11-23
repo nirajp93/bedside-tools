@@ -120,6 +120,18 @@ footer p{margin:0 0 8px}
 /* cause-fix: ruled-out causes stay readable; the name greys, the reason does not fade */
 .cause.out,.cause.less,.cause.unl{opacity:1}
 .cause.less>span,.cause.unl>span{color:var(--muted)}
+.deeper{margin-top:14px;border-top:1px solid var(--line)}
+.deeper>summary{min-height:44px;display:flex;align-items:center;gap:8px;color:var(--accent);font-weight:600;font-size:15px;cursor:pointer;list-style:none}
+.deeper>summary::-webkit-details-marker{display:none}
+.deeper>summary::before{content:"+";font-family:var(--mono);font-size:18px;line-height:1;width:14px;text-align:center}
+.deeper[open]>summary::before{content:"\2212"}
+.deeper>summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.deeper .dpx{border:1px solid var(--line);border-radius:12px;padding:2px 12px;background:var(--card);text-align:left}
+.deeper .dpx>div{padding:10px 0;border-top:1px solid var(--line)}
+.deeper .dpx>div:first-child{border-top:0}
+.deeper .dl{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500;margin:0 0 3px}
+.deeper p{font-size:15px;line-height:1.45;color:var(--ink);margin:0 0 4px}
+.deeper p:last-child{margin-bottom:0}
 </style>
 </head>
 <body>
@@ -718,6 +730,13 @@ $('practice').addEventListener('click', function(e){
 });
 window.__cases = CASES; window.__caseZone = caseZone;
 drawInputs(); render(); fromHash();
+})();
+</script>
+<script id="deeper-data">
+/* Go deeper: mechanism, rationale and the common trap for each Learn chapter. Text only; no doses or thresholds beyond the tool's own. */
+(function(){ var D = {"learn-kin": [["Mechanism", "Troponin is part of the contractile machinery of heart muscle. A small free pool leaks out soon after a cell membrane is damaged; the larger bound pool is released over days as the cell dies. High-sensitivity assays can measure the trace amounts present in healthy people."], ["Why it matters", "This explains the time course: detectable within a few hours, rising for a day or so, and raised for days afterwards. The 99th percentile is the upper limit in a healthy population, not a threshold for infarction."], ["Common trap", "A raised troponin means heart muscle injury, not necessarily an infarct. An infarct needs a rise or fall together with evidence of ischemia."]], "learn-delta": [["Mechanism", "Chronic conditions (kidney disease, heart failure, a thick ventricle) cause steady low-level injury, so troponin sits above the limit and stays put. An acute event makes it move."], ["Why it matters", "The change between two samples is therefore what separates acute from chronic injury, and it is why the algorithm reads the value and the change together."], ["Common trap", "A mismatch between supply and demand (fast rate, low pressure, anemia) also produces a rising troponin. That calls for treating the cause, not for the catheterization lab."]], "learn-early": [["Mechanism", "After an artery closes, troponin needs time to leak out of the damaged cells and reach the blood. In the first hours it can be undetectable despite a real infarct."], ["Why it matters", "A single very low value rules out an infarct only when enough time has passed since the pain began. Before that, a second sample is the test."], ["Common trap", "The time of onset is often uncertain or the pain came in waves. When in doubt, treat the patient as an early presenter."]], "learn-heart": [["Mechanism", "The score combines what was known before testing (the history, age and risk factors) with what the tests show (the ECG and troponin)."], ["Why it matters", "A low score together with negative serial troponin identifies patients at low risk of a major cardiac event over the next weeks, who can leave without further testing."], ["Common trap", "The history item is subjective and scores vary between clinicians. A low score never overrides ischemic ECG changes or a rising troponin."]]};
+  function add(){ Object.keys(D).forEach(function(id){ var c = document.getElementById(id); if (!c || c.querySelector(":scope > .deeper")) return; var host = c.matches(".card,.lsec,section,.chap") ? c : (c.nextElementSibling && c.nextElementSibling.matches(".card") ? c.nextElementSibling : c.parentElement); if (host.querySelector(":scope > .deeper")) return; var d = document.createElement("details"); d.className = "deeper"; d.innerHTML = "<summary>Go deeper: mechanism and rationale</summary><div class=\"dpx\">" + D[id].map(function(r){ return "<div><span class=\"dl\">" + r[0] + "</span><p>" + r[1] + "</p></div>"; }).join("") + "</div>"; var last = host.querySelector(":scope > .row"); if (last) host.insertBefore(d, last); else host.appendChild(d); }); }
+  add(); document.addEventListener("click", function(){ setTimeout(add, 0); });
 })();
 </script>
 </body>
