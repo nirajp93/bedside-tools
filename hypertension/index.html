@@ -237,6 +237,18 @@ details .trial{margin:8px 0 12px}
 .vk-sl input[type=range]{width:100%;min-height:44px;accent-color:var(--accent)}
 .vk-res{margin-top:8px}
 .vk-res .card{margin-bottom:8px}
+.vk-zone{margin:0 0 6px}
+.vk-zs{display:flex;gap:2px;height:8px}
+.vk-zs i{display:block;border-radius:99px;background:var(--line);min-width:4px}
+.vk-zs i.on{background:var(--accent)}
+.vk-zt{font-family:var(--mono);font-size:12px;color:var(--ink);margin:4px 0 0}
+.vk-deep{margin-top:10px;border:1px solid var(--line);border-radius:12px;padding:2px 12px;background:var(--card)}
+.vk-deep:empty{display:none}
+.vk-dr{padding:10px 0;border-top:1px solid var(--line)}
+.vk-dr:first-child{border-top:0}
+.vk-dr .label{margin:0 0 3px}
+.vk-dr p{font-size:15px;margin:0 0 4px}
+.vk-dr p:last-child{margin-bottom:0}
 .vk-flow .vk-dots{display:flex;gap:4px;margin:4px 0 12px}
 .vk-d{flex:1;height:4px;border-radius:99px;background:var(--line)}
 .vk-d.on{background:var(--accent)}
@@ -946,8 +958,8 @@ var VK = (function(){
   function mark(box, j){ var ok = false; box.querySelectorAll('.vk-opt').forEach(function(b, i){ b.disabled = true; if (b.getAttribute('data-ok') === '1') b.classList.add('right'); else if (i === j) b.classList.add('wrong'); if (i === j) ok = b.getAttribute('data-ok') === '1'; }); return ok; }
   function answer(key, j){ var box = document.querySelector('[data-vk-pred="' + key + '"]'), P = C.preds[key]; if (!box || box.getAttribute('data-done')) return; box.setAttribute('data-done', '1'); var ok = mark(box, j), a = box.querySelector('.vk-ans');
     a.innerHTML = '<p><b>' + (ok ? 'Right.' : 'Not quite.') + '</b> ' + P.why() + '</p>' + (typeof P.fig === 'function' ? P.fig() : P.fig ? '<button class="chip vk-chip" type="button" data-fig="' + P.fig[0] + '" data-state="' + (P.fig[1] || '') + '">' + VK_FIC + q(P.fig[2]) + '</button>' : ''); a.hidden = false; }
-  function slHtml(id){ var S = C.sliders[id]; return '<div class="vk-sl" data-vk-sl="' + id + '">' + S.ranges.map(function(r){ return '<label for="vk-' + id + '-' + r.key + '">' + r.label + ' <b data-vk-v="' + r.key + '"></b></label><input type="range" id="vk-' + id + '-' + r.key + '" data-vk-k="' + r.key + '" min="' + r.min + '" max="' + r.max + '" step="' + r.step + '" value="' + r.value + '">'; }).join('') + '<div class="vk-res" aria-live="polite"></div>' + (S.note ? '<p class="vk-src">' + S.note + '</p>' : '') + '</div>'; }
-  function slRun(w){ var S = C.sliders[w.getAttribute('data-vk-sl')], v = {}; S.ranges.forEach(function(r){ var el = w.querySelector('[data-vk-k="' + r.key + '"]'), x = +el.value, tx = (r.fmt ? r.fmt(x) : x) + (r.unit ? ' ' + r.unit : ''); v[r.key] = x; w.querySelector('[data-vk-v="' + r.key + '"]').textContent = tx; el.setAttribute('aria-valuetext', tx); }); w.querySelector('.vk-res').innerHTML = S.run(v); }
+  function slHtml(id){ var S = C.sliders[id]; return '<div class="vk-sl" data-vk-sl="' + id + '">' + S.ranges.map(function(r){ return '<label for="vk-' + id + '-' + r.key + '">' + r.label + ' <b data-vk-v="' + r.key + '"></b></label><input type="range" id="vk-' + id + '-' + r.key + '" data-vk-k="' + r.key + '" min="' + r.min + '" max="' + r.max + '" step="' + r.step + '" value="' + r.value + '">' + (r.zones ? '<div class="vk-zone" data-vk-z="' + r.key + '"></div>' : ''); }).join('') + '<div class="vk-res" aria-live="polite"></div><div class="vk-deep"></div>' + (S.note ? '<p class="vk-src">' + S.note + '</p>' : '') + '</div>'; }
+  function slRun(w){ var S = C.sliders[w.getAttribute('data-vk-sl')], v = {}; S.ranges.forEach(function(r){ var el = w.querySelector('[data-vk-k="' + r.key + '"]'), x = +el.value, tx = (r.fmt ? r.fmt(x) : x) + (r.unit ? ' ' + r.unit : ''); v[r.key] = x; w.querySelector('[data-vk-v="' + r.key + '"]').textContent = tx; el.setAttribute('aria-valuetext', tx); }); w.querySelector('.vk-res').innerHTML = S.run(v); S.ranges.forEach(function(r){ if (!r.zones) return; var Z = typeof r.zones === 'function' ? r.zones(v) : r.zones, x = v[r.key], on = Z.length - 1; Z.forEach(function(z, k){ if (x >= z[0] && x < z[1] && on === Z.length - 1) on = k; }); w.querySelector('[data-vk-z="' + r.key + '"]').innerHTML = '<div class="vk-zs" aria-hidden="true">' + Z.map(function(z, k){ return '<i' + (k === on ? ' class="on"' : '') + ' style="flex:' + Math.max(0.01, Math.min(z[1], r.max) - Math.max(z[0], r.min)) + '"></i>'; }).join('') + '</div><p class="vk-zt">' + Z[on][2] + '</p>'; }); w.querySelector('.vk-deep').innerHTML = S.deep ? S.deep(v).map(function(d){ return '<div class="vk-dr"><p class="label">' + d[0] + '</p>' + d[1] + '</div>'; }).join('') : ''; }
   function flowHtml(id){ var F = C.flows[id]; return '<div class="vk-flow" data-vk-flow="' + id + '"><p class="head vk-head">' + F.t + '</p><div class="vk-dots">' + F.steps.map(function(_, k){ return '<i class="vk-d' + (k ? '' : ' on') + '"></i>'; }).join('') + '</div><div class="vk-fb"></div></div>'; }
   function step(id, k){ var F = C.flows[id], S = F.steps[k], w = document.querySelector('[data-vk-flow="' + id + '"]'); if (!w || !S) return; FS[id] = k;
     w.querySelectorAll('.vk-d').forEach(function(d, j){ d.classList.toggle('on', j <= k); });
@@ -1012,9 +1024,17 @@ var VK = (function(){
         why: function(){ var p = E.pattern(144, 86, 120, 74, false); return '<b>' + PAT[p][0] + '.</b> ' + PAT[p][1]; }}
     },
     sliders: {
-      cat: {ranges: [{key: 's', label: 'Office systolic', min: 100, max: 220, step: 2, value: 136, unit: 'mmHg'},
-                     {key: 'd', label: 'Office diastolic', min: 60, max: 130, step: 2, value: 84, unit: 'mmHg'}],
+      cat: {ranges: [{key: 's', label: 'Office systolic', min: 100, max: 220, step: 2, value: 136, unit: 'mmHg', zones: [[100, 120, 'Under 120'], [120, 130, '120 to 129'], [130, 140, '130 to 139'], [140, 181, '140 to 180'], [181, 221, 'Over 180']]},
+                     {key: 'd', label: 'Office diastolic', min: 60, max: 130, step: 2, value: 84, unit: 'mmHg', zones: [[60, 80, 'Under 80'], [80, 90, '80 to 89'], [90, 121, '90 to 120'], [121, 131, 'Over 120']]}],
         note: 'Category from the office average; whichever number gives the higher category decides. Same rule as the Diagnose tab.',
+        deep: function(v){ var c = E.category(v.s, v.d), ks = E.category(v.s, 60).k, kd = E.category(100, v.d).k;
+          var who = c.k === 0 ? '<p>Both numbers are in the normal range.</p>' : ks > kd ? '<p><b>The systolic number decides here.</b> Systolic pressure climbs with age as the aorta and large arteries stiffen: they no longer cushion each beat, so the peak rises while the diastolic number levels off or falls. This is the common pattern after about age 50.</p>'
+            : kd > ks ? '<p><b>The diastolic number decides here.</b> Diastolic pressure reflects resistance in the small arteries. A raised diastolic with a lower systolic category is more typical of younger adults.</p>'
+            : '<p>Both numbers land in the same category.</p>';
+          var rows = [['What is happening', '<p>Pressure is output times resistance. Sustained high pressure thickens the left ventricle and damages small vessels in the brain, kidney and retina.</p>' + who],
+            ['Why the cut-offs', '<p>Risk rises continuously with pressure, starting well inside the normal range: there is no level where harm begins. The categories mark where trials showed that treating helps, not where disease starts.</p>']];
+          rows.push(['At the bedside', c.severe ? '<p>The question is organ injury, not the number: brain, heart, aorta, kidney, retina. Without injury, lower the pressure over days with oral drugs. Long-standing hypertension shifts the range over which organs keep their own blood flow constant, so a fast drop can cause a stroke or kidney injury.</p>' : '<p>One office reading is not a diagnosis. Confirm with home or ambulatory readings, which predict outcomes better and unmask white-coat and masked hypertension.</p>']);
+          return rows; },
         run: function(v){ var c = E.category(v.s, v.d); return '<p><b>' + c.name + '.</b>' + (c.severe ? ' Over 180/120: look for organ injury. Organ injury, not the number, makes it an emergency.' : '') + '</p>'; }}
     }
   });

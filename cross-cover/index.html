@@ -127,7 +127,15 @@ footer p{margin:0 0 8px}
   .plist{grid-template-columns:repeat(4,1fr)}
   #p-learn,#p-practice{max-width:780px;margin:0 auto}
 }
+.dp{margin-top:10px;border:1px solid var(--line);border-radius:12px;padding:2px 12px;background:var(--card);text-align:left}
+.dp:empty{display:none}
+.dp>div{padding:10px 0;border-top:1px solid var(--line)}
+.dp>div:first-child{border-top:0}
+.dp .dl{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500;margin:0 0 3px}
+.dp p{font-size:15px;line-height:1.45;color:var(--ink);margin:0 0 4px}
+.dp p:last-child{margin-bottom:0}
 </style>
+<script>function dpHtml(rows){ return rows.map(function(r){ return '<div><span class="dl">' + r[0] + '</span>' + r[1] + '</div>'; }).join(''); }</script>
 </head>
 <body>
 <div class="wrap">
@@ -660,6 +668,9 @@ function figO2(){
   return '<div class="sl"><label for="o2r" class="note">Oxygen tension (PaO2)</label><input type="range" id="o2r" min="20" max="100" step="1" value="' + p + '"></div>' +
     '<p class="readout">PaO2 ' + p + ' mm Hg → SpO2 about ' + Math.round(sat) + '%</p>' + svg +
     '<p class="figcap">' + note + ' Fever, acidosis and high carbon dioxide shift the curve right (less saturation for the same tension).</p>' +
+    '<div class="dp">' + dpHtml([['Why the curve bends', '<p>Hemoglobin binds oxygen cooperatively: each oxygen that binds makes the next bind more easily. That gives the flat top, where hemoglobin is nearly full, and the steep middle, where it loads and unloads with small changes in tension.</p>'],
+      ['What is happening', p >= 80 ? '<p>On the flat part the oximeter is a late alarm. Oxygen tension can fall a long way with the saturation barely moving, so a patient on oxygen reading in the high 90s may have lost most of their reserve. Watch how much oxygen it takes to hold the number, not only the number.</p>' : p >= 60 ? '<p>At the shoulder there is no reserve left above the patient. The next fall in tension lands on the steep part.</p>' : '<p>On the steep part every small fall in tension strips oxygen from hemoglobin. The amount of oxygen the blood carries depends almost entirely on saturation, so delivery to the tissues is now falling as fast as the number.</p>'],
+      ['Why a right shift helps the tissues', '<p>Working tissue is warm, acidic and rich in carbon dioxide, and all three loosen the grip of hemoglobin on oxygen. The same shift that lowers the saturation reading releases more oxygen where it is needed.</p>']]) + '</div>' +
     '<p class="figsrc">Curve from the Severinghaus equation (J Appl Physiol 1979), normal pH and temperature.</p>';
 }
 var TRIAGE = [

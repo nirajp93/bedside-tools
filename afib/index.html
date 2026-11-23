@@ -138,6 +138,18 @@ footer strong{color:var(--ink)}
 .vk-sl input[type=range]{width:100%;min-height:44px;accent-color:var(--accent)}
 .vk-res{margin-top:8px}
 .vk-res .card{margin-bottom:8px}
+.vk-zone{margin:0 0 6px}
+.vk-zs{display:flex;gap:2px;height:8px}
+.vk-zs i{display:block;border-radius:99px;background:var(--line);min-width:4px}
+.vk-zs i.on{background:var(--accent)}
+.vk-zt{font-family:var(--mono);font-size:12px;color:var(--ink);margin:4px 0 0}
+.vk-deep{margin-top:10px;border:1px solid var(--line);border-radius:12px;padding:2px 12px;background:var(--card)}
+.vk-deep:empty{display:none}
+.vk-dr{padding:10px 0;border-top:1px solid var(--line)}
+.vk-dr:first-child{border-top:0}
+.vk-dr .label{margin:0 0 3px}
+.vk-dr p{font-size:15px;margin:0 0 4px}
+.vk-dr p:last-child{margin-bottom:0}
 .vk-flow .vk-dots{display:flex;gap:4px;margin:4px 0 12px}
 .vk-d{flex:1;height:4px;border-radius:99px;background:var(--line)}
 .vk-d.on{background:var(--accent)}
@@ -884,8 +896,8 @@ var VK = (function(){
   function mark(box, j){ var ok = false; box.querySelectorAll('.vk-opt').forEach(function(b, i){ b.disabled = true; if (b.getAttribute('data-ok') === '1') b.classList.add('right'); else if (i === j) b.classList.add('wrong'); if (i === j) ok = b.getAttribute('data-ok') === '1'; }); return ok; }
   function answer(key, j){ var box = document.querySelector('[data-vk-pred="' + key + '"]'), P = C.preds[key]; if (!box || box.getAttribute('data-done')) return; box.setAttribute('data-done', '1'); var ok = mark(box, j), a = box.querySelector('.vk-ans');
     a.innerHTML = '<p><b>' + (ok ? 'Right.' : 'Not quite.') + '</b> ' + P.why() + '</p>' + (typeof P.fig === 'function' ? P.fig() : P.fig ? '<button class="chip vk-chip" type="button" data-fig="' + P.fig[0] + '" data-state="' + (P.fig[1] || '') + '">' + VK_FIC + q(P.fig[2]) + '</button>' : ''); a.hidden = false; }
-  function slHtml(id){ var S = C.sliders[id]; return '<div class="vk-sl" data-vk-sl="' + id + '">' + S.ranges.map(function(r){ return '<label for="vk-' + id + '-' + r.key + '">' + r.label + ' <b data-vk-v="' + r.key + '"></b></label><input type="range" id="vk-' + id + '-' + r.key + '" data-vk-k="' + r.key + '" min="' + r.min + '" max="' + r.max + '" step="' + r.step + '" value="' + r.value + '">'; }).join('') + '<div class="vk-res" aria-live="polite"></div>' + (S.note ? '<p class="vk-src">' + S.note + '</p>' : '') + '</div>'; }
-  function slRun(w){ var S = C.sliders[w.getAttribute('data-vk-sl')], v = {}; S.ranges.forEach(function(r){ var el = w.querySelector('[data-vk-k="' + r.key + '"]'), x = +el.value, tx = (r.fmt ? r.fmt(x) : x) + (r.unit ? ' ' + r.unit : ''); v[r.key] = x; w.querySelector('[data-vk-v="' + r.key + '"]').textContent = tx; el.setAttribute('aria-valuetext', tx); }); w.querySelector('.vk-res').innerHTML = S.run(v); }
+  function slHtml(id){ var S = C.sliders[id]; return '<div class="vk-sl" data-vk-sl="' + id + '">' + S.ranges.map(function(r){ return '<label for="vk-' + id + '-' + r.key + '">' + r.label + ' <b data-vk-v="' + r.key + '"></b></label><input type="range" id="vk-' + id + '-' + r.key + '" data-vk-k="' + r.key + '" min="' + r.min + '" max="' + r.max + '" step="' + r.step + '" value="' + r.value + '">' + (r.zones ? '<div class="vk-zone" data-vk-z="' + r.key + '"></div>' : ''); }).join('') + '<div class="vk-res" aria-live="polite"></div><div class="vk-deep"></div>' + (S.note ? '<p class="vk-src">' + S.note + '</p>' : '') + '</div>'; }
+  function slRun(w){ var S = C.sliders[w.getAttribute('data-vk-sl')], v = {}; S.ranges.forEach(function(r){ var el = w.querySelector('[data-vk-k="' + r.key + '"]'), x = +el.value, tx = (r.fmt ? r.fmt(x) : x) + (r.unit ? ' ' + r.unit : ''); v[r.key] = x; w.querySelector('[data-vk-v="' + r.key + '"]').textContent = tx; el.setAttribute('aria-valuetext', tx); }); w.querySelector('.vk-res').innerHTML = S.run(v); S.ranges.forEach(function(r){ if (!r.zones) return; var Z = typeof r.zones === 'function' ? r.zones(v) : r.zones, x = v[r.key], on = Z.length - 1; Z.forEach(function(z, k){ if (x >= z[0] && x < z[1] && on === Z.length - 1) on = k; }); w.querySelector('[data-vk-z="' + r.key + '"]').innerHTML = '<div class="vk-zs" aria-hidden="true">' + Z.map(function(z, k){ return '<i' + (k === on ? ' class="on"' : '') + ' style="flex:' + Math.max(0.01, Math.min(z[1], r.max) - Math.max(z[0], r.min)) + '"></i>'; }).join('') + '</div><p class="vk-zt">' + Z[on][2] + '</p>'; }); w.querySelector('.vk-deep').innerHTML = S.deep ? S.deep(v).map(function(d){ return '<div class="vk-dr"><p class="label">' + d[0] + '</p>' + d[1] + '</div>'; }).join('') : ''; }
   function flowHtml(id){ var F = C.flows[id]; return '<div class="vk-flow" data-vk-flow="' + id + '"><p class="head vk-head">' + F.t + '</p><div class="vk-dots">' + F.steps.map(function(_, k){ return '<i class="vk-d' + (k ? '' : ' on') + '"></i>'; }).join('') + '</div><div class="vk-fb"></div></div>'; }
   function step(id, k){ var F = C.flows[id], S = F.steps[k], w = document.querySelector('[data-vk-flow="' + id + '"]'); if (!w || !S) return; FS[id] = k;
     w.querySelectorAll('.vk-d').forEach(function(d, j){ d.classList.toggle('on', j <= k); });
@@ -951,6 +963,11 @@ var VK = (function(){
                       {key: 'cr', label: 'Creatinine', min: 0.6, max: 4, step: 0.1, value: 1.4, unit: 'mg/dL', fmt: function(x){ return x.toFixed(1); }},
                       {key: 'sex', label: 'Sex', min: 0, max: 1, step: 1, value: 1, fmt: function(x){ return x ? 'Female' : 'Male'; }}],
         note: 'Cockcroft-Gault with actual body weight, then each label\'s dose rule: the same engine as the calculator. Assumes not on dialysis.',
+        deep: function(v){ var d = doacDoses({age: v.age, wt: v.wt, cr: v.cr, sex: v.sex ? 'f' : 'm'}); if (!d) return [];
+          return [['What is happening', '<p>Creatinine comes from muscle. An older or lighter patient makes less of it, so the same creatinine hides a lower clearance: drag age up or weight down and watch the clearance fall while the creatinine stays put.</p>'],
+            ['Why each drug reacts differently', '<p>The kidney clears each drug to a different degree: ' + ['dabi', 'edox', 'riva', 'apix'].filter(function(k){ return DRUGS[k]; }).map(function(k){ return DRUGS[k].n.toLowerCase() + ' about ' + DRUGS[k].kid + '%'; }).join(', ') + '. The more a drug depends on the kidney, the earlier its dose falls. Apixaban depends on it least, so its rule uses age, weight and creatinine together and needs two of the three.</p>'],
+            ['Why Cockcroft-Gault', '<p>The DOAC trials set doses by Cockcroft-Gault clearance, so the labels do too. An eGFR is indexed to body size and tends to read higher than this in small, elderly patients, which leads to overdosing.</p>'],
+            ['The common error', '<p>Reducing the dose "to be safe" when the criteria are not met. An off-label low dose gives less stroke protection without a proven drop in bleeding.</p>']]; },
         run: function(v){ var sex = v.sex ? 'f' : 'm', d = doacDoses({age: v.age, wt: v.wt, cr: v.cr, sex: sex}), b = kidneyBand(d.crcl, false);
           return '<p><b>CrCl ' + d.crcl.toFixed(1) + ' mL/min.</b>' + (b && b.text ? ' ' + b.text + ' (' + b.tier + ')' : '') + '</p><ul>' + d.rows.map(function(r){ return '<li><b>' + r.drug + ':</b> ' + r.dose + '. <span class="vk-src">' + r.note + '</span></li>'; }).join('') + '</ul>'; }}
     }

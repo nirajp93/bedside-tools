@@ -160,6 +160,18 @@ footer p{margin:0 0 8px}
 .vk-sl input[type=range]{width:100%;min-height:44px;accent-color:var(--accent)}
 .vk-res{margin-top:8px}
 .vk-res .card{margin-bottom:8px}
+.vk-zone{margin:0 0 6px}
+.vk-zs{display:flex;gap:2px;height:8px}
+.vk-zs i{display:block;border-radius:99px;background:var(--line);min-width:4px}
+.vk-zs i.on{background:var(--accent)}
+.vk-zt{font-family:var(--mono);font-size:12px;color:var(--ink);margin:4px 0 0}
+.vk-deep{margin-top:10px;border:1px solid var(--line);border-radius:12px;padding:2px 12px;background:var(--card)}
+.vk-deep:empty{display:none}
+.vk-dr{padding:10px 0;border-top:1px solid var(--line)}
+.vk-dr:first-child{border-top:0}
+.vk-dr .label{margin:0 0 3px}
+.vk-dr p{font-size:15px;margin:0 0 4px}
+.vk-dr p:last-child{margin-bottom:0}
 .vk-flow .vk-dots{display:flex;gap:4px;margin:4px 0 12px}
 .vk-d{flex:1;height:4px;border-radius:99px;background:var(--line)}
 .vk-d.on{background:var(--accent)}
@@ -1082,8 +1094,8 @@ var VK = (function(){
   function mark(box, j){ var ok = false; box.querySelectorAll('.vk-opt').forEach(function(b, i){ b.disabled = true; if (b.getAttribute('data-ok') === '1') b.classList.add('right'); else if (i === j) b.classList.add('wrong'); if (i === j) ok = b.getAttribute('data-ok') === '1'; }); return ok; }
   function answer(key, j){ var box = document.querySelector('[data-vk-pred="' + key + '"]'), P = C.preds[key]; if (!box || box.getAttribute('data-done')) return; box.setAttribute('data-done', '1'); var ok = mark(box, j), a = box.querySelector('.vk-ans');
     a.innerHTML = '<p><b>' + (ok ? 'Right.' : 'Not quite.') + '</b> ' + P.why() + '</p>' + (P.fig ? '<button class="chip" type="button" data-fig="' + P.fig[0] + '" data-state="' + (P.fig[1] || '') + '">' + VK_FIC + q(P.fig[2]) + '</button>' : ''); a.hidden = false; }
-  function slHtml(id){ var S = C.sliders[id]; return '<div class="vk-sl" data-vk-sl="' + id + '">' + S.ranges.map(function(r){ return '<label for="vk-' + id + '-' + r.key + '">' + r.label + ' <b data-vk-v="' + r.key + '"></b></label><input type="range" id="vk-' + id + '-' + r.key + '" data-vk-k="' + r.key + '" min="' + r.min + '" max="' + r.max + '" step="' + r.step + '" value="' + r.value + '">'; }).join('') + '<div class="vk-res" aria-live="polite"></div>' + (S.note ? '<p class="vk-src">' + S.note + '</p>' : '') + '</div>'; }
-  function slRun(w){ var S = C.sliders[w.getAttribute('data-vk-sl')], v = {}; S.ranges.forEach(function(r){ var x = +w.querySelector('[data-vk-k="' + r.key + '"]').value; v[r.key] = x; w.querySelector('[data-vk-v="' + r.key + '"]').textContent = (r.fmt ? r.fmt(x) : x) + (r.unit ? ' ' + r.unit : ''); }); w.querySelector('.vk-res').innerHTML = S.run(v); }
+  function slHtml(id){ var S = C.sliders[id]; return '<div class="vk-sl" data-vk-sl="' + id + '">' + S.ranges.map(function(r){ return '<label for="vk-' + id + '-' + r.key + '">' + r.label + ' <b data-vk-v="' + r.key + '"></b></label><input type="range" id="vk-' + id + '-' + r.key + '" data-vk-k="' + r.key + '" min="' + r.min + '" max="' + r.max + '" step="' + r.step + '" value="' + r.value + '">' + (r.zones ? '<div class="vk-zone" data-vk-z="' + r.key + '"></div>' : ''); }).join('') + '<div class="vk-res" aria-live="polite"></div><div class="vk-deep"></div>' + (S.note ? '<p class="vk-src">' + S.note + '</p>' : '') + '</div>'; }
+  function slRun(w){ var S = C.sliders[w.getAttribute('data-vk-sl')], v = {}; S.ranges.forEach(function(r){ var x = +w.querySelector('[data-vk-k="' + r.key + '"]').value; v[r.key] = x; w.querySelector('[data-vk-v="' + r.key + '"]').textContent = (r.fmt ? r.fmt(x) : x) + (r.unit ? ' ' + r.unit : ''); }); w.querySelector('.vk-res').innerHTML = S.run(v); S.ranges.forEach(function(r){ if (!r.zones) return; var Z = typeof r.zones === 'function' ? r.zones(v) : r.zones, x = v[r.key], on = Z.length - 1; Z.forEach(function(z, k){ if (x >= z[0] && x < z[1] && on === Z.length - 1) on = k; }); w.querySelector('[data-vk-z="' + r.key + '"]').innerHTML = '<div class="vk-zs" aria-hidden="true">' + Z.map(function(z, k){ return '<i' + (k === on ? ' class="on"' : '') + ' style="flex:' + Math.max(0.01, Math.min(z[1], r.max) - Math.max(z[0], r.min)) + '"></i>'; }).join('') + '</div><p class="vk-zt">' + Z[on][2] + '</p>'; }); w.querySelector('.vk-deep').innerHTML = S.deep ? S.deep(v).map(function(d){ return '<div class="vk-dr"><p class="label">' + d[0] + '</p>' + d[1] + '</div>'; }).join('') : ''; }
   function flowHtml(id){ var F = C.flows[id]; return '<div class="vk-flow" data-vk-flow="' + id + '"><p class="head">' + F.t + '</p><div class="vk-dots">' + F.steps.map(function(_, k){ return '<i class="vk-d' + (k ? '' : ' on') + '"></i>'; }).join('') + '</div><div class="vk-fb"></div></div>'; }
   function step(id, k){ var F = C.flows[id], S = F.steps[k], w = document.querySelector('[data-vk-flow="' + id + '"]'); if (!w || !S) return; FS[id] = k;
     w.querySelectorAll('.vk-d').forEach(function(d, j){ d.classList.toggle('on', j <= k); });
@@ -1143,7 +1155,11 @@ VK.init({
   'learn-setpoint': {q: 'Calcium mildly high, PTH high-normal, very low urine calcium. Which first test points toward FHH rather than primary hyperparathyroidism?', a: function(){ return [['Calcium-to-creatinine clearance ratio', 1], ['Sestamibi scan', 0], ['PTHrP', 0]]; }, why: function(){ return LOOP.fhh.line + ' A ratio below 0.01 favors FHH; above 0.02 favors primary hyperparathyroidism. Many patients fall between 0.01 and 0.02; genetic testing (CASR, GNA11, AP2S1) confirms FHH. Imaging localizes a gland; it does not make the diagnosis.'; }, fig: ['loop', 'fhh', 'The calcium loop']}
  },
  sliders: {
-  alb: {ranges: [{key: 'ca', label: 'Total calcium', min: 6.5, max: 14, step: 0.1, value: 7.8, unit: 'mg/dL', fmt: function(x){ return x.toFixed(1); }}, {key: 'alb', label: 'Albumin', min: 1.5, max: 4.5, step: 0.1, value: 2.2, unit: 'g/dL', fmt: function(x){ return x.toFixed(1); }}], note: 'Runs this tool\'s adjustment. It is an estimate: measure ionized calcium when it matters.',
+  alb: {ranges: [{key: 'ca', label: 'Total calcium', min: 6.5, max: 14, step: 0.1, value: 7.8, unit: 'mg/dL', fmt: function(x){ return x.toFixed(1); }}, {key: 'alb', label: 'Albumin', min: 1.5, max: 4.5, step: 0.1, value: 2.2, unit: 'g/dL', fmt: function(x){ return x.toFixed(1); }, zones: [[1.5, 1.95, 'Below 2: the adjustment is unreliable'], [1.95, 3.95, '2 to 4: add 0.8 for each 1 g/dL below 4'], [3.95, 4.6, '4 or above: nothing to add']]}], note: 'Runs this tool\'s adjustment. It is an estimate: measure ionized calcium when it matters.',
+   deep: function(v){ var o = decide({ca: v.ca, alb: v.alb}), flip = (v.ca < REF.caLo || v.ca > REF.caHi) !== (o.adj < REF.caLo || o.adj > REF.caHi);
+    return [['What is happening', '<p>A little under half of the calcium in blood rides on albumin, about half is free (ionized), and the rest is bound to anions such as phosphate and citrate. Only the ionized part acts on nerve, muscle and the parathyroid.</p><p>When albumin falls, the bound part falls with it. The total reads low while the ionized calcium, the part the body regulates, has not moved.</p>'],
+     ['Why 0.8', '<p>Each 1 g/dL of albumin carries roughly 0.8 mg/dL of calcium, so the formula adds that back for each gram below 4.' + (flip ? ' Here it moves the value across the reference limit, which is exactly when the estimate should be confirmed.' : '') + '</p>'],
+     ['Where it fails', '<p>Binding also shifts with pH: alkalemia makes albumin hold more calcium, so ionized calcium falls with no change in the total (the tingling of hyperventilation). The formula also performs poorly in critical illness, kidney failure and very low albumin.</p><p>When the answer would change what you do, measure ionized calcium.</p>']]; },
    run: function(v){ var o = decide({ca: v.ca, alb: v.alb}); return '<div class="card"><p class="label">Adjusted for albumin</p><p class="head">' + o.adj.toFixed(1) + ' mg/dL: ' + o.side + '</p><p class="sub">' + v.ca.toFixed(1) + ' + 0.8 × (4 − ' + v.alb.toFixed(1) + ') = ' + o.adj.toFixed(1) + (o.adj !== v.ca && (v.ca < 8.5 || v.ca > 10.5) !== (o.adj < 8.5 || o.adj > 10.5) ? '. The adjustment changes the answer: confirm with ionized calcium.' : '') + '</p>' + (o.lowAlb ? '<div class="guard">Albumin below 2: the adjustment is unreliable; measure ionized calcium.</div>' : '') + '</div>'; }}
  },
  flows: {

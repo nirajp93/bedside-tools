@@ -117,7 +117,15 @@ input[type=range]{width:100%;min-height:44px;accent-color:var(--accent)}
   #p-learn,#p-prac{max-width:720px;margin:0 auto}
 }
 @media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+.dp{margin-top:10px;border:1px solid var(--line);border-radius:12px;padding:2px 12px;background:var(--card);text-align:left}
+.dp:empty{display:none}
+.dp>div{padding:10px 0;border-top:1px solid var(--line)}
+.dp>div:first-child{border-top:0}
+.dp .dl{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500;margin:0 0 3px}
+.dp p{font-size:15px;line-height:1.45;color:var(--ink);margin:0 0 4px}
+.dp p:last-child{margin-bottom:0}
 </style>
+<script>function dpHtml(rows){ return rows.map(function(r){ return '<div><span class="dl">' + r[0] + '</span>' + r[1] + '</div>'; }).join(''); }</script>
 </head>
 <body>
 <div class="wrap">
@@ -197,10 +205,10 @@ input[type=range]{width:100%;min-height:44px;accent-color:var(--accent)}
   <div class="card chap" id="learn-grade" data-pill="Grade"><p class="label">3 · Grading</p><h2>CTRCD: mild, moderate, severe</h2><p class="sub">Baseline LVEF 60%. Drag the LVEF now, and add a strain fall or a biomarker rise. The grade comes from the same rules as the Results tab.</p>
     <input type="range" id="lg-ef" min="30" max="65" step="1" value="52" aria-label="LVEF now">
     <div class="states wrapit" id="lg-tog" role="group" aria-label="Other findings"></div>
-    <div id="lg-fig"></div><p class="head" id="lg-head"></p><p class="line1" id="lg-line"></p></div>
+    <div id="lg-fig"></div><p class="head" id="lg-head"></p><p class="line1" id="lg-line"></p><div class="dp" id="lg-dp"></div></div>
   <div class="card chap" id="learn-gls" data-pill="Strain"><p class="label">4 · Strain</p><h2>Strain falls before the ejection fraction</h2><p class="sub">Global longitudinal strain is negative: about -20% is normal, and closer to zero is worse. What counts is the relative fall from the patient's own baseline. Baseline -20%: drag the value now.</p>
     <input type="range" id="lgl" min="-22" max="-10" step="0.5" value="-17" aria-label="GLS now">
-    <p class="head" id="lgl-head"></p><p class="line1" id="lgl-line"></p></div>
+    <p class="head" id="lgl-head"></p><p class="line1" id="lgl-line"></p><div class="dp" id="lgl-dp"></div></div>
   <div class="card chap" id="learn-dose" data-pill="Dose"><p class="label">5 · Cumulative dose</p><h2>Anthracycline injury adds up</h2><p class="sub">Convert any anthracycline to doxorubicin equivalents, then see where it sits on the dose ladder.</p>
     <div class="grid"><div class="field"><label for="ld-drug">Drug</label><select id="ld-drug"></select></div><div class="field"><label for="ld-dose">Cumulative mg/m²</label><input id="ld-dose" inputmode="decimal" autocomplete="off" value="300"></div></div>
     <div id="ld-fig"></div><p class="line1" id="ld-line"></p></div>
@@ -821,6 +829,9 @@ function drawLG(){
   $('lg-fig').innerHTML = gradeSVG(g.kind === 'asx' ? st : '', 'lg', ef);
   $('lg-head').textContent = g.kind === 'asx' ? 'LVEF ' + ef + '%: ' + g.sev + ' CTRCD' : g.kind === 'none' ? 'LVEF ' + ef + '%: no CTRCD' : 'LVEF ' + ef + '%: below normal, criteria not met';
   $('lg-line').textContent = g.kind === 'asx' ? GWHY[g.by] : g.kind === 'none' ? 'An LVEF of 50% or more with no strain or biomarker change is not CTRCD.' : 'In the 40s with a fall under 10 points, it takes a strain or biomarker change to call it moderate.';
+  $('lg-dp').innerHTML = dpHtml([['What the ejection fraction misses', '<p>The ejection fraction falls late. When some muscle cells are injured the rest work harder, and the ventricle keeps ejecting the same fraction until a good deal of reserve is gone. Strain and troponin move first' + (LG.gls || LG.bio ? ', which is why the change you switched on counts even with the ejection fraction where it is.' : ': switch one on to see it change the grade.') + '</p>'],
+    ['Why the grade asks for a 10-point fall', '<p>Echo ejection fraction varies by several points between studies and readers. A fall of 10 points or more is larger than that noise; a smaller fall needs a second signal (strain or a biomarker) before it is believed.</p>'],
+    ['Why grade at all', '<p>The grade sets how hard to push: the mildest grade usually means continuing cancer treatment with heart protection and closer watching, while the higher grades open the question of interrupting it. Stopping effective cancer therapy for a measurement error is the harm the rules are built to avoid.</p>']]);
 }
 $('lg-ef').addEventListener('input', drawLG);
 $('lg-tog').addEventListener('click', function(e){ var b = e.target.closest('[data-v]'); if (!b) return; var k = b.getAttribute('data-v'); LG[k] = !LG[k]; drawLG(); });
@@ -828,6 +839,9 @@ function drawGLS(){
   var v = +$('lgl').value, f = glsFall(-20, v);
   $('lgl-head').textContent = 'GLS ' + v + '%: relative fall ' + f + '%';
   $('lgl-line').textContent = f > 15 ? 'Over 15%: a significant fall. With LVEF still 50% or more, that is mild CTRCD.' : f > 0 ? '15% or less: within measurement variation. Same machine and reader next time.' : 'No fall.';
+  $('lgl-dp').innerHTML = dpHtml([['What strain measures', '<p>How much the muscle shortens from base to apex with each beat, as a percentage. That lengthwise shortening is done by the fibres just under the inner lining, which are the first to suffer from toxic or ischemic injury.</p>'],
+    ['Why it falls before the ejection fraction', '<p>When the lengthwise fibres weaken, the circular fibres in the mid-wall squeeze harder and keep the ejection fraction normal. Strain looks at the injured layer directly, so it shows damage while the ejection fraction is still compensated.</p>'],
+    ['Why a relative fall, on the same machine', '<p>Vendors compute strain differently, so absolute values are not interchangeable and people start from different baselines. Comparing each patient with their own baseline on the same machine removes both problems.</p>']]);
 }
 $('lgl').addEventListener('input', drawGLS);
 $('ld-drug').innerHTML = Object.keys(ANTH).map(function(k){ return '<option value="' + k + '">' + ANTH[k][0] + ' (× ' + ANTH[k][1] + ')</option>'; }).join('');

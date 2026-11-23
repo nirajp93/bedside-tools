@@ -138,7 +138,15 @@ footer p{margin:0 0 8px}
 }
 @media (max-width:380px){.checks{grid-template-columns:1fr}}
 @media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+.dp{margin-top:10px;border:1px solid var(--line);border-radius:12px;padding:2px 12px;background:var(--card);text-align:left}
+.dp:empty{display:none}
+.dp>div{padding:10px 0;border-top:1px solid var(--line)}
+.dp>div:first-child{border-top:0}
+.dp .dl{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500;margin:0 0 3px}
+.dp p{font-size:15px;line-height:1.45;color:var(--ink);margin:0 0 4px}
+.dp p:last-child{margin-bottom:0}
 </style>
+<script>function dpHtml(rows){ return rows.map(function(r){ return '<div><span class="dl">' + r[0] + '</span>' + r[1] + '</div>'; }).join(''); }</script>
 </head>
 <body>
 <div class="wrap">
@@ -752,7 +760,7 @@ function rateSVG(qt, hr){
 }
 function mountRate(host, qt0, hr0){
   var qt = qt0 || 400, hr = hr0 || 110;
-  host.innerHTML = '<div class="slider"><label for="' + host.id + '-hr">Rate</label><input type="range" id="' + host.id + '-hr" min="40" max="150" step="1" value="' + hr + '"><output id="' + host.id + '-hro"></output></div><div class="slider"><label for="' + host.id + '-qt">QT</label><input type="range" id="' + host.id + '-qt" min="280" max="560" step="5" value="' + qt + '"><output id="' + host.id + '-qto"></output></div><div class="fx"></div><div class="vals"></div><p class="line1"></p>';
+  host.innerHTML = '<div class="slider"><label for="' + host.id + '-hr">Rate</label><input type="range" id="' + host.id + '-hr" min="40" max="150" step="1" value="' + hr + '"><output id="' + host.id + '-hro"></output></div><div class="slider"><label for="' + host.id + '-qt">QT</label><input type="range" id="' + host.id + '-qt" min="280" max="560" step="5" value="' + qt + '"><output id="' + host.id + '-qto"></output></div><div class="fx"></div><div class="vals"></div><p class="line1"></p><div class="dp"></div>';
   function draw(){
     hr = +$(host.id + '-hr').value; qt = +$(host.id + '-qt').value;
     $(host.id + '-hro').textContent = hr + '/min'; $(host.id + '-qto').textContent = qt + ' ms';
@@ -761,6 +769,9 @@ function mountRate(host, qt0, hr0){
     host.querySelector('.vals').innerHTML = ['baz', 'fri', 'fra'].map(function(f){ return '<div class="score' + (f === k ? ' sel' : '') + '"><span>' + FORM[f].n + (f === k ? ' <small>(this tool uses)</small>' : '') + '</span><b>' + r0(FORM[f].f(qt, rr)) + ' ms</b></div>'; }).join('');
     var b = bazett(qt, rr), fr = fridericia(qt, rr);
     host.querySelector('.line1').textContent = hr > 85 ? 'At ' + hr + '/min Bazett reads ' + r0(b - fr) + ' ms longer than Fridericia: dividing by the square root of a short RR inflates the QTc.' : hr < 60 ? 'At ' + hr + '/min Bazett reads ' + r0(fr - b) + ' ms shorter than Fridericia, and can hide a long QT.' : hr === 60 ? 'At 60 a minute every formula returns the measured QT.' : 'At ' + hr + '/min Bazett reads ' + r0(b - fr) + ' ms longer than Fridericia. The gap grows with the rate; above 85 (outside the shaded band) this tool switches to Fridericia.';
+    host.querySelector('.dp').innerHTML = dpHtml([['Why the QT needs correcting', '<p>The action potential shortens as the heart speeds up, so a normal QT at 100 a minute is shorter than a normal QT at 60. Correction estimates what this QT would be at 60, so one cutoff can serve every rate.</p>'],
+      ['Why the formulas disagree', hr > 85 ? '<p>Bazett divides by the square root of the RR interval, which assumes the QT shortens more with rate than it really does. At ' + hr + ' a minute it therefore adds too much. Fridericia uses the cube root, which follows the real relation more closely at fast rates.</p>' : hr < 60 ? '<p>Below 60 the error reverses: Bazett subtracts too much and can make a long QT look acceptable. Slow rates are also when torsades is most likely, so the under-reading matters.</p>' : '<p>Near 60 a minute the RR interval is close to one second, so every formula barely changes the measured QT. The disagreement grows as the rate moves away from 60 in either direction.</p>'],
+      ['At the bedside', '<p>A long QTc in a tachycardic patient is often a Bazett artifact: check which formula the machine used before stopping a needed drug. The QT also takes a couple of minutes to settle after the rate changes, so measure during a steady rate.</p>']]);
   }
   host.addEventListener('input', draw); draw();
 }

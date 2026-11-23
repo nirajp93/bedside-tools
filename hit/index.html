@@ -142,7 +142,15 @@ input[type=range]{width:100%;min-height:44px;accent-color:var(--accent)}
 }
 @media (max-width:420px){.checks{grid-template-columns:1fr}}
 [hidden]{display:none!important}
+.dp{margin-top:10px;border:1px solid var(--line);border-radius:12px;padding:2px 12px;background:var(--card);text-align:left}
+.dp:empty{display:none}
+.dp>div{padding:10px 0;border-top:1px solid var(--line)}
+.dp>div:first-child{border-top:0}
+.dp .dl{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500;margin:0 0 3px}
+.dp p{font-size:15px;line-height:1.45;color:var(--ink);margin:0 0 4px}
+.dp p:last-child{margin-bottom:0}
 </style>
+<script>function dpHtml(rows){ return rows.map(function(r){ return '<div><span class="dl">' + r[0] + '</span>' + r[1] + '</div>'; }).join(''); }</script>
 </head>
 <body>
 <div class="wrap">
@@ -815,7 +823,10 @@ document.addEventListener('click', function(e){ var c = e.target.closest && e.ta
 
 /* Learn: OD slider */
 (function(){
-  function draw(){ var v = parseFloat($('odslide').value), b = odBand(v); $('odfig').innerHTML = odSVG(b.k, 'od-') + '<p class="line1"><b class="mono">' + v.toFixed(1) + '</b> · ' + esc(ODS[b.k].line) + '</p>'; }
+  function draw(){ var v = parseFloat($('odslide').value), b = odBand(v); $('odfig').innerHTML = odSVG(b.k, 'od-') + '<p class="line1"><b class="mono">' + v.toFixed(1) + '</b> · ' + esc(ODS[b.k].line) + '</p><div class="dp">' + dpHtml([['What the number is', '<p>The immunoassay coats a well with PF4 bound to heparin, adds the patient\'s serum, and stains any antibody that sticks. Optical density is how dark the well turns: more antibody bound, higher number.</p>'],
+    ['Why a positive is often not HIT', b.k === 'neg' ? '<p>Below the cutoff there is too little antibody to matter. The assay misses very few true cases, which is why a negative result is so useful.</p>' : '<p>Many patients make antibodies to PF4-heparin after heparin, especially after cardiac surgery, and most of these cannot activate platelets. Only antibodies strong and plentiful enough to cross-link the platelet\'s Fc receptors cause HIT' + (b.k === 'vstrong' || b.k === 'strong' ? '; at this density most are of that kind.' : '; at this density most are not.') + '</p>'],
+    ['Why the functional assay', '<p>It asks the question that matters: does this serum make donor platelets activate at treatment-range heparin, and stop at a very high heparin concentration? The immunoassay finds the antibody; the functional assay shows what the antibody does.</p>'],
+    ['Read it with the 4Ts', '<p>The density changes a probability, it does not replace one. The same value means more with a high 4Ts score than with a low one.</p>']]) + '</div>'; }
   $('odslide').addEventListener('input', draw); draw();
 })();
 
