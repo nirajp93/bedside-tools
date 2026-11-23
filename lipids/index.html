@@ -764,12 +764,20 @@ function ladderSvg(R, p){
   s += '<line x1="56" y1="' + y(top) + '" x2="56" y2="' + y(bot) + '" stroke="var(--line)" stroke-width="2"/>';
   for (var t = Math.ceil(bot / 20) * 20; t <= top; t += 20) s += '<text x="48" y="' + (y(t) + 4) + '" text-anchor="end" font-size="10.5" fill="var(--muted)">' + t + '</text><line x1="52" x2="56" y1="' + y(t) + '" y2="' + y(t) + '" stroke="var(--muted)"/>';
   if (G){ s += '<rect x="56" y="' + y(G.ldl) + '" width="280" height="' + (y(bot) - y(G.ldl)) + '" fill="var(--okbg)"/><line x1="56" x2="336" y1="' + y(G.ldl) + '" y2="' + y(G.ldl) + '" stroke="var(--ok)" stroke-width="2" stroke-dasharray="5 4"/><text x="334" y="' + (y(G.ldl) - 5) + '" text-anchor="end" font-size="11" fill="var(--ok)">goal LDL &lt;' + G.ldl + '</text>'; }
-  s += '<circle cx="56" cy="' + y(L) + '" r="6" fill="var(--warn)"/><text x="70" y="' + (y(L) + 4) + '" font-size="12" fill="var(--ink)">Today ' + L + '</text>';
-  R.steps.forEach(function(st, i){
-    var x = 70, yy = y(st.v);
-    if (st.lo != null && st.hi != null) s += '<rect x="' + (x - 5) + '" y="' + y(st.hi) + '" width="10" height="' + Math.max(4, y(st.lo) - y(st.hi)) + '" rx="5" fill="var(--accent)" opacity=".35"/>';
-    var filled = i === 0;
-    s += '<g class="rung" tabindex="0" role="button" data-rung="' + st.k + '" aria-label="' + esc(st.label) + ', about ' + st.v + '"><circle cx="' + x + '" cy="' + yy + '" r="6" fill="' + (filled ? 'var(--accent)' : 'var(--card)') + '" stroke="var(--accent)" stroke-width="2"/><text x="84" y="' + (yy + 4) + '" font-size="12" fill="var(--ink)">' + esc(st.label) + ' → ' + (st.lo != null ? st.lo + '–' + st.hi : (st.k === 'statin' ? '≤' : '~') + st.v) + '</text></g>';
+  /* Labels sit beside their dots but never on top of each other: each is pushed below the one above it and joined to its dot by a thin line. */
+  var labs = [{y: y(L), x: 56, lines: ['Today ' + L], tx: 70}];
+  R.steps.forEach(function(st){ var val = (st.lo != null ? st.lo + '–' + st.hi : (st.k === 'statin' ? '≤' : '~') + st.v), one = st.label + ' → ' + val; labs.push({y: y(st.v), x: 70, st: st, tx: 84, lines: one.length > 36 ? [st.label + ' →', val] : [one]}); });
+  var order = labs.slice().sort(function(a, b){ return a.y - b.y; }), prev = -99;
+  order.forEach(function(o){ o.ly = Math.max(o.y, prev); prev = o.ly + 15 * o.lines.length + 3; });
+  var Hx = Math.max(H, prev + 6);
+  s = s.replace('viewBox="0 0 340 ' + H + '"', 'viewBox="0 0 340 ' + Hx + '"');
+  s += '<circle cx="56" cy="' + y(L) + '" r="6" fill="var(--warn)"/>';
+  labs.forEach(function(o, i){
+    var st = o.st, tl = o.lines.map(function(t, k){ return '<tspan x="' + o.tx + '" dy="' + (k ? 15 : 0) + '">' + esc(t) + '</tspan>'; }).join('');
+    var lead = Math.abs(o.ly - o.y) > 3 ? '<line x1="' + (o.x + 7) + '" y1="' + o.y + '" x2="' + (o.tx - 3) + '" y2="' + o.ly + '" stroke="var(--muted)"/>' : '';
+    if (!st){ s += lead + '<text x="' + o.tx + '" y="' + (o.ly + 4) + '" font-size="12" fill="var(--ink)">' + tl + '</text>'; return; }
+    if (st.lo != null && st.hi != null) s += '<rect x="65" y="' + y(st.hi) + '" width="10" height="' + Math.max(4, y(st.lo) - y(st.hi)) + '" rx="5" fill="var(--accent)" opacity=".35"/>';
+    s += '<g class="rung" tabindex="0" role="button" data-rung="' + st.k + '" aria-label="' + esc(st.label) + ', about ' + st.v + '"><circle cx="70" cy="' + o.y + '" r="6" fill="' + (i === 1 ? 'var(--accent)' : 'var(--card)') + '" stroke="var(--accent)" stroke-width="2"/>' + lead + '<text x="' + o.tx + '" y="' + (o.ly + 4) + '" font-size="12" fill="var(--ink)">' + tl + '</text></g>';
   });
   return s + '</svg>';
 }
