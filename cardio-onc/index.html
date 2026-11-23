@@ -735,7 +735,7 @@ function svgOpen(vb, label){ return '<svg viewBox="' + vb + '" role="img" aria-l
 function tx(x, y, t, o){ o = o || {}; return '<text x="' + x + '" y="' + y + '" text-anchor="' + (o.a || 'middle') + '" style="' + (o.sans ? FS : FM) + ';font-size:' + (o.s || 11) + 'px;font-weight:' + (o.w || 400) + ';fill:' + (o.c || 'var(--ink)') + '">' + t + '</text>'; }
 function bx(x, y, w, h, t1, t2, stt){
   var fill = stt === 'hot' ? 'var(--warnbg)' : stt === 'on' ? 'var(--card)' : stt === 'bad' ? 'var(--badbg)' : 'var(--fill)', stroke = stt === 'hot' ? 'var(--warn)' : stt === 'on' ? 'var(--accent)' : stt === 'bad' ? 'var(--bad)' : 'var(--line)';
-  return '<g' + (stt === 'dim' ? ' opacity=".62"' : '') + '><rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="10" fill="' + fill + '" stroke="' + stroke + '"' + (stt && stt !== 'dim' ? ' stroke-width="2"' : '') + '/>' +
+  return '<g' + (stt === 'dim' ? ' opacity=".74"' : '') + '><rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="10" fill="' + fill + '" stroke="' + stroke + '"' + (stt && stt !== 'dim' ? ' stroke-width="2"' : '') + '/>' +
     tx(x + w / 2, y + (t2 ? h / 2 - 2 : h / 2 + 4), t1, {sans: 1, s: 12, w: 600}) + (t2 ? tx(x + w / 2, y + h / 2 + 12, t2, {s: 10.5, c: 'var(--muted)'}) : '') + '</g>';
 }
 function mk(p){ return '<defs><marker id="' + p + 'a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--accent)"/></marker></defs>'; }
@@ -746,7 +746,7 @@ var RISKD = {low: {n: 'Low', line: 'No factors, or one 1-point factor. Expected 
 function riskSVG(k, p){
   var s = svgOpen('0 0 340 210', 'Risk ladder, ' + RISKD[k].n), xs = [10, 92, 174, 256], ys = [150, 112, 74, 36];
   LV.forEach(function(l, n){ var on = l === k; s += '<rect x="' + xs[n] + '" y="' + ys[n] + '" width="74" height="' + (190 - ys[n]) + '" rx="8" fill="' + (on ? (l === 'vh' ? 'var(--badbg)' : l === 'high' ? 'var(--warnbg)' : l === 'low' ? 'var(--okbg)' : 'var(--fill)') : 'var(--fill)') + '" stroke="' + (on ? (l === 'vh' ? 'var(--bad)' : l === 'high' ? 'var(--warn)' : l === 'low' ? 'var(--ok)' : 'var(--accent)') : 'var(--line)') + '" stroke-width="' + (on ? 2 : 1) + '"/>' + tx(xs[n] + 37, ys[n] + 18, RISKD[l].n, {sans: 1, s: 11.5, w: on ? 700 : 500}) + tx(xs[n] + 37, ys[n] + 34, RATE[l], {s: 10.5, c: 'var(--muted)'}); });
-  s += tx(170, 205, 'Expected CV toxicity by level (HFA-ICOS, expert guidance)', {s: 10.5, c: 'var(--muted)'});
+  s += tx(170, 205, 'Expected CV toxicity by level (HFA-ICOS, expert guidance)', {sans: 1, s: 11, c: 'var(--muted)'});
   return s + '</svg>';
 }
 
@@ -772,7 +772,7 @@ function mechSVG(k, p){
   s += '<path d="M125 58 C 120 85, 112 110, 118 140" fill="none" stroke="' + (on('vessel') ? 'var(--bad)' : 'var(--hrt-art)') + '" stroke-width="' + (on('vessel') ? 5 : 3) + '" stroke-linecap="round"/>';
   if (z === 'immune') [[95, 100], [140, 110], [110, 125], [150, 88], [88, 82]].forEach(function(c){ s += '<circle cx="' + c[0] + '" cy="' + c[1] + '" r="6" fill="var(--accent)" stroke="var(--card)"/>'; });
   s += tx(125, 190, MECHZ[z], {s: 11.5, w: 700, c: 'var(--ink)'});
-  s += tx(125, 207, 'ovals: atria · red line: coronary artery', {s: 10.5, c: 'var(--muted)'});
+  s += tx(125, 207, 'ovals: atria · red line: coronary artery', {sans: 1, s: 11, c: 'var(--muted)'});
   var y = 14;
   d.c.forEach(function(t, n){ s += bx(198, y + n * 62, 138, 44, t.length > 20 ? t.slice(0, t.lastIndexOf(' ', 20)) : t, t.length > 20 ? t.slice(t.lastIndexOf(' ', 20) + 1) : '', n === 2 ? 'hot' : 'on'); if (n < 2) s += ar(267, y + n * 62 + 46, 267, y + n * 62 + 58, p); });
   s += tx(170, 240, 'Tap a drug: the highlighted part is its target', {s: 10.5, c: 'var(--muted)'});
@@ -782,13 +782,13 @@ function mechSVG(k, p){
 /* CTRCD ladder: LVEF bands. state = mild | moderate | severe */
 var GRD = {mild: {n: 'Mild', line: 'LVEF 50% or more, plus a relative strain fall over 15% and/or a new troponin or NP rise. Anthracycline: continue. HER2: continue.'}, moderate: {n: 'Moderate', line: 'LVEF 40–49% with a fall of 10 points or more, or a smaller fall plus strain or biomarker change. Anthracycline: interrupt. HER2: continue with ACE inhibitor or ARB and beta-blocker.'}, severe: {n: 'Severe', line: 'New LVEF under 40%. Interrupt either drug and start heart failure therapy.'}};
 function gradeSVG(k, p, ef){
-  var s = svgOpen('0 0 340 150', 'LVEF bands for CTRCD grade'), X0 = 20, W = 300;
+  var s = svgOpen('0 0 340 160', 'LVEF bands for CTRCD grade'), X0 = 20, W = 300;
   function px(v){ return X0 + (v - 25) / 45 * W; }
   [['severe', 25, 40], ['moderate', 40, 50], ['mild', 50, 70]].forEach(function(b){ var on = b[0] === k; s += '<rect x="' + px(b[1]) + '" y="40" width="' + (px(b[2]) - px(b[1])) + '" height="44" fill="' + (on ? (b[0] === 'severe' ? 'var(--badbg)' : 'var(--warnbg)') : 'var(--fill)') + '" stroke="' + (on ? (b[0] === 'severe' ? 'var(--bad)' : 'var(--warn)') : 'var(--line)') + '" stroke-width="' + (on ? 2 : 1) + '"/>' + tx((px(b[1]) + px(b[2])) / 2, 67, GRD[b[0]].n, {sans: 1, s: 12, w: on ? 700 : 500}); });
   [25, 40, 50, 60, 70].forEach(function(v){ s += tx(px(v), 102, v + '%', {s: 10.5, c: 'var(--muted)'}); });
-  s += tx(px(60), 32, 'baseline 60', {s: 10.5, c: 'var(--muted)'}) + '<line x1="' + px(60) + '" y1="36" x2="' + px(60) + '" y2="88" stroke="var(--muted)" stroke-dasharray="3 3"/>';
+  s += tx(px(60), 32, 'baseline 60', {s: 10.5, c: 'var(--muted)'}) + '<line x1="' + px(60) + '" y1="35" x2="' + px(60) + '" y2="40" stroke="var(--muted)" stroke-width="2"/><line x1="' + px(60) + '" y1="84" x2="' + px(60) + '" y2="90" stroke="var(--muted)" stroke-width="2"/>';
   if (ef != null){ s += '<path d="M' + px(ef) + ' 92 l-6 10 h12z" fill="var(--accent)"/>' + tx(px(ef), 120, 'now ' + ef, {s: 11, w: 700, c: 'var(--accent)'}); }
-  s += tx(170, 142, 'Mild needs strain or biomarker change; moderate 40–49 needs a 10-point fall or one of them', {s: 10.5, c: 'var(--muted)'});
+  s += tx(170, 138, 'Mild needs a strain or biomarker change.', {sans: 1, s: 11, c: 'var(--muted)'}) + tx(170, 152, 'Moderate at 40–49 needs a 10-point fall or one of them.', {sans: 1, s: 11, c: 'var(--muted)'});
   return s + '</svg>';
 }
 
@@ -800,7 +800,7 @@ function doseSVG(k, p, val){
   [['d0', 0, 100], ['d100', 100, 250], ['d250', 250, 400], ['d400', 400, 500]].forEach(function(b){ var on = b[0] === k; s += '<rect x="' + px(b[1]) + '" y="30" width="' + (px(b[2]) - px(b[1])) + '" height="36" fill="' + (on ? (b[0] === 'd400' ? 'var(--badbg)' : b[0] === 'd0' ? 'var(--okbg)' : 'var(--warnbg)') : 'var(--fill)') + '" stroke="' + (on ? 'var(--accent)' : 'var(--line)') + '" stroke-width="' + (on ? 2 : 1) + '"/>' + tx((px(b[1]) + px(b[2])) / 2, 53, DOSE[b[0]].n, {s: 10.5, w: on ? 700 : 400}); });
   [0, 100, 250, 400].forEach(function(v){ s += tx(px(v), 82, String(v), {s: 10.5, c: 'var(--muted)'}); });
   if (val != null) s += '<path d="M' + px(val) + ' 26 l-6 -10 h12z" fill="var(--accent)"/>' + tx(Math.min(px(val), 300), 12, val + ' mg/m²', {s: 10.5, w: 700, c: 'var(--accent)'});
-  s += tx(170, 108, 'Doxorubicin-equivalent mg/m² (ESC Table 5 and Table 12)', {s: 10.5, c: 'var(--muted)'});
+  s += tx(170, 108, 'Doxorubicin-equivalent mg/m² (ESC Table 5 and Table 12)', {sans: 1, s: 11, c: 'var(--muted)'});
   return s + '</svg>';
 }
 

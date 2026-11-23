@@ -271,7 +271,7 @@ var FS = 'font-family:var(--sans)', FM = 'font-family:var(--mono)';
 function vcol(v){ return v === 'u' ? 'var(--warn)' : v === 'd' ? 'var(--accent)' : v === 'x' ? 'var(--bad)' : 'var(--muted)'; }
 function markers(p){ return '<defs>' + ['n','u','d','x'].map(function(k){ return '<marker id="' + p + k + '" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="' + vcol(k) + '"/></marker>'; }).join('') + '</defs>'; }
 function box(x, y, w, h, t1, t2, hot, dim){
-  return '<g' + (dim ? ' opacity=".62"' : '') + '><rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="10" fill="' + (hot ? 'var(--warnbg)' : 'var(--fill)') + '" stroke="' + (hot ? 'var(--warn)' : 'var(--line)') + '"' + (hot ? ' stroke-width="2"' : '') + '/>' +
+  return '<g' + (dim ? ' opacity=".74"' : '') + '><rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="10" fill="' + (hot ? 'var(--warnbg)' : 'var(--fill)') + '" stroke="' + (hot ? 'var(--warn)' : 'var(--line)') + '"' + (hot ? ' stroke-width="2"' : '') + '/>' +
     '<text x="' + (x + w / 2) + '" y="' + (y + (t2 ? h / 2 - 2 : h / 2 + 4)) + '" text-anchor="middle" style="' + FS + ';font-size:12px;font-weight:600;fill:var(--ink)">' + t1 + '</text>' +
     (t2 ? '<text x="' + (x + w / 2) + '" y="' + (y + h / 2 + 12) + '" text-anchor="middle" style="' + FM + ';font-size:10.5px;fill:var(--muted)">' + t2 + '</text>' : '') + '</g>';
 }
@@ -334,7 +334,7 @@ function mgplugSVG(k, p){
   var h = svgOpen('0 0 340 220', 'ROMK channel: ' + MGPLUG[k].n) + markers(p);
   h += tx(170, 22, 'Urine', 12, 'var(--muted)', 600) + tx(170, 208, 'Inside the cell', 12, 'var(--muted)', 600);
   h += '<rect x="20" y="78" width="118" height="54" rx="8" fill="var(--fill)" stroke="var(--line)"/><rect x="202" y="78" width="118" height="54" rx="8" fill="var(--fill)" stroke="var(--line)"/>' + tx(79, 110, 'cell membrane', 10.5, 'var(--muted)') + tx(261, 110, 'ROMK channel', 10.5, 'var(--muted)');
-  if (low){ h += line('M156 176 V44', 'u', 5, p) + line('M184 176 V44', 'u', 5, p) + tx(170, 60, '', 10); h += tx(250, 54, 'K pours out', 11.5, 'var(--warn)', 700, 'middle', true); }
+  if (low){ h += line('M156 176 V44', 'u', 5, p) + line('M184 176 V44', 'u', 5, p) + tx(170, 60, '', 10.5); h += tx(250, 54, 'K pours out', 11.5, 'var(--warn)', 700, 'middle', true); }
   else { h += '<circle cx="170" cy="128" r="17" fill="var(--accent)"/>' + tx(170, 132, 'Mg', 12, 'var(--accent-ink)', 700, 'middle', true) + line('M170 176 V150', 'x', 2, p) + line('M170 100 V46', 'd', null, p) + tx(250, 54, 'little K leaves', 11.5, 'var(--accent)', 700, 'middle', true); }
   h += tx(170, 192, 'K', 13, 'var(--ink)', 700, 'middle', true);
   return h + '</svg>';
@@ -413,7 +413,7 @@ var PHOSUSE = {
 function phosuseSVG(k){
   var d = PHOSUSE[k], names = [['Diaphragm', 'weak breathing'], ['Muscle, heart', 'weakness, rhabdo'], ['Red cells', 'oxygen release'], ['Brain', 'confusion']];
   var h = svgOpen('0 0 340 200', 'What phosphate is for: ' + d.n);
-  h += '<circle cx="170" cy="100" r="34" fill="var(--accent)"/>' + tx(170, 97, 'ATP', 14, 'var(--accent-ink)', 700, 'middle', true) + tx(170, 112, 'needs P', 10, 'var(--accent-ink)', 400, 'middle', true);
+  h += '<circle cx="170" cy="100" r="34" fill="var(--accent)"/>' + tx(170, 97, 'ATP', 14, 'var(--accent-ink)', 700, 'middle', true) + tx(170, 112, 'needs P', 10.5, 'var(--accent-ink)', 400, 'middle', true);
   [[8, 10], [212, 10], [8, 140], [212, 140]].forEach(function(xy, i){ h += box(xy[0], xy[1], 120, 50, names[i][0], names[i][1], d.hot === i, d.hot >= 0 && d.hot !== i); h += '<path d="M' + (i % 2 ? 212 : 128) + ' ' + (i < 2 ? 60 : 140) + ' L' + (i % 2 ? 196 : 144) + ' ' + (i < 2 ? 78 : 122) + '" stroke="var(--muted)" stroke-width="1.5"/>'; });
   return h + '</svg>';
 }

@@ -843,7 +843,7 @@ var FS = 'font-family:var(--sans)', FM = 'font-family:var(--mono)';
 function vcol(v){ return v === 'u' ? 'var(--warn)' : v === 'd' ? 'var(--accent)' : v === 'x' ? 'var(--bad)' : 'var(--muted)'; }
 function markers(p){ return '<defs>' + ['n','u','d','x'].map(function(k){ return '<marker id="' + p + k + '" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="' + vcol(k) + '"/></marker>'; }).join('') + '</defs>'; }
 function box(x, y, w, h, t1, t2, hot, dim){
-  return '<g' + (dim ? ' opacity=".62"' : '') + '><rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="10" fill="' + (hot ? 'var(--warnbg)' : 'var(--fill)') + '" stroke="' + (hot ? 'var(--warn)' : 'var(--line)') + '"' + (hot ? ' stroke-width="2"' : '') + '/>' +
+  return '<g' + (dim ? ' opacity=".74"' : '') + '><rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="10" fill="' + (hot ? 'var(--warnbg)' : 'var(--fill)') + '" stroke="' + (hot ? 'var(--warn)' : 'var(--line)') + '"' + (hot ? ' stroke-width="2"' : '') + '/>' +
     '<text x="' + (x + w / 2) + '" y="' + (y + (t2 ? h / 2 - 2 : h / 2 + 4)) + '" text-anchor="middle" style="' + FS + ';font-size:12px;font-weight:600;fill:var(--ink)">' + t1 + '</text>' +
     (t2 ? '<text x="' + (x + w / 2) + '" y="' + (y + h / 2 + 12) + '" text-anchor="middle" style="' + FM + ';font-size:10.5px;fill:var(--muted)">' + t2 + '</text>' : '') + '</g>';
 }
@@ -864,8 +864,8 @@ function targetSVG(k){
   var h = svgOpen('0 0 340 220', 'Where the antibiotic acts: ' + TARGET[k].n);
   h += '<rect x="20" y="20" width="300" height="180" rx="80" fill="none" stroke="' + (k === 'wall' ? 'var(--warn)' : 'var(--muted)') + '" stroke-width="' + (k === 'wall' ? 7 : 4) + '"/>' + tx(170, 14, 'cell wall', 10.5, k === 'wall' ? 'var(--warn)' : 'var(--muted)', k === 'wall' ? 700 : 400, 'middle', true);
   h += '<path d="M70 110 C90 70 110 150 130 110 S170 70 190 110" fill="none" stroke="' + (k === 'dna' ? 'var(--warn)' : 'var(--muted)') + '" stroke-width="' + (k === 'dna' ? 4 : 2) + '"/>' + tx(130, 150, 'DNA', 10.5, k === 'dna' ? 'var(--warn)' : 'var(--muted)', k === 'dna' ? 700 : 400, 'middle', true);
-  h += '<ellipse cx="240" cy="80" rx="26" ry="12"' + hot(k === 'r30') + '/>' + tx(240, 84, '30S', 10, 'var(--ink)', k === 'r30' ? 700 : 400, 'middle', true) + '<ellipse cx="240" cy="104" rx="32" ry="15"' + hot(k === 'r50') + '/>' + tx(240, 108, '50S', 10, 'var(--ink)', k === 'r50' ? 700 : 400, 'middle', true) + tx(240, 134, 'ribosome', 10.5, 'var(--muted)', 400, 'middle', true);
-  h += '<rect x="186" y="150" width="116" height="26" rx="8"' + hot(k === 'folate') + '/>' + tx(244, 167, 'folate synthesis', 10, 'var(--ink)', k === 'folate' ? 700 : 400, 'middle', true);
+  h += '<ellipse cx="240" cy="80" rx="26" ry="12"' + hot(k === 'r30') + '/>' + tx(240, 84, '30S', 10.5, 'var(--ink)', k === 'r30' ? 700 : 400, 'middle', true) + '<ellipse cx="240" cy="104" rx="32" ry="15"' + hot(k === 'r50') + '/>' + tx(240, 108, '50S', 10.5, 'var(--ink)', k === 'r50' ? 700 : 400, 'middle', true) + tx(240, 134, 'ribosome', 10.5, 'var(--muted)', 400, 'middle', true);
+  h += '<rect x="186" y="150" width="116" height="26" rx="8"' + hot(k === 'folate') + '/>' + tx(244, 167, 'folate synthesis', 10.5, 'var(--ink)', k === 'folate' ? 700 : 400, 'middle', true);
   return h + '</svg>';
 }
 
@@ -879,8 +879,8 @@ function resistSVG(k, p){
   p = p || 'rs'; var d = RESIST[k];
   var h = svgOpen('0 0 340 200', 'How resistance works: ' + d.n) + markers(p);
   h += box(110, 76, 120, 48, d.n, k === 'mrsa' ? 'altered target' : k === 'ps' ? 'intrinsic resistance' : 'enzyme', true);
-  h += box(8, 14, 150, 40, 'Fails', null, false) + tx(10, 68, d.fails, 10, 'var(--bad)', 700, 'start', true) + '<path d="M83 74 C90 90 98 96 108 100" fill="none" stroke="var(--bad)" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#' + p + 'x)"/>';
-  h += box(182, 146, 150, 40, 'Still works', null, false) + tx(330, 140, d.works.join(', '), 10, 'var(--ok)', 700, 'end', true) + '<path d="M256 128 C250 112 242 106 232 102" fill="none" stroke="var(--ok)" stroke-width="2.5"/>';
+  h += box(8, 14, 150, 40, 'Fails', null, false) + tx(10, 68, d.fails, 10.5, 'var(--bad)', 700, 'start', true) + '<path d="M83 74 C90 90 98 96 108 100" fill="none" stroke="var(--bad)" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#' + p + 'x)"/>';
+  h += box(182, 146, 150, 40, 'Still works', null, false) + tx(330, 140, d.works.join(', '), 10.5, 'var(--ok)', 700, 'end', true) + '<path d="M256 128 C250 112 242 106 232 102" fill="none" stroke="var(--ok)" stroke-width="2.5"/>';
   return h + '</svg>';
 }
 
@@ -894,8 +894,8 @@ function courseSVG(k){
   var d = COURSE[k], st = [['First', 'broad'], ['Narrow', 'by culture'], ['Oral', 'if stable'], ['Stop', 'on date']];
   var h = svgOpen('0 0 340 150', 'The antibiotic course: ' + d.n);
   h += '<path d="M20 60 H320" stroke="var(--line)" stroke-width="3"/>';
-  st.forEach(function(s, i){ var x = 50 + i * 80, on = d.hot === i, wd = [64, 44, 30, 14][i]; h += '<circle cx="' + x + '" cy="60" r="' + (on ? 11 : 7) + '" fill="' + (on ? 'var(--accent)' : 'var(--card)') + '" stroke="var(--accent)" stroke-width="2"/>' + tx(x, 34, s[0], 12, 'var(--ink)', on ? 700 : 600) + tx(x, 88, s[1], 10, 'var(--muted)', 400, 'middle', true) + '<rect x="' + (x - wd / 2) + '" y="104" width="' + wd + '" height="14" rx="7" fill="var(--accent)" opacity="' + (on ? '.6' : '.25') + '"/>'; });
-  return h + tx(170, 140, 'breadth of cover', 10, 'var(--muted)', 400, 'middle', true) + '</svg>';
+  st.forEach(function(s, i){ var x = 50 + i * 80, on = d.hot === i, wd = [64, 44, 30, 14][i]; h += '<circle cx="' + x + '" cy="60" r="' + (on ? 11 : 7) + '" fill="' + (on ? 'var(--accent)' : 'var(--card)') + '" stroke="var(--accent)" stroke-width="2"/>' + tx(x, 34, s[0], 12, 'var(--ink)', on ? 700 : 600) + tx(x, 88, s[1], 10.5, 'var(--muted)', 400, 'middle', true) + '<rect x="' + (x - wd / 2) + '" y="104" width="' + wd + '" height="14" rx="7" fill="var(--accent)" opacity="' + (on ? '.6' : '.25') + '"/>'; });
+  return h + tx(170, 140, 'breadth of cover', 10.5, 'var(--muted)', 400, 'middle', true) + '</svg>';
 }
 
 var PKPD = {
@@ -920,8 +920,8 @@ var SOURCE = {
 function sourceSVG(k, p){
   p = p || 'sc';
   var h = svgOpen('0 0 340 180', 'Source control: ' + SOURCE[k].n) + markers(p);
-  if (k === 'ln'){ h += '<path d="M40 30 C120 30 150 60 170 110" fill="none" stroke="var(--warn)" stroke-width="5"/><circle cx="170" cy="112" r="9" fill="var(--bad)" opacity=".7"/>' + tx(60, 22, 'central line', 10.5, 'var(--warn)', 700, 'start', true) + '<path d="M20 120 H320" stroke="var(--muted)" stroke-width="10" opacity=".3"/>' + tx(300, 142, 'vein', 10.5, 'var(--muted)', 400, 'end', true) + tx(186, 100, 'bacteria on the line', 10, 'var(--bad)', 700, 'start', true); return h + '</svg>'; }
-  h += '<circle cx="120" cy="90" r="56" fill="' + (k === 'und' ? 'var(--badbg)' : 'var(--fill)') + '" stroke="' + (k === 'und' ? 'var(--bad)' : 'var(--line)') + '" stroke-width="2"/>' + tx(120, 86, k === 'und' ? 'collection' : 'drained', 12, 'var(--ink)', 600) + tx(120, 104, k === 'und' ? 'not drained' : 'small residual', 10, 'var(--muted)', 400, 'middle', true);
+  if (k === 'ln'){ h += '<path d="M40 30 C120 30 150 60 170 110" fill="none" stroke="var(--warn)" stroke-width="5"/><circle cx="170" cy="112" r="9" fill="var(--bad)" opacity=".7"/>' + tx(60, 22, 'central line', 10.5, 'var(--warn)', 700, 'start', true) + '<path d="M20 120 H320" stroke="var(--muted)" stroke-width="10" opacity=".3"/>' + tx(300, 142, 'vein', 10.5, 'var(--muted)', 400, 'end', true) + tx(186, 100, 'bacteria on the line', 10.5, 'var(--bad)', 700, 'start', true); return h + '</svg>'; }
+  h += '<circle cx="120" cy="90" r="56" fill="' + (k === 'und' ? 'var(--badbg)' : 'var(--fill)') + '" stroke="' + (k === 'und' ? 'var(--bad)' : 'var(--line)') + '" stroke-width="2"/>' + tx(120, 86, k === 'und' ? 'collection' : 'drained', 12, 'var(--ink)', 600) + tx(120, 104, k === 'und' ? 'not drained' : 'small residual', 10.5, 'var(--muted)', 400, 'middle', true);
   h += '<path d="M300 40 C260 44 220 56 ' + (k === 'und' ? '186 70' : '150 84') + '" fill="none" stroke="var(--accent)" stroke-width="2.5"' + (k === 'und' ? ' stroke-dasharray="5 4"' : '') + ' marker-end="url(#' + p + (k === 'und' ? 'x' : 'n') + ')"/>' + tx(300, 30, 'antibiotic', 10.5, 'var(--accent)', 700, 'end', true);
   if (k === 'dr') h += '<path d="M120 146 V172" stroke="var(--ok)" stroke-width="5"/>' + tx(134, 166, 'drain', 10.5, 'var(--ok)', 700, 'start', true);
   return h + '</svg>';
