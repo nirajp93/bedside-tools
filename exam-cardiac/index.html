@@ -78,11 +78,11 @@ details.more ul{padding-left:18px}
 .lr{font-family:var(--mono);font-size:12px;padding:2px 7px;border-radius:6px;background:var(--fill);white-space:nowrap}
 .lr.up{color:var(--bad);background:var(--badbg)}
 .lr.down{color:var(--ok);background:var(--okbg)}
-.tag{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:2px 6px;border-radius:5px;background:var(--fill);color:var(--muted)}
+.tag{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:2px 6px;border-radius:5px;background:var(--fill);color:var(--muted)}
 .tri{display:inline-grid;grid-auto-flow:column;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--card)}
 .tri button{min-width:46px;min-height:44px;font-size:13px;color:var(--muted);border-left:1px solid var(--line)}
 .tri button:first-child{border-left:0}
-.tri button:disabled{opacity:.35;cursor:not-allowed}
+.tri button:disabled{opacity:.5;cursor:not-allowed}
 .tri button[aria-pressed=true][data-v="1"]{background:var(--badbg);color:var(--bad);font-weight:600}
 .tri button[aria-pressed=true][data-v="1"][data-low]{background:var(--okbg);color:var(--ok)}
 .tri button[aria-pressed=true][data-v="-1"]{background:var(--okbg);color:var(--ok);font-weight:600}
@@ -151,8 +151,30 @@ footer p{margin-top:8px}
 .curvecap{font-size:13px;color:var(--muted);margin:4px 0 0}
 .extab{width:100%;border-collapse:collapse;font-size:14px;margin:8px 0}
 .extab th,.extab td{padding:6px;border-bottom:1px solid var(--line);text-align:left}
-.extab th{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:400}
+.extab th{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:400}
+.dp{margin-top:10px;border:1px solid var(--line);border-radius:12px;padding:2px 12px;background:var(--card);text-align:left}
+.dp:empty{display:none}
+.dp>div{padding:10px 0;border-top:1px solid var(--line)}
+.dp>div:first-child{border-top:0}
+.dp .dl{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500;margin:0 0 3px}
+.dp p{font-size:15px;line-height:1.45;color:var(--ink);margin:0 0 4px}
+.dp p:last-child{margin-bottom:0}
+.deeper{margin-top:14px;border-top:1px solid var(--line)}
+.deeper>summary{min-height:44px;display:flex;align-items:center;gap:8px;color:var(--accent);font-weight:600;font-size:15px;cursor:pointer;list-style:none}
+.deeper>summary::-webkit-details-marker{display:none}
+.deeper>summary::before{content:"+";font-family:var(--mono);font-size:18px;line-height:1;width:14px;text-align:center}
+.deeper[open]>summary::before{content:"\2212"}
+.deeper>summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.deeper .dpx{border:1px solid var(--line);border-radius:12px;padding:2px 12px;background:var(--card);text-align:left}
+.deeper .dpx>div{padding:10px 0;border-top:1px solid var(--line)}
+.deeper .dpx>div:first-child{border-top:0}
+.deeper .dl{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500;margin:0 0 3px}
+.deeper p{font-size:15px;line-height:1.45;color:var(--ink);margin:0 0 4px}
+.deeper p:last-child{margin-bottom:0}
+[data-deeper]>.deeper{margin-top:0;border-top:0}
+.step .deeper{margin-top:10px}
 </style>
+<script>function dpHtml(rows){ return rows.map(function(r){ return '<div><span class="dl">' + r[0] + '</span>' + r[1] + '</div>'; }).join(''); }</script>
 </head>
 <body>
 <header><div class="wrap">
@@ -174,6 +196,7 @@ footer p{margin-top:8px}
       <input type="range" id="pre" min="1" max="99" step="1" aria-describedby="prenote">
     </div>
     <p class="note" id="prenote"></p>
+    <div class="dp" id="prehow"><div><span class="dl">What the starting point is</span><p>How likely the diagnosis is in a patient like this one before you examine: the setting, the story, the age. It matters as much as the exam: the same finding lands very differently from 10% and from 60%.</p></div><div><span class="dl">What a likelihood ratio does</span><p>It multiplies the odds. As a rough guide between 10% and 90%, ratios of 2, 5 and 10 raise the probability by about 15, 30 and 45 points, and 0.5, 0.2 and 0.1 lower it by the same. A ratio near 1 changes nothing, however classic the finding.</p></div><div><span class="dl">Where the exam helps most</span><p>In the middle. At very low or very high starting points even a strong finding rarely moves the probability across a decision line, so examine hardest where you are least sure.</p></div></div>
     <p class="note" id="prehint">Your best guess from the history, before you examine. Unsure? Drag across the range you find plausible and watch the chart in the result.</p>
     <div class="minis"><button type="button" class="mini" id="prehelp">How to choose a starting number</button></div>
   </div>
@@ -383,7 +406,7 @@ function pcgSVG(k,mode){
   var sp=insp?s.split.insp:s.split.exp,g="";
   g+='<line x1="12" y1="'+mid+'" x2="'+(W-12)+'" y2="'+mid+'" stroke="var(--line)" stroke-width="1.5"/>';
   function bar(ms,h,w){return '<rect x="'+(x(ms)-w/2).toFixed(1)+'" y="'+(mid-h)+'" width="'+w+'" height="'+(2*h)+'" rx="2" fill="var(--ink)"/>'}
-  function lab(ms,t){return '<text x="'+x(ms).toFixed(1)+'" y="'+(H-3)+'" text-anchor="middle" style="font-family:var(--mono);font-size:10px" fill="var(--muted)">'+t+'</text>'}
+  function lab(ms,t){return '<text x="'+x(ms).toFixed(1)+'" y="'+(H-3)+'" text-anchor="middle" style="font-family:var(--mono);font-size:10.5px" fill="var(--muted)">'+t+'</text>'}
   var mur=s.mur;
   if(mur){var amp=vals&&s.valsalva?26:18,pts=[];
     for(var ms=mur.start;ms<=mur.end;ms+=8){var u=(ms-mur.start)/(mur.end-mur.start),a;
@@ -395,7 +418,7 @@ function pcgSVG(k,mode){
   if(sp>0){var first=s.split.rev?"P2":"A2",second=s.split.rev?"A2":"P2";g+=bar(320,22,5)+bar(320+sp,16,4)+lab(320-6,first)+lab(320+sp+8,second)}else g+=bar(320,22,5)+lab(320,"S2");
   if(s.s3)g+=bar(470,14,6)+lab(470,"S3");
   if(s.os)g+=bar(400,12,4)+lab(398,"OS");
-  g+='<text x="'+x(160)+'" y="12" text-anchor="middle" style="font-family:var(--mono);font-size:9px" fill="var(--muted)">systole</text><text x="'+x(560)+'" y="12" text-anchor="middle" style="font-family:var(--mono);font-size:9px" fill="var(--muted)">diastole</text>';
+  g+='<text x="'+x(160)+'" y="12" text-anchor="middle" style="font-family:var(--mono);font-size:10.5px" fill="var(--muted)">systole</text><text x="'+x(560)+'" y="12" text-anchor="middle" style="font-family:var(--mono);font-size:10.5px" fill="var(--muted)">diastole</text>';
   return '<svg class="pcg" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Phonocardiogram: '+esc(s.t)+(insp?", inspiration":vals?", Valsalva":"")+'">'+g+'</svg>'}
 var actx=null;
 function ac(){if(!actx){var A=window.AudioContext||window.webkitAudioContext;if(!A)return null;actx=new A()}if(actx.state==="suspended")actx.resume();return actx}
@@ -452,7 +475,7 @@ function jvpWave(state){
   var d="M"+pts.map(function(p){return x(p[0]).toFixed(1)+" "+(base+p[1])}).join(" L");
   var labels={normal:[[30,"a"],[45,"c"],[100,"x"],[150,"v"],[185,"y"]],cannon:[[40,"cannon a"],[150,"v"]],cv:[[130,"large cv"],[190,"y"]],steepy:[[30,"a"],[90,"x"],[170,"steep y"]],tamp:[[30,"a"],[110,"x"],[200,"no y"]],af:[[100,"x"],[150,"v"],[185,"y"]]};
   var lab=labels[state].map(function(l){var p=pts.filter(function(q){return q[0]===l[0]})[0]||[l[0],-40];return '<text x="'+x(l[0]).toFixed(1)+'" y="'+(base+p[1]-8)+'" text-anchor="middle" style="font-family:var(--mono);font-size:11px" fill="var(--ink)">'+l[1]+'</text>'}).join("");
-  return '<svg class="fig" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Jugular venous waveform, '+state+'"><line x1="14" y1="'+base+'" x2="'+(W-14)+'" y2="'+base+'" stroke="var(--line)" stroke-width="1.5"/><path d="'+d+'" fill="none" stroke="var(--hrt-vein)" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>'+lab+'<text x="14" y="'+(H-6)+'" style="font-family:var(--mono);font-size:10px" fill="var(--muted)">S1</text><text x="'+x(150)+'" y="'+(H-6)+'" style="font-family:var(--mono);font-size:10px" fill="var(--muted)">S2</text></svg>'}
+  return '<svg class="fig" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Jugular venous waveform, '+state+'"><line x1="14" y1="'+base+'" x2="'+(W-14)+'" y2="'+base+'" stroke="var(--line)" stroke-width="1.5"/><path d="'+d+'" fill="none" stroke="var(--hrt-vein)" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>'+lab+'<text x="14" y="'+(H-6)+'" style="font-family:var(--mono);font-size:10.5px" fill="var(--muted)">S1</text><text x="'+x(150)+'" y="'+(H-6)+'" style="font-family:var(--mono);font-size:10.5px" fill="var(--muted)">S2</text></svg>'}
 var JVPST={normal:["Normal","a: atrial contraction. c: tricuspid bulging at systole. x: atrial relaxation and descent of the valve ring. v: atrial filling against a closed valve. y: emptying when the valve opens."],
   cannon:["Cannon a wave","Atrium contracts against a closed tricuspid valve: AV dissociation, complete heart block, ventricular tachycardia."],
   cv:["Large cv wave","Tricuspid regurgitation: the ventricle pushes blood back into the atrium in systole, filling in the x descent."],
@@ -464,14 +487,14 @@ var MOVES=[["Breathe in","Raises right-sided return","r"],["Valsalva strain / sq
 var MCOLS=[["AS","as"],["HCM","hcm"],["MR","mr"],["AR","ar"],["Right","rt"]];
 var MDIR={r:{as:"0",hcm:"0",mr:"0",ar:"0",rt:"+"},p:{as:"-",hcm:"+",mr:"-",ar:"-",rt:"-"},s:{as:"+",hcm:"-",mr:"+",ar:"+",rt:"+"},h:{as:"-",hcm:"-",mr:"+",ar:"+",rt:"0"}};
 function figMoves(){var cw=50,rw=118,W=rw+cw*MCOLS.length+8,rh=46,H=30+rh*MOVES.length,g="";
-  MCOLS.forEach(function(c,i){g+='<text x="'+(rw+cw*i+cw/2)+'" y="18" text-anchor="middle" style="font-family:var(--mono);font-size:10px" fill="var(--muted)">'+c[0]+'</text>'});
-  MOVES.forEach(function(m,j){var y=30+rh*j;g+='<line x1="0" y1="'+y+'" x2="'+W+'" y2="'+y+'" stroke="var(--line)"/>';g+='<text x="0" y="'+(y+19)+'" style="font-size:11px" fill="var(--ink)">'+esc(m[0].length>20?m[0].split(" / ")[0]:m[0])+'</text><text x="0" y="'+(y+35)+'" style="font-size:10px" fill="var(--muted)">'+esc(m[1])+'</text>';
+  MCOLS.forEach(function(c,i){g+='<text x="'+(rw+cw*i+cw/2)+'" y="18" text-anchor="middle" style="font-family:var(--mono);font-size:10.5px" fill="var(--muted)">'+c[0]+'</text>'});
+  MOVES.forEach(function(m,j){var y=30+rh*j;g+='<line x1="0" y1="'+y+'" x2="'+W+'" y2="'+y+'" stroke="var(--line)"/>';g+='<text x="0" y="'+(y+19)+'" style="font-size:11px" fill="var(--ink)">'+esc(m[0].length>20?m[0].split(" / ")[0]:m[0])+'</text><text x="0" y="'+(y+35)+'" style="font-size:10.5px" fill="var(--muted)">'+esc(m[1])+'</text>';
     MCOLS.forEach(function(c,i){var d=MDIR[m[2]][c[1]],cx=rw+cw*i+cw/2,cy=y+rh/2;
       if(d==="+")g+='<path d="M'+cx+' '+(cy-10)+' L'+(cx+8)+' '+(cy+6)+' L'+(cx-8)+' '+(cy+6)+' Z" fill="var(--bad)"/>';
       else if(d==="-")g+='<path d="M'+cx+' '+(cy+10)+' L'+(cx+8)+' '+(cy-6)+' L'+(cx-8)+' '+(cy-6)+' Z" fill="var(--ok)"/>';
       else g+='<line x1="'+(cx-7)+'" y1="'+cy+'" x2="'+(cx+7)+'" y2="'+cy+'" stroke="var(--muted)" stroke-width="2"/>'})});
   return '<svg class="fig" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Grid of how each manoeuvre changes each murmur">'+g+'</svg><p class="grid-legend">Red up: louder. Green down: softer. Line: little change. Right: right-sided murmurs such as tricuspid regurgitation. The Valsalva row also covers squat to stand.</p><p class="figtext">The one that breaks the pattern is HCM: anything that shrinks the ventricle (Valsalva, standing) narrows the outflow tract and makes it louder, while every other left-sided murmur gets softer. Handgrip separates regurgitant murmurs (louder) from outflow murmurs (softer). Mitral valve prolapse is the exception in the MR column: less filling moves the click earlier and makes the murmur longer, often louder.</p><p class="note">Directions follow from preload and afterload physiology (McGee 2025; Lembo et al., NEJM 1988). Their accuracy figures are not shown because they have not yet been verified against the primary study.</p>'}
-function figPulsus(){return '<svg class="fig" viewBox="0 0 320 130" role="img" aria-label="Arterial pressure falling with inspiration by more than 10 mmHg"><line x1="20" y1="30" x2="300" y2="30" stroke="var(--muted)" stroke-dasharray="4 4"/><line x1="20" y1="58" x2="300" y2="58" stroke="var(--muted)" stroke-dasharray="4 4"/><text x="300" y="24" text-anchor="end" style="font-family:var(--mono);font-size:10px" fill="var(--muted)">first sounds, expiration only</text><text x="300" y="74" text-anchor="end" style="font-family:var(--mono);font-size:10px" fill="var(--muted)">sounds in every beat</text>'+[0,1,2,3,4,5,6,7].map(function(i){var insp=i>=3&&i<=5,top=insp?52:30,x=34+i*34;return '<path d="M'+x+' 110 L'+(x+6)+' '+top+' L'+(x+16)+' '+(top+20)+' L'+(x+26)+' 110" fill="none" stroke="var(--hrt-art)" stroke-width="2.5" stroke-linejoin="round"/>'}).join("")+'<rect x="128" y="96" width="104" height="22" rx="6" fill="var(--fill)"/><text x="180" y="111" text-anchor="middle" style="font-family:var(--mono);font-size:10px" fill="var(--ink)">inspiration</text></svg><p class="figtext">Inflate the cuff above systolic, then deflate slowly. Note the pressure where you first hear sounds only in expiration, then where you hear them in every beat. The difference is the pulsus paradoxus. Over 10 mmHg in a patient with a known effusion raises the likelihood of tamponade. It can be absent despite tamponade with aortic regurgitation, an atrial septal defect, severe left ventricular dysfunction or positive-pressure ventilation.</p>'}
+function figPulsus(){return '<svg class="fig" viewBox="0 0 320 130" role="img" aria-label="Arterial pressure falling with inspiration by more than 10 mmHg"><line x1="20" y1="30" x2="300" y2="30" stroke="var(--muted)" stroke-dasharray="4 4"/><line x1="20" y1="58" x2="300" y2="58" stroke="var(--muted)" stroke-dasharray="4 4"/><text x="300" y="24" text-anchor="end" style="font-family:var(--mono);font-size:10.5px" fill="var(--muted)">first sounds, expiration only</text><text x="300" y="74" text-anchor="end" style="font-family:var(--mono);font-size:10.5px" fill="var(--muted)">sounds in every beat</text>'+[0,1,2,3,4,5,6,7].map(function(i){var insp=i>=3&&i<=5,top=insp?52:30,x=34+i*34;return '<path d="M'+x+' 110 L'+(x+6)+' '+top+' L'+(x+16)+' '+(top+20)+' L'+(x+26)+' 110" fill="none" stroke="var(--hrt-art)" stroke-width="2.5" stroke-linejoin="round"/>'}).join("")+'<rect x="128" y="96" width="104" height="22" rx="6" fill="var(--fill)"/><text x="180" y="111" text-anchor="middle" style="font-family:var(--mono);font-size:10.5px" fill="var(--ink)">inspiration</text></svg><p class="figtext">Inflate the cuff above systolic, then deflate slowly. Note the pressure where you first hear sounds only in expiration, then where you hear them in every beat. The difference is the pulsus paradoxus. Over 10 mmHg in a patient with a known effusion raises the likelihood of tamponade. It can be absent despite tamponade with aortic regurgitation, an atrial septal defect, severe left ventricular dysfunction or positive-pressure ventilation.</p>'}
 var lastFocus=null,sheetKey=null;
 function openSheet(html){lastFocus=document.activeElement;$("#sheet").innerHTML=html;$("#sheetwrap").hidden=false;var x=$("#sheet .x");if(x)x.focus()}
 function closeSheet(){$("#sheetwrap").hidden=true;$("#sheet").innerHTML="";sheetKey=null;if(playing)stop();if(lastFocus&&lastFocus.focus)lastFocus.focus()}
@@ -522,15 +545,15 @@ function curveHTML(){
  a=d+"L"+X(0)+" "+Y(0)+"Z";
  var dx=X(s),dy=Y(p),right=dx<200,g='<svg class="curve" viewBox="0 0 300 138" role="img" aria-label="Chart of the result against your starting probability. Starting at '+s+' percent gives '+fmt(p)+' percent.">';
  g+='<path d="M'+X(0)+' '+Y(0)+'L'+X(100)+' '+Y(0)+'M'+X(0)+' '+Y(0)+'L'+X(0)+' '+Y(100)+'" stroke="var(--line)" stroke-width="2" fill="none"/>';
- [0,50,100].forEach(function(t){g+='<text x="'+X(t)+'" y="118" text-anchor="middle" style="font-family:var(--mono);font-size:9px" fill="var(--muted)">'+t+'</text><text x="28" y="'+(Y(t)+3)+'" text-anchor="end" style="font-family:var(--mono);font-size:9px" fill="var(--muted)">'+t+'</text>'});
- g+='<text x="'+X(50)+'" y="134" text-anchor="middle" style="font-family:var(--mono);font-size:9px" fill="var(--muted)">your starting probability →</text>';
- g+='<text x="'+(X(0)+4)+'" y="'+(Y(100)+3)+'" style="font-family:var(--mono);font-size:9px" fill="var(--muted)">result ↑</text>';
+ [0,50,100].forEach(function(t){g+='<text x="'+X(t)+'" y="118" text-anchor="middle" style="font-family:var(--mono);font-size:10.5px" fill="var(--muted)">'+t+'</text><text x="28" y="'+(Y(t)+3)+'" text-anchor="end" style="font-family:var(--mono);font-size:10.5px" fill="var(--muted)">'+t+'</text>'});
+ g+='<text x="'+X(50)+'" y="134" text-anchor="middle" style="font-family:var(--mono);font-size:10.5px" fill="var(--muted)">your starting probability →</text>';
+ g+='<text x="'+(X(0)+4)+'" y="'+(Y(100)+3)+'" style="font-family:var(--mono);font-size:10.5px" fill="var(--muted)">result ↑</text>';
  if(has)g+='<path d="'+a+'" fill="var(--accent)" opacity=".12"/>';
  g+='<path d="M'+X(0)+' '+Y(0)+'L'+X(100)+' '+Y(100)+'" stroke="var(--muted)" stroke-width="1.5" stroke-dasharray="2 4" fill="none"/>';
  if(has)g+='<path d="'+d+'" stroke="var(--accent)" stroke-width="2.5" fill="none" stroke-linejoin="round"/>';
  g+='<path d="M'+dx+' '+Y(0)+'L'+dx+' '+dy+'L'+X(0)+' '+dy+'" stroke="var(--ink)" stroke-width="1" stroke-dasharray="3 3" fill="none" opacity=".55"/>';
  g+='<circle cx="'+dx+'" cy="'+dy+'" r="6" fill="var(--accent)" stroke="var(--card)" stroke-width="2.5"/>';
- g+='<text x="'+(right?dx+10:dx-10)+'" y="'+(p>18?dy+14:dy-8)+'" text-anchor="'+(right?"start":"end")+'" style="font-family:var(--mono);font-size:10px;font-weight:600" fill="var(--ink)">'+s+'% → '+fmt(p)+'%</text></svg>';
+ g+='<text x="'+(right?dx+10:dx-10)+'" y="'+(p>18?dy+14:dy-8)+'" text-anchor="'+(right?"start":"end")+'" style="font-family:var(--mono);font-size:10.5px;font-weight:600" fill="var(--ink)">'+s+'% → '+fmt(p)+'%</text></svg>';
  g+='<p class="curvecap">'+(has?'Drag the slider (or the chart) and the dot rides the curve. The further the curve bows from the dotted line, the more these findings tell you.':'No findings marked yet, so the result equals your start (the dotted line). Mark a finding and a curve will bow away from it.')+'</p>';
  return g}
 var renderResultBase=renderResult;
@@ -550,6 +573,13 @@ document.addEventListener("click",function(e){if(!e.target.closest("#prehelp"))r
 renderQ();fromHash();
 /* Save the plates for offline use (the site's service worker keeps any file this page loads). */
 window.addEventListener("load",function(){Object.keys(PLATES).forEach(function(k){var i=new Image();i.src=PLATES[k].src})});
+})();
+</script>
+<script id="deeper-data">
+/* Go deeper: mechanism, rationale and the common trap for each Learn chapter. Text only; no doses or thresholds beyond the tool's own. */
+(function(){ var H2CARD = false; var D = {"step-vitals": [["Mechanism", "The pulse pressure reflects the stroke volume and the stiffness of the arteries. It is narrow when little is ejected and wide when a large volume is ejected and runs off quickly, or when the arteries are stiff. Pulsus paradoxus exaggerates a normal effect: breathing in fills the right heart, and when fluid around the heart fixes its total volume, the septum shifts and the left ventricle fills and ejects less."], ["Why it matters", "Both are read from a cuff in a minute and both point to the mechanism of a low output before any imaging."], ["Common trap", "Pulsus paradoxus is not specific to tamponade: severe asthma and COPD produce it too. It can also be absent in tamponade with aortic regurgitation, an atrial septal defect, severe left ventricular dysfunction or positive-pressure ventilation."]], "step-jvp": [["Mechanism", "The internal jugular vein is an open column of blood continuous with the right atrium, so its height above the heart measures right atrial pressure. In most patients with left heart failure the right atrial pressure moves with the left-sided filling pressure."], ["Why it matters", "It is the most useful physical sign of volume overload and the one usually followed to guide diuresis; its absence does not exclude overload."], ["Common trap", "Looking at one bed angle only. A very high venous pressure sits above the jaw at 45 degrees and is seen only with the patient upright; a low one is seen only lying flatter. The external jugular is easier to see and can be used when the internal cannot, provided it empties and refills; a kinked or valved vein misleads."]], "step-carotid": [["Mechanism", "A fixed obstruction at the aortic valve lengthens ejection and limits peak flow, so the pulse rises slowly and is small. In aortic regurgitation a large stroke volume is ejected fast and then runs back, so the pulse is brisk and collapses."], ["Why it matters", "The character of the pulse tracks the severity of the valve lesion; the loudness of the murmur does so only loosely, and a severe lesion with a failing ventricle can be quiet."], ["Common trap", "Stiff arteries in an older patient transmit the pulse briskly and can make the upstroke feel normal despite severe aortic stenosis."]], "step-apex": [["Mechanism", "The position and size of the apex beat follow the size of the left ventricle. A dilated ventricle moves it outward and makes it diffuse; a ventricle thickened by pressure overload leaves it in place and makes it sustained."], ["Why it matters", "A displaced apex points to an enlarged ventricle; a normal apex does not exclude one."], ["Common trap", "It cannot be felt in many patients with obesity or hyperinflated lungs, and it is displaced by a chest deformity or a shifted mediastinum without any heart disease."]], "step-listen": [["Mechanism", "The first sound is the closing of the mitral and tricuspid valves and the second the closing of the aortic and pulmonary valves. A third sound comes from rapid early filling into a ventricle whose filling pressure is high. A fourth comes from the atrium pushing blood into a stiff ventricle, so it disappears in atrial fibrillation. Both are low-pitched, which is why the bell and the left-side position are used."], ["Why it matters", "In an adult a third sound points to raised filling pressure and a poorly contracting ventricle; in a young person or in pregnancy it can be normal."], ["Common trap", "Pressing the bell firmly stretches the skin into a diaphragm and filters out exactly the low sounds it is meant to find."]], "step-forward": [["Mechanism", "Leaning forward brings the base of the heart toward the chest wall, and breathing out removes the lung between them. The murmur of aortic regurgitation is soft, high-pitched and early in diastole, and it is often audible only like this. A pericardial rub is also best heard here."], ["Why it matters", "It is a short manoeuvre that finds a murmur which changes the diagnosis and is routinely missed without it."], ["Common trap", "A rub comes and goes. Not hearing it once does not exclude pericarditis; listen again."]], "step-moves": [["Mechanism", "A murmur's loudness follows flow and the pressure difference across the valve. Straining or standing reduces the blood returning to the heart and makes the ventricle smaller: the obstruction of hypertrophic cardiomyopathy worsens and its murmur grows, while most other murmurs soften. Squatting does the opposite. Handgrip raises the resistance the ventricle ejects against, so regurgitant murmurs grow. Breathing in raises flow through the right heart, so right-sided murmurs grow."], ["Why it matters", "These changes separate hypertrophic obstruction from aortic stenosis, and right-sided from left-sided murmurs, at the bedside."], ["Common trap", "A weak strain. The change is heard during the strain itself, so listen while the patient is bearing down, not after."]], "step-lungs": [["Mechanism", "Crackles are small airways snapping open after being closed by fluid in and around them. Edema collects where the pressure in the veins is highest, which is the ankles in a patient who walks and the sacrum in one who lies in bed."], ["Why it matters", "Together with the venous pressure they describe where the fluid is. Edema in both legs with a raised venous pressure supports a cardiac cause."], ["Common trap", "In chronic heart failure the lungs can be clear despite high pressures, because lymphatic drainage adapts. And leg edema has many other causes: venous disease, a calcium-channel blocker, a low albumin."]]};
+  function add(){ Object.keys(D).forEach(function(id){ var c = document.getElementById(id); if (!c || c.querySelector(":scope > .deeper")) return; var host = c.matches(".step") ? (c.querySelector(":scope > div") || c) : c.matches(".card,.lsec,section,.chap") ? c : null; if (!host && c.tagName === "H2" && H2CARD){ var old = document.querySelector("[data-deeper=" + id + "]"); if (old) return; var ref = c.nextElementSibling && c.nextElementSibling.matches(".lead") ? c.nextElementSibling : c; host = document.createElement("div"); host.className = "card"; host.setAttribute("data-deeper", id); ref.parentNode.insertBefore(host, ref.nextSibling); } if (!host){ var n = c.nextElementSibling; while (n && !n.matches(".card")) n = n.nextElementSibling; host = n; } if (!host || host.querySelector(":scope > .deeper")) return; var d = document.createElement("details"); d.className = "deeper"; d.innerHTML = "<summary>Go deeper: mechanism and rationale</summary><div class=\"dpx\">" + D[id].map(function(r){ return "<div><span class=\"dl\">" + r[0] + "</span><p>" + r[1] + "</p></div>"; }).join("") + "</div>"; var last = host.querySelector(":scope > .row"); if (last) host.insertBefore(d, last); else host.appendChild(d); }); }
+  add(); document.addEventListener("click", function(){ setTimeout(add, 0); }); document.addEventListener("input", function(){ setTimeout(add, 0); });
 })();
 </script>
 </body>

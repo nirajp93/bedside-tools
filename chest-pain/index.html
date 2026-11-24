@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chest pain · bedside.tools</title>
+<meta name="description" content="Suspected ACS with high-sensitivity troponin: the 0/1-hour and 0/2-hour algorithms for your assay, the HEART score, and the next step, with the reasoning in diagrams.">
+<script src="/theme.js"></script>
+<style>
+:root{--bg:#FBFBFA;--card:#FFFFFF;--ink:#111113;--muted:#55555D;--line:#ECECEE;--accent:#2B4BDB;--warn:#9A3B00;--warnbg:#FFF6EC}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5}
+.mono{font-family:var(--mono)}
+.wrap{max-width:720px;margin:0 auto;padding:20px 16px 48px}
+a{color:var(--accent)}
+.back{font-size:14px;text-decoration:none;display:inline-block;min-height:44px;line-height:44px}
+h1{font-size:26px;margin:4px 0 4px;letter-spacing:-.01em}
+.purpose{color:var(--muted);margin:0 0 20px}
+.tabs{display:flex;gap:6px;margin-bottom:16px}
+.tab{flex:1;min-width:0;min-height:44px;border:1px solid var(--line);background:var(--card);border-radius:14px;padding:0 4px;font:inherit;font-size:15px;font-weight:600;color:var(--muted);cursor:pointer}
+.tab[aria-selected="true"]{border-color:var(--accent);color:var(--accent)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
+.label{font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px}
+.field{display:flex;flex-direction:column;justify-content:flex-end}
+.field label{display:block;font-size:13px;color:var(--muted);margin-bottom:4px}
+.field input,.field select{width:100%;min-height:44px;border:1px solid var(--line);border-radius:10px;padding:8px 10px;font:inherit;font-family:var(--mono);background:var(--card);color:var(--ink)}
+.field input:focus,.field select:focus,.tab:focus-visible,.chk:focus-within,button:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.checks{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.chk{display:flex;align-items:center;gap:10px;min-height:44px;border:1px solid var(--line);border-radius:10px;padding:6px 10px;font-size:14px;cursor:pointer}
+.chk input{width:20px;height:20px;accent-color:var(--accent);flex:none}
+.card h2{font-size:18px;margin:0 0 2px}
+.head{font-family:var(--mono);font-size:17px;font-weight:600;margin:6px 0 4px;overflow-wrap:anywhere}
+.head.bad{color:var(--bad)}.head.okc{color:var(--ok)}.head.wn{color:var(--warn)}
+.sub{font-size:14px;color:var(--muted);margin:0}
+.q{font-size:14px;margin:12px 0 0;font-weight:600}
+.card ul{margin:6px 0 0;padding-left:20px}
+.card li{margin-bottom:4px}
+.guard{border-left:3px solid var(--warn);background:var(--warnbg);padding:8px 10px;border-radius:0 10px 10px 0;margin-top:8px;font-size:14.5px}
+.tier{display:inline-block;font-family:var(--mono);font-size:11px;border:1px solid var(--line);border-radius:999px;padding:2px 8px;color:var(--muted);margin:6px 6px 0 0}
+details{margin-top:10px;border-top:1px solid var(--line);padding-top:8px}
+.whyline{margin:10px 0 0;font-size:14.5px;color:var(--muted)}
+.whyline b{color:var(--ink);font-weight:600}
+summary{cursor:pointer;color:var(--accent);font-weight:600;min-height:44px;line-height:44px}
+details p{margin:0 0 8px;font-size:15px}
+.empty{color:var(--muted)}
+.btn{min-height:44px;border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);border-radius:10px;padding:8px 14px;font:inherit;font-weight:600;cursor:pointer}
+.btn.ghost{background:var(--card);color:var(--accent)}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.note{font-size:14px;color:var(--muted)}
+.tl{position:relative;padding-left:26px;margin-top:6px}
+.tl:before{content:"";position:absolute;left:8px;top:8px;bottom:8px;width:2px;background:var(--line)}
+.st{position:relative;padding:6px 0 10px}
+.st:before{content:"";position:absolute;left:-24px;top:11px;width:12px;height:12px;border-radius:50%;background:var(--card);border:2px solid var(--muted)}
+.st.now:before{background:var(--accent);border-color:var(--accent)}
+.st .when{font-family:var(--mono);font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+.st b{display:block}
+.st small{color:var(--muted);font-size:13.5px;display:block}
+.st .tier{margin-top:4px}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:6px 6px 6px 0;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:var(--mono);font-size:11.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);font-weight:500}
+td.mono{font-size:13px;white-space:nowrap}
+tr.sel td{font-weight:700}
+.tw{overflow-x:auto}
+.case h2{font-size:17px}
+.ans{margin-top:10px;border-top:1px solid var(--line);padding-top:10px}
+footer{margin-top:28px;font-size:13.5px;color:var(--muted)}
+footer p{margin:0 0 8px}
+.panel{display:none}.panel.on{display:block}
+.fig{display:block;width:100%;max-width:460px;height:auto;margin:0 auto}
+.states{display:flex;gap:6px;overflow-x:auto;margin:10px -16px;padding:2px 16px 6px;scrollbar-width:none}
+.states::-webkit-scrollbar{display:none}
+.states.wrapit{flex-wrap:wrap;overflow:visible;margin:10px 0 0;padding:0}
+.sbtn{flex:none;min-height:44px;min-width:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--ink);font:inherit;font-size:14px;cursor:pointer;white-space:nowrap}
+.sbtn[aria-pressed="true"]{border-color:var(--accent);color:var(--accent);font-weight:600}
+.line1{font-size:15px;margin:10px 0 0}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.chip{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--fill);color:var(--ink);font:inherit;font-size:14px;cursor:pointer}
+.chip svg{flex:none;color:var(--accent)}
+.scrim{position:fixed;inset:0;background:var(--scrim);z-index:20}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:21;max-height:90vh;overflow-y:auto;background:var(--card);border:1px solid var(--line);border-bottom:0;border-radius:20px 20px 0 0;padding:8px 16px 24px;max-width:560px;margin:0 auto}
+.sheethead{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.sheethead h2{font-size:18px;margin:0}
+.xbtn{min-height:44px;min-width:44px;border:0;background:transparent;color:var(--accent);font:inherit;font-weight:600;cursor:pointer}
+.pills{position:sticky;top:0;z-index:5;background:var(--bg);display:flex;gap:6px;overflow-x:auto;margin:0 -16px 12px;padding:8px 16px;border-bottom:1px solid var(--line);scrollbar-width:none}
+.pills::-webkit-scrollbar{display:none}
+.pill{flex:none;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--muted);font:inherit;font-size:14px;cursor:pointer;white-space:nowrap}
+.pill[aria-current="true"]{border-color:var(--accent);color:var(--accent);font-weight:600}
+.chap{scroll-margin-top:70px}
+.cause{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:8px 0;border-top:1px solid var(--line);font-size:15px}
+.cause small{color:var(--muted);font-size:13px;text-align:right;flex:0 1 58%}
+.cause.out span{color:var(--muted);text-decoration:line-through}
+.cause.out,.cause.less{opacity:.6}
+.cause.fav span{font-weight:700}
+.cause.fav span:before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--accent);margin-right:8px}
+.trial{border-left:3px solid var(--accent);padding-left:12px}
+.trial p{margin:0 0 6px;font-size:15px}
+.trial .k{font-family:var(--mono);font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);display:block}
+.badge{display:inline-block;font-family:var(--mono);font-size:12px;border-radius:999px;padding:2px 10px;margin:4px 6px 0 0;border:1px solid var(--line);color:var(--muted)}
+.badge.hi{border-color:var(--warn);color:var(--warn);background:var(--warnbg)}
+.badge.lo{border-color:var(--ok);color:var(--ok);background:var(--okbg)}
+.score{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:8px 0;border-top:1px solid var(--line)}
+.score b{font-family:var(--mono);font-size:15px}
+.score small{color:var(--muted);font-size:13px;text-align:right}
+.tap{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.qn{font-size:14px;color:var(--muted);margin:12px 0 0}
+.plate{margin:12px 0 4px}
+.plate img{display:block;width:100%;height:auto;border-radius:10px;border:1px solid var(--line)}
+.plate figcaption{font-size:12px;color:var(--muted);margin-top:4px}
+@media (min-width:900px){
+  .wrap{max-width:1040px}
+  #p-tool.on{display:grid;grid-template-columns:420px minmax(0,1fr);gap:20px;align-items:start}
+  .refgrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;align-items:start}
+  .refgrid .card{margin-bottom:0}
+  #p-learn{max-width:720px;margin:0 auto}
+}
+@media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+/* cause-fix: ruled-out causes stay readable; the name greys, the reason does not fade */
+.cause.out,.cause.less,.cause.unl{opacity:1}
+.cause.less>span,.cause.unl>span{color:var(--muted)}
+.deeper{margin-top:14px;border-top:1px solid var(--line)}
+.deeper>summary{min-height:44px;display:flex;align-items:center;gap:8px;color:var(--accent);font-weight:600;font-size:15px;cursor:pointer;list-style:none}
+.deeper>summary::-webkit-details-marker{display:none}
+.deeper>summary::before{content:"+";font-family:var(--mono);font-size:18px;line-height:1;width:14px;text-align:center}
+.deeper[open]>summary::before{content:"\2212"}
+.deeper>summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.deeper .dpx{border:1px solid var(--line);border-radius:12px;padding:2px 12px;background:var(--card);text-align:left}
+.deeper .dpx>div{padding:10px 0;border-top:1px solid var(--line)}
+.deeper .dpx>div:first-child{border-top:0}
+.deeper .dl{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500;margin:0 0 3px}
+.deeper p{font-size:15px;line-height:1.45;color:var(--ink);margin:0 0 4px}
+.deeper p:last-child{margin-bottom:0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="/">← bedside.tools</a>
+<h1>Chest pain</h1>
+<p class="purpose">Suspected ACS: high-sensitivity troponin by your assay, a HEART score, then rule out, observe or rule in, and what comes next.</p>
+
+<div class="tabs" role="tablist">
+  <button class="tab" role="tab" id="t-tool" aria-selected="true" aria-controls="p-tool">Assess</button>
+  <button class="tab" role="tab" id="t-cut" aria-selected="false" aria-controls="p-cut">Cutoffs</button>
+  <button class="tab" role="tab" id="t-learn" aria-selected="false" aria-controls="p-learn">Learn</button>
+  <button class="tab" role="tab" id="t-prac" aria-selected="false" aria-controls="p-prac">Practice</button>
+</div>
+
+<div class="panel on" id="p-tool" role="tabpanel" aria-labelledby="t-tool">
+  <div id="inputs">
+  <div class="card" id="ecg">
+    <p class="label">ECG · within 10 minutes</p>
+    <div class="states wrapit" id="ecgseg" role="group" aria-label="ECG"></div>
+    <p class="note" id="ecgnote" style="margin:8px 0 0"></p>
+    <div class="checks" id="flagticks"></div>
+  </div>
+  <div class="card" id="trop">
+    <p class="label">High-sensitivity troponin · ng/L</p>
+    <div class="field"><label for="assay">Assay (ask your lab which one it runs)</label><select id="assay"></select></div>
+    <p class="qn">Symptom onset to first draw</p>
+    <div class="states wrapit" id="onsetseg" role="group" aria-label="Onset to first draw"></div>
+    <p class="qn">Sex (sets the 99th percentile)</p>
+    <div class="states wrapit" id="sexseg" role="group" aria-label="Sex"></div>
+    <p class="qn">Second draw</p>
+    <div class="states wrapit" id="pathseg" role="group" aria-label="Second draw"></div>
+    <div class="grid">
+      <div class="field"><label for="t0">First value (0 h)</label><input id="t0" inputmode="decimal" autocomplete="off" placeholder="e.g. 8 or <6"></div>
+      <div class="field"><label for="t1" id="t1lab">Second value (1 h)</label><input id="t1" inputmode="decimal" autocomplete="off" placeholder="blank if not back"></div>
+    </div>
+    <p class="note" id="trnote" style="margin:10px 0 0"></p>
+  </div>
+  <div class="card" id="heart">
+    <p class="label">HEART score</p>
+    <p class="sub">ECG and troponin are scored from above.</p>
+    <p class="qn">History</p>
+    <div class="states wrapit" id="histseg" role="group" aria-label="History"></div>
+    <div class="grid"><div class="field"><label for="age">Age</label><input id="age" inputmode="numeric" autocomplete="off"></div><div></div></div>
+    <p class="qn">Risk factors: high blood pressure, high cholesterol, diabetes, obesity (BMI over 30), smoking, family history</p>
+    <div class="states wrapit" id="rfseg" role="group" aria-label="Risk factors"></div>
+    <div class="checks" id="hxticks"></div>
+  </div>
+  </div>
+  <div id="out"></div>
+</div>
+
+<div class="panel" id="p-cut" role="tabpanel" aria-labelledby="t-cut">
+  <div class="card" id="cutoffs">
+    <p class="label">Algorithm cutoffs · ng/L</p>
+    <h2>The numbers this tool uses</h2>
+    <p class="sub">Rule out: first value below <b>very low</b> (one draw, onset 3 h or more, normal ECG), or below <b>low</b> with a change under <b>no change</b>. Rule in: first value at or above <b>high</b>, or a change at or above <b>rise</b>. Anything else: observe. Changes are absolute, up or down.</p>
+    <div id="cuttable"></div>
+  </div>
+  <div class="refgrid">
+    <div class="card" id="urls"><p class="label">99th percentile and reporting limit</p><h2>When is a value "high"?</h2><div id="urltable"></div><p class="note">From each assay's FDA clearance (lithium-heparin plasma for the Siemens and Beckman values, K2-EDTA plasma for Abbott). A value above the sex-specific 99th percentile is myocardial injury; the algorithm cutoffs above are for triage only, not for diagnosis.</p></div>
+    <div class="card" id="testing"><p class="label">Intermediate risk</p><h2>Which test after observation</h2><div id="testtable"></div></div>
+  </div>
+  <div class="card" id="notlisted"><p class="label">Not listed</p><h2>Other assays and point-of-care tests</h2><p>Abbott Alinity, QuidelOrtho VITROS, Siemens Dimension and point-of-care devices are not offered: no guideline table found gives cutoffs for a full 0/1-hour pathway with them, or (VITROS) the guideline's very-low cutoff sits below the US reporting limit. Algorithm changes cannot be carried from one assay to another. Use the pathway your laboratory has validated, and <b>adjust to your institution</b> if its cutoffs differ from these.</p></div>
+</div>
+
+<div class="panel" id="p-learn" role="tabpanel" aria-labelledby="t-learn">
+  <div class="pills" id="pills"></div>
+  <div class="card chap" id="learn-kin" data-pill="Over time"><p class="label">1 · Kinetics</p><h2>Troponin rises over hours</h2><figure class="plate" style="margin-left:0;margin-right:0"><img src="/media/chest-pain/troponin-release.webp" width="986" height="440" loading="lazy" alt="Three panels: a ruptured coronary plaque with thrombus narrowing the artery; a wedge of heart muscle with a pale starved region beyond the blockage; injured heart muscle cells leaking small troponin particles into a nearby capillary."><figcaption>Plaque ruptures, the muscle downstream starves, troponin leaks into the blood. Created with BioRender.com</figcaption></figure><p class="sub">An infarct leaks troponin into the blood over hours. Pick a patient: the dots are the two draws.</p><div data-figure="kin"></div></div>
+  <div class="card chap" id="learn-delta" data-pill="Change"><p class="label">2 · The change</p><h2>The change beats the number</h2><p class="sub">Kidney disease and heart failure can hold troponin above the 99th percentile for months. An infarct makes it move. The algorithm reads both: tap a zone.</p><div data-figure="map"></div></div>
+  <div class="card chap" id="learn-early" data-pill="Early"><p class="label">3 · Early presenters</p><h2>Why under 3 hours needs a second draw</h2><p class="sub">A single very low value rules out only when the artery has had time to leak.</p><div data-figure="kin" data-state="early"></div></div>
+  <div class="card chap" id="learn-why" data-pill="Why high"><p class="label">4 · Narrowing</p><h2>Why is the troponin high?</h2><p class="sub">Send serial troponin and an ECG first; an echocardiogram next; coronary imaging only when it changes management. Tap what you found: causes that no longer fit fade, each with the reason.</p><figure class="plate" style="margin-left:0;margin-right:0"><img src="/media/chest-pain/primary-secondary.webp" width="1007" height="516" loading="lazy" alt="Two panels. Primary MI: a ruptured coronary plaque with fresh thrombus blocking the artery. Secondary MI: a stable fixed narrowing without thrombus, with a racing heart and blood carrying few red cells, so demand outstrips supply."><figcaption>Primary MI: an acute coronary event. Secondary MI: supply cannot meet demand. Created with BioRender.com</figcaption></figure><div class="states" id="why-feats" role="group" aria-label="Findings"></div><div id="why-causes"></div><div class="chips">CHIPUDMI</div></div>
+  <div class="card chap" id="learn-heart" data-pill="HEART"><p class="label">5 · Risk score</p><h2>HEART: five items, 0 to 10</h2><p class="sub">Tap a score for each item.</p><div id="heart-tap"></div><p class="head" id="heart-sum"></p><p class="line1" id="heart-line"></p></div>
+  <div class="card chap" id="learn-next" data-pill="Next step"><p class="label">6 · Disposition</p><h2>Low, intermediate, high</h2><div data-figure="ladder"></div></div>
+  <div class="card chap" id="trials" data-pill="Trials"><p class="label">7 · Trials</p><h2>The studies behind the pathway</h2><div id="trialbox"></div><div class="row"><button class="btn" id="go-prac">Try the practice cases</button></div></div>
+</div>
+
+<div class="panel" id="p-prac" role="tabpanel" aria-labelledby="t-prac">
+  <div id="practice"></div>
+</div>
+
+<div class="scrim" id="scrim" hidden></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-t" hidden>
+  <div class="sheethead"><h2 id="sheet-t"></h2><button class="xbtn" id="sheet-x">Close</button></div>
+  <div id="sheet-b"></div>
+</div>
+
+<footer>
+  <p><strong>For education only. Not a substitute for clinical judgment.</strong> For adults with acute chest pain or other symptoms of a possible acute coronary syndrome. It does not apply to ST-elevation or occlusion MI, cardiac arrest or shock (see EKG emergencies). A rule-out excludes MI, not pulmonary embolism, aortic dissection or other causes. Cutoffs are assay-specific and come from published algorithms; laboratories validate their own pathways, so adjust to your institution. Evidence tiers are shown as class of recommendation and level of evidence (ACC/AHA), class and level (ESC), or "expert consensus" (ACC decision pathway); "expert practice" marks choices made for this tool.</p>
+  <p>Privacy: everything runs in your browser. Nothing you enter is sent anywhere or stored, and there are no analytics. Do not enter names, record numbers, or dates of birth.</p>
+  <p class="mono">Last reviewed: 2026-11-21</p>
+  <p><strong>Sources:</strong> Gulati M et al., 2021 AHA/ACC/ASE/CHEST/SAEM/SCCT/SCMR guideline for the evaluation and diagnosis of chest pain, Circulation 2021;144:e368 (class and level shown) · Rao SV et al., 2025 ACC/AHA/ACEP/NAEMSP/SCAI guideline for the management of acute coronary syndromes, Circulation 2025;151:e771 · Kontos MC et al., 2022 ACC expert consensus decision pathway on the evaluation and disposition of acute chest pain in the emergency department, J Am Coll Cardiol 2022;80:1925 · Byrne RA et al., 2023 ESC guidelines for the management of acute coronary syndromes, Eur Heart J 2023;44:3720, and its Supplementary Table S4 (assay cutoffs) · 2025 Australian (NHFA/CSANZ) acute coronary syndromes guideline, assay table (Atellica 0/1-hour cutoffs) · Mills NL et al., Fifth Universal Definition of Myocardial Infarction, J Am Coll Cardiol 2026;88:1314 · FDA 510(k) clearances K162895 (Elecsys TnT Gen 5), K191595 (ARCHITECT hs TnI), K171566 (Atellica TnIH), K171274 (ADVIA Centaur TnIH), K172783 (Access hsTnI) · Backus BE et al., HEART score validation, Int J Cardiol 2013;168:2153 · Six AJ et al., Neth Heart J 2008;16:191 · Mahler SA et al., HEART Pathway, Circ Cardiovasc Qual Outcomes 2015;8:195 · Trials: Reichlin T et al., Arch Intern Med 2012;172:1211 and CMAJ 2015;187:E243 · Chew DP et al., Circulation 2019;140:1543 · Anand A et al., Circulation 2021;143:2214 · Shah ASV et al., Lancet 2018;392:919 · Mahler SA et al., Circulation 2018;138:2456 · Douglas PS et al., N Engl J Med 2015;372:1291 · SCOT-HEART Investigators, N Engl J Med 2018;379:924 · Diagrams are schematic and drawn for this site; illustrations created with BioRender.com.</p>
+</footer>
+</div>
+
+<script id="engine">
+/* Pure decision engine. No DOM access. Troponin in ng/L. */
+var ASSAYS = {
+  roche: {n: 'Roche Elecsys hs-cTnT (Gen 5)', s: 'Elecsys hs-cTnT', url: {f: 14, m: 22}, loq: 6,
+    a1: {vl: 6, lo: 12, nd: 3, hi: 52, d: 5}, a2: {vl: 6, lo: 14, nd: 4, hi: 52, d: 10},
+    note: 'Very low is 6, the US reporting limit (ACC decision pathway); the ESC table uses 5, which US labs cannot report.', src: 'ESC 2023 Table S4; very low: ACC 2022 pathway'},
+  architect: {n: 'Abbott ARCHITECT hs-cTnI', s: 'ARCHITECT hs-cTnI', url: {f: 17, m: 35}, loq: 3.5,
+    a1: {vl: 4, lo: 5, nd: 2, hi: 64, d: 6}, a2: {vl: 4, lo: 6, nd: 2, hi: 64, d: 15}, src: 'ESC 2023 Table S4'},
+  atellica: {n: 'Siemens Atellica IM hs-cTnI (TnIH)', s: 'Atellica hs-cTnI', url: {f: 34, m: 53}, loq: 2.5,
+    a1: {vl: 4, lo: 6, nd: 3, hi: 120, d: 12}, a2: null,
+    note: 'No published 0/2-hour cutoffs for Atellica: use a 1-hour second draw.', src: 'NHFA/CSANZ 2025 assay table'},
+  centaur: {n: 'Siemens ADVIA Centaur hs-cTnI (TnIH)', s: 'Centaur hs-cTnI', url: {f: 37, m: 57}, loq: 2.5,
+    a1: {vl: 3, lo: 6, nd: 3, hi: 120, d: 12}, a2: {vl: 3, lo: 8, nd: 7, hi: 120, d: 20}, src: 'ESC 2023 Table S4'},
+  access: {n: 'Beckman Access hs-TnI', s: 'Access hs-TnI', url: {f: 15, m: 20}, loq: 2.1,
+    a1: {vl: 4, lo: 5, nd: 4, hi: 50, d: 15}, a2: {vl: 4, lo: 5, nd: 5, hi: 50, d: 20}, src: 'ESC 2023 Table S4'}
+};
+var ECGS = {
+  normal: {n: 'Normal', h: 0, hm: 0, line: 'No ST or T changes.'},
+  conduct: {n: 'LBBB, RBBB, paced or LVH', h: 1, hm: 1, line: 'Not new ischemia, but it hides it: LBBB and paced rhythms need the Sgarbossa criteria. Allows the two-draw rule-out only.'},
+  nonspec: {n: 'Nonspecific ST-T', h: 1, hm: 0, line: 'Minor ST or T changes that are not new ischemia, or old unchanged changes. Allows the two-draw rule-out only.'},
+  isch: {n: 'New ischemic', h: 2, hm: 2, line: 'New ST depression or T-wave inversion. A high-risk feature whatever the troponin.'},
+  stemi: {n: 'STEMI or equivalent', h: 2, hm: 2, line: 'ST elevation or an occlusion equivalent: call the cath lab now, do not wait for troponin.'}
+};
+
+/* Parse a lab value: "8", "8.5", "<6". Returns {v, lt} or null. */
+function parseT(s){
+  if (s == null) return null;
+  s = String(s).replace(/\s|ng\/l/gi, '').replace(',', '.');
+  if (!s) return null;
+  var lt = /^[<≤]/.test(s); if (lt) s = s.replace(/^[<≤]=?/, '');
+  var v = parseFloat(s);
+  if (!isFinite(v) || v < 0) return null;
+  return {v: v, lt: lt};
+}
+function below(x, t){ return x.lt ? x.v <= t : x.v < t; }     // certainly below t
+function atLeast(x, t){ return !x.lt && x.v >= t; }           // certainly at or above t
+function fmtT(x){ return x ? (x.lt ? '<' + x.v : String(x.v)) : '—'; }
+function urlOf(a, sex){ return sex === 'm' ? a.url.m : a.url.f; }
+
+/* Change between draws. dMin: smallest possible change (rule-in test); dMax: largest possible (no-change test). */
+function deltas(a0, a1, loq){
+  if (a0.lt && a1.lt) return {dMin: 0, dMax: 0, both: true};
+  if (!a0.lt && !a1.lt){ var d = Math.abs(a1.v - a0.v); return {dMin: d, dMax: d}; }
+  var lo = a0.lt ? a0 : a1, hi = a0.lt ? a1 : a0;
+  return {dMin: Math.max(0, hi.v - lo.v), dMax: hi.v};
+}
+
+/* hs-cTn algorithm. i: {assay, path ('1'|'2'), t0, t1 (strings), onset ('lt3'|'ge3'|'unk'), ecg, sex} */
+function algo(i){
+  var a = ASSAYS[i.assay] || ASSAYS.roche, c = i.path === '2' ? a.a2 : a.a1, h = i.path === '2' ? '2 h' : '1 h';
+  var x0 = parseT(i.t0), x1 = parseT(i.t1), url = urlOf(a, i.sex);
+  var o = {a: a, c: c, h: h, x0: x0, x1: x1, url: url};
+  if (!x0){ o.zone = 'none'; return o; }
+  o.inj0 = !x0.lt && x0.v > url;
+  var c1 = c || a.a1;  // first-value cutoffs are the same in both pathways
+  if (atLeast(x0, c1.hi)){ o.zone = 'in'; o.by = 'high'; return o; }
+  var single = below(x0, c1.vl);
+  if (!x1){
+    if (single && i.onset === 'ge3' && i.ecg === 'normal'){ o.zone = 'out'; o.by = 'single'; return o; }
+    if (!c){ o.zone = 'nopath'; return o; }
+    o.zone = 'wait'; o.why = single ? (i.onset !== 'ge3' ? 'early' : 'ecg') : 'mid'; return o;
+  }
+  if (!c){
+    if (single && i.onset === 'ge3' && i.ecg === 'normal' && below(x1, c1.vl)){ o.zone = 'out'; o.by = 'single'; return o; }
+    o.zone = 'nopath'; return o;
+  }
+  var d = deltas(x0, x1, a.loq); o.d = d;
+  o.inj1 = !x1.lt && x1.v > url;
+  o.fall = !x0.lt && (x1.lt ? x1.v <= x0.v : x1.v < x0.v);
+  if (d.dMin >= c.d){ o.zone = 'in'; o.by = 'delta'; return o; }
+  // With a second value, a rule-out needs a change under the no-change cutoff (the single-draw rule cannot override a rise).
+  if (below(x0, c.lo) && d.dMax < c.nd){ o.zone = 'out'; o.by = single && i.onset === 'ge3' && i.ecg === 'normal' ? 'single' : 'two'; return o; }
+  o.zone = 'obs'; return o;
+}
+
+/* Modified HEART: troponin against the sex-specific 99th percentile of the chosen assay. */
+function heart(i, al){
+  var s = 0, miss = [], parts = [];
+  function add(k, v){ s += v; parts.push(k + ' ' + v); }
+  if (i.hist == null) miss.push('history'); else add('history', i.hist);
+  var em = 0; if (!i.ecg) miss.push('ECG'); else { add('ECG', ECGS[i.ecg].h); em = ECGS[i.ecg].hm - ECGS[i.ecg].h; }
+  if (i.age == null) miss.push('age'); else add('age', i.age < 45 ? 0 : i.age <= 65 ? 1 : 2);
+  var rf = i.cad ? 2 : i.rf;
+  if (rf == null) miss.push('risk factors'); else add('risk factors', rf);
+  var hear = s + em, hearFull = !miss.length;   // modified HEART of the ACC pathway: no troponin item
+  if (!al || !al.x0) miss.push('troponin'); else { var x = al.x0, u = al.url; add('troponin', (x.lt || x.v <= u) ? 0 : x.v < 3 * u ? 1 : 2); }
+  var band = s <= 3 ? 'low' : s <= 6 ? 'mid' : 'high';
+  return {score: s, hear: hear, hearFull: hearFull, miss: miss, parts: parts, band: band, full: !miss.length, mace: {low: '1.7%', mid: '16.6%', high: '50.1%'}[band]};
+}
+
+/* Disposition */
+function plan(i){
+  var al = algo(i), hs = heart(i, al), o = {al: al, hs: hs, guards: [], more: [], tiers: [], chips: []};
+  var a = al.a, c = al.c || al.a.a1;
+  if (!i.ecg){ o.kind = 'empty'; return o; }
+  if (i.ecg === 'stemi'){
+    o.kind = 'stemi'; o.head = 'STEMI or occlusion equivalent: call the cath lab now'; o.sub = 'This tool stops here. Do not wait for troponin.';
+    o.steps = [{when: 'Now', now: true, name: 'Activate the cath lab', small: 'Aspirin, anticoagulation and timing as in EKG emergencies.'}];
+    o.why = 'An occluded artery is diagnosed on the ECG; troponin rises too late to guide the call.';
+    o.tiers = ['ACS 2025: ECG within 10 min (1, B-NR)']; o.link = true; return o;
+  }
+  var unstable = !!i.unstable, pain = !!i.pain;
+  var z = al.zone;
+  if (unstable || pain || i.ecg === 'isch' || z === 'in'){
+    o.kind = 'high'; o.head = 'High risk: admit and involve cardiology';
+    var rs = [];
+    if (unstable) rs.push('hemodynamic or electrical instability');
+    if (pain) rs.push('ongoing or recurrent chest pain');
+    if (i.ecg === 'isch') rs.push('new ischemic ECG changes');
+    if (z === 'in') rs.push(al.by === 'high' ? 'first troponin at or above ' + (c || a.a1).hi : 'a change of ' + fmtNum(al.d.dMin) + ' or more in ' + al.h);
+    o.sub = 'Because of ' + rs.join(', ') + '.';
+    o.steps = [];
+    if (unstable || pain) o.steps.push({when: 'Now', now: true, name: 'Treat as unstable', small: 'Monitor, repeat the ECG every 15 to 30 minutes while in pain, and call cardiology now: ongoing pain or instability with NSTE-ACS can need immediate angiography (see EKG emergencies).', t: 'Serial ECG: 2021 (1, C-EO)'});
+    o.steps.push({when: unstable || pain ? 'Then' : 'Now', now: !(unstable || pain), name: 'Admit; decide what the troponin means', small: 'Myocardial injury is a value above the sex-specific 99th percentile (' + al.url + ' for this assay and sex); acute if it rises or falls. MI needs ischemia too. Primary MI: manage as ACS (dissection and spasm need their own care). Secondary MI (supply and demand) or nonischemic injury: treat the cause.', t: 'Fifth UDMI 2026'});
+    o.steps.push({when: 'Testing', name: 'Invasive coronary angiography when MI or high-risk features are confirmed', small: 'Timing (within 24 hours or during the stay) follows the ACS guideline; see EKG emergencies.', t: '2021: high risk → angiography (1, C-EO)'});
+    if (z === 'in') o.guards.push('In US emergency departments only 20 to 50% of rule-in patients turn out to have MI: look for another cause of injury (PE, myocarditis, sepsis, heart failure, a fast rhythm, kidney disease) before calling it ACS.');
+    if (i.ecg === 'isch' && (z === 'out' || z === 'obs' || z === 'wait')) o.guards.push('A low troponin does not make this patient low risk: the ECG already does not.');
+    if (unstable) o.why = 'Instability means the next hour matters more than the next troponin.';
+    else if (pain) o.why = 'Ongoing pain means ischemia may be happening now; no troponin rule-out applies until it settles.';
+    else if (i.ecg === 'isch') o.why = 'New ischemic ECG changes are a high-risk feature on their own, whatever the troponin says.';
+    else if (al.by === 'high') o.why = 'At ' + fmtT(al.x0) + ' ng/L the first value is already in the rule-in range for this assay; no second draw is needed to decide on admission.';
+    else if (al.fall) o.why = 'A fall of ' + fmtNum(al.d.dMin) + ' ng/L in ' + al.h + ' means acute myocardial injury that began hours ago and is clearing: a late-presenting MI is possible.';
+    else o.why = 'A rise of ' + fmtNum(al.d.dMin) + ' ng/L in ' + al.h + ' means troponin is being released now: acute myocardial injury.';
+    o.tiers.push('2021: high-risk features (1, B-NR)', 'ESC 2023 0/1 h and 0/2 h (I, B)');
+    o.more.push('High-risk features in the 2021 guideline: new ischemic ECG changes, troponin-confirmed acute myocardial injury, new LV dysfunction (EF below 40%), newly diagnosed moderate to severe ischemia, hemodynamic instability, or a high decision-pathway score.');
+    o.more.push('The ACC decision pathway calls this zone "abnormal" rather than "rule in", because its positive predictive value for MI is much lower in US cohorts than in the European ones that derived it.');
+    o.link = true; o.chips = ['map', 'ladder'];
+    addCommon(o, i); return o;
+  }
+  if (z === 'none'){ o.kind = 'need'; o.head = 'Enter the first troponin'; o.sub = 'Draw it now with the ECG; the next draw is ' + (c ? 'at ' + al.h : 'at 1 h') + '.'; o.steps = []; o.tiers = ['2021: hs-troponin preferred (1, B-NR)']; o.why = null; addCommon(o, i); return o; }
+  if (z === 'nopath'){
+    o.kind = 'obs'; o.head = 'No 0/2-hour cutoffs for this assay'; o.sub = 'Use a 1-hour second draw, or repeat at 3 hours and read the change against the 99th percentile.';
+    o.steps = [{when: 'Next', now: true, name: 'Second draw at 1 h', small: 'Then pick "1 h" above.'}];
+    o.why = 'Changes are assay-specific and cannot be carried over from another analyser.'; o.tiers = ['Fifth UDMI 2026: deltas are assay-specific'];
+    if (al.x1) o.steps[0].small = 'The 2-hour value cannot be read against Atellica cutoffs: use a 1-hour draw, or repeat at 3 hours.';
+    addCommon(o, i); return o;
+  }
+  if (z === 'wait'){
+    o.kind = 'wait'; o.head = 'Not decided yet: draw again at ' + al.h; o.sub = 'First value ' + fmtT(al.x0) + ' ng/L.';
+    o.steps = [{when: al.h + ' after the first', now: true, name: 'Second hs-troponin', small: 'Draw it close to that time (this tool assumes within about 15 minutes for 1 h, 30 for 2 h; expert practice); far outside it the change cutoffs do not apply.', t: 'ACS 2025: repeat at 1–2 h (1, B-NR)'}];
+    if (al.why === 'early') o.why = 'Troponin takes hours to rise after an artery closes, so a very low value within 3 hours of onset can still miss an MI.';
+    else if (al.why === 'ecg') o.why = 'A single very low value rules out only with a normal ECG; with this ECG the change over ' + al.h + ' decides.';
+    else o.why = 'At ' + fmtT(al.x0) + ' ng/L the first value is between the rule-out and rule-in cutoffs; the change over ' + al.h + ' decides.';
+    if (al.why === 'early' || (al.why === 'mid' && i.onset !== 'ge3')) o.chips = ['kin', 'map']; else o.chips = ['map'];
+    o.tiers = ['ESC 2023 Fig. 6: single rule-out only if onset over 3 h earlier', '2021: single draw ≥3 h with normal ECG (2a, B-NR)'];
+    addCommon(o, i); return o;
+  }
+  if (z === 'out'){
+    o.kind = 'low'; o.head = 'MI ruled out: low risk'; o.sub = al.by === 'single' ? 'One draw: ' + fmtT(al.x0) + ' ng/L, below ' + c.vl + ', 3 h or more after onset, normal ECG.' : 'Two draws: ' + fmtT(al.x0) + ' then ' + fmtT(al.x1) + ' ng/L; below ' + c.lo + ' and a change under ' + c.nd + ' in ' + al.h + '.';
+    o.steps = [
+      {when: 'Today', now: true, name: 'Discharge without admission or urgent cardiac testing', small: 'A decision aid helps the patient weigh it. Before discharge, think again about PE, aortic dissection, pericarditis, pneumothorax and the esophagus: this rules out MI only.', t: '2021: low risk discharge (2a, B-R); decision aids (1, B-R)'},
+      {when: 'Within 30 days', name: 'Outpatient follow-up, ideally within 14 days', small: 'Risk factors and any outpatient testing are decided there.', t: 'ACC 2022 pathway (expert consensus)'}
+    ];
+    o.why = al.by === 'single' ? 'Symptoms began 3 h or more before the draw and troponin is still below ' + c.vl + ': an MI large enough to matter would already have released troponin.' : 'Low and flat over ' + al.h + ': an infarct makes troponin climb.';
+    o.chips = al.by === 'single' ? ['kin', 'map'] : ['map'];
+    if (al.d && al.d.both) o.more.push('Both values were below the reporting limit, so the change is counted as zero (expert practice).');
+    if (hs.hearFull && hs.hear >= 4) o.guards.push('Modified HEART (history, ECG, age, risk factors) ' + hs.hear + ' despite the rule-out. Routine scores are not needed after an hs-troponin rule-out, but where you use one, 4 or more may be considered for early outpatient follow-up or testing (ACC 2022 pathway, §5.5.2).');
+    if (al.by === 'two' && i.onset !== 'ge3') o.guards.push((i.onset === 'lt3' ? 'Early presenter (pain began under 3 hours before the first draw)' : 'Onset time uncertain') + ': the ESC says a further value at 3 hours should be considered in early presenters triaged to rule-out.');
+    if (i.ecg === 'nonspec' || i.ecg === 'conduct') o.more.push('With a nonspecific ECG this tool allows only the two-draw rule-out; LBBB and paced rhythms need the Sgarbossa criteria (EKG emergencies) and a low threshold for an echocardiogram.');
+    o.tiers.push('ESC 2023 0/' + al.h.replace(' ', '') + ' (I, B)', '2021: low risk is <1% 30-day death or MACE');
+    o.more.push('Low risk in the 2021 guideline means a 30-day risk of death or major adverse cardiac events under 1%. The ESC thresholds were chosen for a sensitivity and negative predictive value of at least 99%; in the APACE validation 99.9% of ruled-out patients had no MI.');
+    addCommon(o, i); return o;
+  }
+  // observe
+  o.kind = 'obs'; o.head = 'Observe: repeat troponin at 3 hours';
+  o.sub = fmtT(al.x0) + ' then ' + fmtT(al.x1) + ' ng/L: neither rule-out nor rule-in for ' + a.s + '.';
+  var testing = i.cad
+    ? {when: 'If still flat', name: 'Known coronary disease: optimise medical therapy before more testing', small: 'Angiography if symptoms are worsening with significant left main, proximal LAD or multivessel disease, or after revascularisation; stress imaging or, for nonobstructive plaque, CT angiography otherwise.', t: '2021: GDMT first (1, A); angiography (1, A); stress or CTA (2a, B-NR)'}
+    : {when: 'If still flat', name: 'Noninvasive testing, usually before discharge', small: 'Coronary CT angiography (the ACC pathway prefers it, where available, when there is no known disease) or a stress test; an observation unit shortens the stay. Decide together with the patient.', t: '2021: CCTA (1, A); stress test (1, B-NR); observation unit (2a, A); shared decision (1, B-R)'};
+  o.steps = [
+    {when: '3 h', now: true, name: 'hs-troponin again (3 to 6 h)', small: 'A further rise or fall means acute injury: decide whether it is MI. Echocardiogram for wall motion and valves.', t: 'ESC 2023 (I, B); 2021: echo (1, C-EO)'},
+    testing,
+    {when: 'Or', name: 'Discharge without testing', small: 'Reasonable when the value stays unchanged and there is a recent normal test (CT or invasive angiogram within 2 years, stress test within 1 year) or a known chronic elevation, plus a modified HEART (no troponin item) of 3 or less, or EDACS under 16, with follow-up within 7 days.', t: 'ACC 2022 pathway §5.5.3'}
+  ];
+  o.why = 'Between the cutoffs: about 8 in 100 patients in this zone had MI in the first APACE study, so a later value decides.';
+  if ((al.x0 && !al.x0.lt && al.x0.v > al.url) && al.d && al.d.dMax < (c ? c.nd : 0)) o.guards.push('High but flat: call it chronic injury (kidney disease, heart failure) only if an earlier value from a stable time was similar. Without one, this may be a late MI on the falling side of the curve.');
+  o.chips = (al.x0 && !al.x0.lt && al.x0.v > al.url && al.d && al.d.dMax < c.nd) ? ['map', 'kin', 'ladder'] : ['map', 'ladder'];
+  o.tiers.push('ESC 2023: extra test at 3 h (I, B)');
+  o.more.push('The ACC 2022 pathway puts 30-day death or MI in this intermediate group at 5 to 22%, higher than after a rule-out, so follow-up is closer.');
+  addCommon(o, i); return o;
+}
+function fmtNum(n){ return String(Math.round(n * 10) / 10); }
+function addCommon(o, i){
+  if (i.assay === 'roche') o.more.push('Biotin supplements can falsely lower Elecsys results. Any value that does not fit the picture (macrotroponin, heterophile antibodies, a lab error) deserves a repeat or a second assay.');
+  else o.more.push('Any value that does not fit the picture (macrotroponin, heterophile antibodies, a lab error) deserves a repeat or a second assay.');
+}
+</script>
+
+<script>
+(function(){
+var $ = function(id){ return document.getElementById(id); };
+function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+var FS = 'font-family:var(--sans)', FM = 'font-family:var(--mono)';
+var st = {ecg: null, onset: null, sex: null, path: '1', hist: null, rf: null, t: {}};
+var FLAGS = [['pain','Chest pain now, or recurring'],['unstable','Low BP, shock, arrhythmia or heart failure']];
+var HX = [['cad','Known coronary disease','Prior MI, PCI, bypass, or a known stenosis; scores 2 for risk factors']];
+
+function read(){
+  var age = parseFloat($('age').value);
+  var i = {ecg: st.ecg, onset: st.onset, sex: st.sex, path: st.path, hist: st.hist, rf: st.rf, assay: $('assay').value, t0: $('t0').value, t1: $('t1').value, age: isFinite(age) && age > 0 ? age : null};
+  Object.keys(st.t).forEach(function(k){ if (st.t[k]) i[k] = true; });
+  return i;
+}
+function seg(host, list, cur){ host.innerHTML = list.map(function(c){ return '<button class="sbtn" data-v="' + c[0] + '" aria-pressed="' + (String(c[0]) === String(cur)) + '">' + esc(c[1]) + '</button>'; }).join(''); }
+function ticks(host, list){ host.innerHTML = list.map(function(t){ return '<label class="chk"><input type="checkbox" data-k="' + t[0] + '"' + (st.t[t[0]] ? ' checked' : '') + '><span>' + esc(t[1]) + '</span></label>'; }).join(''); }
+$('assay').innerHTML = Object.keys(ASSAYS).map(function(k){ return '<option value="' + k + '">' + esc(ASSAYS[k].n) + '</option>'; }).join('');
+function drawInputs(){
+  seg($('ecgseg'), Object.keys(ECGS).map(function(k){ return [k, ECGS[k].n]; }), st.ecg);
+  $('ecgnote').textContent = st.ecg ? ECGS[st.ecg].line : 'Read the first ECG, compare it with an old one, and repeat it if symptoms return.';
+  ticks($('flagticks'), FLAGS);
+  seg($('onsetseg'), [['lt3','Under 3 h'],['ge3','3 h or more'],['unk','Not sure']], st.onset);
+  seg($('sexseg'), [['f','Female'],['m','Male']], st.sex);
+  var a = ASSAYS[$('assay').value];
+  seg($('pathseg'), [['1','At 1 h'],['2','At 2 h']], st.path);
+  $('t1lab').textContent = 'Second value (' + st.path + ' h)';
+  var c = st.path === '2' ? a.a2 : a.a1, u = st.sex ? (st.sex === 'm' ? a.url.m : a.url.f) : null;
+  $('trnote').innerHTML = (c ? 'Cutoffs (0/' + st.path + ' h): very low &lt;' + c.vl + ' · low &lt;' + c.lo + ' with change &lt;' + c.nd + ' · high ≥' + c.hi + ' · rise ≥' + c.d + '. ' : '<b>No 0/2-hour cutoffs for this assay.</b> ') + '99th percentile: ' + (u != null ? u : a.url.f + ' (female) or ' + a.url.m + ' (male); pick sex') + '. ' + (a.note ? esc(a.note) + ' ' : '') + 'Type "&lt;6" for a result below the reporting limit.';
+  seg($('histseg'), [[0,'Slightly suspicious 0'],[1,'Moderately 1'],[2,'Highly 2']], st.hist);
+  seg($('rfseg'), [[0,'None 0'],[1,'1 or 2: 1'],[2,'3 or more: 2']], st.t.cad ? 2 : st.rf);
+  ticks($('hxticks'), HX);
+}
+function bindSeg(id, key, num, toggle){ $(id).addEventListener('click', function(e){ var b = e.target.closest('[data-v]'); if (!b) return; var v = b.getAttribute('data-v'); if (num) v = +v; st[key] = toggle && st[key] === v ? null : v; drawInputs(); render(); }); }
+bindSeg('ecgseg', 'ecg'); bindSeg('onsetseg', 'onset'); bindSeg('sexseg', 'sex', false, true); bindSeg('pathseg', 'path'); bindSeg('histseg', 'hist', true, true); bindSeg('rfseg', 'rf', true, true);
+['flagticks','hxticks'].forEach(function(id){ $(id).addEventListener('change', function(e){ var k = e.target.getAttribute('data-k'); if (k){ st.t[k] = e.target.checked; drawInputs(); render(); } }); });
+['t0','t1','age'].forEach(function(k){ $(k).addEventListener('input', render); });
+$('assay').addEventListener('change', function(){ drawInputs(); render(); drawCuts(); });
+
+function steps(list){ return '<div class="tl">' + list.map(function(s){ return '<div class="st' + (s.now ? ' now' : '') + '"><span class="when">' + esc(s.when) + '</span><b>' + esc(s.name) + '</b>' + (s.small ? '<small>' + esc(s.small) + '</small>' : '') + (s.t ? '<span class="tier">' + esc(s.t) + '</span>' : '') + '</div>'; }).join('') + '</div>'; }
+function guards(list){ return (list || []).map(function(g){ return '<div class="guard">' + esc(g) + '</div>'; }).join(''); }
+function tiers(list){ return (list || []).map(function(t){ return '<span class="tier">' + esc(t) + '</span>'; }).join(''); }
+function paras(list){ return (list || []).map(function(m){ return '<p>' + esc(m) + '</p>'; }).join(''); }
+function badge(t, cls){ return '<span class="badge ' + (cls || '') + '">' + esc(t) + '</span>'; }
+var LAB = {stemi: 'Stop · ECG', high: 'High risk', low: 'Low risk', obs: 'Intermediate · observe', wait: 'Waiting on troponin', need: 'Start'};
+function answerCard(o, i){
+  var cls = o.kind === 'low' ? ' okc' : o.kind === 'high' || o.kind === 'stemi' ? ' bad' : o.kind === 'obs' ? ' wn' : '';
+  var h = '<div class="card" id="answer"><p class="label">' + LAB[o.kind] + '</p><p class="head' + cls + '">' + esc(o.head) + '</p>' + (o.sub ? '<p class="sub">' + esc(o.sub) + '</p>' : '') + guards(o.guards) + (o.steps && o.steps.length ? steps(o.steps) : '');
+  if (o.link) h += '<div class="row"><a class="btn ghost" href="/ekg-cath/" style="text-decoration:none;display:inline-flex;align-items:center">EKG emergencies and the cath-lab call</a></div>';
+  if (o.why) h += '<p class="whyline"><b>Why:</b> ' + esc(o.why) + '</p>';
+  if (o.chips && o.chips.length) h += '<div class="chips">' + o.chips.map(function(c){ return chip(c, c === 'kin' ? kinState(o) : c === 'ladder' ? ladState(o) : ''); }).join('') + '</div>';
+  if ((o.more && o.more.length) || (o.tiers && o.tiers.length)) h += '<details><summary>More</summary>' + paras(o.more) + tiers(o.tiers) + '</details>';
+  return h + '</div>';
+}
+function kinState(o){ var al = o.al; if (o.kind === 'obs' && al.x0 && !al.x0.lt && al.x0.v > al.url && al.d && al.d.dMax < (al.c ? al.c.nd : 0)) return 'chronic'; if (o.kind === 'low' && al.by === 'single') return 'none'; if (o.kind === 'high' && al.by === 'high') return 'late'; return 'early'; }
+function ladState(o){ return o.kind === 'low' ? 'low' : o.kind === 'high' ? 'high' : 'mid'; }
+function tropCard(o, i){
+  var al = o.al; if (!al.x0) return '';
+  var h = '<div class="card" id="tropres"><p class="label">Troponin · ' + esc(al.a.s) + '</p>';
+  h += '<div class="score"><span>First (0 h)</span><b>' + esc(fmtT(al.x0)) + '</b></div>';
+  if (al.x1) h += '<div class="score"><span>Second (' + al.h + ')</span><b>' + esc(fmtT(al.x1)) + '</b></div><div class="score"><span>Change</span><b>' + (al.d.both ? '0' : al.d.dMin === al.d.dMax ? fmtNum(al.d.dMin) : fmtNum(al.d.dMin) + ' to ' + fmtNum(al.d.dMax)) + '</b></div>';
+  var zl = {out: ['rule out', 'lo'], 'in': ['rule in', 'hi'], obs: ['observe', 'hi'], wait: ['needs a second value', ''], nopath: ['no 0/2 h cutoffs', '']}[al.zone] || ['', ''];
+  h += '<p class="sub">' + badge(zl[0], zl[1]) + (i.sex ? badge((al.inj0 || al.inj1 ? 'above' : 'not above') + ' the 99th percentile (' + al.url + ')', al.inj0 || al.inj1 ? 'hi' : '') : badge('pick sex for the 99th percentile')) + '</p>';
+  h += '<details><summary>More</summary><p>Cutoffs used (' + esc(al.a.src) + '): ' + (al.c ? 'very low &lt;' + al.c.vl + '; low &lt;' + al.c.lo + ' with a change &lt;' + al.c.nd + '; high ≥' + al.c.hi + '; rise ≥' + al.c.d + ' ng/L in ' + al.h + '.' : 'none for 0/2 h.') + ' They apply whatever the age, sex or kidney function; with kidney disease fewer patients rule out and more land in observe.</p><p>A result typed as "&lt;x" is treated as somewhere between 0 and x: it counts as below a cutoff only if x is at or below it, and the change is taken at its largest for the rule-out test and its smallest for the rule-in test.</p>' + tiers(['ESC 2023 Table S4', 'Fifth UDMI 2026: injury above the sex-specific 99th percentile']) + '</details></div>';
+  return h;
+}
+function heartCard(o){
+  var hs = o.hs, bl = {low: ['0–3 · low', 'lo'], mid: ['4–6 · moderate', 'hi'], high: ['7–10 · high', 'hi']}[hs.band];
+  var h = '<div class="card" id="heartres"><p class="label">HEART score</p><div class="score"><span>HEART' + (hs.full ? '' : ' so far') + '</span><b>' + hs.score + '</b></div>';
+  h += '<p class="sub">' + (hs.full ? badge(bl[0] + ' · MACE ' + hs.mace + ' at 6 weeks', bl[1]) : '') + esc(hs.parts.join(', ')) + '</p>';
+  if (hs.miss.length) h += '<p class="note">Not entered: ' + esc(hs.miss.join(', ')) + '.</p>';
+  if (hs.hearFull) h += '<div class="score"><span>Modified HEART <small>(no troponin; ACC pathway)</small></span><b>' + hs.hear + '</b></div>';
+  h += '<details><summary>More</summary><p>In the HEART validation (2,388 patients, 10 Dutch hospitals) major adverse cardiac events within 6 weeks were 1.7% at 0 to 3, 16.6% at 4 to 6 and 50.1% at 7 to 10. That study scored the first troponin against each hospital\'s normal limit; this tool scores it against the assay\'s sex-specific 99th percentile. Age bands follow the ACC pathway table (under 45, 45 to 65, over 65).</p><p>The ACC 2022 pathway uses a modified HEART without the troponin item (history, ECG, age, risk factors; 0 to 8): 3 or less supports discharge from observation, 4 or more after a rule-out may prompt early testing. With an hs-troponin rule-out, a score is optional. The HEART Pathway (score 3 or less with negative troponin at 0 and 3 hours) was tested with a conventional, not high-sensitivity, assay.</p>' + tiers(['Backus 2013', 'Mahler 2015']) + '</details></div>';
+  return h;
+}
+function render(){
+  var i = read(), o = plan(i);
+  if (o.kind === 'empty'){ $('out').innerHTML = '<div class="card empty" id="answer">Pick the ECG reading to start. Then add the troponin: the zone, the score and the next step update as you go.</div>' + (o.al.x0 ? tropCard(o, i) : '') + heartCard(o); return; }
+  $('out').innerHTML = answerCard(o, i) + (o.kind !== 'stemi' ? tropCard(o, i) + heartCard(o) : '');
+}
+window.__plan = plan;
+
+/* Tabs */
+var tabs = [['t-tool','p-tool'],['t-cut','p-cut'],['t-learn','p-learn'],['t-prac','p-prac']];
+function show(t){ tabs.forEach(function(p){ var on = p[0] === t; $(p[0]).setAttribute('aria-selected', String(on)); $(p[1]).classList.toggle('on', on); }); }
+tabs.forEach(function(p){ $(p[0]).addEventListener('click', function(){ show(p[0]); }); });
+function fromHash(){ var id = location.hash.slice(1); if (!id) return; var el = $(id); if (!el) return; var pan = el.closest('.panel'); if (pan) tabs.forEach(function(p){ if (p[1] === pan.id) show(p[0]); }); el.scrollIntoView(); }
+window.addEventListener('hashchange', fromHash);
+
+/* SVG helpers */
+function svgOpen(vb, label){ return '<svg viewBox="' + vb + '" role="img" aria-label="' + esc(label) + '" class="fig">'; }
+function tx(x, y, t, o){ o = o || {}; return '<text x="' + x + '" y="' + y + '" text-anchor="' + (o.a || 'middle') + '" style="' + (o.sans ? FS : FM) + ';font-size:' + (o.s || 11) + 'px;font-weight:' + (o.w || 400) + ';fill:' + (o.c || 'var(--ink)') + '">' + t + '</text>'; }
+function bx(x, y, w, h, t1, t2, stt){
+  var fill = stt === 'hot' ? 'var(--warnbg)' : stt === 'on' ? 'var(--card)' : 'var(--fill)', stroke = stt === 'hot' ? 'var(--warn)' : stt === 'on' ? 'var(--accent)' : 'var(--line)';
+  return '<g' + (stt === 'dim' ? ' opacity=".74"' : '') + '><rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="10" fill="' + fill + '" stroke="' + stroke + '"' + (stt === 'hot' || stt === 'on' ? ' stroke-width="2"' : '') + '/>' +
+    tx(x + w / 2, y + (t2 ? h / 2 - 2 : h / 2 + 4), t1, {sans: 1, s: 12, w: 600}) + (t2 ? tx(x + w / 2, y + h / 2 + 12, t2, {s: 10.5, c: 'var(--muted)'}) : '') + '</g>';
+}
+function mk(p){ return '<defs>' + [['n','var(--muted)'],['a','var(--accent)']].map(function(k){ return '<marker id="' + p + k[0] + '" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="' + k[1] + '"/></marker>'; }).join('') + '</defs>'; }
+function ar(d, k, p){ var c = k === 'a' ? 'var(--accent)' : 'var(--muted)'; return '<path d="' + d + '" fill="none" stroke="' + c + '" stroke-width="2" marker-end="url(#' + p + k + ')"/>'; }
+
+/* 1. Kinetics (schematic) */
+var KIN = {
+  early: {n: 'MI, seen at 1 h', line: 'First draw 1 h after onset: still very low. The second draw an hour later has climbed: the change, not the first value, gives the infarct away.', t0: 1, curve: 'mi'},
+  late: {n: 'MI, seen at 6 h', line: 'By 6 h the first value is already high; one draw is enough to rule in.', t0: 6, curve: 'mi'},
+  none: {n: 'No injury', line: 'Pain began hours ago and troponin is still very low and flat: one draw can rule out, if the ECG is normal.', t0: 4, curve: 'none'},
+  chronic: {n: 'Chronic injury', line: 'Kidney disease or heart failure: above the 99th percentile but flat on repeat. Chronic only if an earlier value from a stable time matches.', t0: 4, curve: 'chr'}
+};
+function kinY(curve, t){ if (curve === 'none') return 3; if (curve === 'chr') return 30; var r = 1 / (1 + Math.exp(-(t - 3.6) * 1.6)); return 2 + 160 * r; }
+function kinSVG(k, p){
+  var K = KIN[k], X0 = 44, W = 270, Y0 = 200, H = 160;
+  function px(t){ return X0 + t / 10 * W; } function py(v){ return Y0 - Math.log(v + 1) / Math.log(181) * H; }
+  var h = svgOpen('0 0 340 232', 'Troponin over hours after symptom onset: ' + K.n);
+  h += '<line x1="' + X0 + '" y1="' + Y0 + '" x2="' + (X0 + W) + '" y2="' + Y0 + '" stroke="var(--muted)"/><line x1="' + X0 + '" y1="' + Y0 + '" x2="' + X0 + '" y2="' + (Y0 - H - 6) + '" stroke="var(--muted)"/>';
+  [0, 2, 4, 6, 8, 10].forEach(function(t){ h += tx(px(t), Y0 + 16, t + ' h', {s: 10.5, c: 'var(--muted)'}); });
+  h += tx(X0 + W / 2, Y0 + 30, 'hours since symptom onset', {s: 10.5, c: 'var(--muted)'});
+  var lines = [['99th percentile', 20, 'var(--warn)'], ['very low', 5, 'var(--ok)']];
+  lines.forEach(function(l){ var y = py(l[1]); h += '<line x1="' + X0 + '" y1="' + y + '" x2="' + (X0 + W) + '" y2="' + y + '" stroke="' + l[2] + '" stroke-dasharray="5 4"/>' + tx(X0 + W, y - 4, l[0], {a: 'end', s: 10.5, c: l[2]}); });
+  ['mi', 'chr', 'none'].forEach(function(cv){
+    var d = ''; for (var t = 0; t <= 10.01; t += 0.25) d += (t ? 'L' : 'M') + px(t).toFixed(1) + ' ' + py(kinY(cv, t)).toFixed(1);
+    h += '<path d="' + d + '" fill="none" stroke="' + (cv === K.curve ? 'var(--accent)' : 'var(--line)') + '" stroke-width="' + (cv === K.curve ? 3 : 2) + '"/>';
+  });
+  [K.t0, K.t0 + 1].forEach(function(t, n){ var x = px(t), y = py(kinY(K.curve, t)); h += '<circle cx="' + x + '" cy="' + y + '" r="6" fill="var(--card)" stroke="var(--ink)" stroke-width="2"/>' + tx(x, y - 11, n ? 'draw 2' : 'draw 1', {s: 10.5, w: 600}); });
+  h += tx(14, Y0 - H / 2, 'troponin', {s: 10.5, c: 'var(--muted)', a: 'middle'}).replace('<text', '<text transform="rotate(-90 14 ' + (Y0 - H / 2) + ')"');
+  return h + '</svg>';
+}
+
+/* 2. Zones map for the selected assay */
+var MAPS = {
+  out: {n: 'Rule out', line: 'Low first value and almost no change: the bottom-left box. About 60% of patients land here.'},
+  obs: {n: 'Observe', line: 'Between the boxes: about a quarter of patients. A 3-hour value decides.'},
+  in: {n: 'Rule in', line: 'A high first value (right) or a big change (top) means acute injury, usually MI in the cohorts that built it, less often in US emergency departments.'}
+};
+function mapSVG(k, p){
+  var i = read(), a = ASSAYS[i.assay] || ASSAYS.roche, c = (i.path === '2' ? a.a2 : a.a1) || a.a1, ph = (i.path === '2' && a.a2) ? '2 h' : '1 h';
+  var X0 = 50, W = 270, Y0 = 196, H = 160, xmax = c.hi * 1.6, ymax = c.d * 2.5;
+  function px(v){ return X0 + Math.sqrt(Math.min(v, xmax) / xmax) * W; } function py(v){ return Y0 - Math.sqrt(Math.min(v, ymax) / ymax) * H; }
+  var h = svgOpen('0 0 340 236', 'Rule-out, observe and rule-in zones for ' + a.s + ' at 0/' + ph);
+  var ob = k === 'obs' ? 'hot' : 'n', oi = k === 'in' ? 'hot' : 'n', oo = k === 'out' ? 'on' : 'n';
+  h += '<rect x="' + X0 + '" y="' + (Y0 - H) + '" width="' + W + '" height="' + H + '" fill="' + (ob === 'hot' ? 'var(--warnbg)' : 'var(--fill)') + '" stroke="var(--line)"/>';
+  h += '<rect x="' + px(c.hi) + '" y="' + (Y0 - H) + '" width="' + (X0 + W - px(c.hi)) + '" height="' + H + '" fill="' + (oi === 'hot' ? 'var(--badbg)' : 'var(--card)') + '" stroke="var(--bad)"/>';
+  h += '<rect x="' + X0 + '" y="' + (Y0 - H) + '" width="' + (px(c.hi) - X0) + '" height="' + (py(c.d) - (Y0 - H)) + '" fill="' + (oi === 'hot' ? 'var(--badbg)' : 'var(--card)') + '" stroke="var(--bad)"/>';
+  h += '<rect x="' + X0 + '" y="' + py(c.nd) + '" width="' + (px(c.lo) - X0) + '" height="' + (Y0 - py(c.nd)) + '" fill="' + (oo === 'on' ? 'var(--okbg)' : 'var(--card)') + '" stroke="var(--ok)" stroke-width="2"/>';
+  h += tx(px(c.hi) + (X0 + W - px(c.hi)) / 2, Y0 - H / 2, 'rule in', {s: 11, w: 600, c: 'var(--bad)'}) + tx((X0 + px(c.hi)) / 2, Y0 - H + 16, 'rule in (rise)', {s: 11, w: 600, c: 'var(--bad)'}) + tx((X0 + px(c.hi)) / 2 + 20, (py(c.d) + Y0) / 2, 'observe', {s: 11, w: 600, c: 'var(--warn)'});
+  h += tx(X0 + 4, py(c.nd) - 6, 'rule out', {a: 'start', s: 10.5, w: 600, c: 'var(--ok)'});
+  h += tx(px(c.lo), Y0 + 14, '<' + c.lo, {s: 10.5, c: 'var(--muted)'}) + tx(px(c.hi), Y0 + 14, '≥' + c.hi, {s: 10.5, c: 'var(--muted)'}) + tx(X0 - 6, py(c.nd) + 4, '<' + c.nd, {a: 'end', s: 10.5, c: 'var(--muted)'}) + tx(X0 - 6, py(c.d) + 4, '≥' + c.d, {a: 'end', s: 10.5, c: 'var(--muted)'});
+  h += tx(X0 + W / 2, Y0 + 30, 'first value, ng/L (' + a.s + ')', {s: 10.5, c: 'var(--muted)'});
+  h += tx(12, Y0 - H / 2, 'change in ' + ph, {s: 10.5, c: 'var(--muted)'}).replace('<text', '<text transform="rotate(-90 12 ' + (Y0 - H / 2) + ')"');
+  var al = algo(i);
+  if (al.x0 && al.x1 && al.d && al.c){ var dv = al.d.both ? 0 : al.d.dMin; h += '<circle cx="' + px(al.x0.v) + '" cy="' + py(dv) + '" r="7" fill="var(--accent)" stroke="var(--card)" stroke-width="2"/>' + tx(px(al.x0.v) > X0 + W - 80 ? px(al.x0.v) - 10 : px(al.x0.v) + 10, py(dv) + 18, 'your patient', {a: px(al.x0.v) > X0 + W - 80 ? 'end' : 'start', s: 10.5, w: 600, c: 'var(--accent)'}); }
+  return h + '</svg>';
+}
+
+/* 3. Disposition ladder */
+var LAD = {
+  low: {n: 'Low', line: 'Rule-out with a nonischemic ECG: under 1% risk of death or MACE at 30 days. Home, follow-up within 30 days (ideally 14).'},
+  mid: {n: 'Intermediate', line: 'Observe: troponin at 3 h, echocardiogram; then CT angiography or a stress test if still unchanged. Follow-up within 7 days.'},
+  high: {n: 'High', line: 'Rule-in, new ischemic ECG, instability or ongoing pain: admit, decide if it is MI, angiography when confirmed.'}
+};
+function ladSVG(k, p){
+  var h = svgOpen('0 0 340 210', 'Risk tiers and the next step: ' + LAD[k].n) + mk(p);
+  h += bx(110, 8, 120, 40, 'ECG + hs-troponin', '0 h, then 1 or 2 h', 'n');
+  var cols = [['low', 12, 'Low', 'home'], ['mid', 120, 'Intermediate', 'observe'], ['high', 228, 'High', 'admit']];
+  cols.forEach(function(cc){ h += ar('M170 48 L' + (cc[1] + 50) + ' 86', cc[0] === k ? 'a' : 'n', p); h += bx(cc[1], 90, 100, 44, cc[2], cc[3], cc[0] === k ? (cc[0] === 'low' ? 'on' : 'hot') : 'dim'); });
+  var nx = {low: 'follow-up ≤30 d', mid: 'CTA or stress test', high: 'angiography'};
+  cols.forEach(function(cc){ h += ar('M' + (cc[1] + 50) + ' 134 L' + (cc[1] + 50) + ' 160', cc[0] === k ? 'a' : 'n', p); h += bx(cc[1], 164, 100, 36, nx[cc[0]], '', cc[0] === k ? 'on' : 'dim'); });
+  return h + '</svg>';
+}
+
+/* 4. Why is troponin high (Fifth UDMI) */
+var UD = {
+  acute: {n: 'Acute injury', line: 'A rise or fall with at least one value above the sex-specific 99th percentile. Not yet MI.'},
+  chronic: {n: 'Chronic injury', line: 'Two or more values above the 99th percentile, stable, in a stable clinical setting.'},
+  primary: {n: 'Primary MI', line: 'Acute injury with ischemia from an acute coronary problem: plaque rupture or erosion with thrombus, dissection, spasm, embolism, or stent or graft failure after 30 days. Replaces type 1, which covered atherothrombosis only.'},
+  secondary: {n: 'Secondary MI', line: 'Acute injury with ischemia from supply and demand: anemia, a fast rhythm, low pressure, low oxygen, confirmed by obstructive disease without an acute lesion, or by new wall-motion loss. Replaces most of type 2.'}
+};
+function udSVG(k, p){
+  var h = svgOpen('0 0 340 210', 'Kinds of myocardial injury: ' + UD[k].n) + mk(p);
+  h += bx(100, 6, 140, 38, 'Troponin > 99th', 'sex-specific', 'n');
+  h += ar('M150 44 L80 70', k === 'chronic' ? 'a' : 'n', p) + ar('M190 44 L260 70', k !== 'chronic' ? 'a' : 'n', p);
+  h += bx(14, 74, 130, 42, 'Stable', 'chronic injury', k === 'chronic' ? 'on' : 'dim');
+  h += bx(196, 74, 130, 42, 'Rise or fall', 'acute injury', k !== 'chronic' ? 'on' : 'dim');
+  h += ar('M240 116 L180 146', k === 'primary' ? 'a' : 'n', p) + ar('M282 116 L290 146', k === 'secondary' ? 'a' : 'n', p) + ar('M220 116 L70 146', k === 'acute' ? 'a' : 'n', p);
+  h += bx(8, 150, 110, 50, 'No ischemia', 'nonischemic injury', k === 'acute' ? 'hot' : 'dim');
+  h += bx(126, 150, 100, 50, 'Primary MI', 'acute coronary', k === 'primary' ? 'hot' : 'dim');
+  h += bx(234, 150, 100, 50, 'Secondary MI', 'supply–demand', k === 'secondary' ? 'hot' : 'dim');
+  return h + '</svg>';
+}
+
+var FIGS = {
+  kin: {t: 'Troponin over time', states: ['early', 'late', 'none', 'chronic'], data: KIN, svg: kinSVG},
+  map: {t: 'Rule-out, observe, rule-in', states: ['out', 'obs', 'in'], data: MAPS, svg: mapSVG},
+  ladder: {t: 'Risk and the next step', states: ['low', 'mid', 'high'], data: LAD, svg: ladSVG},
+  udmi: {t: 'Kinds of myocardial injury', states: ['acute', 'chronic', 'primary', 'secondary'], data: UD, svg: udSVG}
+};
+var ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M7 15l3-4 3 3 2-2 2 3"/></svg>';
+var figN = 0;
+function mountFig(host, id, state){
+  var F = FIGS[id], pre = 'f' + (++figN) + '-';
+  function draw(k){
+    var d = F.data[k];
+    host.innerHTML = '<div class="states" role="group" aria-label="' + esc(F.t) + '">' + F.states.map(function(x){ return '<button class="sbtn" data-k="' + x + '" aria-pressed="' + (x === k) + '">' + esc(F.data[x].n) + '</button>'; }).join('') + '</div>' + F.svg(k, pre) + '<p class="line1">' + esc(d.line) + '</p>';
+  }
+  host.onclick = function(e){ var b = e.target.closest && e.target.closest('[data-k]'); if (b) draw(b.getAttribute('data-k')); };
+  draw(state && F.data[state] ? state : F.states[0]);
+}
+function chip(fig, state, label){ return '<button class="chip" data-fig="' + fig + '" data-state="' + (state || '') + '">' + ICON + esc(label || FIGS[fig].t) + '</button>'; }
+var lastFocus = null;
+function openSheet(fig, state){
+  lastFocus = document.activeElement;
+  $('sheet-t').textContent = FIGS[fig].t;
+  if (fig === 'map' && !state){ var al = algo(read()); state = al.zone === 'out' ? 'out' : al.zone === 'in' ? 'in' : 'obs'; }
+  mountFig($('sheet-b'), fig, state);
+  $('scrim').hidden = false; $('sheet').hidden = false; $('sheet').scrollTop = 0; $('sheet-x').focus();
+}
+function closeSheet(){ if ($('sheet').hidden) return; $('scrim').hidden = true; $('sheet').hidden = true; if (lastFocus && lastFocus.focus) lastFocus.focus(); }
+$('sheet-x').addEventListener('click', closeSheet); $('scrim').addEventListener('click', closeSheet);
+document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeSheet(); });
+document.addEventListener('click', function(e){ var c = e.target.closest && e.target.closest('[data-fig]'); if (c) openSheet(c.getAttribute('data-fig'), c.getAttribute('data-state')); });
+
+/* Cutoffs tab */
+function drawCuts(){
+  var cur = $('assay').value;
+  function cell(c){ return c ? '&lt;' + c.vl + ' · &lt;' + c.lo + '/&lt;' + c.nd + ' · ≥' + c.hi + '/≥' + c.d : 'not published'; }
+  $('cuttable').innerHTML = '<div class="tw"><table><thead><tr><th>Assay</th><th>0/1 h</th><th>0/2 h</th></tr></thead><tbody>' + Object.keys(ASSAYS).map(function(k){ var a = ASSAYS[k]; return '<tr' + (k === cur ? ' class="sel"' : '') + '><td>' + esc(a.n) + '<br><small class="note">' + esc(a.src) + '</small></td><td class="mono">' + cell(a.a1) + '</td><td class="mono">' + cell(a.a2) + '</td></tr>'; }).join('') + '</tbody></table></div><p class="note">Each cell: very low · low/no change · high/rise. Cutoffs hold whatever the age, sex or kidney function. Single-draw rule-out needs onset 3 h or more before the draw and a normal ECG.</p>';
+  $('urltable').innerHTML = '<div class="tw"><table><thead><tr><th>Assay</th><th>99th F / M</th><th>Reports from (20% CV)</th></tr></thead><tbody>' + Object.keys(ASSAYS).map(function(k){ var a = ASSAYS[k]; return '<tr' + (k === cur ? ' class="sel"' : '') + '><td>' + esc(a.s) + '</td><td class="mono">' + a.url.f + ' / ' + a.url.m + '</td><td class="mono">' + a.loq + '</td></tr>'; }).join('') + '</tbody></table></div>';
+}
+$('testtable').innerHTML = '<div class="tw"><table><tbody>' + [
+  ['No known coronary disease', 'Coronary CT angiography (1, A) or a stress test: exercise ECG, stress echo, PET or SPECT, or MRI (1, B-NR). The ACC pathway prefers CT where available.'],
+  ['Known coronary disease', 'Optimise medical therapy first (1, A). Angiography if worsening with left main, proximal LAD or multivessel disease, or after revascularisation (1, A). Stress imaging (2a, B-NR); CT angiography for nonobstructive plaque (2a, B-NR).'],
+  ['Any intermediate patient', 'Echocardiogram for ventricular and valve function (1, C-EO). Observation unit to shorten the stay (2a, A).'],
+  ['Discharge without testing', 'If unchanged, with a recent normal test (CT or invasive angiogram within 2 years, stress test within 1 year) or a known chronic elevation, and modified HEART (no troponin item) 3 or less, or EDACS under 16; follow-up within 7 days (ACC 2022 pathway).']
+].map(function(r){ return '<tr><th scope="row">' + esc(r[0]) + '</th><td>' + esc(r[1]) + '</td></tr>'; }).join('') + '</tbody></table></div><p class="note">Class and level: 2021 AHA/ACC chest pain guideline, sections 4.1.2.1 and 4.1.2.2.</p>';
+drawCuts();
+
+/* Learn: narrowing workup */
+var CAUSES = [['primary','Primary MI (acute coronary event)'],['secondary','Secondary MI (supply and demand)'],['acute','Nonischemic acute injury: myocarditis, PE, sepsis, takotsubo, acute heart failure'],['chronic','Chronic injury: kidney disease, stable heart failure, LVH']];
+var FEATS = {
+  rise: {n: 'Rise or fall', m: {chronic: ['out', 'chronic injury is stable over time']}},
+  flat: {n: 'Flat, matches an old value', m: {chronic: ['fav', 'stable and seen before'], primary: ['less', 'an acute infarct makes values move (unless seen late)'], secondary: ['less', 'acute injury rises or falls'], acute: ['less', 'acute injury rises or falls']}},
+  isch: {n: 'Ischemic pain or new ECG change', m: {acute: ['less', 'ischemia favours MI, though myocarditis, PE and takotsubo can mimic it'], chronic: ['less', 'ischemia points to an acute process'], primary: ['in', 'ischemia present'], secondary: ['in', 'ischemia present']}},
+  wma: {n: 'New regional wall motion loss', m: {primary: ['fav', 'regional loss fits a coronary territory'], secondary: ['in', 'counts as evidence of ischemia'], chronic: ['less', 'new loss is an acute finding']}},
+  stress: {n: 'Anemia, fast rhythm, low BP or oxygen', m: {secondary: ['fav', 'a supply–demand mismatch is the definition']}},
+  clot: {n: 'Acute plaque or thrombus on angiography', m: {primary: ['fav', 'acute coronary pathology confirms it'], secondary: ['out', 'secondary MI has no acute coronary pathology'], acute: ['out', 'an acute coronary lesion explains the injury'], chronic: ['out', 'an acute coronary lesion explains the injury']}}
+};
+var whySel = {};
+function drawWhy(){
+  $('why-feats').innerHTML = Object.keys(FEATS).map(function(f){ return '<button class="sbtn" data-f="' + f + '" aria-pressed="' + !!whySel[f] + '">' + esc(FEATS[f].n) + '</button>'; }).join('');
+  var ord = {fav: 0, 'in': 1, less: 2, out: 3};
+  var rank = {'in': 0, less: 1, fav: 2, out: 3};
+  var rows = CAUSES.map(function(c){ var s = 'in', why = 'still possible'; Object.keys(whySel).forEach(function(f){ var m = FEATS[f].m[c[0]]; if (m && rank[m[0]] > rank[s]){ s = m[0]; why = m[1]; } }); return {k: c[0], n: c[1], s: s, why: why}; });
+  rows.sort(function(a, b){ return ord[a.s] - ord[b.s]; });
+  $('why-causes').innerHTML = rows.map(function(r){ return '<div class="cause ' + r.s + '"><span>' + esc(r.n) + '</span><small>' + esc(r.why) + '</small></div>'; }).join('');
+}
+$('why-feats').addEventListener('click', function(e){ var b = e.target.closest('[data-f]'); if (!b) return; var f = b.getAttribute('data-f'); if (whySel[f]) delete whySel[f]; else { whySel[f] = 1; if (f === 'rise') delete whySel.flat; if (f === 'flat') delete whySel.rise; } var left = $('why-feats').scrollLeft; drawWhy(); $('why-feats').scrollLeft = left; });
+drawWhy();
+document.querySelectorAll('.chips').forEach(function(c){ if (c.textContent === 'CHIPUDMI') c.innerHTML = chip('udmi', 'acute'); });
+
+/* Learn: HEART tap */
+(function(){
+  var IT = [['History', ['slightly suspicious', 'moderately', 'highly']], ['ECG', ['normal', 'nonspecific repolarisation, LBBB, paced, LVH', 'significant ST depression']], ['Age', ['under 45', '45 to 65', 'over 65']], ['Risk factors', ['none', '1 or 2', '3+, or known atherosclerosis']], ['Troponin', ['at or below normal', 'over 1, under 3 times', '3 times or more']]], on = [0, 0, 0, 0, 0];
+  function draw(){
+    $('heart-tap').innerHTML = IT.map(function(it, n){ return '<p class="qn">' + it[0] + '</p><div class="tap">' + it[1].map(function(l, v){ return '<button class="sbtn" data-h="' + n + '" data-v="' + v + '" aria-pressed="' + (on[n] === v) + '">' + esc(l) + ' ' + v + '</button>'; }).join('') + '</div>'; }).join('');
+    var s = on.reduce(function(a, b){ return a + b; }, 0), b = s <= 3 ? ['low', '1.7%'] : s <= 6 ? ['moderate', '16.6%'] : ['high', '50.1%'];
+    $('heart-sum').textContent = 'HEART ' + s + ' · ' + b[0];
+    $('heart-line').textContent = 'Major adverse cardiac events within 6 weeks: ' + b[1] + ' in the validation cohort.' + (s <= 3 ? ' With negative serial troponin, the HEART Pathway sends these patients home without testing.' : '');
+  }
+  $('heart-tap').addEventListener('click', function(e){ var b = e.target.closest('[data-h]'); if (!b) return; on[+b.getAttribute('data-h')] = +b.getAttribute('data-v'); draw(); });
+  draw();
+})();
+
+/* Learn: pills and trials */
+var TRIALS = [
+  {q: 'APACE: can one hour replace three to six?', d: 'Prospective diagnostic cohorts in emergency departments; hs-troponin T measured blind. Derivation 872 patients (2012); prospective validation 1,320 (2015).', r: 'Validation: 59.5% ruled out with a negative predictive value of 99.9% and sensitivity 99.6%; 16.4% ruled in (PPV 78.2%); 24.1% in observe. 30-day mortality 0.0%, 1.6% and 1.9%.', c: 'Became the ESC 0/1-hour algorithm. Observational: troponin did not guide care.', cite: 'Reichlin T et al., CMAJ 2015;187:E243', doi: '10.1503/cmaj.141349'},
+  {q: 'RAPID-TnT: is a 0/1-hour hs-troponin T pathway safe in practice?', d: 'Randomised, South Australia, 3,378 patients; 0/1 h with results reported down to 5 ng/L versus 0/3 h with values under 29 masked.', r: 'Death or MI at 30 days 1.0% versus 1.0% (noninferior). Discharge from the ED 45.1% versus 32.3%; median ED stay 4.6 versus 5.6 h.', c: 'The only individually randomised trial of the 0/1-hour approach.', cite: 'Chew DP et al., Circulation 2019;140:1543', doi: '10.1161/CIRCULATIONAHA.119.042891'},
+  {q: 'HiSTORIC: does a single-draw rule-out shorten stays safely?', d: 'Stepped-wedge cluster randomised, 7 Scottish hospitals, 31,492 patients with hs-troponin I under the 99th percentile. Rule out below 5 ng/L (if pain began 2 h or more earlier), otherwise retest at 3 h.', r: 'Length of stay 10.1 to 6.8 h; ED discharge 50% to 71%. MI or cardiac death at 30 days 0.4% versus 0.3% (adjusted OR 1.97, 0.95 to 4.08): noninferiority not shown; at 1 year no difference.', c: 'Supports early rule-out with hs-troponin I. Few clusters; results sensitive to the model.', cite: 'Anand A et al., Circulation 2021;143:2214', doi: '10.1161/CIRCULATIONAHA.120.052380'},
+  {q: 'High-STEACS: do more sensitive results improve outcomes?', d: 'Stepped-wedge cluster randomised, 10 Scottish hospitals, 48,282 patients; hs-troponin I with sex-specific 99th percentiles introduced.', r: '17% were reclassified as injury or MI, but MI or cardiovascular death at 1 year in them was 15% before versus 12% after (adjusted OR 1.10, 0.75 to 1.61).', c: 'Finding more injury did not reduce events: the 99th percentile flags injury, not who benefits from ACS treatment.', cite: 'Shah ASV et al., Lancet 2018;392:919', doi: '10.1016/S0140-6736(18)31923-8'},
+  {q: 'HEART Pathway: does a score plus troponin cut testing?', d: 'Randomised, single centre, 282 patients; HEART 3 or less with negative troponin at 0 and 3 h (conventional assay) went home without testing. Then a 3-site before-after study of 8,474 patients (2018).', r: 'Objective testing at 30 days 56.7% versus 68.8%; early discharge 39.7% versus 18.4%; no MACE in those sent home early. In the 2018 study 30.7% were low risk and 0.4% of them had death or MI.', c: 'Basis of HEART-based early discharge. Small trial with a process endpoint; non-randomised follow-up.', cite: 'Mahler SA et al., Circ Cardiovasc Qual Outcomes 2015;8:195', doi: '10.1161/CIRCOUTCOMES.114.001384'},
+  {q: 'PROMISE: CT angiography or functional testing first?', d: 'Randomised, 10,003 symptomatic outpatients with suspected coronary disease; median 25 months.', r: 'Death, MI, unstable angina or major complication 3.3% versus 3.0% (adjusted HR 1.04, 0.83 to 1.29). Fewer catheterisations without obstructive disease with CT (3.4% versus 4.3%).', c: 'CT first is a reasonable alternative to stress testing. Stable outpatients, not ED chest pain.', cite: 'Douglas PS et al., N Engl J Med 2015;372:1291', doi: '10.1056/NEJMoa1415516'},
+  {q: 'SCOT-HEART: does adding CT angiography prevent MI?', d: 'Open-label randomised, 4,146 patients with stable chest pain in cardiology clinics; 5 years.', r: 'Coronary death or MI 2.3% versus 3.9% (HR 0.59, 0.41 to 0.84), with more preventive treatment started after CT and similar rates of angiography.', c: 'Seeing plaque changes treatment. Stable outpatients; small event numbers.', cite: 'SCOT-HEART Investigators, N Engl J Med 2018;379:924', doi: '10.1056/NEJMoa1805971'}
+];
+(function(){
+  var chaps = [].slice.call(document.querySelectorAll('.chap'));
+  $('pills').innerHTML = chaps.map(function(c, n){ return '<button class="pill" data-go="' + c.id + '" aria-current="' + (n === 0) + '">' + (n + 1) + ' ' + esc(c.getAttribute('data-pill')) + '</button>'; }).join('');
+  $('pills').addEventListener('click', function(e){ var g = e.target.getAttribute('data-go'); if (g) $(g).scrollIntoView(); });
+  function mark(id){ [].forEach.call($('pills').children, function(b){ var on = b.getAttribute('data-go') === id; b.setAttribute('aria-current', String(on)); if (on) $('pills').scrollLeft = Math.max(0, b.offsetLeft - 60); }); }
+  if ('IntersectionObserver' in window){ var io = new IntersectionObserver(function(es){ es.forEach(function(en){ if (en.isIntersecting) mark(en.target.id); }); }, {rootMargin: '-30% 0px -60% 0px'}); chaps.forEach(function(c){ io.observe(c); }); }
+  $('trialbox').innerHTML = TRIALS.map(function(t){ return '<div class="trial" style="margin-top:14px"><p><b>' + esc(t.q) + '</b></p><p><span class="k">Design</span>' + esc(t.d) + '</p><p><span class="k">Result</span>' + esc(t.r) + '</p><p><span class="k">What it changed</span>' + esc(t.c) + '</p><p class="mono" style="font-size:13px"><a href="https://doi.org/' + t.doi + '" rel="noopener">' + esc(t.cite) + '</a></p></div>'; }).join('');
+  $('go-prac').addEventListener('click', function(){ show('t-prac'); window.scrollTo(0, 0); });
+})();
+document.querySelectorAll('[data-figure]').forEach(function(h){ mountFig(h, h.getAttribute('data-figure'), h.getAttribute('data-state')); });
+
+/* Practice: cases run through the same engine */
+var CASES = [
+  {t: 'Five hours of pain, now gone', s: 'Woman, 52. Pressure while gardening 5 hours ago, gone now. ECG normal. Elecsys hs-cTnT reported as <6.', q: 'Rule out, observe or rule in?', i: {ecg: 'normal', onset: 'ge3', sex: 'f', assay: 'roche', path: '1', t0: '<6', t1: '', hist: 1, age: 52, rf: 1}, a: 'out', p: 'Rule out on one draw: below 6, 3 hours or more after onset, normal ECG. Home with follow-up.'},
+  {t: 'Ninety minutes in', s: 'Man, 61, smoker with diabetes. Pain began 90 minutes ago, settled in the ED. ECG normal. ARCHITECT hs-cTnI 3, then 11 at 1 hour.', q: 'Rule out, observe or rule in?', i: {ecg: 'normal', onset: 'lt3', sex: 'm', assay: 'architect', path: '1', t0: '3', t1: '11', hist: 2, age: 61, rf: 1}, a: 'in', p: 'Rule in by the change: 8 in an hour (cutoff 6), although both values are under the male 99th percentile of 35.'},
+  {t: 'Dialysis patient with a steady high value', s: 'Man, 74, on dialysis. Atypical pain for a day, none now. ECG shows LVH. Elecsys hs-cTnT 38, then 40 at 1 hour. No old value on file.', q: 'Rule out, observe or rule in?', i: {ecg: 'nonspec', onset: 'ge3', sex: 'm', assay: 'roche', path: '1', t0: '38', t1: '40', hist: 0, age: 74, rf: 2}, a: 'obs', p: 'Observe: above 12 but below 52 with a change of 2. Repeat at 3 hours; calling it chronic needs an earlier stable value.'},
+  {t: 'A high first value', s: 'Woman, 47. Two hours of pain, settled. ECG normal. Access hs-TnI 70.', q: 'Wait for the 1-hour value?', i: {ecg: 'normal', onset: 'lt3', sex: 'f', assay: 'access', path: '1', t0: '70', t1: '', hist: 1, age: 47, rf: 0}, a: 'in', p: 'No: 70 is at or above 50, rule in on the first value. Then ask whether it is MI or another injury.'},
+  {t: 'Early, low and flat', s: 'Man, 39. Pain began 1 hour ago, gone now. ECG normal. Centaur hs-cTnI 4, then 5 at 1 hour.', q: 'Rule out, observe or rule in?', i: {ecg: 'normal', onset: 'lt3', sex: 'm', assay: 'centaur', path: '1', t0: '4', t1: '5', hist: 0, age: 39, rf: 0}, a: 'out', p: 'Rule out on two draws: below 6 with a change of 1 (under 3). Too early for a one-draw rule-out; because pain began under 3 hours before the first draw, the ESC suggests considering a third value at 3 hours.'},
+  {t: 'Normal troponin, abnormal ECG', s: 'Woman, 68. Pain an hour ago. New 1 mm ST depression in V4 to V6. Elecsys <6, then <6 at 1 hour.', q: 'Can she go home?', i: {ecg: 'isch', onset: 'lt3', sex: 'f', assay: 'roche', path: '1', t0: '<6', t1: '<6', hist: 2, age: 68, rf: 1}, a: 'in', p: 'No: new ischemic ECG changes are high risk whatever the troponin. Admit and involve cardiology.'},
+  {t: 'Atellica and a 2-hour draw', s: 'Man, 55. Pain 4 hours ago. ECG normal. Atellica hs-cTnI 5; the second sample was drawn at 2 hours.', q: 'Which cutoffs apply?', i: {ecg: 'normal', onset: 'ge3', sex: 'm', assay: 'atellica', path: '2', t0: '5', t1: '6', hist: 1, age: 55, rf: 1}, a: 'obs', p: 'None: there are no published 0/2-hour cutoffs for Atellica. Use a 1-hour draw, or treat as observe and repeat at 3 hours.'}
+];
+var ZN = {out: 'Rule out', obs: 'Observe', 'in': 'Rule in'};
+(function(){
+  $('practice').innerHTML = CASES.map(function(c, n){
+    return '<div class="card case" id="' + (n ? 'case' + n : 'practice-cases') + '"><p class="label">Case ' + (n + 1) + '</p><h2>' + esc(c.t) + '</h2><p>' + esc(c.s) + '</p><p><b>' + esc(c.q) + '</b></p><div class="row" data-case="' + n + '">' + ['out', 'obs', 'in'].map(function(z){ return '<button class="btn ghost" data-z="' + z + '">' + ZN[z] + '</button>'; }).join('') + '</div><div class="ans" id="ans' + n + '" hidden></div></div>';
+  }).join('');
+})();
+function caseZone(c){ var o = plan(c.i); return o.kind === 'low' ? 'out' : o.kind === 'high' || o.kind === 'stemi' ? 'in' : 'obs'; }
+$('practice').addEventListener('click', function(e){
+  var b = e.target.closest('[data-z]'); if (b){ var n = +b.parentNode.getAttribute('data-case'), c = CASES[n], z = caseZone(c), o = plan(c.i);
+    var box = $('ans' + n); box.innerHTML = '<p><b>' + (b.getAttribute('data-z') === z ? 'Right: ' : 'The tool says: ') + ZN[z] + '.</b> ' + esc(c.p) + '</p><p class="sub"><b>' + esc(o.head) + '.</b> ' + (o.why ? esc(o.why) : '') + '</p><div class="row"><button class="btn ghost" data-load="' + n + '">Open in the tool</button></div>'; box.hidden = false; return; }
+  var l = e.target.closest('[data-load]'); if (l){ var c2 = CASES[+l.getAttribute('data-load')].i; st = {ecg: c2.ecg, onset: c2.onset, sex: c2.sex, path: c2.path, hist: c2.hist, rf: c2.rf, t: {}}; $('assay').value = c2.assay; $('t0').value = c2.t0; $('t1').value = c2.t1; $('age').value = c2.age; drawInputs(); render(); drawCuts(); show('t-tool'); window.scrollTo(0, 0); }
+});
+window.__cases = CASES; window.__caseZone = caseZone;
+drawInputs(); render(); fromHash();
+})();
+</script>
+<script id="deeper-data">
+/* Go deeper: mechanism, rationale and the common trap for each Learn chapter. Text only; no doses or thresholds beyond the tool's own. */
+(function(){ var D = {"learn-kin": [["Mechanism", "Troponin is part of the contractile machinery of heart muscle. A small free pool leaks out soon after a cell membrane is damaged; the larger bound pool is released over days as the cell dies. High-sensitivity assays can measure the trace amounts present in healthy people."], ["Why it matters", "This explains the time course: detectable within a few hours, rising for a day or so, and raised for days afterwards. The 99th percentile is the upper limit in a healthy population, not a threshold for infarction."], ["Common trap", "A raised troponin means heart muscle injury, not necessarily an infarct. An infarct needs a rise or fall together with evidence of ischemia."]], "learn-delta": [["Mechanism", "Chronic conditions (kidney disease, heart failure, a thick ventricle) cause steady low-level injury, so troponin sits above the limit and stays put. An acute event makes it move."], ["Why it matters", "The change between two samples is therefore what separates acute from chronic injury, and it is why the algorithm reads the value and the change together."], ["Common trap", "A mismatch between supply and demand (fast rate, low pressure, anemia) also produces a rising troponin. That calls for treating the cause first; angiography is not the default."]], "learn-early": [["Mechanism", "After an artery closes, troponin needs time to leak out of the damaged cells and reach the blood. In the first hours it can be undetectable despite a real infarct."], ["Why it matters", "A single very low value rules out an infarct only when enough time has passed since the pain began. Before that, a second sample is the test."], ["Common trap", "The time of onset is often uncertain or the pain came in waves. When in doubt, treat the patient as an early presenter."]], "learn-heart": [["Mechanism", "The score combines what was known before testing (the history, age and risk factors) with what the tests show (the ECG and troponin)."], ["Why it matters", "A low score together with negative serial troponin identifies patients at low risk of a major cardiac event over the next weeks, who can leave without further testing."], ["Common trap", "The history item is subjective and scores vary between clinicians. A low score never overrides ischemic ECG changes or a rising troponin."]]};
+  function add(){ Object.keys(D).forEach(function(id){ var c = document.getElementById(id); if (!c || c.querySelector(":scope > .deeper")) return; var host = c.matches(".card,.lsec,section,.chap") ? c : null; if (!host){ var n = c.nextElementSibling; while (n && !n.matches(".card")) n = n.nextElementSibling; host = n; } if (!host || host.querySelector(":scope > .deeper")) return; var d = document.createElement("details"); d.className = "deeper"; d.innerHTML = "<summary>Go deeper: mechanism and rationale</summary><div class=\"dpx\">" + D[id].map(function(r){ return "<div><span class=\"dl\">" + r[0] + "</span><p>" + r[1] + "</p></div>"; }).join("") + "</div>"; var last = host.querySelector(":scope > .row"); if (last) host.insertBefore(d, last); else host.appendChild(d); }); }
+  add(); document.addEventListener("click", function(){ setTimeout(add, 0); }); document.addEventListener("input", function(){ setTimeout(add, 0); });
+})();
+</script>
+</body>
+</html>

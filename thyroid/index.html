@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Thyroid · bedside.tools</title>
+<meta name="description" content="Read a TSH and free T4 on the wards or in clinic, then manage hypothyroidism, hyperthyroidism, thyroid storm, myxedema coma and thyroid nodules, with the physiology in figures.">
+<script src="/theme.js"></script>
+<style>
+:root{--bg:#FBFBFA;--card:#FFFFFF;--ink:#111113;--muted:#55555D;--line:#ECECEE;--accent:#2B4BDB;--warn:#9A3B00;--warnbg:#FFF6EC}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5}
+.wrap{max-width:720px;margin:0 auto;padding:20px 16px 48px}
+a{color:var(--accent)}
+.back{font-size:14px;text-decoration:none;display:inline-block;min-height:44px;line-height:44px}
+h1{font-size:26px;margin:4px 0 4px;letter-spacing:-.01em}
+.purpose{color:var(--muted);margin:0 0 20px}
+.tabs{display:flex;gap:6px;margin-bottom:14px;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:1 0 auto;min-height:44px;border:1px solid var(--line);background:var(--card);border-radius:14px;padding:0 12px;font:inherit;font-size:14px;font-weight:600;color:var(--muted);cursor:pointer}
+.tab[aria-selected="true"]{border-color:var(--accent);color:var(--accent)}
+.panel{display:none}.panel.on{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
+.label{font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+.grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.field{display:flex;flex-direction:column;justify-content:flex-end;min-width:0}
+.field label{display:block;font-size:13px;color:var(--muted);margin-bottom:4px}
+.field input,.field select{width:100%;min-height:44px;border:1px solid var(--line);border-radius:10px;padding:8px 10px;font:inherit;font-family:var(--mono);background:var(--card);color:var(--ink);font-variant-numeric:tabular-nums}
+.field select{font-family:var(--sans);font-size:15px}
+.rng{font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:3px}
+.unitrow{display:flex;gap:6px}.unitrow input{flex:1;min-width:0}.unitrow select{flex:0 0 66px;padding:8px 6px}
+input:focus-visible,select:focus-visible,.tab:focus-visible,.chk:focus-within,button:focus-visible,summary:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.checks{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.chk{display:flex;align-items:center;gap:10px;min-height:44px;border:1px solid var(--line);border-radius:10px;padding:6px 10px;font-size:14px;cursor:pointer}
+.chk input{width:20px;height:20px;accent-color:var(--accent);flex:none}
+.sub{font-size:14px;color:var(--muted);margin:0}
+.subh{font-size:13px;color:var(--muted);margin:14px 0 0}
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.sbx{flex:1 1 auto;min-height:44px;padding:4px 10px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);font:inherit;font-size:14px;cursor:pointer}
+.sbx[aria-pressed="true"]{border-color:var(--accent);color:var(--accent);font-weight:600}
+.head{font-size:18px;font-weight:700;margin:4px 0 4px;line-height:1.3}
+.ctx{font-family:var(--mono);font-size:11.5px;color:var(--muted);margin:0 0 6px}
+.whyline{margin:10px 0 0;font-size:14.5px;color:var(--muted)}
+.whyline b{color:var(--ink);font-weight:600}
+.steps{margin:10px 0 0;padding-left:20px}.steps li{margin-bottom:5px;font-size:15px}
+details{margin-top:10px;border-top:1px solid var(--line);padding-top:4px}
+summary{cursor:pointer;color:var(--accent);font-weight:600;min-height:44px;line-height:44px}
+details p{margin:0 0 8px;font-size:15px}
+.card ul{margin:6px 0 0;padding-left:20px}.card li{margin-bottom:4px;font-size:15px}
+.tier{display:inline-block;font-family:var(--mono);font-size:11px;border:1px solid var(--line);border-radius:999px;padding:2px 8px;color:var(--muted);margin:6px 6px 0 0}
+.guard{border-left:3px solid var(--warn);background:var(--warnbg);padding:10px 12px;border-radius:0 10px 10px 0;margin:10px 0 0;font-size:15px}
+.guard b{display:block;color:var(--warn)}
+.note{font-size:14px;color:var(--muted)}
+.empty{color:var(--muted);font-size:15px;margin:0}
+.tp{display:inline-block;font-family:var(--mono);font-size:11px;letter-spacing:.04em;border-radius:999px;padding:3px 9px;border:1px solid var(--line);color:var(--muted);margin-right:4px}
+.tp.hi{color:var(--bad);border-color:var(--bad);background:var(--badbg)}
+.tp.lo{color:var(--accent);border-color:var(--accent)}
+.tp.ok{color:var(--ok);border-color:var(--ok);background:var(--okbg)}
+.big{font-family:var(--mono);font-size:30px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.1}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:7px 8px 7px 0;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:var(--mono);font-size:11.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);font-weight:500}
+.tw{overflow-x:auto}
+footer{margin-top:28px;font-size:13.5px;color:var(--muted)}
+footer p{margin:0 0 8px}
+/* TSH x free T4 map */
+.map{display:grid;grid-template-columns:30px repeat(3,minmax(0,1fr));grid-template-rows:repeat(3,64px) 26px;gap:4px;position:relative}
+.cell{border:1px solid var(--line);border-radius:10px;padding:5px 7px;font-size:12px;line-height:1.25;color:var(--muted);background:var(--card);text-align:left;font-family:var(--sans);cursor:pointer;min-width:0}
+.cell.here{border-color:var(--accent);color:var(--ink);background:var(--fill);font-weight:600}
+.ax{font-family:var(--mono);font-size:11px;color:var(--muted);display:flex;align-items:center;justify-content:center;text-align:center}
+.ax.y{writing-mode:vertical-rl;transform:rotate(180deg)}
+.dot{position:absolute;width:14px;height:14px;border-radius:50%;background:var(--accent);border:2px solid var(--card);transform:translate(-50%,-50%);pointer-events:none}
+.mapnote{margin:8px 0 0;font-size:14px;color:var(--muted)}
+/* figures */
+.figchips{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.fchip{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--fill);color:var(--ink);font:inherit;font-size:14px;cursor:pointer;text-align:left}
+.fchip svg{flex:none;color:var(--accent)}
+.fig svg{display:block;width:100%;max-width:520px;height:auto;margin:6px auto 0}
+.fig svg text{font-family:var(--mono)}
+.figcap{font-size:14.5px;margin:8px 0 0}
+.figsrc{font-family:var(--mono);font-size:11px;color:var(--muted);margin:6px 0 0}
+.sl input[type=range]{width:100%;min-height:44px;accent-color:var(--accent)}
+.sll{display:flex;justify-content:space-between;font-size:13px;color:var(--muted)}
+/* workup */
+.cause{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:8px 0;border-top:1px solid var(--line);font-size:15px}
+.cause small{color:var(--muted);font-size:13px;text-align:right;flex:0 1 55%}
+.cause.out{opacity:.55}.cause.less{opacity:.75}.cause.out span{text-decoration:line-through;color:var(--muted)}
+.cause.fav span{font-weight:700}
+.cause.fav span:before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--accent);margin-right:8px}
+.rchips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 10px}
+.rchip{min-height:44px;padding:0 12px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--ink);font:inherit;font-size:14px;cursor:pointer}
+.rchip[aria-pressed="true"]{border-color:var(--accent);color:var(--accent);font-weight:600}
+/* score rows */
+.score{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
+.band{font-family:var(--mono);font-size:13px;border-radius:999px;padding:4px 10px;border:1px solid var(--line)}
+.band.hi{color:var(--bad);border-color:var(--bad);background:var(--badbg)}
+.band.mid{color:var(--warn);border-color:var(--warn);background:var(--warnbg)}
+.band.lo{color:var(--ok);border-color:var(--ok);background:var(--okbg)}
+.order{counter-reset:o;list-style:none;padding:0;margin:10px 0 0}
+.order li{counter-increment:o;position:relative;padding:8px 0 8px 40px;border-top:1px solid var(--line);font-size:15px}
+.order li:before{content:counter(o);position:absolute;left:0;top:8px;width:28px;height:28px;border-radius:50%;background:var(--fill);color:var(--accent);font-family:var(--mono);font-weight:700;display:grid;place-items:center;font-size:13px}
+.order li b{display:block}
+.order .when{display:block;font-family:var(--mono);font-size:12px;color:var(--muted);margin-top:2px}
+/* TI-RADS */
+.tr-row{margin-top:12px}
+.tr-row .sub{margin-bottom:6px}
+.trlev{display:grid;grid-template-columns:repeat(5,1fr);gap:3px;margin-top:12px}
+.trlev span{font-family:var(--mono);font-size:12px;text-align:center;padding:8px 2px;border-radius:8px;background:var(--fill);color:var(--muted)}
+.trlev span.on{background:var(--accent);color:var(--accent-ink);font-weight:600}
+/* learn */
+.pills{position:sticky;top:0;z-index:5;background:var(--bg);display:flex;gap:6px;overflow-x:auto;margin:0 -16px 12px;padding:8px 16px;border-bottom:1px solid var(--line);scrollbar-width:none}
+.pills::-webkit-scrollbar{display:none}
+.pill{flex:none;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--muted);font:inherit;font-size:14px;cursor:pointer;white-space:nowrap;text-decoration:none;display:inline-flex;align-items:center}
+.lh{font-size:19px;margin:22px 0 4px;scroll-margin-top:70px}
+.lead{color:var(--muted);margin:0 0 12px;font-size:15px}
+.trial{border-left:3px solid var(--accent);padding-left:12px;margin:6px 0 14px}
+.trial p{margin:0 0 6px;font-size:15px}
+.trial .k{font-family:var(--mono);font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);display:block}
+.flag{display:inline-block;font-family:var(--mono);font-size:11px;border-radius:999px;padding:2px 8px;background:var(--warnbg);color:var(--warn);margin-left:6px}
+/* practice */
+.fdots{display:flex;gap:4px;margin:4px 0 12px}
+.fd{flex:1;height:4px;border-radius:99px;background:var(--line)}.fd.on{background:var(--accent)}
+.case h2{font-size:17px;margin:0 0 6px}
+.popts{display:grid;gap:8px;margin-top:10px}
+.popt{min-height:44px;text-align:left;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);font:inherit;font-size:15px;padding:8px 12px;cursor:pointer}
+.popt.right{border-color:var(--ok);color:var(--ok);font-weight:600}
+.popt.wrong{border-color:var(--bad);color:var(--bad);text-decoration:line-through}
+.ansb{margin-top:12px;border-top:1px solid var(--line);padding-top:12px}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.btn{min-height:44px;border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);border-radius:10px;padding:8px 14px;font:inherit;font-weight:600;cursor:pointer}
+.btn.ghost{background:var(--card);color:var(--accent)}
+/* sheet */
+.scrim{position:fixed;inset:0;background:var(--scrim);z-index:20}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:21;max-height:90vh;overflow-y:auto;background:var(--card);border:1px solid var(--line);border-bottom:0;border-radius:20px 20px 0 0;padding:8px 16px 24px;max-width:640px;margin:0 auto}
+.sheethead{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.sheethead h2{font-size:18px;margin:0}
+.xbtn{min-height:44px;min-width:44px;border:0;background:transparent;color:var(--accent);font:inherit;font-weight:600;cursor:pointer}
+.linkrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.linkrow a,.linkrow button{display:inline-flex;align-items:center;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--accent);font:inherit;font-size:14px;font-weight:600;text-decoration:none;cursor:pointer}
+@media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}.dot{transition:left .25s,top .25s}}
+@media (max-width:420px){.grid{grid-template-columns:1fr 1fr}.field.wide{grid-column:1/-1}.chk{font-size:13.5px;padding:6px 8px;gap:8px}}
+@media (min-width:900px){
+  .wrap{max-width:1040px}
+  .two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;align-items:start}
+  .two>.col{min-width:0}
+  .map{grid-template-rows:repeat(3,76px) 26px}
+  #p-learn,#p-practice{max-width:780px;margin:0 auto}
+}
+.dp{margin-top:10px;border:1px solid var(--line);border-radius:12px;padding:2px 12px;background:var(--card);text-align:left}
+.dp:empty{display:none}
+.dp>div{padding:10px 0;border-top:1px solid var(--line)}
+.dp>div:first-child{border-top:0}
+.dp .dl{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500;margin:0 0 3px}
+.dp p{font-size:15px;line-height:1.45;color:var(--ink);margin:0 0 4px}
+.dp p:last-child{margin-bottom:0}
+/* cause-fix: ruled-out causes stay readable; the name greys, the reason does not fade */
+.cause.out,.cause.less,.cause.unl{opacity:1}
+.cause.less>span,.cause.unl>span{color:var(--muted)}
+.deeper{margin-top:14px;border-top:1px solid var(--line)}
+.deeper>summary{min-height:44px;display:flex;align-items:center;gap:8px;color:var(--accent);font-weight:600;font-size:15px;cursor:pointer;list-style:none}
+.deeper>summary::-webkit-details-marker{display:none}
+.deeper>summary::before{content:"+";font-family:var(--mono);font-size:18px;line-height:1;width:14px;text-align:center}
+.deeper[open]>summary::before{content:"\2212"}
+.deeper>summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.deeper .dpx{border:1px solid var(--line);border-radius:12px;padding:2px 12px;background:var(--card);text-align:left}
+.deeper .dpx>div{padding:10px 0;border-top:1px solid var(--line)}
+.deeper .dpx>div:first-child{border-top:0}
+.deeper .dl{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500;margin:0 0 3px}
+.deeper p{font-size:15px;line-height:1.45;color:var(--ink);margin:0 0 4px}
+.deeper p:last-child{margin-bottom:0}
+</style>
+<script>function dpHtml(rows){ return rows.map(function(r){ return '<div><span class="dl">' + r[0] + '</span>' + r[1] + '</div>'; }).join(''); }</script>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="/">← bedside.tools</a>
+<h1>Thyroid</h1>
+<p class="purpose">Read a TSH and free T4, then manage hypothyroidism, hyperthyroidism, storm, myxedema coma and nodules.</p>
+
+<div class="tabs" role="tablist" aria-label="Sections">
+<button class="tab" role="tab" id="t-labs" aria-controls="p-labs" aria-selected="true">Labs</button>
+<button class="tab" role="tab" id="t-hypo" aria-controls="p-hypo" aria-selected="false">Hypo</button>
+<button class="tab" role="tab" id="t-hyper" aria-controls="p-hyper" aria-selected="false">Hyper</button>
+<button class="tab" role="tab" id="t-crisis" aria-controls="p-crisis" aria-selected="false">Crisis</button>
+<button class="tab" role="tab" id="t-nodule" aria-controls="p-nodule" aria-selected="false">Nodule</button>
+<button class="tab" role="tab" id="t-learn" aria-controls="p-learn" aria-selected="false">Learn</button>
+<button class="tab" role="tab" id="t-practice" aria-controls="p-practice" aria-selected="false">Practice</button>
+</div>
+
+<!-- ================= LABS ================= -->
+<section class="panel on" id="p-labs" role="tabpanel" aria-labelledby="t-labs">
+<div class="two">
+<div class="col">
+<div class="card" id="in-labs">
+<p class="label">Labs</p>
+<div class="grid">
+<div class="field"><label for="tsh">TSH (mIU/L)</label><input id="tsh" type="number" inputmode="decimal" step="any" min="0"><span class="rng" id="rng-tsh">0.4–4.0</span></div>
+<div class="field"><label for="ft4">Free T4 (ng/dL)</label><input id="ft4" type="number" inputmode="decimal" step="any" min="0"><span class="rng">0.8–1.8</span></div>
+<div class="field"><label for="t3">Free T3 (pg/mL)</label><input id="t3" type="number" inputmode="decimal" step="any" min="0" placeholder="optional"><span class="rng">2.3–4.2</span></div>
+</div>
+<div class="checks">
+<label class="chk"><input type="checkbox" id="adm"> Admitted</label>
+<label class="chk"><input type="checkbox" id="icu"> ICU</label>
+<label class="chk"><input type="checkbox" id="preg"> Pregnant</label>
+<label class="chk"><input type="checkbox" id="onlt4"> On levothyroxine</label>
+</div>
+<p class="subh">Things that change the numbers</p>
+<div class="checks">
+<label class="chk"><input type="checkbox" id="amio"> Amiodarone</label>
+<label class="chk"><input type="checkbox" id="ici"> Checkpoint inhibitor</label>
+<label class="chk"><input type="checkbox" id="biotin"> Biotin</label>
+<label class="chk"><input type="checkbox" id="hep"> Heparin (any)</label>
+<label class="chk"><input type="checkbox" id="steroid"> Steroids or dopamine</label>
+<label class="chk"><input type="checkbox" id="rxhyper"> Recent hyper treatment</label>
+</div>
+<details><summary>More: reference ranges</summary>
+<p>The tool uses TSH 0.4–4.0 mIU/L, free T4 0.8–1.8 ng/dL and free T3 2.3–4.2 pg/mL. Adjust to your lab. In pregnancy, without a local trimester range, TSH 0.1–4.0 is used for the first and second trimesters (ATA 2026, conditional, low).</p>
+</details>
+</div>
+</div>
+<div class="col">
+<div class="card" id="map-card">
+<p class="label">Where the result sits</p>
+<div class="map" id="map" aria-label="TSH by free T4 map"></div>
+<p class="mapnote" id="mapnote">Enter TSH and free T4. Tap any square to read what that pattern means.</p>
+</div>
+<div id="labs-out"></div>
+</div>
+</div>
+</section>
+
+<!-- ================= HYPO ================= -->
+<section class="panel" id="p-hypo" role="tabpanel" aria-labelledby="t-hypo">
+<div class="two">
+<div class="col">
+<div class="card" id="in-hypo">
+<p class="label">Patient</p>
+<div class="grid">
+<div class="field"><label for="wt">Weight</label><div class="unitrow"><input id="wt" type="number" inputmode="decimal" step="any" min="0"><select id="wtu" aria-label="Weight unit"><option value="kg">kg</option><option value="lb">lb</option></select></div></div>
+<div class="field"><label for="age">Age</label><input id="age" type="number" inputmode="numeric" min="18" max="110"></div>
+<div class="field"><label for="dose">Current LT4 (mcg)</label><input id="dose" type="number" inputmode="decimal" step="any" min="0" placeholder="if on it"></div>
+</div>
+<div class="checks">
+<label class="chk"><input type="checkbox" id="cad"> Coronary disease</label>
+<label class="chk"><input type="checkbox" id="npo"> NPO or not absorbing</label>
+<label class="chk"><input type="checkbox" id="central"> Pituitary (central) cause</label>
+<label class="chk"><input type="checkbox" id="surg"> Surgery planned</label>
+</div>
+<p class="note" style="margin:10px 0 0">TSH, free T4, pregnancy and drug ticks come from the Labs tab.</p>
+</div>
+</div>
+<div class="col" id="hypo-out"></div>
+</div>
+</section>
+
+<!-- ================= HYPER ================= -->
+<section class="panel" id="p-hyper" role="tabpanel" aria-labelledby="t-hyper">
+<div class="two">
+<div class="col">
+<div class="card" id="in-hyper">
+<p class="label">Patient</p>
+<div class="checks">
+<label class="chk"><input type="checkbox" id="hrhi"> Symptomatic or HR over 90</label>
+<label class="chk"><input type="checkbox" id="cvd"> Heart disease or 65 or older</label>
+<label class="chk"><input type="checkbox" id="lact"> Breastfeeding</label>
+<label class="chk"><input type="checkbox" id="af"> Atrial fibrillation</label>
+<label class="chk"><input type="checkbox" id="contrast"> Iodinated contrast planned</label>
+<label class="chk"><input type="checkbox" id="surg2"> Surgery planned</label>
+</div>
+<p class="note" style="margin:10px 0 0">TSH, free T4, pregnancy, amiodarone and checkpoint-inhibitor ticks come from the Labs tab.</p>
+</div>
+<div class="card" id="hyper-workup">
+<p class="label">Cause: tap results as they come back</p>
+<p class="sub">Send first: TRAb, total or free T3 with T4. Then uptake scan (or Doppler ultrasound) if the cause is still unclear and the patient is not pregnant or breastfeeding.</p>
+<div class="rchips" id="rchips"></div>
+<div id="causes"></div>
+</div>
+</div>
+<div class="col" id="hyper-out"></div>
+</div>
+</section>
+
+<!-- ================= CRISIS ================= -->
+<section class="panel" id="p-crisis" role="tabpanel" aria-labelledby="t-crisis">
+<div class="seg" role="group" aria-label="Crisis type" style="margin-bottom:14px">
+<button class="sbx" type="button" data-cx="storm" aria-pressed="true">Thyroid storm</button>
+<button class="sbx" type="button" data-cx="myx" aria-pressed="false">Myxedema coma</button>
+</div>
+<div id="storm">
+<div class="two">
+<div class="col">
+<div class="card" id="bwps">
+<p class="label">Burch–Wartofsky score</p>
+<div class="grid">
+<div class="field"><label for="temp">Temperature</label><div class="unitrow"><input id="temp" type="number" inputmode="decimal" step="any"><select id="tempu" aria-label="Temperature unit"><option value="F">°F</option><option value="C">°C</option></select></div></div>
+<div class="field"><label for="hr">Heart rate</label><input id="hr" type="number" inputmode="numeric"></div>
+<div class="field wide"><label for="cns">Mental status</label><select id="cns"><option value="0">Normal</option><option value="10">Mild agitation</option><option value="20">Delirium, psychosis, extreme lethargy</option><option value="30">Seizure or coma</option></select></div>
+</div>
+<div class="grid" style="margin-top:12px">
+<div class="field wide"><label for="gi">GI or liver</label><select id="gi"><option value="0">None</option><option value="10">Diarrhea, nausea, vomiting, pain</option><option value="20">Unexplained jaundice</option></select></div>
+<div class="field wide"><label for="hf">Heart failure</label><select id="hf"><option value="0">None</option><option value="5">Pedal edema</option><option value="10">Bibasilar rales</option><option value="15">Pulmonary edema</option></select></div>
+<div class="field"><label for="afs">Rhythm</label><select id="afs"><option value="0">No AF</option><option value="10">Atrial fibrillation</option></select></div>
+</div>
+<div class="checks">
+<label class="chk"><input type="checkbox" id="precip"> Trigger (infection, surgery, iodine, stopped drug)</label>
+<label class="chk"><input type="checkbox" id="lowef"> Low EF or heart failure</label>
+<label class="chk"><input type="checkbox" id="lft3"> Liver tests about 3× normal</label>
+</div>
+</div>
+</div>
+<div class="col" id="storm-out"></div>
+</div>
+</div>
+<div id="myx" hidden>
+<div class="two">
+<div class="col">
+<div class="card" id="in-myx">
+<p class="label">Myxedema coma</p>
+<div class="grid">
+<div class="field"><label for="mwt">Weight</label><div class="unitrow"><input id="mwt" type="number" inputmode="decimal" step="any"><select id="mwtu" aria-label="Weight unit"><option value="kg">kg</option><option value="lb">lb</option></select></div></div>
+</div>
+<div class="checks">
+<label class="chk"><input type="checkbox" id="mold"> Older, small, or coronary disease</label>
+<label class="chk"><input type="checkbox" id="mcort"> Cortisol already drawn</label>
+</div>
+</div>
+</div>
+<div class="col" id="myx-out"></div>
+</div>
+</div>
+</section>
+
+<!-- ================= NODULE ================= -->
+<section class="panel" id="p-nodule" role="tabpanel" aria-labelledby="t-nodule">
+<div class="two">
+<div class="col">
+<div class="card" id="tirads">
+<p class="label">ACR TI-RADS</p>
+<div id="trrows"></div>
+<div class="field" style="margin-top:12px;max-width:200px"><label for="ncm">Largest size (cm)</label><input id="ncm" type="number" inputmode="decimal" step="any" min="0"></div>
+</div>
+</div>
+<div class="col" id="nodule-out"></div>
+</div>
+</section>
+
+<!-- ================= LEARN ================= -->
+<section class="panel" id="p-learn" role="tabpanel" aria-labelledby="t-learn">
+<nav class="pills" aria-label="Learn topics">
+<a class="pill" href="#l-loop">The loop</a><a class="pill" href="#l-curve">Why TSH moves</a><a class="pill" href="#l-deio">T4 to T3</a><a class="pill" href="#l-itis">Thyroiditis</a><a class="pill" href="#l-lt4">Levothyroxine</a><a class="pill" href="#l-preg">Pregnancy</a><a class="pill" href="#l-amio">Amiodarone</a><a class="pill" href="#l-storm">Storm drugs</a><a class="pill" href="#l-trials">Trials</a>
+</nav>
+<div id="learn"></div>
+</section>
+
+<!-- ================= PRACTICE ================= -->
+<section class="panel" id="p-practice" role="tabpanel" aria-labelledby="t-practice">
+<div id="practice"></div>
+</section>
+
+<footer>
+<p>For education only. Not a substitute for clinical judgment.</p>
+<p>Privacy: everything runs in your browser. Nothing you enter is sent anywhere or stored, and there are no analytics. Do not enter names, record numbers, or dates of birth.</p>
+<p>Last reviewed: 19 November 2026.</p>
+<p>Sources: ATA Guidelines for the Treatment of Hypothyroidism (Jonklaas et al, Thyroid 2014). AACE/ATA Clinical Practice Guidelines for Hypothyroidism in Adults (Garber et al, Endocr Pract 2012). 2016 ATA Guidelines for Hyperthyroidism and Other Causes of Thyrotoxicosis (Ross et al, Thyroid 2016), GRADE strength and quality shown on each card. ATA 2026 Guidelines for Thyroid Disease in Preconception, Pregnancy, and Postpartum (Korevaar, Leung et al, Thyroid 2026;36:481). Approach to the Patient with Thyroid Storm (Kopp et al, J Clin Endocrinol Metab 2026;111:1484). Joint consensus statement on management of thyroid storm (ETA/BTA/SfE, Eur Thyroid J 2026). Japan Thyroid Association and Japan Endocrine Society thyroid storm guidelines (Endocr J 2016). Burch and Wartofsky, Endocrinol Metab Clin North Am 1993. 2018 ETA Guidelines for Amiodarone-Associated Thyroid Dysfunction (Bartalena et al, Eur Thyroid J 2018). ASCO Guideline Update on Immune-Related Adverse Events (Schneider et al, J Clin Oncol 2021). ACR TI-RADS (Tessler et al, J Am Coll Radiol 2017); ACR white paper on incidental thyroid nodules (Hoang et al, 2015). 2015 ATA Guidelines for Thyroid Nodules and Differentiated Thyroid Cancer (Haugen et al, Thyroid 2016). Bethesda System for Reporting Thyroid Cytopathology, 3rd edition (2023). Trials as cited on each card. Rows marked expert practice are not from a guideline.</p>
+</footer>
+</div>
+
+<div class="scrim" id="scrim" hidden></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-t" hidden>
+<div class="sheethead"><h2 id="sheet-t"></h2><button class="xbtn" id="sheet-x" type="button">Close</button></div>
+<div id="sheet-b"></div>
+</div>
+
+<script>
+// thyroid engine. Sources: ATA 2014 hypothyroidism (J14), AACE/ATA 2012 (G12), ATA 2016 thyrotoxicosis (R16),
+// ATA 2026 pregnancy (P26), Kopp JCEM 2026 storm review (K26), ETA 2018 amiodarone (E18), ASCO 2021 irAE (A21), ACR TI-RADS 2017 (TR).
+(function(){
+'use strict';
+var REF={tlo:0.4,thi:4.0,flo:0.8,fhi:1.8,t3lo:2.3,t3hi:4.2};
+var TABS=[25,50,75,88,100,112,125,137,150,175,200,300];
+function $(id){return document.getElementById(id)}
+function num(id){var e=$(id);if(!e||e.value==='')return null;var v=parseFloat(e.value);return isFinite(v)&&v>=0?v:null}
+function on(id){var e=$(id);return !!(e&&e.checked)}
+function r1(v){return Math.round(v*10)/10}
+function tab(v){var b=TABS[0];TABS.forEach(function(t){if(Math.abs(t-v)<Math.abs(b-v))b=t});return b}
+function stepTo(dose,target){var near=TABS.filter(function(t){return t!==dose&&Math.abs(t-target)/target<=0.15});if(near.length){var b=near[0];near.forEach(function(t){if(Math.abs(t-target)<Math.abs(b-target))b=t});return b+' mcg/day'}var lo=TABS.filter(function(t){return t<=target}).pop(),hi=TABS.filter(function(t){return t>=target})[0];if(lo&&hi)return 'alternating '+lo+' and '+hi+' mcg/day (about '+Math.round((lo+hi)/2)+')';if(!lo)return '12.5 mcg/day (half of a 25 mcg tablet)';return Math.round(target)+' mcg/day'}
+function tabUp(cur,target){var c=TABS.filter(function(t){return t>cur});if(!c.length)return Math.round(target);var b=c[0];c.forEach(function(t){if(Math.abs(t-target)<Math.abs(b-target))b=t});return b}
+function tabDown(cur,target){var c=TABS.filter(function(t){return t<cur});if(!c.length)return cur;var b=c[c.length-1];c.forEach(function(t){if(Math.abs(t-target)<Math.abs(b-target))b=t});return b}
+function kg(id,uid){var v=num(id);if(v==null)return null;return $(uid).value==='lb'?v*0.4536:v}
+function tier(t){return t?'<span class="tier">'+t+'</span>':''}
+function list(a){return a.length?'<ul class="steps">'+a.map(function(s){return '<li>'+s+'</li>'}).join('')+'</ul>':''}
+function guard(t,b){return '<div class="guard"><b>'+t+'</b>'+b+'</div>'}
+var CHIP_ICON='<svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><rect x="1.5" y="2.5" width="13" height="11" rx="2" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M4 11l3-3 2 2 3-4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+function chips(ids){return ids&&ids.length?'<div class="figchips">'+ids.map(function(f){var F=FIG[f];return '<button type="button" class="fchip" data-open="'+f+'">'+CHIP_ICON+F.title+'</button>'}).join('')+'</div>':''}
+function card(o){
+  // o: id, label, ctx, head, why, body, guard, steps, chips, more, tier
+  return '<div class="card"'+(o.id?' id="'+o.id+'"':'')+'>'+(o.label?'<p class="label">'+o.label+'</p>':'')+(o.ctx?'<p class="ctx">'+o.ctx+'</p>':'')+
+   (o.pre||'')+(o.head?'<p class="head">'+o.head+'</p>':'')+(o.guard||'')+(o.why?'<p class="whyline"><b>Why:</b> '+o.why+'</p>':'')+
+   (o.body||'')+list(o.steps||[])+chips(o.chips)+
+   (o.more||o.tier?'<details><summary>More</summary>'+(o.more||'')+tier(o.tier)+'</details>':'')+'</div>';
+}
+
+/* ---------- shared state ---------- */
+function labs(){
+  return {tsh:num('tsh'),ft4:num('ft4'),t3:num('t3'),adm:on('adm'),icu:on('icu'),preg:on('preg'),onlt4:on('onlt4'),
+   amio:on('amio'),ici:on('ici'),biotin:on('biotin'),hep:on('hep'),steroid:on('steroid'),rxhyper:on('rxhyper'),age:num('age')};
+}
+function band(v,lo,hi){return v==null?null:(v<lo?'lo':v>hi?'hi':'ok')}
+
+/* ---------- Labs pattern engine (decision table rows L1–L17) ---------- */
+function classify(s){
+  var tlo=s.preg?0.1:REF.tlo,inpt=s.adm||s.icu;
+  var r={T:band(s.tsh,tlo,REF.thi),F:band(s.ft4,REF.flo,REF.fhi),T3:band(s.t3,REF.t3lo,REF.t3hi),id:'',head:'',why:'',steps:[],guards:[],chips:[],more:'',tier:'',cell:null,go:[]};
+  if(r.T==null||r.F==null)return r;
+  var x=s.ft4/REF.fhi;
+  if(r.T==='lo'){
+    if(r.F==='hi'||(r.F==='ok'&&r.T3==='hi')){
+      r.cell=[2,2];r.go=['hyper'];r.chips=['axis','itis'];r.tier='ATA 2016';
+      if(r.F==='hi'){r.id='overt-hyper';r.head='Overt thyrotoxicosis · free T4 '+r1(x)+'× upper limit';
+        r.why='TSH is suppressed because the pituitary senses too much hormone, so the problem sits in the thyroid or outside it, not in the pituitary.';}
+      else{r.id='t3tox';r.head='T3 toxicosis';r.why='early Graves disease and toxic nodules can raise T3 first, so free T4 can still be normal.';}
+      r.steps=['Beta-blocker if symptomatic, heart rate over 90, older, or heart disease','Find the cause before any methimazole: TRAb, T3 with T4, then uptake scan or Doppler (Hyper tab)'];
+      if(inpt)r.steps.unshift('Score Burch–Wartofsky now (Crisis tab): 45 or more is storm, 25–44 impending');
+      if(s.amio)r.steps.push('On amiodarone: sort type 1 from type 2 (Hyper tab)');
+      if(s.ici)r.steps.push('On a checkpoint inhibitor: almost always thyroiditis; recheck every 2–3 weeks for the hypothyroid phase');
+      if(s.preg)r.steps.push('Pregnant: first-trimester hCG can do this (gestational transient thyrotoxicosis), which is not treated with antithyroid drugs');
+      if(inpt)r.go.push('crisis');
+    } else if(r.F==='ok'&&s.preg){
+      r.id='gtt';r.cell=[2,1];r.go=['hyper'];r.chips=['preg'];r.tier='ATA 2026 · strong, moderate';
+      r.head='Low TSH in pregnancy: usually hCG, not disease';r.why='hCG stimulates the TSH receptor near its first-trimester peak, so TSH dips with a normal free T4.';
+      r.steps=['Do not treat with antithyroid drugs (subclinical hyperthyroidism or gestational transient thyrotoxicosis)','Propranolol for palpitations if needed','TSH under 0.1: recheck every 2–4 weeks','Eye signs, goitre or known Graves: TRAb'];
+    } else if(r.F==='ok'){
+      r.id='subclin-hyper';r.cell=[2,1];r.go=['hyper'];r.chips=['curve'];r.tier='ATA 2016';
+      r.head='Subclinical hyperthyroidism · grade '+(s.tsh<0.1?'2 (TSH under 0.1)':'1 (TSH 0.1–0.39)');
+      r.why='the pituitary notices small excesses of hormone before free T4 leaves the range.';
+      r.steps=['Confirm it persists: repeat TSH, free T4 and T3 over the next 3–6 months, sooner if high risk','Treatment-leaning: 65 or older, heart disease, osteoporosis, postmenopausal and not on estrogen or a bisphosphonate, or symptoms (Hyper tab)'];
+      if(s.onlt4)r.steps.unshift('On levothyroxine: likely over-replaced; lower the dose 12.5–25 mcg unless TSH suppression is intended');
+      if(inpt||s.steroid)r.steps.unshift('Steroids, dopamine and acute illness lower TSH: recheck after recovery');
+    } else {
+      r.cell=[2,0];r.tier='AACE/ATA 2012';r.chips=['axis'];
+      if(s.rxhyper){r.id='lag';r.head='TSH lagging after hyperthyroidism treatment';r.why='the pituitary stays suppressed for weeks to months after the gland calms down, so TSH misleads here.';r.steps=['Follow free T4 and T3, not TSH','Low free T4: lower the methimazole dose (or start levothyroxine after radioiodine or surgery)'];r.tier='ATA 2016';}
+      else if(inpt){r.id='nti';r.head='Likely nonthyroidal illness';r.why='acute illness lowers TSH, T4 and T3 as part of the body’s response; replacing hormone does not help.';r.steps=['Do not start levothyroxine for this pattern alone','Recheck about 6 weeks after recovery','Pituitary disease suspected (headache, visual loss, low sodium, low cortisol)? Morning cortisol first'];r.chips=['deio','axis'];}
+      else{r.id='central';r.head='Central hypothyroidism until shown otherwise';r.why='a pituitary that cannot make TSH leaves the thyroid unstimulated, so TSH stays low despite a low free T4.';
+        r.guards.push(guard('Cortisol before levothyroxine','Check morning cortisol first. If low, give steroids before thyroid hormone: thyroid hormone first can bring on adrenal crisis.'));
+        r.steps=['Morning cortisol, LH, FSH, prolactin, IGF-1; pituitary MRI','Treat to free T4 in the upper half of the range, not to TSH'];r.go=['hypo'];}
+    }
+  } else if(r.T==='ok'){
+    if(r.F==='ok'&&s.preg&&s.onlt4){r.id='preg-lt4';r.cell=[1,1];r.go=['hypo'];r.chips=['lt4'];r.head='Pregnant on levothyroxine: increase about 25% now';r.why='requirements rise about 25% by week 12 and 50% by week 20, so a normal TSH today will not stay normal.';r.steps=['Increase the dose by about 25% on the positive test (Hypo tab works it out)','TSH about 2 weeks later, then about every 4 weeks in the first half and at least once in the third trimester','Keep TSH within the normal range and under 2.5'];r.tier='ATA 2026';}
+    else if(r.F==='ok'){r.id='normal';r.cell=[1,1];r.head=s.onlt4?'On target':'Thyroid function normal';r.steps=s.onlt4?['Recheck TSH yearly, or 6–8 weeks after any dose or brand change']:['These numbers do not explain thyroid-type symptoms'];r.tier='ATA 2014';}
+    else if(r.F==='lo'){r.cell=[1,0];r.chips=['axis'];r.tier='AACE/ATA 2012';
+      if(inpt){r.id='nti';r.head='Likely nonthyroidal illness';r.why='illness and some drugs lower measured free T4 without thyroid disease.';r.steps=['Recheck after recovery','High-dose steroids, phenytoin and carbamazepine lower free T4 or its binding'];r.chips=['deio'];}
+      else{r.id='central';r.head='Possible central hypothyroidism';r.why='a normal TSH is inappropriately normal when free T4 is low.';r.steps=['Repeat free T4; if still low: morning cortisol, LH, FSH, prolactin, IGF-1, pituitary MRI'];r.guards.push(guard('Cortisol before levothyroxine','If cortisol is low, start steroids first.'));r.go=['hypo'];}}
+    else{r.id='discord';r.cell=[1,2];r.head='High free T4 with normal TSH: check the assay first';r.why='when TSH and free T4 disagree, interference and timing are more common than rare disease.';
+      r.steps=['Biotin? Hold at least 2 days and repeat','Heparin, even line flushes, raises measured free T4','Repeat on another lab platform before considering TSH-secreting adenoma or hormone resistance'];
+      if(s.onlt4)r.steps.unshift('On levothyroxine: free T4 runs higher in the hours after a dose; TSH is the guide');r.tier='ATA 2016';}
+  } else {
+    if(r.F==='lo'){r.id='overt-hypo';r.cell=[0,0];r.go=['hypo'];r.chips=['axis','lt4'];r.tier='ATA 2014';
+      r.head=s.onlt4?'Under-replaced on levothyroxine':'Overt primary hypothyroidism';
+      r.why=s.onlt4?'TSH high with low free T4 on treatment means too little hormone is reaching the blood: dose, timing or absorption.':'the gland is failing and the pituitary is pushing harder.';
+      r.steps=s.onlt4?['Check adherence, timing with food, and binders (calcium, iron, PPIs)','Then increase the dose (Hypo tab); recheck in 6–8 weeks']:['Start levothyroxine (Hypo tab works out the dose)','Recheck TSH in 6–8 weeks','TPO antibody if the cause is unclear'];
+      if(s.preg)r.steps.unshift('Pregnant: treat now; keep TSH under 2.5 (ATA 2026)');
+      if(inpt)r.guards.push(guard('Look for myxedema coma','Confusion, low temperature, low sodium, slow heart rate or CO2 retention: open the Crisis tab.'));
+      if(s.ici)r.steps.push('On a checkpoint inhibitor: usually continue it; check for central disease if TSH is not high');
+      if(s.amio)r.steps.push('On amiodarone: keep amiodarone and treat with levothyroxine (ETA 2018)');}
+    else if(r.F==='ok'){r.cell=[0,1];r.go=['hypo'];r.chips=['curve'];
+      if(s.preg){r.id='subclin-preg';r.head='Subclinical hypothyroidism in pregnancy';r.why='levothyroxine only helps when started in the first trimester (ATA 2026).';
+        r.steps=['TSH over 10: treat','Milder and first trimester: levothyroxine may be considered','After the first trimester: do not start it','On treatment: TSH every 4 weeks to midgestation and about 30 weeks; target under 2.5'];r.tier='ATA 2026 · strong, high (no treatment after first trimester)';}
+      else if(s.onlt4){r.id='under';r.head='Mildly under-replaced';r.why='TSH above range on treatment means a little more hormone is needed.';r.steps=['Increase 12.5–25 mcg/day','Recheck TSH in 6–8 weeks'];r.tier='ATA 2014';}
+      else if(inpt&&s.tsh<=20){r.id='recovery';r.head='TSH rise during or after acute illness';r.why='TSH can overshoot for a while as the body recovers from illness.';r.steps=['Do not treat in hospital on this alone','Repeat TSH and free T4 4–6 weeks after discharge'];r.tier='expert practice';}
+      else if(s.tsh>10){r.id='subclin-10';r.head='Subclinical hypothyroidism · TSH over 10';r.why='above 10, progression to overt disease and cardiovascular risk are higher, so treatment is reasonable.';r.steps=['Repeat to confirm, then levothyroxine is reasonable','Start low if older or coronary disease (Hypo tab)'];r.tier='AACE/ATA 2012';}
+      else{r.id='subclin';r.head='Subclinical hypothyroidism · repeat before treating';r.why='many mild TSH rises are normal again on repeat.';r.steps=['Repeat TSH and free T4 in 2–3 months; TPO antibody','If it persists: individualize (symptoms, TPO positive, pregnancy plans, heart failure)'];if(s.age!=null&&s.age>=65)r.steps.push('65 or older with TSH under 10: levothyroxine did not help symptoms in TRUST');r.tier='AACE/ATA 2012';}}
+    else{r.id='discord';r.cell=[0,2];r.head='High TSH with high free T4: check the assay first';r.why='both rising together is rarely real disease.';r.steps=['Missed levothyroxine, then catch-up doses before the draw','Biotin or heterophile antibodies: repeat on another platform','Then TSH-secreting adenoma or thyroid hormone resistance (endocrinology)'];r.tier='ATA 2016';}
+  }
+  // drug notes
+  if(s.biotin)r.guards.unshift(guard('Biotin','Biotin can make TSH read low and free T4 read high on many assays. Hold it at least 2 days (longer after high doses) and repeat before acting.'));
+  if(s.hep&&r.F==='hi')r.steps.push('Heparin can raise measured free T4 in the tube: draw before the dose or repeat');
+  if(s.amio&&r.id!=='overt-hyper')r.more+='<p>In the first 3 months of amiodarone a mildly high TSH, high-normal free T4 and low T3 are expected and are not disease (ETA 2018, Table 1).</p>';
+  if(inpt&&(r.id==='normal'||r.id==='nti'||r.id==='recovery'))r.more+='<p>In acute illness, send thyroid tests only when thyroid disease is suspected; the numbers are hard to read.</p>';
+  if(s.preg)r.more+='<p>Pregnancy range used: TSH 0.1–4.0 mIU/L in the first two trimesters when the lab has no trimester range (ATA 2026, conditional, low).</p>';
+  return r;
+}
+var CELL=[['Overt primary hypothyroidism','Subclinical hypothyroidism','Assay problem or rare TSH-driven'],['Illness or central','Normal','Assay problem first'],['Central, illness, or after treatment','Subclinical hyperthyroidism','Thyrotoxicosis']];
+var CELLWHY=[['Gland failing, pituitary pushing harder. Treat with levothyroxine.','TSH up first; free T4 still in range. Repeat before treating unless TSH is over 10.','Both up together: biotin, missed doses, then TSH-secreting adenoma or hormone resistance.'],
+ ['Normal TSH with low T4: in hospital usually illness; in clinic think pituitary.','Loop in balance.','Free T4 high with normal TSH: interference or timing more often than disease.'],
+ ['Pituitary not driving, recent illness, or TSH still suppressed after treating hyperthyroidism.','Pituitary senses a small excess before free T4 leaves the range.','Too much hormone; find the source before choosing a drug.']];
+
+function renderMap(s,r){
+  var h='<div class="ax y" style="grid-row:1;grid-column:1">TSH high</div><div class="ax y" style="grid-row:2;grid-column:1">normal</div><div class="ax y" style="grid-row:3;grid-column:1">low</div>';
+  for(var i=0;i<3;i++)for(var j=0;j<3;j++){var here=r.cell&&r.cell[0]===i&&r.cell[1]===j;h+='<button type="button" class="cell'+(here?' here':'')+'" data-cell="'+i+','+j+'" style="grid-row:'+(i+1)+';grid-column:'+(j+2)+'"'+(here?' aria-current="true"':'')+'>'+CELL[i][j]+'</button>'}
+  h+='<div class="ax" style="grid-row:4;grid-column:2">free T4 low</div><div class="ax" style="grid-row:4;grid-column:3">normal</div><div class="ax" style="grid-row:4;grid-column:4">high</div>';
+  if(r.cell){
+    var tlo=s.preg?0.1:REF.tlo,L=Math.log10,t=Math.max(0.005,Math.min(100,s.tsh)),y;
+    if(t>REF.thi)y=(0.55+0.37*(1-(L(t)-L(REF.thi))/(2-L(REF.thi))))/3;
+    else if(t>=tlo)y=(1.55+0.37*(1-(L(t)-L(tlo))/(L(REF.thi)-L(tlo))))/3;
+    else y=(2.55+0.37*(1-(L(t)-L(0.005))/(L(tlo)-L(0.005))))/3;
+    var f=s.ft4,xx=f<REF.flo?(0.1+0.8*f/REF.flo)/3:f<=REF.fhi?(1+(f-REF.flo)/(REF.fhi-REF.flo))/3:(2+0.1+0.8*Math.min(1,(f-REF.fhi)/3))/3;
+    h+='<span class="dot" style="left:calc(34px + (100% - 34px) * '+xx.toFixed(3)+');top:calc((100% - 30px) * '+y.toFixed(3)+')"></span>';
+  }
+  $('map').innerHTML=h;
+}
+var GO={hypo:'Open Hypo',hyper:'Open Hyper',crisis:'Open Crisis'};
+function renderLabs(){
+  var s=labs(),r=classify(s);
+  $('rng-tsh').textContent=s.preg?'0.1–4.0 (pregnancy)':'0.4–4.0';
+  renderMap(s,r);
+  if(!r.T||!r.F){$('labs-out').innerHTML='';$('mapnote').textContent='Enter TSH and free T4. Tap any square to read what that pattern means.';return r}
+  $('mapnote').textContent=CELLWHY[r.cell[0]][r.cell[1]];
+  function p(n,b){return b?'<span class="tp '+b+'">'+n+' '+(b==='hi'?'high':b==='lo'?'low':'normal')+'</span>':''}
+  var ctx=(s.icu?'ICU':s.adm?'Inpatient':'Clinic')+(s.preg?' · pregnant':'')+(s.onlt4?' · on levothyroxine':'');
+  var go=r.go.length?'<div class="linkrow">'+r.go.map(function(g){return '<button type="button" data-go="'+g+'">'+GO[g]+'</button>'}).join('')+'</div>':'';
+  $('labs-out').innerHTML=card({id:'labs-result',ctx:ctx,pre:'<div>'+p('TSH',r.T)+p('Free T4',r.F)+p('T3',r.T3)+'</div>',head:r.head,guard:r.guards.join(''),why:r.why,steps:r.steps,body:'',chips:r.chips,more:r.more,tier:r.tier}).replace(/<details>/,go+'<details>');
+  return r;
+}
+
+/* ---------- Hypo ---------- */
+function renderHypo(){
+  var s=labs(),r=classify(s),w=kg('wt','wtu'),age=num('age'),dose=num('dose'),cad=on('cad'),npo=on('npo'),central=on('central')||r.id==='central',surg=on('surg'),old=age!=null&&age>=65;
+  var out='',ctx=(s.icu?'ICU':s.adm?'Inpatient':'Clinic');
+  // start or adjust
+  if(s.onlt4&&dose!=null){
+    var hd,st,why;
+    if(r.T==='hi'){hd='Increase to '+stepTo(dose,dose+(dose<100?12.5:25));why='TSH is above range on '+dose+' mcg, so more hormone is needed.';st=['Steps of 12.5–25 mcg/day','Recheck TSH in 6–8 weeks'];}
+    else if(r.T==='lo'&&!central){hd='Lower to '+stepTo(dose,dose-(dose<100?12.5:25));why='a suppressed TSH on treatment means too much hormone; over-replacement raises AF and bone-loss risk.';st=['Steps of 12.5–25 mcg/day unless suppression is intended (some thyroid cancers)','Recheck TSH in 6–8 weeks'];}
+    else if(r.T==='ok'&&!s.preg){hd='Keep '+dose+' mcg/day';why='';st=['Recheck yearly or after any dose, brand or major weight change'];}
+    if(hd)out+=card({id:'hypo-start',label:'Dose',ctx:ctx,head:hd,why:why,steps:st,chips:['lt4'],tier:'ATA 2014'});
+  } else {
+    var h,w2,st2=[],why2;
+    if(cad){h='Start 12.5–25 mcg/day';why2='coronary disease: raising hormone quickly raises heart rate and oxygen demand.';st2=['Increase 12.5–25 mcg every 6–8 weeks to target'];}
+    else if(old){h='Start 25–50 mcg/day';why2='older adults are more sensitive to thyroid hormone and more likely to have hidden heart disease.';st2=['Increase 12.5–25 mcg every 6–8 weeks to target'];}
+    else if(w!=null){var full=1.6*w;h='Start '+tab(full)+' mcg/day';w2=Math.round(full);why2='a young adult without heart disease tolerates full replacement from the start.';st2=['Full replacement is about 1.6 mcg/kg/day ('+w2+' mcg at '+Math.round(w)+' kg, nearest tablet shown)','Recheck TSH in 6–8 weeks; adjust 12.5–25 mcg at a time'];}
+    else{h='';}
+    out+=card({id:'hypo-start',label:'Starting dose',ctx:ctx,head:h||'Enter weight and age for a starting dose',why:h?why2:'',steps:st2,chips:h?['lt4']:[],
+      more:'<p>Use ideal body weight in obesity, as replacement tracks lean mass (ATA 2014). Older adults or coronary disease: 25–50 mcg/day, lower (12.5–25) with active coronary disease. ASCO 2021 suggests starting lower (25–50 mcg) in older or frail patients with checkpoint-inhibitor hypothyroidism.</p>',tier:'ATA 2014 · strong, moderate'});
+  }
+  if(central)out+=card({id:'hypo-central',label:'Central hypothyroidism',head:'Follow free T4, not TSH',guard:guard('Cortisol first','Exclude adrenal insufficiency before levothyroxine; if present, start steroids first.'),why:'TSH tells you nothing when the pituitary is the problem.',steps:['Target free T4 in the upper half of the range'],tier:'AACE/ATA 2012',chips:['axis']});
+  else out+=card({id:'hypo-target',label:'Target',head:old&&age>=70?'TSH in range; upper part of the range is fine at 70 or older':'TSH within the reference range',why:'',steps:['Recheck TSH 6–8 weeks after any change, then yearly once stable'],
+    more:'<p>Persistent symptoms with a normal TSH: levothyroxine alone remains standard; adding T3 is a trial only in selected patients (ATA 2014; ATA/BTA/ETA 2021 consensus).</p>',tier:'ATA 2014'});
+  // subclinical
+  if(r.id==='subclin'||r.id==='subclin-10')out+=card({id:'hypo-sub',label:'Subclinical: who to treat',head:s.tsh>10?'TSH over 10: treating is reasonable':'TSH '+s.tsh+': individualize',why:s.tsh>10?'progression to overt disease is likelier above 10.':'below 10, benefit is unproven for most people.',steps:['Treat-leaning: symptoms, TPO positive, goitre, pregnancy planned, heart failure','65 or older with TSH under 10: usually no treatment (TRUST trial)'],tier:'AACE/ATA 2012; TRUST 2017'});
+  // NPO
+  if(npo){var iv=dose!=null?'about '+Math.round(dose*0.7)+' mcg IV daily ('+Math.round(dose*0.5)+'–'+Math.round(dose*0.8)+')':'about 70% of the oral dose IV';
+    out+=card({id:'hypo-npo',label:'NPO',head:'Hold up to 5–7 days, then '+iv,why:'levothyroxine has a half-life of about 7 days, so a few missed days barely change levels.',steps:['Resume the oral dose once eating','If unable to take it beyond about a week, switch to IV'],chips:['lt4'],more:'<p>IV is roughly 50–80% of the oral dose because oral absorption is incomplete; 70% is a common middle value.</p>',tier:'ATA 2014'});}
+  // pregnancy
+  if(s.preg){var pd='Increase the dose by about 25%';if(dose!=null){var tg=dose*1.25,lo=TABS.filter(function(t){return t>dose&&t<=tg}).pop(),hi=TABS.filter(function(t){return t>=tg})[0];var one=TABS.filter(function(t){return t>dose&&Math.abs(t-tg)/tg<=0.05})[0];pd=one?'Increase to '+one+' mcg/day':(lo&&hi&&lo/tg>=0.85&&hi/tg<=1.15?'Increase to '+lo+' or '+hi+' mcg/day (25% is '+Math.round(tg)+')':'Take two extra tablets a week (about 29% more)')}
+    out+=card({id:'hypo-preg',label:'Pregnancy (ATA 2026)',head:s.onlt4?pd+' now':'Overt hypothyroidism: treat now',why:s.onlt4?'requirements rise about 25% by week 12 and 50% by week 20 as estrogen raises binding protein and the placenta deiodinates T4.':'untreated overt hypothyroidism harms pregnancy outcomes.',
+      steps:['TSH about 2 weeks after a positive test, then about every 4 weeks in the first half, and at least once in the third trimester','Keep TSH within the normal range and under 2.5','After delivery: back to the prepregnancy dose; recheck at about 6 weeks'],
+      more:'<p>Overtreatment is more likely if the prepregnancy TSH was under 1.5, the dose is over 100 mcg/day, or two extra tablets a week are used. Levothyroxine only; no T3 or desiccated thyroid in pregnancy (strong, low).</p>',tier:'ATA 2026'});}
+  // take
+  out+=card({id:'hypo-take',label:'How to take it',head:'Empty stomach, same time daily',steps:['60 minutes before breakfast, or at bedtime at least 3 hours after food','Separate calcium, iron, bile-acid binders and sucralfate by 4 hours','Unexplained high dose needs: celiac disease, H. pylori, atrophic gastritis, PPIs'],tier:'ATA 2014'});
+  if(s.amio)out+=card({label:'Amiodarone',head:'Keep amiodarone; treat with levothyroxine',steps:['Overt: levothyroxine','Subclinical: can be followed without treatment'],tier:'ETA 2018; ATA 2016'});
+  if(s.ici)out+=card({label:'Checkpoint inhibitor',head:'Replace and usually continue the immunotherapy',steps:['Symptomatic with any TSH rise, or TSH over 10 on two checks 4 weeks apart: levothyroxine','TSH every 6–8 weeks while adjusting','Low TSH with low free T4: think hypophysitis; check cortisol'],tier:'ASCO 2021 · consensus'});
+  if(surg){var sev=r.id==='overt-hypo'&&(s.icu||s.ft4<0.4);out+=card({id:'hypo-periop',label:'Surgery',head:sev?'Severe hypothyroidism: postpone elective surgery':'Mild or moderate hypothyroidism: proceed',steps:sev?['Urgent surgery: IV levothyroxine and stress-dose steroids as for myxedema coma (Crisis tab)']:['Continue levothyroxine; hold up to 5–7 days if NPO'],more:'<p>The free T4 under 0.4 ng/dL cut-off used here to flag severe disease is a tool rule.</p>',tier:'expert practice'});}
+  $('hypo-out').innerHTML=out;
+}
+
+/* ---------- Hyper ---------- */
+var CAUSES=[['graves','Graves disease'],['adenoma','Toxic adenoma'],['tmng','Toxic multinodular goitre'],['painless','Painless thyroiditis'],['subacute','Subacute (painful) thyroiditis'],['postpartum','Postpartum thyroiditis'],['ici','Checkpoint-inhibitor thyroiditis'],['ait1','Amiodarone type 1'],['ait2','Amiodarone type 2'],['exog','Thyroid hormone ingestion'],['iodine','Iodine load (contrast, kelp)'],['hcg','hCG-driven (pregnancy, molar)'],['tshoma','TSH-secreting adenoma']];
+var ITIS=['painless','subacute','postpartum','ici','ait2'];
+var RES=[
+ {k:'trabp',t:'TRAb positive',keep:['graves'],out:['subacute','exog','ait2','hcg','tshoma'],less:['painless','postpartum','adenoma','tmng','iodine'],why:'antibody that drives the TSH receptor: Graves (low titres occur in other causes)'},
+ {k:'trabn',t:'TRAb negative',less:['graves'],why:'current assays miss about 3 in 100 untreated Graves patients'},
+ {k:'raiud',t:'Uptake high, diffuse',keep:['graves','hcg','tshoma','ici'],out:['painless','subacute','postpartum','ait2','exog','iodine','adenoma','tmng'],why:'whole gland making hormone'},
+ {k:'raiuf',t:'Uptake focal, hot nodules',keep:['adenoma','tmng'],out:['graves','painless','subacute','postpartum','ici','ait2','exog','hcg','tshoma'],why:'autonomous nodules take up iodine, rest suppressed'},
+ {k:'raiul',t:'Uptake low',keep:['painless','subacute','postpartum','ici','ait2','exog','iodine'],out:['graves','adenoma','tmng','hcg','tshoma'],why:'gland is leaking or bypassed, not making hormone'},
+ {k:'tgl',t:'Thyroglobulin low',keep:['exog'],out:['painless','subacute','postpartum','ici','ait2'],why:'pills suppress the gland; a damaged gland leaks thyroglobulin (unreliable if anti-thyroglobulin antibodies are present)'},
+ {k:'esr',t:'Tender gland, ESR or CRP high',keep:['subacute'],out:['painless','exog','postpartum'],why:'inflammation points to subacute thyroiditis'},
+ {k:'ratio',t:'T3:T4 over 20 (ng/mcg)',out:['painless','subacute','postpartum','ici','ait2','exog'],why:'a gland making hormone favours T3; leaking glands release stored T4'},
+ {k:'tshn',t:'TSH not suppressed',keep:['tshoma'],out:['graves','adenoma','tmng','painless','subacute','postpartum','ici','ait1','ait2','exog','iodine','hcg'],why:'every primary cause suppresses TSH'}];
+var picked={};
+function renderCauses(s){
+  var outs={},favs={},less={};
+  RES.forEach(function(r){if(!picked[r.k])return;(r.out||[]).forEach(function(c){if(!outs[c])outs[c]=r.t+': '+r.why});(r.less||[]).forEach(function(c){if(!less[c])less[c]='less likely · '+r.t+': '+r.why});(r.keep||[]).forEach(function(c){favs[c]=1})});
+  var ctxFlag={hcg:s.preg,ait1:s.amio,ait2:s.amio,ici:s.ici};
+  $('rchips').innerHTML=RES.map(function(r){return '<button type="button" class="rchip" data-res="'+r.k+'" aria-pressed="'+(!!picked[r.k])+'">'+r.t+'</button>'}).join('');
+  $('causes').innerHTML=CAUSES.filter(function(c){return !(/ait/.test(c[0])&&!s.amio)&&!(c[0]==='ici'&&!s.ici)}).map(function(c){var o=outs[c[0]],l=!o&&less[c[0]],f=!o&&!l&&favs[c[0]];
+    return '<div class="cause'+(o?' out':'')+(l?' less':'')+(f?' fav':'')+'"><span>'+c[1]+(ctxFlag[c[0]]?' <span class="flag">fits ticks</span>':'')+'</span><small>'+(o||l||'')+'</small></div>'}).join('')+
+    '<p class="note" style="margin:10px 0 0">Amiodarone and checkpoint-inhibitor causes appear when those are ticked on the Labs tab.</p>';
+}
+function renderHyper(){
+  var s=labs(),r=classify(s),x=s.ft4!=null?s.ft4/REF.fhi:null,out='',lact=on('lact');
+  renderCauses(s);
+  var thyro=r.id==='overt-hyper'||r.id==='t3tox'||r.id==='subclin-hyper'||r.id==='gtt';
+  if(r.id==='gtt')out+=card({id:'hyper-sub',label:'Pregnancy',head:'No antithyroid drug for a low TSH with normal free T4',why:'this is usually hCG-driven and settles after the first trimester.',steps:['Propranolol for palpitations','TSH under 0.1: recheck every 2–4 weeks','Eye signs, goitre or known Graves: TRAb'],chips:['preg'],tier:'ATA 2026 · strong, moderate'});
+  if(!thyro&&s.tsh!=null)out+=card({label:'Labs',head:'These labs are not thyrotoxicosis',why:'',steps:['See the Labs tab for what the pattern means'],tier:''});
+  // beta-blocker
+  if(on('hrhi')||on('cvd')||r.id==='overt-hyper'){
+    var bb=(s.preg||lact)?'Propranolol, lowest effective dose':'Propranolol 10–40 mg every 6–8 hours, or atenolol 25–100 mg once or twice daily';
+    out+=card({id:'hyper-bb',label:'Symptoms',head:bb,why:'beta-blockers ease the adrenergic symptoms while the cause is sorted out; they do not lower hormone levels.',steps:['Recommended in symptomatic thyrotoxicosis, especially older patients, resting heart rate over 90, or heart disease'],more:(s.preg||lact)?'<p>Pregnancy and breastfeeding: propranolol or metoprolol (ATA 2026).</p>':'',tier:'ATA 2016 · strong, moderate'});
+  }
+  // methimazole
+  if(r.id==='overt-hyper'||r.id==='t3tox'){
+    var d;if(x==null||x<=1)d='5–10 mg daily';else if(x<=1.5)d='5–10 mg daily';else if(x<=2)d='10–20 mg daily';else if(x<=3)d='30–40 mg daily';else d='30–40 mg daily or more; involve endocrinology';
+    var hd=s.preg?'Pregnancy: PTU up to 16 weeks':'Methimazole '+d;
+    var st=s.preg?['Methimazole to PTU is about 1:20 (methimazole 5 mg daily = PTU 50 mg twice daily)','Target free T4 at or just above the upper third of the range','TRAb in the first trimester; if over 3× upper limit, repeat at 18–22 and 30–34 weeks','Gestational transient thyrotoxicosis is not treated with antithyroid drugs']:
+      ['Before starting: consider CBC with differential and liver tests','Tell the patient in writing: fever or sore throat means stop the drug and get a CBC (agranulocytosis)','Free T4 and T3 at 2–6 weeks; TSH can stay low for months','Graves: 12–18 months, then stop if TSH normal and TRAb negative; long-term low dose is an option'];
+    if(lact&&!s.preg)st.unshift('Breastfeeding: lowest effective dose; methimazole up to 20 mg/day (30 in select cases) or PTU up to 450 mg/day');
+    out+=card({id:'hyper-mmi',label:'Antithyroid drug (Graves or toxic nodules only)',head:hd,guard:guard('Confirm the cause first','Thyroiditis, iodine and pills do not respond to methimazole. Use the cause list.'),why:s.preg?'methimazole in early pregnancy carries a birth-defect risk, so PTU is used up to 16 weeks.':(x?'free T4 is '+r1(x)+'× the upper limit, and the starting dose scales with how high it is.':''),steps:st,
+      more:'<p>Starting doses by free T4: 1–1.5× upper limit 5–10 mg, 1.5–2× 10–20 mg, 2–3× 30–40 mg (ATA 2016). PTU only in the first trimester, thyroid storm, or a minor methimazole reaction (not agranulocytosis).</p>'+(s.preg?'<p>Consider stopping the drug early in pregnancy if euthyroid on methimazole under 5–10 mg/day or PTU under 100–200 mg/day for over 6 months, with TRAb under 3× upper limit (ATA 2026, conditional, low).</p>':''),tier:s.preg?'ATA 2026':'ATA 2016 · strong, moderate'});
+    out+=card({id:'hyper-graves',label:'Graves: choosing treatment',head:'Methimazole, radioiodine or surgery',why:'all three work; the choice rests on goitre size, eye disease, pregnancy plans and preference.',steps:['Favour drugs: mild disease, small goitre, low TRAb, pregnancy within months','Avoid radioiodine: active moderate or severe eye disease, pregnancy, breastfeeding','Favour surgery: large or compressive goitre, suspicious nodule, pregnancy planned within 6 months'],
+      more:'<p>Radioiodine: beta-blocker beforehand; methimazole pretreatment in older or cardiac patients, stopped 2–3 days before; consider restarting 3–7 days after in patients at risk; pregnancy test within 48 hours.</p><p>Toxic adenoma or multinodular goitre: radioiodine or surgery; long-term low-dose methimazole is an alternative.</p>',tier:'ATA 2016'});
+  }
+  if(r.id==='subclin-hyper'){{var g2=s.tsh<0.1,risk=on('cvd');
+    out+=card({id:'hyper-sub',label:'Subclinical hyperthyroidism',head:g2?(risk?'Treat (TSH under 0.1 with risk)':'Treat if in a risk group below'):(risk?'Consider treating':'Usually observe; consider treating in a risk group below'),why:g2?'TSH under 0.1 carries more AF and bone-loss risk.':'TSH 0.1–0.39 carries less risk.',steps:['Risk groups: 65 or older, heart disease, osteoporosis, postmenopausal and not on estrogen or a bisphosphonate, symptoms','Treat the cause as for overt disease','Otherwise recheck every 6–12 months'],tier:'ATA 2016'});}}
+  if(thyro)out+=card({id:'hyper-itis',label:'If it is thyroiditis',head:'No antithyroid drug; beta-blocker for symptoms',why:'thyroiditis releases stored hormone; methimazole blocks new hormone, which is not being made.',steps:['Painful subacute: NSAID; if severe, prednisone 40 mg/day for 1–2 weeks, then taper over 2–4 weeks','Expect a hypothyroid phase; recheck every 4–8 weeks'],chips:['itis'],tier:'ATA 2016'});
+  if(s.amio)out+=card({id:'hyper-ait',label:'Amiodarone-induced thyrotoxicosis',head:'Type 1 → methimazole · Type 2 → prednisone · Unsure → both',why:'type 1 is excess hormone made from amiodarone’s iodine; type 2 is destruction that leaks stored hormone.',steps:['Type 1: underlying nodules or Graves, Doppler flow increased, onset early','Type 2: normal gland, flow absent, uptake under 1%, onset often years in','Continue or stop amiodarone: a joint cardiology and endocrinology decision','Rapid cardiac deterioration: emergency thyroidectomy'],chips:['ait'],more:'<p>Type 2: prednisone 40 mg/day for 2–4 weeks, then taper over 2–3 months (ATA 2016). Mixed or unclear forms: methimazole, adding steroid from the start or after a few weeks without response.</p>',tier:'ETA 2018'});
+  if(s.ici)out+=card({label:'Checkpoint inhibitor',head:'Almost always thyroiditis: beta-blocker, usually continue the drug',steps:['Thyroid tests every 2–3 weeks to catch the hypothyroid phase','TRAb if eye signs or T3-predominant (rare Graves)','Over 6 weeks without resolving: endocrinology'],chips:['itis'],tier:'ASCO 2021 · consensus'});
+  if(on('af'))out+=card({label:'Atrial fibrillation',head:'Rate control with a beta-blocker; anticoagulate by stroke risk',why:'thyrotoxic AF often reverts once euthyroid, but stroke risk follows the usual score, not thyroid status.',body:'<div class="linkrow"><a href="/afib/">Open the AF tool</a></div>',tier:'ATA 2016; 2023 ACC/AHA AF'});
+  if(on('contrast'))out+=card({label:'Iodinated contrast',head:'Avoid if it can wait; otherwise consider methimazole cover',why:'iodine can fuel more hormone in Graves or nodular glands.',tier:'ATA 2016; ETA 2021'});
+  if(on('surg2'))out+=card({id:'hyper-periop',label:'Surgery',head:'Elective: make euthyroid first',steps:['Urgent: beta-blocker plus thionamide, then iodine and a steroid as for storm','Thyroidectomy for Graves: euthyroid on methimazole; potassium iodide for about 10 days before'],tier:'ATA 2016'});
+  if(!out)out='<div class="card"><p class="empty">Enter TSH and free T4 on the Labs tab, or tick what applies.</p></div>';
+  $('hyper-out').innerHTML=out;
+}
+
+/* ---------- Crisis ---------- */
+function bwps(){
+  var t=num('temp'),tf=t==null?null:($('tempu').value==='C'?t*9/5+32:t),hr=num('hr'),sc=0,parts=[];
+  function add(p,l){sc+=p;if(p)parts.push(l+' '+p)}
+  if(t!=null){var tp;if($('tempu').value==='C')tp=t>=40?30:t>=39.5?25:t>=38.9?20:t>=38.3?15:t>=37.8?10:t>=37.2?5:0;else tp=t>=104?30:t>=103?25:t>=102?20:t>=101?15:t>=100?10:t>=99?5:0;add(tp,'temperature')}
+  add(+$('cns').value,'mental status');add(+$('gi').value,'GI or liver');
+  if(hr!=null){var hp=hr>=140?25:hr>=130?20:hr>=120?15:hr>=110?10:hr>=90?5:0;add(hp,'heart rate')}
+  add(+$('hf').value,'heart failure');add(+$('afs').value,'AF');if(on('precip'))add(10,'precipitant');
+  return {sc:sc,parts:parts,any:tf!=null||hr!=null||parts.length>0};
+}
+function renderStorm(){
+  var b=bwps(),lowef=on('lowef'),lft=on('lft3'),out='';
+  var bandc=b.sc>=45?'hi':b.sc>=25?'mid':'lo',bandt=b.sc>=45?'Storm likely':b.sc>=25?'Impending: use judgment':'Storm unlikely';
+  out+=card({id:'storm-score',label:'Score',pre:'<div class="score"><span class="big">'+b.sc+'</span><span class="band '+bandc+'">'+bandt+'</span></div>',why:b.any&&b.parts.length?b.parts.join(' · ')+'.':'',body:b.any?'':'<p class="note">Fill in the findings. 45 or more suggests storm; 25–44 impending.</p>',more:'<p>Cut-offs: under 25 unlikely, 25–44 impending, 45 or more highly suggestive. The Japan Thyroid Association criteria are an alternative; the two scores disagree in some patients, and both support, not replace, clinical judgment.</p>',tier:'ATA 2016; Kopp 2026'});
+  if(b.sc>=25){
+    var bbT=lowef?'Esmolol 500 mcg/kg over 1 minute, then 50–100 mcg/kg/min, starting low':'Propranolol 60–80 mg by mouth every 4 hours';
+    var bbW=lowef?'with low EF, beta-blockade can tip into collapse; a short-acting infusion can be stopped within minutes.':'propranolol also slows conversion of T4 to T3 at high doses.';
+    var th=lft?'Methimazole 60–80 mg/day':'PTU 500–1000 mg load, then 250 mg every 4 hours';
+    out+=card({id:'storm-order',label:'Treat in this order',head:'ICU, then four drugs in sequence',guard:guard('Iodine waits for the thionamide','Give iodine at least 1 hour after the first thionamide dose. Iodine first can feed more hormone production.'),
+      body:'<ol class="order"><li><b>Beta-blocker</b>'+bbT+'<span class="when"> now · '+bbW+'</span></li><li><b>Thionamide</b>'+th+'<span class="when"> now · '+(lft?'liver tests about 3× normal: methimazole over PTU':'PTU also blocks T4-to-T3 conversion')+'</span></li><li><b>Iodine</b>SSKI 5 drops four times daily, or Lugol’s 8 drops four times daily<span class="when"> at least 1 hour after the thionamide · dilute in juice</span></li><li><b>Hydrocortisone</b>300 mg IV, then 100 mg every 8 hours<span class="when"> now · lowers conversion, covers relative adrenal insufficiency</span></li></ol>',
+      steps:['Cool, acetaminophen (paracetamol); avoid aspirin, which frees bound hormone','IV fluids, glucose, electrolytes; treat the trigger'],chips:['storm'],
+      more:'<p>IV propranolol 1–3 mg slowly (no faster than 1 mg/min), then 2–3 mg/hour. The Japanese guideline prefers beta-1-selective drugs (landiolol or esmolol IV, bisoprolol by mouth); a later cohort found similar mortality with propranolol. Beta-blocker impossible: diltiazem 60–90 mg every 6 hours (ETA 2026).</p><p>Hydrocortisone: ATA 2016 and Kopp 2026 use 300 mg then 100 mg every 8 hours; the 2026 ETA/BTA/SfE consensus uses 100 mg then 50 mg every 6 hours. Both are in use.</p><p>Iodine adds little when the storm comes from a destructive thyroiditis, amiodarone type 2 or thyroid hormone ingestion, where no new hormone is being made, and needs caution in amiodarone type 1, where the gland is already iodine-loaded (ETA 2026).</p><p>Refractory: cholestyramine 4 g three times daily, plasmapheresis, thyroidectomy, ECMO. No IV PTU or IV methimazole in the US. Potassium iodide tablets 65 mg three times daily are an iodine alternative.</p>',tier:'ATA 2016; Kopp 2026; ETA/BTA/SfE 2026'});
+  }
+  $('storm-out').innerHTML=out;
+}
+function renderMyx(){
+  var w=kg('mwt','mwtu'),old=on('mold'),cort=on('mcort'),out='';
+  var ld=old?'200 mcg':'200–400 mcg',dly=w!=null?Math.round(1.6*w*0.75):null;
+  out+=card({id:'myx-order',label:'Treat in this order',head:'ICU · steroid · IV thyroid hormone',
+    guard:cort?'':guard('Draw cortisol first','Draw a random cortisol, then give hydrocortisone before or with levothyroxine.'),
+    body:'<ol class="order"><li><b>Hydrocortisone</b>100 mg IV every 8 hours<span class="when"> until adrenal insufficiency is excluded</span></li><li><b>Levothyroxine IV load</b>'+ld+'<span class="when"> '+(old?'lower end: older, small or coronary disease':'lower end if older, small or coronary disease')+'</span></li><li><b>Levothyroxine IV daily</b>'+(dly!=null?dly+' mcg':'1.6 mcg/kg × 0.75')+'<span class="when"> 1.6 mcg/kg/day × 0.75 for IV'+(old?' · consider less':'')+'</span></li></ol>',
+    steps:['Passive rewarming; avoid hypotonic fluids','Treat low sodium and low glucose; low threshold to intubate','Look for the trigger: infection, sedatives, cold, stopped levothyroxine'],chips:['axis'],
+    more:'<p>Optional T3: 5–20 mcg IV load, then 2.5–10 mcg every 8 hours, lower in older or cardiac patients. A diagnostic score (Popoveniuc 2014) exists: 60 or more is highly suggestive, 45–59 at risk.</p>',tier:'ATA 2014'});
+  $('myx-out').innerHTML=out;
+}
+
+/* ---------- Nodule (ACR TI-RADS) ---------- */
+var TR=[
+ {k:'comp',t:'Composition',o:[['Cystic or almost completely cystic',0],['Spongiform',0],['Mixed cystic and solid',1],['Solid or almost completely solid',2],['Cannot tell (calcification)',2]]},
+ {k:'echo',t:'Echogenicity',o:[['Anechoic',0],['Hyper- or isoechoic',1],['Hypoechoic',2],['Very hypoechoic',3],['Cannot tell',1]]},
+ {k:'shape',t:'Shape',o:[['Wider than tall',0],['Taller than wide',3]]},
+ {k:'margin',t:'Margin',o:[['Smooth or ill-defined',0],['Lobulated or irregular',2],['Extends outside the thyroid',3]]},
+ {k:'foci',t:'Echogenic foci (add each)',multi:true,o:[['None or large comet-tail',0],['Macrocalcifications',1],['Peripheral rim',2],['Punctate echogenic foci',3]]}];
+var trsel={foci:{}};
+function renderTRrows(){
+  $('trrows').innerHTML=TR.map(function(g){return '<div class="tr-row"><p class="sub">'+g.t+'</p><div class="seg">'+g.o.map(function(o,i){var p=g.multi?!!trsel.foci[i]:trsel[g.k]===i;return '<button type="button" class="sbx" data-tr="'+g.k+'" data-i="'+i+'" aria-pressed="'+p+'">'+o[0]+' <span class="note">'+o[1]+'</span></button>'}).join('')+'</div></div>'}).join('');
+}
+function renderNodule(){
+  var s=labs(),cm=num('ncm'),pts=0,done=true,sponge=trsel.comp===1,out='';
+  TR.forEach(function(g){if(g.multi){Object.keys(trsel.foci).forEach(function(i){if(trsel.foci[i])pts+=g.o[i][1]})}else if(trsel[g.k]==null){if(!sponge)done=false}else pts+=g.o[trsel[g.k]][1]});
+  if(sponge)pts=0;
+  var lv=pts<=1?1:pts===2?2:pts===3?3:pts<=6?4:5;
+  var rule={1:null,2:null,3:[2.5,1.5],4:[1.5,1.0],5:[1.0,0.5]}[lv],act;
+  if(!rule)act='No FNA';else if(cm==null)act='Enter size';else if(cm>=rule[0])act='FNA';else if(cm>=rule[1])act='Follow with ultrasound';else act='No FNA or follow-up for size';
+  var fu={3:'1, 3 and 5 years',4:'1, 2, 3 and 5 years',5:'yearly for 5 years'}[lv];
+  if(s.T==='lo'||(s.tsh!=null&&s.tsh<REF.tlo))out+=card({label:'Low TSH',head:'Scan first: a hot nodule rarely needs FNA',guard:'',why:'an autonomous nodule that takes up iodine is almost never cancer.',tier:'ATA 2015'});
+  var lev='<div class="trlev">'+[1,2,3,4,5].map(function(n){return '<span class="'+(n===lv&&done?'on':'')+'">TR'+n+'</span>'}).join('')+'</div>';
+  out+=card({id:'nodule-result',label:'Result',pre:'<div class="score"><span class="big">'+(done?pts+' pts':'–')+'</span>'+(done?'<span class="band '+(lv>=4?'hi':lv===3?'mid':'lo')+'">TR'+lv+'</span>':'')+'</div>'+lev,
+    head:done?act+(rule&&act==='Follow with ultrasound'&&fu?' at '+fu:''):'Choose one option in each row',
+    why:done&&rule?'TR'+lv+' biopsies at '+rule[0]+' cm or more and follows at '+rule[1]+' cm or more.':(sponge?'spongiform nodules score 0 whatever the other features.':''),
+    steps:done&&rule?['FNA at '+rule[0]+' cm or larger','Ultrasound follow-up at '+rule[1]+' cm or larger: '+fu]:[],
+    more:'<p>Incidental nodule on CT or MRI: ultrasound if 1.0 cm or more under age 35, 1.5 cm or more at 35 or older, or any suspicious feature; focal uptake on PET always gets ultrasound (ACR 2015 white paper).</p><p>Cytology uses Bethesda categories I–VI: nondiagnostic (repeat), benign (follow), atypia (repeat or molecular testing), follicular neoplasm (molecular testing or lobectomy), suspicious and malignant (surgery). Risks of malignancy per category are in the 2023 Bethesda system.</p><p>A 1-point total is not addressed by ACR; this tool reads it as TR1 (tool rule). Anechoic applies only to cystic or almost completely cystic nodules.</p><p>The 2025 ATA thyroid cancer guideline no longer covers nodules; this tab will be re-audited when the ATA nodule guideline publishes.</p>',tier:'ACR TI-RADS 2017'});
+  $('nodule-out').innerHTML=out;
+}
+
+/* ---------- Figures (inline SVG, shared colours) ---------- */
+function arrowDefs(){return '<defs><marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--muted)"/></marker></defs>'}
+function segBtns(fig,opts,cur){return '<div class="seg" style="margin-top:10px">'+opts.map(function(o){return '<button type="button" class="sbx" data-fig="'+fig+'" data-st="'+o[0]+'" aria-pressed="'+(o[0]===cur)+'">'+o[1]+'</button>'}).join('')+'</div>'}
+var AX={
+ normal:{tsh:'n',h:'n',cap:'TRH from the hypothalamus drives TSH; TSH drives T4 and T3; free hormone feeds back to quiet both. Small, steady signals.'},
+ primary:{tsh:'u',h:'d',cap:'Primary hypothyroidism: the gland fails, feedback falls away, and TSH climbs. High TSH, low free T4.',x:'fail'},
+ central:{tsh:'d',h:'d',cap:'Central: the pituitary cannot make TSH, so both fall. TSH looks normal or low and is useless for dosing.',x:'pit'},
+ graves:{tsh:'d',h:'u',cap:'Graves: TRAb switches on the TSH receptor without TSH. Hormone floods out and feedback silences the pituitary.',x:'trab'},
+ nodule:{tsh:'d',h:'u',cap:'Toxic nodule: one region makes hormone on its own; the rest of the gland is suppressed with TSH.',x:'nod'},
+ itis:{tsh:'d',h:'u',cap:'Thyroiditis: damaged follicles leak stored hormone. No new hormone is made, so methimazole does not help.',x:'leak'},
+ exog:{tsh:'d',h:'u',cap:'Too much levothyroxine (or hidden ingestion): hormone arrives from outside; the gland and TSH go quiet; thyroglobulin is low.',x:'pill'},
+ nti:{tsh:'d',h:'d',cap:'Critical illness: TRH and TSH are turned down and T4 is shunted to reverse T3. It reverses with recovery.',x:'nti'},
+ tshoma:{tsh:'u',h:'u',cap:'TSH-secreting adenoma: the pituitary ignores feedback, so TSH and free T4 are both high. Rare; check the assay first.',x:'pit2'}};
+function figAxis(st){
+  var a=AX[st]||AX.normal,W={u:7,n:3.5,d:1.4},C={u:'var(--bad)',n:'var(--muted)',d:'var(--accent)'};
+  var tw=W[a.tsh],tc=C[a.tsh],hw=W[a.h],hc=C[a.h];
+  var g='<svg viewBox="0 0 340 240" role="img" aria-label="Hypothalamic pituitary thyroid loop: '+st+'">'+arrowDefs()+
+  '<rect x="30" y="10" width="130" height="38" rx="10" fill="var(--fill)" stroke="var(--line)"/><text x="95" y="34" text-anchor="middle" font-size="13" fill="var(--ink)">Hypothalamus</text>'+
+  '<rect x="30" y="82" width="130" height="38" rx="10" fill="var(--fill)" stroke="'+(a.x==='pit'||a.x==='pit2'?'var(--bad)':'var(--line)')+'"/><text x="95" y="106" text-anchor="middle" font-size="13" fill="var(--ink)">Pituitary</text>'+
+  '<rect x="30" y="156" width="130" height="44" rx="10" fill="var(--fill)" stroke="'+(a.x==='fail'?'var(--bad)':'var(--line)')+'"/><text x="95" y="183" text-anchor="middle" font-size="13" fill="var(--ink)">Thyroid</text>'+
+  '<line x1="95" y1="50" x2="95" y2="78" stroke="var(--muted)" stroke-width="'+(a.x==='nti'?1.4:3)+'" marker-end="url(#ah)"/><text x="104" y="68" font-size="11" fill="var(--muted)">TRH</text>'+
+  '<line x1="95" y1="122" x2="95" y2="152" stroke="'+tc+'" stroke-width="'+tw+'" marker-end="url(#ah)"/><text x="106" y="141" font-size="12" fill="'+tc+'">TSH</text>'+
+  '<path d="M162 178 H250 V36 H166" fill="none" stroke="'+hc+'" stroke-width="'+hw+'" stroke-linejoin="round" marker-end="url(#ah)"/>'+
+  '<line x1="250" y1="101" x2="166" y2="101" stroke="'+hc+'" stroke-width="'+Math.max(1.4,hw*0.6)+'" stroke-dasharray="4 3" marker-end="url(#ah)"/>'+
+  '<text x="258" y="130" font-size="12" fill="'+hc+'">free T4</text><text x="258" y="146" font-size="12" fill="'+hc+'">and T3</text><text x="200" y="94" text-anchor="middle" font-size="10.5" fill="var(--muted)">feedback −</text>';
+  if(a.x==='trab')g+='<circle cx="20" cy="178" r="14" fill="var(--badbg)" stroke="var(--bad)"/><text x="20" y="182" text-anchor="middle" font-size="10.5" fill="var(--bad)">TRAb</text>';
+  if(a.x==='nod')g+='<circle cx="140" cy="178" r="9" fill="var(--badbg)" stroke="var(--bad)"/>';
+  if(a.x==='leak')g+='<path d="M60 202 l-6 14 M80 202 l-2 16 M100 202 l2 14" stroke="var(--bad)" stroke-width="2" stroke-linecap="round"/><text x="120" y="222" font-size="10.5" fill="var(--bad)">leak</text>';
+  if(a.x==='pill')g+='<rect x="268" y="196" width="56" height="24" rx="12" fill="var(--badbg)" stroke="var(--bad)"/><text x="296" y="212" text-anchor="middle" font-size="10.5" fill="var(--bad)">pills</text><line x1="268" y1="200" x2="254" y2="182" stroke="var(--bad)" stroke-width="2" marker-end="url(#ah)"/>';
+  if(a.x==='pit')g+='<path d="M40 88 L150 116" stroke="var(--bad)" stroke-width="2"/>';
+  if(a.x==='fail')g+='<path d="M40 162 L150 196" stroke="var(--bad)" stroke-width="2"/>';
+  g+='</svg>';
+  return '<div class="fig" data-figwrap="axis">'+g+segBtns('axis',[['normal','Normal'],['primary','Primary hypo'],['central','Central'],['graves','Graves'],['nodule','Toxic nodule'],['itis','Thyroiditis'],['exog','Too much LT4'],['nti','Critical illness'],['tshoma','TSH adenoma']],st)+'<p class="figcap">'+a.cap+'</p><p class="figsrc">Physiology. Red: higher than normal · blue: lower.</p></div>';
+}
+function figCurve(st){
+  var f=parseFloat(st)||1.25,L=Math.log10,tsh=Math.max(0.005,Math.min(100,1.5*Math.pow(10,-1.6*(f-1.25))));
+  function X(v){return 50+(v-0.4)/(3.0-0.4)*270}function Y(t){return 20+(L(100)-L(t))/(L(100)-L(0.01))*170}
+  var path='';for(var v=0.4;v<=3.0001;v+=0.05){var t=Math.max(0.01,Math.min(100,1.5*Math.pow(10,-1.6*(v-1.25))));path+=(path?'L':'M')+X(v).toFixed(1)+' '+Y(t).toFixed(1)}
+  var g='<svg viewBox="0 0 340 230" role="img" aria-label="TSH falls ten-fold for small rises in free T4">'+
+   '<rect x="'+X(0.8)+'" y="20" width="'+(X(1.8)-X(0.8))+'" height="170" fill="var(--fill)"/><rect x="50" y="'+Y(4)+'" width="270" height="'+(Y(0.4)-Y(4))+'" fill="var(--fill)"/>'+
+   [100,10,1,0.1,0.01].map(function(t){return '<line x1="50" x2="320" y1="'+Y(t)+'" y2="'+Y(t)+'" stroke="var(--line)"/><text x="44" y="'+(Y(t)+4)+'" text-anchor="end" font-size="10.5" fill="var(--muted)">'+t+'</text>'}).join('')+
+   [0.5,1,1.5,2,2.5,3].map(function(v){return '<text x="'+X(v)+'" y="206" text-anchor="middle" font-size="10.5" fill="var(--muted)">'+v+'</text>'}).join('')+
+   '<text x="185" y="224" text-anchor="middle" font-size="10.5" fill="var(--muted)">free T4 (ng/dL)</text><text x="12" y="105" font-size="10.5" fill="var(--muted)" transform="rotate(-90 12 105)" text-anchor="middle">TSH, log scale</text>'+
+   '<path d="'+path+'" fill="none" stroke="var(--accent)" stroke-width="2.5"/><circle cx="'+X(f)+'" cy="'+Y(tsh)+'" r="6" fill="var(--accent)" stroke="var(--card)" stroke-width="2"/></svg>';
+  return '<div class="fig" data-figwrap="curve">'+g+'<div class="sl"><label class="sll" for="curve-sl"><span>free T4 '+f.toFixed(2)+'</span><span>TSH about '+(tsh<0.1?tsh.toFixed(3):tsh<10?tsh.toFixed(2):Math.round(tsh))+'</span></label><input type="range" id="curve-sl" data-figrange="curve" min="0.4" max="3" step="0.05" value="'+f+'"></div><p class="figcap">TSH changes on a log scale for straight-line changes in free T4: doubling free T4 is classically quoted as moving TSH about a hundred-fold. That is why TSH leaves its range first (subclinical disease) and why it is the best single screen when the pituitary is normal.</p><p class="figsrc">Illustrative curve; shaded bands are the reference ranges.</p><div class="dp">'+dpHtml([['What is happening',f<0.8?'<p>Free T4 is low. The pituitary senses it (after converting T4 to T3 inside its own cells) and releases far more TSH, which drives the gland to trap iodine and make hormone. If the gland cannot answer, TSH stays high: primary hypothyroidism.</p>':f>1.8?'<p>Free T4 is high. The pituitary shuts TSH release almost completely. A TSH this low with a high free T4 means the excess is not being driven by the pituitary: Graves disease, a toxic nodule, thyroiditis, or too much levothyroxine.</p>':'<p>Inside the reference range, yet TSH still moves several-fold across it. Each person runs at their own set point within the range, so a TSH outside its range with a normal free T4 means free T4 has moved away from that person\'s own normal.</p>'],['Why TSH is the first test','<p>The pituitary amplifies: a small change in free T4 becomes a large change in TSH. TSH therefore leaves its range before free T4 does, which is what "subclinical" means.</p>'],['When the curve does not hold','<p>The curve assumes a working pituitary and a steady state. It fails with pituitary or hypothalamic disease (TSH low or normal with a low free T4), during severe illness, in the weeks after a dose change or thyroiditis (TSH takes about six weeks to settle after a levothyroxine dose change, and can stay suppressed for longer after hyperthyroidism), and with assay interference such as biotin.</p>']])+'</div></div>';
+}
+var DEIO={none:{cap:'Most T3 is made outside the thyroid: D1 (liver, kidney) and D2 (brain, pituitary, muscle) remove one iodine from T4 to make active T3. D3 makes inactive reverse T3.',b:[]},
+ ptu:{cap:'PTU blocks D1 as well as hormone synthesis, which is why it is preferred in storm.',b:['d1']},
+ prop:{cap:'Propranolol at high doses slows D1 conversion modestly, on top of blocking the adrenergic effects.',b:['d1']},
+ steroid:{cap:'Glucocorticoids lower T4-to-T3 conversion, one reason they are given in storm.',b:['d1']},
+ amio:{cap:'Amiodarone blocks D1 and D2: T3 falls, reverse T3 rises, T4 drifts up, and the pituitary sees less T3, so TSH rises early on.',b:['d1','d2']},
+ ill:{cap:'In critical illness D1 falls and D3 rises: T3 drops and reverse T3 climbs. This is the low-T3 pattern of nonthyroidal illness, not a deficiency to replace.',b:['d1'],up:['d3']}};
+function figDeio(st){
+  var d=DEIO[st]||DEIO.none,blk=function(k){return d.b.indexOf(k)>=0},up=function(k){return (d.up||[]).indexOf(k)>=0};
+  function arr(x1,y1,x2,y2,k,lab,lx,ly){var c=blk(k)?'var(--bad)':up(k)?'var(--accent)':'var(--muted)';return '<line x1="'+x1+'" y1="'+y1+'" x2="'+x2+'" y2="'+y2+'" stroke="'+c+'" stroke-width="'+(up(k)?5:2.5)+'"'+(blk(k)?' stroke-dasharray="5 4"':'')+' marker-end="url(#ah)"/><text x="'+lx+'" y="'+ly+'" font-size="11" fill="'+c+'">'+lab+(blk(k)?' blocked':up(k)?' up':'')+'</text>'}
+  var g='<svg viewBox="0 0 340 200" role="img" aria-label="Deiodinase conversion of T4">'+arrowDefs()+
+   '<rect x="20" y="78" width="70" height="40" rx="10" fill="var(--fill)" stroke="var(--line)"/><text x="55" y="103" text-anchor="middle" font-size="14" fill="var(--ink)">T4</text>'+
+   '<rect x="240" y="20" width="84" height="40" rx="10" fill="var(--fill)" stroke="var(--accent)"/><text x="282" y="45" text-anchor="middle" font-size="14" fill="var(--ink)">T3 active</text>'+
+   '<rect x="240" y="138" width="84" height="40" rx="10" fill="var(--fill)" stroke="var(--line)"/><text x="282" y="163" text-anchor="middle" font-size="12.5" fill="var(--muted)">reverse T3</text>'+
+   arr(92,88,236,46,'d1','D1',120,52)+arr(92,98,236,58,'d2','D2',150,92)+arr(92,108,236,154,'d3','D3',130,150)+'</svg>';
+  return '<div class="fig" data-figwrap="deio">'+g+segBtns('deio',[['none','Normal'],['ptu','PTU'],['prop','Propranolol'],['steroid','Steroids'],['amio','Amiodarone'],['ill','Critical illness']],st)+'<p class="figcap">'+d.cap+'</p><p class="figsrc">Physiology; amiodarone: ETA 2018.</p></div>';
+}
+var ITC={subacute:'Subacute: painful, tender gland, high ESR, often after a viral illness. NSAID, or prednisone if severe (ATA 2016).',painless:'Painless: no pain; TPO antibodies often positive. Same phases, often milder.',postpartum:'Postpartum: starts 1–6 months after delivery. Beta-blocker in the thyrotoxic phase, no antithyroid drugs; levothyroxine in the hypothyroid phase if symptomatic, breastfeeding or planning pregnancy; recheck at 1 year (ATA 2026).',ici:'Checkpoint inhibitor: the thyrotoxic phase is brief; many patients stay hypothyroid and need levothyroxine long term. Check every 2–3 weeks (ASCO 2021).',ait2:'Amiodarone type 2: destructive; prednisone shortens it; some end hypothyroid (ETA 2018).'};
+function figItis(st){
+  var cap=ITC[st]||ITC.subacute;
+  var g='<svg viewBox="0 0 340 190" role="img" aria-label="Phases of thyroiditis over time">'+
+   '<rect x="40" y="70" width="290" height="40" fill="var(--fill)"/><text x="334" y="94" text-anchor="end" font-size="10.5" fill="var(--muted)">normal</text>'+
+   '<path d="M40 90 C60 90 70 20 100 22 C130 24 130 90 150 100 C170 130 190 150 220 148 C250 146 260 92 330 90" fill="none" stroke="var(--accent)" stroke-width="3"/>'+
+   '<text x="96" y="14" text-anchor="middle" font-size="11" fill="var(--bad)">thyrotoxic</text><text x="214" y="172" text-anchor="middle" font-size="11" fill="var(--accent)">hypothyroid</text><text x="300" y="62" text-anchor="middle" font-size="11" fill="var(--ok)">recovery</text>'+
+   '<text x="40" y="186" font-size="10.5" fill="var(--muted)">weeks</text><text x="330" y="186" text-anchor="end" font-size="10.5" fill="var(--muted)">months</text></svg>';
+  return '<div class="fig" data-figwrap="itis">'+g+segBtns('itis',[['subacute','Subacute'],['painless','Painless'],['postpartum','Postpartum'],['ici','Checkpoint inhibitor'],['ait2','Amiodarone type 2']],st)+'<p class="figcap">Stored hormone leaks out, then the emptied gland underproduces until it heals. '+cap+'</p><p class="figsrc">Shape is schematic; timing varies.</p></div>';
+}
+function figLt4(st){
+  var stop=st==='stop',pts='';
+  for(var d=0;d<=56;d+=1){var v=stop?Math.pow(0.5,d/7):1-Math.pow(0.5,d/7);var x=40+d/56*280,y=170-v*140;pts+=(pts?'L':'M')+x.toFixed(1)+' '+y.toFixed(1)}
+  var mk=stop?7:42,mv=stop?0.5:1-Math.pow(0.5,6),mx=40+mk/56*280,my=170-mv*140;
+  var g='<svg viewBox="0 0 340 200" role="img" aria-label="Levothyroxine level over time">'+
+   '<line x1="40" y1="30" x2="320" y2="30" stroke="var(--line)" stroke-dasharray="4 3"/><text x="44" y="24" font-size="10.5" fill="var(--muted)">steady state</text>'+
+   [0,7,14,21,28,35,42,49,56].map(function(d){return d===56?'<text x="332" y="188" text-anchor="end" font-size="10.5" fill="var(--muted)">8 wk</text>':'<text x="'+(40+d/56*280)+'" y="188" text-anchor="middle" font-size="10.5" fill="var(--muted)">'+(d/7)+'</text>'}).join('')+
+   '<path d="'+pts+'" fill="none" stroke="var(--accent)" stroke-width="3"/><circle cx="'+mx+'" cy="'+my+'" r="6" fill="var(--accent)" stroke="var(--card)" stroke-width="2"/></svg>';
+  return '<div class="fig" data-figwrap="lt4">'+g+segBtns('lt4',[['start','Start or change'],['stop','Stop (NPO)']],stop?'stop':'start')+'<p class="figcap">'+(stop?'With a half-life of about 7 days, levels fall by half in a week, so a few missed days while NPO change little.':'With a half-life of about 7 days, a new dose takes about 6 weeks (five to six half-lives) to settle. Checking TSH sooner reads a moving target.')+'</p><p class="figsrc">Pharmacology; half-life about 7 days (ATA 2014).</p></div>';
+}
+function figPreg(){
+  var hc='',ts='';for(var w=0;w<=40;w++){var h=Math.exp(-Math.pow((w-10)/4.5,2));var hv=w<10?h:0.25+0.75*h;var x=40+w/40*280;hc+=(hc?'L':'M')+x.toFixed(1)+' '+(160-hv*120).toFixed(1);ts+=(ts?'L':'M')+x.toFixed(1)+' '+(70+hv*70).toFixed(1)}
+  var g='<svg viewBox="0 0 340 196" role="img" aria-label="hCG peaks near week 10 while TSH dips">'+
+   '<path d="'+hc+'" fill="none" stroke="var(--bad)" stroke-width="3"/><path d="'+ts+'" fill="none" stroke="var(--accent)" stroke-width="3"/>'+
+   '<text x="110" y="34" font-size="11" fill="var(--bad)">hCG</text><text x="300" y="72" font-size="11" fill="var(--accent)">TSH</text>'+
+   [0,10,20,30,40].map(function(w){return w===40?'<text x="332" y="184" text-anchor="end" font-size="10.5" fill="var(--muted)">40 wk</text>':'<text x="'+(40+w/40*280)+'" y="184" text-anchor="middle" font-size="10.5" fill="var(--muted)">'+w+'</text>'}).join('')+'</svg>';
+  return '<div class="fig">'+g+'<p class="figcap">hCG looks enough like TSH to stimulate the TSH receptor. Near its first-trimester peak, TSH dips and free T4 can rise: gestational transient thyrotoxicosis. It is not treated with antithyroid drugs; propranolol for palpitations (ATA 2026).</p><p class="figsrc">Schematic shapes, no units.</p></div>';
+}
+function figAit(){
+  var rows=[['What happens','Excess hormone made from amiodarone’s iodine','Destruction leaks stored hormone'],['Gland before','Nodules or latent Graves','Usually normal'],['Doppler flow','Increased','Absent or reduced'],['Uptake','Low, normal or high','Low, under 1%'],['Onset','Early (median about 3 months)','Late (median about 30 months)'],['First treatment','Methimazole','Prednisone'],['Afterwards','Usually definitive treatment','Often nothing; may end hypothyroid']];
+  return '<div class="fig"><div class="tw"><table><thead><tr><th></th><th>Type 1</th><th>Type 2</th></tr></thead><tbody>'+rows.map(function(r){return '<tr><td><b>'+r[0]+'</b></td><td>'+r[1]+'</td><td>'+r[2]+'</td></tr>'}).join('')+'</tbody></table></div><p class="figcap">Many patients do not fit cleanly; mixed or unclear forms get methimazole, with a steroid added from the start or after a few weeks.</p><p class="figsrc">ETA 2018 (Bartalena), Table adapted in Br Med J Case Rep 2021.</p></div>';
+}
+function figStorm(st){
+  var early=st==='iodfirst';
+  var g='<svg viewBox="0 0 340 200" role="img" aria-label="Where each storm drug acts">'+arrowDefs()+
+   '<rect x="20" y="20" width="140" height="150" rx="14" fill="var(--fill)" stroke="var(--line)"/><text x="90" y="40" text-anchor="middle" font-size="12" fill="var(--ink)">Thyroid</text>'+
+   '<text x="90" y="70" text-anchor="middle" font-size="11" fill="var(--muted)">iodine → new hormone</text><text x="90" y="86" text-anchor="middle" font-size="11" fill="'+(early?'var(--bad)':'var(--accent)')+'">'+(early?'more fuel, no block':'blocked: thionamide')+'</text>'+
+   '<text x="90" y="124" text-anchor="middle" font-size="11" fill="var(--muted)">stored hormone → blood</text><text x="90" y="140" text-anchor="middle" font-size="11" fill="var(--accent)">blocked: iodine</text>'+
+   '<line x1="162" y1="96" x2="210" y2="96" stroke="var(--muted)" stroke-width="2.5" marker-end="url(#ah)"/>'+
+   '<rect x="214" y="70" width="110" height="52" rx="12" fill="var(--fill)" stroke="var(--line)"/><text x="269" y="87" text-anchor="middle" font-size="11" fill="var(--ink)">T4 → T3</text><text x="269" y="102" text-anchor="middle" font-size="10.5" fill="var(--accent)">PTU, steroid,</text><text x="269" y="115" text-anchor="middle" font-size="10.5" fill="var(--accent)">propranolol</text>'+
+   '<text x="269" y="150" text-anchor="middle" font-size="11" fill="var(--ink)">Heart, brain, fever</text><text x="269" y="166" text-anchor="middle" font-size="10.5" fill="var(--accent)">beta-blocker</text></svg>';
+  return '<div class="fig" data-figwrap="storm">'+g+segBtns('storm',[['right','Thionamide, then iodine'],['iodfirst','Iodine first']],early?'iodfirst':'right')+'<p class="figcap">'+(early?'Iodine given before synthesis is blocked becomes raw material for more hormone. That is why it waits at least an hour.':'Each drug closes a different door: new synthesis, release of stored hormone, conversion to T3, and the effect on tissues.')+'</p><p class="figsrc">ATA 2016; Kopp 2026.</p></div>';
+}
+var FIG={axis:{title:'Pituitary–thyroid loop',f:figAxis,d:'normal'},curve:{title:'Why TSH moves so much',f:figCurve,d:'1.25'},deio:{title:'T4 to T3 conversion',f:figDeio,d:'none'},itis:{title:'Thyroiditis phases',f:figItis,d:'subacute'},lt4:{title:'Levothyroxine timing',f:figLt4,d:'start'},preg:{title:'hCG and TSH in pregnancy',f:figPreg,d:''},ait:{title:'Amiodarone type 1 vs 2',f:figAit,d:''},storm:{title:'Where storm drugs act',f:figStorm,d:'right'}};
+
+/* ---------- Learn ---------- */
+var LEARN=[['l-loop','The loop','One feedback loop explains almost every pattern. Pick a disease and watch which arrows change.','axis'],
+ ['l-curve','Why TSH moves so much','Drag free T4 and watch TSH swing across a log scale.','curve'],
+ ['l-deio','T4 is mostly a prohormone','Most active T3 is made in tissues. Several drugs and illness change that step.','deio'],
+ ['l-itis','Thyroiditis comes in phases','Leak, then empty, then heal. That is why antithyroid drugs do nothing for it.','itis'],
+ ['l-lt4','Levothyroxine is slow','The 7-day half-life sets the 6-week recheck and lets NPO patients wait.','lt4'],
+ ['l-preg','Pregnancy borrows the TSH receptor','hCG explains a low TSH in the first trimester.','preg'],
+ ['l-amio','Amiodarone makes two diseases','Iodine-fuelled excess, or destruction. The treatments are opposite.','ait'],
+ ['l-storm','Storm drugs, one door each','Tap “Iodine first” to see why the order matters.','storm']];
+var TRIALS=[
+ {n:'TRUST',c:'Stott et al, N Engl J Med 2017;376:2534. doi:10.1056/NEJMoa1603825',q:'Does levothyroxine help older adults with subclinical hypothyroidism?',d:'Randomized, double-blind; 737 adults 65 or older with persistent TSH 4.6–19.9.',r:'No difference in hypothyroid symptom or tiredness scores at 1 year.',ch:'Supports not treating mild TSH rises in older adults.'},
+ {n:'Casey (MFMU)',c:'Casey et al, N Engl J Med 2017;376:815. doi:10.1056/NEJMoa1606205',q:'Does treating mild thyroid disease in pregnancy help the child?',d:'Randomized; 677 women with subclinical hypothyroidism and 526 with hypothyroxinemia, treatment started around 17–18 weeks.',r:'No difference in child IQ at 5 years.',ch:'Part of why ATA 2026 advises against starting levothyroxine after the first trimester.'},
+ {n:'TABLET',c:'Dhillon-Smith et al, N Engl J Med 2019;380:1316. doi:10.1056/NEJMoa1812537',q:'Does levothyroxine improve live birth in euthyroid women with TPO antibodies?',d:'Randomized, placebo-controlled; 952 women with prior miscarriage or infertility.',r:'Live birth 37.4% with levothyroxine vs 37.9% with placebo.',ch:'TPO antibodies alone no longer decide treatment (ATA 2026).'}];
+function renderLearn(){
+  var h=LEARN.map(function(l){return '<h2 class="lh" id="'+l[0]+'">'+l[1]+'</h2><p class="lead">'+l[2]+'</p><div class="card" data-host="'+l[3]+'">'+FIG[l[3]].f(FIG[l[3]].d)+'</div>'}).join('');
+  h+='<h2 class="lh" id="l-trials">Trials that changed practice</h2><div class="card">'+TRIALS.map(function(t){return '<div class="trial"><p><b>'+t.n+'</b></p><p><span class="k">Question</span>'+t.q+'</p><p><span class="k">Design</span>'+t.d+'</p><p><span class="k">Result</span>'+t.r+'</p><p><span class="k">What it changed</span>'+t.ch+'</p><p class="note">'+t.c+'</p></div>'}).join('')+'</div>';
+  $('learn').innerHTML=h;
+}
+
+/* ---------- Practice (runs through classify) ---------- */
+var CASES=[
+ {t:'Septic shock, day 3',s:'68-year-old in the ICU on norepinephrine. TSH 0.15, free T4 0.6.',set:{tsh:0.15,ft4:0.6,icu:1},q:'Best next step?',o:['Start levothyroxine','Recheck after recovery','Pituitary MRI today','Start methimazole'],a:1,e:'Low TSH with low free T4 in the ICU is nonthyroidal illness until recovery proves otherwise.'},
+ {t:'Amiodarone for 3 years',s:'70-year-old with worsening AF. TSH under 0.01, free T4 3.4, TRAb negative, no Doppler flow, uptake under 1%.',set:{tsh:0.005,ft4:3.4,amio:1},q:'First treatment?',o:['Methimazole','Prednisone','Radioiodine','Stop amiodarone and wait'],a:1,e:'Normal gland, absent flow and very low uptake point to type 2, a destructive thyroiditis treated with glucocorticoid (ETA 2018).'},
+ {t:'Pembrolizumab, cycle 3',s:'55-year-old with mild palpitations. TSH 0.05, free T4 2.2.',set:{tsh:0.05,ft4:2.2,ici:1},q:'Plan?',o:['Methimazole and hold the drug','Beta-blocker, continue the drug, recheck in 2–3 weeks','Radioiodine','Prednisone 1 mg/kg'],a:1,e:'Checkpoint-inhibitor thyrotoxicosis is almost always thyroiditis; watch for the hypothyroid phase (ASCO 2021).'},
+ {t:'New Graves disease',s:'32-year-old, not pregnant. TSH under 0.01, free T4 4.1, TRAb positive.',set:{tsh:0.005,ft4:4.1},q:'Methimazole starting dose?',o:['5–10 mg daily','10–20 mg daily','30–40 mg daily','PTU instead'],a:2,e:'Free T4 is 2.3× the upper limit: 30–40 mg daily (ATA 2016).'},
+ {t:'Tired at 78',s:'78-year-old with TSH 7.2 and free T4 1.1 on one check.',set:{tsh:7.2,ft4:1.1},age:78,q:'Plan?',o:['Start 1.6 mcg/kg','Start 25 mcg','Repeat in 2–3 months; usually no treatment if it stays under 10','Check reverse T3'],a:2,e:'Many mild rises are normal on repeat, and TRUST found no symptom benefit in adults 65 or older.'},
+ {t:'Found confused and cold',s:'74-year-old, temperature 34.2 °C, sodium 124, TSH 68, free T4 0.2.',set:{tsh:68,ft4:0.2,adm:1},q:'Which comes first?',o:['Oral levothyroxine 25 mcg','Hydrocortisone after drawing cortisol, then IV levothyroxine','IV T3 alone','Warming blanket and wait for endocrinology'],a:1,e:'Myxedema coma: steroid cover before or with IV levothyroxine, because adrenal insufficiency may coexist (ATA 2014).'},
+ {t:'Fever, delirium, AF at 150',s:'Graves patient who stopped methimazole; temperature 103.5 °F, delirious, vomiting, AF 150, pedal edema. Score 25+20+10+25+5+10+10 = 105.',set:{tsh:0.005,ft4:5.0,icu:1},q:'What must wait at least an hour after the thionamide?',o:['Propranolol','Hydrocortisone','Iodine','Acetaminophen'],a:2,e:'Iodine before synthesis is blocked can fuel more hormone.'},
+ {t:'Positive pregnancy test',s:'29-year-old on levothyroxine 100 mcg with TSH 1.8 before pregnancy; test positive today.',set:{tsh:1.8,ft4:1.2,preg:1,onlt4:1},dose:100,q:'What now?',o:['No change until the first visit','Increase about 25%, to about 125 mcg; TSH in about 2 weeks','Add two extra tablets a week and recheck at 20 weeks','Switch to desiccated thyroid'],a:1,e:'ATA 2026: increase about 25% on a positive test; TSH about 2 weeks later; target 0.5–2.5.'}];
+var ci=0,picked2=null;
+function renderPractice(){
+  var c=CASES[ci];
+  var h='<div class="fdots">'+CASES.map(function(_,i){return '<span class="fd'+(i<=ci?' on':'')+'"></span>'}).join('')+'</div><div class="card case" id="practice-case"><p class="label">Case '+(ci+1)+' of '+CASES.length+'</p><h2>'+c.t+'</h2><p>'+c.s+'</p><p class="head" style="font-size:16px">'+c.q+'</p><div class="popts">'+
+   c.o.map(function(o,i){var cls=picked2==null?'':(i===c.a?' right':i===picked2?' wrong':'');return '<button type="button" class="popt'+cls+'" data-opt="'+i+'"'+(picked2!=null?' disabled':'')+'>'+o+'</button>'}).join('')+'</div>';
+  if(picked2!=null){
+    var s={tsh:c.set.tsh,ft4:c.set.ft4,t3:null,adm:!!c.set.adm,icu:!!c.set.icu,preg:!!c.set.preg,onlt4:!!c.set.onlt4,amio:!!c.set.amio,ici:!!c.set.ici,biotin:false,hep:false,steroid:false,rxhyper:false,age:c.age||null};
+    var r=classify(s);
+    h+='<div class="ansb"><p><b>'+(picked2===c.a?'Right.':'Not quite.')+'</b> '+c.e+'</p><p class="note">Tool reads these labs as: '+r.head+'.</p><div class="row"><button type="button" class="btn ghost" id="pload">Load into the tool</button>'+(ci<CASES.length-1?'<button type="button" class="btn" id="pnext">Next case</button>':'<button type="button" class="btn" id="pagain">Start over</button>')+'</div></div>';
+  }
+  $('practice').innerHTML=h+'</div>';
+}
+function loadCase(c){
+  ['adm','icu','preg','onlt4','amio','ici','biotin','hep','steroid','rxhyper'].forEach(function(k){$(k).checked=!!c.set[k]});
+  $('tsh').value=c.set.tsh;$('ft4').value=c.set.ft4;$('t3').value='';
+  if(c.age)$('age').value=c.age;if(c.dose)$('dose').value=c.dose;
+  all();showTab('labs');
+}
+
+/* ---------- sheet ---------- */
+var lastFocus=null;
+function openSheet(id){var F=FIG[id];lastFocus=document.activeElement;$('sheet-t').textContent=F.title;$('sheet-b').innerHTML='<div data-host="'+id+'">'+F.f(F.d)+'</div>';$('sheet').hidden=false;$('scrim').hidden=false;$('sheet-x').focus()}
+function closeSheet(){$('sheet').hidden=true;$('scrim').hidden=true;if(lastFocus)try{lastFocus.focus()}catch(e){}}
+
+/* ---------- tabs and wiring ---------- */
+function showTab(k){document.querySelectorAll('.tab').forEach(function(t){var sel=t.id==='t-'+k;t.setAttribute('aria-selected',sel)});document.querySelectorAll('.panel').forEach(function(p){p.classList.toggle('on',p.id==='p-'+k)});window.scrollTo(0,0)}
+function all(){renderLabs();renderHypo();renderHyper();renderStorm();renderMyx();renderNodule()}
+document.addEventListener('input',function(e){var t=e.target;if(t.dataset&&t.dataset.figrange){var host=t.closest('[data-host]');host.innerHTML=FIG[t.dataset.figrange].f(t.value);var n=host.querySelector('input[type=range]');if(n)n.focus();return}if(t.closest('.panel')&&!t.closest('#p-learn'))all()});
+document.addEventListener('change',function(e){if(e.target.closest('.panel'))all()});
+document.addEventListener('click',function(e){
+  var b=e.target.closest('button,a');if(!b)return;
+  if(b.classList.contains('tab')){showTab(b.id.slice(2));return}
+  if(b.dataset.go){showTab(b.dataset.go);return}
+  if(b.dataset.open){openSheet(b.dataset.open);return}
+  if(b.dataset.fig){var host=b.closest('[data-host]');if(host){host.innerHTML=FIG[b.dataset.fig].f(b.dataset.st);var nb=host.querySelector('[data-st="'+b.dataset.st+'"]');if(nb)nb.focus()}return}
+  if(b.dataset.cell){var ij=b.dataset.cell.split(',');$('mapnote').textContent=CELL[ij[0]][ij[1]]+': '+CELLWHY[ij[0]][ij[1]];return}
+  if(b.dataset.res){picked[b.dataset.res]=!picked[b.dataset.res];if(b.dataset.res==='trabp'&&picked.trabp)picked.trabn=false;if(b.dataset.res==='trabn'&&picked.trabn)picked.trabp=false;
+    if(/^raiu/.test(b.dataset.res)&&picked[b.dataset.res])['raiud','raiuf','raiul'].forEach(function(k){if(k!==b.dataset.res)picked[k]=false});renderHyper();var nb2=document.querySelector('[data-res="'+b.dataset.res+'"]');if(nb2)nb2.focus();return}
+  if(b.dataset.cx){document.querySelectorAll('[data-cx]').forEach(function(x){x.setAttribute('aria-pressed',x===b)});$('storm').hidden=b.dataset.cx!=='storm';$('myx').hidden=b.dataset.cx!=='myx';return}
+  if(b.dataset.tr){var g=b.dataset.tr,i=+b.dataset.i;if(g==='foci'){if(i===0)trsel.foci={0:!trsel.foci[0]};else{trsel.foci[0]=false;trsel.foci[i]=!trsel.foci[i]}}else trsel[g]=i;renderTRrows();renderNodule();var nb3=document.querySelector('[data-tr="'+g+'"][data-i="'+i+'"]');if(nb3)nb3.focus();return}
+  if(b.dataset.opt){picked2=+b.dataset.opt;renderPractice();return}
+  if(b.id==='pnext'){ci++;picked2=null;renderPractice();$('practice-case').scrollIntoView();return}
+  if(b.id==='pagain'){ci=0;picked2=null;renderPractice();return}
+  if(b.id==='pload'){loadCase(CASES[ci]);return}
+  if(b.id==='sheet-x'){closeSheet();return}
+});
+$('scrim').addEventListener('click',closeSheet);
+document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!$('sheet').hidden)closeSheet()});
+renderTRrows();renderLearn();renderPractice();all();
+})();
+
+</script>
+<script id="deeper-data">
+/* Go deeper: mechanism, rationale and the common trap for each Learn chapter. Text only; no doses or thresholds beyond the tool's own. */
+(function(){ var D = {"l-loop": [["Mechanism", "The hypothalamus releases TRH, the pituitary releases TSH, and the thyroid makes mostly T4 with a little T3. The free hormone feeds back on both. To make hormone the gland traps iodide from the blood and attaches it to thyroglobulin, the step that thyroid peroxidase performs."], ["Why it matters", "Read the TSH first: it reports what the pituitary makes of the hormone level. TSH and free T4 moving in opposite directions means the thyroid is the problem. Both moving the same way means the pituitary is the problem, the patient is acutely ill, or the assay is being interfered with."], ["Common trap", "In pituitary disease the TSH can be low, normal or slightly high while being biologically weak. It cannot be used to diagnose or to adjust treatment there; the free T4 is the guide."]], "l-deio": [["Mechanism", "T4 lasts about a week in the blood and acts as a reservoir. Tissues convert it to active T3 as they need it. In illness and starvation the conversion shifts toward inactive reverse T3: T3 falls first, T4 later in severe illness, and the TSH can be low, normal or briefly high."], ["Why it matters", "This is the usual explanation for odd thyroid tests in a sick inpatient. Unless thyroid disease is strongly suspected, interpret them cautiously and repeat after recovery. The same conversion step is blocked on purpose in thyroid storm, by propylthiouracil, propranolol and glucocorticoids."], ["Common trap", "During recovery from illness the TSH can overshoot above the range for a few weeks. It looks like new hypothyroidism and usually is not."]], "l-itis": [["Mechanism", "In thyroiditis the damaged gland leaks its stored hormone, so the patient is thyrotoxic while the gland is making nothing new: iodine uptake is low. When the store is spent the patient becomes hypothyroid, and then the gland usually recovers."], ["Why it matters", "With no synthesis to block, antithyroid drugs have nothing to act on. Treatment in the toxic phase is a beta-blocker for symptoms. A low uptake and the absence of TSH-receptor antibodies separate it from Graves disease."], ["Common trap", "Assuming the hypothyroid phase is permanent and committing the patient to lifelong treatment without rechecking. Some do stay hypothyroid, so follow-up is what decides."]], "l-lt4": [["Mechanism", "A drug reaches steady state after about five half-lives. With a half-life of about a week, levothyroxine takes five to six weeks, and the pituitary takes that long to settle on a new TSH."], ["Why it matters", "So the TSH is rechecked about six weeks after any change, not sooner (pregnancy is the exception, with more frequent checks). A missed dose can simply be taken later, and a patient who is unable to take tablets for a few days comes to no harm."], ["Common trap", "Absorption is easily disturbed. Calcium, iron, acid-suppressing drugs, food and coffee reduce it, and estrogen and pregnancy raise the requirement. A rising TSH on a stable dose is usually missed doses or one of these before it is a failing gland."]], "l-preg": [["Mechanism", "hCG is built on the same frame as TSH and weakly stimulates the TSH receptor. As it peaks late in the first trimester, free T4 edges up and TSH falls. Estrogen also raises thyroid-binding globulin, so total T4 rises while the free hormone is what matters."], ["Why it matters", "A low TSH in early pregnancy is usually this physiology. It is mostly silent, the more marked cases come with severe vomiting, and it needs no antithyroid drug. Graves disease is separated from it by a goiter, eye signs and TSH-receptor antibodies."], ["Common trap", "A woman already on levothyroxine needs more from early in pregnancy, because her gland cannot answer the extra demand. The dose is adjusted as soon as pregnancy is known, not at the first routine visit."]], "l-amio": [["Mechanism", "Amiodarone is more than a third iodine by weight, resembles thyroid hormone, and stays in the body for months. It causes thyrotoxicosis in two ways: the iodine load fuels excess synthesis in a gland that was already abnormal (type 1), or the drug directly inflames and destroys a normal gland, which leaks hormone (type 2). It can also cause hypothyroidism, most often in a gland with autoimmune disease."], ["Why it matters", "The two forms need opposite treatment: antithyroid drugs for type 1, glucocorticoids for type 2. Mixed forms occur. The drug also blocks conversion of T4 to T3, so a high T4 with a normal T3 and a normal TSH can be an expected effect, not disease."], ["Common trap", "Stopping amiodarone does not help quickly, because the stores last for months, and it may not be safe for the arrhythmia it is treating. That decision is made together with cardiology."]], "l-storm": [["Mechanism", "Each storm drug closes a different door. A thionamide stops new hormone being made. Iodine stops release of what is stored. A beta-blocker blunts the adrenergic effects. Glucocorticoids reduce conversion of T4 to T3 and cover an adrenal reserve that may be inadequate. A bile-acid binder interrupts the recycling of hormone through the gut."], ["Why it matters", "The order matters. Iodine given before the thionamide has taken effect becomes raw material for more hormone, so the thionamide goes first."], ["Common trap", "A thyrotoxic heart can be failing with a low output and depending on its fast rate. A beta-blocker can then cause collapse: use a short-acting one with care. Avoid aspirin for the fever, because it displaces hormone from its binding proteins."]]};
+  function add(){ Object.keys(D).forEach(function(id){ var c = document.getElementById(id); if (!c || c.querySelector(":scope > .deeper")) return; var host = c.matches(".card,.lsec,section,.chap") ? c : null; if (!host){ var n = c.nextElementSibling; while (n && !n.matches(".card")) n = n.nextElementSibling; host = n; } if (!host || host.querySelector(":scope > .deeper")) return; var d = document.createElement("details"); d.className = "deeper"; d.innerHTML = "<summary>Go deeper: mechanism and rationale</summary><div class=\"dpx\">" + D[id].map(function(r){ return "<div><span class=\"dl\">" + r[0] + "</span><p>" + r[1] + "</p></div>"; }).join("") + "</div>"; var last = host.querySelector(":scope > .row"); if (last) host.insertBefore(d, last); else host.appendChild(d); }); }
+  add(); document.addEventListener("click", function(){ setTimeout(add, 0); }); document.addEventListener("input", function(){ setTimeout(add, 0); });
+})();
+</script>
+</body>
+</html>

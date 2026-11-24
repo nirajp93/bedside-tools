@@ -1,0 +1,1259 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Diabetes in clinic · bedside.tools</title>
+<meta name="description" content="Type 2 and type 1 diabetes in clinic: screening and diagnosis, drug choice by heart, kidney and liver, starting and adjusting insulin, and the yearly visit.">
+<meta name="theme-color" content="#FBFBFA">
+<script src="/theme.js"></script>
+<style>
+:root{--bg:#FBFBFA;--card:#FFFFFF;--ink:#111113;--muted:#55555D;--line:#ECECEE;--accent:#2B4BDB;--warn:#9A3B00;--warnbg:#FFF6EC}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5}
+.mono{font-family:var(--mono)}
+.wrap{max-width:720px;margin:0 auto;padding:20px 16px 48px}
+a{color:var(--accent)}
+.back{font-size:14px;text-decoration:none;display:inline-block;min-height:44px;line-height:44px}
+h1{font-size:26px;margin:4px 0 4px;letter-spacing:-.01em}
+.purpose{color:var(--muted);margin:0 0 16px}
+.tabs{display:flex;gap:6px;margin:0 -16px 16px;padding:0 16px 4px;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:1 0 auto;min-height:44px;border:1px solid var(--line);background:var(--card);border-radius:14px;padding:0 12px;font:inherit;font-size:14px;font-weight:600;color:var(--muted);cursor:pointer}
+.tab[aria-selected="true"]{border-color:var(--accent);color:var(--accent)}
+.panel{display:none}.panel.on{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
+.label{font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+.bar{display:flex;flex-wrap:wrap;align-items:center;gap:4px 14px;background:var(--fill);border-radius:12px;padding:8px 8px 8px 12px;margin-bottom:14px;font-family:var(--mono);font-size:13px}
+.bar b{font-weight:600}
+.bar .ex{color:var(--muted);font-family:var(--sans);font-size:12.5px}
+.bar .edit{margin-left:auto;min-height:44px;border:0;background:transparent;color:var(--accent);font:inherit;font-family:var(--sans);font-weight:600;font-size:14px;cursor:pointer;padding:0 8px}
+.inputs{display:none}.inputs.on{display:block}
+.grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.grid.g2{grid-template-columns:1fr 1fr}
+.field{display:flex;flex-direction:column;justify-content:flex-end;min-width:0}
+.field label{display:block;font-size:13px;color:var(--muted);margin-bottom:4px}
+.field input,.field select{width:100%;min-height:44px;border:1px solid var(--line);border-radius:10px;padding:8px 10px;font:inherit;font-size:15px;background:var(--card);color:var(--ink)}
+.field input{font-family:var(--mono)}
+.field input:focus,.field select:focus,.tab:focus-visible,.chk:focus-within,button:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.grp{font-size:13px;color:var(--muted);margin:14px 0 6px}
+.checks{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.chk{display:flex;align-items:center;gap:10px;min-height:44px;border:1px solid var(--line);border-radius:10px;padding:6px 10px;font-size:14px;cursor:pointer;min-width:0}
+.chk input{width:20px;height:20px;accent-color:var(--accent);flex:none}
+.row{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.btn{min-height:44px;border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);border-radius:10px;padding:8px 14px;font:inherit;font-weight:600;cursor:pointer}
+.btn.ghost{background:var(--card);color:var(--accent)}
+.next{border:1.5px solid var(--accent)}
+.next>.label{color:var(--accent)}
+.head{font-family:var(--mono);font-size:17px;font-weight:600;margin:4px 0 4px;overflow-wrap:anywhere}
+.head.bad{color:var(--bad)}.head.okc{color:var(--ok)}
+.sub{font-size:14.5px;color:var(--muted);margin:0}
+.dose{font-family:var(--mono);font-size:14px;margin:8px 0 0}
+.dose div{margin-bottom:2px}
+.card ul{margin:6px 0 0;padding-left:20px}
+.card li{margin-bottom:4px}
+.guard{border-left:3px solid var(--warn);background:var(--warnbg);padding:8px 10px;border-radius:0 10px 10px 0;margin-top:10px;font-size:14.5px}
+.guard.bad{border-left-color:var(--bad);background:var(--badbg)}
+.tier{display:inline-block;font-family:var(--mono);font-size:11px;border:1px solid var(--line);border-radius:999px;padding:2px 8px;color:var(--muted);margin:6px 6px 0 0}
+.whyline{margin:10px 0 0;font-size:14.5px;color:var(--muted)}
+.whyline b{color:var(--ink);font-weight:600}
+details{margin-top:10px;border-top:1px solid var(--line);padding-top:4px}
+summary{cursor:pointer;color:var(--accent);font-weight:600;min-height:44px;line-height:44px}
+details p{margin:0 0 8px;font-size:15px}
+details li{font-size:15px}
+.ladder{list-style:none;margin:0;padding:0}
+.ladder li{display:grid;grid-template-columns:24px 1fr auto;gap:10px;align-items:start;padding:10px 0;border-top:1px solid var(--line);margin:0}
+.ladder li:first-child{border-top:0;padding-top:2px}
+.ladder .n{font-family:var(--mono);font-size:12.5px;color:var(--muted);padding-top:2px}
+.ladder .t b{display:block;font-weight:600;font-size:15px}
+.ladder .t span{display:block;font-size:13.5px;color:var(--muted)}
+.ladder .t .dl{font-family:var(--mono);font-size:12.5px;color:var(--ink)}
+.state{font-family:var(--mono);font-size:11.5px;border-radius:999px;padding:3px 9px;white-space:nowrap}
+.s-keep{background:var(--okbg);color:var(--ok)}
+.s-add{background:var(--fill);color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.s-next,.s-later{background:var(--fill);color:var(--muted)}
+.s-cut{background:var(--warnbg);color:var(--warn)}
+.s-stop{background:var(--badbg);color:var(--bad)}
+.s-due{background:var(--warnbg);color:var(--warn)}
+.s-ok{background:var(--okbg);color:var(--ok)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.chip{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--fill);color:var(--ink);font:inherit;font-size:14px;cursor:pointer}
+.chip svg{flex:none;color:var(--accent)}
+.empty{color:var(--muted)}
+.dtab{width:100%;border-collapse:collapse;font-size:14px}
+.dtab th{text-align:left;font-family:var(--mono);font-weight:400;font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);padding:6px 6px 6px 0;border-bottom:1px solid var(--line)}
+.dtab td{padding:8px 6px 8px 0;border-bottom:1px solid var(--line);vertical-align:top}
+.dtab td:first-child{font-weight:600}
+.scroll{overflow-x:auto}
+.metric{display:grid;grid-template-columns:1fr auto auto;gap:4px 10px;align-items:center;padding:6px 0;border-top:1px solid var(--line);font-size:14.5px}
+.metric:first-child{border-top:0}
+.metric .v{font-family:var(--mono);font-weight:600}
+.metric .g{font-family:var(--mono);font-size:12.5px;color:var(--muted)}
+.cgmbar{display:flex;height:16px;border-radius:8px;overflow:hidden;margin:6px 0 4px;background:var(--fill)}
+.cgmbar i{display:block;height:100%}
+.leg{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:12.5px;color:var(--muted)}
+.leg i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:4px;vertical-align:-1px}
+.fig{display:block;width:100%;max-width:460px;height:auto;margin:0 auto}
+.states{display:flex;gap:6px;overflow-x:auto;margin:10px -16px;padding:2px 16px 6px;scrollbar-width:none}
+.states::-webkit-scrollbar{display:none}
+.sbtn{flex:none;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--ink);font:inherit;font-size:14px;cursor:pointer;white-space:nowrap}
+.sbtn[aria-pressed="true"]{border-color:var(--accent);color:var(--accent);font-weight:600}
+.cap{font-size:14.5px;margin:8px 0 0}
+.scrim{position:fixed;inset:0;background:var(--scrim);z-index:20}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:21;max-height:90vh;overflow-y:auto;background:var(--card);border:1px solid var(--line);border-bottom:0;border-radius:20px 20px 0 0;padding:8px 16px 24px;max-width:560px;margin:0 auto}
+.sheethead{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.sheethead h2{font-size:18px;margin:0}
+.xbtn{min-height:44px;min-width:44px;border:0;background:transparent;color:var(--accent);font:inherit;font-weight:600;cursor:pointer}
+.pills{position:sticky;top:0;z-index:5;background:var(--bg);display:flex;gap:6px;overflow-x:auto;margin:0 -16px 12px;padding:8px 16px;border-bottom:1px solid var(--line);scrollbar-width:none}
+.pills::-webkit-scrollbar{display:none}
+.pill{flex:none;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--muted);font:inherit;font-size:14px;cursor:pointer;white-space:nowrap}
+.chap{scroll-margin-top:70px}
+.cause{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:8px 0;border-top:1px solid var(--line);font-size:15px}
+.cause small{color:var(--muted);font-size:13px;text-align:right;flex:0 1 50%}
+.cause.out{opacity:.55}.cause.out span{text-decoration:line-through;color:var(--muted)}
+.cause.fav span{font-weight:700}
+.cause.fav span:before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--accent);margin-right:8px}
+.seg{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 4px}
+.trial{border-left:3px solid var(--accent);padding-left:12px}
+.trial p{margin:0 0 6px;font-size:15px}
+.trial .k{font-family:var(--mono);font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);display:block}
+.case .opts{display:grid;gap:8px;margin-top:10px}
+.opt{min-height:44px;text-align:left;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);font:inherit;font-size:15px;padding:8px 12px;cursor:pointer}
+.opt.right{border-color:var(--ok);background:var(--okbg)}
+.opt.wrong{border-color:var(--bad);background:var(--badbg)}
+.ans{margin-top:12px;border-top:1px solid var(--line);padding-top:12px}
+footer{margin-top:28px;font-size:13.5px;color:var(--muted)}
+footer p{margin:0 0 8px}
+@media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+@media (max-width:480px){.grid{grid-template-columns:1fr 1fr}.checks{grid-template-columns:1fr}}
+@media (min-width:1000px){.wrap{max-width:980px}.cols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:0 18px;align-items:start}}
+/* cause-fix: ruled-out causes stay readable; the name greys, the reason does not fade */
+.cause.out,.cause.less,.cause.unl{opacity:1}
+.cause.less>span,.cause.unl>span{color:var(--muted)}
+.deeper{margin-top:14px;border-top:1px solid var(--line)}
+.deeper>summary{min-height:44px;display:flex;align-items:center;gap:8px;color:var(--accent);font-weight:600;font-size:15px;cursor:pointer;list-style:none}
+.deeper>summary::-webkit-details-marker{display:none}
+.deeper>summary::before{content:"+";font-family:var(--mono);font-size:18px;line-height:1;width:14px;text-align:center}
+.deeper[open]>summary::before{content:"\2212"}
+.deeper>summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.deeper .dpx{border:1px solid var(--line);border-radius:12px;padding:2px 12px;background:var(--card);text-align:left}
+.deeper .dpx>div{padding:10px 0;border-top:1px solid var(--line)}
+.deeper .dpx>div:first-child{border-top:0}
+.deeper .dl{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500;margin:0 0 3px}
+.deeper p{font-size:15px;line-height:1.45;color:var(--ink);margin:0 0 4px}
+.deeper p:last-child{margin-bottom:0}
+[data-deeper]>.deeper{margin-top:0;border-top:0}
+.step .deeper{margin-top:10px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="/">← bedside.tools</a>
+<h1>Diabetes in clinic</h1>
+<p class="purpose">Screen and diagnose, choose drugs by heart, kidney and liver, start and adjust insulin, and plan the yearly visit.</p>
+
+<div class="tabs" role="tablist">
+  <button class="tab" role="tab" id="t-screen" aria-controls="p-screen" aria-selected="false" data-tab="screen">Screen</button>
+  <button class="tab" role="tab" id="t-meds" aria-controls="p-meds" aria-selected="true" data-tab="meds">Meds</button>
+  <button class="tab" role="tab" id="t-insulin" aria-controls="p-insulin" aria-selected="false" data-tab="insulin">Insulin</button>
+  <button class="tab" role="tab" id="t-visit" aria-controls="p-visit" aria-selected="false" data-tab="visit">Visit</button>
+  <button class="tab" role="tab" id="t-learn" aria-controls="p-learn" aria-selected="false" data-tab="learn">Learn</button>
+  <button class="tab" role="tab" id="t-practice" aria-controls="p-practice" aria-selected="false" data-tab="practice">Practice</button>
+</div>
+
+<!-- ================= SCREEN ================= -->
+<section class="panel" id="p-screen" role="tabpanel" aria-labelledby="t-screen">
+  <div class="bar" id="bar-screen"></div>
+  <div class="card inputs" id="in-screen">
+    <p class="label">Results</p>
+    <div class="grid">
+      <div class="field"><label for="s-a1c">A1C %</label><input id="s-a1c" inputmode="decimal"></div>
+      <div class="field"><label for="s-fpg">Fasting glucose</label><input id="s-fpg" inputmode="decimal"></div>
+      <div class="field"><label for="s-ogtt">2-h OGTT</label><input id="s-ogtt" inputmode="decimal"></div>
+      <div class="field"><label for="s-rand">Random glucose</label><input id="s-rand" inputmode="decimal"></div>
+      <div class="field"><label for="s-age">Age</label><input id="s-age" inputmode="numeric"></div>
+      <div class="field"><label for="s-bmi">BMI</label><input id="s-bmi" inputmode="decimal"></div>
+    </div>
+    <p class="grp">How the results came</p>
+    <div class="checks">
+      <label class="chk"><input type="checkbox" id="s-sym">Classic symptoms or crisis</label>
+      <label class="chk"><input type="checkbox" id="s-repeat">Results are from 2 samples or 2 days</label>
+      <label class="chk"><input type="checkbox" id="s-a1cbad">A1C may be wrong (anemia, transfusion, dialysis, Hb variant, G6PD, HIV, pregnancy, cirrhosis)</label>
+    </div>
+    <p class="grp">Risk</p>
+    <div class="checks">
+      <label class="chk"><input type="checkbox" id="s-asian">Asian ancestry</label>
+      <label class="chk"><input type="checkbox" id="s-rf">Another risk factor (family history, high-risk ancestry, CVD, BP ≥130/80, HDL &lt;35 or TG &gt;250, PCOS, inactivity, MASLD)</label>
+      <label class="chk"><input type="checkbox" id="s-gdm">Prior gestational diabetes</label>
+      <label class="chk"><input type="checkbox" id="s-drug">On an antipsychotic, glucocorticoid or HIV therapy</label>
+    </div>
+    <p class="grp">Type clues</p>
+    <div class="checks">
+      <label class="chk"><input type="checkbox" id="s-wl">Unintended weight loss or ketosis</label>
+      <label class="chk"><input type="checkbox" id="s-auto">Personal or family autoimmunity, or type 1 in family</label>
+      <label class="chk"><input type="checkbox" id="s-ici">Immune checkpoint inhibitor</label>
+      <label class="chk"><input type="checkbox" id="s-fail">Not reaching goal on non-insulin drugs</label>
+    </div>
+    <div class="row"><button class="btn" type="button" data-done="screen">Done</button><button class="btn ghost" type="button" data-clear="screen">Clear</button></div>
+  </div>
+  <div class="cols"><div id="out-screen"></div><div id="out-screen2"></div></div>
+</section>
+
+<!-- ================= MEDS ================= -->
+<section class="panel on" id="p-meds" role="tabpanel" aria-labelledby="t-meds">
+  <div class="bar" id="bar-meds"></div>
+  <div class="card inputs" id="in-meds">
+    <p class="label">Patient</p>
+    <div class="grid">
+      <div class="field"><label for="m-a1c">A1C %</label><input id="m-a1c" inputmode="decimal"></div>
+      <div class="field"><label for="m-goal">A1C goal</label><select id="m-goal"><option value="7">&lt;7% (most)</option><option value="6.5">&lt;6.5% (healthy, low risk of lows)</option><option value="7.5">&lt;7.5% (healthy older adult)</option><option value="8">&lt;8% (complex health)</option></select></div>
+      <div class="field"><label for="m-age">Age</label><input id="m-age" inputmode="numeric"></div>
+      <div class="field"><label for="m-egfr">eGFR</label><input id="m-egfr" inputmode="decimal"></div>
+      <div class="field"><label for="m-uacr">UACR mg/g</label><input id="m-uacr" inputmode="decimal"></div>
+      <div class="field"><label for="m-k">Potassium</label><input id="m-k" inputmode="decimal"></div>
+      <div class="field"><label for="m-bmi">BMI</label><input id="m-bmi" inputmode="decimal"></div>
+      <div class="field"><label for="m-glu">Glucose now</label><input id="m-glu" inputmode="decimal"></div>
+    </div>
+    <p class="grp">Conditions</p>
+    <div class="checks">
+      <label class="chk"><input type="checkbox" id="m-ascvd">Established ASCVD (MI, stroke, revascularisation, PAD)</label>
+      <label class="chk"><input type="checkbox" id="m-risk">Age ≥55 with 2+ of obesity, hypertension, smoking, dyslipidemia, albuminuria</label>
+      <label class="chk"><input type="checkbox" id="m-hf">Heart failure (any EF)</label>
+      <label class="chk"><input type="checkbox" id="m-hfpef">Symptomatic HFpEF with obesity</label>
+      <label class="chk"><input type="checkbox" id="m-masld">MASLD</label>
+      <label class="chk"><input type="checkbox" id="m-fib">High fibrosis risk or MASH</label>
+      <label class="chk"><input type="checkbox" id="m-htn">Hypertension</label>
+      <label class="chk"><input type="checkbox" id="m-wt">Weight loss is a goal</label>
+      <label class="chk"><input type="checkbox" id="m-hypo">High risk of lows (older, frail, lives alone, past severe low)</label>
+      <label class="chk"><input type="checkbox" id="m-cost">Cost limits choices</label>
+      <label class="chk"><input type="checkbox" id="m-sym">Symptoms of high glucose or weight loss</label>
+      <label class="chk"><input type="checkbox" id="m-preg">Could become pregnant</label>
+    </div>
+    <p class="grp">Cannot use</p>
+    <div class="checks">
+      <label class="chk"><input type="checkbox" id="m-mtc">Medullary thyroid cancer or MEN2 (self or family)</label>
+      <label class="chk"><input type="checkbox" id="m-panc">Past pancreatitis</label>
+      <label class="chk"><input type="checkbox" id="m-gp">Severe gastroparesis</label>
+      <label class="chk"><input type="checkbox" id="m-dka">Past DKA</label>
+    </div>
+    <p class="grp">Taking now</p>
+    <div class="checks">
+      <label class="chk"><input type="checkbox" id="m-met">Metformin</label>
+      <label class="chk"><input type="checkbox" id="m-sglt2">SGLT2 inhibitor</label>
+      <label class="chk"><input type="checkbox" id="m-glp1">GLP-1 RA</label>
+      <label class="chk"><input type="checkbox" id="m-tirz">Tirzepatide</label>
+      <label class="chk"><input type="checkbox" id="m-dpp4">DPP-4 inhibitor</label>
+      <label class="chk"><input type="checkbox" id="m-su">Sulfonylurea</label>
+      <label class="chk"><input type="checkbox" id="m-tzd">Pioglitazone</label>
+      <label class="chk"><input type="checkbox" id="m-ins">Insulin</label>
+      <label class="chk"><input type="checkbox" id="m-raas">ACE inhibitor or ARB (max dose)</label>
+      <label class="chk"><input type="checkbox" id="m-fin">Finerenone</label>
+    </div>
+    <div class="row"><button class="btn" type="button" data-done="meds">Done</button><button class="btn ghost" type="button" data-clear="meds">Clear</button></div>
+  </div>
+  <div class="cols"><div id="out-meds"></div><div id="out-meds2"></div></div>
+</section>
+
+<!-- ================= INSULIN ================= -->
+<section class="panel" id="p-insulin" role="tabpanel" aria-labelledby="t-insulin">
+  <div class="bar" id="bar-insulin"></div>
+  <div class="card inputs" id="in-insulin">
+    <p class="label">Insulin now</p>
+    <div class="grid">
+      <div class="field"><label for="i-type">Diabetes type</label><select id="i-type"><option value="2">Type 2</option><option value="1">Type 1</option></select></div>
+      <div class="field"><label for="i-wt">Weight kg</label><input id="i-wt" inputmode="decimal"></div>
+      <div class="field"><label for="i-a1c">A1C %</label><input id="i-a1c" inputmode="decimal"></div>
+      <div class="field"><label for="i-basal">Basal units/day</label><input id="i-basal" inputmode="decimal" placeholder="0 if none"></div>
+      <div class="field"><label for="i-kind">Basal kind</label><select id="i-kind"><option value="analog">Glargine or degludec</option><option value="nph">Bedtime NPH</option></select></div>
+      <div class="field"><label for="i-fpg">Usual fasting</label><input id="i-fpg" inputmode="decimal"></div>
+      <div class="field"><label for="i-bed">Usual bedtime</label><input id="i-bed" inputmode="decimal"></div>
+      <div class="field"><label for="i-low">Lows</label><select id="i-low"><option value="none">None</option><option value="explained">Yes, clear cause</option><option value="unexplained">Yes, no clear cause</option><option value="severe">Level 2 or 3 (&lt;54 or needed help)</option></select></div>
+      <div class="field"><label for="i-bhb">Ketones (BHB)</label><input id="i-bhb" inputmode="decimal" placeholder="mmol/L"></div>
+    </div>
+    <div class="checks" style="margin-top:12px">
+      <label class="chk"><input type="checkbox" id="i-glp">On GLP-1 RA or tirzepatide</label>
+      <label class="chk"><input type="checkbox" id="i-pran">Already on mealtime insulin</label>
+      <label class="chk"><input type="checkbox" id="i-sev">Glucose ≥300, A1C &gt;10%, or symptoms</label>
+    </div>
+    <div class="row"><button class="btn" type="button" data-done="insulin">Done</button><button class="btn ghost" type="button" data-clear="insulin">Clear</button></div>
+  </div>
+  <div class="cols"><div id="out-insulin"></div><div id="out-insulin2"></div></div>
+</section>
+
+<!-- ================= VISIT ================= -->
+<section class="panel" id="p-visit" role="tabpanel" aria-labelledby="t-visit">
+  <div class="bar" id="bar-visit"></div>
+  <div class="card inputs" id="in-visit">
+    <p class="label">This visit</p>
+    <div class="grid">
+      <div class="field"><label for="v-type">Type</label><select id="v-type"><option value="2">Type 2</option><option value="1">Type 1</option></select></div>
+      <div class="field"><label for="v-age">Age</label><input id="v-age" inputmode="numeric"></div>
+      <div class="field"><label for="v-yrs">Years since diagnosis</label><input id="v-yrs" inputmode="decimal"></div>
+      <div class="field"><label for="v-health">Overall health</label><select id="v-health"><option value="well">Few, stable conditions</option><option value="complex">Complex or frail</option><option value="very">Very complex, limited life expectancy</option></select></div>
+      <div class="field"><label for="v-a1c">A1C %</label><input id="v-a1c" inputmode="decimal"></div>
+      <div class="field"><label for="v-ldl">LDL</label><input id="v-ldl" inputmode="decimal"></div>
+      <div class="field"><label for="v-sbp">Systolic BP</label><input id="v-sbp" inputmode="numeric"></div>
+      <div class="field"><label for="v-dbp">Diastolic BP</label><input id="v-dbp" inputmode="numeric"></div>
+      <div class="field"><label for="v-fib4">FIB-4</label><input id="v-fib4" inputmode="decimal"></div>
+    </div>
+    <p class="grp">CGM report (optional, % of time)</p>
+    <div class="grid">
+      <div class="field"><label for="v-tir">In range 70–180</label><input id="v-tir" inputmode="decimal"></div>
+      <div class="field"><label for="v-tbr1">Below 70</label><input id="v-tbr1" inputmode="decimal"></div>
+      <div class="field"><label for="v-tbr2">Below 54</label><input id="v-tbr2" inputmode="decimal"></div>
+      <div class="field"><label for="v-tar1">Above 180</label><input id="v-tar1" inputmode="decimal"></div>
+      <div class="field"><label for="v-tar2">Above 250</label><input id="v-tar2" inputmode="decimal"></div>
+      <div class="field"><label for="v-cv">CV %</label><input id="v-cv" inputmode="decimal"></div>
+      <div class="field"><label for="v-gmi">GMI %</label><input id="v-gmi" inputmode="decimal"></div>
+      <div class="field"><label for="v-days">Days worn</label><input id="v-days" inputmode="numeric"></div>
+      <div class="field"><label for="v-wear">% active</label><input id="v-wear" inputmode="decimal"></div>
+    </div>
+    <p class="grp">Done in the last year</p>
+    <div class="checks">
+      <label class="chk"><input type="checkbox" id="v-uacr">UACR and eGFR</label>
+      <label class="chk"><input type="checkbox" id="v-eye">Dilated eye exam or retinal photo</label>
+      <label class="chk"><input type="checkbox" id="v-foot">Foot exam with monofilament</label>
+      <label class="chk"><input type="checkbox" id="v-lipid">Lipid panel</label>
+      <label class="chk"><input type="checkbox" id="v-mood">Depression, distress and anxiety screen</label>
+      <label class="chk"><input type="checkbox" id="v-dental">Dental visit</label>
+    </div>
+    <p class="grp">Also</p>
+    <div class="checks">
+      <label class="chk"><input type="checkbox" id="v-ascvd">ASCVD</label>
+      <label class="chk"><input type="checkbox" id="v-statin">On a statin</label>
+      <label class="chk"><input type="checkbox" id="v-met5">Metformin more than 5 years</label>
+      <label class="chk"><input type="checkbox" id="v-retino">Any retinopathy</label>
+      <label class="chk"><input type="checkbox" id="v-lops">Lost sensation or past foot ulcer</label>
+      <label class="chk"><input type="checkbox" id="v-ins">On insulin or a sulfonylurea</label>
+    </div>
+    <div class="row"><button class="btn" type="button" data-done="visit">Done</button><button class="btn ghost" type="button" data-clear="visit">Clear</button></div>
+  </div>
+  <div class="cols"><div id="out-visit"></div><div id="out-visit2"></div></div>
+</section>
+
+<!-- ================= LEARN ================= -->
+<section class="panel" id="p-learn" role="tabpanel" aria-labelledby="t-learn">
+  <div class="pills" id="learn-pills"></div>
+  <div id="learn-body"></div>
+</section>
+
+<!-- ================= PRACTICE ================= -->
+<section class="panel" id="p-practice" role="tabpanel" aria-labelledby="t-practice">
+  <div id="practice"></div>
+</section>
+
+<div class="scrim" id="scrim" hidden></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-t" hidden>
+  <div class="sheethead"><h2 id="sheet-t"></h2><button class="xbtn" id="sheet-x" type="button">Close</button></div>
+  <div id="sheet-b"></div>
+</div>
+
+<footer>
+  <p><strong>For education only. Not a substitute for clinical judgment.</strong> Built to the ADA Standards of Care in Diabetes 2026 and current FDA labels. Rows marked expert practice are not from a graded recommendation. Formularies, coverage and prices vary, so adjust to your institution. Diagrams are schematic. Not for pregnancy, children, inpatient insulin or pump settings.</p>
+  <p>Privacy: everything runs in your browser. Nothing you enter is sent anywhere or stored, and there are no analytics. Do not enter names, record numbers, or dates of birth.</p>
+  <p class="mono">Last reviewed: 2026-11-16</p>
+  <p><strong>Sources:</strong> American Diabetes Association Professional Practice Committee, Standards of Care in Diabetes—2026, Diabetes Care 2026;49(Suppl 1): §2 Diagnosis and Classification, §3 Prevention or Delay, §4 Comprehensive Medical Evaluation, §5 Positive Health Behaviors, §6 Glycemic Goals and Hypoglycemia, §9 Pharmacologic Approaches (incl. Figs 9.2, 9.4, 9.5), §10 Cardiovascular Disease, §11 Chronic Kidney Disease, §12 Retinopathy, Neuropathy and Foot Care, §13 Older Adults. Evidence grades A, B, C, E are ADA's; E is expert consensus · US Preventive Services Task Force, Screening for Prediabetes and Type 2 Diabetes, JAMA 2021 (grade B) · Danne T et al., International consensus on risk management of DKA in type 1 diabetes treated with SGLT inhibitors, Diabetes Care 2019;42:1147 · CDC Adult Immunization Schedule notes, 2025 · FDA prescribing information (DailyMed, 2023–2026): metformin ER, Jardiance, Farxiga, Invokana, Steglatro, Ozempic injection, Rybelsus and Ozempic tablets, Trulicity, Victoza, Mounjaro, Januvia, Tradjenta, pioglitazone, glipizide, glimepiride, Kerendia · Trials are cited on their cards.</p>
+</footer>
+</div>
+<script id="engine">
+/* Pure decision engines. No DOM access. Units: glucose mg/dL; A1C %; eGFR mL/min/1.73 m2; UACR mg/g;
+   potassium mEq/L; insulin units; weight kg; BHB mmol/L. Sources are tagged on each item (ADA 2026 rec numbers,
+   FDA labels, or "E" = expert practice). */
+function num(v){ var n = parseFloat(v); return isFinite(n) ? n : null; }
+function r1(x){ return Math.round(x * 10) / 10; }
+function rU(x){ return Math.round(x); }
+
+/* Doses: FDA labels read 2026-11-16 (see footer). cost: relative tier from ADA 2026 Table 9.3 (finerenone not listed). */
+var DRUG = {
+  metformin: {n:'Metformin ER', cls:'Biguanide', start:'500 mg with the evening meal', step:'+500 mg each week', max:'2000 mg once daily (IR to 2550 mg/day)', kid:'Do not start at eGFR 30 to 45; below 45 reassess and reduce; stop below 30. Hold for iodinated contrast if eGFR 30 to 60, liver disease, alcohol use disorder, heart failure or intra-arterial contrast; recheck eGFR at 48 h.', cost:'$'},
+  empagliflozin: {n:'Empagliflozin', cls:'SGLT2 inhibitor', start:'10 mg each morning', step:'25 mg for more glucose lowering', max:'25 mg', kid:'Heart and kidney trials enrolled eGFR 20 and up; not for glucose lowering below 30. Hold 3 days before surgery.', cost:'$$'},
+  dapagliflozin: {n:'Dapagliflozin', cls:'SGLT2 inhibitor', start:'10 mg (5 mg if for glucose only)', step:'10 mg', max:'10 mg', kid:'Start at eGFR 25 and up for kidney/heart use (may continue below 25); not for glucose lowering below 45. Hold 3 days before surgery.', cost:'$$'},
+  canagliflozin: {n:'Canagliflozin', cls:'SGLT2 inhibitor', start:'100 mg before the first meal', step:'300 mg only if eGFR 60 and up', max:'300 mg', kid:'eGFR 30 to 59: 100 mg; below 30 do not start (may continue 100 mg with albuminuria over 300 mg/day). Amputation warning. Hold 3 days before surgery.', cost:'$$'},
+  ertugliflozin: {n:'Ertugliflozin', cls:'SGLT2 inhibitor', start:'5 mg each morning', step:'15 mg', max:'15 mg', kid:'Not recommended below eGFR 45. Hold 4 days before surgery.', cost:'$$'},
+  semaglutide: {n:'Semaglutide (weekly injection)', cls:'GLP-1 RA', start:'0.25 mg weekly for 4 weeks (starting dose)', step:'0.5 mg, then 1 mg, then 2 mg, at least 4 weeks each', max:'2 mg weekly; kidney indication dose 1 mg', kid:'No adjustment, including kidney failure. Watch kidney function with vomiting or diarrhea.', cost:'$$$'},
+  semaOral: {n:'Semaglutide tablets', cls:'GLP-1 RA', start:'Rybelsus 3 mg daily for 30 days (Ozempic tablets 1.5 mg)', step:'7 mg (4 mg) from day 31', max:'14 mg (9 mg)', kid:'No adjustment. Empty stomach, up to 120 mL water, wait 30 min. The two brands are not mg-for-mg interchangeable.', cost:'$$$'},
+  dulaglutide: {n:'Dulaglutide', cls:'GLP-1 RA', start:'0.75 mg weekly', step:'1.5 mg after 4 weeks, then 1.5 mg steps at least 4 weeks apart', max:'4.5 mg weekly', kid:'No adjustment, including kidney failure. Watch kidney function with vomiting or diarrhea.', cost:'$$$'},
+  liraglutide: {n:'Liraglutide', cls:'GLP-1 RA', start:'0.6 mg daily for 1 week (not a treatment dose)', step:'1.2 mg, then 1.8 mg after at least 1 week', max:'1.8 mg daily', kid:'No adjustment.', cost:'$$$'},
+  tirzepatide: {n:'Tirzepatide', cls:'GIP/GLP-1 RA', start:'2.5 mg weekly', step:'if more glucose lowering is needed, +2.5 mg after at least 4 weeks on the current dose', max:'15 mg weekly', kid:'No adjustment, including kidney failure. Oral contraceptives: add a barrier or non-oral method for 4 weeks after starting and after each step.', cost:'$$$'},
+  sitagliptin: {n:'Sitagliptin', cls:'DPP-4 inhibitor', start:'100 mg daily', step:'none', max:'100 mg', kid:'eGFR 30 to 44: 50 mg; below 30 or dialysis: 25 mg.', cost:'$$'},
+  linagliptin: {n:'Linagliptin', cls:'DPP-4 inhibitor', start:'5 mg daily', step:'none', max:'5 mg', kid:'No adjustment.', cost:'$$'},
+  pioglitazone: {n:'Pioglitazone', cls:'Thiazolidinedione', start:'15 or 30 mg daily (15 mg with NYHA I to II heart failure)', step:'+15 mg', max:'45 mg', kid:'No adjustment. Do not start with NYHA III to IV heart failure; liver tests first; not with active bladder cancer; fractures in women.', cost:'$'},
+  glipizide: {n:'Glipizide', cls:'Sulfonylurea', start:'5 mg before breakfast (2.5 mg if older, frail or liver disease)', step:'2.5 to 5 mg every several days', max:'15 mg once daily; 40 mg/day in divided doses', kid:'Start low and go slow in kidney disease.', cost:'$'},
+  glimepiride: {n:'Glimepiride', cls:'Sulfonylurea', start:'1 to 2 mg with breakfast (1 mg if older or kidney disease)', step:'+1 to 2 mg every 1 to 2 weeks', max:'8 mg', kid:'Start at 1 mg in kidney disease.', cost:'$'},
+  finerenone: {n:'Finerenone', cls:'Nonsteroidal MRA', start:'20 mg if eGFR 60 and up; 10 mg if 25 to 59', step:'10 to 20 mg at 4 weeks if K 4.8 or less and eGFR has not fallen more than 30%', max:'20 mg', kid:'Do not start below eGFR 25 or with K over 5.0. K at 4 weeks and after each change; withhold above 5.5, restart 10 mg at 5.0 or less.', cost:'–'}
+};
+
+function medsEngine(i){
+  var o = {next: [], ladder: [], guards: [], why: '', tiers: [], figs: [], more: [], notes: []};
+  var eg = i.egfr, ua = i.uacr;
+  var ckd = (eg != null && eg < 60) || (ua != null && ua >= 30);
+  var cv = i.ascvd || i.risk;
+  var gap = (i.a1c != null) ? r1(i.a1c - i.goal) : null;
+  var severe = i.sym || (i.a1c != null && i.a1c > 10) || (i.glu != null && i.glu >= 300);
+  var onInc = i.glp1 || i.tirz;
+  var incOK = !i.mtc && !i.gp && !i.panc;
+  var sgltOK = !i.dka && !(eg != null && eg < 20);
+  var L = [];
+  function recs(arr){ var s = []; arr.forEach(function(r){ var m = r.match(/\(([^)]*), [A-E]\)/); if (m) m[1].split(', ').forEach(function(x){ if (s.indexOf(x) < 0) s.push(x); }); }); return s.join(', '); }
+  function add(key, state, name, detail, dose, src){ L.push({key: key, state: state, name: name, detail: detail, dose: dose || '', src: src || ''}); }
+
+  /* --- which organs need protecting (ADA 9.7-9.13, 10.40-10.44, 11.7) --- */
+  var sgReasons = [], incReasons = [];
+  if (i.hf) sgReasons.push('heart failure (9.8, A)');
+  if (ckd && !(eg != null && eg < 20)) sgReasons.push('CKD (9.10, 11.7a, A)');
+  if (cv) sgReasons.push(i.ascvd ? 'ASCVD (9.7, A)' : 'high CV risk (9.7, A)');
+  if (cv) incReasons.push(i.ascvd ? 'ASCVD (9.7, A)' : 'high CV risk (9.7, A)');
+  if (ckd) incReasons.push('CKD (9.10, 11.7b, A)');
+  if (i.hfpef) incReasons.push('obesity with HFpEF (9.9, A)');
+  if (i.masld || i.fib) incReasons.push(i.fib ? 'MASH or fibrosis risk (9.13a, A)' : 'MASLD (9.12, A)');
+  if (i.wt || (i.bmi != null && i.bmi >= 30)) incReasons.push('weight');
+
+  /* incretin choice */
+  var incKey = 'semaglutide', incWhy = 'kidney (FLOW), heart (SUSTAIN-6) and liver (ESSENCE) benefit';
+  if (i.hfpef) { incKey = 'tirzepatide'; incWhy = 'fewer heart failure events in obesity with HFpEF (SUMMIT; ADA 9.9a, A); semaglutide is the alternative (9.9b)'; }
+  else if (!ckd && !i.masld && !i.fib && !cv && (i.wt || (i.bmi != null && i.bmi >= 30))) { incKey = 'tirzepatide'; incWhy = 'the largest weight and A1C effect head to head (SURPASS-2); Fig 9.4 rates it and semaglutide very high'; }
+
+  /* priority: which organ drug first */
+  var sgFirst = true;
+  if (eg != null && eg < 30) sgFirst = false;                              /* 9.11: GLP-1 RA preferred */
+  else if (i.hf) sgFirst = true;
+  else if (i.hfpef || i.masld || i.fib) sgFirst = false;
+  else if (ckd) sgFirst = true;
+  else if (cv) sgFirst = !((i.bmi != null && i.bmi >= 30) || i.wt || (gap != null && gap >= 1)) || i.cost;
+  else sgFirst = false;
+  var combo = gap != null && gap >= 1.5 && !i.met && !i.sglt2 && !onInc && !i.dpp4 && !i.su && !i.tzd && !i.ins;  /* 9.6 (D3) */
+
+  var sgNeeded = sgReasons.length > 0, incNeeded = incReasons.length > 0 || (gap != null && gap > 0);
+  var added = 0;
+  function slot(){ added++; return added === 1 || combo ? 'add' : 'next'; }
+
+  /* insulin when glucose is very high (9.20, E) */
+  if (severe && !i.ins) { added++; add('insulin', 'add', 'Consider basal insulin now', 'Symptoms, A1C over 10% or glucose 300 and up: insulin works fastest (9.20, E). Keep other agents (9.23, A). Check ketones; think of type 1 if weight loss or ketosis.', '10 units/day or 0.1 to 0.2 units/kg/day; +2 units every 3 days to fasting 80 to 130 (Insulin tab)', '9.20, Fig 9.5'); }
+  var order = sgFirst ? ['sg', 'inc'] : ['inc', 'sg'];
+  order.forEach(function(k){
+    if (k === 'sg'){
+      if (i.sglt2) add('sglt2', 'keep', 'SGLT2 inhibitor', 'Keep' + (sgReasons.length ? ' for ' + sgReasons.join(', ') : '') + (eg != null && eg < 45 ? '. Glucose lowering is small below eGFR 45; heart and kidney benefit continues to dialysis.' : '.'), '', '9.8, 9.10, 11.11a');
+      else if (sgNeeded && sgltOK) add('sglt2', slot(), 'Add an SGLT2 inhibitor', 'For ' + sgReasons.join(', ') + ', whatever the A1C.' + (eg != null && eg < 45 ? ' Expect little glucose lowering at this eGFR.' : ''), (eg != null && eg < 25 ? 'Empagliflozin 10 mg daily (dapagliflozin is not started below eGFR 25)' : 'Empagliflozin 10 mg daily, or dapagliflozin 10 mg daily'), recs(sgReasons));
+      else if (sgNeeded && i.dka) add('sglt2', 'later', 'SGLT2 inhibitor: not used', 'Past DKA: people who have had DKA should not be treated with SGLT inhibition (ADA 2026 §9).', '', '§9');
+      else if (sgNeeded && eg != null && eg < 20) add('sglt2', 'later', 'SGLT2 inhibitor: do not start', 'eGFR under 20: do not start (continue if already taking, 11.11a).', '', '11.7a');
+    } else {
+      if (onInc) {
+        var upTxt = (gap != null && gap > 0) || i.wt ? ' Above goal: raise to the top dose; if already there, switching from a GLP-1 RA to tirzepatide gives more A1C and weight lowering (SURPASS-2).' : '';
+        add('inc', 'keep', i.tirz ? 'Tirzepatide' : 'GLP-1 RA', 'Keep' + (incReasons.length ? ' for ' + incReasons.join(', ') : '') + '.' + upTxt, '', '9.7, 9.10, 9.12');
+      } else if (incNeeded && incOK && !severe) {
+        add('inc', slot(), 'Add ' + DRUG[incKey].n.replace(' (weekly injection)', '').toLowerCase(), (incReasons.length ? 'For ' + incReasons.join(', ') + '. ' : 'For glucose. ') + 'Chosen for ' + incWhy + '.' , DRUG[incKey].start + ', then ' + DRUG[incKey].step + '; max ' + DRUG[incKey].max, recs(incReasons) || '9.21');
+      } else if (incNeeded && incOK && severe) {
+        add('inc', 'next', 'Add a GLP-1 RA or tirzepatide with insulin', 'With insulin, add GLP-1-based therapy and reassess the insulin dose (9.22, A).', DRUG[incKey].start, '9.22');
+      } else if (incNeeded && !incOK) {
+        add('inc', 'later', 'GLP-1 RA and tirzepatide: avoid', i.mtc ? 'Contraindicated with personal or family medullary thyroid cancer or MEN2 (boxed warning).' : (i.gp ? 'Not recommended with severe gastroparesis (labels).' : 'Past pancreatitis: ADA advises avoiding incretin-based drugs (GLP-1 RA, tirzepatide, DPP-4 inhibitors) and considering early insulin (§2, §9); labels: stop if pancreatitis is suspected.'), '', i.panc && !i.mtc && !i.gp ? '§2, §9' : 'labels');
+      }
+    }
+  });
+
+
+  /* metformin */
+  if (i.met) {
+    if (eg != null && eg < 30) add('met', 'stop', 'Stop metformin', 'eGFR under 30 (label: contraindicated; ADA Table 9.2).', '', 'label');
+    else if (eg != null && eg < 45) add('met', 'cut', 'Reduce metformin', 'eGFR 30 to 44: reduce the dose and reassess (ADA §9, label). Many cap at 1000 mg/day (expert practice; no number in ADA or the label).', '', '§9, label');
+    else add('met', 'keep', 'Metformin', 'Keep. Check B12 yearly after 5 years (Table 4.1) or with anemia or neuropathy (3.10).' + (i.hf ? ' Fine in stable heart failure if eGFR over 30 (10.45).' : ''), '', '§9');
+  } else if (gap != null && gap > 0 && (eg == null || eg >= 45)) {
+    add('met', (added === 0 || (combo && !severe)) ? 'add' : 'later', 'Metformin', 'Low-cost glucose lowering with no lows; titrate slowly or use extended release for GI effects.', DRUG.metformin.start + ', ' + DRUG.metformin.step + ', max ' + DRUG.metformin.max, '§9, Fig 9.4');
+    if (added === 0) added++;
+  }
+
+  /* DPP-4 (9.18) */
+  if (i.dpp4 && i.panc) add('dpp4', 'stop', 'Stop the DPP-4 inhibitor', 'Past pancreatitis: avoid incretin-based drugs (§2, §9).', '', '§2, §9');
+  else if (i.dpp4 && (onInc || L.some(function(x){ return x.key === 'inc' && (x.state === 'add' || x.state === 'next'); })))
+    add('dpp4', 'stop', 'Stop the DPP-4 inhibitor', 'Do not combine with a GLP-1 RA or tirzepatide (9.18, B).', '', '9.18');
+  else if (i.dpp4) add('dpp4', 'keep', 'DPP-4 inhibitor', 'No heart, kidney, weight or liver benefit; ADA advises limiting or replacing it.' + (eg != null && eg < 45 ? ' Check the kidney dose (sitagliptin 50 mg at eGFR 30 to 44, 25 mg below 30; linagliptin unchanged).' : ''), '', '§9');
+
+  /* sulfonylurea (9.17, 6.6, 13.14a) */
+  var adding = L.some(function(x){ return (x.key === 'inc' || x.key === 'sglt2' || x.key === 'insulin') && (x.state === 'add'); });
+  if (i.su) {
+    if (i.hypo || (gap != null && gap <= 0) || adding || i.ins) add('su', 'cut', 'Lower or stop the sulfonylurea', (i.hypo ? 'High risk of lows: deintensify (6.6, 13.14a, B). ' : '') + (adding ? 'A new glucose-lowering drug is being added: reassess the dose (9.17, A). ' : '') + (gap != null && gap <= 0 ? 'At goal: lows outweigh benefit. ' : '') + 'Halving the dose is a common first step (expert practice).', '', '9.17, 6.6');
+    else add('su', 'keep', 'Sulfonylurea', 'Keep for now; replace with a lower-risk class when possible (§9).', '', '§9');
+  }
+
+  /* insulin already on */
+  if (i.ins && adding) add('insulin', 'cut', 'Reassess the insulin dose', 'Adding a GLP-1 RA, tirzepatide or SGLT2 inhibitor lowers insulin needs (9.17, 9.22). Use the Insulin tab.', '', '9.22');
+  else if (i.ins && i.hypo) add('insulin', 'cut', 'Deintensify insulin', 'High risk of lows: lower or simplify the insulin plan within an individualized goal (6.6, 13.14a, 13.14c, B).', '', '6.6, 13.14a');
+  else if (i.ins) add('insulin', 'keep', 'Insulin', 'Titrate on the Insulin tab.', '', '§9');
+
+  /* pioglitazone */
+  if (i.tzd && i.hf) add('tzd', 'stop', 'Stop pioglitazone', 'Raises heart failure risk; do not use in heart failure (Table 9.2; label).', '', 'Table 9.2');
+  else if (i.tzd) add('tzd', 'keep', 'Pioglitazone', 'Keep' + (i.fib ? ' (MASH benefit, 9.13a, B)' : '') + '; watch weight, edema and fracture risk.', '', '§9');
+  else if (i.fib && !i.hf) add('tzd', 'later', 'Pioglitazone', 'Can be added for MASH or fibrosis risk, alone or with a GLP-1 RA (9.13a-b, B).', DRUG.pioglitazone.start, '9.13');
+
+  /* ACE inhibitor / ARB (11.6a, 10.43) */
+  if (!i.raas) {
+    var raasWhy = '';
+    if (i.htn && ua != null && ua >= 300) raasWhy = 'hypertension with UACR 300 and up (11.6a, A)';
+    else if (i.htn && ua != null && ua >= 30 && eg != null && eg < 60) raasWhy = 'hypertension with albuminuria and eGFR under 60 (11.6a, A)';
+    else if (i.htn && ua != null && ua >= 30) raasWhy = 'hypertension with albuminuria (11.6a, B)';
+    else if (i.age != null && i.age >= 55 && cv) raasWhy = 'age 55 and up with ASCVD or risk factors (10.43, A)';
+    if (raasWhy) add('raas', 'next', 'ACE inhibitor or ARB to the top tolerated dose', 'For ' + raasWhy + '. Check creatinine and potassium after starting; keep it through a creatinine rise up to 30% (11.6d).', '', '11.6, 10.43');
+  }
+
+  /* finerenone (11.8, 11.9, 10.42) */
+  if (i.fin) add('fin', 'keep', 'Finerenone', 'Keep; potassium at 4 weeks after each change, withhold above 5.5 (label).', '', '11.8, label');
+  else if (ua != null && ua >= 30) {
+    if (eg != null && eg < 25) add('fin', 'later', 'Finerenone: do not start', 'eGFR under 25 (11.8, label).', '', '11.8');
+    else if (i.k != null && i.k > 5.0) add('fin', 'later', 'Finerenone: not yet', 'Potassium over 5.0: do not start (label).', '', 'label');
+    else if (!i.raas) add('fin', 'later', 'Finerenone', 'After an ACE inhibitor or ARB at the top tolerated dose (10.42, A).', '', '10.42');
+    else {
+      var together = ua >= 100 && eg != null && eg >= 30 && eg <= 90 && !i.sglt2;
+      add('fin', 'next', 'Add finerenone', 'Albuminuria on an ACE inhibitor or ARB: lowers kidney and heart failure events (11.8, 10.42, A).' + (together ? ' With UACR 100 and up and eGFR 30 to 90 it can start together with the SGLT2 inhibitor (11.9, B; CONFIDENCE).' : '') + (i.k != null && i.k > 4.8 ? ' Potassium 4.8 to 5.0: extra checks in the first 4 weeks.' : ''), eg != null && eg >= 60 ? '20 mg daily' : '10 mg daily; 20 mg at 4 weeks if K 4.8 or less and eGFR has not fallen more than 30%', '11.8, 11.9');
+    }
+  }
+
+  /* above goal after organ drugs: next glucose step */
+  if (gap != null && gap > 0 && onInc && !severe && !i.ins) add('basal', 'later', 'Basal insulin if still above goal', 'After GLP-1-based therapy at full dose (Fig 9.5).', '10 units or 0.1 to 0.2 units/kg/day', 'Fig 9.5');
+
+  /* ordering for the ladder */
+  var rank = i.hypo ? {stop: 0, cut: 1, add: 2, next: 3, later: 4, keep: 5} : {add: 0, stop: 1, cut: 2, next: 3, later: 4, keep: 5};
+  L.sort(function(a, b){ return rank[a.state] - rank[b.state]; });
+  o.ladder = L;
+  o.next = L.filter(function(x){ return x.state === 'add' || x.state === 'stop' || x.state === 'cut'; });
+  o.combo = combo;
+  o.gap = gap; o.ckd = ckd; o.cv = cv; o.severe = severe;
+
+  /* guards */
+  if (severe) o.guards.push({bad: true, t: 'Very high glucose: check ketones. If ketones are raised or the person is unwell, use DKA/HHS care, not clinic titration.'});
+  if (i.preg) o.guards.push({t: 'Could become pregnant: counsel on contraception (9.32a). ACE inhibitors, ARBs, MRAs and statins are avoided without reliable contraception (10.12, 10.25, 11.10). GLP-1 RAs and tirzepatide can lower oral contraceptive effect at the start and each step.'});
+  if (combo) o.guards.push({t: 'A1C is ' + gap + ' points above goal: starting two drugs together is reasonable at 1.5 points or more (9.6, A; ADA gives 1.5 to 2.0).'});
+  if (i.su && adding) o.guards.push({t: 'Sulfonylurea plus a new glucose-lowering drug raises the risk of lows.'});
+
+  /* why line: by top driver */
+  var top = o.next[0];
+  if (!top) {
+    if (gap != null && gap <= 0) o.why = '';
+    else o.why = '';
+  } else if (top.key === 'insulin' && severe) o.why = 'At this level of glucose, high glucose itself blunts insulin release, so insulin works fastest.';
+  else if (top.key === 'sglt2' && i.hf) o.why = 'In heart failure an SGLT2 inhibitor cuts hospital stays and cardiovascular death, whatever the A1C.';
+  else if (top.key === 'sglt2' && ckd) o.why = 'An SGLT2 inhibitor slows kidney decline down to eGFR 20, even where its glucose effect has faded.';
+  else if (top.key === 'inc' && eg != null && eg < 30) o.why = 'Below eGFR 30 SGLT2 inhibitors barely lower glucose, and GLP-1 RAs need no kidney dose change.';
+  else if (top.key === 'inc' && i.hfpef) o.why = 'In obesity with HFpEF, weight-lowering incretins improve symptoms and cut heart failure events.';
+  else if (top.key === 'inc' && (i.masld || i.fib)) o.why = 'Semaglutide resolved MASH in more people than placebo, so it treats the liver as well as the glucose.';
+  else if ((top.key === 'inc' || top.key === 'sglt2') && cv) o.why = 'These drugs cut heart attack, stroke or cardiovascular death in outcome trials, so they are chosen for the heart, not the A1C.';
+  else if (top.key === 'met' && top.state === 'stop') o.why = 'Metformin is cleared by the kidney; below eGFR 30 it can build up.';
+  else if (top.key === 'met' && top.state === 'cut') o.why = 'Metformin is cleared by the kidney, so the dose comes down as eGFR falls below 45.';
+  else if (top.key === 'su') o.why = 'Sulfonylureas release insulin whatever the glucose, so they cause lows' + (adding ? ', more so with another drug added.' : '.');
+  else if (top.key === 'insulin' && top.state === 'cut') o.why = adding ? 'The drug being added lowers glucose too, so the same insulin dose now risks lows.' : 'With a high risk of lows, the harm of tight control outweighs its benefit.';
+  else if (top.key === 'dpp4') o.why = 'DPP-4 inhibitors and GLP-1 RAs act on the same hormone, so together they add nothing.';
+  else if (top.key === 'tzd') o.why = 'Pioglitazone retains sodium and fluid, which worsens heart failure.';
+  else if (top.key === 'inc' && i.wt) o.why = 'GIP/GLP-1 and GLP-1 agonists give the most weight loss of any glucose-lowering drug.';
+  else if (top.key === 'met') o.why = 'Metformin lowers glucose without lows or weight gain, at the lowest cost.';
+  else if (combo) o.why = 'When A1C is far above goal, two drugs started together reach it sooner than adding one at a time.';
+  else if (gap != null && gap > 0) o.why = 'Above goal: the next drug is chosen by its other benefits and its risks.';
+  else o.why = '';
+
+  o.tiers = [];
+  o.next.forEach(function(x){ if (x.src) o.tiers.push(/^(label|labels)/.test(x.src) ? 'FDA ' + x.src : 'ADA 2026 ' + x.src); });
+  o.figs = ['sites'];
+  if (L.some(function(x){ return x.key === 'sglt2'; })) o.figs.push('kidney');
+  return o;
+}
+
+/* ---------- Insulin ---------- */
+function ketoneBand(b){
+  if (b == null) return null;
+  if (b < 0.6) return {lvl: 0, t: 'Normal (under 0.6)', a: 'No action needed.'};
+  if (b <= 1.5) return {lvl: 1, t: 'Ketonemia (0.6 to 1.5)', a: '15 to 30 g fast carbohydrate and 300 to 500 mL fluid each hour, rapid-acting insulin with the carbohydrate, recheck ketones every 3 to 4 hours; get care if it persists with symptoms.'};
+  if (b <= 3.0) return {lvl: 2, t: 'Impending DKA (1.6 to 3.0)', a: 'Same steps, and consider immediate medical care.'};
+  return {lvl: 3, t: 'Probable DKA (over 3.0)', a: 'Immediate medical care.'};
+}
+function insulinEngine(i){
+  var o = {head: '', sub: '', dose: [], ladder: [], guards: [], why: '', tiers: [], figs: [], cls: ''};
+  var wt = i.wt, b = i.basal || 0;
+  i.sev = i.sev || (i.a1c != null && i.a1c > 10) || (i.fpg != null && i.fpg >= 300);
+  var aboveGoal = (i.a1c != null && i.a1c >= 7) || (i.fpg != null && i.fpg > 130);
+  var kb = ketoneBand(i.bhb);
+  if (kb && kb.lvl >= 1) o.guards.push({bad: kb.lvl >= 2, t: 'Ketones ' + i.bhb + ' mmol/L: ' + kb.t + '. ' + kb.a + (kb.lvl >= 2 ? ' See DKA & HHS.' : '') + ' (Danne 2019 consensus; written for type 1 on SGLT inhibitors.)'});
+  if (i.low === 'severe') o.guards.push({bad: true, t: 'Level 2 or 3 low: reevaluate the whole plan, deintensify or switch drugs (6.19, B). Glucagon for everyone on insulin (9.28, A).'});
+
+  if (i.type === '1') {
+    if (!b) {
+      o.head = wt ? 'Start ' + r1(0.4 * wt) + ' to ' + r1(0.5 * wt) + ' units/day, half basal, half mealtime' : 'Start 0.4 to 0.5 units/kg/day, half basal, half mealtime';
+      o.sub = 'Analog insulin by multiple daily injections or a pump/AID (9.1, 9.2, A). Mealtime doses matched to carbohydrate (9.3, B).';
+      if (wt) o.dose = ['Basal ' + rU(0.2 * wt) + ' to ' + rU(0.25 * wt) + ' units', 'Mealtime total ' + rU(0.2 * wt) + ' to ' + rU(0.25 * wt) + ' units, split across meals'];
+      o.tiers = ['ADA 2026 Fig 9.2', '9.1 A', '9.3 B'];
+    } else {
+      o.head = 'Adjust by the timing of highs and lows';
+      o.sub = 'Change basal or mealtime insulin by 1 to 4 units or 5 to 10% for the time of day the problem occurs; fasting highs → basal; after-meal highs → mealtime dose and timing.';
+      o.tiers = ['ADA 2026 Fig 9.2'];
+    }
+    o.why = 'In type 1 the pancreas makes little or no insulin, so both background and mealtime insulin are needed.';
+    o.ladder = [
+      {state: 'add', name: 'CGM and glucagon', detail: 'CGM from onset (9.25, A); glucagon prescribed (9.28, A); offer AID (9.27, A).'},
+      {state: 'next', name: 'Sick-day ketone plan', detail: 'Blood ketone meter and the four bands (Danne 2019).'},
+      {state: 'later', name: 'Review every 3 to 6 months', detail: '9.4, E.'}
+    ];
+    o.figs = ['curves', 'ketones'];
+    return o;
+  }
+
+  /* type 2 */
+  if (!b) {
+    if (!i.glp && !i.sev) {
+      o.head = 'GLP-1 RA or tirzepatide before insulin';
+      o.sub = 'Without severe hyperglycemia, GLP-1-based therapy is preferred over insulin (9.21, A). Use the Meds tab.';
+      o.why = 'GLP-1-based drugs lower A1C as much as basal insulin with weight loss and no lows.';
+      o.tiers = ['ADA 2026 9.21 A'];
+      o.ladder = [{state: 'add', name: 'GLP-1 RA or tirzepatide', detail: 'Meds tab for the drug and steps.'}, {state: 'later', name: 'Basal insulin if still above goal', detail: '10 units or 0.1 to 0.2 units/kg/day.'}];
+    } else if (!i.sev && !aboveGoal) {
+      o.head = 'No insulin needed now';
+      o.sub = (i.a1c == null && i.fpg == null) ? 'Enter A1C or fasting glucose. Basal insulin is added when glucose stays above goal on GLP-1-based therapy (Fig 9.5).' : 'At goal on GLP-1-based therapy. Basal insulin is added only if glucose stays above goal (Fig 9.5).';
+      o.ladder = [];
+    } else {
+      var lo = wt ? rU(0.1 * wt) : null, hi = wt ? rU(0.2 * wt) : null;
+      o.head = 'Start basal insulin: 10 units/day' + (wt ? ' (or ' + lo + ' to ' + hi + ' units by weight)' : ' or 0.1 to 0.2 units/kg/day');
+      o.sub = 'Glargine or degludec, or bedtime NPH. Keep other glucose-lowering drugs (9.23, A).';
+      o.dose = ['Titrate +2 units every 3 days until fasting 80 to 130 without lows', 'Low with no clear cause: lower 10 to 20%'];
+      o.why = i.sev ? 'With symptoms or very high glucose, insulin lowers glucose fastest and lets the pancreas recover from glucose toxicity.' : 'GLP-1-based therapy is on board and glucose is still above goal, so basal insulin is the next step.';
+      o.tiers = ['ADA 2026 Fig 9.5', '9.20 E', '9.23 A'];
+      o.ladder = [
+        {state: 'add', name: 'Glucagon and CGM', detail: 'Glucagon for everyone on insulin (9.28, A); CGM from insulin start (9.25, A).'},
+        {state: i.glp ? 'keep' : 'next', name: 'GLP-1 RA or tirzepatide', detail: i.glp ? 'Keep; reassess insulin when escalating it (9.22).' : 'Add once glucose is lower (9.22, A); fixed-ratio products exist.'},
+        {state: 'later', name: 'Mealtime insulin', detail: 'Only if basal is adequate and A1C is still above goal.'}
+      ];
+    }
+    o.figs = ['curves'];
+    return o;
+  }
+
+  var perkg = wt ? b / wt : null;
+  var diff = (i.bed != null && i.fpg != null) ? i.bed - i.fpg : null;
+  var signs = [];
+  if (perkg != null && perkg > 0.5) signs.push('basal ' + r1(perkg) + ' units/kg (over 0.5, expert practice)');
+  if (diff != null && diff >= 50) signs.push('bedtime-to-morning drop of ' + rU(diff) + ' mg/dL (50 or more)');
+  if (i.low === 'unexplained' || i.low === 'severe') signs.push('lows');
+  var over = signs.length > 0 && !(signs.length === 1 && signs[0] === 'lows');
+  var fHigh = i.fpg != null && i.fpg > 130;
+  var a1cHigh = i.a1c != null && i.a1c >= 7;
+
+  if (i.low === 'unexplained' || i.low === 'severe') {
+    var cut1 = rU(b * 0.8), cut2 = rU(b * 0.9);
+    o.head = (i.low === 'severe' ? 'Level 2 or 3 low: find the cause; if none, ' : '') + 'lower basal 10 to 20%: ' + b + ' → ' + cut1 + ' to ' + cut2 + ' units';
+    o.head = o.head.charAt(0).toUpperCase() + o.head.slice(1);
+    o.sub = (i.low === 'severe' ? 'Find the cause first (timing, missed meal, alcohol, exercise, kidney function, other drugs); if there is no clear cause, lower 10 to 20% (Fig 9.5) and reevaluate the plan (6.19).' : 'Low with no clear cause (Fig 9.5). Review timing, meals, alcohol, kidney function and other drugs.');
+    o.why = i.low === 'severe' ? 'A level 2 or 3 low is dangerous in itself; the plan changes even if the A1C is high.' : 'A low with no other cause means the dose is more than the body needs at that time of day.';
+    o.cls = 'bad';
+    o.tiers = ['ADA 2026 Fig 9.5', '6.19 B'];
+  } else if (over) {
+    o.head = 'Stop raising basal: likely overbasalized';
+    o.sub = 'Signs: ' + signs.join('; ') + '. Address the after-meal glucose instead (9.26, E).';
+    o.why = (diff != null && diff >= 50) ? 'An overnight fall means basal is covering meals; more basal adds lows without fixing after-meal highs.' : 'The basal dose is high for body weight, a common sign that basal is being used to cover meals.';
+    o.cls = 'bad';
+    o.tiers = ['ADA 2026 9.26 E', 'Fig 9.5', '0.5 units/kg: expert practice'];
+  } else if (fHigh) {
+    o.head = 'Raise basal +2 units every 3 days';
+    o.sub = 'Fasting ' + i.fpg + ' is above 80 to 130. Next: ' + (b + 2) + ' units.';
+    o.why = 'Fasting glucose reflects overnight liver glucose output, which basal insulin controls.';
+    o.tiers = ['ADA 2026 Fig 9.5', 'Table 6.3'];
+  } else if (a1cHigh) {
+    o.head = 'Fasting at goal, A1C above: treat after-meal glucose';
+    o.sub = 'Basal is doing its job. Add GLP-1-based therapy or one mealtime dose (Fig 9.5).';
+    o.why = 'When fasting is at goal but A1C is high, the excess is coming after meals.';
+    o.tiers = ['ADA 2026 Fig 9.5'];
+  } else {
+    o.head = 'Keep the current dose';
+    o.sub = 'Fasting and A1C at goal with no lows. Recheck every 3 to 6 months (9.14).';
+    o.cls = 'okc';
+    o.tiers = ['ADA 2026 9.14 E'];
+  }
+
+  var L = [];
+  if ((over || (!fHigh && a1cHigh)) && !i.glp) L.push({state: 'add', name: 'Add a GLP-1 RA or tirzepatide', detail: 'Before mealtime insulin (9.22, A; Fig 9.5). Reassess the basal dose when adding it.'});
+  if ((over || (!fHigh && a1cHigh)) && i.glp && !i.pran) {
+    L.push({state: 'add', name: 'Add one mealtime dose at the largest meal', detail: '4 units or 10% of basal (' + (b * 0.1 < 4 ? '4' : rU(b * 0.1)) + ' units). Titrate +1 to 2 units or 10 to 15% twice weekly; lows → lower 10 to 20%.' + (i.a1c != null && i.a1c < 8 ? ' A1C under 8%: consider lowering basal by 4 units or 10% at the same time (' + ((b - 4) === rU(b * 0.9) ? (b - 4) : (b - 4) + ' or ' + rU(b * 0.9)) + ' units).' : '')});
+  }
+  if (i.pran && (over || a1cHigh)) L.push({state: 'next', name: 'Add mealtime doses stepwise', detail: 'Two, then three injections, then full basal-bolus (Fig 9.5).'});
+  if (i.kind === 'nph' && (over || i.low !== 'none')) L.push({state: 'next', name: 'Bedtime NPH: split it or switch', detail: 'Twice-daily NPH: total ' + rU(b * 0.8) + ' units (80%), ⅔ morning (' + rU(b * 0.8 * 2 / 3) + '), ⅓ bedtime (' + rU(b * 0.8 / 3) + '). Or switch to glargine/degludec unit for unit, minus 10 to 20% from NPH.'});
+  L.push({state: 'keep', name: 'Glucagon and CGM', detail: 'Glucagon for all on insulin (9.28, A); CGM (9.25, A).'});
+  if (!i.glp && !over && fHigh) L.push({state: 'next', name: 'GLP-1 RA or tirzepatide', detail: 'Add with insulin (9.22, A).'});
+  o.ladder = L;
+  if (i.kind === 'nph') o.dose.push('Switching NPH to an analog: unit for unit, reduce 10 to 20% (§9).');
+  o.figs = ['overbasal', 'curves'];
+  return o;
+}
+
+/* ---------- Screen ---------- */
+function screenEngine(i){
+  var o = {cls: '', head: '', sub: '', why: '', ladder: [], guards: [], tiers: [], type: null, prediabetes: false, diabetes: false};
+  var useA1c = i.a1c != null && !i.a1cbad;
+  var hits = [], pre = [];
+  if (useA1c && i.a1c >= 6.5) hits.push('A1C ' + i.a1c.toFixed(1) + '%'); else if (useA1c && i.a1c >= 5.7) pre.push('A1C ' + i.a1c.toFixed(1) + '%');
+  if (i.fpg != null && i.fpg >= 126) hits.push('fasting ' + i.fpg); else if (i.fpg != null && i.fpg >= 100) pre.push('fasting ' + i.fpg);
+  if (i.ogtt != null && i.ogtt >= 200) hits.push('2-h ' + i.ogtt); else if (i.ogtt != null && i.ogtt >= 140) pre.push('2-h ' + i.ogtt);
+  var anyRes = useA1c || i.fpg != null || i.ogtt != null || i.rand != null;
+  if (i.a1cbad && i.a1c != null) o.guards.push({t: 'A1C may not reflect glucose here: diagnose with plasma glucose (2.4, B).'});
+
+  if (i.sym && i.rand != null && i.rand >= 200) {
+    o.diabetes = true; o.cls = 'bad'; o.head = 'Diabetes';
+    o.sub = 'Random glucose ' + i.rand + ' with classic symptoms or crisis: no confirmation needed (Table 2.1). An A1C shows how long it has been high.';
+    o.tiers = ['ADA 2026 2.1a B'];
+    o.why = 'Symptoms plus a random glucose of 200 or more are unequivocal hyperglycemia.';
+  } else if (!i.sym && i.rand != null && i.rand >= 200 && hits.length === 0) {
+    o.cls = 'bad'; o.head = 'Random glucose ' + i.rand + ': test properly';
+    o.sub = 'Without classic symptoms a random glucose does not diagnose diabetes. Send A1C, fasting glucose or an OGTT and confirm (Table 2.1, 2.1b).';
+    o.tiers = ['ADA 2026 2.1a-b B'];
+    o.why = 'Random glucose diagnoses only with symptoms or crisis; otherwise a standard test is needed.';
+  } else if (hits.length >= 2 || (hits.length === 1 && i.repeat)) {
+    o.diabetes = true; o.cls = 'bad'; o.head = 'Diabetes, confirmed';
+    o.sub = hits.join(' and ') + (hits.length >= 2 ? ': two tests above the cut-off (same sample counts).' : ': same test above the cut-off twice.');
+    o.tiers = ['ADA 2026 2.1b B'];
+    o.why = 'Two results above the line, from two tests or the same test twice, confirm diabetes without symptoms.';
+  } else if (hits.length === 1) {
+    o.cls = 'bad'; o.head = 'Above the diabetes line once: confirm';
+    o.sub = hits[0] + '. Repeat the same test or add a second test (can be the same sample). If tests disagree, repeat the one above the cut-off; the confirmatory result decides.';
+    o.tiers = ['ADA 2026 2.1b B'];
+    o.why = 'Without symptoms one result can be lab or day-to-day variation, so a second is required.';
+  } else if (pre.length) {
+    o.prediabetes = true; o.head = 'Prediabetes';
+    o.sub = pre.join(', ') + '. Retest at least yearly (3.1, E).';
+    o.tiers = ['ADA 2026 Table 2.2', '3.1 E'];
+    o.why = 'Risk of diabetes and heart disease rises steadily through this range, steepest near the top.';
+  } else if (anyRes) {
+    o.cls = 'okc'; o.head = 'Normal';
+    o.sub = 'Repeat at least every 3 years; sooner with symptoms or rising risk (2.12c, C).';
+    o.tiers = ['ADA 2026 2.12c C'];
+  } else {
+    /* who to screen */
+    var bmiCut = i.asian ? 23 : 25;
+    var why = [];
+    if (i.age != null && i.age >= 35) why.push('age 35 and up (2.12b, B)');
+    if (i.bmi != null && i.bmi >= bmiCut && i.rf) why.push('BMI ' + bmiCut + '+ with a risk factor (2.12a, B)');
+    if (i.gdm) why.push('prior gestational diabetes: every 1 to 3 years');
+    if (i.drug) why.push('drug exposure: antipsychotic at baseline, 12 to 16 weeks and yearly (2.16b); HIV FPG before and 3 to 6 months after ART changes (2.17); glucocorticoids by post-meal or random glucose (2.18)');
+    var usp = i.age != null && i.age >= 35 && i.age <= 70 && i.bmi != null && i.bmi >= 25;
+    if (why.length) { o.head = 'Screen now'; o.sub = 'Indicated for ' + why.join('; ') + '. A1C, fasting glucose or 75-g OGTT (2.13, B).' + (usp ? ' USPSTF also recommends it (35 to 70 with overweight, grade B).' : ''); o.tiers = ['ADA 2026 Table 2.5']; o.why = 'Type 2 diabetes is silent for years and the duration of high glucose drives complications.'; }
+    else { o.head = 'Enter results, or age and BMI to see who to screen'; o.sub = 'All adults from 35; any age with BMI 25 or more (23 Asian ancestry) and a risk factor.'; o.cls = ''; }
+  }
+
+  /* prediabetes plan */
+  if (o.prediabetes) {
+    var metWhy = [];
+    if (i.age != null && i.age >= 25 && i.age <= 59 && i.bmi != null && i.bmi >= 35) metWhy.push('age 25 to 59 with BMI 35+');
+    if (i.fpg != null && i.fpg >= 110) metWhy.push('fasting 110+');
+    if (useA1c && i.a1c >= 6.0) metWhy.push('A1C 6.0+');
+    if (i.gdm) metWhy.push('prior gestational diabetes');
+    o.ladder.push({state: 'add', name: 'Diabetes prevention program', detail: '5 to 7% weight loss and 150 min/week of moderate activity (3.3, A); Mediterranean or low-carbohydrate pattern (3.4, B).'});
+    o.ladder.push({state: metWhy.length ? 'next' : 'later', name: 'Metformin to prevent diabetes', detail: metWhy.length ? 'Consider: ' + metWhy.join(', ') + ' (3.7, A). Not FDA-approved for this.' : 'Considered mainly for age 25 to 59 with BMI 35+, fasting 110+, A1C 6.0+, or prior GDM (3.7, A).'});
+    o.ladder.push({state: 'next', name: 'Cardiovascular risk', detail: 'Screen and treat BP and lipids (3.11, B); do not stop a statin over diabetes risk (3.12, B).'});
+    o.ladder.push({state: 'later', name: 'Retest yearly', detail: '3.1, E.'});
+  }
+  if (o.diabetes) {
+    var clues = [];
+    if (i.age != null && i.age < 35) clues.push('age under 35');
+    if (i.bmi != null && i.bmi < 25) clues.push('BMI under 25');
+    if (i.wl) clues.push('weight loss or ketosis');
+    if (i.auto) clues.push('autoimmunity or type 1 in family');
+    if (i.ici) clues.push('checkpoint inhibitor');
+    if (i.fail) clues.push('not reaching goal on non-insulin drugs');
+    if (i.rand != null && i.rand > 360) clues.push('glucose over 360');
+    o.type = clues;
+    if (clues.length) o.guards.push({t: 'Type 1 clues: ' + clues.join(', ') + '. Send islet antibodies (GAD first) before labelling it type 2 (2.10, E; Fig 2.1). Up to 40% of adults with new type 1 are first labelled type 2.'});
+    o.ladder.push({state: 'add', name: 'First visit', detail: 'UACR and eGFR, lipids, liver tests with FIB-4, CBC (Table 4.1); dilated eye exam at diagnosis of type 2 (12.4, B); foot and neuropathy exam (12.17, B).'});
+    o.ladder.push({state: 'next', name: 'Choose treatment', detail: 'Meds tab: drugs chosen by heart, kidney, liver and weight.'});
+    o.ladder.push({state: 'next', name: 'Education', detail: 'DSMES at diagnosis (5.2, E).'});
+  }
+  return o;
+}
+
+/* type narrowing (Fig 2.1) */
+var TYPES = [
+  {k: 't1', n: 'Type 1 (autoimmune, incl. LADA)'},
+  {k: 't2', n: 'Type 2'},
+  {k: 'mody', n: 'Monogenic (MODY)'},
+  {k: 'panc', n: 'Pancreatic (after pancreatitis or surgery)'},
+  {k: 'ici', n: 'Checkpoint-inhibitor diabetes'}
+];
+var RESULTS = [
+  {k: 'abpos', n: 'Antibody positive', fav: ['t1'], out: {t2: 'antibodies mark autoimmune destruction', mody: 'MODY is antibody negative', panc: 'autoimmunity points elsewhere'}},
+  {k: 'abneg', n: 'Antibodies negative', fav: [], out: {}, less: {t1: '5 to 10% of type 1 is antibody negative, so it stays possible under 35'}},
+  {k: 'cplow', n: 'C-peptide under 200 pmol/L', fav: ['t1', 'ici'], out: {t2: 'type 2 keeps insulin secretion', mody: 'MODY keeps insulin secretion'}},
+  {k: 'cpmid', n: 'C-peptide 200 to 600', fav: ['t1', 'mody'], out: {}, less: {t2: 'possible after long insulin-treated type 2'}},
+  {k: 'cphigh', n: 'C-peptide over 600', fav: ['t2', 'mody'], out: {t1: 'insulin secretion is well preserved'}},
+  {k: 'modyf', n: 'MODY features', fav: ['mody'], out: {}, less: {}},
+  {k: 'pancx', n: 'Pancreatitis or pancreas surgery', fav: ['panc'], out: {}},
+  {k: 'icix', n: 'On a checkpoint inhibitor', fav: ['ici'], out: {}}
+];
+
+/* ---------- Visit ---------- */
+function visitEngine(i){
+  var o = {head: '', sub: '', cls: '', why: '', tiers: [], ladder: [], cgm: null, goal: null, guards: []};
+  var older = i.health !== 'well';
+  o.goal = i.health === 'very' ? null : (i.health === 'complex' ? 8.0 : (i.age != null && i.age >= 65 ? 7.5 : 7.0));
+  var T = older ? {tir: 50, tbr1: 1, tbr2: 1, tar1: 50, tar2: 10, cv: 36} : {tir: 70, tbr1: 4, tbr2: 1, tar1: 25, tar2: 5, cv: 36};
+  if (i.health === 'well' && i.age != null && i.age >= 65) T.tbr1 = 4;
+  var cg = null;
+  if (i.tir != null || i.tbr1 != null) {
+    cg = {T: T, rows: [], enough: (i.days == null || i.days >= 14) && (i.wear == null || i.wear >= 70)};
+    function row(n, v, tgt, dir){ if (v == null || tgt == null) return; cg.rows.push({n: n, v: v, tgt: (dir === 'hi' ? '>' : '<') + tgt + '%', ok: dir === 'hi' ? v > tgt : v < tgt}); }
+    row('Time in range 70–180', i.tir, T.tir, 'hi');
+    row('Below 70', i.tbr1, T.tbr1, 'lo');
+    row('Below 54', i.tbr2, T.tbr2, 'lo');
+    row('Above 180', i.tar1, T.tar1, 'lo');
+    row('Above 250', i.tar2, T.tar2, 'lo');
+    if (i.cv != null) cg.rows.push({n: 'Variability (CV)', v: i.cv, tgt: '≤36%', ok: i.cv <= 36});
+    o.cgm = cg;
+  }
+  var lowBad = cg && cg.rows.some(function(r){ return (r.n === 'Below 70' || r.n === 'Below 54') && !r.ok; });
+  var hiBad = (o.goal != null && i.a1c != null && i.a1c >= o.goal) || (cg && cg.rows.some(function(r){ return r.n === 'Time in range 70–180' && !r.ok; }));
+  var bpHigh = (i.sbp != null && i.sbp >= 130) || (i.dbp != null && i.dbp >= 80);
+
+  if (lowBad) { o.cls = 'bad'; o.head = 'Too much time low: deintensify'; o.sub = 'Time below range is above target. Lower or switch insulin, sulfonylureas or meglitinides (6.3c, 6.6, B).'; o.why = 'Time below range above target predicts severe lows; safety comes before the A1C.'; o.tiers = ['ADA 2026 6.3c B', '6.6 B']; }
+  else if (hiBad) { o.head = 'Above glycemic goal: intensify'; o.sub = (o.goal != null ? 'Goal A1C under ' + o.goal + '%. ' : '') + 'Use the Meds or Insulin tab; do not delay (9.15, A).'; o.why = 'Each step closer to goal lowers eye, kidney and nerve complications.'; o.tiers = ['ADA 2026 6.3a A', '13.7 C', '9.15 A']; }
+  else if (bpHigh) { o.head = 'Blood pressure above 130/80'; o.sub = 'Confirm, then treat to under 130/80 (10.4, 10.6, A); 150/90 and up: two drugs or a single pill (10.7, A).'; o.why = 'Blood pressure lowering reduces cardiovascular events and slows kidney disease in diabetes (§10, §11).'; o.tiers = ['ADA 2026 10.4 A', '10.6 A']; }
+  else if (i.ascvd && (!i.statin || (i.ldl != null && i.ldl >= 55))) { o.head = i.statin ? 'LDL above 55 with ASCVD' : 'ASCVD: start a high-intensity statin'; o.sub = 'High-intensity statin for LDL under 55 and at least 50% lower; add ezetimibe or a PCSK9 inhibitor if not reached (10.26-10.27).'; o.why = 'After a cardiovascular event, the lower the LDL the fewer repeat events.'; o.tiers = ['ADA 2026 10.26 A', '10.27 B']; }
+  else if (!i.ascvd && !i.statin && i.age != null && i.age >= 40 && i.age <= 75) { o.head = 'Start a statin'; o.sub = 'Age 40 to 75: at least moderate intensity (10.18, A); high intensity, LDL under 70 and 50% lower if one or more extra ASCVD risk factors (10.20, A).'; o.why = 'Statins cut cardiovascular events in diabetes regardless of starting LDL.'; o.tiers = ['ADA 2026 10.18 A', '10.20 A']; }
+  else if (i.fib4 != null && i.fib4 >= 1.3) { o.head = 'FIB-4 ' + i.fib4 + ': elastography'; o.sub = 'Liver stiffness by transient elastography (or ELF if unavailable) (4.23, B); refer if high risk (4.24, B).'; o.why = 'FIB-4 of 1.3 or more cannot exclude advanced fibrosis, so a second test is needed.'; o.tiers = ['ADA 2026 4.23 B']; }
+  else if (i.health === 'very') { o.head = 'No A1C target: avoid lows and symptomatic highs'; o.sub = 'Stringent goals add little; simplify and deintensify where treatment burden outweighs benefit (13.7c, 13.14b).'; o.tiers = ['ADA 2026 13.7c C']; }
+  else { o.cls = 'okc'; o.head = (i.a1c != null || cg) ? 'At goal: keep going' : 'Yearly checklist'; o.sub = 'Work through what is due below.'; o.tiers = []; }
+  if (i.health === 'very') o.guards.push({t: 'Very complex or poor health: avoid lows and symptomatic highs; stringent goals add little (13.7c, C).'});
+  if (cg && !cg.enough) o.guards.push({t: 'Fewer than 14 days or under 70% active wear: the report may not be representative (Table 6.2).'});
+  if (i.gmi != null && i.a1c != null) o.gmiNote = 'A1C ' + i.a1c + '% vs GMI ' + i.gmi + '% (difference ' + r1(Math.abs(i.a1c - i.gmi)) + '). GMI approximates A1C but is not the same; a consistent, substantial gap should prompt a look for A1C interference (2.3, B).';
+
+  var t1 = i.type === '1', yrs = i.yrs;
+  var L = [];
+  function due(done, name, detail, src){ L.push({state: done ? 'ok' : 'due', name: name, detail: detail, src: src}); }
+  var kidneyDue = !t1 || yrs == null || yrs >= 5;
+  if (kidneyDue) due(i.uacr, 'UACR and eGFR', 'At least yearly (type 2 from diagnosis; type 1 from 5 years) (11.1a, B).', '11.1a');
+  var eyeDue = !t1 || yrs == null || yrs >= 5;
+  if (eyeDue) due(i.eye, 'Eye exam', i.retino ? 'Any retinopathy: at least yearly by eye care; refer moderate NPDR, any PDR or macular edema promptly (12.5, 12.9).' : 'Yearly; every 1 to 2 years if no retinopathy on one or more exams and glucose at goal (12.5, B). Retinal photos or FDA-approved AI screening are acceptable (12.6).', '12.5');
+  due(i.foot, 'Foot exam', 'Yearly: skin, deformity, 10-g monofilament plus pinprick, temperature or vibration, pulses (12.23-12.24).' + (i.lops ? ' Lost sensation or past ulcer: look at the feet every visit (12.25, A).' : ''), '12.24');
+  due(i.lipid, 'Lipids', 'Yearly, and 4 to 12 weeks after starting or changing a statin (10.16-10.17).' + (i.statin ? '' : ' Not on a statin: age 40 to 75 → at least moderate intensity (10.18, A).'), '10.17');
+  due(i.mood, 'Depression, distress, anxiety', 'At least yearly; disordered eating with a validated tool (5.45, 5.46, 5.48, 5.50, B).', '5.48');
+  due(i.dental, 'Dental', 'At least yearly (4.15, E).', '4.15');
+  if (i.met5) L.push({state: 'due', name: 'Vitamin B12', detail: 'Yearly after more than 5 years on metformin (Table 4.1); label: every 2 to 3 years.', src: 'Table 4.1'});
+  if (i.age != null && i.age >= 65) { L.push({state: 'due', name: 'Cognition and geriatric screen', detail: 'Yearly from 65 (13.2-13.3, B).', src: '13.3'}); L.push({state: 'due', name: 'Bone density', detail: 'DXA every 2 to 3 years from 65 (4.9, A).', src: '4.9'}); }
+  if (i.ins) L.push({state: 'due', name: 'Hypoglycemia review and glucagon', detail: 'Ask about lows each visit; screen awareness yearly; glucagon for all on insulin (6.10, 6.11, 6.16).', src: '6.16'});
+  L.push({state: 'due', name: 'Vaccines', detail: vaccineText(i.age), src: 'CDC 2025; Table 4.3'});
+  if (i.ascvd) L.push({state: 'due', name: 'Aspirin', detail: '75 to 162 mg daily for ASCVD (10.33, A); clopidogrel if allergic.', src: '10.33'});
+  L.push({state: 'later', name: 'Consider natriuretic peptide', detail: 'Screening for stage B heart failure; echo if abnormal (10.38a-b, B/A).', src: '10.38'});
+  o.ladder = L;
+  return o;
+}
+function vaccineText(age){
+  var t = 'Current CDC: COVID-19 per the current CDC schedule; influenza yearly; Tdap/Td every 10 years; hepatitis B through 59 (60+: shared decision with diabetes); zoster 2 doses from 50; pneumococcal (PCV20 or PCV21, or PCV15 then PPSV23) from 50, or 19 to 49 with diabetes; RSV once at 75+, or 50 to 74 if diabetes has end-organ damage or needs insulin or an SGLT2 inhibitor.';
+  t += ' ADA 2026 Table 4.3 differs: it lists pneumococcal by 19 to 64 and 65+, and RSV from 60.';
+  return t;
+}
+</script>
+<script id="figs">
+/* Figures: site-drawn SVG, shared colour names only. Each has states; the same figure is used in chips and Learn. */
+var SV = 'xmlns="http://www.w3.org/2000/svg" class="fig" role="img"';
+function T(x, y, s, o){ o = o || {}; return '<text x="' + x + '" y="' + y + '" text-anchor="' + (o.a || 'middle') + '" style="font-family:var(--mono);font-size:' + (o.s || 11) + 'px" fill="' + (o.c || 'var(--ink)') + '"' + (o.w ? ' font-weight="600"' : '') + '>' + s + '</text>'; }
+function box(x, y, w, h, on, lab, sub){
+  return '<rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="12" fill="' + (on ? 'var(--fill)' : 'var(--card)') + '" stroke="' + (on ? 'var(--accent)' : 'var(--line)') + '" stroke-width="' + (on ? 2 : 1) + '"/>' +
+    T(x + w / 2, y + h / 2 - (sub ? 2 : -4), lab, {c: on ? 'var(--accent)' : 'var(--muted)', w: on, s: 12}) + (sub ? T(x + w / 2, y + h / 2 + 14, sub, {c: on ? 'var(--ink)' : 'var(--muted)', s: 10.5}) : '');
+}
+var SITES = {
+  all: {on: ['brain', 'gut', 'panc', 'liver', 'muscle', 'fat', 'kidney'], sub: {}},
+  met: {on: ['liver', 'gut'], sub: {liver: 'less output', gut: 'GI effects'}},
+  sglt: {on: ['kidney'], sub: {kidney: 'to urine'}},
+  glp: {on: ['brain', 'gut', 'panc'], sub: {brain: 'satiety', gut: 'slow emptying', panc: 'more insulin'}},
+  tirz: {on: ['brain', 'gut', 'panc', 'fat'], sub: {brain: 'satiety', gut: 'slow emptying', panc: 'more insulin', fat: 'GIP'}},
+  dpp: {on: ['gut', 'panc'], sub: {gut: 'incretins last', panc: 'mild rise'}},
+  su: {on: ['panc'], sub: {panc: 'any glucose'}},
+  tzd: {on: ['fat', 'muscle', 'liver'], sub: {fat: 'sensitized', muscle: 'more uptake', liver: 'less output'}},
+  ins: {on: ['liver', 'muscle', 'fat'], sub: {liver: 'output stops', muscle: 'more uptake', fat: 'no breakdown'}}
+};
+var FIG = {
+  sites: {title: 'Where each drug acts', states: [
+      {k: 'all', l: 'All sites', c: 'Seven places glucose is set: brain (appetite), gut (emptying, incretin hormones), pancreas (insulin and glucagon), liver (glucose output), muscle and fat (uptake), kidney (reabsorption).'},
+      {k: 'met', l: 'Metformin', c: 'Lowers liver glucose output; acts in the gut too, hence nausea and diarrhea. No lows on its own.'},
+      {k: 'sglt', l: 'SGLT2i', c: 'Blocks glucose reabsorption in the kidney, so glucose leaves in urine. Works without insulin, so no lows; less effect as filtration falls.'},
+      {k: 'glp', l: 'GLP-1 RA', c: 'Insulin up and glucagon down only when glucose is high, slower stomach emptying, and earlier fullness: lower glucose and weight without lows.'},
+      {k: 'tirz', l: 'Tirzepatide', c: 'GLP-1 actions plus the GIP receptor, including on fat tissue: the largest A1C and weight effect.'},
+      {k: 'dpp', l: 'DPP-4i', c: 'Slows breakdown of the body\'s own incretins: a modest glucose effect, no weight change.'},
+      {k: 'su', l: 'Sulfonylurea', c: 'Makes the beta cell release insulin whatever the glucose, which is why lows and weight gain follow.'},
+      {k: 'tzd', l: 'Pioglitazone', c: 'Makes fat, muscle and liver more insulin sensitive; holds sodium and fluid, so not in heart failure.'},
+      {k: 'ins', l: 'Insulin', c: 'Replaces what the beta cell no longer makes: stops liver glucose output and fat breakdown, drives uptake into muscle and fat.'}],
+    svg: function(s){
+      var m = SITES[FIG.sites.states[s].k], on = function(k){ return m.on.indexOf(k) >= 0; }, sb = function(k){ return m.sub[k] || ''; };
+      return '<svg ' + SV + ' viewBox="0 0 340 250" aria-label="Organs where glucose-lowering drugs act">' +
+        box(10, 10, 100, 54, on('brain'), 'Brain', sb('brain')) + box(120, 10, 100, 54, on('gut'), 'Gut', sb('gut')) + box(230, 10, 100, 54, on('panc'), 'Pancreas', sb('panc')) +
+        box(10, 98, 100, 54, on('liver'), 'Liver', sb('liver')) + box(120, 98, 100, 54, on('muscle'), 'Muscle', sb('muscle')) + box(230, 98, 100, 54, on('fat'), 'Fat', sb('fat')) +
+        box(120, 186, 100, 54, on('kidney'), 'Kidney', sb('kidney')) +
+        '<path d="M170 64 V98 M280 64 V98 M60 64 V98 M170 152 V186" stroke="var(--line)" stroke-width="1.5" fill="none"/>' + '</svg>';
+    }},
+  kidney: {title: 'The kidney glucose threshold', states: [
+      {k: 'n', l: 'Normal', c: 'Glucose is filtered and almost all of it is taken back by SGLT2 in the proximal tubule. Below the threshold (about 180 mg/dL in adults; schematic), urine has no glucose.'},
+      {k: 'h', l: 'High glucose', c: 'Above the threshold the transporters are saturated and glucose spills into urine, pulling water with it: thirst and frequent urination.'},
+      {k: 's', l: 'SGLT2 inhibitor', c: 'Blocking SGLT2 lowers the threshold, so glucose is lost at ordinary levels: about 60 to 80 g a day (schematic), which also lowers weight and blood pressure.'},
+      {k: 'l', l: 'Low eGFR', c: 'With fewer working nephrons, less glucose is filtered, so less can be blocked: glucose lowering fades below eGFR 45, while kidney and heart protection persists down to eGFR 20.'}],
+    svg: function(s){
+      var k = FIG.kidney.states[s].k;
+      var th = (k === 's' || k === 'l') ? 70 : 180, g = k === 'n' ? 100 : (k === 'h' ? 260 : 140);
+      var x = function(v){ return 20 + v * 1; };
+      var spill = Math.max(0, g - th) * (k === 'l' ? 0.35 : 1);
+      return '<svg ' + SV + ' viewBox="0 0 340 170" aria-label="Glucose level against the kidney threshold">' +
+        '<rect x="20" y="40" width="300" height="26" rx="8" fill="var(--fill)"/>' +
+        '<rect x="20" y="40" width="' + (x(g) - 20) + '" height="26" rx="8" fill="var(--accent)" opacity=".25"/>' +
+        '<line x1="' + x(th) + '" y1="30" x2="' + x(th) + '" y2="76" stroke="var(--warn)" stroke-width="2"/>' +
+        T(x(th), 24, 'threshold', {c: 'var(--warn)', s: 10.5}) +
+        T(x(g), 92, 'blood ' + (k === 'l' ? '140' : g), {s: 10.5}) +
+        '<line x1="' + x(g) + '" y1="66" x2="' + x(g) + '" y2="80" stroke="var(--ink)" stroke-width="1.5"/>' +
+        T(20, 120, 'Glucose in urine', {a: 'start', c: 'var(--muted)', s: 11}) +
+        '<rect x="20" y="128" width="300" height="18" rx="6" fill="var(--fill)"/>' +
+        '<rect x="20" y="128" width="' + Math.min(300, spill * 1.6) + '" height="18" rx="6" fill="var(--warn)"/>' +
+        T(320, 160, k === 'n' ? 'none' : (k === 'l' ? 'less' : 'yes'), {a: 'end', c: 'var(--muted)', s: 10.5}) +
+        T(20, 108, '0', {a: 'start', c: 'var(--muted)', s: 10.5}) + T(320, 108, '300 mg/dL', {a: 'end', c: 'var(--muted)', s: 10.5}) + '</svg>';
+    }},
+  curves: {title: 'How long each insulin lasts', states: [
+      {k: 'all', l: 'All', c: 'Schematic action profiles. Typical ranges vary by dose and person; see each label.'},
+      {k: 'rapid', l: 'Rapid', c: 'Lispro, aspart, glulisine: start in about 15 minutes, peak around 1 to 2 hours, gone by about 4 to 5 hours. Given with meals.'},
+      {k: 'reg', l: 'Regular', c: 'Human regular: starts in about 30 minutes, peaks at 2 to 3 hours, lasts 6 to 8 hours, so it is given 30 minutes before meals and can cause late lows.'},
+      {k: 'nph', l: 'NPH', c: 'Peaks at about 4 to 10 hours and lasts 12 to 16 hours. A bedtime dose peaks overnight, the reason for night lows; it is cheap.'},
+      {k: 'long', l: 'Glargine, degludec', c: 'Nearly flat for about 24 hours (degludec longer). Covers liver glucose output between meals and overnight.'}],
+    svg: function(s){
+      var k = FIG.curves.states[s].k;
+      function path(pts){ return 'M' + pts.map(function(p){ return (30 + p[0] * 12) + ' ' + (140 - p[1] * 100); }).join(' L'); }
+      var C = {
+        rapid: [[0, 0], [0.25, .3], [1, .95], [1.5, 1], [2.5, .55], [4, .12], [5, 0]],
+        reg: [[0, 0], [0.5, .2], [2, .75], [3, .8], [5, .4], [7, .08], [8, 0]],
+        nph: [[0, 0], [1.5, .15], [5, .55], [8, .55], [12, .22], [16, 0]],
+        long: [[0, 0], [2, .3], [4, .38], [12, .4], [20, .38], [24, .3]]
+      };
+      var col = {rapid: 'var(--accent)', reg: 'var(--warn)', nph: 'var(--bad)', long: 'var(--ok)'};
+      var lab = {rapid: 'rapid', reg: 'regular', nph: 'NPH', long: 'long-acting'};
+      var lp = {rapid: [2.2, 1.04], reg: [4.6, .84], nph: [8.6, .62], long: [16, .48]};
+      var h = '<svg ' + SV + ' viewBox="0 0 340 170" aria-label="Insulin action over 24 hours">' +
+        '<line x1="30" y1="140" x2="318" y2="140" stroke="var(--line)"/>';
+      [0, 6, 12, 18, 24].forEach(function(t){ h += T(30 + t * 12, 156, t + ' h', {c: 'var(--muted)', s: 10.5}); });
+      Object.keys(C).forEach(function(n){
+        var hi = k === 'all' || k === n;
+        h += '<path d="' + path(C[n]) + '" fill="none" stroke="' + col[n] + '" stroke-width="' + (hi ? 2.5 : 1) + '" opacity="' + (hi ? 1 : .3) + '"/>';
+        if (hi) h += T(30 + lp[n][0] * 12, 140 - lp[n][1] * 100 - 4, lab[n], {c: col[n], s: 10.5});
+      });
+      return h + '</svg>';
+    }},
+  overbasal: {title: 'Overbasalization: the overnight fall', states: [
+      {k: 'ok', l: 'Basal right', c: 'Bedtime and waking glucose are close: basal is matching overnight liver output. After-meal highs, if any, need a meal-time fix.'},
+      {k: 'over', l: 'Overbasalized', c: 'Glucose falls 50 mg/dL or more from bedtime to morning: basal is doing a meal insulin\'s job. Raising it adds lows and still leaves daytime highs (ADA 9.26; Fig 9.5).'}],
+    svg: function(s){
+      var over = FIG.overbasal.states[s].k === 'over';
+      var y = function(g){ return 150 - (g - 50) * 0.6; };
+      var a = over ? 230 : 160, b = over ? 105 : 140;
+      return '<svg ' + SV + ' viewBox="0 0 340 170" aria-label="Glucose from bedtime to morning">' +
+        '<rect x="30" y="' + y(130) + '" width="290" height="' + (y(80) - y(130)) + '" fill="var(--okbg)"/>' + T(316, y(130) + 12, 'fasting goal 80–130', {a: 'end', c: 'var(--ok)', s: 10.5}) +
+        '<line x1="30" y1="' + y(70) + '" x2="320" y2="' + y(70) + '" stroke="var(--bad)" stroke-dasharray="4 4"/>' + T(316, y(70) + 12, '70', {a: 'end', c: 'var(--bad)', s: 10.5}) +
+        '<path d="M50 ' + y(a) + ' C130 ' + y(a - 10) + ' 220 ' + y(b + (over ? -25 : 0)) + ' 300 ' + y(b) + '" fill="none" stroke="var(--accent)" stroke-width="2.5"/>' +
+        '<circle cx="50" cy="' + y(a) + '" r="4" fill="var(--accent)"/><circle cx="300" cy="' + y(b) + '" r="4" fill="var(--accent)"/>' +
+        T(50, y(a) - 8, 'bedtime ' + a, {s: 10.5}) + T(300, y(b) - 8, 'waking ' + b, {s: 10.5}) +
+        T(175, 22, 'drop ' + (a - b) + ' mg/dL' + (over ? ' (≥50)' : ''), {c: over ? 'var(--bad)' : 'var(--ink)', w: true, s: 11}) + '</svg>';
+    }},
+  a1c: {title: 'Why A1C and CGM can disagree', states: [
+      {k: 'n', l: 'Usual', c: 'A1C is glucose stuck to hemoglobin over the red cell\'s life (about 120 days), weighted to the last weeks. GMI is calculated from CGM glucose and approximates it.'},
+      {k: 's', l: 'Shorter red-cell life', c: 'Blood loss, hemolysis, transfusion or erythropoietin replace old cells with young ones that have had less time to glycate, so A1C reads lower than glucose would suggest (schematic). Use plasma glucose to diagnose (ADA 2.4); CGM is not used for diagnosis.'},
+      {k: 'v', l: 'Hb variant or assay', c: 'Some hemoglobin variants interfere with some assays; G6PD deficiency and HIV alter the relationship. A consistent, substantial gap between A1C and glucose should prompt a check (ADA 2.3).'}],
+    svg: function(s){
+      var k = FIG.a1c.states[s].k, w = k === 's' ? 150 : 270;
+      var h = '<svg ' + SV + ' viewBox="0 0 340 130" aria-label="Red cell lifespan and glycation">' +
+        T(30, 22, 'red cell life', {a: 'start', c: 'var(--muted)', s: 10.5}) +
+        '<rect x="30" y="32" width="270" height="22" rx="8" fill="var(--fill)"/>' +
+        '<rect x="30" y="32" width="' + w + '" height="22" rx="8" fill="var(--accent)" opacity=".3"/>' + T(30 + w, 70, k === 's' ? 'shorter' : '~120 days', {s: 10.5}) +
+        T(30, 98, 'A1C', {a: 'start', s: 11, w: true}) + T(110, 98, k === 's' ? 'reads low' : (k === 'v' ? 'may mislead' : 'tracks glucose'), {a: 'start', s: 11, c: k === 'n' ? 'var(--ok)' : 'var(--warn)'}) +
+        T(30, 118, 'GMI (CGM)', {a: 'start', s: 11, w: true}) + T(110, 118, 'unaffected by red cells', {a: 'start', s: 11, c: 'var(--muted)'});
+      return h + '</svg>';
+    }},
+  ketones: {title: 'Blood ketone bands', states: [{k: 'b', l: 'Bands', c: 'Beta-hydroxybutyrate on a finger-stick meter. Actions from the 2019 international consensus written for type 1 on SGLT inhibitors, often used for sick days. STICH: stop the SGLT inhibitor, insulin, carbohydrate, hydration.'}],
+    svg: function(){
+      var x = function(v){ return 20 + v * 75; };
+      var seg = [[0, .6, 'var(--ok)', 'normal'], [.6, 1.5, 'var(--accent)', 'act'], [1.5, 3.0, 'var(--warn)', 'impending'], [3.0, 4.0, 'var(--bad)', 'probable DKA']];
+      var h = '<svg ' + SV + ' viewBox="0 0 340 110" aria-label="Ketone bands">';
+      seg.forEach(function(q){ h += '<rect x="' + x(q[0]) + '" y="30" width="' + (x(q[1]) - x(q[0])) + '" height="24" fill="' + q[2] + '" opacity=".85"/>' + T((x(q[0]) + x(q[1])) / 2, 74, q[3], {s: 10.5, c: q[2]}); });
+      [0, .6, 1.5, 3.0].forEach(function(v){ h += T(x(v), 22, v, {s: 10.5, c: 'var(--muted)'}); });
+      return h + T(320, 22, 'mmol/L', {a: 'end', s: 10.5, c: 'var(--muted)'}) + '</svg>';
+    }},
+  hypo: {title: 'Levels of hypoglycemia', states: [{k: 'h', l: 'Levels', c: 'Level 1: under 70 and 54 or more. Level 2: under 54. Level 3: needs another person\'s help, at any number. Treat with glucose (usually 15 g; 5 to 10 g on AID), recheck in 15 minutes and repeat if still low. Any level 2 or 3 event means the plan changes (ADA Table 6.4, 6.15, 6.19).'}],
+    svg: function(){
+      var y = function(g){ return 20 + (130 - g) * 1.1; };
+      return '<svg ' + SV + ' viewBox="0 0 340 152" aria-label="Glucose levels defining hypoglycemia">' +
+        '<rect x="90" y="' + y(130) + '" width="160" height="' + (y(70) - y(130)) + '" fill="var(--okbg)"/>' + T(170, y(100), 'target range', {c: 'var(--ok)', s: 11}) +
+        '<rect x="90" y="' + y(70) + '" width="160" height="' + (y(54) - y(70)) + '" fill="var(--warnbg)"/>' + T(170, y(62) + 4, 'level 1 (54–69)', {c: 'var(--warn)', s: 11}) +
+        '<rect x="90" y="' + y(54) + '" width="160" height="' + (y(40) - y(54)) + '" fill="var(--badbg)"/>' + T(170, y(47) + 4, 'level 2 (<54)', {c: 'var(--bad)', s: 11}) +
+        T(80, y(70) + 4, '70', {a: 'end', s: 10.5, c: 'var(--muted)'}) + T(80, y(54) + 4, '54', {a: 'end', s: 10.5, c: 'var(--muted)'}) +
+        T(170, y(40) + 18, 'level 3: needs another person\'s help, at any number', {s: 10.5, c: 'var(--bad)'}) + '</svg>';
+    }}
+};
+var FIGS = Object.keys(FIG);
+function figBody(f, s){
+  var h = '';
+  if (f.states.length > 1) h += '<div class="states">' + f.states.map(function(st, j){ return '<button class="sbtn" type="button" data-s="' + j + '" aria-pressed="' + (j === s) + '">' + st.l + '</button>'; }).join('') + '</div>';
+  return h + f.svg(s) + '<p class="cap">' + f.states[s].c + '</p>';
+}
+</script>
+<script id="ui">
+var $ = function(id){ return document.getElementById(id); };
+function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return {'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c]; }); }
+var ICON = '<svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><rect x="1.5" y="2.5" width="13" height="11" rx="2" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M4 11l3-3 2 2 3-4" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>';
+var STATE_LABEL = {add: 'add now', next: 'add next', later: 'later', keep: 'keep', cut: 'reduce', stop: 'stop', due: 'due', ok: 'done'};
+
+/* Example values so each tab opens in a working state. Clearly labelled; Clear empties them. */
+var EX = {
+  screen: {'s-a1c': '6.9', 's-fpg': '131', 's-age': '29', 's-bmi': '23.5', 's-wl': true},
+  meds: {'m-a1c': '8.4', 'm-goal': '7', 'm-age': '62', 'm-egfr': '48', 'm-uacr': '210', 'm-k': '4.6', 'm-bmi': '34', 'm-ascvd': true, 'm-htn': true, 'm-wt': true, 'm-met': true, 'm-su': true, 'm-raas': true},
+  insulin: {'i-type': '2', 'i-wt': '90', 'i-a1c': '8.6', 'i-basal': '56', 'i-kind': 'analog', 'i-fpg': '118', 'i-bed': '205', 'i-low': 'none', 'i-glp': true},
+  visit: {'v-type': '2', 'v-age': '67', 'v-yrs': '9', 'v-health': 'well', 'v-a1c': '7.1', 'v-sbp': '128', 'v-dbp': '76', 'v-ldl': '64', 'v-tir': '66', 'v-tbr1': '5', 'v-tbr2': '1.5', 'v-tar1': '28', 'v-tar2': '6', 'v-cv': '38', 'v-gmi': '7.0', 'v-days': '14', 'v-wear': '92', 'v-uacr': true, 'v-lipid': true, 'v-statin': true, 'v-met5': true, 'v-ins': true}
+};
+var isEx = {screen: true, meds: true, insulin: true, visit: true};
+var PFX = {screen: 's-', meds: 'm-', insulin: 'i-', visit: 'v-'};
+function fieldsOf(tab){ return Array.prototype.slice.call($('in-' + tab).querySelectorAll('input,select')); }
+function fill(tab, vals){
+  fieldsOf(tab).forEach(function(el){
+    var v = vals[el.id];
+    if (el.type === 'checkbox') el.checked = !!v;
+    else if (el.tagName === 'SELECT') el.value = v != null ? v : el.options[0].value;
+    else el.value = v != null ? v : '';
+  });
+}
+function read(tab){
+  var r = {};
+  fieldsOf(tab).forEach(function(el){
+    var k = el.id.slice(2);
+    if (el.type === 'checkbox') r[k] = el.checked;
+    else if (el.tagName === 'SELECT') r[k] = el.value;
+    else r[k] = num(el.value);
+  });
+  return r;
+}
+function tierHtml(ts){ return (ts || []).map(function(t){ return '<span class="tier">' + esc(t) + '</span>'; }).join(''); }
+function guardHtml(gs){ return (gs || []).map(function(g){ return '<div class="guard' + (g.bad ? ' bad' : '') + '">' + g.t + '</div>'; }).join(''); }
+function chipHtml(fs){ return fs && fs.length ? '<div class="chips">' + fs.map(function(f){ return '<button class="chip" type="button" data-fig="' + f + '">' + ICON + esc(FIG[f].title) + '</button>'; }).join('') + '</div>' : ''; }
+function card(o){
+  var h = '<div class="card' + (o.next ? ' next' : '') + '"' + (o.id ? ' id="' + o.id + '"' : '') + '><p class="label">' + o.label + '</p>';
+  if (o.head) h += '<p class="head ' + (o.cls || '') + '">' + o.head + '</p>';
+  if (o.sub) h += '<p class="sub">' + o.sub + '</p>';
+  if (o.dose && o.dose.length) h += '<div class="dose">' + o.dose.map(function(d){ return '<div>' + d + '</div>'; }).join('') + '</div>';
+  if (o.body) h += o.body;
+  h += guardHtml(o.guards);
+  if (o.why) h += '<p class="whyline"><b>Why:</b> ' + o.why + '</p>';
+  if (o.tiers && o.tiers.length) h += '<div>' + tierHtml(o.tiers) + '</div>';
+  h += chipHtml(o.figs);
+  if (o.more) h += '<details><summary>More</summary>' + o.more + '</details>';
+  return h + '</div>';
+}
+function ladderHtml(L, numbered){
+  var n = 0;
+  return '<ul class="ladder">' + L.map(function(x){
+    var num = (numbered && (x.state === 'add' || x.state === 'next' || x.state === 'later')) ? ++n : '·';
+    return '<li><span class="n">' + num + '</span><span class="t"><b>' + x.name + '</b><span>' + x.detail + '</span>' + (x.dose ? '<span class="dl">' + x.dose + '</span>' : '') + '</span><span class="state s-' + x.state + '">' + STATE_LABEL[x.state] + '</span></li>';
+  }).join('') + '</ul>';
+}
+function barHtml(tab, parts){
+  return parts.filter(Boolean).map(function(p){ return '<span>' + p + '</span>'; }).join('') + (isEx[tab] ? '<span class="ex">Example patient</span>' : '') + '<button class="edit" type="button" data-edit="' + tab + '" aria-expanded="' + ($('in-' + tab).classList.contains('on')) + '" aria-controls="in-' + tab + '">Edit</button>';
+}
+function v(x, suf){ return x == null ? null : '<b>' + x + '</b>' + (suf || ''); }
+function a1(x){ return x == null ? null : x.toFixed(1); }
+
+/* ---------- MEDS ---------- */
+function renderMeds(){
+  var i = read('meds'); i.goal = num(i.goal) || 7;
+  $('bar-meds').innerHTML = barHtml('meds', [i.a1c != null ? 'A1C ' + v(a1(i.a1c)) + '/' + i.goal : null, i.egfr != null ? 'eGFR ' + v(i.egfr) : null, i.uacr != null ? 'UACR ' + v(i.uacr) : null, i.bmi != null ? 'BMI ' + v(i.bmi) : null, [i.ascvd && 'ASCVD', i.hf && 'HF', i.masld && 'MASLD'].filter(Boolean).join(' · ') || null]);
+  var o = medsEngine(i), h = '', h2 = '';
+  if (o.next.length) {
+    var head = o.next.slice(0, 3).map(function(x, n){ return n ? x.name.charAt(0).toLowerCase() + x.name.slice(1) : x.name; }).join('; ');
+    var more = '<ul>' + o.ladder.filter(function(x){ return x.state !== 'keep'; }).map(function(x){ return '<li><b>' + x.name + ':</b> ' + x.detail + (x.src ? ' <span class="mono">(' + x.src + ')</span>' : '') + '</li>'; }).join('') + '</ul><p>Doses are from the FDA labels; the full table is in "Doses and kidney limits".</p>';
+    h += card({id: 'next', next: true, label: 'Next step', head: head, dose: o.next.filter(function(x){ return x.dose; }).map(function(x){ return x.dose; }), guards: o.guards, why: o.why, tiers: o.tiers.slice(0, 3), figs: o.figs, more: more});
+  } else if (o.ladder.length) {
+    h += card({id: 'next', next: true, label: 'Next step', head: o.gap != null && o.gap <= 0 ? 'At goal: keep the current plan' : 'Keep the current plan', cls: 'okc', sub: (o.ladder.some(function(x){ return x.key === 'sglt2' || x.key === 'inc'; }) ? 'Organ-protecting drugs are in place. ' : '') + 'Reassess every 3 to 6 months (9.14, E).', guards: o.guards, figs: o.figs});
+  } else {
+    h += card({id: 'next', next: true, label: 'Next step', head: 'Enter A1C, eGFR and conditions', sub: 'Tap Edit. Drugs are chosen first for heart, kidney and liver, then for glucose and weight.'});
+  }
+  h2 += card({id: 'ladder', label: 'The plan for this patient', body: o.ladder.length ? ladderHtml(o.ladder, true) : '<p class="empty">Nothing yet.</p>'});
+  h2 += doseCard(i);
+  h2 += holdCard();
+  $('out-meds').innerHTML = h; $('out-meds2').innerHTML = h2;
+}
+function doseCard(i){
+  var keys = ['metformin', 'empagliflozin', 'dapagliflozin', 'canagliflozin', 'ertugliflozin', 'semaglutide', 'semaOral', 'dulaglutide', 'liraglutide', 'tirzepatide', 'sitagliptin', 'linagliptin', 'pioglitazone', 'glipizide', 'glimepiride', 'finerenone'];
+  var t = '<div class="scroll"><table class="dtab"><thead><tr><th>Drug</th><th>Start → max</th><th>Cost</th></tr></thead><tbody>' + keys.map(function(k){ var d = DRUG[k]; return '<tr><td>' + d.n + '<br><span class="sub">' + d.cls + '</span></td><td><span class="mono">' + d.start + '</span><br>' + d.step + '; max ' + d.max + '</td><td class="mono">' + d.cost + '</td></tr>'; }).join('') + '</tbody></table></div>';
+  var kid = '<ul>' + keys.map(function(k){ return '<li><b>' + DRUG[k].n + ':</b> ' + DRUG[k].kid + '</li>'; }).join('') + '</ul>';
+  var cost = i.cost ? '<div class="guard">Cost limits choices: metformin, sulfonylureas, pioglitazone and human insulin (NPH, regular, 70/30) are the lower-cost options, weighed against their risks (9.30, E). Compounded GLP-1 products are not recommended (9.31a, C). Check Medi-Cal and plan formularies; adjust to your institution.</div>' : '';
+  return card({id: 'doses', label: 'Doses and kidney limits', body: t + cost, more: kid + '<p>Cost: $ low, $$ middle, $$$ high, relative to each other (ADA 2026 Table 9.3); finerenone is not in that table. Actual cost depends on the plan.</p>', tiers: ['FDA labels 2023–2026']});
+}
+function holdCard(){
+  return card({id: 'holds', label: 'Sick days and procedures', head: 'SGLT2 inhibitors: hold 3 days before surgery (ertugliflozin 4)', sub: 'Also stop on sick days with poor intake. Teach ketoacidosis symptoms, give a blood ketone meter, avoid ketogenic diets (9.39, E); DKA can occur with glucose under 200.', more: '<p>GLP-1 RAs and tirzepatide: most people continue them; 24 hours of liquids before the procedure for those at high risk of retained stomach contents (multisociety guidance, 2024). Insulin, metformin and sulfonylureas: see the pre-op tool.</p><p><a href="/preop/#meds">Pre-op medication holds</a></p>', tiers: ['FDA labels', 'ADA 2026 9.39 E']});
+}
+
+/* ---------- INSULIN ---------- */
+function renderInsulin(){
+  var i = read('insulin');
+  $('bar-insulin').innerHTML = barHtml('insulin', ['Type ' + v(i.type), i.wt != null ? v(i.wt, ' kg') : null, i.basal ? 'basal ' + v(i.basal, ' U') : 'no basal', i.fpg != null ? 'fasting ' + v(i.fpg) : null, i.bed != null ? 'bedtime ' + v(i.bed) : null, i.a1c != null ? 'A1C ' + v(i.a1c) : null]);
+  var o = insulinEngine(i);
+  var more = '<p>Basal start 10 units/day or 0.1 to 0.2 units/kg/day; +2 units every 3 days to fasting 80 to 130; lower 10 to 20% for a low with no clear cause. Mealtime: one dose at the largest meal, 4 units or 10% of basal; +1 to 2 units or 10 to 15% twice weekly. Bedtime NPH to twice daily: 80% of the dose, ⅔ morning, ⅓ bedtime. Premixed twice daily: unit for unit at the same total (ADA 2026 Fig 9.5).</p><p>Overbasalization (9.26, E): bedtime-to-morning or after-to-before-meal differences, lows, high variability. ADA gives no dose threshold; over 0.5 units/kg/day is a common flag (expert practice).</p>';
+  var h = card({id: 'ins-next', next: true, label: 'Next step', head: o.head, cls: o.cls, sub: o.sub, dose: o.dose, guards: o.guards, why: o.why, tiers: o.tiers, figs: o.figs, more: more});
+  var h2 = o.ladder.length ? card({id: 'ins-ladder', label: 'Then', body: ladderHtml(o.ladder, true)}) : '';
+  h2 += card({id: 'hypo', label: 'Lows', head: 'Under 70: glucose 15 g, recheck in 15 minutes', sub: 'Repeat until above 70. 5 to 10 g on automated insulin delivery. Avoid fat or protein for the first treatment. Then a meal or snack.', more: '<p>Level 1: 54 to 69. Level 2: under 54. Level 3: needs help at any number (Table 6.4). Any level 2 or 3 event: reevaluate the plan (6.19, B). Glucagon for everyone on insulin, ready-to-use forms preferred (6.16, A/B).</p>', figs: ['hypo'], tiers: ['ADA 2026 6.15 B', '6.16 A']});
+  h2 += card({id: 'switch', label: 'Switching basal products', head: 'Usually unit for unit', sub: 'Reduce 10 to 20% when glucose is tightly controlled or lows are a risk, especially from NPH or glargine U-300 (ADA 2026 §9).', tiers: ['ADA 2026 §9']});
+  h2 += card({id: 'ketones', label: 'Sick-day ketones', head: i.bhb != null ? ketoneBand(i.bhb).t : 'Type 1 or on an SGLT2 inhibitor: check blood ketones when ill', sub: i.bhb != null ? ketoneBand(i.bhb).a : 'Under 0.6 normal; 0.6 to 1.5 act at home; 1.6 to 3.0 impending DKA; over 3.0 probable DKA.', figs: ['ketones'], tiers: ['Danne 2019 consensus']});
+  $('out-insulin').innerHTML = h; $('out-insulin2').innerHTML = h2;
+}
+
+/* ---------- SCREEN ---------- */
+var narrowSel = {};
+function renderScreen(){
+  var i = read('screen');
+  $('bar-screen').innerHTML = barHtml('screen', [i.a1c != null ? 'A1C ' + v(a1(i.a1c)) : null, i.fpg != null ? 'FPG ' + v(i.fpg) : null, i.ogtt != null ? '2-h ' + v(i.ogtt) : null, i.rand != null ? 'random ' + v(i.rand) : null, i.age != null ? 'age ' + v(i.age) : null, i.bmi != null ? 'BMI ' + v(i.bmi) : null]);
+  var o = screenEngine(i);
+  var more = '<p>Diabetes: A1C 6.5% or more, fasting 126 or more (8 hours), 2-h OGTT 200 or more, or random 200 or more with symptoms (Table 2.1). Prediabetes: A1C 5.7 to 6.4%, fasting 100 to 125, 2-h 140 to 199 (Table 2.2). Results close to a threshold: educate and repeat in 3 to 6 months. OGTT: eat at least 150 g carbohydrate a day for 3 days first (2.14, C). CGM is not used to diagnose.</p><p>Screen: everyone from 35; any age with BMI 25+ (23+ Asian ancestry) and a risk factor; prior GDM every 1 to 3 years; prediabetes yearly; normal every 3 years or sooner (Table 2.5). USPSTF: 35 to 70 with overweight or obesity (grade B, 2021).</p>';
+  var h = card({id: 'dx', next: true, label: 'Result', head: o.head, cls: o.cls, sub: o.sub, guards: o.guards, why: o.why, tiers: o.tiers, more: more, figs: (i.a1cbad ? ['a1c'] : [])});
+  if (o.ladder.length) h += card({id: 'screen-plan', label: o.prediabetes ? 'Prediabetes plan' : 'Then', body: ladderHtml(o.ladder, true)});
+  var h2 = '';
+  if (o.diabetes || (o.type && o.type.length)) h2 += narrowCard('narrow');
+  else h2 += card({id: 'narrow', label: 'Which type?', sub: 'Shown once diabetes is diagnosed: antibodies, C-peptide and MODY clues narrow the type.'});
+  $('out-screen').innerHTML = h; $('out-screen2').innerHTML = h2;
+}
+function narrowCard(id){
+  var fav = {}, out = {}, less = {};
+  RESULTS.forEach(function(r){ if (narrowSel[r.k]) { r.fav.forEach(function(k){ fav[k] = 1; }); Object.keys(r.out).forEach(function(k){ out[k] = r.out[k]; }); Object.keys(r.less || {}).forEach(function(k){ less[k] = r.less[k]; }); } });
+  var body = '<p class="sub">Send first: GAD antibody (then IA-2 and/or ZnT8 if negative; insulin antibody only if never on insulin). C-peptide only in people on insulin, with a paired glucose, not within 2 weeks of DKA. Tap results:</p><div class="seg">' +
+    RESULTS.map(function(r){ return '<button class="sbtn" type="button" data-res="' + r.k + '" aria-pressed="' + !!narrowSel[r.k] + '">' + r.n + '</button>'; }).join('') + '</div>' +
+    TYPES.map(function(t){ var c = out[t.k] ? 'out' : (fav[t.k] ? 'fav' : ''); return '<div class="cause ' + c + '"><span>' + t.n + '</span><small>' + (out[t.k] || less[t.k] || (fav[t.k] ? 'fits' : '')) + '</small></div>'; }).join('');
+  return card({id: id, label: 'Which type? Narrow it', body: body, more: '<p>Clues to type 1: age under 35, BMI under 25, weight loss, ketoacidosis, glucose over 360 at presentation, autoimmunity, type 1 in the family, checkpoint inhibitors (AABBCC; Fig 2.1). C-peptide: 600 pmol/L (1.8 ng/mL) or more favors type 2; 200 to 600 indeterminate (type 1, MODY, or long insulin-treated type 2); under 200 (0.6 ng/mL) type 1; under 80 needs no repeat. MODY clues: A1C under 7.5% at diagnosis, one parent with diabetes, renal cysts, partial lipodystrophy, maternal deafness, Exeter probability over 5% → genetic testing. After pancreatitis: screen 3 to 6 months later and yearly (2.23).</p>', tiers: ['ADA 2026 Fig 2.1 (adapted from Holt 2021)', '2.10 E']});
+}
+
+/* ---------- VISIT ---------- */
+function renderVisit(){
+  var i = read('visit');
+  $('bar-visit').innerHTML = barHtml('visit', ['Type ' + v(i.type), i.age != null ? 'age ' + v(i.age) : null, i.a1c != null ? 'A1C ' + v(i.a1c) : null, i.tir != null ? 'TIR ' + v(i.tir, '%') : null, i.sbp != null ? 'BP ' + v(i.sbp) + '/' + (i.dbp != null ? i.dbp : '–') : null]);
+  var o = visitEngine(i);
+  var goalTxt = o.goal == null ? 'No A1C target: avoid lows and symptomatic highs (13.7c).' : 'A1C goal under ' + o.goal + '%' + (i.health === 'well' && i.age != null && i.age >= 65 ? ' (healthy older adult: 7.0 to 7.5%, 13.7a)' : (i.health === 'complex' ? ' (13.7b)' : ' (6.3a; under 6.5% if healthy with low risk of lows, 6.4)'));
+  var h = card({id: 'visit-next', next: true, label: 'Next step', head: o.head, cls: o.cls, sub: o.sub + ' ' + goalTxt, guards: o.guards, why: o.why, tiers: o.tiers, figs: o.gmiNote ? ['a1c'] : [], more: o.gmiNote ? '<p>' + o.gmiNote + '</p>' : ''});
+  var h2 = '';
+  if (o.cgm) {
+    var c = o.cgm, val = function(x){ return x == null ? 0 : x; };
+    var tb2 = val(i.tbr2), tb1 = Math.max(0, val(i.tbr1) - tb2), ta2 = val(i.tar2), ta1 = Math.max(0, val(i.tar1) - ta2), tir = val(i.tir);
+    var bar = '<div class="cgmbar" aria-hidden="true"><i style="width:' + tb2 + '%;background:var(--bad)"></i><i style="width:' + tb1 + '%;background:var(--warn)"></i><i style="width:' + tir + '%;background:var(--ok)"></i><i style="width:' + ta1 + '%;background:var(--accent)"></i><i style="width:' + ta2 + '%;background:var(--muted)"></i></div><div class="leg"><span><i style="background:var(--bad)"></i>&lt;54</span><span><i style="background:var(--warn)"></i>54–69</span><span><i style="background:var(--ok)"></i>70–180</span><span><i style="background:var(--accent)"></i>181–250</span><span><i style="background:var(--muted)"></i>&gt;250</span></div>';
+    var rows = c.rows.map(function(r){ return '<div class="metric"><span>' + r.n + '</span><span class="v">' + r.v + '%</span><span class="g">' + r.tgt + ' ' + (r.ok ? '✓' : '✗') + '</span></div>'; }).join('');
+    h2 += card({id: 'cgm', label: 'CGM report' + (i.health !== 'well' ? ' · older or complex targets' : ''), body: bar + rows, more: '<p>Most adults: in range over 70%, below 70 under 4%, below 54 under 1%, above 180 under 25%, above 250 under 5%, CV 36% or less, 14 days with 70% wear (Table 6.2, 6.3b-c). Older with intermediate or complex health: in range over 50%, below 70 under 1%, above 180 under 50%, above 250 under 10% (Table 6.2, 13.7b).</p>', tiers: ['ADA 2026 Table 6.2', '6.3c B']});
+  }
+  h2 += card({id: 'checklist', label: 'Yearly checklist', body: ladderHtml(o.ladder, false), more: '<p>Also yearly: BMI, BP every visit, skin and injection sites, OSA screen, CBC, potassium on ACE inhibitor, ARB or diuretic, TSH in type 1 (Table 4.1). Fracture risk in older adults; avoid TZDs and sulfonylureas if high (4.10). ABI from 65 or with microvascular disease if it would change care (10.39). Neuropathy and autonomic symptoms yearly (12.17, 12.19).</p>'});
+  $('out-visit').innerHTML = h; $('out-visit2').innerHTML = h2;
+}
+
+/* ---------- LEARN ---------- */
+var CHAP = [
+  {id: 'learn-sites', t: 'Where each drug acts', p: 'Tap a class to see the organs it works on. The heart and kidney benefits of SGLT2 inhibitors and GLP-1 RAs are not explained by glucose lowering alone.', f: 'sites'},
+  {id: 'learn-kidney', t: 'The kidney threshold and SGLT2', p: 'Why an SGLT2 inhibitor still protects a kidney whose eGFR is too low for it to lower glucose.', f: 'kidney'},
+  {id: 'learn-curves', t: 'Insulin action profiles', p: 'Match the profile to the problem: fasting highs need basal; after-meal highs need mealtime insulin or a GLP-1 RA.', f: 'curves'},
+  {id: 'learn-overbasal', t: 'Overbasalization', p: 'The commonest insulin error in clinic: chasing the A1C with ever more basal.', f: 'overbasal'},
+  {id: 'learn-a1c', t: 'A1C, GMI and when they disagree', p: 'A1C is a red-cell measurement as much as a glucose one.', f: 'a1c'},
+  {id: 'learn-hypo', t: 'Hypoglycemia levels', p: 'Level, not a single number, decides how the plan changes.', f: 'hypo'},
+  {id: 'learn-ketones', t: 'Ketones on sick days', p: 'Type 1, or anyone on an SGLT2 inhibitor, can develop ketoacidosis with near-normal glucose.', f: 'ketones'},
+  {id: 'learn-type', t: 'Which type of diabetes?', p: 'Misclassification is common; adults with type 1 are often first called type 2.', narrow: true},
+  {id: 'trials', t: 'Trials', trials: true}
+];
+var learnState = {};
+function renderLearn(){
+  $('learn-pills').innerHTML = CHAP.map(function(c){ return '<button class="pill" type="button" data-jump="' + c.id + '">' + c.t + '</button>'; }).join('');
+  $('learn-body').innerHTML = CHAP.map(function(c){
+    var h = '<div class="card chap" id="' + c.id + '"><p class="label">' + c.t + '</p>' + (c.p ? '<p class="sub">' + c.p + '</p>' : '');
+    if (c.f) h += '<div data-inl="' + c.f + '">' + figBody(FIG[c.f], learnState[c.f] || 0) + '</div>';
+    if (c.trials) h += TRIALS.map(trialHtml).join('<hr style="border:0;border-top:1px solid var(--line);margin:14px 0">');
+    h += '</div>';
+    if (c.narrow) h = '<div class="chap" id="' + c.id + '">' + narrowCard('learn-narrow') + '</div>';
+    return h;
+  }).join('');
+}
+var TRIALS = [
+  {n: 'UKPDS 33', q: 'Does intensive glucose control in new type 2 diabetes prevent complications?', d: 'RCT, 3,867 adults; sulfonylurea or insulin vs diet; median 10 years.', r: 'A1C 7.0% vs 7.9%; any diabetes-related endpoint 12% lower, mostly microvascular (25% lower); no significant MI reduction.', c: 'Established glucose control for eye and kidney disease.', ref: 'Lancet 1998;352:837. doi:10.1016/S0140-6736(98)07019-6'},
+  {n: 'UKPDS 34', q: 'Metformin in overweight new type 2 diabetes?', d: 'RCT, 753 overweight adults; metformin vs conventional.', r: 'Any diabetes endpoint 32% lower, all-cause death 36% lower, MI 39% lower.', c: 'Made metformin first-line for decades. Small subgroup.', ref: 'Lancet 1998;352:854. doi:10.1016/S0140-6736(98)07037-8'},
+  {n: 'UKPDS 80 (legacy)', q: 'Do early benefits last after the trial ends?', d: '10-year post-trial follow-up; A1C differences disappeared within a year.', r: 'Sulfonylurea/insulin: MI 15% and death 13% lower; metformin: MI 33% and death 27% lower.', c: 'Early control leaves a "legacy".', ref: 'N Engl J Med 2008;359:1577. doi:10.1056/NEJMoa0806470'},
+  {n: 'DCCT', q: 'Intensive insulin in type 1?', d: 'RCT, 1,441 adults and teens; mean 6.5 years.', r: 'Retinopathy onset 76% lower in primary prevention; nephropathy and neuropathy reduced; severe lows 2 to 3 times more frequent.', c: 'Founded intensive insulin therapy in type 1.', ref: 'N Engl J Med 1993;329:977. doi:10.1056/NEJM199309303291401'},
+  {n: 'ACCORD (glycemia)', q: 'Does an A1C target under 6% cut CV events in high-risk type 2?', d: 'RCT, 10,251 adults; stopped early.', r: 'Primary outcome not reduced (HR 0.90); all-cause death higher (HR 1.22).', c: 'Why goals are individualized and lows avoided.', ref: 'N Engl J Med 2008;358:2545. doi:10.1056/NEJMoa0802743'},
+  {n: 'DPP', q: 'Can lifestyle or metformin prevent type 2 diabetes?', d: 'RCT, 3,234 adults with prediabetes (IGT); 2.8 years.', r: 'Incidence 58% lower with lifestyle, 31% lower with metformin vs placebo.', c: 'The basis of prevention programs and metformin in prediabetes.', ref: 'N Engl J Med 2002;346:393. doi:10.1056/NEJMoa012512'},
+  {n: 'EMPA-REG OUTCOME', q: 'Empagliflozin in type 2 with CVD?', d: 'RCT, 7,020 adults.', r: 'MACE HR 0.86; CV death HR 0.62; HF hospitalization HR 0.65.', c: 'First glucose drug to lower CV death.', ref: 'N Engl J Med 2015;373:2117. doi:10.1056/NEJMoa1504720'},
+  {n: 'CANVAS Program', q: 'Canagliflozin in type 2 with high CV risk?', d: 'Two RCTs, 10,142 adults.', r: 'MACE HR 0.86; amputation 6.3 vs 3.4 per 1,000 patient-years.', c: 'Class benefit and the amputation warning.', ref: 'N Engl J Med 2017;377:644. doi:10.1056/NEJMoa1611925'},
+  {n: 'CREDENCE', q: 'Canagliflozin in type 2 with albuminuric CKD?', d: 'RCT, 4,401 adults; eGFR 30 to 89, UACR over 300; stopped early for benefit.', r: 'Kidney failure, doubling of creatinine or renal/CV death HR 0.70.', c: 'First kidney-outcome trial of an SGLT2 inhibitor.', ref: 'N Engl J Med 2019;380:2295. doi:10.1056/NEJMoa1811744'},
+  {n: 'DAPA-CKD', q: 'Dapagliflozin in CKD with or without diabetes?', d: 'RCT, 4,304 adults; eGFR 25 to 75.', r: 'Primary kidney/CV outcome HR 0.61.', c: 'Extended SGLT2 benefit to CKD without diabetes.', ref: 'N Engl J Med 2020;383:1436. doi:10.1056/NEJMoa2024816'},
+  {n: 'EMPA-KIDNEY', q: 'Empagliflozin across a wide CKD range?', d: 'RCT, 6,609 adults; eGFR 20 to 45, or 45 to 90 with albuminuria.', r: 'Kidney progression or CV death HR 0.72.', c: 'Supports starting down to eGFR 20.', ref: 'N Engl J Med 2023;388:117. doi:10.1056/NEJMoa2204233'},
+  {n: 'LEADER', q: 'Liraglutide in type 2 with high CV risk?', d: 'RCT, 9,340 adults.', r: 'MACE HR 0.87.', c: 'Established GLP-1 RA CV benefit.', ref: 'N Engl J Med 2016;375:311. doi:10.1056/NEJMoa1603827'},
+  {n: 'SUSTAIN-6', q: 'Semaglutide weekly in type 2 with high CV risk?', d: 'RCT, 3,297 adults; safety trial, 2 years.', r: 'MACE HR 0.74; retinopathy complications more frequent (HR 1.76).', c: 'Why retinopathy is watched when glucose falls fast.', ref: 'N Engl J Med 2016;375:1834. doi:10.1056/NEJMoa1607141'},
+  {n: 'REWIND', q: 'Dulaglutide in a mostly primary-prevention population?', d: 'RCT, 9,901 adults, most without established CVD.', r: 'MACE HR 0.88.', c: 'Supports use for high CV risk without prior events.', ref: 'Lancet 2019;394:121. doi:10.1016/S0140-6736(19)31149-3'},
+  {n: 'FLOW', q: 'Semaglutide in type 2 with CKD?', d: 'RCT, 3,533 adults; stopped early for benefit.', r: 'Major kidney events HR 0.76.', c: 'GLP-1 RA as a kidney drug; label indication.', ref: 'N Engl J Med 2024;391:109. doi:10.1056/NEJMoa2403347'},
+  {n: 'SOUL', q: 'Oral semaglutide in type 2 with CVD or CKD?', d: 'RCT, 9,650 adults.', r: 'MACE HR 0.86.', c: 'CV benefit for the tablet form.', ref: 'N Engl J Med 2025;392:2001. doi:10.1056/NEJMoa2501006'},
+  {n: 'SURPASS-2', q: 'Tirzepatide vs semaglutide 1 mg?', d: 'RCT, 1,879 adults on metformin; 40 weeks.', r: 'A1C fell 2.01 to 2.30 points vs 1.86; weight 7.6 to 11.2 kg vs 5.7 kg.', c: 'Tirzepatide is the strongest glucose and weight agent; surrogate endpoints.', ref: 'N Engl J Med 2021;385:503. doi:10.1056/NEJMoa2107519'},
+  {n: 'SELECT', q: 'Semaglutide 2.4 mg in obesity with CVD, without diabetes?', d: 'RCT, 17,604 adults.', r: 'MACE HR 0.80.', c: 'Not a diabetes trial; shows weight-related CV benefit.', ref: 'N Engl J Med 2023;389:2221. doi:10.1056/NEJMoa2307563'},
+  {n: 'SUMMIT', q: 'Tirzepatide in obesity with HFpEF?', d: 'RCT, 731 adults.', r: 'CV death or worsening HF HR 0.62; better symptoms.', c: 'Basis for ADA 9.9a.', ref: 'N Engl J Med 2025;392:427. doi:10.1056/NEJMoa2410027'},
+  {n: 'ESSENCE', q: 'Semaglutide in MASH with fibrosis F2 to F3?', d: 'RCT, 800 adults; 72-week biopsy (surrogate).', r: 'MASH resolution 62.9% vs 34.3%; fibrosis improvement 36.8% vs 22.4%.', c: 'Basis for semaglutide in MASH; surrogate endpoint.', ref: 'N Engl J Med 2025;392:2089. doi:10.1056/NEJMoa2413258'},
+  {n: 'FIDELIO-DKD / FIGARO-DKD', q: 'Finerenone in type 2 with albuminuric CKD on max RAS blockade?', d: 'Two RCTs, 5,734 and 7,437 adults.', r: 'Kidney composite HR 0.82 (FIDELIO); CV composite HR 0.87 (FIGARO).', c: 'Added the nonsteroidal MRA as a pillar.', ref: 'N Engl J Med 2020;383:2219. doi:10.1056/NEJMoa2025845 · N Engl J Med 2021;385:2252. doi:10.1056/NEJMoa2110956'},
+  {n: 'CONFIDENCE', q: 'Finerenone and empagliflozin started together?', d: 'RCT, finerenone, empagliflozin or both; 180 days; UACR (surrogate).', r: 'UACR fell 29% more with both than with finerenone alone and 32% more than with empagliflozin alone.', c: 'Basis for ADA 11.9 (B); surrogate, short.', ref: 'N Engl J Med 2025;393:533. doi:10.1056/NEJMoa2410659'},
+  {n: 'GRADE', q: 'Which second drug after metformin keeps A1C under 7% longest?', d: 'RCT, 5,047 adults; glargine, glimepiride, liraglutide or sitagliptin; 5 years.', r: 'Glargine and liraglutide modestly best; sitagliptin least effective.', c: 'Durability of glucose control; not a CV trial.', ref: 'N Engl J Med 2022;387:1063. doi:10.1056/NEJMoa2200433'}
+];
+function trialHtml(t){ return '<div class="trial"><p><b>' + t.n + '</b></p><p><span class="k">Question</span>' + t.q + '</p><p><span class="k">Design</span>' + t.d + '</p><p><span class="k">Result</span>' + t.r + '</p><p><span class="k">What it changed</span>' + t.c + '</p><p class="mono" style="font-size:12.5px">' + t.ref + '</p></div>'; }
+
+/* ---------- PRACTICE: each case runs through the same engines ---------- */
+var CASES = [
+  {t: 'meds', q: '58-year-old, A1C 8.1%, prior stent, eGFR 75, UACR 12, BMI 29, on metformin.', i: {a1c: 8.1, goal: 7, age: 58, egfr: 75, uacr: 12, bmi: 29, ascvd: true, met: true}, o: ['Add a sulfonylurea', 'Add a GLP-1 RA or SGLT2 inhibitor with CV benefit', 'Start basal insulin'], a: 1},
+  {t: 'meds', q: '66-year-old, A1C 7.4%, eGFR 38, UACR 420, on metformin 2000 mg and an ARB at full dose.', i: {a1c: 7.4, goal: 7, age: 66, egfr: 38, uacr: 420, k: 4.5, met: true, raas: true, htn: true}, o: ['Add an SGLT2 inhibitor and reduce metformin', 'Stop the ARB', 'Add pioglitazone'], a: 0},
+  {t: 'meds', q: '45-year-old, A1C 11.6%, thirsty, lost 6 kg, glucose 342, BMI 31, no medicines.', i: {a1c: 11.6, goal: 7, age: 45, bmi: 31, glu: 342, sym: true}, o: ['Metformin alone and recheck in 3 months', 'Basal insulin now, check ketones, consider type 1', 'DPP-4 inhibitor'], a: 1},
+  {t: 'meds', q: '61-year-old with obesity (BMI 38) and HFpEF, NYHA II, A1C 7.6%, eGFR 70.', i: {a1c: 7.6, goal: 7, age: 61, egfr: 70, uacr: 20, bmi: 38, hf: true, hfpef: true}, o: ['SGLT2 inhibitor for the heart failure first, then tirzepatide', 'Pioglitazone', 'Sulfonylurea'], a: 0},
+  {t: 'insulin', q: 'Type 2, 82 kg, glargine 52 units, fasting 115, bedtime 220, A1C 8.4%, on semaglutide.', i: {type: '2', wt: 82, basal: 52, kind: 'analog', fpg: 115, bed: 220, a1c: 8.4, low: 'none', glp: true}, o: ['Raise glargine to 54 units', 'Stop raising basal; add one mealtime dose', 'Switch to NPH'], a: 1},
+  {t: 'insulin', q: 'Type 2, 95 kg, A1C 9.2%, on metformin and dulaglutide 4.5 mg, no insulin, fasting 190.', i: {type: '2', wt: 95, basal: 0, fpg: 190, a1c: 9.2, low: 'none', glp: true}, o: ['Start basal 10 units (or 10 to 19 by weight), +2 every 3 days', 'Add a sulfonylurea', 'Start premixed 70/30 at 0.5 units/kg'], a: 0},
+  {t: 'meds', q: '84-year-old, frail, A1C 6.6% on glipizide 10 mg and metformin; two lows this month. Goal under 8%.', i: {a1c: 6.6, goal: 8, age: 84, egfr: 52, met: true, su: true, hypo: true}, o: ['Lower or stop glipizide', 'Add insulin', 'Raise glipizide'], a: 0},
+  {t: 'screen', q: '28-year-old, BMI 22, A1C 7.2% and fasting 140 in the same sample, recent weight loss.', i: {a1c: 7.2, fpg: 140, age: 28, bmi: 22, wl: true}, o: ['Type 2; start metformin', 'Diabetes confirmed; send GAD antibody for type 1', 'Repeat A1C in a year'], a: 1}
+];
+function caseResult(c){
+  if (c.t === 'meds') { var o = medsEngine(c.i); var x = o.next[0] || o.ladder[0]; return {h: o.next.map(function(n){ return n.name; }).join('; ') || 'Keep the plan', w: o.why}; }
+  if (c.t === 'insulin') { var p = insulinEngine(c.i); return {h: p.head + (p.ladder[0] && p.ladder[0].state === 'add' ? '; ' + p.ladder[0].name.toLowerCase() : ''), w: p.why}; }
+  var s = screenEngine(c.i); return {h: s.head + (s.type && s.type.length ? '; send islet antibodies' : ''), w: s.why};
+}
+function renderPractice(){
+  $('practice').innerHTML = '<div class="card" id="practice-intro"><p class="label">Practice</p><p class="sub">Eight clinic cases. Pick an answer; the explanation comes from the same engine as the other tabs.</p></div>' + CASES.map(function(c, k){
+    return '<div class="card case" id="case-' + (k + 1) + '"><p class="label">Case ' + (k + 1) + ' · ' + c.t + '</p><p>' + c.q + '</p><div class="opts">' + c.o.map(function(t, j){ return '<button class="opt" type="button" data-case="' + k + '" data-opt="' + j + '">' + t + '</button>'; }).join('') + '</div><div class="ans" id="ans-' + k + '" hidden></div></div>';
+  }).join('');
+}
+
+/* ---------- sheet ---------- */
+var lastFocus = null;
+function openFig(id, s){ lastFocus = document.activeElement; $('sheet-t').textContent = FIG[id].title; $('sheet-b').innerHTML = figBody(FIG[id], s || 0); $('sheet-b').dataset.fig = id; $('sheet').hidden = false; $('scrim').hidden = false; $('sheet').scrollTop = 0; $('sheet-x').focus({preventScroll: true}); }
+function closeFig(){ if ($('sheet').hidden) return; $('sheet').hidden = true; $('scrim').hidden = true; if (lastFocus && lastFocus.focus) lastFocus.focus({preventScroll: true}); }
+
+/* ---------- wiring ---------- */
+var RENDER = {screen: renderScreen, meds: renderMeds, insulin: renderInsulin, visit: renderVisit};
+function showTab(t){
+  document.querySelectorAll('.tab').forEach(function(b){ b.setAttribute('aria-selected', String(b.dataset.tab === t)); });
+  document.querySelectorAll('.panel').forEach(function(p){ p.classList.toggle('on', p.id === 'p-' + t); });
+}
+function init(){
+  Object.keys(EX).forEach(function(t){ fill(t, EX[t]); RENDER[t](); });
+  renderLearn(); renderPractice();
+  document.addEventListener('input', function(e){ var p = e.target.closest('.inputs'); if (!p) return; var t = p.id.slice(3); isEx[t] = false; RENDER[t](); });
+  document.addEventListener('change', function(e){ var p = e.target.closest('.inputs'); if (!p) return; var t = p.id.slice(3); isEx[t] = false; RENDER[t](); });
+  document.addEventListener('click', function(e){
+    var b;
+    if ((b = e.target.closest('.tab'))) { showTab(b.dataset.tab); return; }
+    if ((b = e.target.closest('[data-edit]'))) { var t = b.dataset.edit, p = $('in-' + t); p.classList.toggle('on'); RENDER[t](); if (p.classList.contains('on')) p.querySelector('input,select').focus({preventScroll: false}); return; }
+    if ((b = e.target.closest('[data-done]'))) { $('in-' + b.dataset.done).classList.remove('on'); RENDER[b.dataset.done](); $('bar-' + b.dataset.done).scrollIntoView({block: 'start'}); return; }
+    if ((b = e.target.closest('[data-clear]'))) { var c = b.dataset.clear; fill(c, {}); isEx[c] = false; if (c === 'screen') narrowSel = {}; RENDER[c](); return; }
+    if ((b = e.target.closest('button[data-fig]'))) { openFig(b.dataset.fig, 0); return; }
+    if ((b = e.target.closest('.sbtn[data-s]'))) { var inl = b.closest('[data-inl]'); var s = +b.dataset.s; if (inl) { learnState[inl.dataset.inl] = s; inl.innerHTML = figBody(FIG[inl.dataset.inl], s); inl.querySelector('.sbtn[data-s="' + s + '"]').focus({preventScroll: true}); } else { $('sheet-b').innerHTML = figBody(FIG[$('sheet-b').dataset.fig], s); $('sheet-b').querySelector('.sbtn[data-s="' + s + '"]').focus({preventScroll: true}); } return; }
+    if ((b = e.target.closest('[data-res]'))) { narrowSel[b.dataset.res] = !narrowSel[b.dataset.res]; renderScreen(); var nl = $('learn-narrow'); if (nl) nl.outerHTML = narrowCard('learn-narrow'); return; }
+    if ((b = e.target.closest('[data-jump]'))) { $(b.dataset.jump).scrollIntoView({block: 'start'}); return; }
+    if ((b = e.target.closest('.opt'))) {
+      var k = +b.dataset.case, c2 = CASES[k], j = +b.dataset.opt, r = caseResult(c2);
+      b.closest('.opts').querySelectorAll('.opt').forEach(function(x, n){ x.classList.toggle('right', n === c2.a); x.classList.toggle('wrong', n === j && j !== c2.a); });
+      var a = $('ans-' + k); a.hidden = false; a.innerHTML = '<p><b>' + (j === c2.a ? 'Right.' : 'Not quite.') + '</b> The engine says: ' + r.h + '.</p>' + (r.w ? '<p class="whyline"><b>Why:</b> ' + r.w + '</p>' : '');
+      return;
+    }
+    if (e.target.id === 'scrim' || e.target.id === 'sheet-x') closeFig();
+  });
+  document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeFig(); });
+  var h = (location.hash || '').slice(1);
+  if (h) { var el = $(h); if (el) { var pn = el.closest('.panel'); if (pn) showTab(pn.id.slice(2)); setTimeout(function(){ el.scrollIntoView({block: 'start'}); }, 50); } }
+}
+init();
+</script>
+<script id="deeper-data">
+/* Go deeper: mechanism, rationale and the common trap for each Learn chapter. Text only; no doses or thresholds beyond the tool's own. */
+(function(){ var H2CARD = false; var D = {"learn-sites": [["Mechanism", "Glucose rises through several faults at once: the liver makes too much, muscle and fat take up too little, the beta cell cannot keep up, glucagon is too high, and the kidney reclaims more glucose than it should. Each class corrects one of them. Metformin lowers the liver's output. SGLT2 inhibitors block reclaiming in the kidney. GLP-1 receptor agonists raise insulin release only when glucose is high, suppress glucagon, slow the stomach and reduce appetite. Sulfonylureas release insulin whatever the glucose."], ["Why it matters", "Whether a drug works only when glucose is high predicts hypoglycemia: metformin, SGLT2 inhibitors, GLP-1 receptor agonists and DPP-4 inhibitors rarely cause it on their own, while sulfonylureas and insulin do. Heart and kidney protection is a separate effect and is a reason to choose a drug whatever the A1C."], ["Common trap", "Combining a DPP-4 inhibitor with a GLP-1 receptor agonist. Both act on the same pathway, and the pair adds cost without added benefit."]], "learn-kidney": [["Mechanism", "The proximal tubule reclaims filtered glucose through SGLT2, up to a ceiling. Blocking it leaves glucose and sodium in the urine. The extra sodium reaching the sensor at the end of the loop signals the incoming artery of the glomerulus to tighten, which lowers the pressure inside the filter."], ["Why it matters", "Glucose lowering depends on how much glucose is filtered, so it fades as eGFR falls. The pressure effect does not. That is why the eGFR dips a little when the drug starts, which is hemodynamic and expected, and then declines more slowly over the years."], ["Common trap", "Stopping the drug because of that early dip. The opposite error also matters: not holding it during acute illness, fasting or before surgery, when ketoacidosis can develop at a near-normal glucose."]], "learn-curves": [["Mechanism", "A healthy pancreas releases insulin in two patterns: a steady background that restrains the liver's glucose output overnight and between meals, and bursts with food. Insulin products imitate one or the other, depending on how fast they are absorbed from under the skin."], ["Why it matters", "So each glucose reading points to a dose. The fasting value reflects the basal dose; the value after a meal reflects the mealtime dose. An insulin with a peak can cause lows at the time of the peak, often at night."], ["Common trap", "Correction doses alone treat a high glucose that has already happened. Repeating a rapid-acting dose before the last one has finished acting stacks them and causes late hypoglycemia."]], "learn-overbasal": [["Mechanism", "Basal insulin can only restrain the liver. Once the fasting glucose is at goal, more basal cannot cover meals: it pushes the overnight and fasting glucose lower while the glucose after meals stays high."], ["Why it matters", "The signs the tool lists identify this state. The answer is cover for meals, with a GLP-1 receptor agonist or mealtime insulin, and not a higher basal dose."], ["Common trap", "Reading an A1C above goal as a need for more basal when the fasting glucose is already at goal."]], "learn-a1c": [["Mechanism", "Glucose attaches to hemoglobin slowly and permanently, in proportion to the glucose the red cell meets over its life of about four months. The A1C is therefore an average of roughly the last three months, weighted toward recent weeks, and it depends on how long red cells live."], ["Why it matters", "Anything that shortens red cell life lowers the A1C with no change in glucose: hemolysis, bleeding, transfusion, erythropoietin, advanced kidney disease, late pregnancy. Iron deficiency raises it. Some hemoglobin variants interfere with the assay."], ["Common trap", "A reassuring A1C in a patient on dialysis, with hemolysis or after blood loss. When the A1C and the meter or sensor disagree, believe the glucose."]], "learn-hypo": [["Mechanism", "As glucose falls, insulin release stops, then glucagon and epinephrine rise and produce the warning symptoms (sweating, tremor, palpitations) before the brain is short of fuel. Repeated lows blunt that epinephrine response and lower the glucose at which symptoms appear, so the next low arrives without warning."], ["Why it matters", "This is why the level of an episode changes the plan. Awareness often improves after several weeks of carefully avoiding lows, which is the reason to relax targets for a time after a severe episode."], ["Common trap", "A low caused by a sulfonylurea can recur for many hours, longer with kidney impairment, so one normal reading after treatment is not the end of it. Beta-blockers hide most warning symptoms except sweating."]], "learn-ketones": [["Mechanism", "Ketones form when insulin is too low to hold back fat breakdown. Illness raises stress hormones, so the need for insulin goes up even when the patient is not eating. An SGLT2 inhibitor keeps glucose down through the urine, independent of insulin, so the glucose can look acceptable while insulin is deficient."], ["Why it matters", "This is the reasoning behind sick-day rules: basal insulin continues, ketones are checked when unwell, and an SGLT2 inhibitor is held when the patient is not eating or drinking, or before surgery."], ["Common trap", "Cutting or stopping insulin in type 1 diabetes because the patient is not eating."]], "learn-type": [["Mechanism", "Type 1 is autoimmune loss of beta cells, usually marked by autoantibodies and, in time, a low C-peptide; in adults it can progress slowly, so tablets seem to work for a while. Type 2 is insulin resistance with a gradual, relative failure of secretion. Diabetes from pancreatic disease loses glucagon as well as insulin, which makes it prone to lows. Some forms are caused by a single gene or by drugs such as glucocorticoids and checkpoint inhibitors."], ["Why it matters", "The type decides the treatment: whether insulin is essential, how risky an SGLT2 inhibitor is, and whether relatives should be tested."], ["Common trap", "A lean adult labelled type 2 whose tablets fail within a few years. Islet antibodies, and a C-peptide read as the tool describes, usually settle the question; a minority of type 1 is antibody negative."]]};
+  function add(){ Object.keys(D).forEach(function(id){ var c = document.getElementById(id); if (!c || c.querySelector(":scope > .deeper")) return; var host = c.matches(".step") ? (c.querySelector(":scope > div") || c) : c.matches(".card,.lsec,section,.chap") ? c : null; if (!host && c.tagName === "H2" && H2CARD){ var old = document.querySelector("[data-deeper=" + id + "]"); if (old) return; var ref = c.nextElementSibling && c.nextElementSibling.matches(".lead") ? c.nextElementSibling : c; host = document.createElement("div"); host.className = "card"; host.setAttribute("data-deeper", id); ref.parentNode.insertBefore(host, ref.nextSibling); } if (!host){ var n = c.nextElementSibling; while (n && !n.matches(".card")) n = n.nextElementSibling; host = n; } if (!host || host.querySelector(":scope > .deeper")) return; var d = document.createElement("details"); d.className = "deeper"; d.innerHTML = "<summary>Go deeper: mechanism and rationale</summary><div class=\"dpx\">" + D[id].map(function(r){ return "<div><span class=\"dl\">" + r[0] + "</span><p>" + r[1] + "</p></div>"; }).join("") + "</div>"; var last = host.querySelector(":scope > .row"); if (last) host.insertBefore(d, last); else host.appendChild(d); }); }
+  add(); document.addEventListener("click", function(){ setTimeout(add, 0); }); document.addEventListener("input", function(){ setTimeout(add, 0); });
+})();
+</script>
+</body>
+</html>

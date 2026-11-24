@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ventilator basics · bedside.tools</title>
+<meta name="description" content="Mechanical ventilation at the bedside: predicted body weight and tidal volume, starting settings, PEEP tables, driving pressure and P/F, troubleshooting alarms, and getting the tube out.">
+<script src="/theme.js"></script>
+<style>
+:root{--bg:#FBFBFA;--card:#FFFFFF;--ink:#111113;--muted:#55555D;--line:#ECECEE;--accent:#2B4BDB;--warn:#9A3B00;--warnbg:#FFF6EC}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5}
+.mono{font-family:var(--mono)}
+.wrap{max-width:720px;margin:0 auto;padding:20px 16px 48px}
+a{color:var(--accent)}
+.back{font-size:14px;text-decoration:none;display:inline-block;min-height:44px;line-height:44px}
+h1{font-size:26px;margin:4px 0 4px;letter-spacing:-.01em}
+.purpose{color:var(--muted);margin:0 0 20px}
+.tabs{display:flex;gap:6px;margin:0 -16px 16px;padding:0 16px 2px;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:1 0 auto;min-width:0;min-height:44px;border:1px solid var(--line);background:var(--card);border-radius:14px;padding:0 12px;font:inherit;font-size:15px;font-weight:600;color:var(--muted);cursor:pointer}
+.tab[aria-selected="true"]{border-color:var(--accent);color:var(--accent)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
+.label{font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+.grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.grid2{grid-template-columns:1fr 1fr}
+.field{display:flex;flex-direction:column;justify-content:flex-end}
+.field label{display:block;font-size:13px;color:var(--muted);margin-bottom:4px}
+.field input,.field select{width:100%;min-height:44px;border:1px solid var(--line);border-radius:10px;padding:8px 10px;font:inherit;font-family:var(--mono);background:var(--card);color:var(--ink)}
+.field input:focus,.field select:focus,.tab:focus-visible,.chk:focus-within,button:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.checks{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.chk{display:flex;align-items:center;gap:10px;min-height:44px;border:1px solid var(--line);border-radius:10px;padding:6px 10px;font-size:14px;cursor:pointer}
+.chk input{width:20px;height:20px;accent-color:var(--accent);flex:none}
+.card h2{font-size:18px;margin:0 0 2px}
+.head{font-family:var(--mono);font-size:17px;font-weight:600;margin:6px 0 4px;overflow-wrap:anywhere}
+.head.bad{color:var(--bad)}.head.okc{color:var(--ok)}
+.sub{font-size:14px;color:var(--muted);margin:0}
+.card ul{margin:6px 0 0;padding-left:20px}
+.card li{margin-bottom:4px}
+.guard{border-left:3px solid var(--warn);background:var(--warnbg);padding:8px 10px;border-radius:0 10px 10px 0;margin-top:8px;font-size:14.5px}
+.tier{display:inline-block;font-family:var(--mono);font-size:11px;border:1px solid var(--line);border-radius:999px;padding:2px 8px;color:var(--muted);margin:6px 6px 0 0}
+details{margin-top:10px;border-top:1px solid var(--line);padding-top:8px}
+.whyline{margin:10px 0 0;font-size:14.5px;color:var(--muted)}
+.whyline b{color:var(--ink);font-weight:600}
+summary{cursor:pointer;color:var(--accent);font-weight:600;min-height:44px;line-height:44px}
+details p{margin:0 0 8px;font-size:15px}
+.empty{color:var(--muted)}
+.btn{min-height:44px;border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);border-radius:10px;padding:8px 14px;font:inherit;font-weight:600;cursor:pointer}
+.btn.ghost{background:var(--card);color:var(--accent)}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.note{font-size:14px;color:var(--muted)}
+.tl{position:relative;padding-left:26px}
+.tl:before{content:"";position:absolute;left:8px;top:8px;bottom:8px;width:2px;background:var(--line)}
+.st{position:relative;padding:6px 0 10px}
+.st:before{content:"";position:absolute;left:-24px;top:11px;width:12px;height:12px;border-radius:50%;background:var(--card);border:2px solid var(--muted)}
+.st.now:before{background:var(--accent);border-color:var(--accent)}
+.st .when{font-family:var(--mono);font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+.st b{display:block}
+.st .dose{font-family:var(--mono);font-size:14.5px;display:block;overflow-wrap:anywhere}
+.st small{color:var(--muted);font-size:13.5px;display:block}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:6px 6px 6px 0;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:var(--mono);font-size:11.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);font-weight:500}
+td.mono{font-size:13px}
+.tw{overflow-x:auto}
+.case h2{font-size:17px}
+.ans{margin-top:10px;border-top:1px solid var(--line);padding-top:10px}
+footer{margin-top:28px;font-size:13.5px;color:var(--muted)}
+footer p{margin:0 0 8px}
+.panel{display:none}.panel.on{display:block}
+.fig{display:block;width:100%;max-width:460px;height:auto;margin:0 auto}
+.states{display:flex;gap:6px;overflow-x:auto;margin:10px -16px;padding:2px 16px 6px;scrollbar-width:none}
+.states::-webkit-scrollbar{display:none}
+.states.wrapit{flex-wrap:wrap;overflow:visible;margin:10px 0;padding:0}
+.sbtn{flex:none;min-height:44px;min-width:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--ink);font:inherit;font-size:14px;cursor:pointer;white-space:nowrap}
+.sbtn[aria-pressed="true"]{border-color:var(--accent);color:var(--accent);font-weight:600}
+.line1{font-size:15px;margin:10px 0 0}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.chip{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--fill);color:var(--ink);font:inherit;font-size:14px;cursor:pointer}
+.chip svg{flex:none;color:var(--accent)}
+.scrim{position:fixed;inset:0;background:var(--scrim);z-index:20}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:21;max-height:90vh;overflow-y:auto;background:var(--card);border:1px solid var(--line);border-bottom:0;border-radius:20px 20px 0 0;padding:8px 16px 24px;max-width:560px;margin:0 auto}
+.sheethead{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.sheethead h2{font-size:18px;margin:0}
+.xbtn{min-height:44px;min-width:44px;border:0;background:transparent;color:var(--accent);font:inherit;font-weight:600;cursor:pointer}
+.pills{position:sticky;top:0;z-index:5;background:var(--bg);display:flex;gap:6px;overflow-x:auto;margin:0 -16px 12px;padding:8px 16px;border-bottom:1px solid var(--line);scrollbar-width:none}
+.pills::-webkit-scrollbar{display:none}
+.pill{flex:none;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--muted);font:inherit;font-size:14px;cursor:pointer;white-space:nowrap}
+.pill[aria-current="true"]{border-color:var(--accent);color:var(--accent);font-weight:600}
+.chap{scroll-margin-top:70px}
+.cause{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:8px 0;border-top:1px solid var(--line);font-size:15px}
+.cause small{color:var(--muted);font-size:13px;text-align:right;flex:0 1 58%}
+.cause.out span{color:var(--muted);text-decoration:line-through}
+.cause.out,.cause.less{opacity:.6}
+.cause.fav span{font-weight:700}
+.cause.fav span:before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--accent);margin-right:8px}
+.trial{border-left:3px solid var(--accent);padding-left:12px}
+.trial p{margin:0 0 6px;font-size:15px}
+.trial .k{font-family:var(--mono);font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);display:block}
+tr.mark td{font-weight:700;color:var(--accent)}
+@media (min-width:900px){
+  .wrap{max-width:1040px}
+  .panel.two.on{display:grid;grid-template-columns:380px minmax(0,1fr);gap:20px;align-items:start}
+  #p-fix{max-width:720px;margin:0 auto}
+  .refgrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;align-items:start}
+  .refgrid .card{margin-bottom:0}
+  #p-learn{max-width:720px;margin:0 auto}
+}
+@media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+.deeper{margin-top:14px;border-top:1px solid var(--line)}
+.deeper>summary{min-height:44px;display:flex;align-items:center;gap:8px;color:var(--accent);font-weight:600;font-size:15px;cursor:pointer;list-style:none}
+.deeper>summary::-webkit-details-marker{display:none}
+.deeper>summary::before{content:"+";font-family:var(--mono);font-size:18px;line-height:1;width:14px;text-align:center}
+.deeper[open]>summary::before{content:"\2212"}
+.deeper>summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.deeper .dpx{border:1px solid var(--line);border-radius:12px;padding:2px 12px;background:var(--card);text-align:left}
+.deeper .dpx>div{padding:10px 0;border-top:1px solid var(--line)}
+.deeper .dpx>div:first-child{border-top:0}
+.deeper .dl{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500;margin:0 0 3px}
+.deeper p{font-size:15px;line-height:1.45;color:var(--ink);margin:0 0 4px}
+.deeper p:last-child{margin-bottom:0}
+/* cause-fix: ruled-out causes stay readable; the name greys, the reason does not fade */
+.cause.out,.cause.less,.cause.unl{opacity:1}
+.cause.less>span,.cause.unl>span{color:var(--muted)}
+.plate{margin:12px 0 4px}
+.plate img{display:block;width:100%;height:auto;border-radius:10px;border:1px solid var(--line)}
+.plate figcaption{font-size:13px;color:var(--muted);margin-top:6px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="/">← bedside.tools</a>
+<h1>Ventilator basics</h1>
+<p class="purpose">Set the breath to the patient's size, read the pressures, find what went wrong, and get the tube out.</p>
+
+<div class="tabs" role="tablist">
+  <button class="tab" role="tab" id="t-setup" aria-selected="true" aria-controls="p-setup">Set up</button>
+  <button class="tab" role="tab" id="t-assess" aria-selected="false" aria-controls="p-assess">Assess</button>
+  <button class="tab" role="tab" id="t-fix" aria-selected="false" aria-controls="p-fix">Fix</button>
+  <button class="tab" role="tab" id="t-lib" aria-selected="false" aria-controls="p-lib">Liberate</button>
+  <button class="tab" role="tab" id="t-learn" aria-selected="false" aria-controls="p-learn">Learn</button>
+  <button class="tab" role="tab" id="t-prac" aria-selected="false" aria-controls="p-prac">Practice</button>
+</div>
+
+<div class="panel two on" id="p-setup" role="tabpanel" aria-labelledby="t-setup">
+  <div id="setup-in">
+  <div class="card" id="size">
+    <p class="label">Patient size</p>
+    <div class="states wrapit" id="sexseg" role="group" aria-label="Sex" style="margin-top:0"></div>
+    <div class="grid grid2">
+      <div class="field"><label for="ht">Height</label><input id="ht" inputmode="decimal" autocomplete="off"></div>
+      <div class="field"><label for="htu">Unit</label><select id="htu"><option value="cm">cm</option><option value="in">inches</option></select></div>
+    </div>
+  </div>
+  <div class="card" id="situation">
+    <p class="label">Why is the patient on the ventilator?</p>
+    <div class="states wrapit" id="scenseg" role="group" aria-label="Situation" style="margin-top:0"></div>
+  </div>
+  <div class="card" id="modes">
+    <p class="label">Modes</p>
+    <h2>What you set, what the patient gets</h2>
+    <div class="tw" id="modetable"></div>
+  </div>
+  </div>
+  <div id="setup-out"></div>
+</div>
+
+<div class="panel two" id="p-assess" role="tabpanel" aria-labelledby="t-assess">
+  <div id="assess-in">
+  <div class="card" id="pressures">
+    <p class="label">Pressures and volume</p>
+    <div class="grid grid2">
+      <div class="field"><label for="plat">Plateau (cm H2O)</label><input id="plat" inputmode="decimal" autocomplete="off"></div>
+      <div class="field"><label for="peep">PEEP (cm H2O)</label><input id="peep" inputmode="decimal" autocomplete="off"></div>
+      <div class="field"><label for="vt">Tidal volume (mL)</label><input id="vt" inputmode="decimal" autocomplete="off"></div>
+      <div class="field"><label for="pbwkg">Predicted weight (kg)</label><input id="pbwkg" inputmode="decimal" autocomplete="off"></div>
+    </div>
+    <p class="note" style="margin:10px 0 0">Predicted weight fills in from the Set up tab. Measure the plateau with an inspiratory hold while the patient is not making effort.</p>
+  </div>
+  <div class="card" id="gas">
+    <p class="label">Oxygen and pH</p>
+    <div class="grid grid2">
+      <div class="field"><label for="fio2">FiO2 (0.21 to 1, or %)</label><input id="fio2" inputmode="decimal" autocomplete="off"></div>
+      <div class="field"><label for="pao2">PaO2 (mm Hg)</label><input id="pao2" inputmode="decimal" autocomplete="off"></div>
+      <div class="field"><label for="spo2">SpO2 (%) if no PaO2</label><input id="spo2" inputmode="decimal" autocomplete="off"></div>
+      <div class="field"><label for="ph">pH</label><input id="ph" inputmode="decimal" autocomplete="off"></div>
+    </div>
+    <div class="checks" style="grid-template-columns:1fr"><label class="chk"><input type="checkbox" id="ards">This is ARDS: onset within a week, opacities on both sides, not explained by heart failure or fluid overload</label></div>
+  </div>
+  </div>
+  <div id="assess-out"></div>
+</div>
+
+<div class="panel" id="p-fix" role="tabpanel" aria-labelledby="t-fix">
+  <div class="card" id="unstable">
+    <p class="label">Crashing on the ventilator</p>
+    <h2>Take the patient off the ventilator and bag by hand</h2>
+    <p class="sub">A sudden pressure change with a falling blood pressure or saturation: disconnect, give 100% oxygen, and ventilate through the tube at 8 to 10 breaths a minute. Then work through DOPE.</p>
+    <div class="tw" id="dopetable" style="margin-top:10px"></div>
+    <div class="guard">On high PEEP, disconnecting drops the PEEP: use a bag with a PEEP valve if you have one (expert practice).</div>
+    <p class="whyline"><b>Why:</b> Bagging by hand takes the machine out of the question and lets trapped gas escape; how the bag feels tells you whether the problem is the patient or the equipment.</p>
+    <details><summary>More</summary><p>Easy to bag and the patient improves: the ventilator or circuit was the problem. Hard to bag: the tube or the patient. Pass a suction catheter, listen to both sides, and look at the tube depth.</p><span class="tier">Disconnect and bag at 8 to 10: review (expert practice)</span><span class="tier">DOPE: teaching mnemonic</span></details>
+  </div>
+  <div class="card" id="pattern">
+    <p class="label">High or low pressure alarm</p>
+    <h2>Read peak against plateau</h2>
+    <p class="sub">Do an inspiratory hold, then tap what you see. Causes that no longer fit fade.</p>
+    <div class="states wrapit" id="patseg" role="group" aria-label="Pressure pattern"></div>
+    <p class="line1" id="patsays"></p>
+    <div id="patout"></div>
+    <div class="chips" id="patchip"></div>
+    <p class="whyline"><b>Why:</b> Peak pressure includes the push needed to move gas down the tube; the plateau, measured with flow stopped, is what the lung itself is under. The gap between them is resistance.</p>
+    <details><summary>More</summary><p>The hold is only valid when the patient is making little or no effort. Normal compliance on a ventilator is 60 to 80 mL/cm H2O, and normal airway resistance under 15 cm H2O/L/s with a normal-sized tube.</p><span class="tier">Review (expert practice)</span></details>
+  </div>
+  <div class="card" id="autopeep">
+    <p class="label">Air trapping</p>
+    <h2>Trapped gas (auto-PEEP)</h2>
+    <ul id="autolist"></ul>
+    <div class="guard">Blood pressure falling with trapped gas: disconnect the ventilator and let the chest empty.</div>
+    <p class="whyline"><b>Why:</b> Trapped gas raises the pressure in the chest, which holds back blood returning to the heart, so the blood pressure falls.</p>
+    <div class="chips" id="autochip"></div>
+    <details><summary>More</summary><p>For missed triggers caused by trapped gas, in COPD with flow limitation, added PEEP up to about 80% of the trapped pressure does not add to the hyperinflation and can help the patient trigger.</p><span class="tier">Reviews (expert practice)</span></details>
+  </div>
+  <div class="card" id="dyssynchrony">
+    <p class="label">Fighting the ventilator</p>
+    <h2>Kinds of dyssynchrony</h2>
+    <div id="dyslist"></div>
+    <details><summary>More</summary><p>Dyssynchrony in more than one breath in ten has been linked to longer ventilation and more tracheostomy. Look for pain, a blocked tube, trapped gas and wrong settings before adding sedation.</p><span class="tier">Review (expert practice)</span></details>
+  </div>
+</div>
+
+<div class="panel two" id="p-lib" role="tabpanel" aria-labelledby="t-lib">
+  <div id="lib-in">
+  <div class="card" id="screen">
+    <p class="label">Daily screen</p>
+    <div class="checks" id="readyticks" style="grid-template-columns:1fr;margin-top:0"></div>
+  </div>
+  <div class="card" id="after">
+    <p class="label">After the trial</p>
+    <div class="checks" id="libticks" style="grid-template-columns:1fr;margin-top:0"></div>
+  </div>
+  <div class="card" id="rsbicalc">
+    <p class="label">Rapid shallow breathing index</p>
+    <div class="grid grid2">
+      <div class="field"><label for="rr">Rate (breaths/min)</label><input id="rr" inputmode="decimal" autocomplete="off"></div>
+      <div class="field"><label for="vtl">Tidal volume (mL)</label><input id="vtl" inputmode="decimal" autocomplete="off"></div>
+    </div>
+  </div>
+  </div>
+  <div id="lib-out"></div>
+</div>
+
+<div class="panel" id="p-learn" role="tabpanel" aria-labelledby="t-learn">
+  <div class="pills" id="pills"></div>
+  <div class="card chap" id="learn-size" data-pill="Size"><p class="label">1 · Size the breath</p><h2>Lungs follow height, not weight</h2><figure class="plate" style="margin-left:0;margin-right:0"><img src="/media/vent/alveoli-ards.webp" width="942" height="572" loading="lazy" alt="Two clusters of alveoli. On the left they are round, open and air-filled with thin walls and capillaries. On the right most are flooded with pink fluid containing white cells, lined by a pink membrane, or collapsed, and only one or two still hold much air."><figcaption>Left: healthy alveoli. Right: ARDS. Most units are flooded or collapsed, so each breath goes to the few that remain open. Created with BioRender.com</figcaption></figure><p>Two men of 175 cm have the same size lungs whether they weigh 60 kg or 120 kg. Tap a weight to see what 6 mL/kg would give if you used it.</p><div class="states wrapit" id="sizeseg" role="group" aria-label="Weight used"></div><p class="line1" id="sizeout"></p></div>
+  <div class="card chap" id="learn-press" data-pill="Pressures"><p class="label">2 · Pressures</p><h2>One breath, three numbers</h2><div data-figure="press"></div></div>
+  <div class="card chap" id="learn-dp" data-pill="Driving pressure"><p class="label">3 · Driving pressure</p><h2>The number that tracked with survival</h2><p>Plateau minus PEEP is the pressure swing of each breath. In a pooled analysis of nine trials, each 7 cm H2O more went with 41% higher mortality, and 36% higher when the tidal volume and plateau were already in the safe range.</p><p class="line1">One small trial of limiting driving pressure (STAMINA, 2025) found no benefit, so 15 is a working mark, not a rule.</p><div class="chips"><button class="chip" data-fig="press" data-state="comp">See it on the pressure trace</button></div></div>
+  <div class="card chap" id="learn-co2" data-pill="CO2"><p class="label">4 · Permissive hypercapnia</p><h2>A high CO2 is the price of a small breath</h2><p>In ARDS the protocol answers a falling pH with rate first. Tap a pH.</p><div class="states wrapit" id="phseg" role="group" aria-label="pH band"></div><p class="line1" id="phout"></p><p class="line1">This does not apply in brain injury or after cardiac arrest, where the CO2 is kept normal.</p></div>
+  <div class="card chap" id="learn-trap" data-pill="Air trapping"><p class="label">5 · Air trapping</p><h2>When the lung does not finish emptying</h2><div data-figure="flow" data-state="trap"></div></div>
+  <div class="card chap" id="learn-ladder" data-pill="ARDS ladder"><p class="label">6 · ARDS</p><h2>Add a step only when the last is not enough</h2><div data-figure="ladder"></div></div>
+  <div class="card chap" id="learn-proof" data-pill="Evidence"><p class="label">7 · Evidence</p><h2>Three results worth knowing by heart</h2><div data-figure="bars"></div></div>
+  <div class="card chap" id="trials" data-pill="Trials"><p class="label">8 · Trials</p><h2>The trials behind the practice</h2><div id="trialbox"></div><div class="row"><button class="btn" id="go-prac">Try the practice cases</button></div></div>
+</div>
+
+<div class="panel" id="p-prac" role="tabpanel" aria-labelledby="t-prac">
+  <div id="practice"></div>
+</div>
+
+<div class="scrim" id="scrim" hidden></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-t" hidden>
+  <div class="sheethead"><h2 id="sheet-t"></h2><button class="xbtn" id="sheet-x">Close</button></div>
+  <div id="sheet-b"></div>
+</div>
+
+<footer>
+  <p><strong>For education only. Not a substitute for clinical judgment.</strong> Built to national guidelines and the ARDS Network protocol. Ventilator models, mode names, protocols for proning, paralysis, breathing trials and extubation, and who may change settings vary, so adjust to your institution and work with your respiratory therapist. Rows marked expert practice come from reviews, not graded guidelines. Evidence tiers are shown as strength and certainty (ATS, ESICM, SCCM, AARC, ATS/CHEST), class and level (AHA), or the source's own grading.</p>
+  <p>Privacy: everything runs in your browser. Nothing you enter is sent anywhere or stored, and there are no analytics. Do not enter names, record numbers, or dates of birth.</p>
+  <p class="mono">Last reviewed: 2026-11-16</p>
+  <p><strong>Sources:</strong> NIH NHLBI ARDS Network, Mechanical Ventilation Protocol Summary (2008) · ARDS Network, N Engl J Med 2000;342:1301 · Qadir N et al., ATS clinical practice guideline update on ARDS, Am J Respir Crit Care Med 2024;209:24 · Fan E et al., ATS/ESICM/SCCM guideline on mechanical ventilation in ARDS, Am J Respir Crit Care Med 2017;195:1253 · Grasselli G et al., ESICM guidelines on ARDS, Intensive Care Med 2023;49:727 · Erstad BL et al., SCCM guideline on neuromuscular blockade in ARDS, Crit Care Med 2026;54:634 · ARDS Definition Task Force (Berlin definition), JAMA 2012;307:2526 · Matthay MA et al., A new global definition of ARDS, Am J Respir Crit Care Med 2024;209:37 · Schmidt GA et al. and Girard TD et al., ATS/CHEST liberation from mechanical ventilation guidelines, Am J Respir Crit Care Med 2017;195:115 and 195:120 · Roberts KJ et al., AARC guideline on spontaneous breathing trials, Respir Care 2024;69:891 · Goel NN et al., ATS guideline on noninvasive respiratory support, Am J Respir Crit Care Med 2026;212:2135 (abstract reviewed) · Rochwerg B et al., ERS/ATS guideline on noninvasive ventilation, Eur Respir J 2017;50:1602426 · Oczkowski S et al., ERS guideline on high-flow nasal cannula, Eur Respir J 2022;59:2101574 (abstract reviewed) · Boles JM et al., Weaning from mechanical ventilation, Eur Respir J 2007;29:1033 · Hirsch KG et al., 2025 AHA guidelines Part 11: post-cardiac arrest care, Circulation 2025;152:S673 · Robba C et al., ESICM consensus on mechanical ventilation in acute brain injury, Intensive Care Med 2020;46:2397 · Carney N et al., Brain Trauma Foundation guidelines, 4th edition, Neurosurgery 2017;80:6 · Reviews: Demoule A et al., Intensive Care Med 2020;46:2436 · Walter JM et al., South Med J 2018;111:746 · Mosier JM et al., West J Emerg Med 2015;16:1109 · De Oliveira B et al., J Clin Med 2021;10:4550 · Thomas VK, Abraham SV, Indian J Crit Care Med 2018;22:388 · Trials: Brower RG et al., N Engl J Med 2004;351:327 · Amato MBP et al., N Engl J Med 2015;372:747 · Maia IS et al. (STAMINA), Br J Anaesth 2025;134:693 · Guérin C et al., N Engl J Med 2013;368:2159 · Papazian L et al., N Engl J Med 2010;363:1107 · ROSE (PETAL Network), N Engl J Med 2019;380:1997 · Combes A et al., N Engl J Med 2018;378:1965 · Yang KL, Tobin MJ, N Engl J Med 1991;324:1445 · Subirà C et al., JAMA 2019;321:2175 · Girard TD et al., Lancet 2008;371:126 · Hernández G et al., JAMA 2016;315:1354 and 2016;316:1565 · Thille AW et al., JAMA 2019;322:1465 · François B et al., Lancet 2007;369:1083.</p>
+</footer>
+</div>
+
+<script id="engine">
+/* Data and decision engine: no page access here, so the practice cases and the audits run the same code. */
+function r0(n){ return Math.round(n); }
+function r1(n){ return Math.round(n * 10) / 10; }
+function has(v){ return v != null; }
+
+/* Thresholds, each with its source in the decision table. */
+var T = {
+  pbwM: 50, pbwF: 45.5, perIn: 2.3, baseIn: 60,       /* ARDSNet card */
+  htLo: 130, htHi: 220,                                /* adult range accepted, cm */
+  vtLo: 4, vtGoal: 6, vtHi: 8,                         /* mL/kg PBW: card; ATS/ESICM/SCCM 2017 */
+  platMax: 30, platLow: 25,                            /* card */
+  dpMark: 15,                                          /* expert practice; no guideline number */
+  pfMild: 300, pfMod: 200, pfSev: 100,                 /* Berlin; global definition */
+  sfMild: 315, sfMod: 235, sfSev: 148, sfMaxSat: 97,   /* global definition 2023 */
+  peepMin: 5,
+  pfProne: 150, fio2Prone: 0.6,                        /* ESICM 2023; PROSEVA */
+  pfEcmo: 80,                                          /* ATS 2024 selection text */
+  phLo: 7.30, phHi: 7.45, phFloor: 7.15, rrMax: 35,    /* card */
+  rsbi: 105,                                           /* Boles 2007; Yang and Tobin 1991 */
+  sbtFio2: 0.40, sbtPeep: 8                            /* card */
+};
+
+var PEEP_LOW = [[0.3,'5'],[0.4,'5'],[0.4,'8'],[0.5,'8'],[0.5,'10'],[0.6,'10'],[0.7,'10'],[0.7,'12'],[0.7,'14'],[0.8,'14'],[0.9,'14'],[0.9,'16'],[0.9,'18'],[1.0,'18 to 24']];
+var PEEP_HIGH = [[0.3,'5'],[0.3,'8'],[0.3,'10'],[0.3,'12'],[0.3,'14'],[0.4,'14'],[0.4,'16'],[0.5,'16'],[0.5,'18'],[0.5,'20'],[0.6,'20'],[0.7,'20'],[0.8,'20'],[0.8,'22'],[0.9,'22'],[1.0,'22'],[1.0,'24']];
+/* The card prints "0.5-0.8 / 20" as one column of the higher-PEEP table; it is expanded above to 0.5, 0.6, 0.7 and 0.8 at PEEP 20. */
+var FIO2S = [0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0];
+function peepFor(f){
+  function pick(t){ return t.filter(function(r){ return r[0] === f; }).map(function(r){ return r[1]; }); }
+  return {low: pick(PEEP_LOW), high: pick(PEEP_HIGH)};
+}
+
+function pbw(sex, ht, unit){
+  if (!sex || !has(ht)) return null;
+  var cm = unit === 'in' ? ht * 2.54 : ht;
+  if (cm < T.htLo || cm > T.htHi) return {bad: true};
+  var inches = cm / 2.54;
+  return {kg: r1((sex === 'm' ? T.pbwM : T.pbwF) + T.perIn * (inches - T.baseIn)), cm: r0(cm), inches: r1(inches)};
+}
+function fio2Of(v){ if (!has(v)) return null; if (v >= 0.21 && v <= 1) return v; if (v >= 21 && v <= 100) return v / 100; return NaN; }
+
+var SCEN = {
+  ards: {n: 'ARDS'}, obs: {n: 'Asthma or COPD'}, acid: {n: 'Severe metabolic acidosis'}, brain: {n: 'Brain injury'}, arrest: {n: 'After cardiac arrest'}
+};
+var SCENS = ['ards','obs','acid','brain','arrest'];
+
+var WHY = {
+  pbw: 'Lung size follows height and sex, not weight: a heavier patient does not have bigger lungs.',
+  ards: 'Small breaths and a capped plateau pressure protect the part of the lung that is still open.',
+  obs: 'The danger is gas that cannot get out. A slow rate and a long time to breathe out matter more than a normal CO2.',
+  acid: 'The patient was breathing hard to hold the pH up. A ventilator set to an ordinary rate takes that away within minutes.',
+  brain: 'CO2 sets the width of the brain\'s vessels: too high raises the pressure in the skull, too low starves it of blood.',
+  arrest: 'After an arrest both too little and too much oxygen have been linked to harm, and CO2 changes brain blood flow.',
+  peep: 'PEEP holds unstable lung open at the end of the breath, so less oxygen is needed; too much overstretches lung and drops the blood pressure.',
+  mech: 'Driving pressure is the pressure swing of each breath; across trials higher values went with more deaths, which may reflect stretch on the lung that is still open.',
+  platHigh: 'A plateau above 30 usually means the breath is too big for the lung available to take it.',
+  ox: 'The ratio corrects the oxygen level for how much oxygen is being given, so severity can be compared between settings.',
+  ladder: 'Each step is added only when the one before is not enough, because each brings its own harm.',
+  ph: 'A raised CO2 is the price of a small breath. The protocol first answers it with rate, and gives up some lung protection only below 7.15.',
+  ready: 'The screen only asks whether a trial is safe to try. Most patients who are ready are found by testing every day, not by waiting.',
+  trial: 'The trial asks whether the patient can do the work of breathing with almost no help.',
+  rsbi: 'Fast, shallow breathing is how failing respiratory muscles look from the bedside.',
+  niv: 'High-risk patients tire in the hours after the tube comes out; support started straight away prevents failure better than rescue after it.',
+  cuff: 'No leak around a deflated cuff suggests a swollen upper airway, which can obstruct once the tube is out.'
+};
+
+function setup(i){
+  var c = [], p = pbw(i.sex, i.ht, i.unit), kg = p && !p.bad ? p.kg : null;
+  if (!p) c.push({id: 'pbw', label: 'Predicted body weight', head: 'Enter sex and height', empty: true, sub: 'Tidal volume is set from predicted body weight, not actual weight.'});
+  else if (p.bad) c.push({id: 'pbw', label: 'Predicted body weight', head: 'Height is outside the adult range', empty: true, sub: 'Check the height and its unit (cm or inches).'});
+  else c.push({id: 'pbw', label: 'Predicted body weight', head: p.kg + ' kg', sub: 'Height ' + p.cm + ' cm (' + p.inches + ' in). Tidal volume by mL per kg:',
+    table: {head: ['mL/kg','Tidal volume'], rows: [4,5,6,7,8].map(function(m){ return [m + (m === 6 ? ' (goal)' : ''), r0(m * p.kg) + ' mL']; }), mark: 2},
+    why: WHY.pbw, more: ['Formula (ARDS Network card): ' + (i.sex === 'm' ? '50' : '45.5') + ' + 2.3 × (height in inches − 60). The trial paper also prints a centimeter form (0.91 × (cm − 152.4)); the two differ by about 0.3 kg at most.', 'Do not set a tidal volume below 4 mL/kg.'], tiers: ['Tidal volume 4 to 8 mL/kg predicted weight in ARDS: strong, moderate', 'Formula: ARDS Network protocol']});
+  if (!i.scen){ c.push({id: 'start', label: 'Starting settings', head: 'Pick the situation', empty: true, sub: 'Starting settings differ by why the patient is on the ventilator.'}); return {cards: c, pbw: p}; }
+  function vt(lo, hi){ return has(kg) ? ' (' + r0(lo * kg) + (hi ? ' to ' + r0(hi * kg) : '') + ' mL)' : ''; }
+  var s = {id: 'start', label: 'Starting settings · ' + SCEN[i.scen].n};
+  if (i.scen === 'ards'){
+    s.head = 'Tidal volume 8 mL/kg, then down to 6'; s.sub = 'Start at 8 mL/kg' + vt(8) + ' and step down by 1 mL/kg every 2 hours or sooner to 6 mL/kg' + vt(6) + '.';
+    s.list = ['Rate: match the minute ventilation the patient had, no higher than 35.', 'PEEP: at least 5, paired with FiO2 from the table below.', 'Oxygen goal: PaO2 55 to 80 mm Hg or SpO2 88 to 95%.', 'Plateau pressure 30 or less: check it after every change. pH goal 7.30 to 7.45.', 'Keep inspiration shorter than expiration.'];
+    s.why = WHY.ards; s.more = ['ARMA: 31.0% died with 6 mL/kg and a plateau of 30 or less, 39.8% with 12 mL/kg.', 'If the patient is stacking breaths and the plateau stays 30 or less, the tidal volume may go up to 7 or 8 mL/kg.'];
+    s.tiers = ['Low tidal volume and plateau limit: strong, moderate', 'Steps and goals: ARDS Network protocol'];
+    c.push(s);
+    c.push({id: 'peeptable', label: 'PEEP and FiO2', head: 'Pair PEEP with FiO2', sub: 'Tap the FiO2 in use to see the PEEP each table pairs with it.', peep: true, why: WHY.peep,
+      more: ['Moderate or severe ARDS (P/F 200 or less): a higher-PEEP strategy is suggested, such as the higher-PEEP table. Mild ARDS: no recommendation, and a possible trend to harm with higher PEEP.', 'ALVEOLI compared the two tables in 549 patients: deaths 24.9% with lower PEEP and 27.5% with higher (no difference). The European guideline makes no recommendation between them.', 'The combinations are a guide, not a requirement.'],
+      tiers: ['Higher PEEP in moderate to severe ARDS: conditional, low to moderate', 'Tables: ARDS Network protocol']});
+  } else if (i.scen === 'obs'){
+    s.head = 'Slow rate, long time to breathe out'; s.sub = 'Tidal volume 6 to 8 mL/kg' + vt(6, 8) + ', rate about 12, inspiratory flow 60 to 90 L/min, I:E about 1:4 (asthma 1:4 to 1:6).';
+    s.list = ['Accept a high CO2: aim for a pH around 7.25 to 7.30; one review tolerates it down to 7.15.', 'Plateau over 28: cut the minute ventilation (rate, tidal volume or both).', 'Minute ventilation about 6 to 8 L/min.', 'Added PEEP in asthma: no more than 5, and disputed. In COPD, titrate it against the plateau.'];
+    s.guards = ['Blood pressure falling after intubation: suspect trapped gas. Disconnect the ventilator and let the chest empty.'];
+    s.why = WHY.obs; s.chips = [['flow','trap','How air trapping looks']]; s.tiers = ['Settings: narrative reviews, expert practice'];
+    c.push(s);
+  } else if (i.scen === 'acid'){
+    s.head = 'Match the breathing the patient was doing'; s.sub = 'Avoid intubation if you can. If you cannot, the ventilator must keep up the minute ventilation the patient had.';
+    s.list = ['Minute ventilation = rate × tidal volume. A patient breathing 40 times a minute at 1 liter is moving 40 L/min; ordinary settings give 6 to 8.' + (has(kg) ? ' At 8 mL/kg (' + r0(8 * kg) + ' mL) and a rate of 30 this patient gets ' + r1(8 * kg * 30 / 1000) + ' L/min.' : ''), 'Prefer a mode in which the patient sets the minute ventilation (pressure control with a set rate, or pressure support).', 'Check a blood gas within minutes and watch for air trapping and tiring.'];
+    s.guards = ['Even a brief pause in breathing at intubation can drop the pH sharply.', 'Pressure support has no backup rate: set the apnea backup, or use pressure control with a rate.'];
+    s.why = WHY.acid; s.tiers = ['Expert practice (review); no guideline'];
+    c.push(s);
+  } else if (i.scen === 'brain'){
+    s.head = 'Normal CO2, PaO2 80 to 120'; s.sub = 'PaCO2 35 to 45 mm Hg when skull pressure is not raised; PaO2 80 to 120 mm Hg.';
+    s.list = ['Tidal volume 6 to 8 mL/kg' + vt(6, 8) + ' (expert practice: the consensus suggests lung-protective ventilation without giving a number).', 'PEEP as for other patients when skull pressure is not significantly raised.', 'Hyperventilation only briefly, as a bridge, for herniation.'];
+    s.guards = ['Do not use the ARDS targets here: permissive hypercapnia and SpO2 88 to 95% conflict with these goals.', 'No prolonged preventive hyperventilation to a PaCO2 of 25 or less.'];
+    s.why = WHY.brain; s.tiers = ['PaO2 80 to 120 and PaCO2 35 to 45: strong (ESICM consensus 2020)', 'Herniation: weak', 'Prolonged hyperventilation: level II B, against (Brain Trauma Foundation)', 'Tidal volume: expert practice'];
+    c.push(s);
+  } else {
+    s.head = 'SpO2 90 to 98%, PaCO2 35 to 45'; s.sub = '100% oxygen until the saturation can be measured reliably, then titrate down.';
+    s.list = ['Oxygen: SpO2 90 to 98% (PaO2 60 to 105 mm Hg). Avoid hypoxemia.', 'PaCO2 in the normal range, generally 35 to 45 mm Hg, in patients who remain comatose; confirm with a blood gas.', 'Tidal volume 6 to 8 mL/kg' + vt(6, 8) + ' (expert practice: the guideline gives no number).'];
+    s.why = WHY.arrest; s.tiers = ['100% oxygen until measurable: class 1, B-R', 'SpO2 90 to 98%: class 2a, B-R', 'Avoid hypoxemia: class 1, B-NR', 'PaCO2 35 to 45: class 1, B-R', 'Tidal volume: expert practice'];
+    c.push(s);
+  }
+  return {cards: c, pbw: p};
+}
+
+function assess(i){
+  var c = [], f = fio2Of(i.fio2), okPeep = has(i.peep) && i.peep >= T.peepMin;
+  /* Mechanics */
+  if (has(i.plat) && has(i.peep)){
+    if (i.plat <= i.peep) c.push({id: 'mech', label: 'Mechanics', head: 'Plateau must be higher than PEEP', empty: true, sub: 'Check the numbers: the plateau is measured with an inspiratory hold.'});
+    else {
+      var dp = i.plat - i.peep, comp = has(i.vt) ? i.vt / dp : null, perkg = has(i.vt) && has(i.pbw) && i.pbw > 0 ? i.vt / i.pbw : null;
+      var m = {id: 'mech', label: 'Mechanics', head: 'Driving pressure ' + r1(dp) + ' cm H2O', sub: 'Plateau ' + i.plat + ' − PEEP ' + i.peep + '.' + (has(comp) ? ' Compliance ' + r0(comp) + ' mL/cm H2O (normal on a ventilator 60 to 80).' : '') + (has(perkg) ? ' Tidal volume ' + r1(perkg) + ' mL/kg.' : ''), list: [], guards: [], chips: [['press', i.plat > T.platMax || dp > T.dpMark ? 'comp' : 'norm', 'Peak, plateau and PEEP']], tiers: []};
+      if (i.plat > T.platMax && has(perkg) && r1(perkg) <= T.vtLo){ m.guards.push('Plateau over 30 with the tidal volume already at or below 4 mL/kg: do not go lower. Look for another cause (trapped gas, pneumothorax, a stiff chest wall) and get help.'); m.why = WHY.platHigh; }
+      else if (i.plat > T.platMax){ m.guards.push('Plateau over 30. In ARDS: reduce the tidal volume by 1 mL/kg at a time, to no less than 4 mL/kg' + (has(i.pbw) ? ' (' + r0(4 * i.pbw) + ' mL)' : '') + '. In asthma or COPD: look for trapped gas and lower the rate.'); m.tiers.push('Plateau limit in ARDS: strong, moderate'); m.why = WHY.platHigh; }
+      else if (i.plat < T.platLow && has(perkg) && perkg < T.vtGoal && dp <= T.dpMark){ m.list.push('Plateau under 25 with a tidal volume under 6 mL/kg: the tidal volume may go up by 1 mL/kg until the plateau passes 25 or the volume reaches 6 mL/kg.'); m.tiers.push('ARDS Network protocol'); }
+      else m.list.push('Plateau is 30 or less' + (i.plat > 28 ? ' (in asthma or COPD the mark is 28).' : '.'));
+      if (has(perkg) && r1(perkg) < T.vtLo) m.guards.push('Tidal volume is under 4 mL/kg predicted weight: the protocol does not go below 4.');
+      if (has(perkg) && r1(perkg) > T.vtHi) m.guards.push('Tidal volume is over 8 mL/kg predicted weight: in ARDS bring it to 6' + (has(i.pbw) ? ' (' + r0(6 * i.pbw) + ' mL)' : '') + '.');
+      if (dp > T.dpMark) m.guards.push('Driving pressure over 15: look for a smaller breath or a better PEEP. This mark is expert practice; no guideline sets a number.');
+      if (!m.why) m.why = WHY.mech;
+      m.more = ['Valid only with an inspiratory hold in a patient who is not making effort. Trapped gas makes the set PEEP too low a number to subtract. A stiff chest wall or tense abdomen raises it without more lung stretch.', 'Across 9 trials (3,562 patients) each 7 cm H2O more driving pressure went with 41% higher mortality (relative risk 1.41, 95% CI 1.31 to 1.51).'];
+      m.tiers.push('Driving pressure mark of 15: expert practice');
+      if (!m.list.length) delete m.list; if (!m.guards.length) delete m.guards;
+      c.push(m);
+    }
+  } else c.push({id: 'mech', label: 'Mechanics', head: 'Enter plateau and PEEP', empty: true, sub: 'Driving pressure is plateau minus PEEP.'});
+
+  /* Oxygenation */
+  var pf = null, sf = null, band = null, by = null;
+  if (f !== null && isNaN(f)) c.push({id: 'ox', label: 'Oxygenation', head: 'Check the FiO2', empty: true, sub: 'Enter it as a fraction (0.21 to 1.0) or a percent (21 to 100).'});
+  else if (has(f) && has(i.pao2)){ pf = r0(i.pao2 / f); band = pf <= T.pfSev ? 'severe' : pf <= T.pfMod ? 'moderate' : pf <= T.pfMild ? 'mild' : null; by = 'pf'; }
+  else if (has(f) && has(i.spo2)){
+    if (i.spo2 > T.sfMaxSat) c.push({id: 'ox', label: 'Oxygenation', head: 'SpO2 is above 97%', empty: true, sub: 'The SpO2/FiO2 ratio is only valid at 97% or below. Lower the FiO2 or send a blood gas.'});
+    else { sf = r0(i.spo2 / f); band = sf <= T.sfSev ? 'severe' : sf <= T.sfMod ? 'moderate' : sf <= T.sfMild ? 'mild' : null; by = 'sf'; }
+  } else if (!(f !== null && isNaN(f))) c.push({id: 'ox', label: 'Oxygenation', head: 'Enter FiO2 with PaO2 or SpO2', empty: true, sub: 'P/F is PaO2 divided by FiO2.'});
+  if (by){
+    var o = {id: 'ox', label: 'Oxygenation', head: (by === 'pf' ? 'P/F ' + r0(pf) : 'SpO2/FiO2 ' + r0(sf)) + (band ? ': ' + band + ' range' : ': above the ARDS range'),
+      sub: by === 'pf' ? 'PaO2 ' + i.pao2 + ' ÷ FiO2 ' + r1(f * 100) / 100 + '.' : 'SpO2 ' + i.spo2 + ' ÷ FiO2 ' + r1(f * 100) / 100 + '.' + (band ? ' Send a blood gas before acting on this: proning and ECMO are defined by PaO2.' : ''), list: [], guards: [], why: WHY.ox, tiers: ['Berlin definition 2012; global definition 2024']};
+    o.list.push(by === 'pf' ? 'Bands: mild over 200 to 300, moderate over 100 to 200, severe 100 or less.' : 'Bands: mild over 235 to 315, moderate over 148 to 235, severe 148 or less.');
+    if (band && !okPeep) o.guards.push(has(i.peep) ? 'PEEP is under 5: the severity bands are defined on at least 5.' : 'The severity bands are defined on a PEEP of at least 5: enter the PEEP.');
+    if (band && !i.ards) o.guards.push('A low ratio is not ARDS by itself. ARDS also needs onset within a week, opacities on both sides, and no better explanation from heart failure or fluid overload.');
+    if (by === 'sf') o.more = ['SpO2/FiO2 misleads with a poor pulse-oximeter trace, shock, carbon monoxide or methemoglobin, and reads falsely high more often in darker skin. Above 1,000 m altitude the cut-offs are adjusted.'];
+    if (!o.guards.length) delete o.guards;
+    c.push(o);
+  }
+
+  /* ARDS ladder: only when the user confirms the other criteria, PEEP is 5 or more, and the ratio is in range */
+  if (i.ards && band && okPeep){
+    var L = {id: 'ladder', label: 'ARDS · next steps', list: [], guards: [], tiers: ['Low tidal volume and plateau limit: strong, moderate', 'Corticosteroids: conditional, moderate'], why: WHY.ladder};
+    L.list.push('Every patient: tidal volume 6 mL/kg (4 to 8) predicted weight and plateau 30 or less.');
+    L.list.push('Corticosteroids are suggested. Starting more than 2 weeks after onset may do harm.');
+    var lvl = 's0';
+    if (by === 'sf'){ L.head = 'Send a blood gas to place the next step'; L.sub = 'Higher PEEP, proning, paralysis and ECMO are all triggered by P/F.'; }
+    else {
+      if (pf <= T.pfMod){ L.list.push('P/F 200 or less: a higher-PEEP strategy is suggested, such as the higher-PEEP table on the Set up tab. No prolonged recruitment maneuvers.'); L.tiers.push('Higher PEEP: conditional, low to moderate', 'Prolonged recruitment maneuvers: strong, against'); lvl = 's1'; L.head = 'Moderate: add higher PEEP'; }
+      else L.head = 'Mild: protect the lung and treat the cause';
+      if (pf < T.pfProne){
+        if (has(f) && f >= T.fio2Prone){ L.list.push('P/F under 150 on FiO2 0.6 or more: turn prone for 16 hours or more a day, started early once settings are optimised.'); L.head = 'Prone positioning'; L.tiers.push('Prone 16 hours or more: strong, high (ESICM 2023); severe ARDS over 12 hours: strong (ATS 2017)'); }
+        else { L.list.push('P/F under 150 but FiO2 under 0.6: the proning trial enrolled patients on 0.6 or more after stabilisation. Optimise PEEP and recheck; prone if it stays under 150.'); L.head = 'Optimise, then consider prone'; }
+        L.list.push('Neuromuscular blockade if still hypoxemic or fighting the ventilator despite sedation; needs deep sedation, and 48 hours at most where possible.');
+        L.tiers.push('Neuromuscular blockade at P/F under 150 with persistent hypoxemia: conditional, low (SCCM 2026)'); lvl = 's2';
+      }
+      if (pf < T.pfEcmo){ L.guards.push('P/F under 80: if it stays there despite the steps above (the trial required more than 6 hours), call an ECMO center. Referral is for selected patients early in the illness (within about 7 days).'); L.head = (has(f) && f >= T.fio2Prone ? 'Prone now' : 'Optimise first') + '; call an ECMO center if it stays under 80'; L.tiers.push('VV-ECMO in selected severe ARDS: conditional, low (ATS 2024); strong, moderate for patients meeting the EOLIA criteria (ESICM 2023)'); lvl = 's3'; }
+    }
+    L.chips = [['ladder', lvl, 'The ARDS ladder']];
+    L.more = ['Paralysis: guidelines differ. ATS 2024 suggests it in early severe ARDS (P/F 100 or less, within 48 hours); SCCM 2026 suggests it at P/F under 150 with persistent hypoxemia; the European guideline recommends against routine infusions. ACURASYS favored it; the larger ROSE trial found no difference (42.5% against 42.8%).', 'ECMO: the other criterion is pH under 7.25 with PaCO2 60 or more that persists despite best ventilation. EOLIA enrolled P/F under 50 for over 3 hours or under 80 for over 6 hours; deaths at 60 days were 35% against 46% (not significant, with 28% of controls crossing over).', 'PROSEVA (P/F under 150 on FiO2 0.6 or more, sessions of 16 hours or more): deaths at 28 days 16.0% against 32.8%.'];
+    if (!L.guards.length) delete L.guards;
+    c.push(L);
+  }
+
+  /* pH: ARDS Network rules, shown only in ARDS */
+  if (has(i.ph) && (i.ph < 6.5 || i.ph > 7.8)) c.push({id: 'phcard', label: 'pH', head: 'Check the pH', empty: true, sub: 'That value is outside the range a blood gas reports.'});
+  else if (has(i.ph) && i.ards){
+    var P = {id: 'phcard', label: 'ARDS · pH', tiers: ['ARDS Network protocol'], why: WHY.ph};
+    if (i.ph < T.phFloor){ P.head = 'pH under 7.15: rate to 35, then give ground'; P.list = ['Set the rate to 35.', 'If the pH is still under 7.15, the tidal volume may go up 1 mL/kg at a time; the plateau limit of 30 may be exceeded.', 'Bicarbonate may be given.']; }
+    else if (i.ph < T.phLo){ P.head = 'pH 7.15 to 7.30: raise the rate'; P.list = ['Raise the rate until the pH is over 7.30 or the PaCO2 is under 25, to a maximum of 35.', 'Keep the tidal volume where it is.']; P.guards = ['At a fast rate, check that the patient finishes breathing out before the next breath.']; }
+    else if (i.ph > T.phHi){ P.head = 'pH over 7.45: lower the rate if possible'; }
+    else { P.head = 'pH in the goal range (7.30 to 7.45)'; }
+    c.push(P);
+  } else if (has(i.ph) && !i.ards){
+    c.push({id: 'phcard', label: 'pH', head: 'pH ' + i.ph, empty: true, sub: 'The rate-to-35 rules are for ARDS only. In asthma or COPD a faster rate traps more gas; in metabolic acidosis treat the cause and match the patient\'s own ventilation.'});
+  }
+  return {cards: c, pf: pf, sf: sf, band: band};
+}
+
+var READY = [['cause','The reason for intubation is improving'],['oxy','FiO2 0.40 or less and PEEP 8 or less'],['same','FiO2 and PEEP no higher than yesterday'],['bp','Systolic 90 or more without vasopressors (or minimal)'],['effort','Making breathing efforts'],['nmb','No neuromuscular blockade']];
+var EXTUB = [['awake','Awake enough to protect the airway'],['cough','Strong cough, secretions manageable']];
+var LIBT = [['pass','Passed the breathing trial'],['risk','High risk: hypercapnia, COPD, heart failure, older age or other serious illness'],['stridor','Stridor risk: traumatic intubation, tube in over 6 days, large tube, female, or reintubated after an unplanned extubation'],['leakok','Cuff leak test passed (leak heard)'],['noleak','Cuff leak test failed (no leak)']];
+
+function liberate(i){
+  var c = [], miss = READY.filter(function(r){ return !i[r[0]]; }), ready = miss.length === 0;
+  c.push(ready ? {id: 'ready', label: 'Readiness', head: i.pass ? 'Screen met and trial passed' : 'Ready for a breathing trial today', sub: 'All six screening items are met.', why: WHY.ready, tiers: ['Screen: ARDS Network protocol; task force statement 2007', 'Liberation protocol and sedation-minimising protocol: conditional, low'], more: ['Pairing a daily sedation pause with the breathing trial gave 3.1 more days breathing unassisted and fewer deaths at one year (hazard ratio 0.68) in the ABC trial.']}
+    : {id: 'ready', label: 'Readiness', head: miss.length === READY.length ? 'Tick what is true today' : 'Not yet: ' + miss.length + ' item' + (miss.length > 1 ? 's' : '') + ' missing', empty: miss.length === READY.length, sub: miss.length === READY.length ? 'Screen every ventilated patient every day.' : null, list: miss.length === READY.length ? null : miss.map(function(r){ return r[1]; }), why: miss.length === READY.length ? null : WHY.ready});
+  if (ready && !i.pass) c.push({id: 'trial', label: 'Breathing trial', head: 'Pressure support 5 to 8 cm H2O for 30 minutes', sub: 'Suggested over a T-piece or CPAP alone for the first trial. Do not raise the FiO2 during it.',
+    list: ['Stop the trial for: rate over 35 or up by half; SpO2 under 90%; heart rate over 140 or up by a fifth; systolic over 180 or under 90; pH under 7.32, PaCO2 over 50 or up more than 8; new arrhythmia.', 'Also stop for agitation, sweating, use of accessory muscles, or falling consciousness.', 'Failed: return to the previous settings, rest, find the reason, try again tomorrow.'],
+    why: WHY.trial, more: ['Pressure support 8 for 30 minutes against a T-piece for 2 hours: 82.3% against 74.0% extubated successfully, with similar reintubation (Subirà 2019, 1,153 patients).', 'The 2024 respiratory care guideline says a trial can be run with or without pressure support. The ARDS Network card allows up to 120 minutes and uses its own limits (pH 7.30 or more; two or more signs of distress).'],
+    tiers: ['Pressure support 5 to 8 for the first trial: conditional, moderate (ATS/CHEST 2017)', 'With or without pressure support: conditional, moderate (AARC 2024)', 'Stop criteria: task force statement 2007']});
+  if (has(i.rr) && has(i.vtl) && i.vtl > 0){
+    var x = i.rr / (i.vtl / 1000);
+    c.push({id: 'rsbi', label: 'Rapid shallow breathing index', head: r0(x) + ' breaths/min/L: ' + (x < T.rsbi ? 'under 105, favors success' : '105 or more, failure more likely'), sub: 'Rate ' + i.rr + ' ÷ tidal volume ' + r1(i.vtl / 1000 * 100) / 100 + ' L.',
+      guards: ['Valid only when measured during unsupported spontaneous breathing. It is not needed to decide whether to start a trial.'], why: WHY.rsbi,
+      more: ['In the original study the index had a sensitivity of 0.97 and a specificity of 0.64 for successful weaning.'], tiers: ['Threshold 105: task force statement 2007; Yang and Tobin 1991', 'Not needed for readiness: conditional, moderate (AARC 2024)']});
+  }
+  if (i.pass){
+    var okx = EXTUB.filter(function(r){ return !i[r[0]]; });
+    var e = {id: 'extub', label: 'Extubation plan', list: [], tiers: []};
+    if (!ready){ e.head = 'Complete the daily screen first'; e.list.push('The plan below assumes every screening item is met.'); }
+    else if (okx.length){ e.head = 'Passed the trial; check the airway before pulling the tube'; e.list.push('Still to confirm: ' + okx.map(function(r){ return r[1].toLowerCase(); }).join('; ') + '.'); }
+    else if (i.noleak){ e.head = 'Hold extubation: steroid first'; e.list.push('No cuff leak: give the steroid and wait at least 4 hours, then extubate with the plan below.'); }
+    else if (i.stridor && !i.leakok){ e.head = 'Cuff leak test first'; e.list.push('Stridor risk: do the cuff leak test before extubation, then use the plan below.'); }
+    else e.head = i.risk ? 'Extubate straight to NIV' : 'Extubate to high-flow nasal oxygen';
+    if (i.risk){ e.list.push('High risk: start preventive NIV immediately after extubation, not when the patient is already struggling.'); e.tiers.push('Preventive NIV in high-risk patients: strong, moderate (ATS/CHEST 2017); suggested in ATS 2026 and ERS/ATS 2017 (conditional)'); e.why = WHY.niv; }
+    else { e.list.push('If not high risk: high-flow nasal oxygen is suggested after extubation.'); e.tiers.push('High-flow nasal oxygen in low-risk patients: suggested (ATS 2026; ERS 2022, conditional)'); e.why = 'High flow washes out dead space and gives a little pressure; in low-risk patients it lowered reintubation from 12.2% to 4.9%.'; }
+    e.guards = ['If respiratory failure sets in after extubation, do not let NIV delay reintubation.'];
+    e.tiers.push('NIV for established post-extubation failure: conditional, against');
+    e.more = ['High risk, high flow against NIV: reintubation 22.8% against 19.1%, non-inferior (Hernández 2016). High flow plus NIV against high flow alone: 11.8% against 18.2% (Thille 2019).'];
+    c.push(e);
+  }
+  if ((i.stridor && !i.leakok) || i.noleak) c.push({id: 'cuff', label: 'Stridor risk', head: i.noleak ? 'Steroid at least 4 hours before extubation' : 'Do a cuff leak test before extubation',
+    sub: i.noleak ? 'A repeat cuff leak test is not needed.' : 'Deflate the cuff and look for a leak around the tube.',
+    list: i.noleak ? ['The guideline minimum is 4 hours. The main trial started earlier: methylprednisolone 20 mg IV 12 hours before extubation, then every 4 hours until the tube is out.'] : ['No leak: give a systemic steroid at least 4 hours before extubation.'],
+    why: WHY.cuff, more: ['With that regimen laryngeal edema fell from 22% to 3% and reintubation from 8% to 4% (François 2007, 698 patients).'],
+    tiers: ['Cuff leak test in high-risk patients: conditional, very low', 'Steroid after a failed test: conditional, moderate']});
+  return {cards: c, ready: ready};
+}
+
+/* Troubleshooting data */
+var PATTERN = {
+  both: {n: 'Peak high, plateau high', says: 'The lung or chest has become stiffer.', fit: {ptx: 1, autopeep: 1, lung: 1, wall: 1, main: 1}},
+  peak: {n: 'Peak high, plateau not raised', says: 'Resistance in the tube or the large airways.', fit: {kink: 1, plug: 1, spasm: 1}},
+  low: {n: 'Pressure suddenly low', says: 'Gas is escaping from the circuit.', fit: {leak: 1}}
+};
+var CAUSES = [
+  ['ptx','Pneumothorax','Exclude quickly; if the patient is collapsing, decompress without waiting for a film'],
+  ['autopeep','Trapped gas (auto-PEEP)','Check that expiratory flow reaches zero'],
+  ['lung','Lung getting worse','Pulmonary edema, worsening ARDS, pleural disease'],
+  ['wall','Stiff chest wall or abdomen','Obesity, ascites, chest wall deformity'],
+  ['main','Tube in the right main bronchus','Check the depth; listen to both sides'],
+  ['kink','Tube kinked or bitten','Look at the tube and the bite block'],
+  ['plug','Secretions or a plug','Pass a suction catheter'],
+  ['spasm','Bronchospasm','Listen for wheeze'],
+  ['leak','Leak','Circuit disconnected, tube dislodged, cuff down, a defect in the tube, or a large leak through a chest tube']
+];
+function patternRows(k){
+  var P = PATTERN[k];
+  return CAUSES.map(function(r){ return {name: r[1], why: r[2], st: P ? (P.fit[r[0]] ? 'fav' : 'out') : ''}; });
+}
+var AUTOPEEP = ['Recognise it: expiratory flow has not returned to zero when the next breath starts.', 'Measure it: an end-expiratory hold shows a pressure above the set PEEP. Reliable only when the patient is not making effort.', 'Fix it: lower the rate, lower the tidal volume, raise the inspiratory flow so inspiration is shorter. Treat bronchospasm.'];
+var DOPE = [['D','Displacement','Tube out, or too deep'],['O','Obstruction','Kink, bite, plug'],['P','Pneumothorax','One side silent, pressures up'],['E','Equipment','Ventilator, circuit, oxygen supply']];
+var DYS = [
+  ['Ineffective triggering','The patient pulls but no breath comes. The commonest kind; usually from trapped gas.'],
+  ['Auto-triggering','Breaths the patient did not ask for: a leak, an over-sensitive trigger, or the heartbeat moving the circuit.'],
+  ['Flow starvation','Flow set too low for the patient\'s demand in volume control: the pressure curve looks scooped out.'],
+  ['Premature cycling and double triggering','The machine breath ends before the patient\'s does, so a second breath stacks on the first. Common with low tidal volumes.'],
+  ['Delayed cycling','The machine breath runs on after the patient has stopped: a pressure spike at the end of inspiration.'],
+  ['Reverse triggering','In a deeply sedated patient the machine breath sets off an effort.']
+];
+var MODES = [
+  ['Volume control','Tidal volume, rate, flow','Pressure'],
+  ['Pressure control','Inspiratory pressure, inspiratory time, rate','Tidal volume'],
+  ['PRVC','Target tidal volume, rate; the ventilator adjusts pressure breath by breath','Pressure, within a limit'],
+  ['Pressure support','Pressure boost only; the patient triggers every breath and sets rate and length','Tidal volume and rate; no backup rate']
+];
+
+var TRIALS = [
+  {q: 'Do smaller breaths save lives in ARDS? (ARMA)', d: 'Randomized, 861 patients; 6 mL/kg predicted weight with plateau 30 or less against 12 mL/kg with plateau 50 or less. Stopped early.', r: 'Deaths 31.0% against 39.8% (P = 0.007). More ventilator-free days.', c: 'Made 6 mL/kg predicted body weight the standard.', cite: 'ARDS Network. N Engl J Med 2000;342:1301', doi: '10.1056/NEJM200005043421801'},
+  {q: 'Higher or lower PEEP? (ALVEOLI)', d: 'Randomized, 549 patients, all on 6 mL/kg; the two PEEP/FiO2 tables.', r: 'Deaths before discharge 24.9% with lower PEEP against 27.5% with higher (P = 0.48).', c: 'Neither table is clearly better across all ARDS; guidelines suggest higher PEEP only in moderate to severe disease.', cite: 'Brower RG et al. N Engl J Med 2004;351:327', doi: '10.1056/NEJMoa032193'},
+  {q: 'Does driving pressure predict death?', d: 'Pooled analysis of 3,562 patients in 9 randomized trials.', r: 'Each 7 cm H2O higher driving pressure: relative risk of death 1.41 (95% CI 1.31 to 1.51); 1.36 (1.17 to 1.58) when plateau and tidal volume were already protective.', c: 'Made driving pressure a bedside number to watch. One small trial of limiting it (STAMINA, 2025) found no benefit.', cite: 'Amato MBP et al. N Engl J Med 2015;372:747', doi: '10.1056/NEJMsa1410639'},
+  {q: 'Does proning save lives? (PROSEVA)', d: 'Randomized, 466 patients with P/F under 150 on FiO2 0.6 or more and PEEP 5 or more; prone sessions of 16 hours or more.', r: 'Deaths at 28 days 16.0% against 32.8% (hazard ratio 0.39, 95% CI 0.25 to 0.63).', c: 'Proning became standard for ARDS with P/F under 150. One trial, in experienced centers.', cite: 'Guérin C et al. N Engl J Med 2013;368:2159', doi: '10.1056/NEJMoa1214103'},
+  {q: 'Early paralysis? (ACURASYS and ROSE)', d: 'ACURASYS: 340 patients, P/F under 150, cisatracurium for 48 hours. ROSE: 1,006 patients, against lighter sedation.', r: 'ACURASYS: adjusted 90-day hazard ratio 0.68 (0.48 to 0.98); crude deaths 31.6% against 40.7%. ROSE: 42.5% against 42.8%.', c: 'Paralysis moved from routine to selective, which is why guidelines differ.', cite: 'Papazian L et al. N Engl J Med 2010;363:1107', doi: '10.1056/NEJMoa1005372'},
+  {q: 'ECMO for the most severe ARDS? (EOLIA)', d: 'Randomized, 249 patients; P/F under 50 for over 3 hours, under 80 for over 6 hours, or pH under 7.25 with PaCO2 60 or more for over 6 hours.', r: 'Deaths at 60 days 35% against 46% (relative risk 0.76, 95% CI 0.55 to 1.04); 28% of controls crossed over to ECMO.', c: 'Not significant on its own, but the basis for early referral of selected patients.', cite: 'Combes A et al. N Engl J Med 2018;378:1965', doi: '10.1056/NEJMoa1800385'},
+  {q: 'How should the breathing trial be run? (Subirà)', d: 'Randomized, 1,153 patients; pressure support 8 cm H2O for 30 minutes against a T-piece for 2 hours.', r: 'Successful extubation 82.3% against 74.0%; reintubation 11.1% against 11.9%.', c: 'A shorter, lightly supported trial gets more patients extubated without more failures.', cite: 'Subirà C et al. JAMA 2019;321:2175', doi: '10.1001/jama.2019.7234'},
+  {q: 'Wake up and breathe? (ABC)', d: 'Randomized, 336 patients; daily sedation pause paired with the breathing trial against the trial alone.', r: 'Days breathing unassisted 14.7 against 11.6; death at one year hazard ratio 0.68 (0.50 to 0.92).', c: 'Sedation practice is part of liberation.', cite: 'Girard TD et al. Lancet 2008;371:126', doi: '10.1016/S0140-6736(08)60105-1'},
+  {q: 'What support after extubation? (Hernández, Thille)', d: 'Three randomized trials: high-flow against conventional oxygen in 527 low-risk patients; high-flow against NIV in 604 high-risk patients; high-flow plus NIV against high-flow alone in 641 high-risk patients.', r: 'Reintubation: 4.9% against 12.2%; 22.8% against 19.1% (non-inferior); 11.8% against 18.2%.', c: 'High flow for low-risk patients; NIV, with high flow between sessions, for high-risk patients.', cite: 'Hernández G et al. JAMA 2016;315:1354', doi: '10.1001/jama.2016.2711'},
+  {q: 'Steroids to prevent stridor? (François)', d: 'Randomized, double blind, 698 patients; methylprednisolone 20 mg from 12 hours before extubation, every 4 hours.', r: 'Laryngeal edema 3% against 22%; reintubation 4% against 8%.', c: 'Supports a steroid before extubation in patients at risk of airway swelling.', cite: 'François B et al. Lancet 2007;369:1083', doi: '10.1016/S0140-6736(07)60526-1'}
+];
+
+/* Figures: plain SVG strings in the shared colour names. */
+var FS = 'font-family:var(--sans)', FM = 'font-family:var(--mono)';
+function svgOpen(vb, label){ return '<svg viewBox="' + vb + '" role="img" aria-label="' + label + '" class="fig">'; }
+function tx(x, y, t, o){ o = o || {}; return '<text x="' + x + '" y="' + y + '" text-anchor="' + (o.a || 'middle') + '" style="' + (o.sans ? FS : FM) + ';font-size:' + (o.s || 11) + 'px;font-weight:' + (o.w || 400) + ';fill:' + (o.c || 'var(--ink)') + '">' + t + '</text>'; }
+function bx(x, y, w, h, t1, t2, st){
+  var fill = st === 'hot' ? 'var(--warnbg)' : st === 'on' ? 'var(--card)' : 'var(--fill)', stroke = st === 'hot' ? 'var(--warn)' : st === 'on' ? 'var(--accent)' : 'var(--line)';
+  return '<g' + (st === 'dim' ? ' opacity=".74"' : '') + '><rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="10" fill="' + fill + '" stroke="' + stroke + '"' + (st === 'hot' || st === 'on' ? ' stroke-width="2"' : '') + '/>' +
+    tx(x + w / 2, y + (t2 ? h / 2 - 2 : h / 2 + 4), t1, {sans: 1, s: 12, w: 600}) + (t2 ? tx(x + w / 2, y + h / 2 + 12, t2, {s: 10.5, c: 'var(--muted)'}) : '') + '</g>';
+}
+
+var PRESS = {
+  norm: {n: 'Normal', peak: 22, plat: 18, peep: 5, base: 5, line: 'Peak is the pressure to push gas down the tube and fill the lung. Hold the breath in and it falls to the plateau: the pressure the lung itself is under. Plateau minus PEEP is the driving pressure.'},
+  res: {n: 'High resistance', peak: 38, plat: 18, peep: 5, base: 5, hot: 'gap', line: 'Peak is up but the plateau has not moved: the problem is in the tube or airways. Kinked or bitten tube, secretions, bronchospasm.'},
+  comp: {n: 'Stiff lung', peak: 36, plat: 32, peep: 5, base: 5, hot: 'dp', line: 'Peak and plateau are both up: the lung or chest is stiffer. Pneumothorax, trapped gas, a tube in one main bronchus, edema, worsening ARDS. The driving pressure has risen with it.'},
+  auto: {n: 'Trapped gas', peak: 31, plat: 27, peep: 5, base: 12, hot: 'base', line: 'The pressure at the end of the breath never gets down to the set PEEP: gas is trapped. Subtracting the set PEEP then overstates the driving pressure.'}
+};
+function pressSVG(k){
+  var d = PRESS[k], Y = function(p){ return 178 - p * 3.6; }, s = svgOpen('0 0 360 200', 'Airway pressure over one breath: ' + d.n);
+  s += '<line x1="34" y1="' + Y(0) + '" x2="346" y2="' + Y(0) + '" stroke="var(--line)"/><line x1="34" y1="16" x2="34" y2="' + Y(0) + '" stroke="var(--line)"/>';
+  [0, 10, 20, 30, 40].forEach(function(p){ s += tx(28, Y(p) + 3, p, {a: 'end', s: 10.5, c: 'var(--muted)'}); });
+  s += '<line x1="34" y1="' + Y(d.peep) + '" x2="346" y2="' + Y(d.peep) + '" stroke="var(--muted)" stroke-dasharray="3 4"/>' + tx(344, Y(d.peep) + 12, 'set PEEP ' + d.peep, {a: 'end', s: 10.5, c: 'var(--muted)'});
+  var step = d.peak - d.plat;
+  var pts = [[40, d.base], [80, d.base], [80, d.base + step], [150, d.peak], [150, d.plat], [215, d.plat], [232, d.base + (d.plat - d.base) * 0.25], [252, d.base + (d.plat - d.base) * 0.05], [270, d.base], [340, d.base]];
+  s += '<path d="' + pts.map(function(p, n){ return (n ? 'L' : 'M') + p[0] + ' ' + r1(Y(p[1])); }).join('') + '" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linejoin="round"/>';
+  s += '<circle cx="150" cy="' + Y(d.peak) + '" r="4" fill="' + (d.hot === 'gap' ? 'var(--warn)' : 'var(--accent)') + '"/>' + tx(144, Y(d.peak) - 7, 'peak ' + d.peak, {a: 'end', s: 10.5, w: 600});
+  s += tx(184, Y(d.plat) - 7, 'plateau ' + d.plat, {s: 10.5, w: 600}) + tx(184, Y(d.plat) + 14, 'hold', {s: 10.5, c: 'var(--muted)'});
+  var c2 = d.hot === 'dp' ? 'var(--warn)' : 'var(--ink)';
+  s += '<path d="M300 ' + Y(d.plat) + 'h8M304 ' + Y(d.plat) + 'V' + Y(d.peep) + 'M300 ' + Y(d.peep) + 'h8" stroke="' + c2 + '" stroke-width="1.5" fill="none"/><line x1="215" y1="' + Y(d.plat) + '" x2="300" y2="' + Y(d.plat) + '" stroke="var(--line)" stroke-dasharray="2 3"/>';
+  s += tx(298, (Y(d.plat) + Y(d.peep)) / 2 + 3, 'driving ' + (d.plat - d.peep), {a: 'end', s: 10.5, w: 600, c: c2});
+  if (d.hot === 'base') s += tx(56, Y(d.base) - 6, 'total ' + d.base, {s: 10.5, w: 600, c: 'var(--warn)'});
+  s += tx(190, 196, 'cm H2O · illustrative values', {s: 10.5, c: 'var(--muted)'});
+  return s + '</svg>';
+}
+
+var FLOW = {
+  norm: {n: 'Empties fully', line: 'Expiratory flow comes back to zero before the next breath: the lung has emptied.'},
+  trap: {n: 'Air trapping', line: 'The next breath starts while gas is still flowing out. Each breath leaves a little more behind, pressure in the chest climbs, and the blood pressure falls.'}
+};
+function flowSVG(k){
+  var trap = k === 'trap', s = svgOpen('0 0 360 170', 'Flow over two breaths: ' + FLOW[k].n), z = 80;
+  s += '<line x1="20" y1="' + z + '" x2="346" y2="' + z + '" stroke="var(--muted)"/>' + tx(22, 16, 'flow in', {a: 'start', s: 10.5, c: 'var(--muted)'}) + tx(22, 160, 'flow out', {a: 'start', s: 10.5, c: 'var(--muted)'});
+  function breath(x){ return 'L' + x + ' 34L' + (x + 40) + ' 34L' + (x + 40) + ' ' + (z + 62) + (trap ? 'Q' + (x + 70) + ' ' + (z + 30) + ' ' + (x + 150) + ' ' + (z + 22) : 'Q' + (x + 62) + ' ' + (z + 8) + ' ' + (x + 110) + ' ' + z + 'L' + (x + 150) + ' ' + z); }
+  s += '<path d="M30 ' + z + breath(30) + breath(180) + '" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linejoin="round"/>';
+  s += '<circle cx="180" cy="' + (trap ? z + 22 : z) + '" r="5" fill="none" stroke="var(--warn)" stroke-width="2"/>' + tx(trap ? 150 : 180, trap ? z + 46 : z - 10, trap ? 'still flowing out' : 'back to zero', {s: 10.5, w: 600, c: trap ? 'var(--warn)' : 'var(--ink)'});
+  return s + '</svg>';
+}
+
+var LADDER = {
+  s0: {n: 'Every patient', st: ['hot','dim','dim','dim'], line: 'Tidal volume 6 mL/kg predicted weight, plateau 30 or less. Corticosteroids are suggested.'},
+  s1: {n: 'P/F 200 or less', st: ['on','hot','dim','dim'], line: 'Higher PEEP is suggested in moderate to severe ARDS, without prolonged recruitment maneuvers.'},
+  s2: {n: 'P/F under 150', st: ['on','on','hot','dim'], line: 'On FiO2 0.6 or more after settings are optimised: prone for 16 hours or more a day. Paralysis if still hypoxemic or fighting the ventilator.'},
+  s3: {n: 'P/F under 80', st: ['on','on','on','hot'], line: 'If it stays under 80 despite the other steps, call an ECMO center early, for selected patients.'}
+};
+function ladderSVG(k){
+  var L = LADDER[k], s = svgOpen('0 0 360 236', 'ARDS steps: ' + L.n);
+  var rows = [['Small breaths','6 mL/kg, plateau 30 or less'],['+ Higher PEEP','P/F 200 or less'],['+ Prone, 16 hours','P/F under 150, FiO2 0.6+'],['Call ECMO center','P/F stays under 80']];
+  rows.forEach(function(r, n){ s += bx(6 + n * 34, 176 - n * 56, 220, 46, r[0], r[1], L.st[n]); });
+  return s + '</svg>';
+}
+
+var BARS = {
+  arma: {n: 'Small breaths', a: ['12 mL/kg', 39.8], b: ['6 mL/kg', 31.0], line: 'ARMA, 861 patients: deaths fell from 39.8% to 31.0% with 6 mL/kg predicted weight and a plateau of 30 or less.'},
+  prone: {n: 'Proning', a: ['Supine', 32.8], b: ['Prone 16 hours', 16.0], line: 'PROSEVA, 466 patients with P/F under 150 on FiO2 0.6 or more: deaths at 28 days 32.8% supine, 16.0% prone.'},
+  sbt: {n: 'Breathing trial', a: ['T-piece, 2 hours', 74.0], b: ['Pressure support, 30 min', 82.3], good: 1, line: 'Subirà, 1,153 patients: 82.3% were extubated successfully after a 30-minute pressure-support trial, 74.0% after 2 hours on a T-piece.'}
+};
+function barsSVG(k){
+  var d = BARS[k], s = svgOpen('0 0 360 120', d.n);
+  [d.a, d.b].forEach(function(r, n){
+    var y = 14 + n * 52, w = Math.max(2, 250 * r[1] / 100);
+    s += tx(6, y + 4, r[0], {a: 'start', sans: 1, s: 12, w: 600});
+    s += '<rect x="6" y="' + (y + 12) + '" width="250" height="20" rx="6" fill="var(--fill)" stroke="var(--line)"/>';
+    s += '<rect x="6" y="' + (y + 12) + '" width="' + w + '" height="20" rx="6" fill="' + (n === 0 ? 'var(--warn)' : 'var(--accent)') + '"/>';
+    s += tx(266, y + 27, r[1].toFixed(1) + '%', {a: 'start', s: 13, w: 600});
+  });
+  return s + '</svg>';
+}
+
+var FIGS = {
+  press: {t: 'Peak, plateau and PEEP', states: ['norm','res','comp','auto'], data: PRESS, svg: pressSVG},
+  flow: {t: 'Is the lung emptying?', states: ['norm','trap'], data: FLOW, svg: flowSVG},
+  ladder: {t: 'The ARDS ladder', states: ['s0','s1','s2','s3'], data: LADDER, svg: ladderSVG},
+  bars: {t: 'What the trials showed', states: ['arma','prone','sbt'], data: BARS, svg: barsSVG}
+};
+var PHBANDS = [['ok','7.30 to 7.45','The goal. Nothing to change.'],['mid','7.15 to 7.30','Raise the rate, up to 35, until the pH is over 7.30. The breath stays small.'],['low','Under 7.15','Rate to 35. If still under 7.15 the tidal volume may go up 1 mL/kg at a time, even past a plateau of 30, and bicarbonate may be given.']];
+var CASES = [
+  {tab: 'setup', t: 'Pneumonia, both lungs white', s: 'Woman, 163 cm, 95 kg. Intubated for ARDS.', q: 'What tidal volume do you aim for?', i: {sex:'f', ht:163, unit:'cm', scen:'ards'}, p: 'Predicted weight is 55.1 kg whatever she weighs: start at 8 mL/kg (441 mL) and come down to 6 mL/kg, 331 mL.'},
+  {tab: 'assess', t: 'Plateau 34 on 420 mL', s: 'Man, predicted weight 70 kg, ARDS. Tidal volume 420 mL, plateau 34, PEEP 12. PaO2 68 on FiO2 0.7.', q: 'What is the driving pressure, and what do you change first?', i: {plat:34, peep:12, vt:420, pbw:70, pao2:68, fio2:0.7, ards:true}, p: 'Driving pressure 22, plateau over 30: bring the tidal volume down 1 mL/kg at a time. P/F is 97 on FiO2 0.7, so he should also be turned prone.'},
+  {tab: 'assess', t: 'pH 7.22 on 6 mL/kg', s: 'ARDS, predicted weight 60 kg, tidal volume 360 mL, rate 22. Plateau 24, PEEP 10. PaO2 85 on FiO2 0.5. pH 7.22, PaCO2 62.', q: 'Do you make the breaths bigger?', i: {plat:24, peep:10, vt:360, pbw:60, pao2:85, fio2:0.5, ph:7.22, ards:true}, p: 'No. Between 7.15 and 7.30 the answer is rate, up to 35. The tidal volume only moves if the pH stays under 7.15.'},
+  {tab: 'assess', t: 'Saturation 91% on FiO2 0.8, no gas yet', s: 'Just intubated, PEEP 8, bilateral infiltrates after aspiration two days ago.', q: 'How severe is this, and can you act on it?', i: {peep:8, spo2:91, fio2:80, ards:true}, p: 'SpO2/FiO2 is 114, in the severe band. It is enough to call it ARDS, but send a blood gas before proning or calling for ECMO.'},
+  {tab: 'lib', t: 'Day 4, on FiO2 0.35 and PEEP 5', s: 'Pneumonia improving, off vasopressors since yesterday, triggering the ventilator, settings unchanged from yesterday, no paralytic.', q: 'What happens this morning?', i: {cause:true, oxy:true, same:true, bp:true, effort:true, nmb:true}, p: 'The screen is met: a breathing trial on pressure support 5 to 8 for 30 minutes, today.'},
+  {tab: 'lib', t: 'Passed the trial; COPD with a PaCO2 of 58', s: 'Age 71. Awake, strong cough. Rate 24 and tidal volume 380 mL over a minute of unsupported breathing.', q: 'What does he go on to after the tube comes out?', i: {cause:true, oxy:true, same:true, bp:true, effort:true, nmb:true, pass:true, awake:true, cough:true, risk:true, rr:24, vtl:380}, p: 'Index 63, under 105. He is high risk (COPD, hypercapnia, age): extubate straight to NIV, not to oxygen alone.'},
+  {tab: 'lib', t: 'Intubated 9 days, no cuff leak', s: 'Woman, difficult intubation, passed her breathing trial. Cuff deflated: no audible leak.', q: 'Extubate now?', i: {cause:true, oxy:true, same:true, bp:true, effort:true, nmb:true, pass:true, awake:true, cough:true, stridor:true, noleak:true}, p: 'Not yet. Give a systemic steroid at least 4 hours before extubation; the test does not need repeating.'}
+];
+</script>
+
+<script>
+(function(){
+var $ = function(id){ return document.getElementById(id); };
+function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+var ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M7 15l3-4 3 3 2-2 2 3"/></svg>';
+function chip(fig, state, label){ return '<button class="chip" data-fig="' + fig + '" data-state="' + (state || '') + '">' + ICON + esc(label || FIGS[fig].t) + '</button>'; }
+var peepSel = 0.5;
+function peepHTML(){
+  var p = peepFor(peepSel);
+  return '<div class="states wrapit" role="group" aria-label="FiO2">' + FIO2S.map(function(f){ return '<button class="sbtn" data-fio2="' + f + '" aria-pressed="' + (f === peepSel) + '">' + f.toFixed(1) + '</button>'; }).join('') + '</div>' +
+    '<div class="tw"><table><thead><tr><th>Table</th><th>PEEP at FiO2 ' + peepSel.toFixed(1) + '</th></tr></thead><tbody><tr><td><b>Lower PEEP</b></td><td class="mono">' + esc(p.low.join(', ') || 'not used') + '</td></tr><tr><td><b>Higher PEEP</b></td><td class="mono">' + esc(p.high.join(', ') || 'not used') + '</td></tr></tbody></table></div>';
+}
+function cardHTML(c){
+  var h = '<div class="card" id="' + c.id + '"><p class="label">' + esc(c.label) + '</p>';
+  h += c.empty ? '<p class="head">' + esc(c.head) + '</p>' : '<h2>' + esc(c.head) + '</h2>';
+  if (c.sub) h += '<p class="sub">' + esc(c.sub) + '</p>';
+  if (c.table) h += '<div class="tw" style="margin-top:8px"><table><thead><tr>' + c.table.head.map(function(x){ return '<th>' + esc(x) + '</th>'; }).join('') + '</tr></thead><tbody>' + c.table.rows.map(function(r, n){ return '<tr' + (n === c.table.mark ? ' class="mark"' : '') + '>' + r.map(function(x){ return '<td class="mono">' + esc(x) + '</td>'; }).join('') + '</tr>'; }).join('') + '</tbody></table></div>';
+  if (c.peep) h += '<div data-peep>' + peepHTML() + '</div>';
+  if (c.list) h += '<ul>' + c.list.map(function(s){ return '<li>' + esc(s) + '</li>'; }).join('') + '</ul>';
+  h += (c.guards || []).map(function(g){ return '<div class="guard">' + esc(g) + '</div>'; }).join('');
+  if (c.why) h += '<p class="whyline"><b>Why:</b> ' + esc(c.why) + '</p>';
+  if (c.chips && c.chips.length) h += '<div class="chips">' + c.chips.map(function(x){ return chip(x[0], x[1], x[2]); }).join('') + '</div>';
+  if ((c.more && c.more.length) || (c.tiers && c.tiers.length)) h += '<details><summary>More</summary>' + (c.more || []).map(function(m){ return '<p>' + esc(m) + '</p>'; }).join('') + (c.tiers || []).map(function(t){ return '<span class="tier">' + esc(t) + '</span>'; }).join('') + '</details>';
+  return h + '</div>';
+}
+function num(id){ var v = parseFloat($(id).value); return isFinite(v) && v >= 0 ? v : null; }
+function html(o){ return o.cards.map(cardHTML).join(''); }
+
+/* Set up */
+var st = {sex: null, scen: null, lib: {}};
+function seg(host, list, cur){ host.innerHTML = list.map(function(c){ return '<button class="sbtn" data-v="' + c[0] + '" aria-pressed="' + (c[0] === cur) + '">' + esc(c[1]) + '</button>'; }).join(''); }
+function readSetup(){ return {sex: st.sex, ht: num('ht'), unit: $('htu').value, scen: st.scen}; }
+var pbwTouched = false;
+function renderSetup(){
+  seg($('sexseg'), [['m','Male'],['f','Female']], st.sex);
+  seg($('scenseg'), SCENS.map(function(k){ return [k, SCEN[k].n]; }), st.scen);
+  var o = setup(readSetup());
+  $('setup-out').innerHTML = html(o);
+  if (!pbwTouched && o.pbw && !o.pbw.bad){ $('pbwkg').value = o.pbw.kg; renderAssess(); }
+}
+$('sexseg').addEventListener('click', function(e){ var v = e.target.getAttribute('data-v'); if (v){ st.sex = v; renderSetup(); } });
+$('scenseg').addEventListener('click', function(e){ var v = e.target.getAttribute('data-v'); if (v){ st.scen = v; renderSetup(); } });
+$('ht').addEventListener('input', renderSetup); $('htu').addEventListener('change', renderSetup);
+$('setup-out').addEventListener('click', function(e){ var f = e.target.getAttribute('data-fio2'); if (f){ peepSel = parseFloat(f); var h = $('setup-out').querySelector('[data-peep]'); if (h) h.innerHTML = peepHTML(); } });
+$('modetable').innerHTML = '<table><thead><tr><th>Mode</th><th>You set</th><th>Varies</th></tr></thead><tbody>' + MODES.map(function(r){ return '<tr><td><b>' + esc(r[0]) + '</b></td><td>' + esc(r[1]) + '</td><td>' + esc(r[2]) + '</td></tr>'; }).join('') + '</tbody></table>';
+
+/* Assess */
+function readAssess(){ return {plat: num('plat'), peep: num('peep'), vt: num('vt'), pbw: num('pbwkg'), fio2: num('fio2'), pao2: num('pao2'), spo2: num('spo2'), ph: num('ph'), ards: $('ards').checked}; }
+function renderAssess(){ $('assess-out').innerHTML = html(assess(readAssess())); }
+$('assess-in').addEventListener('input', function(e){ if (e.target.id === 'pbwkg') pbwTouched = true; renderAssess(); });
+$('ards').addEventListener('change', renderAssess);
+
+/* Fix */
+$('dopetable').innerHTML = '<table><tbody>' + DOPE.map(function(r){ return '<tr><td class="mono"><b>' + r[0] + '</b></td><td><b>' + esc(r[1]) + '</b></td><td>' + esc(r[2]) + '</td></tr>'; }).join('') + '</tbody></table>';
+var patSel = null;
+function drawPattern(){
+  $('patseg').innerHTML = Object.keys(PATTERN).map(function(k){ return '<button class="sbtn" data-v="' + k + '" aria-pressed="' + (k === patSel) + '">' + esc(PATTERN[k].n) + '</button>'; }).join('');
+  $('patsays').textContent = patSel ? PATTERN[patSel].says : '';
+  $('patout').innerHTML = patternRows(patSel).map(function(r){ return '<div class="cause' + (r.st ? ' ' + r.st : '') + '"><span>' + esc(r.name) + '</span><small>' + esc(r.why) + '</small></div>'; }).join('');
+  $('patchip').innerHTML = patSel === 'low' ? '' : chip('press', patSel === 'both' ? 'comp' : patSel === 'peak' ? 'res' : 'norm', 'Peak, plateau and PEEP');
+}
+$('patseg').addEventListener('click', function(e){ var v = e.target.getAttribute('data-v'); if (v){ patSel = patSel === v ? null : v; drawPattern(); } });
+drawPattern();
+$('autolist').innerHTML = AUTOPEEP.map(function(s){ return '<li>' + esc(s) + '</li>'; }).join('');
+$('autochip').innerHTML = chip('flow', 'trap', 'How air trapping looks');
+$('dyslist').innerHTML = DYS.map(function(r){ return '<div class="cause"><span>' + esc(r[0]) + '</span><small>' + esc(r[1]) + '</small></div>'; }).join('');
+
+/* Liberate */
+function ticks(host, list){ host.innerHTML = list.map(function(t){ return '<label class="chk"><input type="checkbox" data-t="' + t[0] + '"' + (st.lib[t[0]] ? ' checked' : '') + '>' + esc(t[1]) + '</label>'; }).join(''); }
+function readLib(){ var i = {rr: num('rr'), vtl: num('vtl')}; Object.keys(st.lib).forEach(function(k){ if (st.lib[k]) i[k] = true; }); return i; }
+function renderLib(){ $('lib-out').innerHTML = html(liberate(readLib())); }
+function drawLib(){ ticks($('readyticks'), READY); ticks($('libticks'), LIBT.slice(0, 1).concat(EXTUB, LIBT.slice(1))); renderLib(); }
+$('lib-in').addEventListener('change', function(e){ var t = e.target.getAttribute('data-t'); if (t){ st.lib[t] = e.target.checked; renderLib(); } });
+$('lib-in').addEventListener('input', renderLib);
+
+/* Tabs */
+var tabs = [['t-setup','p-setup'],['t-assess','p-assess'],['t-fix','p-fix'],['t-lib','p-lib'],['t-learn','p-learn'],['t-prac','p-prac']];
+function show(t){ tabs.forEach(function(p){ var on = p[0] === t; $(p[0]).setAttribute('aria-selected', String(on)); $(p[1]).classList.toggle('on', on); }); }
+tabs.forEach(function(p){ $(p[0]).addEventListener('click', function(){ show(p[0]); }); });
+function fromHash(){ var id = location.hash.slice(1); if (!id) return; var el = $(id); if (!el) return; var pan = el.closest('.panel'); if (pan) tabs.forEach(function(p){ if (p[1] === pan.id) show(p[0]); }); el.scrollIntoView(); }
+window.addEventListener('hashchange', fromHash);
+
+/* Figures and the sheet */
+function mountFig(host, id, state){
+  var F = FIGS[id];
+  function draw(k){
+    var d = F.data[k];
+    host.innerHTML = '<div class="states" role="group" aria-label="' + esc(F.t) + '">' + F.states.map(function(x){ return '<button class="sbtn" data-k="' + x + '" aria-pressed="' + (x === k) + '">' + esc(F.data[x].n) + '</button>'; }).join('') + '</div>' + F.svg(k) + '<p class="line1">' + esc(d.line) + '</p>';
+    var on = host.querySelector('[aria-pressed="true"]'), row = host.querySelector('.states');
+    if (on && row) row.scrollLeft = Math.max(0, on.offsetLeft - 60);
+  }
+  host.onclick = function(e){ var k = e.target.getAttribute && e.target.getAttribute('data-k'); if (k) draw(k); };
+  draw(state && F.data[state] ? state : F.states[0]);
+}
+var lastFocus = null;
+function openSheet(fig, state){
+  lastFocus = document.activeElement;
+  $('sheet-t').textContent = FIGS[fig].t;
+  mountFig($('sheet-b'), fig, state);
+  $('scrim').hidden = false; $('sheet').hidden = false; $('sheet').scrollTop = 0; $('sheet-x').focus();
+}
+function closeSheet(){ if ($('sheet').hidden) return; $('scrim').hidden = true; $('sheet').hidden = true; if (lastFocus && lastFocus.focus) lastFocus.focus(); }
+$('sheet-x').addEventListener('click', closeSheet); $('scrim').addEventListener('click', closeSheet);
+document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeSheet(); });
+document.addEventListener('click', function(e){ var c = e.target.closest && e.target.closest('[data-fig]'); if (c) openSheet(c.getAttribute('data-fig'), c.getAttribute('data-state')); });
+document.querySelectorAll('[data-figure]').forEach(function(h){ mountFig(h, h.getAttribute('data-figure'), h.getAttribute('data-state')); });
+
+/* Learn tab */
+var SIZE = [['pbw','Predicted'],['thin','Actual 60 kg'],['big','Actual 120 kg']], sizeSel = 'pbw';
+function drawSize(){
+  seg($('sizeseg'), SIZE, sizeSel);
+  var p = pbw('m', 175, 'cm').kg, w = sizeSel === 'pbw' ? p : sizeSel === 'thin' ? 60 : 120, v = r0(6 * w);
+  $('sizeout').textContent = sizeSel === 'pbw' ? '6 mL/kg of predicted weight: ' + v + ' mL. This is the right breath for both men.' : '6 mL/kg of ' + w + ' kg: ' + v + ' mL, which is ' + r1(v / p) + ' mL/kg for his lungs.' + (sizeSel === 'big' ? ' That is ' + r0((v / p / 6 - 1) * 100) + '% bigger than intended.' : '');
+}
+$('sizeseg').addEventListener('click', function(e){ var v = e.target.getAttribute('data-v'); if (v){ sizeSel = v; drawSize(); } });
+SIZE[0][1] = 'Predicted, ' + pbw('m', 175, 'cm').kg + ' kg';
+drawSize();
+var phSel = 'mid';
+function drawPh(){ seg($('phseg'), PHBANDS, phSel); $('phout').textContent = PHBANDS.filter(function(s){ return s[0] === phSel; })[0][2]; }
+$('phseg').addEventListener('click', function(e){ var v = e.target.getAttribute('data-v'); if (v){ phSel = v; drawPh(); } });
+drawPh();
+(function(){
+  var chaps = [].slice.call(document.querySelectorAll('.chap'));
+  $('pills').innerHTML = chaps.map(function(c, n){ return '<button class="pill" data-go="' + c.id + '" aria-current="' + (n === 0) + '">' + (n + 1) + ' ' + esc(c.getAttribute('data-pill')) + '</button>'; }).join('');
+  $('pills').addEventListener('click', function(e){ var g = e.target.getAttribute('data-go'); if (g) $(g).scrollIntoView(); });
+  function mark(id){ [].forEach.call($('pills').children, function(b){ var on = b.getAttribute('data-go') === id; b.setAttribute('aria-current', String(on)); if (on) $('pills').scrollLeft = Math.max(0, b.offsetLeft - 60); }); }
+  if ('IntersectionObserver' in window){
+    var io = new IntersectionObserver(function(es){ es.forEach(function(en){ if (en.isIntersecting) mark(en.target.id); }); }, {rootMargin: '-30% 0px -60% 0px'});
+    chaps.forEach(function(c){ io.observe(c); });
+  }
+  $('trialbox').innerHTML = TRIALS.map(function(t){ return '<div class="trial" style="margin-top:14px"><p><b>' + esc(t.q) + '</b></p><p><span class="k">Design</span>' + esc(t.d) + '</p><p><span class="k">Result</span>' + esc(t.r) + '</p><p><span class="k">What it changed</span>' + esc(t.c) + '</p><p class="mono" style="font-size:13px"><a href="https://doi.org/' + t.doi + '" rel="noopener">' + esc(t.cite) + '</a></p></div>'; }).join('');
+  $('go-prac').addEventListener('click', function(){ show('t-prac'); window.scrollTo(0, 0); });
+})();
+
+/* Practice: cases run through the same engines */
+var ENG = {setup: setup, assess: assess, lib: liberate}, TABOF = {setup: 't-setup', assess: 't-assess', lib: 't-lib'};
+function rng(seed){ var a = seed >>> 0; return function(){ a |= 0; a = a + 0x6D2B79F5 | 0; var t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+(function(){
+  var d = new Date(); var rnd = rng(d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate());
+  var order = CASES.map(function(c, n){ return n; });
+  for (var k = order.length - 1; k > 0; k--){ var j = Math.floor(rnd() * (k + 1)); var t = order[k]; order[k] = order[j]; order[j] = t; }
+  $('practice').innerHTML = order.map(function(n, pos){ var c = CASES[n];
+    return '<div class="card case"><p class="label">Case ' + (pos + 1) + '</p><h2>' + esc(c.t) + '</h2><p>' + esc(c.s) + '</p><p><b>' + esc(c.q) + '</b></p><div class="row"><button class="btn" data-ans="' + n + '">Show the answer</button><button class="btn ghost" data-load="' + n + '">Open in the tool</button></div><div class="ans" id="ans' + n + '" hidden></div></div>';
+  }).join('');
+})();
+$('practice').addEventListener('click', function(e){
+  var a = e.target.getAttribute('data-ans'), l = e.target.getAttribute('data-load');
+  if (a != null){ var c = CASES[a]; var box = $('ans' + a); box.innerHTML = '<p>' + esc(c.p) + '</p>' + html(ENG[c.tab](c.i)).replace(/ id="[^"]*"/g, ''); box.hidden = false; e.target.hidden = true; }
+  if (l != null){ var c2 = CASES[l], i = c2.i;
+    if (c2.tab === 'setup'){ st.sex = i.sex; st.scen = i.scen; $('ht').value = i.ht; $('htu').value = i.unit; pbwTouched = false; renderSetup(); }
+    if (c2.tab === 'assess'){ ['plat','peep','vt','fio2','pao2','spo2','ph'].forEach(function(k){ $(k).value = i[k] != null ? i[k] : ''; }); $('pbwkg').value = i.pbw != null ? i.pbw : ''; pbwTouched = true; $('ards').checked = !!i.ards; renderAssess(); }
+    if (c2.tab === 'lib'){ st.lib = {}; Object.keys(i).forEach(function(k){ if (i[k] === true) st.lib[k] = true; }); $('rr').value = i.rr != null ? i.rr : ''; $('vtl').value = i.vtl != null ? i.vtl : ''; drawLib(); }
+    show(TABOF[c2.tab]); window.scrollTo(0, 0); }
+});
+renderSetup(); renderAssess(); drawLib(); fromHash();
+})();
+</script>
+<script id="deeper-data">
+/* Go deeper: mechanism, rationale and the common trap for each Learn chapter. Text only; no doses or thresholds beyond the tool's own. */
+(function(){ var D = {"learn-size": [["Mechanism", "Lung size follows height and sex, not weight. In ARDS much of the lung is flooded or collapsed, so the part still taking air is small. A breath sized for a whole lung overstretches the part that is open, and the stretch itself inflames and injures it."], ["Why it matters", "This is why tidal volume is set per kilogram of predicted, not actual, body weight. Using the measured weight gives a patient with obesity a breath far too large for their lungs."], ["Common trap", "Short patients, and so most often women, are the ones who receive oversized breaths when height is guessed or a default volume is left in place."]], "learn-press": [["Mechanism", "The peak pressure is what it takes to push gas down the airways and stretch the lung. During a brief pause at the end of inspiration, with no gas flowing, the airway part drops out and what remains is the plateau: the pressure actually distending the alveoli. PEEP is the pressure the breath starts from."], ["Why it matters", "The gap between peak and plateau localizes a problem. A wide gap is resistance: bronchospasm, secretions, a kinked or bitten tube. Both high is stiffness: pneumothorax, edema, ARDS, a tube in one main bronchus, a tense abdomen, trapped air."], ["Common trap", "The plateau is only valid when the patient is passive; breathing effort distorts it. A stiff chest wall (obesity, ascites) raises it without the lung being overstretched."]], "learn-dp": [["Mechanism", "Driving pressure is the tidal volume divided by the compliance of the respiratory system. Compliance reflects how much lung is still open, so the number scales the breath to the working lung instead of to body size."], ["Why it matters", "It explains why a correctly sized breath can still be too much: in severe ARDS so little lung is open that even a small volume produces a large pressure swing."], ["Common trap", "The evidence is an association in pooled trial data. It shows which patients do worse; it does not prove that deliberately lowering the number saves lives."]], "learn-co2": [["Mechanism", "A smaller breath clears less carbon dioxide. Raising the rate compensates until the lungs no longer have time to empty. Over days the kidneys retain bicarbonate and the pH recovers."], ["Why it matters", "The trade is deliberate: a moderately acid pH is tolerated better than a lung injured by large breaths."], ["Common trap", "Carbon dioxide dilates the brain's vessels and constricts the lung's. A high level is dangerous with raised intracranial pressure and is poorly tolerated by a failing right ventricle."]], "learn-trap": [["Mechanism", "If the time allowed for breathing out is shorter than the lungs need, the next breath starts before the last has left. Volume and pressure build up breath by breath. The raised pressure in the chest blocks blood returning to the heart, so the blood pressure falls; it also overstretches the lung and makes it harder for the patient to trigger a breath."], ["Why it matters", "The treatment is time to exhale: a slower rate, a smaller breath, a shorter inspiration, and bronchodilators. In a collapsing patient, disconnecting the ventilator and letting the chest empty is both the test and the treatment."], ["Common trap", "Hypotension soon after intubating a patient with asthma or COPD is trapped air until proven otherwise. On the screen, expiratory flow that has not returned to zero before the next breath gives it away."]], "learn-ladder": [["Mechanism", "Low oxygen in ARDS comes from shunt: blood flowing past alveoli that are flooded or collapsed and take no air. Extra oxygen does little for blood that never meets gas. PEEP holds alveoli open. Turning prone evens out the stretch across the lung and matches air to blood flow better. Paralysis removes fighting and strong efforts that add injury."], ["Why it matters", "Each step up is more effective for oxygenation but carries more risk or work, so each is added only when the previous one is not enough."], ["Common trap", "Chasing the oxygen number with settings that injure the lung. And prone positioning, the step with the strongest survival evidence, is often delayed or not used."]]};
+  function add(){ Object.keys(D).forEach(function(id){ var c = document.getElementById(id); if (!c || c.querySelector(":scope > .deeper")) return; var host = c.matches(".card,.lsec,section,.chap") ? c : null; if (!host){ var n = c.nextElementSibling; while (n && !n.matches(".card")) n = n.nextElementSibling; host = n; } if (!host || host.querySelector(":scope > .deeper")) return; var d = document.createElement("details"); d.className = "deeper"; d.innerHTML = "<summary>Go deeper: mechanism and rationale</summary><div class=\"dpx\">" + D[id].map(function(r){ return "<div><span class=\"dl\">" + r[0] + "</span><p>" + r[1] + "</p></div>"; }).join("") + "</div>"; var last = host.querySelector(":scope > .row"); if (last) host.insertBefore(d, last); else host.appendChild(d); }); }
+  add(); document.addEventListener("click", function(){ setTimeout(add, 0); }); document.addEventListener("input", function(){ setTimeout(add, 0); });
+})();
+</script>
+</body>
+</html>

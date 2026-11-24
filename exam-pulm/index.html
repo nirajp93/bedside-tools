@@ -79,11 +79,11 @@ details.more ul{padding-left:18px}
 .lr{font-family:var(--mono);font-size:12px;padding:2px 7px;border-radius:6px;background:var(--fill);white-space:nowrap}
 .lr.up{color:var(--bad);background:var(--badbg)}
 .lr.down{color:var(--ok);background:var(--okbg)}
-.tag{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:2px 6px;border-radius:5px;background:var(--fill);color:var(--muted)}
+.tag{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:2px 6px;border-radius:5px;background:var(--fill);color:var(--muted)}
 .tri{display:inline-grid;grid-auto-flow:column;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--card)}
 .tri button{min-width:46px;min-height:44px;font-size:13px;color:var(--muted);border-left:1px solid var(--line)}
 .tri button:first-child{border-left:0}
-.tri button:disabled{opacity:.35;cursor:not-allowed}
+.tri button:disabled{opacity:.5;cursor:not-allowed}
 .tri button[aria-pressed=true][data-v="1"]{background:var(--badbg);color:var(--bad);font-weight:600}
 .tri button[aria-pressed=true][data-v="1"][data-low]{background:var(--okbg);color:var(--ok)}
 .tri button[aria-pressed=true][data-v="-1"]{background:var(--okbg);color:var(--ok);font-weight:600}
@@ -151,7 +151,7 @@ footer p{margin-top:8px}
 
 .pgrid{width:100%;border-collapse:collapse;font-size:13px;margin-top:10px}
 .pgrid th,.pgrid td{padding:8px 6px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
-.pgrid th{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:400}
+.pgrid th{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:400}
 .pgrid tr.on td{background:var(--fill);font-weight:600}
 .tablewrap{overflow-x:auto}
 .lungfig{display:block;width:100%;max-width:380px;height:auto;margin:6px auto 0}
@@ -162,8 +162,30 @@ footer p{margin-top:8px}
 .curvecap{font-size:13px;color:var(--muted);margin:4px 0 0}
 .extab{width:100%;border-collapse:collapse;font-size:14px;margin:8px 0}
 .extab th,.extab td{padding:6px;border-bottom:1px solid var(--line);text-align:left}
-.extab th{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:400}
+.extab th{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:400}
+.dp{margin-top:10px;border:1px solid var(--line);border-radius:12px;padding:2px 12px;background:var(--card);text-align:left}
+.dp:empty{display:none}
+.dp>div{padding:10px 0;border-top:1px solid var(--line)}
+.dp>div:first-child{border-top:0}
+.dp .dl{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500;margin:0 0 3px}
+.dp p{font-size:15px;line-height:1.45;color:var(--ink);margin:0 0 4px}
+.dp p:last-child{margin-bottom:0}
+.deeper{margin-top:14px;border-top:1px solid var(--line)}
+.deeper>summary{min-height:44px;display:flex;align-items:center;gap:8px;color:var(--accent);font-weight:600;font-size:15px;cursor:pointer;list-style:none}
+.deeper>summary::-webkit-details-marker{display:none}
+.deeper>summary::before{content:"+";font-family:var(--mono);font-size:18px;line-height:1;width:14px;text-align:center}
+.deeper[open]>summary::before{content:"\2212"}
+.deeper>summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.deeper .dpx{border:1px solid var(--line);border-radius:12px;padding:2px 12px;background:var(--card);text-align:left}
+.deeper .dpx>div{padding:10px 0;border-top:1px solid var(--line)}
+.deeper .dpx>div:first-child{border-top:0}
+.deeper .dl{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500;margin:0 0 3px}
+.deeper p{font-size:15px;line-height:1.45;color:var(--ink);margin:0 0 4px}
+.deeper p:last-child{margin-bottom:0}
+[data-deeper]>.deeper{margin-top:0;border-top:0}
+.step .deeper{margin-top:10px}
 </style>
+<script>function dpHtml(rows){ return rows.map(function(r){ return '<div><span class="dl">' + r[0] + '</span>' + r[1] + '</div>'; }).join(''); }</script>
 </head>
 <body>
 <header><div class="wrap">
@@ -182,6 +204,7 @@ footer p{margin-top:8px}
     <div class="pre"><label for="pre">Your probability before the exam</label><span class="v" id="prev"></span>
       <input type="range" id="pre" min="1" max="99" step="1" aria-describedby="prenote"></div>
     <p class="note" id="prenote"></p>
+    <div class="dp" id="prehow"><div><span class="dl">What the starting point is</span><p>How likely the diagnosis is in a patient like this one before you examine: the setting, the story, the age. It matters as much as the exam: the same finding lands very differently from 10% and from 60%.</p></div><div><span class="dl">What a likelihood ratio does</span><p>It multiplies the odds. As a rough guide between 10% and 90%, ratios of 2, 5 and 10 raise the probability by about 15, 30 and 45 points, and 0.5, 0.2 and 0.1 lower it by the same. A ratio near 1 changes nothing, however classic the finding.</p></div><div><span class="dl">Where the exam helps most</span><p>In the middle. At very low or very high starting points even a strong finding rarely moves the probability across a decision line, so examine hardest where you are least sure.</p></div></div>
     <p class="note" id="prehint">Your best guess from the history, before you examine. Unsure? Drag across the range you find plausible and watch the chart in the result.</p>
     <div class="minis"><button type="button" class="mini" id="prehelp">How to choose a starting number</button></div>
   </div>
@@ -342,16 +365,16 @@ function lungSVG(k){var W=320,H=220,g="",tx=160;if(k==="eff"||k==="ptx")tx=150;i
  g+='<rect x="'+(tx-6)+'" y="10" width="12" height="54" rx="5" fill="var(--card)" stroke="var(--muted)" stroke-width="2"/>';
  g+='<path d="M'+tx+' 64 L148 78 M'+tx+' 64 L172 78" stroke="var(--muted)" stroke-width="5" fill="none" stroke-linecap="round"/>';
  g+='<path d="'+L+'" fill="var(--card)" stroke="var(--muted)" stroke-width="2"/>';
- if(k==="ptx"){g+='<path d="'+R+'" fill="var(--fill)" stroke="var(--muted)" stroke-width="2" stroke-dasharray="5 4"/><path d="M174 90 C 200 86, 214 110, 212 140 C 210 170, 194 184, 176 186 Z" fill="var(--card)" stroke="var(--muted)" stroke-width="2"/><text x="236" y="120" text-anchor="middle" style="font-family:var(--mono);font-size:10px" fill="var(--ink)">air</text>'}
- else if(k==="atel"){g+='<path d="'+R+'" fill="var(--card)" stroke="var(--muted)" stroke-width="2"/><path d="M172 64 C 200 60, 222 72, 226 96 L172 118 Z" fill="var(--hrt-art)" opacity=".55"/><text x="214" y="216" text-anchor="middle" style="font-family:var(--mono);font-size:10px" fill="var(--ink)">collapsed upper lobe</text>'}
+ if(k==="ptx"){g+='<path d="'+R+'" fill="var(--fill)" stroke="var(--muted)" stroke-width="2" stroke-dasharray="5 4"/><path d="M174 90 C 200 86, 214 110, 212 140 C 210 170, 194 184, 176 186 Z" fill="var(--card)" stroke="var(--muted)" stroke-width="2"/><text x="236" y="120" text-anchor="middle" style="font-family:var(--mono);font-size:10.5px" fill="var(--ink)">air</text>'}
+ else if(k==="atel"){g+='<path d="'+R+'" fill="var(--card)" stroke="var(--muted)" stroke-width="2"/><path d="M172 64 C 200 60, 222 72, 226 96 L172 118 Z" fill="var(--hrt-art)" opacity=".55"/><text x="214" y="216" text-anchor="middle" style="font-family:var(--mono);font-size:10.5px" fill="var(--ink)">collapsed upper lobe</text>'}
  else g+='<path d="'+R+'" fill="var(--card)" stroke="var(--muted)" stroke-width="2"/>';
- if(k==="cons"){g+='<path d="M176 140 C 210 130, 250 140, 258 160 C 262 182, 246 196, 228 198 L176 198 Z" fill="var(--hrt-art)" opacity=".5"/>';for(var i=0;i<14;i++){g+='<circle cx="'+(190+(i*13)%62)+'" cy="'+(152+((i*7)%40))+'" r="2.2" fill="var(--hrt-art)"/>'}g+='<text x="214" y="216" text-anchor="middle" style="font-family:var(--mono);font-size:10px" fill="var(--ink)">consolidated lobe</text>'}
- if(k==="eff"){g+='<path d="M176 150 Q 220 140 262 128 C 268 160, 260 192, 228 200 L176 200 Z" fill="var(--hrt-vein)" opacity=".45"/><text x="222" y="216" text-anchor="middle" style="font-family:var(--mono);font-size:10px" fill="var(--ink)">fluid, meniscus</text>'}
- if(k==="fib"){[0,1].forEach(function(s){var x0=s?190:80;for(var i=0;i<6;i++){g+='<path d="M'+(x0+i*8)+' 150 l6 12 l-4 10 l8 14" stroke="var(--muted)" fill="none" stroke-width="1.5"/>'}});g+='<text x="160" y="216" text-anchor="middle" style="font-family:var(--mono);font-size:10px" fill="var(--ink)">basal scarring, both sides</text>'}
- if(k==="edema"){g+='<path d="M60 160 C 70 190, 92 200, 148 200 L148 150 Z" fill="var(--hrt-vein)" opacity=".3"/><path d="M260 160 C 250 190, 228 200, 172 200 L172 150 Z" fill="var(--hrt-vein)" opacity=".3"/><text x="160" y="216" text-anchor="middle" style="font-family:var(--mono);font-size:10px" fill="var(--ink)">fluid at both bases</text>'}
- if(k==="hyper"){g+='<text x="160" y="226" text-anchor="middle" style="font-family:var(--mono);font-size:10px" fill="var(--ink)">large lungs, flat diaphragms</text>'}
- if(tx!==160)g+='<text x="'+tx+'" y="8" text-anchor="middle" style="font-family:var(--mono);font-size:9px" fill="var(--bad)">'+(k==="eff"?"shifted if large":k==="ptx"?"shifted if tension":"trachea pulled")+'</text>';
- g+='<text x="4" y="40" style="font-family:var(--mono);font-size:9px" fill="var(--muted)">patient right</text><text x="316" y="40" text-anchor="end" style="font-family:var(--mono);font-size:9px" fill="var(--muted)">patient left</text>';
+ if(k==="cons"){g+='<path d="M176 140 C 210 130, 250 140, 258 160 C 262 182, 246 196, 228 198 L176 198 Z" fill="var(--hrt-art)" opacity=".5"/>';for(var i=0;i<14;i++){g+='<circle cx="'+(190+(i*13)%62)+'" cy="'+(152+((i*7)%40))+'" r="2.2" fill="var(--hrt-art)"/>'}g+='<text x="214" y="216" text-anchor="middle" style="font-family:var(--mono);font-size:10.5px" fill="var(--ink)">consolidated lobe</text>'}
+ if(k==="eff"){g+='<path d="M176 150 Q 220 140 262 128 C 268 160, 260 192, 228 200 L176 200 Z" fill="var(--hrt-vein)" opacity=".45"/><text x="222" y="216" text-anchor="middle" style="font-family:var(--mono);font-size:10.5px" fill="var(--ink)">fluid, meniscus</text>'}
+ if(k==="fib"){[0,1].forEach(function(s){var x0=s?190:80;for(var i=0;i<6;i++){g+='<path d="M'+(x0+i*8)+' 150 l6 12 l-4 10 l8 14" stroke="var(--muted)" fill="none" stroke-width="1.5"/>'}});g+='<text x="160" y="216" text-anchor="middle" style="font-family:var(--mono);font-size:10.5px" fill="var(--ink)">basal scarring, both sides</text>'}
+ if(k==="edema"){g+='<path d="M60 160 C 70 190, 92 200, 148 200 L148 150 Z" fill="var(--hrt-vein)" opacity=".3"/><path d="M260 160 C 250 190, 228 200, 172 200 L172 150 Z" fill="var(--hrt-vein)" opacity=".3"/><text x="160" y="216" text-anchor="middle" style="font-family:var(--mono);font-size:10.5px" fill="var(--ink)">fluid at both bases</text>'}
+ if(k==="hyper"){g+='<text x="160" y="226" text-anchor="middle" style="font-family:var(--mono);font-size:10.5px" fill="var(--ink)">large lungs, flat diaphragms</text>'}
+ if(tx!==160)g+='<text x="'+tx+'" y="8" text-anchor="middle" style="font-family:var(--mono);font-size:10.5px" fill="var(--bad)">'+(k==="eff"?"shifted if large":k==="ptx"?"shifted if tension":"trachea pulled")+'</text>';
+ g+='<text x="4" y="40" style="font-family:var(--mono);font-size:10.5px" fill="var(--muted)">patient right</text><text x="316" y="40" text-anchor="end" style="font-family:var(--mono);font-size:10.5px" fill="var(--muted)">patient left</text>';
  return '<svg class="lungfig" viewBox="0 -6 '+W+' '+(H+18)+'" role="img" aria-label="Chest diagram: '+esc(P[k].t)+'">'+g+'</svg>'}
 function renderP(){$("#pchips").innerHTML=PORDER.map(function(k){return '<button type="button" class="chip" id="p-'+k+'" data-p="'+k+'" aria-pressed="'+(k===pk)+'">'+esc(P[k].t)+'</button>'}).join("");
  var p=P[pk];$("#pcard").innerHTML='<span class="kicker">Pattern</span><h3 style="margin-top:4px">'+esc(p.t)+'</h3>'+lungSVG(pk)+'<p class="note" style="text-align:center;margin-top:2px">Front view, as you face the patient.</p><dl class="sigs"><dt>Trachea</dt><dd>'+esc(p.trachea)+'</dd><dt>Expansion</dt><dd>'+esc(p.exp)+'</dd><dt>Fremitus</dt><dd>'+esc(p.frem)+'</dd><dt>Percussion</dt><dd>'+esc(p.perc)+'</dd><dt>Breath</dt><dd>'+esc(p.breath)+'</dd><dt>Voice</dt><dd>'+esc(p.voice)+'</dd><dt>Added</dt><dd>'+esc(p.added)+'</dd></dl><p class="why"><b>Why:</b> '+esc(p.why)+'</p><details class="more"><summary>More</summary><p>Common causes: '+esc(p.cause)+'</p>'+(LINKS[pk]?'<p>'+LINKS[pk]+'</p>':'')+'<p>Source: standard physical diagnosis teaching. Real patients often mix patterns (consolidation with a small effusion), and small lesions change little on exam.</p></details>';
@@ -361,7 +384,7 @@ $("#pchips").addEventListener("click",function(e){var b=e.target.closest("[data-
 renderP();
 
 /* Figures */
-function figClub(){return '<svg class="fig" viewBox="0 0 320 150" role="img" aria-label="Finger in profile: normal and clubbed"><g fill="none" stroke-width="2"><path d="M20 90 L110 90 C 130 90, 140 80, 142 70 L110 70 L20 70" stroke="var(--muted)"/><path d="M110 70 L142 70" stroke="var(--ink)"/><text x="70" y="112" text-anchor="middle" style="font-family:var(--mono);font-size:10px" fill="var(--ink)" stroke="none">normal: 176° or less</text><path d="M180 92 L270 92 C 300 96, 312 80, 304 62 C 296 50, 280 52, 270 62 L180 66" stroke="var(--muted)"/><path d="M270 62 C 284 52, 300 52, 304 62" stroke="var(--ink)"/><text x="245" y="112" text-anchor="middle" style="font-family:var(--mono);font-size:10px" fill="var(--bad)" stroke="none">clubbed: angle over 180°</text></g><line x1="262" y1="92" x2="262" y2="62" stroke="var(--accent)" stroke-dasharray="3 3"/><line x1="226" y1="92" x2="226" y2="66" stroke="var(--accent)" stroke-dasharray="3 3"/><text x="244" y="140" text-anchor="middle" style="font-family:var(--mono);font-size:10px" fill="var(--accent)">nail-bed depth / joint depth</text></svg><p class="figtext">Look at the index finger from the side. Profile angle (nail plate against the finger at the nail fold): normal up to 176°; over 180° is clubbing; 176–180° is a grey zone. Phalangeal depth ratio: depth at the nail bed divided by depth at the last finger joint; over 1.0 is clubbing. Schamroth sign (not validated): the diamond-shaped window between two opposed nails is lost.</p>'}
+function figClub(){return '<svg class="fig" viewBox="0 0 320 150" role="img" aria-label="Finger in profile: normal and clubbed"><g fill="none" stroke-width="2"><path d="M20 90 L110 90 C 130 90, 140 80, 142 70 L110 70 L20 70" stroke="var(--muted)"/><path d="M110 70 L142 70" stroke="var(--ink)"/><text x="70" y="112" text-anchor="middle" style="font-family:var(--mono);font-size:10.5px" fill="var(--ink)" stroke="none">normal: 176° or less</text><path d="M180 92 L270 92 C 300 96, 312 80, 304 62 C 296 50, 280 52, 270 62 L180 66" stroke="var(--muted)"/><path d="M270 62 C 284 52, 300 52, 304 62" stroke="var(--ink)"/><text x="314" y="112" text-anchor="end" style="font-family:var(--mono);font-size:10.5px" fill="var(--bad)" stroke="none">clubbed: over 180°</text></g><line x1="262" y1="92" x2="262" y2="62" stroke="var(--accent)" stroke-dasharray="3 3"/><line x1="226" y1="92" x2="226" y2="66" stroke="var(--accent)" stroke-dasharray="3 3"/><text x="314" y="140" text-anchor="end" style="font-family:var(--mono);font-size:10.5px" fill="var(--accent)">nail-bed depth / joint depth</text></svg><p class="figtext">Look at the index finger from the side. Profile angle (nail plate against the finger at the nail fold): normal up to 176°; over 180° is clubbing; 176–180° is a grey zone. Phalangeal depth ratio: depth at the nail bed divided by depth at the last finger joint; over 1.0 is clubbing. Schamroth sign (not validated): the diamond-shaped window between two opposed nails is lost.</p>'}
 var lastFocus=null;
 function openSheet(html){lastFocus=document.activeElement;$("#sheet").innerHTML=html;$("#sheetwrap").hidden=false;var x=$("#sheet .x");if(x)x.focus()}
 function closeSheet(){$("#sheetwrap").hidden=true;$("#sheet").innerHTML="";if(lastFocus&&lastFocus.focus)lastFocus.focus()}
@@ -405,15 +428,15 @@ function curveHTML(){
  a=d+"L"+X(0)+" "+Y(0)+"Z";
  var dx=X(s),dy=Y(p),right=dx<200,g='<svg class="curve" viewBox="0 0 300 138" role="img" aria-label="Chart of the result against your starting probability. Starting at '+s+' percent gives '+fmt(p)+' percent.">';
  g+='<path d="M'+X(0)+' '+Y(0)+'L'+X(100)+' '+Y(0)+'M'+X(0)+' '+Y(0)+'L'+X(0)+' '+Y(100)+'" stroke="var(--line)" stroke-width="2" fill="none"/>';
- [0,50,100].forEach(function(t){g+='<text x="'+X(t)+'" y="118" text-anchor="middle" style="font-family:var(--mono);font-size:9px" fill="var(--muted)">'+t+'</text><text x="28" y="'+(Y(t)+3)+'" text-anchor="end" style="font-family:var(--mono);font-size:9px" fill="var(--muted)">'+t+'</text>'});
- g+='<text x="'+X(50)+'" y="134" text-anchor="middle" style="font-family:var(--mono);font-size:9px" fill="var(--muted)">your starting probability →</text>';
- g+='<text x="'+(X(0)+4)+'" y="'+(Y(100)+3)+'" style="font-family:var(--mono);font-size:9px" fill="var(--muted)">result ↑</text>';
+ [0,50,100].forEach(function(t){g+='<text x="'+X(t)+'" y="118" text-anchor="middle" style="font-family:var(--mono);font-size:10.5px" fill="var(--muted)">'+t+'</text><text x="28" y="'+(Y(t)+3)+'" text-anchor="end" style="font-family:var(--mono);font-size:10.5px" fill="var(--muted)">'+t+'</text>'});
+ g+='<text x="'+X(50)+'" y="134" text-anchor="middle" style="font-family:var(--mono);font-size:10.5px" fill="var(--muted)">your starting probability →</text>';
+ g+='<text x="'+(X(0)+4)+'" y="'+(Y(100)+3)+'" style="font-family:var(--mono);font-size:10.5px" fill="var(--muted)">result ↑</text>';
  if(has)g+='<path d="'+a+'" fill="var(--accent)" opacity=".12"/>';
  g+='<path d="M'+X(0)+' '+Y(0)+'L'+X(100)+' '+Y(100)+'" stroke="var(--muted)" stroke-width="1.5" stroke-dasharray="2 4" fill="none"/>';
  if(has)g+='<path d="'+d+'" stroke="var(--accent)" stroke-width="2.5" fill="none" stroke-linejoin="round"/>';
  g+='<path d="M'+dx+' '+Y(0)+'L'+dx+' '+dy+'L'+X(0)+' '+dy+'" stroke="var(--ink)" stroke-width="1" stroke-dasharray="3 3" fill="none" opacity=".55"/>';
  g+='<circle cx="'+dx+'" cy="'+dy+'" r="6" fill="var(--accent)" stroke="var(--card)" stroke-width="2.5"/>';
- g+='<text x="'+(right?dx+10:dx-10)+'" y="'+(p>18?dy+14:dy-8)+'" text-anchor="'+(right?"start":"end")+'" style="font-family:var(--mono);font-size:10px;font-weight:600" fill="var(--ink)">'+s+'% → '+fmt(p)+'%</text></svg>';
+ g+='<text x="'+(right?dx+10:dx-10)+'" y="'+(p>18?dy+14:dy-8)+'" text-anchor="'+(right?"start":"end")+'" style="font-family:var(--mono);font-size:10.5px;font-weight:600" fill="var(--ink)">'+s+'% → '+fmt(p)+'%</text></svg>';
  g+='<p class="curvecap">'+(has?'Drag the slider (or the chart) and the dot rides the curve. The further the curve bows from the dotted line, the more these findings tell you.':'No findings marked yet, so the result equals your start (the dotted line). Mark a finding and a curve will bow away from it.')+'</p>';
  return g}
 var renderResultBase=renderResult;
@@ -431,6 +454,13 @@ document.addEventListener("click",function(e){if(!e.target.closest("#prehelp"))r
  '<p class="figtext"><b>Reading the chart</b><br>Across: your starting probability. Up: the result. The dotted line means no change. The solid curve is the result with the findings you have marked, and the dot is you.</p>'+
  '<p class="figtext"><b>Check your conclusion</b><br>After marking findings, drag across the range of starting values you find plausible. If you would do the same thing at both ends, the exam has answered the question. If your action would change, you need another test.</p>')});
 renderQ();fromHash();
+})();
+</script>
+<script id="deeper-data">
+/* Go deeper: mechanism, rationale and the common trap for each Learn chapter. Text only; no doses or thresholds beyond the tool's own. */
+(function(){ var H2CARD = false; var D = {"step-inspect": [["Mechanism", "The respiratory rate rises with almost any stress on the heart, lungs or acid-base balance. Accessory muscles are recruited when the work of breathing is high, typically when the diaphragm is flattened by hyperinflation and works at a disadvantage; pursed lips keep small airways open during breathing out. An abdomen that moves in as the chest moves out means the diaphragm is failing."], ["Why it matters", "Rate and work of breathing warn of respiratory failure before the blood gases do. Clubbing does not come from COPD alone, so finding it is a reason to look for cancer, bronchiectasis or fibrosis."], ["Common trap", "A normal saturation in a patient who is working hard to maintain it. And a rate that slows in a tiring patient is a sign of impending arrest, not of recovery."]], "step-palpate": [["Mechanism", "The trachea follows the mediastinum: it is pulled toward a side that has lost volume and pushed away from a large effusion or a pneumothorax under tension. Fremitus is the vibration of the voice reaching the chest wall. Solid lung with an open airway transmits it well; air or fluid between the lung and the wall, or a blocked bronchus, damps it."], ["Why it matters", "Fremitus helps separate the common causes of a dull percussion note: increased over consolidation with an open airway, reduced over an effusion or a collapsed lobe."], ["Common trap", "Tracheal shift is a late sign of a tension pneumothorax. Do not wait for it."]], "step-percuss": [["Mechanism", "The note depends on how much air lies under the finger. Normal lung is resonant, solid or fluid-filled tissue is dull, and excess air is hyper-resonant."], ["Why it matters", "It locates an abnormality and, with fremitus and breath sounds, says what it is: dull with reduced sounds for an effusion, dull with bronchial breathing for consolidation, hyper-resonant with reduced sounds on one side for a pneumothorax."], ["Common trap", "Percussion reaches only a few centimetres into the chest and needs a lesion of some size, so a deep or small abnormality is missed. A raised diaphragm gives the same dull base as an effusion."]], "step-listen": [["Mechanism", "Breath sounds are made in the larger airways and filtered by the air-filled lung on the way out, which is why they are soft and low. Solid lung transmits the higher pitches, giving bronchial breathing. A wheeze is the wall of a narrowed airway fluttering. Crackles are closed airways snapping open: fine and late in inspiration in fibrosis and edema, coarse and early in COPD, coarse through both phases in bronchiectasis. Stridor is a harsh sound, usually in inspiration, from a narrowed upper airway."], ["Why it matters", "Timing and pitch identify the process and its site, and a single fixed wheeze points to a local obstruction."], ["Common trap", "A quiet chest in severe asthma means so little air is moving that no wheeze is made. And wheeze is not always asthma: heart failure and an obstructed central airway also cause it."]], "step-voice": [["Mechanism", "The same filtering explains voice sounds. Solid lung passes the higher frequencies of speech, so a spoken 'ee' is heard as 'ay' and a whisper is heard clearly."], ["Why it matters", "They confirm consolidation where the breath sounds are bronchial. The compressed lung at the top of an effusion can produce the same change."], ["Common trap", "They need an open airway into the area. A bronchus plugged with mucus removes the signs over consolidated lung."]], "step-fet": [["Mechanism", "Narrowed airways empty slowly, so the time needed to breathe all the way out lengthens as airflow limitation worsens."], ["Why it matters", "It is a quick bedside screen for obstruction when spirometry is not at hand."], ["Common trap", "It depends on effort and it cannot replace spirometry for diagnosis."]]};
+  function add(){ Object.keys(D).forEach(function(id){ var c = document.getElementById(id); if (!c || c.querySelector(":scope > .deeper")) return; var host = c.matches(".step") ? (c.querySelector(":scope > div") || c) : c.matches(".card,.lsec,section,.chap") ? c : null; if (!host && c.tagName === "H2" && H2CARD){ var old = document.querySelector("[data-deeper=" + id + "]"); if (old) return; var ref = c.nextElementSibling && c.nextElementSibling.matches(".lead") ? c.nextElementSibling : c; host = document.createElement("div"); host.className = "card"; host.setAttribute("data-deeper", id); ref.parentNode.insertBefore(host, ref.nextSibling); } if (!host){ var n = c.nextElementSibling; while (n && !n.matches(".card")) n = n.nextElementSibling; host = n; } if (!host || host.querySelector(":scope > .deeper")) return; var d = document.createElement("details"); d.className = "deeper"; d.innerHTML = "<summary>Go deeper: mechanism and rationale</summary><div class=\"dpx\">" + D[id].map(function(r){ return "<div><span class=\"dl\">" + r[0] + "</span><p>" + r[1] + "</p></div>"; }).join("") + "</div>"; var last = host.querySelector(":scope > .row"); if (last) host.insertBefore(d, last); else host.appendChild(d); }); }
+  add(); document.addEventListener("click", function(){ setTimeout(add, 0); }); document.addEventListener("input", function(){ setTimeout(add, 0); });
 })();
 </script>
 </body>

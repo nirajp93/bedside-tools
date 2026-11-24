@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>QT risk checker · bedside.tools</title>
+<meta name="description" content="Correct the QT for heart rate, see the torsades risk, check each drug on the list and what to swap it for, and get a monitoring plan, with the reasoning in diagrams.">
+<script src="/theme.js"></script>
+<style>
+:root{--bg:#FBFBFA;--card:#FFFFFF;--ink:#111113;--muted:#55555D;--line:#ECECEE;--accent:#2B4BDB;--warn:#9A3B00;--warnbg:#FFF6EC}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5}
+.mono{font-family:var(--mono)}
+.wrap{max-width:720px;margin:0 auto;padding:20px 16px 48px}
+a{color:var(--accent)}
+.back{font-size:14px;text-decoration:none;display:inline-block;min-height:44px;line-height:44px}
+h1{font-size:26px;margin:4px 0 4px;letter-spacing:-.01em}
+.purpose{color:var(--muted);margin:0 0 20px}
+.tabs{display:flex;gap:6px;margin-bottom:16px}
+.tab{flex:1;min-width:0;min-height:44px;border:1px solid var(--line);background:var(--card);border-radius:14px;padding:0 4px;font:inherit;font-size:15px;font-weight:600;color:var(--muted);cursor:pointer}
+.tab[aria-selected="true"]{border-color:var(--accent);color:var(--accent)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
+.label{font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px}
+.field{display:flex;flex-direction:column;justify-content:flex-end}
+.field label{display:block;font-size:13px;color:var(--muted);margin-bottom:4px}
+.field input,.field select{width:100%;min-height:44px;border:1px solid var(--line);border-radius:10px;padding:8px 10px;font:inherit;font-family:var(--mono);background:var(--card);color:var(--ink)}
+.field input:focus,.tab:focus-visible,.chk:focus-within,button:focus-visible,summary:focus-visible,input[type=range]:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.checks{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.chk{display:flex;align-items:center;gap:10px;min-height:44px;border:1px solid var(--line);border-radius:10px;padding:6px 10px;font-size:14px;cursor:pointer}
+.chk input{width:20px;height:20px;accent-color:var(--accent);flex:none}
+.card h2{font-size:18px;margin:0 0 2px}
+.head{font-family:var(--mono);font-size:17px;font-weight:600;margin:6px 0 4px;overflow-wrap:anywhere}
+.head.bad{color:var(--bad)}.head.okc{color:var(--ok)}.head.wn{color:var(--warn)}
+.big{font-family:var(--mono);font-size:34px;font-weight:700;line-height:1.1;margin:4px 0 0}
+.big small{font-size:15px;font-weight:500;color:var(--muted)}
+.sub{font-size:14px;color:var(--muted);margin:0}
+.card ul{margin:6px 0 0;padding-left:20px}
+.card li{margin-bottom:4px}
+.guard{border-left:3px solid var(--warn);background:var(--warnbg);padding:8px 10px;border-radius:0 10px 10px 0;margin-top:8px;font-size:14.5px}
+.guard.bad{border-left-color:var(--bad);background:var(--badbg)}
+.tier{display:inline-block;font-family:var(--mono);font-size:11px;border:1px solid var(--line);border-radius:999px;padding:2px 8px;color:var(--muted);margin:6px 6px 0 0}
+details{margin-top:10px;border-top:1px solid var(--line);padding-top:8px}
+.whyline{margin:10px 0 0;font-size:14.5px;color:var(--muted)}
+.whyline b{color:var(--ink);font-weight:600}
+summary{cursor:pointer;color:var(--accent);font-weight:600;min-height:44px;line-height:44px}
+details p{margin:0 0 8px;font-size:15px}
+.empty{color:var(--muted)}
+.btn{min-height:44px;border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);border-radius:10px;padding:8px 14px;font:inherit;font-weight:600;cursor:pointer}
+.btn.ghost{background:var(--card);color:var(--accent)}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.note{font-size:14px;color:var(--muted)}
+.tl{position:relative;padding-left:26px;margin-top:6px}
+.tl:before{content:"";position:absolute;left:8px;top:8px;bottom:8px;width:2px;background:var(--line)}
+.st{position:relative;padding:6px 0 10px}
+.st:before{content:"";position:absolute;left:-24px;top:11px;width:12px;height:12px;border-radius:50%;background:var(--card);border:2px solid var(--muted)}
+.st.now:before{background:var(--accent);border-color:var(--accent)}
+.st .when{font-family:var(--mono);font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+.st b{display:block}
+.st small{color:var(--muted);font-size:13.5px;display:block}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:6px 6px 6px 0;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:var(--mono);font-size:11.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);font-weight:500}
+tbody th{font-family:var(--sans);font-size:14px;letter-spacing:0;text-transform:none;color:var(--ink);font-weight:600}
+td.mono{font-size:13px;white-space:nowrap}
+tr.sel td{font-weight:700}
+.tw{overflow-x:auto}
+.case h2{font-size:17px}
+.ans{margin-top:10px;border-top:1px solid var(--line);padding-top:10px}
+footer{margin-top:28px;font-size:13.5px;color:var(--muted)}
+footer p{margin:0 0 8px}
+.panel{display:none}.panel.on{display:block}
+.fig{display:block;width:100%;max-width:460px;height:auto;margin:0 auto}
+.states{display:flex;gap:6px;overflow-x:auto;margin:10px -16px;padding:2px 16px 6px;scrollbar-width:none}
+.states::-webkit-scrollbar{display:none}
+.states.wrapit{flex-wrap:wrap;overflow:visible;margin:10px 0 0;padding:0}
+.sbtn{flex:none;min-height:44px;min-width:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--ink);font:inherit;font-size:14px;cursor:pointer;white-space:nowrap}
+.sbtn[aria-pressed="true"]{border-color:var(--accent);color:var(--accent);font-weight:600}
+.line1{font-size:15px;margin:10px 0 0}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.chip{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--fill);color:var(--ink);font:inherit;font-size:14px;cursor:pointer;text-align:left}
+.chip svg{flex:none;color:var(--accent)}
+.chip.rm{background:var(--card)}
+.chip.rm b{font-family:var(--mono);font-size:11px;font-weight:600}
+.scrim{position:fixed;inset:0;background:var(--scrim);z-index:20}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:21;max-height:90vh;overflow-y:auto;background:var(--card);border:1px solid var(--line);border-bottom:0;border-radius:20px 20px 0 0;padding:8px 16px 24px;max-width:560px;margin:0 auto}
+.sheethead{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.sheethead h2{font-size:18px;margin:0}
+.xbtn{min-height:44px;min-width:44px;border:0;background:transparent;color:var(--accent);font:inherit;font-weight:600;cursor:pointer}
+.pills{position:sticky;top:0;z-index:5;background:var(--bg);display:flex;gap:6px;overflow-x:auto;margin:0 -16px 12px;padding:8px 16px;border-bottom:1px solid var(--line);scrollbar-width:none}
+.pills::-webkit-scrollbar{display:none}
+.pill{flex:none;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--muted);font:inherit;font-size:14px;cursor:pointer;white-space:nowrap}
+.pill[aria-current="true"]{border-color:var(--accent);color:var(--accent);font-weight:600}
+.chap{scroll-margin-top:70px}
+.cause{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:8px 0;border-top:1px solid var(--line);font-size:15px}
+.cause small{color:var(--muted);font-size:13px;text-align:right;flex:0 1 58%}
+.cause.out span{color:var(--muted);text-decoration:line-through}
+.cause.out{opacity:.6}
+.cause.fav span{font-weight:700}
+.cause.fav span:before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--accent);margin-right:8px}
+.trial{border-left:3px solid var(--accent);padding-left:12px}
+.trial p{margin:0 0 6px;font-size:15px}
+.trial .k{font-family:var(--mono);font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);display:block}
+.badge{display:inline-block;font-family:var(--mono);font-size:12px;border-radius:999px;padding:2px 10px;margin:4px 6px 0 0;border:1px solid var(--line);color:var(--muted)}
+.badge.hi{border-color:var(--warn);color:var(--warn);background:var(--warnbg)}
+.badge.bad{border-color:var(--bad);color:var(--bad);background:var(--badbg)}
+.badge.lo{border-color:var(--ok);color:var(--ok);background:var(--okbg)}
+.score{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:8px 0;border-top:1px solid var(--line)}
+.score b{font-family:var(--mono);font-size:15px;white-space:nowrap}
+.score small{color:var(--muted);font-size:13px}
+.score.sel b,.score.sel span{color:var(--accent);font-weight:700}
+.tap{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.qn{font-size:14px;color:var(--muted);margin:12px 0 0}
+.sugg{display:flex;flex-direction:column;gap:4px;margin-top:6px}
+.sugg button{min-height:44px;text-align:left;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);font:inherit;font-size:15px;padding:6px 10px;cursor:pointer;display:flex;justify-content:space-between;gap:10px;align-items:center}
+.sugg button small{color:var(--muted);font-size:12.5px;font-family:var(--mono)}
+.drug{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:8px 0;border-top:1px solid var(--line)}
+.drug .dn{font-weight:600}
+.drug p{margin:2px 0 0;font-size:14px;color:var(--muted)}
+.t-tdp{border-color:var(--bad);color:var(--bad);background:var(--badbg)}
+.t-qt{border-color:var(--warn);color:var(--warn);background:var(--warnbg)}
+.t-trig{border-color:var(--accent);color:var(--accent)}
+.t-low{border-color:var(--ok);color:var(--ok);background:var(--okbg)}
+.slider{display:flex;align-items:center;gap:10px;margin-top:10px}
+.slider label{font-size:14px;color:var(--muted);min-width:76px}
+.slider input{flex:1;min-height:44px;accent-color:var(--accent)}
+.slider output{font-family:var(--mono);font-weight:600;min-width:72px;text-align:right}
+.meter{height:14px;border-radius:999px;background:var(--fill);border:1px solid var(--line);overflow:hidden;margin-top:10px;position:relative}
+.meter i{display:block;height:100%;background:var(--accent)}
+.meter.mid i{background:var(--warn)}.meter.hi i{background:var(--bad)}
+@media (min-width:900px){
+  .wrap{max-width:1040px}
+  #p-tool.on{display:grid;grid-template-columns:420px minmax(0,1fr);gap:20px;align-items:start}
+  .refgrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;align-items:start}
+  .refgrid .card{margin-bottom:0}
+  #p-learn{max-width:720px;margin:0 auto}
+}
+@media (max-width:380px){.checks{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+.dp{margin-top:10px;border:1px solid var(--line);border-radius:12px;padding:2px 12px;background:var(--card);text-align:left}
+.dp:empty{display:none}
+.dp>div{padding:10px 0;border-top:1px solid var(--line)}
+.dp>div:first-child{border-top:0}
+.dp .dl{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500;margin:0 0 3px}
+.dp p{font-size:15px;line-height:1.45;color:var(--ink);margin:0 0 4px}
+.dp p:last-child{margin-bottom:0}
+.deeper{margin-top:14px;border-top:1px solid var(--line)}
+.deeper>summary{min-height:44px;display:flex;align-items:center;gap:8px;color:var(--accent);font-weight:600;font-size:15px;cursor:pointer;list-style:none}
+.deeper>summary::-webkit-details-marker{display:none}
+.deeper>summary::before{content:"+";font-family:var(--mono);font-size:18px;line-height:1;width:14px;text-align:center}
+.deeper[open]>summary::before{content:"\2212"}
+.deeper>summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.deeper .dpx{border:1px solid var(--line);border-radius:12px;padding:2px 12px;background:var(--card);text-align:left}
+.deeper .dpx>div{padding:10px 0;border-top:1px solid var(--line)}
+.deeper .dpx>div:first-child{border-top:0}
+.deeper .dl{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500;margin:0 0 3px}
+.deeper p{font-size:15px;line-height:1.45;color:var(--ink);margin:0 0 4px}
+.deeper p:last-child{margin-bottom:0}
+/* cause-fix: ruled-out causes stay readable; the name greys, the reason does not fade */
+.cause.out,.cause.less,.cause.unl{opacity:1}
+.cause.less>span,.cause.unl>span{color:var(--muted)}
+</style>
+<script>function dpHtml(rows){ return rows.map(function(r){ return '<div><span class="dl">' + r[0] + '</span>' + r[1] + '</div>'; }).join(''); }</script>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="/">← bedside.tools</a>
+<h1>QT risk checker</h1>
+<p class="purpose">Correct the QT for heart rate, see how likely torsades is, check each drug on the list and what to swap it for, and plan the monitoring.</p>
+
+<div class="tabs" role="tablist">
+  <button class="tab" role="tab" id="t-tool" aria-selected="true" aria-controls="p-tool">Check</button>
+  <button class="tab" role="tab" id="t-drugs" aria-selected="false" aria-controls="p-drugs">Drugs</button>
+  <button class="tab" role="tab" id="t-learn" aria-selected="false" aria-controls="p-learn">Learn</button>
+  <button class="tab" role="tab" id="t-prac" aria-selected="false" aria-controls="p-prac">Practice</button>
+</div>
+
+<div class="panel on" id="p-tool" role="tabpanel" aria-labelledby="t-tool">
+  <div id="inputs">
+  <div class="card" id="ecg">
+    <p class="label">ECG · milliseconds</p>
+    <div class="grid">
+      <div class="field"><label for="qt">QT (ms)</label><input id="qt" inputmode="numeric" autocomplete="off" placeholder="e.g. 440"></div>
+      <div class="field"><label for="hr">Heart rate (/min)</label><input id="hr" inputmode="numeric" autocomplete="off" placeholder="or RR below"></div>
+      <div class="field"><label for="qrs">QRS (ms)</label><input id="qrs" inputmode="numeric" autocomplete="off" placeholder="e.g. 96"></div>
+      <div class="field"><label for="rr">RR (ms), if no rate</label><input id="rr" inputmode="numeric" autocomplete="off" placeholder="e.g. 800"></div>
+    </div>
+    <p class="qn">Sex (sets the upper limit)</p>
+    <div class="states wrapit" id="sexseg" role="group" aria-label="Sex"></div>
+    <p class="qn">Rhythm</p>
+    <div class="states wrapit" id="rhyseg" role="group" aria-label="Rhythm"></div>
+    <div class="grid"><div class="field"><label for="base">QTc before the drug (optional)</label><input id="base" inputmode="numeric" autocomplete="off" placeholder="baseline ms"></div><div></div></div>
+    <p class="note" id="ecgnote" style="margin:10px 0 0">Measure in a lead where the T wave is clear (at least 2 mm) with a distinct end, the same lead and machine each time, to where a tangent on the T-wave downslope meets the baseline.</p>
+  </div>
+  <div class="card" id="meds">
+    <p class="label">Medicines</p>
+    <div class="field"><label for="dq">Add a drug (type a name or class)</label><input id="dq" autocomplete="off" placeholder="e.g. ondansetron, azithro, haloperidol" role="combobox" aria-expanded="false" aria-controls="dsugg"></div>
+    <div class="sugg" id="dsugg" role="listbox" aria-label="Matching drugs"></div>
+    <div class="chips" id="dchips"></div>
+    <p class="note" style="margin:10px 0 0">Covers about 60 common hospital drugs, grouped from US labels. Not on the list does not mean safe: check the label or CredibleMeds.</p>
+  </div>
+  <div class="card" id="labs">
+    <p class="label">Labs and age</p>
+    <div class="grid">
+      <div class="field"><label for="k">Potassium (mEq/L)</label><input id="k" inputmode="decimal" autocomplete="off"></div>
+      <div class="field"><label for="mg">Magnesium (mg/dL)</label><input id="mg" inputmode="decimal" autocomplete="off"></div>
+      <div class="field"><label for="ca">Calcium, corrected (mg/dL)</label><input id="ca" inputmode="decimal" autocomplete="off"></div>
+      <div class="field"><label for="age">Age</label><input id="age" inputmode="numeric" autocomplete="off"></div>
+    </div>
+  </div>
+  <div class="card" id="riskf">
+    <p class="label">Risk factors</p>
+    <div class="checks" id="rticks"></div>
+  </div>
+  </div>
+  <div id="out">
+    <div class="card" id="res-qtc"></div>
+    <div id="res-tdp"></div>
+    <div class="card" id="res-risk"></div>
+    <div class="card" id="res-drugs"></div>
+    <div class="card" id="res-plan"></div>
+  </div>
+</div>
+
+<div class="panel" id="p-drugs" role="tabpanel" aria-labelledby="t-drugs">
+  <div class="card" id="tiers">
+    <p class="label">How drugs are grouped</p>
+    <h2>Four groups, from the US label</h2>
+    <div id="tierdefs"></div>
+    <p class="note">This grouping is the tool's own, made from each drug's FDA prescribing information and the 2020 AHA statement on drug-induced arrhythmias. It is not the CredibleMeds list, which is more complete and curated: check <a href="https://www.crediblemeds.org">crediblemeds.org</a> for anything not here.</p>
+  </div>
+  <div class="card" id="druglist">
+    <p class="label">Drug list</p>
+    <h2>Every drug in the checker</h2>
+    <div class="field"><label for="dfilter">Filter</label><input id="dfilter" autocomplete="off" placeholder="name or class"></div>
+    <div id="dtable"></div>
+  </div>
+  <div class="refgrid">
+    <div class="card" id="labelrules"><p class="label">Label rules</p><h2>Drugs with their own QT limits</h2><div id="rulebox"></div></div>
+    <div class="card" id="alts"><p class="label">Swaps</p><h2>Safer choices by class</h2><div id="altbox"></div></div>
+  </div>
+</div>
+
+<div class="panel" id="p-learn" role="tabpanel" aria-labelledby="t-learn">
+  <div class="pills" id="pills"></div>
+  <div class="card chap" id="learn-ap" data-pill="The QT"><p class="label">1 · What it measures</p><h2>The QT is the time the ventricles take to recharge</h2><p class="sub">Each ventricular cell fires, holds a plateau, then repolarizes. The QT spans that whole cycle. Tap what a QT drug changes.</p><figure class="plate" style="margin-left:0;margin-right:0"><img src="/media/qtc/ikr-block.webp" width="984" height="537" loading="lazy" alt="Two panels of a heart muscle cell membrane, outside the cell above and inside below. Left, labelled Normal: potassium ions pass through an open potassium channel from inside to outside. Right, labelled Drug in the pore: one drug molecule sits in the inner part of the channel pore and no potassium passes."><figcaption>IKr: potassium leaving the cell (top is outside) ends the plateau. Most QT drugs enter the pore from inside the cell and plug it, so less current flows and repolarization takes longer. Created with BioRender.com</figcaption></figure><div data-figure="ap"></div></div>
+  <div class="card chap" id="learn-rate" data-pill="Correction"><p class="label">2 · Rate correction</p><h2>Why Bazett overcorrects at fast rates</h2><p class="sub">The QT shortens as the rate rises, so it is corrected to what it would be at 60 a minute. Drag the rate: the three formulas agree near 60 and part ways at the extremes.</p><div id="ratefig"></div></div>
+  <div class="card chap" id="learn-measure" data-pill="Measuring"><p class="label">3 · Measuring</p><h2>Where the T wave ends</h2><p class="sub">Most QT errors are measurement errors. Tap a situation.</p><div data-figure="meas"></div></div>
+  <div class="card chap" id="learn-stack" data-pill="Risk stacks"><p class="label">4 · Repolarization reserve</p><h2>Risk factors stack</h2><p class="sub">One drug rarely causes torsades alone. Tap the factors present (Tisdale score, cardiac care unit patients).</p><div class="tap" id="stack-tap"></div><div class="meter" id="stack-m"><i></i></div><p class="head" id="stack-sum"></p><p class="line1" id="stack-line"></p></div>
+  <div class="card chap" id="narrow" data-pill="Why long"><p class="label">5 · Narrowing</p><h2>Why is the QT long?</h2><p class="sub">Send potassium, magnesium and calcium and read the medicine list first; repeat the 12-lead. Only if it stays long off drugs: thyroid, ischemia, family history and a cardiology referral. Tap what you found: causes that no longer fit fade, each with the reason.</p><div class="tap" id="nar-tap"></div><div id="nar-list"></div></div>
+  <div class="card chap" id="learn-tdp" data-pill="Torsades"><p class="label">6 · Torsades</p><h2>How torsades starts</h2><p class="sub">A pause lengthens the next QT; an afterdepolarization lands on that long T wave and sets off a twisting polymorphic VT.</p><div data-figure="tdp"></div></div>
+  <div class="card chap" id="trials" data-pill="Evidence"><p class="label">7 · Evidence</p><h2>The studies behind the numbers</h2><div id="trialbox"></div><div class="row"><button class="btn" id="go-prac">Try the practice cases</button></div></div>
+</div>
+
+<div class="panel" id="p-prac" role="tabpanel" aria-labelledby="t-prac">
+  <div id="practice"></div>
+</div>
+
+<div class="scrim" id="scrim" hidden></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-t" hidden>
+  <div class="sheethead"><h2 id="sheet-t"></h2><button class="xbtn" id="sheet-x">Close</button></div>
+  <div id="sheet-b"></div>
+</div>
+
+<footer>
+  <p><strong>For education only. Not a substitute for clinical judgment.</strong> For adults. The drug list is a teaching subset, not a complete or curated database; a drug not listed is not known to be safe. Machine QT readings are often wrong: measure by hand before acting on a value. Polymorphic VT with a long QT is an emergency: see Code cards and Arrhythmias.</p>
+  <p>Privacy: everything runs in your browser. Nothing you enter is sent anywhere or stored, and there are no analytics. Do not enter names, record numbers, or dates of birth.</p>
+  <p class="mono">Last reviewed: 2026-11-22</p>
+  <p><strong>Sources:</strong> Drew BJ et al., Prevention of torsade de pointes in hospital settings: AHA/ACCF scientific statement, Circulation 2010;121:1047 (class and level shown where given; otherwise expert consensus) · Rautaharju PM et al., AHA/ACCF/HRS recommendations for standardization and interpretation of the ECG, part IV: the ST segment, T and U waves, and the QT interval, Circulation 2009;119:e241 · Tisdale JE et al., Drug-induced arrhythmias: AHA scientific statement, Circulation 2020;142:e214 · Tisdale JE et al., Development and validation of a risk score to predict QT interval prolongation in hospitalized patients, Circ Cardiovasc Qual Outcomes 2013;6:479 · Sagie A et al., An improved method for adjusting the QT interval for heart rate (Framingham), Am J Cardiol 1992;70:797 · Bogossian H et al., New formula for evaluation of the QT interval in patients with left bundle branch block, Heart Rhythm 2014;11:2273 · Chou R et al., Methadone safety: APS, CPDD and HRS clinical practice guideline, J Pain 2014;15:321 · Ray WA et al., Azithromycin and the risk of cardiovascular death, N Engl J Med 2012;366:1881 · Tisdale JE et al., Clinical decision support to reduce QT prolongation in hospitalized patients, Circ Cardiovasc Qual Outcomes 2014;7:381 · FDA prescribing information for each listed drug (DailyMed). Drug groups are this tool's own reading of US labels; expert practice where marked.</p>
+</footer>
+</div>
+
+<script id="engine">
+/* Pure engine. No DOM access. Times in ms. */
+var TIERS = {
+  tdp: {n: 'Torsades', s: 'TdP', d: 'The US label names torsades de pointes in a boxed warning or in its Warnings and Precautions (or the Warnings or Precautions section of an older-format label), including reports cited there.'},
+  qt: {n: 'QT', s: 'QT', d: 'The label warns of QT prolongation without naming torsades there, or lists torsades only among adverse-reaction, postmarketing or overdose reports.'},
+  trig: {n: 'Indirect', s: 'Indirect', d: 'Little direct QT effect; raises the risk another way: low potassium or magnesium, raising another drug’s level, slowing the heart, building up in kidney failure, or overdose.'},
+  low: {n: 'No QT warning', s: 'None', d: 'No QT warning in the US label (or not a labelled drug). Offered as an alternative; still check its other risks.'}
+};
+var CLASSES = {
+  aa: 'Antiarrhythmics', mac: 'Macrolides', fq: 'Fluoroquinolones', azole: 'Azole antifungals', ai: 'Other anti-infectives',
+  em: 'Antiemetics', gi: 'Acid and gut', ap: 'Antipsychotics', ad: 'Antidepressants and mood', op: 'Opioids',
+  ah: 'Antihistamines and sleep', onc: 'Cancer and transplant', diu: 'Diuretics', oth: 'Other'
+};
+/* id, name, search words, class, tier, one line, flags: cyp = strong CYP3A4 inhibitor, loop = loop diuretic, swap = alternative group */
+var DRUGS = [
+  ['amiodarone','Amiodarone','cordarone pacerone','aa','tdp','Lengthens the QT a lot but rarely causes torsades (Drew 2010); the 500 ms flag applies less. Raises levels of many drugs.',{swap:'aa'}],
+  ['dofetilide','Dofetilide','tikosyn','aa','tdp','Boxed warning: start in hospital with continuous ECG for 3 days; dose by creatinine clearance and QTc.',{swap:'aa',rule:'dofetilide'}],
+  ['sotalol','Sotalol','betapace sotylize','aa','tdp','Boxed warning: start or increase with continuous ECG for 3 days; renally cleared.',{swap:'aa',rule:'sotalol'}],
+  ['dronedarone','Dronedarone','multaq','aa','tdp','Contraindicated with QTc 500 ms or more, and with other drugs that cause torsades.',{swap:'aa',rule:'dronedarone'}],
+  ['ibutilide','Ibutilide','corvert','aa','tdp','Boxed warning: can cause fatal arrhythmias, mostly torsades; continuous ECG for at least 4 hours after the infusion.',{swap:'aa'}],
+  ['quinidine','Quinidine','','aa','tdp','Classic cause of torsades, often at low blood levels.',{swap:'aa'}],
+  ['procainamide','Procainamide','pronestyl','aa','tdp','Its metabolite NAPA also lengthens the QT and builds up in kidney failure.',{swap:'aa'}],
+  ['disopyramide','Disopyramide','norpace','aa','tdp','Class Ia; QT and QRS both lengthen.',{swap:'aa'}],
+  ['flecainide','Flecainide','tambocor','aa','tdp','Label reports rare torsades; most of the QT rise comes from a wider QRS.',{swap:'aa'}],
+  ['azithromycin','Azithromycin','zithromax z-pak azithro macrolide','mac','tdp','Label warns of QT prolongation and torsades; avoid with other QT drugs, low K or Mg, or bradycardia.',{swap:'mac'}],
+  ['clarithromycin','Clarithromycin','biaxin macrolide','mac','tdp','Also a strong CYP3A4 inhibitor: raises levels of other QT drugs.',{swap:'mac',cyp:1}],
+  ['erythromycin','Erythromycin','macrolide','mac','tdp','High doses, IV use, and CYP3A4 inhibitors that raise its level add risk; it is itself a moderate CYP3A4 inhibitor.',{swap:'mac',cyp:1}],
+  ['levofloxacin','Levofloxacin','levaquin quinolone fluoroquinolone','fq','tdp','Label warns of rare QT prolongation and torsades.',{swap:'fq'}],
+  ['moxifloxacin','Moxifloxacin','avelox quinolone fluoroquinolone','fq','tdp','The quinolone with the largest QT effect; it is the positive control in QT studies.',{swap:'fq'}],
+  ['ciprofloxacin','Ciprofloxacin','cipro quinolone fluoroquinolone','fq','tdp','The label warns of rare QT prolongation and torsades.',{swap:'fq'}],
+  ['fluconazole','Fluconazole','diflucan azole','azole','tdp','Label warns of QT prolongation and torsades; higher risk with kidney failure and other QT drugs.',{swap:'azole'}],
+  ['voriconazole','Voriconazole','vfend azole','azole','tdp','Also a strong CYP3A4 inhibitor.',{swap:'azole',cyp:1}],
+  ['posaconazole','Posaconazole','noxafil azole','azole','tdp','Label warns of QT prolongation and torsades; strong CYP3A4 inhibitor.',{swap:'azole',cyp:1}],
+  ['itraconazole','Itraconazole','sporanox azole','azole','trig','Boxed warning: raises levels of methadone, dofetilide, quinidine and others enough to cause torsades.',{swap:'azole',cyp:1}],
+  ['hcq','Hydroxychloroquine','plaquenil hcq','ai','tdp','Label warns of QT prolongation and torsades; not recommended with other QT drugs.',{rule:'hcq'}],
+  ['chloroquine','Chloroquine','antimalarial','ai','tdp','QT prolongation and torsades in the label.',{}],
+  ['pentamidine','Pentamidine','pentam','ai','tdp','IV pentamidine is a recognized cause of torsades.',{}],
+  ['bedaquiline','Bedaquiline','sirturo tb tuberculosis','ai','qt','QT prolongation in the label; ECG at baseline and during treatment.',{}],
+  ['ondansetron','Ondansetron','zofran antiemetic 5ht3','em','tdp','Dose-dependent; single IV dose no more than 16 mg.',{swap:'ht3',rule:'ondansetron'}],
+  ['granisetron','Granisetron','kytril sancuso antiemetic 5ht3','em','qt','QT prolongation in the label.',{swap:'ht3'}],
+  ['droperidol','Droperidol','inapsine antiemetic','em','tdp','Boxed warning for QT prolongation and torsades.',{swap:'ht3'}],
+  ['metoclopramide','Metoclopramide','reglan antiemetic','em','low','No QT warning in the label; watch for movement side effects.',{}],
+  ['dexamethasone','Dexamethasone','decadron steroid antiemetic','em','low','No QT warning; an antiemetic for chemotherapy and after surgery.',{}],
+  ['aprepitant','Aprepitant or fosaprepitant','emend cinvanti antiemetic nk1','em','low','No QT effect expected (label), but a CYP3A4 inhibitor: contraindicated with pimozide.',{}],
+  ['famotidine','Famotidine','pepcid h2','gi','trig','Label: QT prolongation in moderate or severe kidney impairment; reduce the dose.',{swap:'famotidine'}],
+  ['ppi','Omeprazole or pantoprazole','ppi proton pump prilosec protonix esomeprazole','gi','trig','Long use can lower magnesium.',{}],
+  ['loperamide','Loperamide','imodium','gi','tdp','Boxed warning: torsades and sudden death at doses above those recommended.',{rule:'loperamide'}],
+  ['haloperidol','Haloperidol','haldol antipsychotic','ap','tdp','Torsades especially IV and at higher doses; IV use is not FDA-approved.',{swap:'ap',rule:'haloperidol'}],
+  ['quetiapine','Quetiapine','seroquel antipsychotic','ap','qt','Label warns of QT prolongation; avoid with other QT drugs.',{swap:'ap'}],
+  ['ziprasidone','Ziprasidone','geodon antipsychotic','ap','qt','Larger QT effect than most antipsychotics; contraindicated with other QT drugs.',{swap:'ap'}],
+  ['risperidone','Risperidone','risperdal antipsychotic','ap','qt','QT prolongation in postmarketing reports.',{swap:'ap'}],
+  ['thioridazine','Thioridazine','antipsychotic','ap','tdp','Boxed warning: QT prolongation and sudden death.',{swap:'ap'}],
+  ['pimozide','Pimozide','orap antipsychotic','ap','tdp','QT prolongation and torsades; many contraindicated interactions.',{swap:'ap'}],
+  ['olanzapine','Olanzapine','zyprexa antipsychotic','ap','low','No QT warning in the label.',{}],
+  ['aripiprazole','Aripiprazole','abilify antipsychotic','ap','low','No QT warning in the label.',{}],
+  ['citalopram','Citalopram','celexa ssri antidepressant','ad','tdp','Dose-dependent; maximum 40 mg a day, 20 mg over age 60.',{swap:'ssri',rule:'citalopram'}],
+  ['escitalopram','Escitalopram','lexapro ssri antidepressant','ad','qt','QT prolongation and torsades in postmarketing and overdose reports.',{swap:'ssri'}],
+  ['sertraline','Sertraline','zoloft ssri antidepressant','ad','tdp','Label reports QTc prolongation and torsades, mostly with other risk factors.',{swap:'ssri'}],
+  ['trazodone','Trazodone','desyrel sleep antidepressant','ad','tdp','Label reports QT prolongation and torsades.',{swap:'sleep'}],
+  ['amitriptyline','Amitriptyline','elavil tricyclic tca nortriptyline','ad','trig','QT and QRS lengthen mainly in overdose.',{}],
+  ['lithium','Lithium','lithobid mood','ad','trig','QT changes mainly in toxicity; the label also warns of unmasking Brugada syndrome.',{}],
+  ['donepezil','Donepezil','aricept dementia','oth','qt','QT prolongation and torsades in postmarketing reports; also slows the heart.',{}],
+  ['methadone','Methadone','dolophine methadose opioid','op','tdp','Boxed warning; most cases above 200 mg a day, but they occur at any dose.',{swap:'methadone',rule:'methadone'}],
+  ['buprenorphine','Buprenorphine','suboxone subutex butrans sublocade opioid','op','qt','The patch, buccal film and monthly injection labels warn of QT prolongation; sublingual products do not. A small effect at usual doses.',{}],
+  ['morphine','Morphine, hydromorphone or oxycodone','dilaudid oxycontin opioid','op','low','No QT warning in the labels.',{}],
+  ['hydroxyzine','Hydroxyzine','atarax vistaril antihistamine','ah','tdp','Label warns of QT prolongation and torsades; contraindicated with a prolonged QT.',{swap:'sleep'}],
+  ['diphenhydramine','Diphenhydramine','benadryl antihistamine sleep','ah','trig','QT and QRS changes in overdose.',{swap:'sleep'}],
+  ['tacrolimus','Tacrolimus','prograf transplant','onc','tdp','Label: may cause QT prolongation and torsades; levels rise with azoles and macrolides.',{}],
+  ['arsenic','Arsenic trioxide','trisenox apl','onc','tdp','Boxed warning: correct K, Mg and Ca and check the ECG before and during treatment.',{}],
+  ['vandetanib','Vandetanib','caprelsa','onc','tdp','Boxed warning: QT prolongation, torsades and sudden death.',{}],
+  ['nilotinib','Nilotinib','tasigna','onc','tdp','Boxed warning: QT prolongation and sudden death.',{}],
+  ['ribociclib','Ribociclib','kisqali','onc','qt','Start only if QTcF is under 450 ms; ECG checks in the first cycles.',{rule:'ribociclib'}],
+  ['furosemide','Furosemide','lasix loop diuretic','diu','trig','Lowers potassium and magnesium (counts in the risk score).',{loop:1}],
+  ['bumetanide','Bumetanide','bumex loop diuretic','diu','trig','Lowers potassium and magnesium (counts in the risk score).',{loop:1}],
+  ['torsemide','Torsemide','demadex loop diuretic','diu','trig','Lowers potassium and magnesium (counts in the risk score).',{loop:1}],
+  ['hctz','Hydrochlorothiazide','hctz thiazide diuretic chlorthalidone','diu','trig','Lowers potassium and magnesium.',{}],
+  ['fingolimod','Fingolimod','gilenya','oth','trig','Slows the heart after the first dose.',{}],
+  ['doxycycline','Doxycycline','vibramycin tetracycline','ai','low','No QT warning; covers atypical pneumonia organisms.',{}],
+  ['micafungin','Micafungin or another echinocandin','mycamine caspofungin anidulafungin echinocandin','azole','low','No QT warning in the label.',{}]
+];
+var SWAPS = {
+  mac: 'Atypical cover: doxycycline (no QT warning). Otherwise a beta-lactam alone where the guideline allows.',
+  fq: 'A beta-lactam or another class that fits the infection and the cultures.',
+  azole: 'For candida: an echinocandin (micafungin, caspofungin, anidulafungin), which has no QT warning.',
+  ht3: 'Dexamethasone or aprepitant where they fit (chemotherapy, after surgery); metoclopramide; or the lowest ondansetron dose with K and Mg corrected.',
+  ap: 'Non-drug measures first for delirium. If a drug is needed: olanzapine or aripiprazole (no QT warning in their labels); avoid IV haloperidol.',
+  ssri: 'Every SSRI checked has QT wording in its label. Keep citalopram within its dose limits, correct K and Mg, and ask psychiatry if the QT is long.',
+  methadone: 'Pain: another opioid (morphine, hydromorphone, oxycodone; no QT warning). Opioid use disorder: buprenorphine (some forms carry a QT warning; small effect). Do not stop methadone abruptly.',
+  sleep: 'Non-drug sleep measures first. Melatonin is a supplement, not an FDA-labelled drug.',
+  famotidine: 'Reduce the dose for kidney function, or use a proton pump inhibitor (watch magnesium on long use).',
+  aa: 'Rate control instead of rhythm control where it fits, or ask cardiology or electrophysiology.'
+};
+var RULES = {
+  dofetilide: {n: 'Dofetilide', t: 'Do not start if QTc is over 440 ms (500 with a ventricular conduction delay) or creatinine clearance is under 20 mL/min. Start in a facility with continuous ECG for at least 3 days. Check QTc 2 to 3 hours after the first dose: if it rose more than 15% or is over 500 ms (550 with a conduction delay), reduce the dose. At any time after the second dose, stop if QTc is over 500 ms (550).', s: 'Tikosyn label'},
+  sotalol: {n: 'Sotalol', t: 'Start, restart or increase with continuous ECG for at least 3 days and check the QT 2 to 4 hours after each dose increase. Contraindicated with potassium under 4 mEq/L; for AF, contraindicated with a baseline QT over 450 ms. If the QT reaches 500 ms, reduce the dose or stop. Dose interval by creatinine clearance.', s: 'Betapace / Betapace AF label (2023)'},
+  dronedarone: {n: 'Dronedarone', t: 'Contraindicated with QTc (Bazett) of 500 ms or more, PR over 280 ms, or with drugs that can cause torsades. Stop if QTc reaches 500 ms.', s: 'Multaq label'},
+  citalopram: {n: 'Citalopram', t: 'Maximum 40 mg a day. Maximum 20 mg a day over age 60, with liver impairment, in CYP2C19 poor metabolizers, or with cimetidine or another CYP2C19 inhibitor. Stop if QTc stays over 500 ms.', s: 'Celexa label'},
+  ondansetron: {n: 'Ondansetron', t: 'IV: no more than 16 mg per dose, over at least 15 minutes. Avoid in congenital long QT. ECG monitoring with low K or Mg, heart failure, bradyarrhythmia, or other QT drugs.', s: 'Zofran label'},
+  haloperidol: {n: 'Haloperidol', t: 'The injection is not approved for IV use; torsades is reported mostly with IV and higher doses. If given IV, monitor the ECG.', s: 'Haldol label'},
+  methadone: {n: 'Methadone', t: 'ECG before starting if there are risk factors (consider in everyone); repeat 2 to 4 weeks after starting and after large dose increases, and at 30 to 40 mg and at 100 mg a day. Baseline QTc 500 ms or more: do not start. Baseline 450 to 499: correct reversible causes and consider another opioid. On treatment, QTc 450 to 499: discuss risks, consider a lower dose or a switch. QTc 500 or more: switch, or reduce the dose now.', s: 'Chou 2014 (APS/CPDD/HRS); Dolophine label'},
+  hcq: {n: 'Hydroxychloroquine', t: 'QT prolongation, ventricular arrhythmias and torsades reported; use with other QT drugs is not recommended.', s: 'Plaquenil label'},
+  loperamide: {n: 'Loperamide', t: 'Torsades and sudden death with doses above the label (often misuse for opioid withdrawal); avoid with other QT drugs.', s: 'Imodium label'},
+  ribociclib: {n: 'Ribociclib', t: 'Start only if QTcF (Fridericia) is under 450 ms; repeat the ECG early in treatment and correct K, Mg, Ca and phosphate first.', s: 'Kisqali label'}
+};
+var BYID = {}; DRUGS.forEach(function(d){ BYID[d[0]] = d; });
+
+function num(v){ if (v == null || v === '') return null; var x = parseFloat(String(v).replace(',', '.')); return isFinite(x) ? x : null; }
+function r0(x){ return Math.round(x); }
+
+/* Rate correction. qt in ms; rr in seconds. */
+function bazett(qt, rr){ return qt / Math.sqrt(rr); }
+function fridericia(qt, rr){ return qt / Math.cbrt(rr); }
+function framingham(qt, rr){ return qt + 154 * (1 - rr); }
+var FORM = {baz: {n: 'Bazett', f: bazett}, fri: {n: 'Fridericia', f: fridericia}, fra: {n: 'Framingham', f: framingham}};
+
+/* Headline formula: Bazett from 60 to 85 /min; Fridericia below 60 or above 85 (Drew 2010: Bazett overcorrects above about 85). */
+function pickFormula(hr){ return hr < 60 || hr > 85 ? 'fri' : 'baz'; }
+
+/* Tisdale 2013 (Table 5). drugsN: count of listed drugs in the torsades or QT groups. */
+function tisdale(i, drugsN, loop){
+  var items = [], s = 0;
+  function add(on, pts, n){ if (on){ s += pts; items.push([n, pts]); } }
+  add(i.age != null && i.age >= 68, 1, 'Age 68 or older');
+  add(i.sex === 'f', 1, 'Female');
+  add(!!loop, 1, 'Loop diuretic');
+  add(i.k != null && i.k <= 3.5, 2, 'Potassium 3.5 or less');
+  add(i.admQtc != null && i.admQtc >= 450, 2, 'QTc 450 ms or more');
+  add(!!i.f.mi, 2, 'Acute MI');
+  add(drugsN >= 1, 3, 'One QT-prolonging drug');
+  add(drugsN >= 2, 3, 'A second QT-prolonging drug');
+  add(!!i.f.sepsis, 3, 'Sepsis');
+  add(!!i.f.hf, 3, 'Heart failure (reduced EF)');
+  var band = s >= 11 ? 'high' : s >= 7 ? 'mid' : 'low';
+  return {score: s, items: items, band: band};
+}
+
+/* Main assessment. i: {qt, hr, rr, qrs, sex, rhy, base, k, mg, ca, age, f:{...}, drugs:[ids]} */
+function assess(i){
+  var o = {i: i, q: null, guards: [], plan: [], rules: [], tiers: []};
+  var qt = num(i.qt), hr = num(i.hr), rrms = num(i.rr), qrs = num(i.qrs), base = num(i.base);
+  var rr = null;
+  if (hr && hr >= 20 && hr <= 250) rr = 60 / hr; else if (rrms && rrms >= 240 && rrms <= 3000){ rr = rrms / 1000; hr = 60 / rr; } else hr = null;
+  o.hr = hr; o.rr = rr;
+  if (qt != null && (qt < 200 || qt > 800)){ o.err = 'QT should be between 200 and 800 ms.'; qt = null; }
+  if (qrs != null && (qrs < 40 || qrs > 300)){ o.err = 'QRS should be between 40 and 300 ms.'; qrs = null; }
+  o.qt = qt; o.qrs = qrs; o.base = base;
+  var limit = i.sex === 'f' ? 460 : 450;
+  o.limit = limit;
+  if (qt != null && rr){
+    var k = pickFormula(hr);
+    o.form = k;
+    o.all = {baz: bazett(qt, rr), fri: fridericia(qt, rr), fra: framingham(qt, rr)};
+    o.raw = o.all[k];
+    o.wide = qrs != null && qrs >= 120;
+    if (o.wide){
+      o.jt = qt - qrs;
+      o.modQt = qt - 0.485 * qrs;
+      o.modQtc = FORM[k].f(o.modQt, rr);
+      o.q = o.modQtc;
+    } else o.q = o.raw;
+    o.rise = base != null && base >= 300 && base <= 700 ? o.q - base : null;
+    o.high = o.q > 500 || (o.rise != null && o.rise >= 60);
+    o.cat = o.high ? 'high' : o.q >= limit ? 'prolonged' : o.q <= 390 && !o.wide ? 'short' : 'normal';
+    var cat2 = function(v){ return v > 500 ? 'high' : v >= limit ? 'prolonged' : 'normal'; };
+    var adj = function(f){ return o.wide ? FORM[f].f(o.modQt, rr) : o.all[f]; };
+    o.split = !(o.rise != null && o.rise >= 60) && cat2(adj('baz')) !== cat2(adj('fri')) ? {baz: adj('baz'), fri: adj('fri')} : null;
+  }
+  /* Drugs */
+  var picked = (i.drugs || []).map(function(id){ return BYID[id]; }).filter(Boolean);
+  o.picked = picked;
+  var qtDrugs = picked.filter(function(d){ return d[4] === 'tdp' || d[4] === 'qt'; });
+  o.qtDrugs = qtDrugs;
+  o.loop = picked.some(function(d){ return d[6].loop; });
+  var cyp = picked.filter(function(d){ return d[6].cyp; });
+  o.cypHit = cyp.length && picked.some(function(d){ return cyp.indexOf(d) < 0 && (d[4] === 'tdp' || d[4] === 'qt'); });
+  o.cyp = cyp;
+  var sw = []; picked.forEach(function(d){ var s = d[6].swap; if (s && sw.indexOf(s) < 0 && d[4] !== 'low') sw.push(s); });
+  o.swaps = sw;
+  picked.forEach(function(d){ if (d[6].rule) o.rules.push(d[6].rule); });
+  /* Labs */
+  var K = num(i.k), Mg = num(i.mg), Ca = num(i.ca), age = num(i.age);
+  o.lowK = K != null && K < 3.5; o.lowMg = Mg != null && Mg < 1.7; o.lowCa = Ca != null && Ca < 8.5;
+  o.K = K; o.Mg = Mg; o.Ca = Ca;
+  o.brady = hr != null && hr < 50;
+  o.ts = tisdale({age: age, sex: i.sex, k: K, admQtc: o.q != null ? o.q : null, f: i.f || {}}, qtDrugs.length, o.loop);
+  /* Status for plan and practice */
+  var f = i.f || {};
+  o.status = f.tdp ? 'tdp' : o.q == null ? (qtDrugs.length ? 'drugsonly' : 'none') : o.high ? 'high' : o.cat === 'prolonged' ? 'prolonged' : 'normal';
+  /* Why line, first match */
+  o.why = f.tdp ? 'Magnesium suppresses the early afterdepolarizations that start torsades, even when the level is normal.'
+    : o.q != null && o.high ? 'Most drug-induced torsades happens with a QTc over 500 ms or after a rise of 60 ms or more.'
+    : o.q != null && o.form === 'fri' && hr > 85 ? 'At fast rates Bazett overcorrects and reads the QT as longer than it is, so Fridericia is used here.'
+    : o.q != null && o.form === 'fri' && hr < 60 ? 'At slow rates Bazett undercorrects and can hide a long QT, so Fridericia is used here.'
+    : o.wide ? 'A wide QRS lengthens the QT without slowing repolarization, so the QT is adjusted for it before the limit is applied.'
+    : o.lowK ? 'Low potassium weakens IKr, the current most QT drugs block, so each drug lengthens the QT more.'
+    : qtDrugs.length >= 2 ? 'QT effects add: two drugs that are each acceptable alone can together push the QT much longer.'
+    : o.q != null && o.cat === 'prolonged' ? 'A long QT means ventricular repolarization is slow; the risk depends on how long and on what else is stacked on it.'
+    : '';
+  return o;
+}
+</script>
+<script>
+(function(){
+var $ = function(id){ return document.getElementById(id); };
+function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+var FS = 'font-family:var(--sans)', FM = 'font-family:var(--mono)';
+var st = {sex: null, rhy: 'reg', f: {}, drugs: []};
+var RF = [['mi','Acute MI'],['sepsis','Sepsis'],['hf','Heart failure, reduced EF'],['tdp','Torsades or polymorphic VT now'],['lqts','Congenital long QT, or family sudden death'],['prior','Torsades before'],['renal','Kidney impairment'],['liver','Liver impairment']];
+
+function read(){
+  return {qt: $('qt').value, hr: $('hr').value, rr: $('rr').value, qrs: $('qrs').value, base: $('base').value, k: $('k').value, mg: $('mg').value, ca: $('ca').value, age: $('age').value, sex: st.sex, rhy: st.rhy, f: st.f, drugs: st.drugs.slice()};
+}
+function seg(host, list, cur){ host.innerHTML = list.map(function(c){ return '<button class="sbtn" data-v="' + c[0] + '" aria-pressed="' + (String(c[0]) === String(cur)) + '">' + esc(c[1]) + '</button>'; }).join(''); }
+function drawInputs(){
+  seg($('sexseg'), [['f','Female'],['m','Male']], st.sex);
+  seg($('rhyseg'), [['reg','Regular'],['af','AF or irregular']], st.rhy);
+  $('rticks').innerHTML = RF.map(function(t){ return '<label class="chk"><input type="checkbox" data-k="' + t[0] + '"' + (st.f[t[0]] ? ' checked' : '') + '><span>' + esc(t[1]) + '</span></label>'; }).join('');
+  $('dchips').innerHTML = st.drugs.map(function(id){ var d = BYID[id]; return '<button class="chip rm" data-rm="' + id + '" aria-label="Remove ' + esc(d[1]) + '"><span>' + esc(d[1]) + '</span> <span class="badge t-' + d[4] + '">' + TIERS[d[4]].s + '</span> <b aria-hidden="true">×</b></button>'; }).join('');
+}
+$('sexseg').addEventListener('click', function(e){ var b = e.target.closest('[data-v]'); if (!b) return; var v = b.getAttribute('data-v'); st.sex = st.sex === v ? null : v; drawInputs(); render(); });
+$('rhyseg').addEventListener('click', function(e){ var b = e.target.closest('[data-v]'); if (!b) return; st.rhy = b.getAttribute('data-v'); drawInputs(); render(); });
+$('rticks').addEventListener('change', function(e){ var k = e.target.getAttribute('data-k'); if (k){ st.f[k] = e.target.checked; render(); } });
+['qt','hr','rr','qrs','base','k','mg','ca','age'].forEach(function(k){ $(k).addEventListener('input', render); });
+
+/* Drug type-ahead */
+function norm(s){ return String(s).toLowerCase().replace(/[^a-z0-9 ]/g, ''); }
+function matches(q){
+  q = norm(q).trim(); if (!q) return [];
+  return DRUGS.filter(function(d){ var hay = norm(d[1] + ' ' + d[2] + ' ' + CLASSES[d[3]]); return hay.split(' ').some(function(w){ return w.indexOf(q) === 0; }) || hay.indexOf(q) >= 0 && q.length > 3; }).slice(0, 6);
+}
+function drawSugg(){
+  var m = matches($('dq').value).filter(function(d){ return st.drugs.indexOf(d[0]) < 0; });
+  $('dsugg').innerHTML = m.map(function(d){ return '<button role="option" data-add="' + d[0] + '"><span>' + esc(d[1]) + '</span><small>' + esc(TIERS[d[4]].n) + '</small></button>'; }).join('') || ($('dq').value.trim() ? '<p class="note" style="margin:4px 0 0">Not on this list. Check the label or CredibleMeds.</p>' : '');
+  $('dq').setAttribute('aria-expanded', String(m.length > 0));
+}
+function addDrug(id){ if (BYID[id] && st.drugs.indexOf(id) < 0) st.drugs.push(id); $('dq').value = ''; drawSugg(); drawInputs(); render(); }
+$('dq').addEventListener('input', drawSugg);
+$('dq').addEventListener('keydown', function(e){ if (e.key === 'Enter'){ var m = matches($('dq').value).filter(function(d){ return st.drugs.indexOf(d[0]) < 0; }); if (m.length){ e.preventDefault(); addDrug(m[0][0]); } } });
+$('dsugg').addEventListener('click', function(e){ var b = e.target.closest('[data-add]'); if (b){ addDrug(b.getAttribute('data-add')); $('dq').focus(); } });
+$('dchips').addEventListener('click', function(e){ var b = e.target.closest('[data-rm]'); if (!b) return; var id = b.getAttribute('data-rm'); st.drugs = st.drugs.filter(function(x){ return x !== id; }); drawInputs(); render(); });
+
+/* Result cards */
+function badge(t, cls){ return '<span class="badge ' + (cls || '') + '">' + esc(t) + '</span>'; }
+function tiers(list){ return (list || []).map(function(t){ return '<span class="tier">' + esc(t) + '</span>'; }).join(''); }
+function guard(t, bad){ return '<div class="guard' + (bad ? ' bad' : '') + '">' + t + '</div>'; }
+function steps(list){ return '<div class="tl">' + list.map(function(s){ return '<div class="st' + (s.now ? ' now' : '') + '"><span class="when">' + esc(s.when) + '</span><b>' + esc(s.name) + '</b>' + (s.small ? '<small>' + esc(s.small) + '</small>' : '') + (s.t ? '<span class="tier">' + esc(s.t) + '</span>' : '') + '</div>'; }).join('') + '</div>'; }
+var CATN = {high: ['High risk', 'bad'], prolonged: ['Prolonged', 'wn'], normal: ['Normal', 'okc'], 'short': ['Short', 'wn']};
+
+function qtcCard(o, i){
+  if (o.q == null){
+    return '<p class="label">QTc</p><p class="empty" style="margin:0">' + (o.err ? esc(o.err) : 'Enter the QT and the heart rate (or RR) to correct it. Add drugs and labs as you go: the risk and the plan update below.') + '</p>';
+  }
+  var c = CATN[o.cat], fn = FORM[o.form].n;
+  var h = '<p class="label">QTc · ' + fn + (o.wide ? ' · adjusted for QRS' : '') + '</p>';
+  h += '<p class="big ' + c[1] + '" style="color:var(--' + (c[1] === 'bad' ? 'bad' : c[1] === 'wn' ? 'warn' : c[1] === 'okc' ? 'ok' : 'ink') + ')">' + r0(o.q) + ' <small>ms · ' + c[0].toLowerCase() + '</small></p>';
+  var lim = i.sex ? 'limit ' + o.limit + ' (' + (i.sex === 'f' ? 'women' : 'men') + ')' : 'limit 450 men / 460 women: pick sex';
+  h += '<p class="sub">' + esc(lim) + ' · high risk over 500' + (o.rise != null ? ' · rise ' + (o.rise >= 0 ? '+' : '') + r0(o.rise) + ' ms from baseline' : '') + '</p>';
+  if (o.cat === 'high') h += guard('<b>QTc ' + (o.q > 500 ? 'over 500 ms' : '') + (o.q > 500 && o.rise >= 60 ? ' and ' : '') + (o.rise != null && o.rise >= 60 ? 'a rise of 60 ms or more' : '') + ':</b> torsades risk is high. Stop or swap nonessential QT drugs and monitor (plan below).', true);
+  if (o.cat === 'short') h += guard('QTc 390 ms or less is short. Short QT syndrome and hypercalcemia are outside this tool.');
+  if (o.split) h += guard((o.wide ? 'QRS-adjusted, ' : '') + 'Bazett gives ' + r0(o.split.baz) + ' and Fridericia ' + r0(o.split.fri) + ': they fall in different categories. Treat the higher one as possible until a repeat ECG at a rate nearer 60 settles it.');
+  if (o.wide) h += guard('QRS ' + r0(o.qrs) + ' ms: the usual limits assume a normal QRS. Raw ' + fn + ' QTc is ' + r0(o.raw) + '; the value above subtracts 48.5% of the QRS first (Bogossian, derived in pacing-induced left bundle branch block). Compare with an ECG from before the block if there is one.');
+  if (i.rhy === 'af') h += guard('Irregular rhythm: one beat misleads. Measure QT and RR on the shortest and the longest RR interval, correct each, and average the two QTc values (Drew 2010).');
+  if (o.why && !(i.f && i.f.tdp)) h += '<p class="whyline"><b>Why:</b> ' + esc(o.why) + '</p>';
+  var ch = ['ap'];
+  if (o.form === 'fri' || (o.hr && (o.hr < 60 || o.hr > 85))) ch.unshift('rate');
+  if (o.cat === 'high' || (i.f && i.f.tdp)) ch.push('tdp');
+  if (i.rhy === 'af' || o.wide) ch.push('meas');
+  h += '<div class="chips">' + ch.map(function(c){ return chip(c, c === 'ap' ? (o.lowK ? 'lowk' : o.qtDrugs.length ? 'drug' : 'normal') : c === 'meas' ? (i.rhy === 'af' ? 'af' : 'tangent') : ''); }).join('') + '</div>';
+  h += '<details><summary>More</summary>';
+  h += ['baz', 'fri', 'fra'].map(function(k){ return '<div class="score' + (k === o.form ? ' sel' : '') + '"><span>' + FORM[k].n + (k === o.form ? ' <small>(used)</small>' : '') + '</span><b>' + r0(o.all[k]) + ' ms</b></div>'; }).join('');
+  if (o.wide) h += '<div class="score"><span>JT (QT − QRS)</span><b>' + r0(o.jt) + ' ms</b></div><div class="score"><span>Modified QT (QT − 0.485 × QRS)</span><b>' + r0(o.modQt) + ' ms</b></div>';
+  h += '<p style="margin-top:10px">Rate ' + r0(o.hr) + '/min, RR ' + r0(o.rr * 1000) + ' ms. Bazett is used from 60 to 85 a minute because ECG machines report it. Below 60 or above 85, Fridericia is used: Bazett undercorrects at slow rates and overcorrects at fast ones (Drew 2010 notes overcorrection particularly above 85). Even between 60 and 85 Bazett reads higher than Fridericia once the rate is over 60, by up to about 30 ms at 85; when the two fall in different categories the card says so. The 2009 AHA/ACCF/HRS standards prefer a linear formula such as Framingham over Bazett.</p>';
+  h += '<p>Limits: prolonged at 450 ms or more in men and 460 or more in women; short at 390 or less (2009 standards). Drew 2010 uses the 99th percentile, over 470 in men and 480 in women, as clearly prolonged, and treats over 500 ms, or a rise of 60 ms or more, as high risk for torsades.</p>';
+  if (o.wide) h += '<p>Bogossian’s formula was derived in left bundle branch block produced by right ventricular pacing; it has not been validated in right bundle branch block or other wide QRS, where it is an approximation. The JT interval avoids the QRS but has no agreed limit.</p>';
+  h += tiers(['Limits: 2009 standards (expert consensus)', 'High risk: Drew 2010', 'Formula choice: expert practice']) + '</details>';
+  return h;
+}
+function tdpCard(o){
+  if (!(o.i.f && o.i.f.tdp)) return '';
+  return '<div class="card" id="tdpnow"><p class="label">Emergency</p><p class="head bad">Torsades: shock if unstable, then magnesium</p>' + steps([
+    {when: 'Now', now: true, name: 'Unsynchronized shock if it does not stop or becomes VF', small: 'Pads on, defibrillator at the bedside. Pulseless: run the arrest algorithm (Code cards).'},
+    {when: 'Now', now: true, name: 'Magnesium sulfate 2 g IV, whatever the magnesium level', small: 'Repeat 2 g if torsades recurs.', t: 'Drew 2010'},
+    {when: 'Now', name: 'Stop every QT drug; potassium to 4.5–5.0 mEq/L', small: 'The potassium target has little evidence behind it.', t: 'K target: Class IIb, LOE C'},
+    {when: 'If it recurs after pauses', name: 'Temporary transvenous pacing at a rate over 70 /min', small: 'Isoproterenol can also suppress pause-dependent torsades.', t: 'Drew 2010'}
+  ]) + '<div class="row"><a class="btn ghost" href="/rrt/" style="text-decoration:none;display:inline-flex;align-items:center">Code cards</a><a class="btn ghost" href="/rhythm/#qt" style="text-decoration:none;display:inline-flex;align-items:center">Arrhythmias: long QT</a></div><p class="whyline"><b>Why:</b> Magnesium suppresses the early afterdepolarizations that start torsades, even when the level is normal.</p></div>';
+}
+function riskCard(o, i){
+  var t = o.ts, bl = {low: ['Low (6 or less)', 'lo'], mid: ['Moderate (7 to 10)', 'hi'], high: ['High (11 or more)', 'bad']}[t.band];
+  var h = '<p class="label">Risk score · Tisdale</p><div class="score"><span>Score (0 to 21)</span><b>' + t.score + '</b></div>';
+  h += '<p class="sub">' + badge(bl[0], bl[1]) + '</p>';
+  h += t.items.length ? '<ul>' + t.items.map(function(x){ return '<li>' + esc(x[0]) + ' <span class="mono">+' + x[1] + '</span></li>'; }).join('') + '</ul>' : '<p class="note">No scored factors entered yet.</p>';
+  var other = [];
+  if (o.brady) other.push('heart rate under 50');
+  if (o.lowMg) other.push('magnesium under 1.7');
+  if (o.lowCa) other.push('calcium under 8.5');
+  if (i.f.lqts) other.push('congenital long QT or family sudden death');
+  if (i.f.prior) other.push('torsades before');
+  if (i.f.renal) other.push('kidney impairment (dofetilide, sotalol, procainamide and famotidine build up)');
+  if (i.f.liver) other.push('liver impairment');
+  if (o.cyp && o.cyp.length && o.cypHit) other.push(o.cyp.map(function(d){ return d[1]; }).join(' and ') + ' raises levels of other QT drugs');
+  if (other.length) h += '<p class="note" style="margin-top:8px"><b>Also raising risk (not scored):</b> ' + esc(other.join('; ')) + '.</p>';
+  if (t.band !== 'low') h += '<p class="whyline"><b>Why:</b> ' + (t.band === 'high' ? 'Each factor uses up repolarization reserve; at 11 or more, a QTc over 500 ms or a 60 ms rise was most likely in the derivation study.' : 'Each factor uses up repolarization reserve; one or two more make the score high.') + '</p>';
+  h += '<details><summary>More</summary><p>Tisdale 2013: derived in 900 and validated in 300 patients in cardiac care units at one hospital; outcome QTc over 500 ms or a rise of 60 ms or more. Items: age 68 or over 1, female 1, loop diuretic 1, potassium 3.5 or less 2, QTc on admission 450 or more 2, acute MI 2, sepsis 3, heart failure with reduced EF 3, one QT-prolonging drug 3, two or more 3 more. Here the QTc you entered stands in for the admission QTc.</p><p>The study counted drugs from its own list. This tool counts every listed drug in the Torsades and QT groups, an adaptation that has not been validated. Outside cardiac care units the score is less tested.</p>' + tiers(['Tisdale 2013 (single-centre derivation and validation)', 'Drug count: expert practice']) + '</details>';
+  return h;
+}
+function drugsCard(o){
+  var p = o.picked;
+  if (!p.length) return '<p class="label">Drugs</p><p class="empty" style="margin:0">No drugs added. Add each drug the patient takes or is about to get.</p>';
+  var order = {tdp: 0, qt: 1, trig: 2, low: 3};
+  var h = '<p class="label">Drugs · ' + o.qtDrugs.length + ' QT-prolonging</p>';
+  if (o.qtDrugs.length >= 2) h += guard('<b>' + o.qtDrugs.length + ' QT-prolonging drugs together.</b> Effects add; keep only those that are essential.');
+  if (o.cypHit) h += guard('<b>' + esc(o.cyp.map(function(d){ return d[1]; }).join(' and ')) + '</b> blocks CYP3A4 and can raise levels of other drugs on this list. Check each interaction.');
+  h += p.slice().sort(function(a, b){ return order[a[4]] - order[b[4]]; }).map(function(d){ return '<div class="drug"><div><span class="dn">' + esc(d[1]) + '</span><p>' + esc(d[5]) + '</p></div><span class="badge t-' + d[4] + '">' + esc(TIERS[d[4]].n) + '</span></div>'; }).join('');
+  if (o.swaps.length) h += '<p class="q" style="margin:12px 0 0;font-weight:600">Swaps to consider</p><ul>' + o.swaps.map(function(s){ return '<li>' + esc(SWAPS[s]) + '</li>'; }).join('') + '</ul>';
+  if (o.qtDrugs.length) h += '<p class="whyline"><b>Why:</b> Most QT drugs block the same potassium channel (IKr); the more block, and the less reserve, the longer the QT.</p>';
+  h += '<details><summary>More</summary><p>' + Object.keys(TIERS).map(function(k){ return '<b>' + TIERS[k].n + ':</b> ' + esc(TIERS[k].d); }).join('<br>') + '</p><p>Groups are this tool’s reading of the US labels, not CredibleMeds. A drug not listed is not known to be safe.</p>' + tiers(['FDA labels', 'AHA 2020 statement']) + '</details>';
+  return h;
+}
+function planCard(o, i){
+  var s = [], status = o.status;
+  if (status === 'none') return '<p class="label">Plan</p><p class="empty" style="margin:0">The monitoring plan appears once there is a QTc or a drug.</p>';
+  var head = {tdp: 'Treat torsades first (above)', high: 'Act now: remove QT drugs and monitor', prolonged: 'Prolonged: avoid adding risk', normal: 'Normal QTc', drugsonly: 'Get a QTc before deciding'}[status];
+  var cls = {tdp: 'bad', high: 'bad', prolonged: 'wn', normal: 'okc', drugsonly: ''}[status];
+  if (status === 'high' || status === 'tdp'){
+    s.push({when: 'Now', now: true, name: 'Stop or swap nonessential QT drugs', small: 'Use the swaps above. Keep a drug only if the benefit is clear and nothing else will do.', t: 'Drew 2010'});
+    s.push({when: 'Now', now: true, name: 'Continuous ECG monitoring; defibrillator at hand', small: 'Do not move the patient off a monitored unit for tests while the QTc is over 500 ms.', t: 'Drew 2010'});
+    s.push({when: 'Often', name: 'Measure the QTc more often than every 8 to 12 h', small: 'Once the QTc is prolonged, measure it more frequently, in the same lead, until it falls and the drug is out.', t: 'Drew 2010'});
+  } else if (status === 'prolonged'){
+    s.push({when: 'Now', now: true, name: 'Avoid adding another QT drug where an alternative exists', small: o.qtDrugs.length ? 'Review each drug above; swap what is not essential.' : 'Check the full medicine list, including as-needed antiemetics and sleep aids.', t: 'Expert practice'});
+    s.push({when: 'Next', name: 'Repeat the ECG after a new QT drug or dose change', small: 'Hospitalized and starting a drug with torsades risk: QTc before and at least every 8 to 12 h after starting, a dose increase, or an overdose.', t: 'Drew 2010'});
+  } else if (status === 'normal'){
+    s.push({when: o.qtDrugs.length ? 'Before' : 'Now', now: true, name: o.qtDrugs.length ? 'Baseline QTc is fine; recheck after starting' : 'No QT action needed for this value', small: o.qtDrugs.length ? 'Repeat the ECG once the drug is at steady state or after a dose increase, sooner if risk factors are present.' : 'Recheck before adding a drug with torsades risk.', t: 'Drew 2010; expert practice'});
+  } else if (status === 'drugsonly'){
+    s.push({when: 'Now', now: true, name: 'Get a 12-lead ECG and measure the QT', small: 'Before starting a drug with torsades risk in someone with risk factors.', t: 'Drew 2010'});
+  }
+  var lab = [];
+  var kt = status === 'tdp' ? 4.5 : 4;
+  if (o.K == null || o.K < kt) lab.push(o.K == null ? 'check potassium' : 'potassium ' + o.K + ': replete to ' + (status === 'tdp' ? '4.5\u20135.0' : '4.0 or more'));
+  if (o.Mg == null || o.Mg < 2) lab.push(o.Mg == null ? 'check magnesium' : 'magnesium ' + o.Mg + ': replete to 2.0 or more');
+  if (o.lowCa) lab.push('calcium ' + o.Ca + ': correct it');
+  else if (o.Ca == null) lab.push('check calcium');
+  if (lab.length) s.push({when: 'Labs', name: 'Correct electrolytes', small: lab.join('; ') + '.', t: 'Targets: expert practice'});
+  if (o.brady) s.push({when: 'Rate', name: 'Avoid slowing the heart further', small: 'Bradycardia and pauses lengthen the QT and set up torsades.', t: 'Drew 2010'});
+  var h = '<p class="label">Plan</p><p class="head ' + cls + '">' + esc(head) + '</p>' + steps(s);
+  if (o.rules.length) h += o.rules.map(function(r){ return '<div class="guard"><b>' + esc(RULES[r].n) + ':</b> ' + esc(RULES[r].t) + ' <span class="mono" style="font-size:12px">(' + esc(RULES[r].s) + ')</span></div>'; }).join('');
+  if (o.rules.indexOf('methadone') < 0 && o.picked.some(function(d){ return d[0] === 'amiodarone'; }) && status === 'high') h += guard('Amiodarone often lengthens the QTc past 500 ms with little torsades; weigh it against the reason it was started rather than stopping it on the number alone.');
+  h += '<p class="whyline"><b>Why:</b> ' + esc({tdp: 'Torsades recurs while the trigger is in place: drugs, low potassium and pauses.', high: 'Over 500 ms the risk is high enough that removing the trigger and watching the rhythm come first.', prolonged: 'Each added drug or lost electrolyte uses up more of the remaining reserve.', normal: 'A normal baseline is the reference: a rise of 60 ms on treatment matters even below 500.', drugsonly: 'The risk of a QT drug depends on the QT it starts from.'}[status]) + '</p>';
+  h += '<details><summary>More</summary><p>Drew 2010 lists who needs QT monitoring in hospital: starting a drug known to cause torsades, an overdose of a QT drug, a new severe bradyarrhythmia, and severe hypokalemia or hypomagnesemia. Measure before and at least every 8 to 12 hours after starting, increasing the dose, or an overdose. Torsades is less likely when the underlying rhythm is AF, unless there is complete heart block.</p><p>Potassium 4.0 and magnesium 2.0 are common working targets, not trial-tested thresholds.</p>' + tiers(['Drew 2010 (expert consensus)', 'Electrolyte targets: expert practice']) + '</details>';
+  return h;
+}
+function render(){
+  var i = read(), o = assess(i);
+  $('res-qtc').innerHTML = qtcCard(o, i);
+  $('res-tdp').innerHTML = tdpCard(o);
+  $('res-risk').innerHTML = riskCard(o, i);
+  $('res-drugs').innerHTML = drugsCard(o);
+  $('res-plan').innerHTML = planCard(o, i);
+  $('res-plan').className = 'card';
+}
+window.__assess = assess;
+
+/* Tabs */
+var tabs = [['t-tool','p-tool'],['t-drugs','p-drugs'],['t-learn','p-learn'],['t-prac','p-prac']];
+function show(t){ tabs.forEach(function(p){ var on = p[0] === t; $(p[0]).setAttribute('aria-selected', String(on)); $(p[1]).classList.toggle('on', on); }); }
+tabs.forEach(function(p){ $(p[0]).addEventListener('click', function(){ show(p[0]); }); });
+function fromHash(){ var id = location.hash.slice(1); if (!id) return; var el = $(id); if (!el) return; var pan = el.closest('.panel'); if (pan) tabs.forEach(function(p){ if (p[1] === pan.id) show(p[0]); }); el.scrollIntoView(); }
+window.addEventListener('hashchange', fromHash);
+
+/* Drugs tab */
+$('tierdefs').innerHTML = Object.keys(TIERS).map(function(k){ return '<div class="drug"><div><span class="dn">' + esc(TIERS[k].n) + '</span><p>' + esc(TIERS[k].d) + '</p></div><span class="badge t-' + k + '">' + esc(TIERS[k].s) + '</span></div>'; }).join('');
+function drawTable(){
+  var q = norm($('dfilter').value).trim();
+  var by = {};
+  DRUGS.forEach(function(d){ var hay = norm(d[1] + ' ' + d[2] + ' ' + CLASSES[d[3]] + ' ' + TIERS[d[4]].n); if (q && hay.indexOf(q) < 0) return; (by[d[3]] = by[d[3]] || []).push(d); });
+  var h = Object.keys(CLASSES).filter(function(c){ return by[c]; }).map(function(c){ return '<p class="label" style="margin:14px 0 0">' + esc(CLASSES[c]) + '</p>' + by[c].map(function(d){ return '<div class="drug"><div><span class="dn">' + esc(d[1]) + '</span><p>' + esc(d[5]) + '</p></div><span class="badge t-' + d[4] + '">' + esc(TIERS[d[4]].n) + '</span></div>'; }).join(''); }).join('');
+  $('dtable').innerHTML = h || '<p class="note">Not on this list. Check the label or CredibleMeds.</p>';
+}
+$('dfilter').addEventListener('input', drawTable); drawTable();
+$('rulebox').innerHTML = Object.keys(RULES).map(function(k){ var r = RULES[k]; return '<div class="drug"><div><span class="dn">' + esc(r.n) + '</span><p>' + esc(r.t) + '</p><p class="mono" style="font-size:12px">' + esc(r.s) + '</p></div></div>'; }).join('');
+var SWN = {mac: 'Macrolide', fq: 'Fluoroquinolone', azole: 'Azole antifungal', ht3: 'Ondansetron, granisetron, droperidol', ap: 'Antipsychotic for agitation', ssri: 'SSRI', methadone: 'Methadone', sleep: 'Sleep and itch (trazodone, hydroxyzine, diphenhydramine)', famotidine: 'Famotidine in kidney failure', aa: 'Antiarrhythmic'};
+$('altbox').innerHTML = Object.keys(SWAPS).map(function(k){ return '<div class="drug"><div><span class="dn">' + esc(SWN[k]) + '</span><p>' + esc(SWAPS[k]) + '</p></div></div>'; }).join('') + '<p class="note" style="margin-top:8px">Swaps are expert practice: no QT warning in the alternative’s label, not a trial comparison. Adjust to your institution’s formulary and antibiogram.</p>';
+
+/* SVG helpers */
+function svgOpen(vb, label){ return '<svg viewBox="' + vb + '" role="img" aria-label="' + esc(label) + '" class="fig">'; }
+function tx(x, y, t, o){ o = o || {}; return '<text x="' + x + '" y="' + y + '" text-anchor="' + (o.a || 'middle') + '" style="' + (o.sans ? FS : FM) + ';font-size:' + (o.s || 11) + 'px;font-weight:' + (o.w || 400) + ';fill:' + (o.c || 'var(--ink)') + '">' + t + '</text>'; }
+function pth(d, c, w, extra){ return '<path d="' + d + '" fill="none" stroke="' + c + '" stroke-width="' + (w || 2) + '" stroke-linecap="round" stroke-linejoin="round"' + (extra || '') + '/>'; }
+
+/* 1. Action potential over the ECG */
+var AP = {
+  normal: {n: 'Normal', line: 'Fast upstroke (QRS), a plateau (ST segment), then repolarization (T wave). The QT runs from the start of the QRS to the end of the T.', plat: 0, k: 0, ead: 0},
+  drug: {n: 'QT drug', line: 'Most QT drugs block IKr, the potassium current that ends the plateau. The plateau lasts longer, the T wave comes later, and the QT lengthens.', plat: 40, k: 0, ead: 0},
+  lowk: {n: 'Low K', line: 'Low potassium also weakens IKr: the T flattens, a U wave can appear, and the QT (or QU) lengthens. With a drug on top, the effects add.', plat: 34, k: 1, ead: 0},
+  ead: {n: 'Afterdepolarization', line: 'A long plateau lets calcium channels reopen: an early afterdepolarization. If it reaches threshold it fires a beat on the T wave, which can start torsades.', plat: 40, k: 0, ead: 1}
+};
+function apSVG(k){
+  var s = AP[k], p = s.plat, x0 = 40;
+  var h = svgOpen('0 0 340 230', 'Ventricular action potential above an ECG beat: ' + s.n);
+  h += tx(8, 18, 'Cell', {a: 'start', s: 10.5, c: 'var(--muted)'}) + tx(8, 138, 'ECG', {a: 'start', s: 10.5, c: 'var(--muted)'});
+  /* action potential: rest at y 100, peak 26, plateau 40 */
+  var endPlat = 150 + p, endRep = 200 + p;
+  var ap = 'M' + x0 + ' 100 L' + (x0 + 22) + ' 100 L' + (x0 + 26) + ' 26 L' + (x0 + 34) + ' 40 L' + (x0 + 40) + ' 42 C ' + (x0 + 80) + ' 44 ' + (endPlat - 20) + ' 46 ' + endPlat + ' 52 ';
+  if (s.ead) ap += 'C ' + (endPlat + 12) + ' 62 ' + (endPlat + 18) + ' 70 ' + (endPlat + 24) + ' 64 C ' + (endPlat + 30) + ' 56 ' + (endPlat + 36) + ' 58 ' + (endPlat + 42) + ' 76 C ' + (endPlat + 52) + ' 96 ' + (endRep + 26) + ' 100 ' + (endRep + 40) + ' 100';
+  else ap += 'C ' + (endPlat + 22) + ' 64 ' + (endRep - 14) + ' 98 ' + endRep + ' 100 L 330 100';
+  h += pth(ap, 'var(--accent)', 2.5);
+  if (s.ead) h += '<circle cx="' + (endPlat + 30) + '" cy="58" r="12" fill="none" stroke="var(--bad)" stroke-width="2" stroke-dasharray="3 3"/>' + tx(endPlat + 30, 22, 'EAD', {s: 11, w: 700, c: 'var(--bad)'});
+  h += tx(x0 + 58, 34, 'plateau', {s: 10.5, c: 'var(--muted)', a: 'start'});
+  /* ECG: baseline y 180 */
+  var tH = s.k ? 10 : 24, tw = 46;
+  var tStart = endPlat - 30, tPeak = endPlat + 10, tEnd = endRep + 4;
+  var ecg = 'M' + x0 + ' 180 L' + (x0 + 18) + ' 180 L' + (x0 + 22) + ' 186 L' + (x0 + 27) + ' 140 L' + (x0 + 32) + ' 192 L' + (x0 + 36) + ' 180 L' + tStart + ' 180 Q ' + tPeak + ' ' + (180 - tH * 2) + ' ' + tEnd + ' 180';
+  if (s.k) ecg += ' Q ' + (tEnd + 16) + ' 172 ' + (tEnd + 30) + ' 180';
+  ecg += ' L 330 180';
+  h += '<rect x="30" y="128" width="304" height="72" rx="6" fill="var(--ecg-paper)"/>' + pth(ecg, 'var(--ecg-ink)', 2);
+  if (s.k) h += tx(tEnd + 16, 166, 'U', {s: 10.5, c: 'var(--muted)'});
+  if (s.ead) h += pth('M' + (endPlat + 30) + ' 180 L' + (endPlat + 34) + ' 150 L' + (endPlat + 40) + ' 196 L' + (endPlat + 44) + ' 180', 'var(--bad)', 2);
+  /* QT bracket */
+  h += pth('M' + (x0 + 18) + ' 212 L' + (x0 + 18) + ' 220 L' + tEnd + ' 220 L' + tEnd + ' 212', 'var(--muted)', 1.5) + tx((x0 + 18 + tEnd) / 2, 216, '', {}) + tx((x0 + 18 + tEnd) / 2, 228, 'QT ' + (k === 'normal' ? '' : '(longer)'), {s: 11, w: 600});
+  h += pth('M' + (x0 + 18) + ' 108 L' + (x0 + 18) + ' 128', 'var(--line)', 1, ' stroke-dasharray="3 3"') + pth('M' + endRep + ' 108 L' + endRep + ' 128', 'var(--line)', 1, ' stroke-dasharray="3 3"');
+  return h + '</svg>';
+}
+
+/* 3. Measuring */
+var MEAS = {
+  tangent: {n: 'Tangent', line: 'Draw a line along the steepest part of the T-wave downslope; the QT ends where it meets the baseline. Use a lead with a clear T wave (at least 2 mm) and a distinct end, and the same lead each time.'},
+  uwave: {n: 'U wave', line: 'A separate U wave after the T is left out. If it fuses with the T (common with low potassium), the tangent on the T downslope still marks the end.'},
+  af: {n: 'AF', line: 'In AF the QT follows the preceding RR. Measure on the shortest and the longest RR, correct each, and average the two QTc values.'},
+  wide: {n: 'Wide QRS', line: 'A bundle branch block adds QRS time, not repolarization time. Subtract about half the QRS (Bogossian) or read the JT, and compare with an old ECG.'}
+};
+function measSVG(k){
+  var h = svgOpen('0 0 340 170', 'Measuring the QT: ' + MEAS[k].n);
+  h += '<rect x="6" y="6" width="328" height="140" rx="8" fill="var(--ecg-paper)"/>';
+  for (var gx = 6; gx <= 334; gx += 16) h += pth('M' + gx + ' 6 L' + gx + ' 146', 'var(--ecg-grid)', 1);
+  for (var gy = 6; gy <= 146; gy += 16) h += pth('M6 ' + gy + ' L334 ' + gy, 'var(--ecg-grid)', 1);
+  var base = 110;
+  function beat(x, qrsW, tEnd, u){
+    var d = 'M' + x + ' ' + base + ' L' + (x + 4) + ' ' + (base + 6) + ' L' + (x + 4 + qrsW / 2) + ' ' + (base - 70) + ' L' + (x + qrsW) + ' ' + (base + 10) + ' L' + (x + qrsW + 4) + ' ' + base + ' L' + (tEnd - 70) + ' ' + base + ' Q ' + (tEnd - 34) + ' ' + (base - 56) + ' ' + tEnd + ' ' + base;
+    if (u) d += ' Q ' + (tEnd + 16) + ' ' + (base - 12) + ' ' + (tEnd + 30) + ' ' + base;
+    return d;
+  }
+  if (k === 'af'){
+    h += pth(beat(14, 10, 104) + ' L 150 ' + base + beat(150, 10, 236).replace(/^M/, ' L') + ' L 334 ' + base, 'var(--ecg-ink)', 2);
+    h += tx(70, 30, 'after a short RR', {s: 10.5, c: 'var(--muted)'}) + tx(212, 30, 'after a long RR', {s: 10.5, c: 'var(--muted)'});
+    h += pth('M14 132 L104 132', 'var(--accent)', 2) + pth('M150 132 L236 132', 'var(--accent)', 2) + tx(270, 136, 'average', {s: 11, w: 600, c: 'var(--accent)'});
+  } else {
+    var w = k === 'wide' ? 34 : 12, tEnd = k === 'wide' ? 250 : 226;
+    h += pth(beat(30, w, tEnd, k === 'uwave') + ' L 334 ' + base, 'var(--ecg-ink)', 2);
+    if (k === 'tangent' || k === 'uwave') h += pth('M' + (tEnd - 34) + ' ' + (base - 42) + ' L' + (tEnd + 8) + ' ' + (base + 4), 'var(--accent)', 2, ' stroke-dasharray="5 4"');
+    h += pth('M30 132 L' + tEnd + ' 132', 'var(--accent)', 2) + pth('M30 126 L30 138', 'var(--accent)', 2) + pth('M' + tEnd + ' 126 L' + tEnd + ' 138', 'var(--accent)', 2);
+    h += tx((30 + tEnd) / 2, 152, 'QT', {s: 12, w: 700, c: 'var(--accent)'});
+    if (k === 'uwave') h += tx(tEnd + 16, 90, 'U', {s: 11, w: 600});
+    if (k === 'wide') h += pth('M30 22 L' + (30 + w + 4) + ' 22', 'var(--warn)', 2) + tx(30 + w + 10, 26, 'wide QRS', {a: 'start', s: 10.5, c: 'var(--warn)'});
+  }
+  return h + '</svg>';
+}
+
+/* 6. Torsades strip */
+var TDP = {
+  ssl: {n: 'Short-long-short', line: 'An early beat, a pause, then a sinus beat with an even longer QT. The next early beat lands on its T wave.'},
+  tdp: {n: 'Torsades', line: 'Polymorphic VT whose QRS axis twists around the baseline. It often stops by itself and recurs; it can degenerate to VF.'}
+};
+function tdpSVG(k){
+  var h = svgOpen('0 0 340 150', 'Rhythm strip: ' + TDP[k].n);
+  h += '<rect x="4" y="6" width="332" height="126" rx="8" fill="var(--ecg-paper)"/>';
+  for (var gx = 4; gx <= 336; gx += 16) h += pth('M' + gx + ' 6 L' + gx + ' 132', 'var(--ecg-grid)', 1);
+  var b = 84, d = 'M4 ' + b;
+  function sinus(x, tlen){ return ' L' + x + ' ' + b + ' L' + (x + 3) + ' ' + (b + 5) + ' L' + (x + 7) + ' ' + (b - 44) + ' L' + (x + 11) + ' ' + (b + 8) + ' L' + (x + 14) + ' ' + b + ' L' + (x + 14 + tlen - 34) + ' ' + b + ' Q ' + (x + tlen - 6) + ' ' + (b - 34) + ' ' + (x + 14 + tlen) + ' ' + b; }
+  function pvc(x){ return ' L' + x + ' ' + b + ' L' + (x + 10) + ' ' + (b - 52) + ' L' + (x + 22) + ' ' + (b + 30) + ' L' + (x + 34) + ' ' + b; }
+  if (k === 'ssl'){
+    d += sinus(14, 56) + pvc(88) + ' L150 ' + b + sinus(150, 84) + pvc(240) + ' L336 ' + b;
+    h += pth(d, 'var(--ecg-ink)', 2);
+    h += tx(100, 26, 'early beat', {s: 10.5, c: 'var(--muted)'}) + tx(132, 120, 'pause', {s: 10.5, c: 'var(--muted)'}) + tx(196, 26, 'longer QT', {s: 10.5, c: 'var(--muted)'}) + tx(256, 26, 'R on T', {s: 10.5, w: 700, c: 'var(--bad)'});
+  } else {
+    d += sinus(14, 70) + ' L96 ' + b;
+    var x = 96;
+    for (var n = 0; n < 15; n++){ var amp = 10 + 34 * Math.abs(Math.sin(n / 15 * Math.PI * 1.5 + .4)); var sg = n % 2 ? 1 : -1; d += ' L' + (x + 6) + ' ' + (b + sg * amp) + ' L' + (x + 15) + ' ' + (b - sg * amp * .8); x += 15; }
+    d += ' L336 ' + b;
+    h += pth(d, 'var(--ecg-ink)', 2) + tx(220, 24, 'twisting polymorphic VT', {s: 10.5, w: 700, c: 'var(--bad)'});
+  }
+  return h + '</svg>';
+}
+
+/* 2. Rate correction (interactive, through the engine formulas) */
+var RATE = {}; /* chip figure: drawn from the current inputs */
+function rateSVG(qt, hr){
+  var W = 340, H = 200, L = 40, R = 330, T = 14, B = 160;
+  var x = function(v){ return L + (v - 40) / (150 - 40) * (R - L); };
+  var lo = 280, hi = 640, y = function(v){ return B - (Math.max(lo, Math.min(hi, v)) - lo) / (hi - lo) * (B - T); };
+  var h = svgOpen('0 0 ' + W + ' ' + H, 'Corrected QT across heart rates for a QT of ' + qt + ' ms');
+  [300, 400, 500, 600].forEach(function(v){ h += pth('M' + L + ' ' + y(v) + ' L' + R + ' ' + y(v), 'var(--line)', 1) + tx(L - 4, y(v) + 4, v, {a: 'end', s: 10.5, c: 'var(--muted)'}); });
+  [40, 60, 85, 100, 150].forEach(function(v){ h += tx(x(v), B + 14, v, {s: 10.5, c: 'var(--muted)'}); });
+  h += tx((L + R) / 2, B + 30, 'heart rate /min', {s: 10.5, c: 'var(--muted)'});
+  h += '<rect x="' + x(60) + '" y="' + T + '" width="' + (x(85) - x(60)) + '" height="' + (B - T) + '" fill="var(--fill)"/>';
+  h += pth('M' + L + ' ' + y(500) + ' L' + R + ' ' + y(500), 'var(--bad)', 1, ' stroke-dasharray="4 4"') + tx(R, y(500) - 4, '500', {a: 'end', s: 10.5, c: 'var(--bad)'});
+  var cols = {baz: 'var(--bad)', fri: 'var(--accent)', fra: 'var(--ok)'};
+  ['baz', 'fri', 'fra'].forEach(function(k){
+    var d = ''; for (var v = 40; v <= 150; v += 2){ var q = FORM[k].f(qt, 60 / v); d += (d ? ' L' : 'M') + x(v).toFixed(1) + ' ' + y(q).toFixed(1); }
+    h += pth(d, cols[k], k === 'baz' ? 2.5 : 2);
+  });
+  h += pth('M' + x(hr) + ' ' + T + ' L' + x(hr) + ' ' + B, 'var(--ink)', 1.5);
+  h += tx(L + 6, T + 12, 'Bazett', {a: 'start', s: 11, w: 700, c: 'var(--bad)'}) + tx(L + 66, T + 12, 'Fridericia', {a: 'start', s: 11, w: 700, c: 'var(--accent)'}) + tx(L + 146, T + 12, 'Framingham', {a: 'start', s: 11, w: 700, c: 'var(--ok)'});
+  return h + '</svg>';
+}
+function mountRate(host, qt0, hr0){
+  var qt = qt0 || 400, hr = hr0 || 110;
+  host.innerHTML = '<div class="slider"><label for="' + host.id + '-hr">Rate</label><input type="range" id="' + host.id + '-hr" min="40" max="150" step="1" value="' + hr + '"><output id="' + host.id + '-hro"></output></div><div class="slider"><label for="' + host.id + '-qt">QT</label><input type="range" id="' + host.id + '-qt" min="280" max="560" step="5" value="' + qt + '"><output id="' + host.id + '-qto"></output></div><div class="fx"></div><div class="vals"></div><p class="line1"></p><div class="dp"></div>';
+  function draw(){
+    hr = +$(host.id + '-hr').value; qt = +$(host.id + '-qt').value;
+    $(host.id + '-hro').textContent = hr + '/min'; $(host.id + '-qto').textContent = qt + ' ms';
+    host.querySelector('.fx').innerHTML = rateSVG(qt, hr);
+    var rr = 60 / hr, k = pickFormula(hr);
+    host.querySelector('.vals').innerHTML = ['baz', 'fri', 'fra'].map(function(f){ return '<div class="score' + (f === k ? ' sel' : '') + '"><span>' + FORM[f].n + (f === k ? ' <small>(this tool uses)</small>' : '') + '</span><b>' + r0(FORM[f].f(qt, rr)) + ' ms</b></div>'; }).join('');
+    var b = bazett(qt, rr), fr = fridericia(qt, rr);
+    host.querySelector('.line1').textContent = hr > 85 ? 'At ' + hr + '/min Bazett reads ' + r0(b - fr) + ' ms longer than Fridericia: dividing by the square root of a short RR inflates the QTc.' : hr < 60 ? 'At ' + hr + '/min Bazett reads ' + r0(fr - b) + ' ms shorter than Fridericia, and can hide a long QT.' : hr === 60 ? 'At 60 a minute every formula returns the measured QT.' : 'At ' + hr + '/min Bazett reads ' + r0(b - fr) + ' ms longer than Fridericia. The gap grows with the rate; above 85 (outside the shaded band) this tool switches to Fridericia.';
+    host.querySelector('.dp').innerHTML = dpHtml([['Why the QT needs correcting', '<p>The action potential shortens as the heart speeds up, so a normal QT at 100 a minute is shorter than a normal QT at 60. Correction estimates what this QT would be at 60, so one cutoff can serve every rate.</p>'],
+      ['Why the formulas disagree', hr > 85 ? '<p>Bazett divides by the square root of the RR interval, which assumes the QT shortens more with rate than it really does. At ' + hr + ' a minute it therefore adds too much. Fridericia uses the cube root, which follows the real relation more closely at fast rates.</p>' : hr < 60 ? '<p>Below 60 the error reverses: Bazett subtracts too much and can make a long QT look acceptable. Slow rates are also when torsades is most likely, so the under-reading matters.</p>' : '<p>Near 60 a minute the RR interval is close to one second, so every formula barely changes the measured QT. The disagreement grows as the rate moves away from 60 in either direction.</p>'],
+      ['At the bedside', '<p>A long QTc in a tachycardic patient is often a Bazett artifact: check which formula the machine used before stopping a needed drug. The QT also takes a couple of minutes to settle after the rate changes, so measure during a steady rate.</p>']]);
+  }
+  host.addEventListener('input', draw); draw();
+}
+
+var FIGS = {
+  ap: {t: 'What the QT measures', states: ['normal', 'drug', 'lowk', 'ead'], data: AP, svg: apSVG},
+  meas: {t: 'Where the T wave ends', states: ['tangent', 'uwave', 'af', 'wide'], data: MEAS, svg: measSVG},
+  tdp: {t: 'How torsades starts', states: ['ssl', 'tdp'], data: TDP, svg: tdpSVG},
+  rate: {t: 'Why Bazett overcorrects', rate: 1}
+};
+var ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M7 15l3-4 3 3 2-2 2 3"/></svg>';
+function mountFig(host, id, state){
+  var F = FIGS[id];
+  function draw(k){
+    var d = F.data[k];
+    host.innerHTML = '<div class="states" role="group" aria-label="' + esc(F.t) + '">' + F.states.map(function(x){ return '<button class="sbtn" data-k="' + x + '" aria-pressed="' + (x === k) + '">' + esc(F.data[x].n) + '</button>'; }).join('') + '</div>' + F.svg(k) + '<p class="line1">' + esc(d.line) + '</p>';
+  }
+  host.onclick = function(e){ var b = e.target.closest && e.target.closest('[data-k]'); if (b) draw(b.getAttribute('data-k')); };
+  draw(state && F.data[state] ? state : F.states[0]);
+}
+function chip(fig, state){ return '<button class="chip" data-fig="' + fig + '" data-state="' + (state || '') + '">' + ICON + esc(FIGS[fig].t) + '</button>'; }
+var lastFocus = null;
+function openSheet(fig, state){
+  lastFocus = document.activeElement;
+  $('sheet-t').textContent = FIGS[fig].t;
+  var b = $('sheet-b');
+  if (FIGS[fig].rate){ var o = assess(read()); b.innerHTML = '<div id="sheetrate"></div>'; mountRate($('sheetrate'), o.qt ? Math.max(280, Math.min(560, Math.round(o.qt / 5) * 5)) : 400, o.hr ? Math.max(40, Math.min(150, Math.round(o.hr))) : 110); }
+  else mountFig(b, fig, state);
+  $('scrim').hidden = false; $('sheet').hidden = false; $('sheet').scrollTop = 0; $('sheet-x').focus();
+}
+function closeSheet(){ if ($('sheet').hidden) return; $('scrim').hidden = true; $('sheet').hidden = true; $('sheet-b').innerHTML = ''; if (lastFocus && lastFocus.focus) lastFocus.focus(); }
+$('sheet-x').addEventListener('click', closeSheet); $('scrim').addEventListener('click', closeSheet);
+document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeSheet(); });
+document.addEventListener('click', function(e){ var c = e.target.closest && e.target.closest('[data-fig]'); if (c) openSheet(c.getAttribute('data-fig'), c.getAttribute('data-state')); });
+document.querySelectorAll('[data-figure]').forEach(function(h){ mountFig(h, h.getAttribute('data-figure'), h.getAttribute('data-state')); });
+mountRate($('ratefig'), 400, 110);
+
+/* Learn 4: risk stack, through the engine's tisdale() */
+(function(){
+  var F = [['age', 'Age 68+'], ['f', 'Female'], ['loop', 'Loop diuretic'], ['k', 'K 3.5 or less'], ['q', 'QTc 450+'], ['mi', 'Acute MI'], ['d1', 'One QT drug'], ['d2', 'Second QT drug'], ['sepsis', 'Sepsis'], ['hf', 'Heart failure']];
+  var on = {};
+  function draw(){
+    $('stack-tap').innerHTML = F.map(function(x){ return '<button class="sbtn" data-s="' + x[0] + '" aria-pressed="' + !!on[x[0]] + '">' + esc(x[1]) + '</button>'; }).join('');
+    var t = tisdale({age: on.age ? 70 : null, sex: on.f ? 'f' : null, k: on.k ? 3.2 : null, admQtc: on.q ? 460 : null, f: {mi: on.mi, sepsis: on.sepsis, hf: on.hf}}, on.d2 ? 2 : on.d1 ? 1 : 0, on.loop);
+    var m = $('stack-m'); m.className = 'meter' + (t.band === 'high' ? ' hi' : t.band === 'mid' ? ' mid' : ''); m.firstChild.style.width = (t.score / 21 * 100) + '%';
+    $('stack-sum').textContent = 'Score ' + t.score + ' of 21 · ' + {low: 'low', mid: 'moderate', high: 'high'}[t.band];
+    $('stack-line').textContent = t.band === 'high' ? 'High (11 or more): the group most likely to reach a QTc over 500 ms or a 60 ms rise in the derivation study. Avoid adding another QT drug.' : t.band === 'mid' ? 'Moderate (7 to 10): one or two more factors make it high. Sepsis or heart failure plus one drug is already 6.' : t.score ? 'Low (6 or less): one QT drug (3) plus a few small factors stays low.' : 'Tap the factors present.';
+  }
+  $('stack-tap').addEventListener('click', function(e){ var b = e.target.closest('[data-s]'); if (!b) return; var k = b.getAttribute('data-s'); on[k] = !on[k]; if (k === 'd2' && on.d2) on.d1 = true; if (k === 'd1' && !on.d1) on.d2 = false; draw(); });
+  draw();
+})();
+
+/* Learn 5: narrowing workup */
+var CAUSES = [['drug', 'A QT drug'], ['k', 'Low potassium'], ['mg', 'Low magnesium'], ['ca', 'Low calcium'], ['brady', 'Bradycardia or pauses'], ['isch', 'Myocardial ischemia or cardiomyopathy'], ['neuro', 'Intracranial bleed or stroke'], ['thy', 'Hypothyroidism or hypothermia'], ['cong', 'Congenital long QT'], ['qrs', 'Wide QRS (not true QT prolongation)']];
+var FEATS = {
+  nodrug: {n: 'No QT drugs on the list', m: {drug: ['out', 'nothing on the medicine list prolongs the QT']}},
+  klab: {n: 'K normal', m: {k: ['out', 'potassium is normal']}},
+  mglab: {n: 'Mg normal', m: {mg: ['out', 'magnesium is normal']}},
+  calab: {n: 'Ca normal', m: {ca: ['out', 'calcium is normal']}},
+  narrowq: {n: 'QRS under 120', m: {qrs: ['out', 'the QRS is narrow, so the long QT is repolarization']}},
+  persists: {n: 'Still long off drugs, labs fixed', m: {drug: ['out', 'it outlasted the drugs'], k: ['out', 'potassium corrected'], mg: ['out', 'magnesium corrected'], ca: ['out', 'calcium corrected'], cong: ['fav', 'a QT that stays long with no cause points to congenital long QT: family history, cardiology']}},
+  family: {n: 'Family sudden death or syncope', m: {cong: ['fav', 'family history of sudden death or unexplained syncope']}},
+  ttwi: {n: 'Deep T inversions', m: {isch: ['fav', 'ischemia, takotsubo and cardiomyopathy invert and lengthen the T'], neuro: ['fav', 'giant inverted T waves follow subarachnoid bleeds too']}},
+  tsh: {n: 'TSH normal, warm', m: {thy: ['out', 'thyroid and temperature are normal']}},
+  hrok: {n: 'Rate over 60, no pauses', m: {brady: ['out', 'no slow rate or pauses']}}
+};
+(function(){
+  var on = {};
+  function draw(){
+    $('nar-tap').innerHTML = Object.keys(FEATS).map(function(k){ return '<button class="sbtn" data-n="' + k + '" aria-pressed="' + !!on[k] + '">' + esc(FEATS[k].n) + '</button>'; }).join('');
+    $('nar-list').innerHTML = CAUSES.map(function(c){
+      var st = '', why = [];
+      Object.keys(on).forEach(function(f){ if (!on[f]) return; var m = FEATS[f].m[c[0]]; if (m){ if (m[0] === 'out') st = 'out'; else if (st !== 'out') st = 'fav'; why.push(m[1]); } });
+      return '<div class="cause ' + st + '"><span>' + esc(c[1]) + '</span><small>' + esc(why.join('; ')) + '</small></div>';
+    }).join('');
+  }
+  $('nar-tap').addEventListener('click', function(e){ var b = e.target.closest('[data-n]'); if (!b) return; var k = b.getAttribute('data-n'); on[k] = !on[k]; draw(); });
+  draw();
+})();
+
+/* Learn 7: evidence */
+var TRIALS = [
+  {q: 'Can a bedside score predict who will develop a dangerous QT?', d: 'Tisdale 2013. Derivation in 900 and validation in 300 patients admitted to cardiac care units at one US hospital; outcome QTc over 500 ms or a rise of 60 ms or more.', r: 'Ten items, 0 to 21 points; it separated low, moderate and high risk well (C statistic 0.82 for the risk bands).', c: 'The basis for screening hospitalized patients before adding QT drugs. Single centre, cardiac units only, and an ECG outcome rather than torsades itself.', ref: 'Circ Cardiovasc Qual Outcomes 2013;6:479', doi: '10.1161/CIRCOUTCOMES.113.000152'},
+  {q: 'Does a QT alert in the order system help?', d: 'Tisdale 2014. Before-and-after study, 1,200 cardiac-unit patients in each period; a computer alert built on the risk score warned prescribers ordering QT drugs.', r: 'QTc prolongation fell (adjusted odds ratio 0.65), and fewer drugs with torsades risk, such as IV haloperidol and fluoroquinolones, were ordered.', c: 'Supports building the score into order entry. Not randomized; torsades was too rare to count.', ref: 'Circ Cardiovasc Qual Outcomes 2014;7:381', doi: '10.1161/CIRCOUTCOMES.113.000651'},
+  {q: 'Does azithromycin raise the risk of cardiovascular death?', d: 'Ray 2012. Observational cohort of Tennessee Medicaid patients; 5-day azithromycin courses against no antibiotic and against amoxicillin and other antibiotics.', r: 'Cardiovascular death during the 5 days: hazard ratio 2.88 against no antibiotic. About 47 extra deaths per million courses against amoxicillin, and 245 per million in the patients at highest cardiovascular risk.', c: 'Led to an FDA warning for azithromycin. Observational, so confounding is possible; the absolute risk is small except in high-risk patients.', ref: 'N Engl J Med 2012;366:1881', doi: '10.1056/NEJMoa1003833'}
+];
+$('trialbox').innerHTML = TRIALS.map(function(t){ return '<div class="trial" style="margin-top:14px"><p><b>' + esc(t.q) + '</b></p><p><span class="k">Design</span>' + esc(t.d) + '</p><p><span class="k">Result</span>' + esc(t.r) + '</p><p><span class="k">What it changed</span>' + esc(t.c) + '</p><p class="note">' + esc(t.ref) + ' · <a href="https://doi.org/' + t.doi + '">doi:' + t.doi + '</a></p></div>'; }).join('');
+$('go-prac').addEventListener('click', function(){ show('t-prac'); window.scrollTo(0, 0); });
+
+/* Learn pills */
+(function(){
+  var chaps = [].slice.call(document.querySelectorAll('.chap'));
+  $('pills').innerHTML = chaps.map(function(c, n){ return '<button class="pill" data-go="' + c.id + '" aria-current="' + (n === 0) + '">' + (n + 1) + ' ' + esc(c.getAttribute('data-pill')) + '</button>'; }).join('');
+  $('pills').addEventListener('click', function(e){ var g = e.target.getAttribute('data-go'); if (g) $(g).scrollIntoView(); });
+  function mark(id){ [].forEach.call($('pills').children, function(b){ var on = b.getAttribute('data-go') === id; b.setAttribute('aria-current', String(on)); if (on) $('pills').scrollLeft = Math.max(0, b.offsetLeft - 60); }); }
+  if ('IntersectionObserver' in window){ var io = new IntersectionObserver(function(es){ es.forEach(function(en){ if (en.isIntersecting) mark(en.target.id); }); }, {rootMargin: '-30% 0px -60% 0px'}); chaps.forEach(function(c){ io.observe(c); }); }
+})();
+
+/* Practice: cases run through the same engine */
+var CASES = [
+  {t: 'Septic, fast and on two QT drugs', s: 'Woman, 78, with sepsis. Azithromycin, ondansetron as needed, furosemide. QT 440 ms, rate 110, QRS 90. Potassium 3.2.', i: {qt: 440, hr: 110, qrs: 90, sex: 'f', k: 3.2, age: 78, f: {sepsis: true}, drugs: ['azithromycin', 'ondansetron', 'furosemide']}, p: 'Bazett reads 596, but at 110 a minute it overcorrects. Fridericia gives 539: still over 500. Her risk score is 16 (high). Swap azithromycin for doxycycline, stop ondansetron, replete potassium and magnesium, and monitor.'},
+  {t: 'Febrile and fast, nothing else', s: 'Man, 30, fever, rate 125. QT 320 ms, QRS 88. No QT drugs. Labs normal.', i: {qt: 320, hr: 125, qrs: 88, sex: 'm', k: 4.2, mg: 2.1, ca: 9.2, age: 30, f: {}, drugs: []}, p: 'Bazett says 462, which would be prolonged. Fridericia gives 409: normal. At fast rates the square root inflates the QTc; recheck once the fever settles.'},
+  {t: 'Slow rate hiding a long QT', s: 'Man, 70, rate 48 on metoprolol. QT 490 ms, QRS 96. No QT drugs.', i: {qt: 490, hr: 48, qrs: 96, sex: 'm', age: 70, f: {}, drugs: []}, p: 'Bazett gives 438, which looks normal. Fridericia gives 455: prolonged for a man. At slow rates Bazett undercorrects. Avoid adding QT drugs and avoid slowing him further.'},
+  {t: 'Left bundle branch block', s: 'Woman, 66, known LBBB, QRS 160 ms. QT 520 ms, rate 72. Starting levofloxacin.', i: {qt: 520, hr: 72, qrs: 160, sex: 'f', age: 66, f: {}, drugs: ['levofloxacin']}, p: 'Raw Bazett QTc is 570, but most of that is the wide QRS. Subtracting 48.5% of the QRS gives a QTc of 485: prolonged, not over 500. A beta-lactam would avoid adding a QT drug.'},
+  {t: 'Methadone at 120 mg', s: 'Man, 45, methadone 120 mg a day for opioid use disorder. QT 470 ms, rate 75, QRS 94. Potassium 4.1, magnesium 2.0.', i: {qt: 470, hr: 75, qrs: 94, sex: 'm', k: 4.1, mg: 2.0, age: 45, f: {}, drugs: ['methadone']}, p: 'QTc 525 (Bazett at 75 a minute): high risk. The methadone guideline says switch to buprenorphine or reduce the dose now, with the patient and the addiction team; do not stop it abruptly.'},
+  {t: 'Starting dofetilide', s: 'Man, 70, persistent AF to be cardioverted. Plan to load dofetilide. In sinus rhythm after cardioversion: QT 420 ms, rate 70, QRS 100. Creatinine clearance 55.', i: {qt: 420, hr: 70, qrs: 100, sex: 'm', age: 70, f: {}, drugs: ['dofetilide']}, p: 'QTc 454: prolonged, and over the 440 ms limit in the dofetilide label, so it cannot be started. Choose another strategy with cardiology.'}
+];
+var ZN = {normal: 'Normal', prolonged: 'Prolonged', high: 'High risk'};
+function caseZone(c){ var o = assess(c.i); return o.status === 'high' ? 'high' : o.status === 'prolonged' ? 'prolonged' : 'normal'; }
+$('practice').innerHTML = CASES.map(function(c, n){
+  return '<div class="card case" id="' + (n ? 'case' + n : 'practice-cases') + '"><p class="label">Case ' + (n + 1) + '</p><h2>' + esc(c.t) + '</h2><p>' + esc(c.s) + '</p><p><b>How do you read the QTc?</b></p><div class="row" data-case="' + n + '">' + ['normal', 'prolonged', 'high'].map(function(z){ return '<button class="btn ghost" data-z="' + z + '">' + ZN[z] + '</button>'; }).join('') + '</div><div class="ans" id="ans' + n + '" hidden></div></div>';
+}).join('');
+$('practice').addEventListener('click', function(e){
+  var b = e.target.closest('[data-z]');
+  if (b){ var n = +b.parentNode.getAttribute('data-case'), c = CASES[n], z = caseZone(c), o = assess(c.i);
+    var box = $('ans' + n); box.innerHTML = '<p><b>' + (b.getAttribute('data-z') === z ? 'Right: ' : 'The tool says: ') + ZN[z] + ' (' + FORM[o.form].n + ' ' + r0(o.q) + ' ms).</b> ' + esc(c.p) + '</p><div class="row"><button class="btn ghost" data-load="' + n + '">Open in the checker</button></div>'; box.hidden = false; return; }
+  var l = e.target.closest('[data-load]');
+  if (l){ var ci = CASES[+l.getAttribute('data-load')].i;
+    ['qt','hr','qrs','k','mg','ca','age'].forEach(function(k){ $(k).value = ci[k] != null ? ci[k] : ''; }); $('rr').value = ''; $('base').value = '';
+    st.sex = ci.sex; st.rhy = 'reg'; st.f = JSON.parse(JSON.stringify(ci.f)); st.drugs = ci.drugs.slice();
+    drawInputs(); render(); show('t-tool'); window.scrollTo(0, 0); }
+});
+window.__cases = CASES; window.__caseZone = caseZone;
+drawInputs(); render(); fromHash();
+})();
+</script>
+<script id="deeper-data">
+/* Go deeper: mechanism, rationale and the common trap for each Learn chapter. Text only; no doses or thresholds beyond the tool's own. */
+(function(){ var D = {"learn-ap": [["Mechanism", "The plateau of the action potential is a balance: calcium flowing in against potassium flowing out. The QT lengthens when the outward potassium current is reduced, which is what most QT-prolonging drugs and a low potassium do, or when the inward currents are increased."], ["Why it matters", "The channel carrying the main repolarizing current has an unusually large inner cavity that binds many unrelated molecules. That is why drugs from so many classes (antibiotics, antipsychotics, antiemetics, antiarrhythmics) share this one side effect."], ["Common trap", "A wide QRS lengthens the QT without any change in repolarization. In bundle branch block or a paced rhythm the measured QT overstates the risk and needs adjusting."]], "learn-measure": [["Mechanism", "The end of the T wave marks the moment the last ventricular cells finish repolarizing. The tangent method draws a line down the steepest part of the T wave's descent to the baseline, which gives a reproducible end point. A U wave is a separate deflection and is not part of the QT."], ["Why it matters", "Machine readings go wrong exactly where it matters: flat T waves, U waves, atrial fibrillation and noisy tracings. A long QTc that would change treatment deserves a measurement by hand."], ["Common trap", "In atrial fibrillation the QT changes with every beat. Average several beats instead of trusting one."]], "learn-stack": [["Mechanism", "The heart has several overlapping potassium currents, so losing part of one is normally covered by the others. This spare capacity is the repolarization reserve. Each risk factor removes some of it: a channel-blocking drug, low potassium or magnesium, a slow heart rate, female sex, heart failure, an inherited variant. Kidney or liver impairment and interacting drugs raise drug levels and deepen the block."], ["Why it matters", "This explains why the same drug is harmless in one patient and causes torsades in another, and it points to the first move: correct what can be corrected (potassium, magnesium, interacting drugs) before giving up a needed medicine."], ["Common trap", "Counting only the QT-prolonging drugs. A new drug that slows the metabolism of one already on the list can do more harm than a second QT drug."]], "learn-tdp": [["Mechanism", "When the plateau is prolonged, calcium channels have time to reopen and fire an extra beat during repolarization: an early afterdepolarization. Repolarization that is uneven across the heart wall lets that beat circulate. A pause makes the next beat's QT longer still, which is why torsades typically starts after a short-long-short sequence."], ["Why it matters", "The treatments follow from this. Magnesium suppresses afterdepolarizations even when the magnesium level is normal. A faster heart rate, from isoproterenol or pacing, shortens the QT and abolishes the pauses."], ["Common trap", "Treating torsades like ordinary ventricular tachycardia. Antiarrhythmics that prolong the QT make it worse. Polymorphic VT with a normal QT is a different disease, usually ischemia, with different treatment."]]};
+  function add(){ Object.keys(D).forEach(function(id){ var c = document.getElementById(id); if (!c || c.querySelector(":scope > .deeper")) return; var host = c.matches(".card,.lsec,section,.chap") ? c : null; if (!host){ var n = c.nextElementSibling; while (n && !n.matches(".card")) n = n.nextElementSibling; host = n; } if (!host || host.querySelector(":scope > .deeper")) return; var d = document.createElement("details"); d.className = "deeper"; d.innerHTML = "<summary>Go deeper: mechanism and rationale</summary><div class=\"dpx\">" + D[id].map(function(r){ return "<div><span class=\"dl\">" + r[0] + "</span><p>" + r[1] + "</p></div>"; }).join("") + "</div>"; var last = host.querySelector(":scope > .row"); if (last) host.insertBefore(d, last); else host.appendChild(d); }); }
+  add(); document.addEventListener("click", function(){ setTimeout(add, 0); }); document.addEventListener("input", function(){ setTimeout(add, 0); });
+})();
+</script>
+</body>
+</html>
