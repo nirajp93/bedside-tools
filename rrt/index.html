@@ -123,6 +123,20 @@ footer p{margin:0 0 8px}
 /* cause-fix: ruled-out causes stay readable; the name greys, the reason does not fade */
 .cause.out,.cause.less,.cause.unl{opacity:1}
 .cause.less>span,.cause.unl>span{color:var(--muted)}
+.deeper{margin-top:14px;border-top:1px solid var(--line)}
+.deeper>summary{min-height:44px;display:flex;align-items:center;gap:8px;color:var(--accent);font-weight:600;font-size:15px;cursor:pointer;list-style:none}
+.deeper>summary::-webkit-details-marker{display:none}
+.deeper>summary::before{content:"+";font-family:var(--mono);font-size:18px;line-height:1;width:14px;text-align:center}
+.deeper[open]>summary::before{content:"\2212"}
+.deeper>summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.deeper .dpx{border:1px solid var(--line);border-radius:12px;padding:2px 12px;background:var(--card);text-align:left}
+.deeper .dpx>div{padding:10px 0;border-top:1px solid var(--line)}
+.deeper .dpx>div:first-child{border-top:0}
+.deeper .dl{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500;margin:0 0 3px}
+.deeper p{font-size:15px;line-height:1.45;color:var(--ink);margin:0 0 4px}
+.deeper p:last-child{margin-bottom:0}
+[data-deeper]>.deeper{margin-top:0;border-top:0}
+.step .deeper{margin-top:10px}
 </style>
 </head>
 <body>
@@ -787,6 +801,13 @@ renderCards();
 $('learnbody').innerHTML = learnHTML();
 renderCase();
 route();
+})();
+</script>
+<script id="deeper-data">
+/* Go deeper: mechanism, rationale and the common trap for each Learn chapter. Text only; no doses or thresholds beyond the tool's own. */
+(function(){ var H2CARD = false; var D = {"learn-cpr": [["Mechanism", "During arrest the heart muscle is fed only by the pressure compressions build in the aorta between beats. That pressure takes several compressions to build and collapses within seconds of stopping."], ["Why it matters", "This is the reason for everything about compression quality: short pauses, charging the defibrillator while compressing, changing the compressor before fatigue. A return of circulation depends on that pressure."], ["Common trap", "Ventilating too fast or too hard. Each breath raises the pressure in the chest and reduces the blood returning to the heart. Leaning on the chest between compressions does the same."]], "learn-loop": [["Mechanism", "In ventricular fibrillation the electrical activity is chaotic. A shock depolarizes the whole heart at once so an organized rhythm can resume, and its chance of working falls with each minute as the muscle runs out of energy. In asystole and pulseless electrical activity the problem is not electrical, so a shock does nothing and the task is to find the cause."], ["Why it matters", "This is why the two paths differ in drugs and in thinking. Epinephrine tightens vessels and so raises the pressure that feeds the heart during compressions."], ["Common trap", "Stopping to look at the rhythm straight after a shock instead of resuming compressions. And treating an organized rhythm without a palpable pulse as lifeless: it may be profound shock with a cause that can be reversed."]], "learn-epi": [["Mechanism", "In anaphylaxis mast cells release mediators that dilate vessels, make capillaries leak and narrow the airways. A large share of the plasma can leave the circulation within minutes. Epinephrine reverses each of these: it tightens vessels and reduces swelling, strengthens the heart, opens the airways and quietens the mast cells."], ["Why it matters", "No other drug does this, and delay is what kills. Injection into the thigh muscle is absorbed quickly and reliably. Antihistamines and glucocorticoids treat itch and hives and do not treat the airway or the circulation."], ["Common trap", "Sitting or standing a hypotensive patient up, which empties an already underfilled heart. And assuming it is over once the patient improves: symptoms can return hours later."]], "learn-k": [["Mechanism", "A high potassium partly depolarizes heart cells, which inactivates their sodium channels and slows conduction: the QRS widens and the heart can stop. Calcium restores the cell's excitability within minutes without changing the potassium. Insulin and beta-2 agonists drive potassium into cells. Only the kidney, the gut or dialysis remove it from the body."], ["Why it matters", "The three moves have three time courses. Calcium protects briefly, shifting lasts a few hours, and without removal the potassium returns."], ["Common trap", "A normal ECG does not exclude a dangerous level. And the insulin given to shift potassium can cause hypoglycemia hours later, most often in kidney failure, so the glucose is followed."]], "learn-se": [["Mechanism", "Most seizures stop on their own through the brain's inhibitory system. The longer one continues, the more the receptors that benzodiazepines act on are withdrawn from the cell surface, and the seizure becomes self-sustaining and harder to stop."], ["Why it matters", "This is why treatment starts at five minutes and not at thirty, why the first benzodiazepine dose has to be a full one, and why the second-line drug follows promptly. Injury to the brain rises with time."], ["Common trap", "Giving a small benzodiazepine dose for fear of slowing the breathing: a continuing seizure threatens the airway more. And a patient who stops shaking but does not wake may still be seizing; that needs an EEG."]]};
+  function add(){ Object.keys(D).forEach(function(id){ var c = document.getElementById(id); if (!c || c.querySelector(":scope > .deeper")) return; var host = c.matches(".step") ? (c.querySelector(":scope > div") || c) : c.matches(".card,.lsec,section,.chap") ? c : null; if (!host && c.tagName === "H2" && H2CARD){ var old = document.querySelector("[data-deeper=" + id + "]"); if (old) return; var ref = c.nextElementSibling && c.nextElementSibling.matches(".lead") ? c.nextElementSibling : c; host = document.createElement("div"); host.className = "card"; host.setAttribute("data-deeper", id); ref.parentNode.insertBefore(host, ref.nextSibling); } if (!host){ var n = c.nextElementSibling; while (n && !n.matches(".card")) n = n.nextElementSibling; host = n; } if (!host || host.querySelector(":scope > .deeper")) return; var d = document.createElement("details"); d.className = "deeper"; d.innerHTML = "<summary>Go deeper: mechanism and rationale</summary><div class=\"dpx\">" + D[id].map(function(r){ return "<div><span class=\"dl\">" + r[0] + "</span><p>" + r[1] + "</p></div>"; }).join("") + "</div>"; var last = host.querySelector(":scope > .row"); if (last) host.insertBefore(d, last); else host.appendChild(d); }); }
+  add(); document.addEventListener("click", function(){ setTimeout(add, 0); }); document.addEventListener("input", function(){ setTimeout(add, 0); });
 })();
 </script>
 </body>
