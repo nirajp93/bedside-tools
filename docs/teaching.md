@@ -37,3 +37,31 @@ The work answer stays on top and fast; the teaching sits one tap away. Reference
 6. **Same engine, same sources.** Nothing in a diagram may contradict a result card. Every diagram label, lab
    pattern and trial number has a source in the decision table and is checked in the content audit. Sheets
    close with one tap and with Escape; everything works offline and with animation turned off.
+
+## Sliders explain themselves
+
+A slider never shows a bare number. Under the result, always visible with no tap:
+
+- **A zone scale** when the value crosses thresholds: a band strip with the active zone named in words.
+- **Two to four labelled rows** that change as the value moves: *What is happening* (the physiology at this value),
+  *Why the rule* (the rationale for the threshold), *At the bedside* (what to do or watch for).
+
+Rows are computed from the tool's own engine and data, never hand-copied numbers. In the visual kit this is
+`zones` on a range and `deep(v)` on a slider; elsewhere `dpHtml(rows)` into a `.dp` block.
+
+## Go deeper
+
+Each Learn chapter ends with one disclosure, **Go deeper: mechanism and rationale**, holding three rows:
+*Mechanism* (pathophysiology), *Why it matters* (why practice follows from it), *Common trap*. Text only; it adds no
+dose or threshold beyond the tool's own, and every sentence goes through the independent content audit. The text
+lives in one `<script id="deeper-data">` block at the end of the tool, keyed by chapter id.
+
+## Legibility floor
+
+- Figure text is at least 10.5 units in a 340 to 360 wide viewBox; page text at least 11 px.
+- A label never leaves its figure or sits on another label: re-anchor, wrap onto two lines, or move the caption
+  under the figure as page text.
+- Dimmed states stay readable (group opacity 0.74 or more); a ruled-out cause greys its name, not its reason.
+- Before a pull request, open every tab and sheet at 390 px and check for clipped, overlapping and low-contrast
+  text, in light and dark.
+
