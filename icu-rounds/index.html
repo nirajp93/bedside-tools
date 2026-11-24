@@ -354,7 +354,7 @@ function supAdvice(s){
   if (risk.length){
     var names = risk.map(function(k){ return SUPR[k].n.toLowerCase(); }).join(' and ');
     return { act:'give', head: on ? 'Keep it: a PPI or an H2 blocker, low dose' : 'Give a PPI or an H2 blocker, low dose',
-      why: names.charAt(0).toUpperCase() + names.slice(1) + (risk.length > 1 ? ' raise' : ' raises') + ' the risk of clinically important upper GI bleeding; in at-risk patients prophylaxis lowered bleeding (' + P(TR.supicu.sup) + '% against ' + P(TR.supicu.ctl) + '% in SUP-ICU) without changing survival.',
+      why: names.charAt(0).toUpperCase() + names.slice(1) + (risk.length > 1 ? ' raise' : ' raises') + ' the risk of clinically important GI bleeding; in at-risk patients prophylaxis lowered bleeding (' + P(TR.supicu.sup) + '% against ' + P(TR.supicu.ctl) + '% in SUP-ICU) without changing survival.',
       tier:'SCCM/ASHP 2024: conditional, moderate' };
   }
   if (s.neuro) return { act:'give', head: on ? 'Keep it (neurocritical care)' : 'Suggested in neurocritical care: a PPI or an H2 blocker, low dose',
@@ -430,7 +430,7 @@ var CK = [
   guard:'',
   why:'High glucose harms, but chasing a normal glucose causes severe lows and, in NICE-SUGAR, more deaths.',
   more:['Start an insulin protocol for persistent glucose of 180 mg/dL or more; an IV infusion with an explicit protocol is preferred to correction-only insulin.',
-    'The guideline suggests against routinely titrating to a lower target (80 to 139) than the conventional range used in trials (140 to 200). Its 2026 evidence update notes that 110 to 140 may be acceptable in centres where low glucose is documented to be rare.',
+    'The guideline suggests against routinely titrating to a lower target (80 to 139) than the conventional range used in trials (140 to 200). Its 2026 evidence update notes that 110 to 140 may be acceptable in centres where low glucose is documented to be negligible.',
     'Check glucose at least hourly on an IV infusion while glucose is unstable.'],
   tiers:['Start at 180 or more: SCCM 2024 GPS','Against a lower target: SCCM 2024 conditional, moderate','IV infusion: SCCM 2024 conditional, very low','Explicit protocol: SCCM 2024 conditional, moderate','Hourly checks during instability on IV insulin: SCCM 2024 conditional, low'],
   links:['dka'], figs:['glucose'], need:function(f){ return f.gluHigh && !f.plan.glucose; } },
@@ -558,7 +558,7 @@ function renderPresent(){
 var ADMIT = [
 { id:'admit-stabilise', n:'First 15 minutes: stabilise', head:'Airway, breathing, circulation, then monitoring and access',
   items:['Airway: protected? Oxygen or ventilator settings checked; blood gas.','Circulation: MAP and perfusion; two working IVs (a pressor can start peripherally; place a central line when needed); arterial line if on pressors or titrating closely.','Monitors on: continuous ECG, SpO2, blood pressure (cuff cycling or arterial line).','Glucose by fingerstick.'],
-  why:'The handover can wait 5 minutes; an unstable airway or pressure cannot.', link:['pressors','vent'], tiers:[EP] },
+  why:'The handover can wait 5 minutes; an unstable airway or pressure cannot.', link:['pressors','vent'], tiers:['Peripheral pressor start: SSC 2026 conditional, very low','Rest: expert practice'] },
 { id:'admit-orders', n:'First hour: orders', head:'Labs, cultures, imaging, and the drugs that cannot wait',
   items:['Labs: chemistry, CBC, coagulation, lactate, blood gas, type and screen; troponin, liver tests, magnesium and phosphate as relevant.','Suspected infection: blood cultures before antibiotics when that does not delay them; antibiotics as soon as possible, ideally within 1 hour, if shock or sepsis is probable.','Imaging: chest film after any line or tube; other imaging as the problem needs.','Medication reconciliation: hold home drugs that harm now (antihypertensives in shock, metformin, anticoagulants before procedures); continue those that must not stop.','The daily checklist from day one: VTE and stress-ulcer prophylaxis, feeding plan, glucose, head of bed.'],
   why:'Cultures drawn after antibiotics lose yield, and delaying antibiotics in septic shock costs lives; most admission mistakes are a home drug continued or stopped by accident.', link:['abx-empiric'], tiers:['Cultures before antibiotics: SSC 2026 strong, low','Antibiotics within 1 hour if shock or sepsis is probable: SSC 2026 strong, very low','Rest: expert practice'] },
@@ -614,10 +614,10 @@ function figBundle(){
 }
 
 var WAKE = [
-  ['PAUSE','SCREEN','Safe to pause sedation?', 'Skip the pause today if any of: ' + SAT_SCREEN.join('; ') + '.'],
+  ['PAUSE','SCREEN','Safe to pause sedation', 'Skip the pause today if any of: ' + SAT_SCREEN.join('; ') + '.'],
   ['SEDATION','OFF','The sedation pause', 'Stop sedative infusions (keep analgesia for pain). It passes when they open their eyes to voice (ABC) or follow simple commands, or stay off for 4 hours (AHRQ). It fails with ' + SAT_FAIL.join('; ') + ': restart at half the previous dose and try again tomorrow.'],
-  ['TRIAL','SCREEN','Safe to try breathing?', 'Straight after a passed pause: ' + SBT_SCREEN.join('; ') + '.'],
-  ['BREATHE','ON PS','The breathing trial', 'Pressure support 5 to 8 for 30 minutes is suggested for the first trial (ATS/CHEST 2017; AARC 2024, as in the ventilator tool), which has the details and the failure signs.'],
+  ['TRIAL','SCREEN','Safe to try breathing', 'Straight after a passed pause: ' + SBT_SCREEN.join('; ') + '.'],
+  ['BREATHE','ON PS','The breathing trial', 'For the first trial, ATS/CHEST 2017 suggests pressure support of 5 to 8 rather than a T-piece or CPAP; AARC 2024 accepts a trial with or without pressure support. The ventilator tool has the details and the failure signs.'],
   ['EXTUBATE','?','Talk about extubation', 'Passed the trial: can they protect the airway (awake, cough, secretions)? High-risk patients go to NIV or high flow after extubation; see the ventilator tool.']
 ];
 function figWake(){
