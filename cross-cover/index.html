@@ -137,6 +137,20 @@ footer p{margin:0 0 8px}
 /* cause-fix: ruled-out causes stay readable; the name greys, the reason does not fade */
 .cause.out,.cause.less,.cause.unl{opacity:1}
 .cause.less>span,.cause.unl>span{color:var(--muted)}
+.deeper{margin-top:14px;border-top:1px solid var(--line)}
+.deeper>summary{min-height:44px;display:flex;align-items:center;gap:8px;color:var(--accent);font-weight:600;font-size:15px;cursor:pointer;list-style:none}
+.deeper>summary::-webkit-details-marker{display:none}
+.deeper>summary::before{content:"+";font-family:var(--mono);font-size:18px;line-height:1;width:14px;text-align:center}
+.deeper[open]>summary::before{content:"\2212"}
+.deeper>summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.deeper .dpx{border:1px solid var(--line);border-radius:12px;padding:2px 12px;background:var(--card);text-align:left}
+.deeper .dpx>div{padding:10px 0;border-top:1px solid var(--line)}
+.deeper .dpx>div:first-child{border-top:0}
+.deeper .dl{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500;margin:0 0 3px}
+.deeper p{font-size:15px;line-height:1.45;color:var(--ink);margin:0 0 4px}
+.deeper p:last-child{margin-bottom:0}
+[data-deeper]>.deeper{margin-top:0;border-top:0}
+.step .deeper{margin-top:10px}
 </style>
 <script>function dpHtml(rows){ return rows.map(function(r){ return '<div><span class="dl">' + r[0] + '</span>' + r[1] + '</div>'; }).join(''); }</script>
 </head>
@@ -951,6 +965,13 @@ document.querySelector('#learn-shock .lead').insertAdjacentHTML('afterend', plat
 document.querySelector('#learn-delirium .lead').insertAdjacentHTML('afterend', plateBlock('pl-del', false));
 renderPages(); renderFigs(); renderTrials(); renderCase(); filter();
 route();
+})();
+</script>
+<script id="deeper-data">
+/* Go deeper: mechanism, rationale and the common trap for each Learn chapter. Text only; no doses or thresholds beyond the tool's own. */
+(function(){ var H2CARD = false; var D = {"learn-triage": [["Mechanism", "Deterioration usually shows in the vital signs hours before a collapse. The respiratory rate is often the first to change and the most often ignored: it can rise to compensate for acidosis, low oxygen, pain or sepsis before the pressure or the saturation change."], ["Why it matters", "Trends carry more than single values, and a nurse's concern is a signal in its own right. The three gates exist to decide quickly whether this page needs you at the bedside."], ["Common trap", "Treating the number over the phone. A sedative ordered for agitation, unseen, in a patient whose agitation is low oxygen is the classic overnight error."]], "learn-shock": [["Mechanism", "The body defends pressure with a faster heart and, except when the vessels themselves are dilated, tighter vessels, so the pressure falls late. Before it does, flow is already poor: slow thinking, little urine, slow capillary refill, a rising lactate."], ["Why it matters", "Shock is a state of poor flow, not a pressure. Which term has failed (output or resistance) decides whether the patient needs volume, a pressor, an inotrope or relief of an obstruction."], ["Common trap", "Older patients and those on a beta-blocker may not raise their heart rate. And a pressure that improves briefly after a fluid bolus has not been explained: more fluid can harm a failing heart, and helps an obstructed one only briefly, if at all."]], "learn-delirium": [["Mechanism", "Delirium is an acute failure of attention when a vulnerable brain is stressed by something systemic: infection, low oxygen, a metabolic disturbance, a drug or its withdrawal, pain, a full bladder, constipation or lost sleep."], ["Why it matters", "It is a sign with a cause to find, and it carries a higher risk of death and of lasting cognitive decline. The quiet, withdrawn form is commoner than the agitated one and is the one that gets missed."], ["Common trap", "Sedating without examining. Benzodiazepines worsen delirium except in alcohol or benzodiazepine withdrawal, and antipsychotics do not shorten it: they are for agitation that is dangerous."]]};
+  function add(){ Object.keys(D).forEach(function(id){ var c = document.getElementById(id); if (!c || c.querySelector(":scope > .deeper")) return; var host = c.matches(".step") ? (c.querySelector(":scope > div") || c) : c.matches(".card,.lsec,section,.chap") ? c : null; if (!host && c.tagName === "H2" && H2CARD){ var old = document.querySelector("[data-deeper=" + id + "]"); if (old) return; var ref = c.nextElementSibling && c.nextElementSibling.matches(".lead") ? c.nextElementSibling : c; host = document.createElement("div"); host.className = "card"; host.setAttribute("data-deeper", id); ref.parentNode.insertBefore(host, ref.nextSibling); } if (!host){ var n = c.nextElementSibling; while (n && !n.matches(".card")) n = n.nextElementSibling; host = n; } if (!host || host.querySelector(":scope > .deeper")) return; var d = document.createElement("details"); d.className = "deeper"; d.innerHTML = "<summary>Go deeper: mechanism and rationale</summary><div class=\"dpx\">" + D[id].map(function(r){ return "<div><span class=\"dl\">" + r[0] + "</span><p>" + r[1] + "</p></div>"; }).join("") + "</div>"; var last = host.querySelector(":scope > .row"); if (last) host.insertBefore(d, last); else host.appendChild(d); }); }
+  add(); document.addEventListener("click", function(){ setTimeout(add, 0); }); document.addEventListener("input", function(){ setTimeout(add, 0); });
 })();
 </script>
 </body>
