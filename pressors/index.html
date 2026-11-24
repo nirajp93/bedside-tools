@@ -106,6 +106,18 @@ footer p{margin:0 0 8px}
   #p-learn{max-width:720px;margin:0 auto}
 }
 @media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+.deeper{margin-top:14px;border-top:1px solid var(--line)}
+.deeper>summary{min-height:44px;display:flex;align-items:center;gap:8px;color:var(--accent);font-weight:600;font-size:15px;cursor:pointer;list-style:none}
+.deeper>summary::-webkit-details-marker{display:none}
+.deeper>summary::before{content:"+";font-family:var(--mono);font-size:18px;line-height:1;width:14px;text-align:center}
+.deeper[open]>summary::before{content:"\2212"}
+.deeper>summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.deeper .dpx{border:1px solid var(--line);border-radius:12px;padding:2px 12px;background:var(--card);text-align:left}
+.deeper .dpx>div{padding:10px 0;border-top:1px solid var(--line)}
+.deeper .dpx>div:first-child{border-top:0}
+.deeper .dl{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500;margin:0 0 3px}
+.deeper p{font-size:15px;line-height:1.45;color:var(--ink);margin:0 0 4px}
+.deeper p:last-child{margin-bottom:0}
 </style>
 <style id="vk-css">
 .vk-plate{margin-top:10px;border:1px solid var(--line);border-radius:12px;padding:6px;background:var(--card)}
@@ -138,6 +150,18 @@ footer p{margin:0 0 8px}
 .vk-sl input[type=range]{width:100%;min-height:44px;accent-color:var(--accent)}
 .vk-res{margin-top:8px}
 .vk-res .card{margin-bottom:8px}
+.vk-zone{margin:0 0 6px}
+.vk-zs{display:flex;gap:2px;height:8px}
+.vk-zs i{display:block;border-radius:99px;background:var(--line);min-width:4px}
+.vk-zs i.on{background:var(--accent)}
+.vk-zt{font-family:var(--mono);font-size:12px;color:var(--ink);margin:4px 0 0}
+.vk-deep{margin-top:10px;border:1px solid var(--line);border-radius:12px;padding:2px 12px;background:var(--card)}
+.vk-deep:empty{display:none}
+.vk-dr{padding:10px 0;border-top:1px solid var(--line)}
+.vk-dr:first-child{border-top:0}
+.vk-dr .label{margin:0 0 3px}
+.vk-dr p{font-size:15px;margin:0 0 4px}
+.vk-dr p:last-child{margin-bottom:0}
 .vk-flow .vk-dots{display:flex;gap:4px;margin:4px 0 12px}
 .vk-d{flex:1;height:4px;border-radius:99px;background:var(--line)}
 .vk-d.on{background:var(--accent)}
@@ -156,6 +180,9 @@ footer p{margin:0 0 8px}
 .vk-lab{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 6px}
 .vk-head{font-weight:600;margin:0 0 4px}
 .vk-chip:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+/* cause-fix: ruled-out causes stay readable; the name greys, the reason does not fade */
+.cause.out,.cause.less,.cause.unl{opacity:1}
+.cause.less>span,.cause.unl>span{color:var(--muted)}
 </style>
 </head>
 <body>
@@ -651,8 +678,8 @@ function svgOpen(vb, label){ return '<svg viewBox="' + vb + '" role="img" aria-l
 function tx(x, y, t, o){ o = o || {}; return '<text x="' + x + '" y="' + y + '" text-anchor="' + (o.a || 'middle') + '" style="' + (o.sans ? FS : FM) + ';font-size:' + (o.s || 11) + 'px;font-weight:' + (o.w || 400) + ';fill:' + (o.c || 'var(--ink)') + '">' + t + '</text>'; }
 function bx(x, y, w, h, t1, t2, st){
   var fill = st === 'hot' ? 'var(--warnbg)' : st === 'on' ? 'var(--card)' : 'var(--fill)', stroke = st === 'hot' ? 'var(--warn)' : st === 'on' ? 'var(--accent)' : 'var(--line)';
-  return '<g' + (st === 'dim' ? ' opacity=".45"' : '') + '><rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="10" fill="' + fill + '" stroke="' + stroke + '"' + (st === 'hot' || st === 'on' ? ' stroke-width="2"' : '') + '/>' +
-    tx(x + w / 2, y + (t2 ? h / 2 - 2 : h / 2 + 4), t1, {sans: 1, s: 12, w: 600}) + (t2 ? tx(x + w / 2, y + h / 2 + 12, t2, {s: 9.5, c: 'var(--muted)'}) : '') + '</g>';
+  return '<g' + (st === 'dim' ? ' opacity=".74"' : '') + '><rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="10" fill="' + fill + '" stroke="' + stroke + '"' + (st === 'hot' || st === 'on' ? ' stroke-width="2"' : '') + '/>' +
+    tx(x + w / 2, y + (t2 ? h / 2 - 2 : h / 2 + 4), t1, {sans: 1, s: 12, w: 600}) + (t2 ? tx(x + w / 2, y + h / 2 + 12, t2, {s: 10.5, c: 'var(--muted)'}) : '') + '</g>';
 }
 
 var RKEYS = ['a1','b1','b2','d1','v1','at1','pde','no'];
@@ -664,16 +691,16 @@ function receptSVG(k){
   RKEYS.forEach(function(r, n){
     var col = n % 4, row = Math.floor(n / 4), x = 6 + col * 88, y = 8 + row * 62, v = A.rec[r] || 0;
     s += bx(x, y, 84, 54, RECN[r][0] + (v ? ' ' + '+++'.slice(0, v) : ''), '', v ? 'on' : 'dim');
-    s += '<g' + (v ? '' : ' opacity=".45"') + '>' + tx(x + 42, y + 46, RECN[r][1].length > 16 ? RECN[r][1].slice(0, 15) + '…' : RECN[r][1], {s: 8.5, c: 'var(--muted)'}) + '</g>';
+    s += '<g' + (v ? '' : ' opacity=".74"') + '>' + tx(x + 42, y + 46, RECN[r][1], {sans: 1, s: 10.5, c: 'var(--muted)'}) + '</g>';
   });
-  s += tx(6, 150, 'WHAT IT DOES', {a: 'start', s: 10, c: 'var(--muted)'});
+  s += tx(6, 150, 'WHAT IT DOES', {a: 'start', s: 10.5, c: 'var(--muted)'});
   EFFN.forEach(function(e, n){
     var x = 6 + n * 88, v = A.eff[n], up = v.indexOf('↑') === 0, dn = v.indexOf('↓') === 0, none = v.indexOf('not') === 0;
     s += '<rect x="' + x + '" y="160" width="84" height="64" rx="10" fill="' + (dn ? 'var(--warnbg)' : 'var(--fill)') + '" stroke="' + (dn ? 'var(--warn)' : up ? 'var(--accent)' : 'var(--line)') + '"/>';
     s += tx(x + 42, 180, e, {sans: 1, s: 11.5, w: 600});
-    s += none ? tx(x + 42, 204, 'not listed', {s: 9.5, c: 'var(--muted)'}) : tx(x + 42, 208, v.replace(' or ', ' / '), {s: 16, w: 600, c: dn ? 'var(--warn)' : 'var(--ink)'});
+    s += none ? tx(x + 42, 204, 'not listed', {s: 10.5, c: 'var(--muted)'}) : tx(x + 42, 208, v.replace(' or ', ' / '), {s: 16, w: 600, c: dn ? 'var(--warn)' : 'var(--ink)'});
   });
-  s += tx(180, 246, '+ to +++: strength of effect on that receptor', {s: 9.5, c: 'var(--muted)'});
+  s += tx(180, 246, '+ to +++: strength of effect on that receptor', {s: 10.5, c: 'var(--muted)'});
   return s + '</svg>';
 }
 
@@ -689,7 +716,7 @@ function mapSVG(k){
   var M = MAPD[k], s = svgOpen('0 0 360 150', 'Pressure equals output times resistance: ' + M.n);
   function b(x, id, t){ return bx(x, 34, 100, 50, t, M.note[id] || '', M.hot.indexOf(id) >= 0 ? 'hot' : 'on'); }
   s += b(4, 'fill', 'Filling') + tx(117, 64, '→', {s: 16}) + b(130, 'out', 'Output') + tx(243, 64, '×', {s: 16}) + b(256, 'res', 'Resistance');
-  s += tx(180, 20, 'what fails is outlined', {s: 9.5, c: 'var(--muted)'});
+  s += tx(180, 20, 'what fails is outlined', {s: 10.5, c: 'var(--muted)'});
   s += '<rect x="110" y="104" width="140" height="38" rx="10" fill="var(--fill)" stroke="var(--line)"/>' + tx(180, 127, 'Mean pressure ↓', {sans: 1, s: 12.5, w: 600});
   s += '<path d="M180 86V102" stroke="var(--muted)" stroke-width="2" fill="none"/>';
   return s + '</svg>';
@@ -706,7 +733,7 @@ function ladderSVG(k){
   var rows = [['Norepinephrine','first drug'],['+ Vasopressin','0.03 units/min'],['+ Epinephrine','still below target'],['+ Dobutamine','pressure fine, heart failing']];
   rows.forEach(function(r, n){ s += bx(6, 176 - n * 56, 160 + n * 22, 46, r[0], r[1], L.st[n]); });
   s += bx(246, 64, 108, 102, 'Hydrocortisone', '200 mg a day', L.at >= 2 ? 'on' : 'dim');
-  s += '<g' + (L.at >= 2 ? '' : ' opacity=".45"') + '>' + tx(300, 150, 'if the need persists', {s: 9, c: 'var(--muted)'}) + '</g>';
+  s += '<g' + (L.at >= 2 ? '' : ' opacity=".74"') + '>' + tx(354, 150, 'if the need persists', {a: 'end', s: 10.5, c: 'var(--muted)'}) + '</g>';
   return s + '</svg>';
 }
 
@@ -904,8 +931,8 @@ var VK = (function(){
   function mark(box, j){ var ok = false; box.querySelectorAll('.vk-opt').forEach(function(b, i){ b.disabled = true; if (b.getAttribute('data-ok') === '1') b.classList.add('right'); else if (i === j) b.classList.add('wrong'); if (i === j) ok = b.getAttribute('data-ok') === '1'; }); return ok; }
   function answer(key, j){ var box = document.querySelector('[data-vk-pred="' + key + '"]'), P = C.preds[key]; if (!box || box.getAttribute('data-done')) return; box.setAttribute('data-done', '1'); var ok = mark(box, j), a = box.querySelector('.vk-ans');
     a.innerHTML = '<p><b>' + (ok ? 'Right.' : 'Not quite.') + '</b> ' + P.why() + '</p>' + (typeof P.fig === 'function' ? P.fig() : P.fig ? '<button class="chip vk-chip" type="button" data-fig="' + P.fig[0] + '" data-state="' + (P.fig[1] || '') + '">' + VK_FIC + q(P.fig[2]) + '</button>' : ''); a.hidden = false; }
-  function slHtml(id){ var S = C.sliders[id]; return '<div class="vk-sl" data-vk-sl="' + id + '">' + S.ranges.map(function(r){ return '<label for="vk-' + id + '-' + r.key + '">' + r.label + ' <b data-vk-v="' + r.key + '"></b></label><input type="range" id="vk-' + id + '-' + r.key + '" data-vk-k="' + r.key + '" min="' + r.min + '" max="' + r.max + '" step="' + r.step + '" value="' + r.value + '">'; }).join('') + '<div class="vk-res" aria-live="polite"></div>' + (S.note ? '<p class="vk-src">' + S.note + '</p>' : '') + '</div>'; }
-  function slRun(w){ var S = C.sliders[w.getAttribute('data-vk-sl')], v = {}; S.ranges.forEach(function(r){ var el = w.querySelector('[data-vk-k="' + r.key + '"]'), x = +el.value, tx = (r.fmt ? r.fmt(x) : x) + (r.unit ? ' ' + r.unit : ''); v[r.key] = x; w.querySelector('[data-vk-v="' + r.key + '"]').textContent = tx; el.setAttribute('aria-valuetext', tx); }); w.querySelector('.vk-res').innerHTML = S.run(v); }
+  function slHtml(id){ var S = C.sliders[id]; return '<div class="vk-sl" data-vk-sl="' + id + '">' + S.ranges.map(function(r){ return '<label for="vk-' + id + '-' + r.key + '">' + r.label + ' <b data-vk-v="' + r.key + '"></b></label><input type="range" id="vk-' + id + '-' + r.key + '" data-vk-k="' + r.key + '" min="' + r.min + '" max="' + r.max + '" step="' + r.step + '" value="' + r.value + '">' + (r.zones ? '<div class="vk-zone" data-vk-z="' + r.key + '"></div>' : ''); }).join('') + '<div class="vk-res" aria-live="polite"></div><div class="vk-deep"></div>' + (S.note ? '<p class="vk-src">' + S.note + '</p>' : '') + '</div>'; }
+  function slRun(w){ var S = C.sliders[w.getAttribute('data-vk-sl')], v = {}; S.ranges.forEach(function(r){ var el = w.querySelector('[data-vk-k="' + r.key + '"]'), x = +el.value, tx = (r.fmt ? r.fmt(x) : x) + (r.unit ? ' ' + r.unit : ''); v[r.key] = x; w.querySelector('[data-vk-v="' + r.key + '"]').textContent = tx; el.setAttribute('aria-valuetext', tx); }); w.querySelector('.vk-res').innerHTML = S.run(v); S.ranges.forEach(function(r){ if (!r.zones) return; var Z = typeof r.zones === 'function' ? r.zones(v) : r.zones, x = v[r.key], on = Z.length - 1; Z.forEach(function(z, k){ if (x >= z[0] && x < z[1] && on === Z.length - 1) on = k; }); w.querySelector('[data-vk-z="' + r.key + '"]').innerHTML = '<div class="vk-zs" aria-hidden="true">' + Z.map(function(z, k){ return '<i' + (k === on ? ' class="on"' : '') + ' style="flex:' + Math.max(0.01, Math.min(z[1], r.max) - Math.max(z[0], r.min)) + '"></i>'; }).join('') + '</div><p class="vk-zt">' + Z[on][2] + '</p>'; }); w.querySelector('.vk-deep').innerHTML = S.deep ? S.deep(v).map(function(d){ return '<div class="vk-dr"><p class="label">' + d[0] + '</p>' + d[1] + '</div>'; }).join('') : ''; }
   function flowHtml(id){ var F = C.flows[id]; return '<div class="vk-flow" data-vk-flow="' + id + '"><p class="head vk-head">' + F.t + '</p><div class="vk-dots">' + F.steps.map(function(_, k){ return '<i class="vk-d' + (k ? '' : ' on') + '"></i>'; }).join('') + '</div><div class="vk-fb"></div></div>'; }
   function step(id, k){ var F = C.flows[id], S = F.steps[k], w = document.querySelector('[data-vk-flow="' + id + '"]'); if (!w || !S) return; FS[id] = k;
     w.querySelectorAll('.vk-d').forEach(function(d, j){ d.classList.toggle('on', j <= k); });
@@ -970,9 +997,20 @@ var VK = (function(){
       units: {ranges: [{key: 'wt', label: 'Weight', min: 40, max: 150, step: 1, value: 80, unit: 'kg'},
                        {key: 'd', label: 'Norepinephrine', min: 0.02, max: 1, step: 0.01, value: 0.1, unit: 'mcg/kg/min', fmt: function(x){ return x.toFixed(2); }}],
         note: 'Same conversion as the calculator: mcg/min = mcg/kg/min × weight. ' + AG.ne.dose[1] + ' Label start: 8 to 12 mcg/min.',
+        deep: function(v){ return [
+          ['What the drug is doing', '<p>' + AG.ne.n + ' acts mostly on ' + RECN.a1[0] + ' receptors: arteries tighten, so resistance and pressure rise, and veins tighten, pushing blood back to the heart. A smaller ' + RECN.b1[0] + ' effect keeps output from falling against the higher resistance.</p>'],
+          ['Why two units', '<p>Guidelines and trials write doses per kilogram; the label and many pumps run in mcg/min. The same infusion reads very differently in the two: at ' + v.wt + ' kg, ' + v.d.toFixed(2) + ' and ' + (Math.round(v.d * v.wt * 10) / 10) + ' are one dose. Say the unit every time a dose is handed over.</p>'],
+          ['When the dose keeps rising', '<p>' + LADDER.s2.line + '</p><p>High doses buy pressure with tighter and tighter vessels: fingers, gut and skin pay for it. A climbing dose is a prompt to add a drug with a different mechanism and to look again for a cause a drug will not fix.</p>']]; },
         run: function(v){ return '<p><b>' + v.d.toFixed(2) + ' mcg/kg/min = ' + (Math.round(v.d * v.wt * 10) / 10) + ' mcg/min</b> at ' + v.wt + ' kg.</p>'; }}
     }
   });
+})();
+</script>
+<script id="deeper-data">
+/* Go deeper: mechanism, rationale and the common trap for each Learn chapter. Text only; no doses or thresholds beyond the tool's own. */
+(function(){ var D = {"learn-map": [["Mechanism", "Mean arterial pressure is what drives blood through the organs, and it is the product of how much the heart pumps and how tight the small arteries are. The body defends the pressure first. When output falls, baroreceptors tighten the vessels: cold, clamped limbs and a narrow pulse pressure. When the vessels dilate, the heart speeds up and output rises: warm limbs and a low diastolic (in neurogenic shock the heart cannot speed up: warm with a slow pulse)."], ["Why it matters", "The compensation tells you which term broke. Cold and narrow means output is the problem (cardiogenic, hypovolemic, obstructive); warm and wide means resistance is (septic, anaphylactic, neurogenic). The drug should replace the broken term, not flog the one already working at its limit."], ["Common trap", "A normal pressure is not normal flow. Compensated shock holds the number by vasoconstriction while lactate rises and urine falls, and a vasopressor can restore the number while flow to gut, kidney and skin gets worse. Judge the result by perfusion."]], "learn-recept": [["Mechanism", "Alpha-1 receptors release calcium inside vascular smooth muscle, which contracts. Beta-1 receptors raise cyclic AMP in heart muscle: stronger and faster beats, paid for in oxygen demand and arrhythmia. Beta-2 receptors raise cyclic AMP in vascular smooth muscle, which relaxes. Vasopressin and angiotensin II constrict through their own receptors, with no adrenergic receptor involved. Milrinone raises cyclic AMP by blocking the enzyme that breaks it down, so it needs no receptor at all."], ["Why it matters", "The receptor mix predicts both the benefit and the harm. A pure alpha agonist raises pressure but can lower output, through the higher afterload and a reflex slowing of the heart. Beta-heavy drugs raise output and provoke tachyarrhythmia. Dose shifts the mix: epinephrine leans beta at low doses and alpha at high doses."], ["Common trap", "Adrenergic receptors are thought to respond less well in severe acidosis and after long exposure to high doses. That is one reason a non-adrenergic drug can work when catecholamine doses keep climbing, and why a patient on a beta-blocker may respond to milrinone when dobutamine does little."]], "learn-ladder": [["Mechanism", "Septic vasodilation has several causes at once: excess nitric oxide, potassium channels in vascular smooth muscle held open so the cells cannot contract, and a relative lack of vasopressin once the pituitary store is spent. Sometimes cortisol is lacking too. Each rung of the ladder answers a different one."], ["Why it matters", "Catecholamine harm rises with dose: arrhythmia, ischemic fingers and gut, injury to heart muscle. Adding a second mechanism before the first drug runs high lets the norepinephrine dose stay lower for the same pressure."], ["Common trap", "Climbing the ladder without asking again why the pressure is low. Look for an uncontrolled source, too little volume, a failing heart (sepsis depresses it), adrenal insufficiency, tamponade or tension pneumothorax, and air trapping on the ventilator."]], "learn-vaso": [["Mechanism", "Early in shock the pituitary releases a surge of vasopressin. Over the next day or two the level falls, and in a good share of patients it becomes too low for the pressure. In septic shock vasopressin is usually run at a fixed low dose (the label allows titration), on the reasoning that it replaces a missing hormone. Its effect is thought to be better preserved in acidosis, when adrenergic drugs work less well."], ["Why it matters", "Above replacement doses vasopressin constricts the coronary, gut and skin circulations with no rise in the heart's contractility to match. Holding it at a fixed dose keeps the benefit (a lower catecholamine dose) without that cost."], ["Common trap", "It raises afterload and gives the heart nothing in return. A weak ventricle can lose output when it is added: recheck perfusion, not only the pressure, afterwards."]], "learn-dopa": [["Mechanism", "Dopamine acts on dopamine receptors at low doses, beta-1 at middle doses and alpha-1 at high doses, but the ranges overlap so widely between patients that the dose does not predict the effect. Part of its action is indirect, through releasing the norepinephrine stored in nerve endings, so it weakens when those stores are depleted."], ["Why it matters", "At the doses needed to hold a pressure it brings more beta-1 stimulation than norepinephrine does, and so more tachyarrhythmia for the same pressure. That, not weaker pressor effect, is what cost it first place."], ["Common trap", "Low-dose dopamine raises urine output by making the kidney excrete sodium. That is a diuretic effect, not protection: it does not prevent kidney injury or the need for dialysis."]], "learn-mil": [["Mechanism", "Both drugs work by raising cyclic AMP: dobutamine by stimulating the beta-1 receptor, milrinone by blocking the breakdown of cyclic AMP. In heart muscle that strengthens contraction and speeds relaxation. In vascular smooth muscle the same signal relaxes the vessel, so resistance and filling pressures fall as output rises."], ["Why it matters", "Pressure is output times resistance. If the ventricle cannot raise its output by as much as the resistance falls, the pressure drops. That is why an inodilator is paired with a vasopressor when the pressure is marginal. Milrinone is cleared by the kidney and lasts for hours, so its hypotension lingers and it accumulates in kidney failure; dobutamine wears off in minutes."], ["Common trap", "Reaching for an inodilator because the pressure is low. These drugs are for low output with an adequate pressure; in a hypotensive patient they need a vasopressor alongside or they make the pressure worse."]], "learn-periph": [["Mechanism", "The injury from a leaked vasopressor is ischemic. The drug pools in the tissue and clamps the local vessels through alpha-1 receptors. Risk rises with small distal veins, long infusions and concentrated solutions. Phentolamine blocks alpha receptors, which is why infiltrating it reverses the constriction."], ["Why it matters", "Time spent hypotensive injures organs, and placing a central line takes time. A short infusion through a good vein at or above the elbow, with the site checked often, carries a low risk of tissue injury, which makes waiting the worse choice."], ["Common trap", "Hand, wrist and foot veins; a cannula that will not draw back blood; and a site hidden under blankets where swelling and blanching go unseen."]]};
+  function add(){ Object.keys(D).forEach(function(id){ var c = document.getElementById(id); if (!c || c.querySelector(":scope > .deeper")) return; var host = c.matches(".card,.lsec,section,.chap") ? c : null; if (!host){ var n = c.nextElementSibling; while (n && !n.matches(".card")) n = n.nextElementSibling; host = n; } if (!host || host.querySelector(":scope > .deeper")) return; var d = document.createElement("details"); d.className = "deeper"; d.innerHTML = "<summary>Go deeper: mechanism and rationale</summary><div class=\"dpx\">" + D[id].map(function(r){ return "<div><span class=\"dl\">" + r[0] + "</span><p>" + r[1] + "</p></div>"; }).join("") + "</div>"; var last = host.querySelector(":scope > .row"); if (last) host.insertBefore(d, last); else host.appendChild(d); }); }
+  add(); document.addEventListener("click", function(){ setTimeout(add, 0); }); document.addEventListener("input", function(){ setTimeout(add, 0); });
 })();
 </script>
 </body>

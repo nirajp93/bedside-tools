@@ -106,6 +106,18 @@ footer p{margin:0 0 8px}
 .trial .k{font-family:var(--mono);font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);display:block}
 @media (max-width:420px){.grid{grid-template-columns:1fr 1fr}.nums{grid-template-columns:1fr 1fr}}
 @media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+.deeper{margin-top:14px;border-top:1px solid var(--line)}
+.deeper>summary{min-height:44px;display:flex;align-items:center;gap:8px;color:var(--accent);font-weight:600;font-size:15px;cursor:pointer;list-style:none}
+.deeper>summary::-webkit-details-marker{display:none}
+.deeper>summary::before{content:"+";font-family:var(--mono);font-size:18px;line-height:1;width:14px;text-align:center}
+.deeper[open]>summary::before{content:"\2212"}
+.deeper>summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.deeper .dpx{border:1px solid var(--line);border-radius:12px;padding:2px 12px;background:var(--card);text-align:left}
+.deeper .dpx>div{padding:10px 0;border-top:1px solid var(--line)}
+.deeper .dpx>div:first-child{border-top:0}
+.deeper .dl{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500;margin:0 0 3px}
+.deeper p{font-size:15px;line-height:1.45;color:var(--ink);margin:0 0 4px}
+.deeper p:last-child{margin-bottom:0}
 </style>
 <style id="vk-css">
 .vk-plate{margin-top:10px;border:1px solid var(--line);border-radius:12px;padding:6px;background:var(--card)}
@@ -138,6 +150,18 @@ footer p{margin:0 0 8px}
 .vk-sl input[type=range]{width:100%;min-height:44px;accent-color:var(--accent)}
 .vk-res{margin-top:8px}
 .vk-res .card{margin-bottom:8px}
+.vk-zone{margin:0 0 6px}
+.vk-zs{display:flex;gap:2px;height:8px}
+.vk-zs i{display:block;border-radius:99px;background:var(--line);min-width:4px}
+.vk-zs i.on{background:var(--accent)}
+.vk-zt{font-family:var(--mono);font-size:12px;color:var(--ink);margin:4px 0 0}
+.vk-deep{margin-top:10px;border:1px solid var(--line);border-radius:12px;padding:2px 12px;background:var(--card)}
+.vk-deep:empty{display:none}
+.vk-dr{padding:10px 0;border-top:1px solid var(--line)}
+.vk-dr:first-child{border-top:0}
+.vk-dr .label{margin:0 0 3px}
+.vk-dr p{font-size:15px;margin:0 0 4px}
+.vk-dr p:last-child{margin-bottom:0}
 .vk-flow .vk-dots{display:flex;gap:4px;margin:4px 0 12px}
 .vk-d{flex:1;height:4px;border-radius:99px;background:var(--line)}
 .vk-d.on{background:var(--accent)}
@@ -149,8 +173,11 @@ footer p{margin:0 0 8px}
 .vk-btn{min-height:44px;border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);border-radius:10px;padding:8px 14px;font:inherit;font-weight:600;cursor:pointer;margin-top:10px}
 .vk-btn.ghost{background:var(--card);color:var(--accent)}
 .vk-hot:focus-visible,.vk-opt:focus-visible,.vk-cell:focus-visible,.vk-btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-@media (max-width:479px){.vk-hot{width:20px;height:20px;font-size:11px}}
+@media (max-width:479px){.vk-hot{width:18px;height:18px;font-size:11px;border-width:1.5px}}
 @media (min-width:900px){.vk-grid{grid-template-columns:repeat(3,1fr)}.vk-hot{width:30px;height:30px}}
+/* cause-fix: ruled-out causes stay readable; the name greys, the reason does not fade */
+.cause.out,.cause.less,.cause.unl{opacity:1}
+.cause.less>span,.cause.unl>span{color:var(--muted)}
 </style>
 </head>
 <body>
@@ -900,8 +927,8 @@ var VK = (function(){
   function mark(box, j){ var ok = false; box.querySelectorAll('.vk-opt').forEach(function(b, i){ b.disabled = true; if (b.getAttribute('data-ok') === '1') b.classList.add('right'); else if (i === j) b.classList.add('wrong'); if (i === j) ok = b.getAttribute('data-ok') === '1'; }); return ok; }
   function answer(key, j){ var box = document.querySelector('[data-vk-pred="' + key + '"]'), P = C.preds[key]; if (!box || box.getAttribute('data-done')) return; box.setAttribute('data-done', '1'); var ok = mark(box, j), a = box.querySelector('.vk-ans');
     a.innerHTML = '<p><b>' + (ok ? 'Right.' : 'Not quite.') + '</b> ' + P.why() + '</p>' + (P.fig ? '<button class="chip" type="button" data-fig="' + P.fig[0] + '" data-state="' + (P.fig[1] || '') + '">' + VK_FIC + q(P.fig[2]) + '</button>' : ''); a.hidden = false; }
-  function slHtml(id){ var S = C.sliders[id]; return '<div class="vk-sl" data-vk-sl="' + id + '">' + S.ranges.map(function(r){ return '<label for="vk-' + id + '-' + r.key + '">' + r.label + ' <b data-vk-v="' + r.key + '"></b></label><input type="range" id="vk-' + id + '-' + r.key + '" data-vk-k="' + r.key + '" min="' + r.min + '" max="' + r.max + '" step="' + r.step + '" value="' + r.value + '">'; }).join('') + '<div class="vk-res" aria-live="polite"></div>' + (S.note ? '<p class="vk-src">' + S.note + '</p>' : '') + '</div>'; }
-  function slRun(w){ var S = C.sliders[w.getAttribute('data-vk-sl')], v = {}; S.ranges.forEach(function(r){ var x = +w.querySelector('[data-vk-k="' + r.key + '"]').value; v[r.key] = x; w.querySelector('[data-vk-v="' + r.key + '"]').textContent = (r.fmt ? r.fmt(x) : x) + (r.unit ? ' ' + r.unit : ''); }); w.querySelector('.vk-res').innerHTML = S.run(v); }
+  function slHtml(id){ var S = C.sliders[id]; return '<div class="vk-sl" data-vk-sl="' + id + '">' + S.ranges.map(function(r){ return '<label for="vk-' + id + '-' + r.key + '">' + r.label + ' <b data-vk-v="' + r.key + '"></b></label><input type="range" id="vk-' + id + '-' + r.key + '" data-vk-k="' + r.key + '" min="' + r.min + '" max="' + r.max + '" step="' + r.step + '" value="' + r.value + '">' + (r.zones ? '<div class="vk-zone" data-vk-z="' + r.key + '"></div>' : ''); }).join('') + '<div class="vk-res" aria-live="polite"></div><div class="vk-deep"></div>' + (S.note ? '<p class="vk-src">' + S.note + '</p>' : '') + '</div>'; }
+  function slRun(w){ var S = C.sliders[w.getAttribute('data-vk-sl')], v = {}; S.ranges.forEach(function(r){ var x = +w.querySelector('[data-vk-k="' + r.key + '"]').value; v[r.key] = x; w.querySelector('[data-vk-v="' + r.key + '"]').textContent = (r.fmt ? r.fmt(x) : x) + (r.unit ? ' ' + r.unit : ''); }); w.querySelector('.vk-res').innerHTML = S.run(v); S.ranges.forEach(function(r){ if (!r.zones) return; var Z = typeof r.zones === 'function' ? r.zones(v) : r.zones, x = v[r.key], on = Z.length - 1; Z.forEach(function(z, k){ if (x >= z[0] && x < z[1] && on === Z.length - 1) on = k; }); w.querySelector('[data-vk-z="' + r.key + '"]').innerHTML = '<div class="vk-zs" aria-hidden="true">' + Z.map(function(z, k){ return '<i' + (k === on ? ' class="on"' : '') + ' style="flex:' + Math.max(0.01, Math.min(z[1], r.max) - Math.max(z[0], r.min)) + '"></i>'; }).join('') + '</div><p class="vk-zt">' + Z[on][2] + '</p>'; }); w.querySelector('.vk-deep').innerHTML = S.deep ? S.deep(v).map(function(d){ return '<div class="vk-dr"><p class="label">' + d[0] + '</p>' + d[1] + '</div>'; }).join('') : ''; }
   function flowHtml(id){ var F = C.flows[id]; return '<div class="vk-flow" data-vk-flow="' + id + '"><p class="head">' + F.t + '</p><div class="vk-dots">' + F.steps.map(function(_, k){ return '<i class="vk-d' + (k ? '' : ' on') + '"></i>'; }).join('') + '</div><div class="vk-fb"></div></div>'; }
   function step(id, k){ var F = C.flows[id], S = F.steps[k], w = document.querySelector('[data-vk-flow="' + id + '"]'); if (!w || !S) return; FS[id] = k;
     w.querySelectorAll('.vk-d').forEach(function(d, j){ d.classList.toggle('on', j <= k); });
@@ -959,7 +986,16 @@ VK.init({
   'learn-urine': {q: 'Normal-gap acidosis; urine Na 40, K 30, Cl 50. Kidney or gut?', a: function(){ var u = urineAG({una: 40, uk: 30, ucl: 50}); return [['Kidney: ammonium excretion is low', u >= 0], ['Gut: the kidney is responding', u < 0]]; }, why: function(){ return 'Urine anion gap 40 + 30 − 50 = +' + urineAG({una: 40, uk: 30, ucl: 50}) + ': zero or positive, so ammonium excretion is low, as in distal RTA. Diarrhea gives a negative gap.'; }, fig: ['urine', 'impaired', 'Ammonium and the urine anion gap']}
  },
  sliders: {
-  comp: {ranges: [{key: 'p', label: 'PaCO2 with HCO3 fixed at 12', min: 15, max: 45, step: 1, value: 26, unit: 'mmHg'}], note: 'Runs this tool\'s compensation check for a metabolic acidosis (Winters). If the pH reads 7.40 or above with no high gap, a chronic respiratory alkalosis fits these numbers too.',
+  comp: {ranges: [{key: 'p', label: 'PaCO2 with HCO3 fixed at 12', min: 15, max: 45, step: 1, value: 26, unit: 'mmHg', zones: function(){ var E = compMet('acid', 12); return [[15, E.lo, 'Below ' + E.lo + ': lower than the acidosis explains'], [E.lo, E.hi + 0.5, E.lo + '–' + E.hi + ': what the lungs should reach'], [E.hi + 0.5, 46, 'Above ' + E.hi + ': not ventilating enough']]; }}], note: 'Runs this tool\'s compensation check for a metabolic acidosis (Winters). If the pH reads 7.40 or above with no high gap, a chronic respiratory alkalosis fits these numbers too.',
+   deep: function(v){ var f = metFit('acid', v.p, 12), ph = phFrom(v.p, 12);
+    var now = f.v === 'ok' ? '<p>The acid load lowers the pH. Chemoreceptors in the carotid bodies and the brainstem sense it and drive deeper, faster breathing (Kussmaul breathing). Blowing off CO2 pulls the pH back toward normal, but never all the way.</p>'
+      : f.v === 'plusRacid' ? '<p>The lungs are not clearing as much CO2 as this acidosis demands. Think of fatigue, sedatives or opioids, airway obstruction, or neuromuscular weakness.</p><p>A PaCO2 that would look normal on its own is too high here.</p>'
+      : '<p>Something besides the acidosis is driving the breathing: salicylates, sepsis, pain or anxiety, liver failure, pulmonary embolism, pregnancy.</p>';
+    var why = '<p>Compensation moves the pH toward normal and never past it. So a PaCO2 outside ' + f.E.lo + '–' + f.E.hi + ' is a second primary disorder with its own cause to find, not strong or weak compensation.</p>';
+    var act = f.v === 'plusRacid' ? '<p>A patient with a metabolic acidosis whose PaCO2 is climbing is tiring. Plan ventilatory support before the pH collapses, and if you intubate, match the high minute ventilation they were generating.</p>'
+      : f.v === 'plusRalk' ? '<p>Look for the second driver before attributing everything to the acidosis. Salicylate poisoning is the classic mixed picture: a high-gap acidosis with a respiratory alkalosis.</p>'
+      : '<p>One disorder so far. Go on to the gap and the delta check to see whether a second metabolic process is hiding.</p>';
+    return [['What is happening', now], ['Why the check works', why + (ph >= 7.4 ? '<p>pH ' + ph.toFixed(2) + ' with an HCO3 of 12: in a metabolic acidosis a normal or high pH means a second, opposing disorder; compensation alone never gets it there.</p>' : '')], ['At the bedside', act]]; },
    run: function(v){ var f = metFit('acid', v.p, 12); return '<div class="card"><p class="label">Expected ' + f.E.lo + '–' + f.E.hi + '</p><p class="head">' + (f.v === 'ok' ? 'Compensated as expected' : f.v === 'plusRacid' ? 'Too high: a respiratory acidosis too' : 'Too low: a respiratory alkalosis too') + '</p><p class="sub">pH would be about ' + phFrom(v.p, 12).toFixed(2) + '.</p></div>'; }}
  },
  flows: {
@@ -975,6 +1011,13 @@ VK.init({
   hag: {items: NW.hag.causes.map(function(c){ return [c[1], function(){ var r = NW.hag.results.filter(function(x){ return x[3][c[0]] && x[3][c[0]][0] === 'fav'; }); return (r.length ? r.map(function(x){ return '<p><b>' + x[1] + '</b>: ' + x[3][c[0]][1] + '</p>'; }).join('') : '<p>No single first-line result points to it; see the narrowing workup.</p>') + (c[0] === 'meth' || c[0] === 'eg' ? '<p>Once the alcohol is metabolised the osmolal gap closes as the anion gap opens, so a normal osmolal gap does not exclude it late.</p>' : ''); }]; })}
  }
 });
+</script>
+<script id="deeper-data">
+/* Go deeper: mechanism, rationale and the common trap for each Learn chapter. Text only; no doses or thresholds beyond the tool's own. */
+(function(){ var D = {"learn-ratio": [["Mechanism", "Carbon dioxide and water form carbonic acid, which splits into hydrogen ion and bicarbonate. The pH depends on the ratio of bicarbonate to PaCO2, not on either alone. This buffer is powerful because it is open at both ends: the lungs can remove carbon dioxide in large amounts and the kidneys can make new bicarbonate."], ["Why it matters", "The defences work at three speeds: buffers in seconds, the lungs in minutes to hours, the kidneys over days. That is why a respiratory disorder has an acute and a chronic expected value (the kidney needs days to respond) while a metabolic disorder has one (the lungs answer quickly)."], ["Common trap", "A normal pH is not a normal acid-base state. Two opposing disorders can cancel each other. Look at the PaCO2 and the bicarbonate even when the pH is in range."]], "learn-comp": [["Mechanism", "Chemoreceptors sense the pH and change ventilation in response to a metabolic disorder. The kidney senses the PaCO2 and changes how much acid it excretes as ammonium and how much bicarbonate it reclaims. Each response has a characteristic size, measured in patients known to have a single disorder."], ["Why it matters", "Because the size is predictable, a value outside the expected range identifies a second primary disorder. Compensation for a metabolic alkalosis has been the least predictable in older series; the usual explanation is that breathing less lowers the oxygen, which limits how far the PaCO2 can rise."], ["Common trap", "Calling a second disorder 'overcompensation'. Compensation moves the pH toward normal and does not carry it past. If the pH is on the other side of normal, something else is driving it."]], "learn-gap": [["Mechanism", "The gap is the difference between the anions and cations the laboratory does not measure, and normally most of it is the negative charge on albumin. When an acid is added, its hydrogen ion consumes bicarbonate and its anion stays behind. If that anion is chloride the gap does not change. If it is lactate, a ketoacid, the metabolite of a toxic alcohol or the retained anions of kidney failure, the gap rises."], ["Why it matters", "Because albumin makes up most of the normal gap, a low albumin lowers the baseline and can hide a high gap completely. That is why the tool adjusts the gap for albumin before judging it."], ["Common trap", "A normal unadjusted gap in a sick patient with a low albumin does not exclude lactic acidosis. A very low or negative gap has its own short list: lithium, a myeloma protein, bromide, or a laboratory error."]], "learn-delta": [["Mechanism", "In a pure high-gap acidosis each added anion has replaced roughly one bicarbonate, so the rise in the gap is about equal to the fall in bicarbonate. If bicarbonate fell further than the gap rose, something else lowered it too: a normal-gap acidosis. If it fell less, something is adding bicarbonate: a metabolic alkalosis."], ["Why it matters", "This is how a hidden third disorder is found. The classic case is ketoacidosis with vomiting: the vomiting adds bicarbonate, the pH looks less alarming than the gap, and only the comparison reveals both."], ["Common trap", "The exchange is not exactly one for one. Some acid is buffered outside the blood and some anions are lost in the urine, and the proportion differs between lactic acidosis and ketoacidosis. Read the result as a range, the way the tool does, not as a single cutoff."]], "learn-urine": [["Mechanism", "The kidney gets rid of the day's acid as ammonium, which the laboratory does not measure and which leaves the body with chloride. When ammonium excretion is high, urine chloride exceeds urine sodium plus potassium and the urine gap is negative. A positive gap during an acidosis means little ammonium is being made."], ["Why it matters", "It separates the two main causes of a normal-gap acidosis. With bicarbonate lost from the gut the kidney responds properly and the gap is negative. With renal tubular acidosis the kidney is the problem and the gap is positive."], ["Common trap", "The test fails when little sodium reaches the distal tubule (volume depletion), because acid excretion there depends on sodium delivery. It also fails when the urine carries other unmeasured anions, such as ketones. In those settings the urine osmolal gap is the better estimate of ammonium."]]};
+  function add(){ Object.keys(D).forEach(function(id){ var c = document.getElementById(id); if (!c || c.querySelector(":scope > .deeper")) return; var host = c.matches(".card,.lsec,section,.chap") ? c : null; if (!host){ var n = c.nextElementSibling; while (n && !n.matches(".card")) n = n.nextElementSibling; host = n; } if (!host || host.querySelector(":scope > .deeper")) return; var d = document.createElement("details"); d.className = "deeper"; d.innerHTML = "<summary>Go deeper: mechanism and rationale</summary><div class=\"dpx\">" + D[id].map(function(r){ return "<div><span class=\"dl\">" + r[0] + "</span><p>" + r[1] + "</p></div>"; }).join("") + "</div>"; var last = host.querySelector(":scope > .row"); if (last) host.insertBefore(d, last); else host.appendChild(d); }); }
+  add(); document.addEventListener("click", function(){ setTimeout(add, 0); }); document.addEventListener("input", function(){ setTimeout(add, 0); });
+})();
 </script>
 </body>
 </html>

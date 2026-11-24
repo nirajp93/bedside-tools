@@ -117,6 +117,21 @@ footer p{margin:0 0 8px}
   #p-learn{max-width:720px;margin:0 auto}
 }
 @media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+/* cause-fix: ruled-out causes stay readable; the name greys, the reason does not fade */
+.cause.out,.cause.less,.cause.unl{opacity:1}
+.cause.less>span,.cause.unl>span{color:var(--muted)}
+.deeper{margin-top:14px;border-top:1px solid var(--line)}
+.deeper>summary{min-height:44px;display:flex;align-items:center;gap:8px;color:var(--accent);font-weight:600;font-size:15px;cursor:pointer;list-style:none}
+.deeper>summary::-webkit-details-marker{display:none}
+.deeper>summary::before{content:"+";font-family:var(--mono);font-size:18px;line-height:1;width:14px;text-align:center}
+.deeper[open]>summary::before{content:"\2212"}
+.deeper>summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.deeper .dpx{border:1px solid var(--line);border-radius:12px;padding:2px 12px;background:var(--card);text-align:left}
+.deeper .dpx>div{padding:10px 0;border-top:1px solid var(--line)}
+.deeper .dpx>div:first-child{border-top:0}
+.deeper .dl{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500;margin:0 0 3px}
+.deeper p{font-size:15px;line-height:1.45;color:var(--ink);margin:0 0 4px}
+.deeper p:last-child{margin-bottom:0}
 </style>
 </head>
 <body>
@@ -494,8 +509,8 @@ function svgOpen(vb, label){ return '<svg viewBox="' + vb + '" role="img" aria-l
 function tx(x, y, t, o){ o = o || {}; return '<text x="' + x + '" y="' + y + '" text-anchor="' + (o.a || 'middle') + '" style="' + (o.sans ? FS : FM) + ';font-size:' + (o.s || 11) + 'px;font-weight:' + (o.w || 400) + ';fill:' + (o.c || 'var(--ink)') + '">' + t + '</text>'; }
 function bx(x, y, w, h, t1, t2, stt){
   var fill = stt === 'hot' ? 'var(--warnbg)' : stt === 'on' ? 'var(--card)' : 'var(--fill)', stroke = stt === 'hot' ? 'var(--warn)' : stt === 'on' ? 'var(--accent)' : 'var(--line)';
-  return '<g' + (stt === 'dim' ? ' opacity=".4"' : '') + '><rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="10" fill="' + fill + '" stroke="' + stroke + '"' + (stt === 'hot' || stt === 'on' ? ' stroke-width="2"' : '') + '/>' +
-    tx(x + w / 2, y + (t2 ? h / 2 - 2 : h / 2 + 4), t1, {sans: 1, s: 12, w: 600}) + (t2 ? tx(x + w / 2, y + h / 2 + 12, t2, {s: 10, c: 'var(--muted)'}) : '') + '</g>';
+  return '<g' + (stt === 'dim' ? ' opacity=".74"' : '') + '><rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="10" fill="' + fill + '" stroke="' + stroke + '"' + (stt === 'hot' || stt === 'on' ? ' stroke-width="2"' : '') + '/>' +
+    tx(x + w / 2, y + (t2 ? h / 2 - 2 : h / 2 + 4), t1, {sans: 1, s: 12, w: 600}) + (t2 ? tx(x + w / 2, y + h / 2 + 12, t2, {s: 10.5, c: 'var(--muted)'}) : '') + '</g>';
 }
 function mk(p){ return '<defs>' + [['n','var(--muted)'],['a','var(--accent)']].map(function(k){ return '<marker id="' + p + k[0] + '" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="' + k[1] + '"/></marker>'; }).join('') + '</defs>'; }
 function ar(d, k, p){ var c = k === 'a' ? 'var(--accent)' : 'var(--muted)'; return '<path d="' + d + '" fill="none" stroke="' + c + '" stroke-width="2" marker-end="url(#' + p + k + ')"/>'; }
@@ -513,16 +528,16 @@ function kinSVG(k, p){
   function px(t){ return X0 + t / 10 * W; } function py(v){ return Y0 - Math.log(v + 1) / Math.log(181) * H; }
   var h = svgOpen('0 0 340 232', 'Troponin over hours after symptom onset: ' + K.n);
   h += '<line x1="' + X0 + '" y1="' + Y0 + '" x2="' + (X0 + W) + '" y2="' + Y0 + '" stroke="var(--muted)"/><line x1="' + X0 + '" y1="' + Y0 + '" x2="' + X0 + '" y2="' + (Y0 - H - 6) + '" stroke="var(--muted)"/>';
-  [0, 2, 4, 6, 8, 10].forEach(function(t){ h += tx(px(t), Y0 + 16, t + ' h', {s: 10, c: 'var(--muted)'}); });
-  h += tx(X0 + W / 2, Y0 + 30, 'hours since symptom onset', {s: 10, c: 'var(--muted)'});
+  [0, 2, 4, 6, 8, 10].forEach(function(t){ h += tx(px(t), Y0 + 16, t + ' h', {s: 10.5, c: 'var(--muted)'}); });
+  h += tx(X0 + W / 2, Y0 + 30, 'hours since symptom onset', {s: 10.5, c: 'var(--muted)'});
   var lines = [['99th percentile', 20, 'var(--warn)'], ['very low', 5, 'var(--ok)']];
-  lines.forEach(function(l){ var y = py(l[1]); h += '<line x1="' + X0 + '" y1="' + y + '" x2="' + (X0 + W) + '" y2="' + y + '" stroke="' + l[2] + '" stroke-dasharray="5 4"/>' + tx(X0 + W, y - 4, l[0], {a: 'end', s: 10, c: l[2]}); });
+  lines.forEach(function(l){ var y = py(l[1]); h += '<line x1="' + X0 + '" y1="' + y + '" x2="' + (X0 + W) + '" y2="' + y + '" stroke="' + l[2] + '" stroke-dasharray="5 4"/>' + tx(X0 + W, y - 4, l[0], {a: 'end', s: 10.5, c: l[2]}); });
   ['mi', 'chr', 'none'].forEach(function(cv){
     var d = ''; for (var t = 0; t <= 10.01; t += 0.25) d += (t ? 'L' : 'M') + px(t).toFixed(1) + ' ' + py(kinY(cv, t)).toFixed(1);
     h += '<path d="' + d + '" fill="none" stroke="' + (cv === K.curve ? 'var(--accent)' : 'var(--line)') + '" stroke-width="' + (cv === K.curve ? 3 : 2) + '"/>';
   });
-  [K.t0, K.t0 + 1].forEach(function(t, n){ var x = px(t), y = py(kinY(K.curve, t)); h += '<circle cx="' + x + '" cy="' + y + '" r="6" fill="var(--card)" stroke="var(--ink)" stroke-width="2"/>' + tx(x, y - 11, n ? 'draw 2' : 'draw 1', {s: 10, w: 600}); });
-  h += tx(14, Y0 - H / 2, 'troponin', {s: 10, c: 'var(--muted)', a: 'middle'}).replace('<text', '<text transform="rotate(-90 14 ' + (Y0 - H / 2) + ')"');
+  [K.t0, K.t0 + 1].forEach(function(t, n){ var x = px(t), y = py(kinY(K.curve, t)); h += '<circle cx="' + x + '" cy="' + y + '" r="6" fill="var(--card)" stroke="var(--ink)" stroke-width="2"/>' + tx(x, y - 11, n ? 'draw 2' : 'draw 1', {s: 10.5, w: 600}); });
+  h += tx(14, Y0 - H / 2, 'troponin', {s: 10.5, c: 'var(--muted)', a: 'middle'}).replace('<text', '<text transform="rotate(-90 14 ' + (Y0 - H / 2) + ')"');
   return h + '</svg>';
 }
 
@@ -544,11 +559,11 @@ function mapSVG(k, p){
   h += '<rect x="' + X0 + '" y="' + py(c.nd) + '" width="' + (px(c.lo) - X0) + '" height="' + (Y0 - py(c.nd)) + '" fill="' + (oo === 'on' ? 'var(--okbg)' : 'var(--card)') + '" stroke="var(--ok)" stroke-width="2"/>';
   h += tx(px(c.hi) + (X0 + W - px(c.hi)) / 2, Y0 - H / 2, 'rule in', {s: 11, w: 600, c: 'var(--bad)'}) + tx((X0 + px(c.hi)) / 2, Y0 - H + 16, 'rule in (rise)', {s: 11, w: 600, c: 'var(--bad)'}) + tx((X0 + px(c.hi)) / 2 + 20, (py(c.d) + Y0) / 2, 'observe', {s: 11, w: 600, c: 'var(--warn)'});
   h += tx(X0 + 4, py(c.nd) - 6, 'rule out', {a: 'start', s: 10.5, w: 600, c: 'var(--ok)'});
-  h += tx(px(c.lo), Y0 + 14, '<' + c.lo, {s: 10, c: 'var(--muted)'}) + tx(px(c.hi), Y0 + 14, '≥' + c.hi, {s: 10, c: 'var(--muted)'}) + tx(X0 - 6, py(c.nd) + 4, '<' + c.nd, {a: 'end', s: 10, c: 'var(--muted)'}) + tx(X0 - 6, py(c.d) + 4, '≥' + c.d, {a: 'end', s: 10, c: 'var(--muted)'});
-  h += tx(X0 + W / 2, Y0 + 30, 'first value, ng/L (' + a.s + ')', {s: 10, c: 'var(--muted)'});
-  h += tx(12, Y0 - H / 2, 'change in ' + ph, {s: 10, c: 'var(--muted)'}).replace('<text', '<text transform="rotate(-90 12 ' + (Y0 - H / 2) + ')"');
+  h += tx(px(c.lo), Y0 + 14, '<' + c.lo, {s: 10.5, c: 'var(--muted)'}) + tx(px(c.hi), Y0 + 14, '≥' + c.hi, {s: 10.5, c: 'var(--muted)'}) + tx(X0 - 6, py(c.nd) + 4, '<' + c.nd, {a: 'end', s: 10.5, c: 'var(--muted)'}) + tx(X0 - 6, py(c.d) + 4, '≥' + c.d, {a: 'end', s: 10.5, c: 'var(--muted)'});
+  h += tx(X0 + W / 2, Y0 + 30, 'first value, ng/L (' + a.s + ')', {s: 10.5, c: 'var(--muted)'});
+  h += tx(12, Y0 - H / 2, 'change in ' + ph, {s: 10.5, c: 'var(--muted)'}).replace('<text', '<text transform="rotate(-90 12 ' + (Y0 - H / 2) + ')"');
   var al = algo(i);
-  if (al.x0 && al.x1 && al.d && al.c){ var dv = al.d.both ? 0 : al.d.dMin; h += '<circle cx="' + px(al.x0.v) + '" cy="' + py(dv) + '" r="7" fill="var(--accent)" stroke="var(--card)" stroke-width="2"/>' + tx(px(al.x0.v) > X0 + W - 80 ? px(al.x0.v) - 10 : px(al.x0.v) + 10, py(dv) + 18, 'your patient', {a: px(al.x0.v) > X0 + W - 80 ? 'end' : 'start', s: 10, w: 600, c: 'var(--accent)'}); }
+  if (al.x0 && al.x1 && al.d && al.c){ var dv = al.d.both ? 0 : al.d.dMin; h += '<circle cx="' + px(al.x0.v) + '" cy="' + py(dv) + '" r="7" fill="var(--accent)" stroke="var(--card)" stroke-width="2"/>' + tx(px(al.x0.v) > X0 + W - 80 ? px(al.x0.v) - 10 : px(al.x0.v) + 10, py(dv) + 18, 'your patient', {a: px(al.x0.v) > X0 + W - 80 ? 'end' : 'start', s: 10.5, w: 600, c: 'var(--accent)'}); }
   return h + '</svg>';
 }
 
@@ -715,6 +730,13 @@ $('practice').addEventListener('click', function(e){
 });
 window.__cases = CASES; window.__caseZone = caseZone;
 drawInputs(); render(); fromHash();
+})();
+</script>
+<script id="deeper-data">
+/* Go deeper: mechanism, rationale and the common trap for each Learn chapter. Text only; no doses or thresholds beyond the tool's own. */
+(function(){ var D = {"learn-kin": [["Mechanism", "Troponin is part of the contractile machinery of heart muscle. A small free pool leaks out soon after a cell membrane is damaged; the larger bound pool is released over days as the cell dies. High-sensitivity assays can measure the trace amounts present in healthy people."], ["Why it matters", "This explains the time course: detectable within a few hours, rising for a day or so, and raised for days afterwards. The 99th percentile is the upper limit in a healthy population, not a threshold for infarction."], ["Common trap", "A raised troponin means heart muscle injury, not necessarily an infarct. An infarct needs a rise or fall together with evidence of ischemia."]], "learn-delta": [["Mechanism", "Chronic conditions (kidney disease, heart failure, a thick ventricle) cause steady low-level injury, so troponin sits above the limit and stays put. An acute event makes it move."], ["Why it matters", "The change between two samples is therefore what separates acute from chronic injury, and it is why the algorithm reads the value and the change together."], ["Common trap", "A mismatch between supply and demand (fast rate, low pressure, anemia) also produces a rising troponin. That calls for treating the cause first; angiography is not the default."]], "learn-early": [["Mechanism", "After an artery closes, troponin needs time to leak out of the damaged cells and reach the blood. In the first hours it can be undetectable despite a real infarct."], ["Why it matters", "A single very low value rules out an infarct only when enough time has passed since the pain began. Before that, a second sample is the test."], ["Common trap", "The time of onset is often uncertain or the pain came in waves. When in doubt, treat the patient as an early presenter."]], "learn-heart": [["Mechanism", "The score combines what was known before testing (the history, age and risk factors) with what the tests show (the ECG and troponin)."], ["Why it matters", "A low score together with negative serial troponin identifies patients at low risk of a major cardiac event over the next weeks, who can leave without further testing."], ["Common trap", "The history item is subjective and scores vary between clinicians. A low score never overrides ischemic ECG changes or a rising troponin."]]};
+  function add(){ Object.keys(D).forEach(function(id){ var c = document.getElementById(id); if (!c || c.querySelector(":scope > .deeper")) return; var host = c.matches(".card,.lsec,section,.chap") ? c : null; if (!host){ var n = c.nextElementSibling; while (n && !n.matches(".card")) n = n.nextElementSibling; host = n; } if (!host || host.querySelector(":scope > .deeper")) return; var d = document.createElement("details"); d.className = "deeper"; d.innerHTML = "<summary>Go deeper: mechanism and rationale</summary><div class=\"dpx\">" + D[id].map(function(r){ return "<div><span class=\"dl\">" + r[0] + "</span><p>" + r[1] + "</p></div>"; }).join("") + "</div>"; var last = host.querySelector(":scope > .row"); if (last) host.insertBefore(d, last); else host.appendChild(d); }); }
+  add(); document.addEventListener("click", function(){ setTimeout(add, 0); }); document.addEventListener("input", function(){ setTimeout(add, 0); });
 })();
 </script>
 </body>

@@ -128,6 +128,18 @@ footer p{margin:0 0 8px}
 .trial p{margin:0 0 6px;font-size:15px}
 .trial .k{font-family:var(--mono);font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);display:block}
 @media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+.deeper{margin-top:14px;border-top:1px solid var(--line)}
+.deeper>summary{min-height:44px;display:flex;align-items:center;gap:8px;color:var(--accent);font-weight:600;font-size:15px;cursor:pointer;list-style:none}
+.deeper>summary::-webkit-details-marker{display:none}
+.deeper>summary::before{content:"+";font-family:var(--mono);font-size:18px;line-height:1;width:14px;text-align:center}
+.deeper[open]>summary::before{content:"\2212"}
+.deeper>summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.deeper .dpx{border:1px solid var(--line);border-radius:12px;padding:2px 12px;background:var(--card);text-align:left}
+.deeper .dpx>div{padding:10px 0;border-top:1px solid var(--line)}
+.deeper .dpx>div:first-child{border-top:0}
+.deeper .dl{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500;margin:0 0 3px}
+.deeper p{font-size:15px;line-height:1.45;color:var(--ink);margin:0 0 4px}
+.deeper p:last-child{margin-bottom:0}
 </style>
 <style id="vk-css">
 .vk-plate{margin-top:10px;border:1px solid var(--line);border-radius:12px;padding:6px;background:var(--card)}
@@ -160,6 +172,18 @@ footer p{margin:0 0 8px}
 .vk-sl input[type=range]{width:100%;min-height:44px;accent-color:var(--accent)}
 .vk-res{margin-top:8px}
 .vk-res .card{margin-bottom:8px}
+.vk-zone{margin:0 0 6px}
+.vk-zs{display:flex;gap:2px;height:8px}
+.vk-zs i{display:block;border-radius:99px;background:var(--line);min-width:4px}
+.vk-zs i.on{background:var(--accent)}
+.vk-zt{font-family:var(--mono);font-size:12px;color:var(--ink);margin:4px 0 0}
+.vk-deep{margin-top:10px;border:1px solid var(--line);border-radius:12px;padding:2px 12px;background:var(--card)}
+.vk-deep:empty{display:none}
+.vk-dr{padding:10px 0;border-top:1px solid var(--line)}
+.vk-dr:first-child{border-top:0}
+.vk-dr .label{margin:0 0 3px}
+.vk-dr p{font-size:15px;margin:0 0 4px}
+.vk-dr p:last-child{margin-bottom:0}
 .vk-flow .vk-dots{display:flex;gap:4px;margin:4px 0 12px}
 .vk-d{flex:1;height:4px;border-radius:99px;background:var(--line)}
 .vk-d.on{background:var(--accent)}
@@ -171,8 +195,11 @@ footer p{margin:0 0 8px}
 .vk-btn{min-height:44px;border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);border-radius:10px;padding:8px 14px;font:inherit;font-weight:600;cursor:pointer;margin-top:10px}
 .vk-btn.ghost{background:var(--card);color:var(--accent)}
 .vk-hot:focus-visible,.vk-opt:focus-visible,.vk-cell:focus-visible,.vk-btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-@media (max-width:479px){.vk-hot{width:20px;height:20px;font-size:11px}}
+@media (max-width:479px){.vk-hot{width:18px;height:18px;font-size:11px;border-width:1.5px}}
 @media (min-width:900px){.vk-grid{grid-template-columns:repeat(3,1fr)}.vk-hot{width:30px;height:30px}}
+/* cause-fix: ruled-out causes stay readable; the name greys, the reason does not fade */
+.cause.out,.cause.less,.cause.unl{opacity:1}
+.cause.less>span,.cause.unl>span{color:var(--muted)}
 </style>
 </head>
 <body>
@@ -560,9 +587,9 @@ var FS = 'font-family:var(--sans)', FM = 'font-family:var(--mono)';
 function vcol(v){ return v === 'u' ? 'var(--warn)' : v === 'd' ? 'var(--accent)' : v === 'x' ? 'var(--bad)' : 'var(--muted)'; }
 function markers(p){ return '<defs>' + ['n','u','d','x'].map(function(k){ return '<marker id="' + p + k + '" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="' + vcol(k) + '"/></marker>'; }).join('') + '</defs>'; }
 function box(x, y, w, h, t1, t2, hot, dim){
-  return '<g' + (dim ? ' opacity=".45"' : '') + '><rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="10" fill="' + (hot ? 'var(--warnbg)' : 'var(--fill)') + '" stroke="' + (hot ? 'var(--warn)' : 'var(--line)') + '"' + (hot ? ' stroke-width="2"' : '') + '/>' +
+  return '<g' + (dim ? ' opacity=".74"' : '') + '><rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="10" fill="' + (hot ? 'var(--warnbg)' : 'var(--fill)') + '" stroke="' + (hot ? 'var(--warn)' : 'var(--line)') + '"' + (hot ? ' stroke-width="2"' : '') + '/>' +
     '<text x="' + (x + w / 2) + '" y="' + (y + (t2 ? h / 2 - 2 : h / 2 + 4)) + '" text-anchor="middle" style="' + FS + ';font-size:12px;font-weight:600;fill:var(--ink)">' + t1 + '</text>' +
-    (t2 ? '<text x="' + (x + w / 2) + '" y="' + (y + h / 2 + 12) + '" text-anchor="middle" style="' + FM + ';font-size:10px;fill:var(--muted)">' + t2 + '</text>' : '') + '</g>';
+    (t2 ? '<text x="' + (x + w / 2) + '" y="' + (y + h / 2 + 12) + '" text-anchor="middle" style="' + FM + ';font-size:10.5px;fill:var(--muted)">' + t2 + '</text>' : '') + '</g>';
 }
 function svgOpen(vb, label){ return '<svg viewBox="' + vb + '" role="img" aria-label="' + label + '" class="fig">'; }
 function line(d, v, w, p){ return '<path d="' + d + '" fill="none" stroke="' + vcol(v) + '" stroke-width="' + (w || (v === 'u' ? 4 : v === 'd' ? 1.5 : 2)) + '"' + (v === 'd' || v === 'x' ? ' stroke-dasharray="5 4"' : '') + ' marker-end="url(#' + p + (v || 'n') + ')"/>'; }
@@ -576,7 +603,7 @@ function loopSVG(key, p){
   h += line('M94 150 L118 150', a.boneCa, 0, p) + line('M246 150 L222 150', a.kidCa, 0, p);
   h += line('M290 180 L224 262', a.cal, 0, p) + lab(296, 222, 'calcitriol', a.cal);
   h += line('M170 248 L170 178', a.gutCa, 0, p);
-  h += '<path d="M170 126 L170 52" fill="none" stroke="' + vcol(a.fb) + '" stroke-width="2"' + (a.fb ? ' stroke-dasharray="5 4"' : '') + '/><path d="M160 50 H180" stroke="' + vcol(a.fb) + '" stroke-width="3"/><text x="177" y="112" style="' + FM + ';font-size:10px;fill:' + vcol(a.fb) + '">' + (a.fb ? 'ignored ✕' : 'off switch') + '</text>';
+  h += '<path d="M170 126 L170 52" fill="none" stroke="' + vcol(a.fb) + '" stroke-width="2"' + (a.fb ? ' stroke-dasharray="5 4"' : '') + '/><path d="M160 50 H180" stroke="' + vcol(a.fb) + '" stroke-width="3"/><text x="177" y="112" style="' + FM + ';font-size:10.5px;fill:' + vcol(a.fb) + '">' + (a.fb ? 'ignored ✕' : 'off switch') + '</text>';
   h += box(120, 6, 100, 40, 'Parathyroid', null, key === 'phpt' || key === 'fhh');
   h += box(120, 126, 100, 50, 'Blood calcium', LABTXT[s.labs[0]], false);
   h += box(8, 122, 84, 56, 'Bone', 'releases', false) + box(248, 122, 84, 56, 'Kidney', 'saves Ca', key === 'ckd') + box(120, 250, 100, 42, 'Gut', 'absorbs', false);
@@ -624,7 +651,7 @@ function setpSVG(k){
   function pt(x, x0, floor){ var y = floor + (1 - floor) / (1 + Math.exp((x - x0) / 6)); return [40 + x * 2.8, 190 - y * 160]; }
   var h = svgOpen('0 0 340 240', 'PTH against calcium: ' + SETP[k].n);
   h += '<path d="M40 20V190H324" fill="none" stroke="var(--muted)" stroke-width="1.5"/><text x="182" y="226" text-anchor="middle" style="' + FM + ';font-size:11px;fill:var(--muted)">blood calcium →</text><text x="14" y="110" text-anchor="middle" transform="rotate(-90 14 110)" style="' + FM + ';font-size:11px;fill:var(--muted)">PTH →</text>';
-  h += '<rect x="138" y="20" width="56" height="170" fill="var(--fill)"/><text x="166" y="206" text-anchor="middle" style="' + FM + ';font-size:10px;fill:var(--muted)">normal range</text>';
+  h += '<rect x="138" y="20" width="56" height="170" fill="var(--fill)"/><text x="166" y="206" text-anchor="middle" style="' + FM + ';font-size:10.5px;fill:var(--muted)">normal range</text>';
   h += '<path d="' + curve(42, 0.04) + '" fill="none" stroke="var(--muted)" stroke-width="2"' + (k === 'phpt' || k === 'fhh' ? ' stroke-dasharray="4 4"' : '') + '/>';
   var P;
   if (k === 'phpt'){ h += '<path d="' + curve(62, 0.28) + '" fill="none" stroke="var(--warn)" stroke-width="3"/>'; P = pt(72, 62, 0.28); }
@@ -898,7 +925,7 @@ function fork(o){
     '<rect x="104" y="4" width="112" height="30" rx="8" fill="var(--fill)" stroke="var(--line)"/><text x="160" y="24" text-anchor="middle" style="font-family:var(--mono)">' + (hi ? 'High calcium' : 'Low calcium') + '</text>' +
     '<path d="M160 34V50M70 50H250M70 50V64M250 50V64" stroke="var(--muted)" fill="none"/>' + box(8, L, left) + box(188, R, right) +
     '<path d="M250 108V120M184 120H316M184 120V130M250 120V130M316 120V130" stroke="' + (right ? 'var(--accent)' : 'var(--line)') + '" fill="none"/>';
-  [184, 250, 316].forEach(function(x, n){ s += '<text x="' + x + '" y="144" text-anchor="middle" style="font-family:var(--mono)" class="' + (right ? '' : 'dim') + '">' + leaves[n][0] + '</text><text x="' + x + '" y="159" text-anchor="middle" style="font-family:var(--mono);font-size:10px" class="dim">' + leaves[n][1] + '</text>'; });
+  [184, 250, 316].forEach(function(x, n){ s += '<text x="' + x + '" y="144" text-anchor="middle" style="font-family:var(--mono)" class="' + (right ? '' : 'dim') + '">' + leaves[n][0] + '</text><text x="' + x + '" y="159" text-anchor="middle" style="font-family:var(--mono);font-size:10.5px" class="dim">' + leaves[n][1] + '</text>'; });
   return s + '</svg>';
 }
 function workCard(o){
@@ -1082,8 +1109,8 @@ var VK = (function(){
   function mark(box, j){ var ok = false; box.querySelectorAll('.vk-opt').forEach(function(b, i){ b.disabled = true; if (b.getAttribute('data-ok') === '1') b.classList.add('right'); else if (i === j) b.classList.add('wrong'); if (i === j) ok = b.getAttribute('data-ok') === '1'; }); return ok; }
   function answer(key, j){ var box = document.querySelector('[data-vk-pred="' + key + '"]'), P = C.preds[key]; if (!box || box.getAttribute('data-done')) return; box.setAttribute('data-done', '1'); var ok = mark(box, j), a = box.querySelector('.vk-ans');
     a.innerHTML = '<p><b>' + (ok ? 'Right.' : 'Not quite.') + '</b> ' + P.why() + '</p>' + (P.fig ? '<button class="chip" type="button" data-fig="' + P.fig[0] + '" data-state="' + (P.fig[1] || '') + '">' + VK_FIC + q(P.fig[2]) + '</button>' : ''); a.hidden = false; }
-  function slHtml(id){ var S = C.sliders[id]; return '<div class="vk-sl" data-vk-sl="' + id + '">' + S.ranges.map(function(r){ return '<label for="vk-' + id + '-' + r.key + '">' + r.label + ' <b data-vk-v="' + r.key + '"></b></label><input type="range" id="vk-' + id + '-' + r.key + '" data-vk-k="' + r.key + '" min="' + r.min + '" max="' + r.max + '" step="' + r.step + '" value="' + r.value + '">'; }).join('') + '<div class="vk-res" aria-live="polite"></div>' + (S.note ? '<p class="vk-src">' + S.note + '</p>' : '') + '</div>'; }
-  function slRun(w){ var S = C.sliders[w.getAttribute('data-vk-sl')], v = {}; S.ranges.forEach(function(r){ var x = +w.querySelector('[data-vk-k="' + r.key + '"]').value; v[r.key] = x; w.querySelector('[data-vk-v="' + r.key + '"]').textContent = (r.fmt ? r.fmt(x) : x) + (r.unit ? ' ' + r.unit : ''); }); w.querySelector('.vk-res').innerHTML = S.run(v); }
+  function slHtml(id){ var S = C.sliders[id]; return '<div class="vk-sl" data-vk-sl="' + id + '">' + S.ranges.map(function(r){ return '<label for="vk-' + id + '-' + r.key + '">' + r.label + ' <b data-vk-v="' + r.key + '"></b></label><input type="range" id="vk-' + id + '-' + r.key + '" data-vk-k="' + r.key + '" min="' + r.min + '" max="' + r.max + '" step="' + r.step + '" value="' + r.value + '">' + (r.zones ? '<div class="vk-zone" data-vk-z="' + r.key + '"></div>' : ''); }).join('') + '<div class="vk-res" aria-live="polite"></div><div class="vk-deep"></div>' + (S.note ? '<p class="vk-src">' + S.note + '</p>' : '') + '</div>'; }
+  function slRun(w){ var S = C.sliders[w.getAttribute('data-vk-sl')], v = {}; S.ranges.forEach(function(r){ var x = +w.querySelector('[data-vk-k="' + r.key + '"]').value; v[r.key] = x; w.querySelector('[data-vk-v="' + r.key + '"]').textContent = (r.fmt ? r.fmt(x) : x) + (r.unit ? ' ' + r.unit : ''); }); w.querySelector('.vk-res').innerHTML = S.run(v); S.ranges.forEach(function(r){ if (!r.zones) return; var Z = typeof r.zones === 'function' ? r.zones(v) : r.zones, x = v[r.key], on = Z.length - 1; Z.forEach(function(z, k){ if (x >= z[0] && x < z[1] && on === Z.length - 1) on = k; }); w.querySelector('[data-vk-z="' + r.key + '"]').innerHTML = '<div class="vk-zs" aria-hidden="true">' + Z.map(function(z, k){ return '<i' + (k === on ? ' class="on"' : '') + ' style="flex:' + Math.max(0.01, Math.min(z[1], r.max) - Math.max(z[0], r.min)) + '"></i>'; }).join('') + '</div><p class="vk-zt">' + Z[on][2] + '</p>'; }); w.querySelector('.vk-deep').innerHTML = S.deep ? S.deep(v).map(function(d){ return '<div class="vk-dr"><p class="label">' + d[0] + '</p>' + d[1] + '</div>'; }).join('') : ''; }
   function flowHtml(id){ var F = C.flows[id]; return '<div class="vk-flow" data-vk-flow="' + id + '"><p class="head">' + F.t + '</p><div class="vk-dots">' + F.steps.map(function(_, k){ return '<i class="vk-d' + (k ? '' : ' on') + '"></i>'; }).join('') + '</div><div class="vk-fb"></div></div>'; }
   function step(id, k){ var F = C.flows[id], S = F.steps[k], w = document.querySelector('[data-vk-flow="' + id + '"]'); if (!w || !S) return; FS[id] = k;
     w.querySelectorAll('.vk-d').forEach(function(d, j){ d.classList.toggle('on', j <= k); });
@@ -1143,7 +1170,11 @@ VK.init({
   'learn-setpoint': {q: 'Calcium mildly high, PTH high-normal, very low urine calcium. Which first test points toward FHH rather than primary hyperparathyroidism?', a: function(){ return [['Calcium-to-creatinine clearance ratio', 1], ['Sestamibi scan', 0], ['PTHrP', 0]]; }, why: function(){ return LOOP.fhh.line + ' A ratio below 0.01 favors FHH; above 0.02 favors primary hyperparathyroidism. Many patients fall between 0.01 and 0.02; genetic testing (CASR, GNA11, AP2S1) confirms FHH. Imaging localizes a gland; it does not make the diagnosis.'; }, fig: ['loop', 'fhh', 'The calcium loop']}
  },
  sliders: {
-  alb: {ranges: [{key: 'ca', label: 'Total calcium', min: 6.5, max: 14, step: 0.1, value: 7.8, unit: 'mg/dL', fmt: function(x){ return x.toFixed(1); }}, {key: 'alb', label: 'Albumin', min: 1.5, max: 4.5, step: 0.1, value: 2.2, unit: 'g/dL', fmt: function(x){ return x.toFixed(1); }}], note: 'Runs this tool\'s adjustment. It is an estimate: measure ionized calcium when it matters.',
+  alb: {ranges: [{key: 'ca', label: 'Total calcium', min: 6.5, max: 14, step: 0.1, value: 7.8, unit: 'mg/dL', fmt: function(x){ return x.toFixed(1); }}, {key: 'alb', label: 'Albumin', min: 1.5, max: 4.5, step: 0.1, value: 2.2, unit: 'g/dL', fmt: function(x){ return x.toFixed(1); }, zones: [[1.5, 1.95, 'Below 2: the adjustment is unreliable'], [1.95, 3.95, '2 to 4: add 0.8 for each 1 g/dL below 4'], [3.95, 4.6, '4 or above: nothing to add']]}], note: 'Runs this tool\'s adjustment. It is an estimate: measure ionized calcium when it matters.',
+   deep: function(v){ var o = decide({ca: v.ca, alb: v.alb}), flip = (v.ca < REF.caLo || v.ca > REF.caHi) !== (o.adj < REF.caLo || o.adj > REF.caHi);
+    return [['What is happening', '<p>A little under half of the calcium in blood rides on albumin, about half is free (ionized), and the rest is bound to anions such as phosphate and citrate. Only the ionized part acts on nerve, muscle and the parathyroid.</p><p>When albumin falls, the bound part falls with it. The total reads low while the ionized calcium, the part the body regulates, has not moved.</p>'],
+     ['Why 0.8', '<p>Each 1 g/dL of albumin carries roughly 0.8 mg/dL of calcium, so the formula adds that back for each gram below 4.' + (flip ? ' Here it moves the value across the reference limit, which is exactly when the estimate should be confirmed.' : '') + '</p>'],
+     ['Where it fails', '<p>Binding also shifts with pH: alkalemia makes albumin hold more calcium, so ionized calcium falls with no change in the total (the tingling of hyperventilation). The formula also performs poorly in critical illness, kidney failure and very low albumin.</p><p>When the answer would change what you do, measure ionized calcium.</p>']]; },
    run: function(v){ var o = decide({ca: v.ca, alb: v.alb}); return '<div class="card"><p class="label">Adjusted for albumin</p><p class="head">' + o.adj.toFixed(1) + ' mg/dL: ' + o.side + '</p><p class="sub">' + v.ca.toFixed(1) + ' + 0.8 × (4 − ' + v.alb.toFixed(1) + ') = ' + o.adj.toFixed(1) + (o.adj !== v.ca && (v.ca < 8.5 || v.ca > 10.5) !== (o.adj < 8.5 || o.adj > 10.5) ? '. The adjustment changes the answer: confirm with ionized calcium.' : '') + '</p>' + (o.lowAlb ? '<div class="guard">Albumin below 2: the adjustment is unreliable; measure ionized calcium.</div>' : '') + '</div>'; }}
  },
  flows: {
@@ -1157,6 +1188,13 @@ VK.init({
   loop: {items: Object.keys(LOOP).filter(function(k){ return k !== 'normal' && k !== 'mgfix'; }).map(function(k){ var d = LOOP[k]; return [d.n, function(){ return '<p>' + d.line + '</p><p class="mono">' + LABNAMES.map(function(n, j){ return n + ' ' + LABTXT[d.labs[j]]; }).join(' · ') + '</p><button class="chip" type="button" data-fig="loop" data-state="' + k + '">' + VK_FIC + 'See it in the loop</button>'; }]; })}
  }
 });
+</script>
+<script id="deeper-data">
+/* Go deeper: mechanism, rationale and the common trap for each Learn chapter. Text only; no doses or thresholds beyond the tool's own. */
+(function(){ var D = {"learn-bound": [["Mechanism", "Calcium and hydrogen ions compete for the same binding sites on albumin. When the blood turns alkaline, hydrogen ions leave those sites and calcium takes them: the ionized calcium falls with no change in the total."], ["Why it matters", "The parathyroid gland senses and regulates only the ionized part, and symptoms follow it. Anything that changes binding changes how the patient feels without changing the number on the routine panel."], ["Common trap", "Citrate in transfused blood binds calcium. In a massive transfusion the ionized calcium can be dangerously low with a normal total, so measure the ionized level."]], "learn-loop": [["Mechanism", "Parathyroid hormone raises calcium three ways: it releases calcium and phosphate from bone, it makes the kidney keep calcium and spill phosphate, and it switches on the kidney enzyme that activates vitamin D, which increases absorption of both from the gut. The net effect of the hormone is calcium up and phosphate down. Active vitamin D raises both."], ["Why it matters", "Phosphate therefore separates the mechanisms. A high calcium with a low phosphate points to parathyroid hormone or its tumour-made relative. A high calcium with a normal or high phosphate points to vitamin D or to release from bone."], ["Common trap", "A parathyroid hormone level in the normal range with a high calcium is not normal. The gland should be switched off; a level that is not suppressed means the cause is PTH-dependent: usually the gland, sometimes familial hypocalciuric hypercalcemia or lithium."]], "learn-vitd": [["Mechanism", "Vitamin D from skin or diet is converted by the liver, without regulation, into the storage form, which lasts for weeks. The kidney converts that into the active form under tight control: parathyroid hormone speeds the step and the active form itself slows it. The active form lasts only hours."], ["Why it matters", "Measure the storage form to judge the body's supply. Measure the active form only when its production may have escaped control: granulomas and some lymphomas activate vitamin D in their own macrophages with no feedback."], ["Common trap", "In deficiency the active form can be normal or even high, because the raised parathyroid hormone is driving the conversion of what little there is. It is the wrong test for deficiency."]], "learn-setpoint": [["Mechanism", "A calcium-sensing receptor on the parathyroid cell reads the ionized calcium. Hormone release falls steeply as calcium rises across a narrow range, and the hormone lasts only minutes in the blood, so the system corrects within minutes."], ["Why it matters", "Disease moves the set point. An adenoma needs a higher calcium before it switches off. In familial hypocalciuric hypercalcemia the receptor is less sensitive in the gland and in the kidney, so the kidney also holds on to calcium: the urine calcium is low. Lithium shifts the set point the same way."], ["Common trap", "Familial hypocalciuric hypercalcemia looks like primary hyperparathyroidism on blood tests, and surgery does not help it. The urine calcium is what tells them apart."]], "learn-cancer": [["Mechanism", "Tumours raise calcium in four ways. Most often they secrete a protein that acts on the parathyroid hormone receptor in bone and kidney. Some destroy bone locally around metastases. Some lymphomas activate vitamin D. Rarely a tumour makes true parathyroid hormone."], ["Why it matters", "The mechanism predicts the labs and the treatment. The vitamin D route responds to glucocorticoids; the others need a drug that stops bone resorption."], ["Common trap", "A patient with cancer can also have ordinary primary hyperparathyroidism. Measure the parathyroid hormone every time instead of assuming the tumour is the cause."]], "learn-effects": [["Mechanism", "High calcium acts on the kidney's own calcium-sensing receptor: the loop of Henle reabsorbs less salt and the collecting duct stops responding to ADH. The patient passes large volumes of dilute urine and becomes volume depleted. Filtration then falls and the tubule reabsorbs more calcium, so the level rises further."], ["Why it matters", "This loop is why saline comes first: restoring volume restores calcium excretion. On the ECG a high calcium shortens the plateau of the action potential, so the QT interval is short."], ["Common trap", "Giving a loop diuretic before volume is restored deepens the depletion and feeds the loop. Keep it for volume overload."]], "learn-drugs": [["Mechanism", "Each treatment acts at a different site. Saline restores filtration so the kidney can excrete calcium. Calcitonin blocks the bone-resorbing cells and increases excretion, quickly, but its receptors soon stop responding. Bisphosphonates bind to bone and poison the resorbing cells, which takes days. Denosumab blocks the signal that forms those cells. Glucocorticoids switch off vitamin D activation in granulomas and lymphoma."], ["Why it matters", "Treatment is layered by speed. The fast agents bridge the days until the slow, durable ones take effect."], ["Common trap", "Bisphosphonates are cleared by the kidney and can injure it. Denosumab does not depend on the kidney but can cause a deep, lasting low calcium, particularly in advanced kidney disease or when vitamin D is deficient."]], "learn-low": [["Mechanism", "Magnesium is needed both for the parathyroid gland to release its hormone and for the hormone to act on bone and kidney. A low magnesium produces a functional lack of parathyroid hormone."], ["Why it matters", "Calcium given in this state does not hold: the level drifts back down until the magnesium is replaced."], ["Common trap", "Symptoms follow the ionized calcium and the speed of the fall, not the total. Alkalosis lowers the ionized calcium, and after parathyroid surgery recovering bone can take up calcium for days."]]};
+  function add(){ Object.keys(D).forEach(function(id){ var c = document.getElementById(id); if (!c || c.querySelector(":scope > .deeper")) return; var host = c.matches(".card,.lsec,section,.chap") ? c : null; if (!host){ var n = c.nextElementSibling; while (n && !n.matches(".card")) n = n.nextElementSibling; host = n; } if (!host || host.querySelector(":scope > .deeper")) return; var d = document.createElement("details"); d.className = "deeper"; d.innerHTML = "<summary>Go deeper: mechanism and rationale</summary><div class=\"dpx\">" + D[id].map(function(r){ return "<div><span class=\"dl\">" + r[0] + "</span><p>" + r[1] + "</p></div>"; }).join("") + "</div>"; var last = host.querySelector(":scope > .row"); if (last) host.insertBefore(d, last); else host.appendChild(d); }); }
+  add(); document.addEventListener("click", function(){ setTimeout(add, 0); }); document.addEventListener("input", function(){ setTimeout(add, 0); });
+})();
 </script>
 </body>
 </html>

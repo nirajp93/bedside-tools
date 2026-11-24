@@ -142,7 +142,30 @@ input[type=range]{width:100%;min-height:44px;accent-color:var(--accent)}
 }
 @media (max-width:420px){.checks{grid-template-columns:1fr}}
 [hidden]{display:none!important}
+.dp{margin-top:10px;border:1px solid var(--line);border-radius:12px;padding:2px 12px;background:var(--card);text-align:left}
+.dp:empty{display:none}
+.dp>div{padding:10px 0;border-top:1px solid var(--line)}
+.dp>div:first-child{border-top:0}
+.dp .dl{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500;margin:0 0 3px}
+.dp p{font-size:15px;line-height:1.45;color:var(--ink);margin:0 0 4px}
+.dp p:last-child{margin-bottom:0}
+.deeper{margin-top:14px;border-top:1px solid var(--line)}
+.deeper>summary{min-height:44px;display:flex;align-items:center;gap:8px;color:var(--accent);font-weight:600;font-size:15px;cursor:pointer;list-style:none}
+.deeper>summary::-webkit-details-marker{display:none}
+.deeper>summary::before{content:"+";font-family:var(--mono);font-size:18px;line-height:1;width:14px;text-align:center}
+.deeper[open]>summary::before{content:"\2212"}
+.deeper>summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.deeper .dpx{border:1px solid var(--line);border-radius:12px;padding:2px 12px;background:var(--card);text-align:left}
+.deeper .dpx>div{padding:10px 0;border-top:1px solid var(--line)}
+.deeper .dpx>div:first-child{border-top:0}
+.deeper .dl{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500;margin:0 0 3px}
+.deeper p{font-size:15px;line-height:1.45;color:var(--ink);margin:0 0 4px}
+.deeper p:last-child{margin-bottom:0}
+/* cause-fix: ruled-out causes stay readable; the name greys, the reason does not fade */
+.cause.out,.cause.less,.cause.unl{opacity:1}
+.cause.less>span,.cause.unl>span{color:var(--muted)}
 </style>
+<script>function dpHtml(rows){ return rows.map(function(r){ return '<div><span class="dl">' + r[0] + '</span>' + r[1] + '</div>'; }).join(''); }</script>
 </head>
 <body>
 <div class="wrap">
@@ -643,8 +666,8 @@ function svgOpen(vb, label){ return '<svg viewBox="' + vb + '" role="img" aria-l
 function tx(x, y, t, o){ o = o || {}; return '<text x="' + x + '" y="' + y + '" text-anchor="' + (o.a || 'middle') + '" style="' + (o.sans ? FS : FM) + ';font-size:' + (o.s || 11) + 'px;font-weight:' + (o.w || 400) + ';fill:' + (o.c || 'var(--ink)') + '">' + t + '</text>'; }
 function bx(x, y, w, h, t1, t2, stt){
   var fill = stt === 'hot' ? 'var(--warnbg)' : stt === 'on' ? 'var(--card)' : 'var(--fill)', stroke = stt === 'hot' ? 'var(--warn)' : stt === 'on' ? 'var(--accent)' : 'var(--line)';
-  return '<g' + (stt === 'dim' ? ' opacity=".45"' : '') + '><rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="10" fill="' + fill + '" stroke="' + stroke + '"' + (stt === 'hot' || stt === 'on' ? ' stroke-width="2"' : '') + '/>' +
-    tx(x + w / 2, y + (t2 ? h / 2 - 3 : h / 2 + 4), t1, {sans: 1, s: 12, w: 600}) + (t2 ? tx(x + w / 2, y + h / 2 + 12, t2, {s: 10, c: 'var(--muted)'}) : '') + '</g>';
+  return '<g' + (stt === 'dim' ? ' opacity=".74"' : '') + '><rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="10" fill="' + fill + '" stroke="' + stroke + '"' + (stt === 'hot' || stt === 'on' ? ' stroke-width="2"' : '') + '/>' +
+    tx(x + w / 2, y + (t2 ? h / 2 - 3 : h / 2 + 4), t1, {sans: 1, s: 12, w: 600}) + (t2 ? tx(x + w / 2, y + h / 2 + 12, t2, {s: 10.5, c: 'var(--muted)'}) : '') + '</g>';
 }
 function mk(p){ return '<defs>' + [['n','var(--muted)'],['a','var(--accent)'],['w','var(--warn)']].map(function(k){ return '<marker id="' + p + k[0] + '" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="' + k[1] + '"/></marker>'; }).join('') + '</defs>'; }
 function ar(d, k, p){ var c = k === 'a' ? 'var(--accent)' : k === 'w' ? 'var(--warn)' : 'var(--muted)'; return '<path d="' + d + '" fill="none" stroke="' + c + '" stroke-width="2" marker-end="url(#' + p + k + ')"/>'; }
@@ -683,13 +706,13 @@ function timeSVG(k, p){
   var h = svgOpen('0 0 340 232', 'Platelet count over days: ' + d.n);
   h += '<line x1="44" y1="190" x2="324" y2="190" stroke="var(--line)"/><line x1="44" y1="30" x2="44" y2="190" stroke="var(--line)"/>';
   [0, 5, 10, 15, 20].forEach(function(dd){ h += '<line x1="' + X(dd) + '" y1="190" x2="' + X(dd) + '" y2="194" stroke="var(--muted)"/>' + tx(X(dd), 206, dd); });
-  h += tx(184, 222, 'day of heparin', {c: 'var(--muted)', s: 10});
-  [100, 200].forEach(function(v){ h += '<line x1="44" y1="' + Y(v) + '" x2="324" y2="' + Y(v) + '" stroke="var(--line)" stroke-dasharray="2 4"/>' + tx(38, Y(v) + 4, v, {a: 'end', s: 10}); });
-  h += '<rect x="' + X(5) + '" y="30" width="' + (X(10) - X(5)) + '" height="160" fill="var(--fill)"/>' + tx((X(5) + X(10)) / 2, 44, 'day 5–10', {s: 10, c: 'var(--muted)'});
-  h += '<rect x="' + X(d.hep[0]) + '" y="16" width="' + (X(d.hep[1]) - X(d.hep[0])) + '" height="8" rx="4" fill="var(--accent)" opacity=".8"/>' + tx(X(d.hep[1]) + 4, 24, 'heparin', {a: 'start', s: 10, c: 'var(--accent)'});
+  h += tx(184, 222, 'day of heparin', {c: 'var(--muted)', s: 10.5});
+  [100, 200].forEach(function(v){ h += '<line x1="44" y1="' + Y(v) + '" x2="324" y2="' + Y(v) + '" stroke="var(--line)" stroke-dasharray="2 4"/>' + tx(38, Y(v) + 4, v, {a: 'end', s: 10.5}); });
+  h += '<rect x="' + X(5) + '" y="30" width="' + (X(10) - X(5)) + '" height="160" fill="var(--fill)"/>' + tx((X(5) + X(10)) / 2, 44, 'day 5–10', {s: 10.5, c: 'var(--muted)'});
+  h += '<rect x="' + X(d.hep[0]) + '" y="16" width="' + (X(d.hep[1]) - X(d.hep[0])) + '" height="8" rx="4" fill="var(--accent)" opacity=".8"/>' + tx(X(d.hep[1]) + 4, 24, 'heparin', {a: 'start', s: 10.5, c: 'var(--accent)'});
   h += '<polyline points="' + d.pts.map(function(q){ return X(q[0]) + ',' + Y(q[1]); }).join(' ') + '" fill="none" stroke="var(--warn)" stroke-width="2.5" stroke-linejoin="round"/>';
-  if (k === 'rapid') h += tx(X(0) + 4, 64, 'antibodies already present', {a: 'start', s: 10, c: 'var(--muted)'});
-  if (k === 'delayed') h += tx(X(10), 64, 'after heparin stopped', {a: 'start', s: 10, c: 'var(--muted)'});
+  if (k === 'rapid') h += tx(X(0) + 4, 64, 'antibodies already present', {a: 'start', s: 10.5, c: 'var(--muted)'});
+  if (k === 'delayed') h += tx(X(10), 64, 'after heparin stopped', {a: 'start', s: 10.5, c: 'var(--muted)'});
   return h + '</svg>';
 }
 
@@ -702,7 +725,7 @@ var LAD = {
 function ladSVG(k, p){
   var rows = [['high', '6–8', 'High', 'PPV 0.64'], ['mid', '4–5', 'Intermediate', 'PPV 0.14'], ['low', '0–3', 'Low', 'NPV 0.998']];
   var h = svgOpen('0 0 340 196', '4Ts probability bands, ' + LAD[k].n) + mk(p);
-  rows.forEach(function(r, n){ var y = 10 + n * 60; h += bx(8, y, 200, 50, r[2] + ' · ' + r[1], r[3], r[0] === k ? 'hot' : 'dim'); h += tx(220, y + 22, r[0] === 'low' ? 'keep heparin' : 'stop heparin', {a: 'start', s: 11, w: r[0] === k ? 600 : 400, c: r[0] === k ? 'var(--ink)' : 'var(--muted)'}) + tx(220, y + 38, r[0] === 'low' ? 'no test' : 'immunoassay', {a: 'start', s: 10, c: 'var(--muted)'}); });
+  rows.forEach(function(r, n){ var y = 10 + n * 60; h += bx(8, y, 200, 50, r[2] + ' · ' + r[1], r[3], r[0] === k ? 'hot' : 'dim'); h += tx(220, y + 22, r[0] === 'low' ? 'keep heparin' : 'stop heparin', {a: 'start', s: 11, w: r[0] === k ? 600 : 400, c: r[0] === k ? 'var(--ink)' : 'var(--muted)'}) + tx(220, y + 38, r[0] === 'low' ? 'no test' : 'immunoassay', {a: 'start', s: 10.5, c: 'var(--muted)'}); });
   return h + '</svg>';
 }
 
@@ -719,9 +742,9 @@ function odSVG(k, p){
   var pct = {neg: '', weak: '≤5%', mod: '<50%', strong: '≥50%', vstrong: '~90%'};
   var h = svgOpen('0 0 340 120', 'Immunoassay optical density bands: ' + ODS[k].n);
   bands.forEach(function(b){ var on = b[2] === k; h += '<rect x="' + X(b[0]) + '" y="30" width="' + (X(b[1]) - X(b[0]) - 2) + '" height="36" rx="6" fill="' + (on ? 'var(--warnbg)' : 'var(--fill)') + '" stroke="' + (on ? 'var(--warn)' : 'var(--line)') + '"' + (on ? ' stroke-width="2"' : '') + '/>' + tx((X(b[0]) + X(b[1])) / 2, 53, pct[b[2]] || 'neg', {s: 11, w: on ? 600 : 400}); });
-  [0, 0.4, 1.0, 1.4, 2.0, 3.0].forEach(function(v){ h += tx(X(v), 84, v.toFixed(1), {s: 10, c: 'var(--muted)'}); });
-  h += tx(170, 104, 'OD units · % with a strong-positive SRA', {s: 10, c: 'var(--muted)'});
-  h += tx(170, 20, 'one laboratory\'s series (2008)', {s: 10, c: 'var(--muted)'});
+  [0, 0.4, 1.0, 1.4, 2.0, 3.0].forEach(function(v){ h += tx(X(v), 84, v.toFixed(1), {s: 10.5, c: 'var(--muted)'}); });
+  h += tx(170, 104, 'OD units · % with a strong-positive SRA', {s: 10.5, c: 'var(--muted)'});
+  h += tx(170, 20, 'one laboratory\'s series (2008)', {s: 10.5, c: 'var(--muted)'});
   return h + '</svg>';
 }
 
@@ -758,7 +781,7 @@ function phSVG(k, p){
   var h = svgOpen('0 0 352 170', 'Phases of HIT: ' + PH[k].n);
   ord.forEach(function(q, n){ var x = x0 + n * (w + 4), on = q === k; h += '<rect x="' + x + '" y="20" width="' + w + '" height="44" rx="8" fill="' + (on ? 'var(--warnbg)' : 'var(--fill)') + '" stroke="' + (on ? 'var(--warn)' : 'var(--line)') + '"' + (on ? ' stroke-width="2"' : '') + '/>' + tx(x + w / 2, 39, PH[q].n.split(' ')[0], {sans: 1, s: 11, w: 600}) + (PH[q].n.split(' ')[1] ? tx(x + w / 2, 54, PH[q].n.split(' ')[1], {sans: 1, s: 11, w: 600}) : ''); });
   var rows = [['Platelets', ['low', 'normal', 'normal', 'normal']], ['Functional', ['+', '+', '−', '−']], ['Immunoassay', ['+', '+', '+', '−']], ['Heparin', ['no', 'no', 'surgery', 'surgery']]];
-  rows.forEach(function(r, m){ var y = 90 + m * 22; h += tx(4, y, r[0], {a: 'start', s: 10, c: 'var(--muted)'}); r[1].forEach(function(v, n){ h += tx(x0 + n * (w + 4) + w / 2, y, v, {s: 11, w: ord[n] === k ? 600 : 400, c: ord[n] === k ? 'var(--ink)' : 'var(--muted)'}); }); });
+  rows.forEach(function(r, m){ var y = 90 + m * 22; h += tx(4, y, r[0], {a: 'start', s: 10.5, c: 'var(--muted)'}); r[1].forEach(function(v, n){ h += tx(x0 + n * (w + 4) + w / 2, y, v, {s: 11, w: ord[n] === k ? 600 : 400, c: ord[n] === k ? 'var(--ink)' : 'var(--muted)'}); }); });
   return h + '</svg>';
 }
 
@@ -815,7 +838,10 @@ document.addEventListener('click', function(e){ var c = e.target.closest && e.ta
 
 /* Learn: OD slider */
 (function(){
-  function draw(){ var v = parseFloat($('odslide').value), b = odBand(v); $('odfig').innerHTML = odSVG(b.k, 'od-') + '<p class="line1"><b class="mono">' + v.toFixed(1) + '</b> · ' + esc(ODS[b.k].line) + '</p>'; }
+  function draw(){ var v = parseFloat($('odslide').value), b = odBand(v); $('odfig').innerHTML = odSVG(b.k, 'od-') + '<p class="line1"><b class="mono">' + v.toFixed(1) + '</b> · ' + esc(ODS[b.k].line) + '</p><div class="dp">' + dpHtml([['What the number is', '<p>The immunoassay coats a well with PF4 bound to heparin, adds the patient\'s serum, and stains any antibody that sticks. Optical density is how dark the well turns: more antibody bound, higher number.</p>'],
+    ['Why a positive is often not HIT', b.k === 'neg' ? '<p>Below the cutoff there is too little antibody to matter. The assay misses very few true cases, which is why a negative result is so useful.</p>' : '<p>Many patients make antibodies to PF4-heparin after heparin, especially after cardiac surgery, and most of these cannot activate platelets. Only antibodies strong and plentiful enough to cross-link the platelet\'s Fc receptors cause HIT' + (b.k === 'vstrong' || b.k === 'strong' ? '; at this density most are of that kind.' : '; at this density most are not.') + '</p>'],
+    ['Why the functional assay', '<p>It asks the question that matters: does this serum make donor platelets activate at treatment-range heparin, and stop at a very high heparin concentration? The immunoassay finds the antibody; the functional assay shows what the antibody does.</p>'],
+    ['Read it with the 4Ts', '<p>The density changes a probability, it does not replace one. The same value means more with a high 4Ts score than with a low one.</p>']]) + '</div>'; }
   $('odslide').addEventListener('input', draw); draw();
 })();
 
@@ -890,6 +916,13 @@ $('practice').addEventListener('click', function(e){
 });
 window.__cases = CASES; window.__caseIn = caseIn;
 drawStatic(); drawInputs(); render(); fromHash();
+})();
+</script>
+<script id="deeper-data">
+/* Go deeper: mechanism, rationale and the common trap for each Learn chapter. Text only; no doses or thresholds beyond the tool's own. */
+(function(){ var D = {"learn-mech": [["Mechanism", "PF4 is a positively charged protein released from platelets. Heparin, a long negative chain, wraps around it, and the complex exposes a new surface. IgG binds there, and the resulting immune complexes cross-link Fc receptors on platelets. The platelets activate, shed procoagulant particles and release more PF4; monocytes and the vessel lining join in and thrombin is generated."], ["Why it matters", "This is why the platelet count falls while the patient clots instead of bleeding. It is also why unfractionated heparin carries more risk than low-molecular-weight heparin (longer chains form complexes more readily) and surgical patients more than medical ones (more PF4 is released)."], ["Common trap", "Heparin in line flushes and on coated catheters counts as exposure. A platelet transfusion for the number alone may feed the process and is avoided."]], "learn-timing": [["Mechanism", "A new IgG response takes five to ten days to build. If heparin was given recently, antibody is still circulating and the count can fall within a day of re-exposure. The antibody is short-lived and the immune system keeps little memory of it."], ["Why it matters", "Timing is the most discriminating part of the 4Ts. A fall on day two in a patient never exposed before is something else."], ["Common trap", "After cardiac surgery the count normally dips and recovers. HIT shows as a second fall after that recovery. Rarely HIT begins days after heparin has already been stopped."]], "learn-4ts": [["Mechanism", "Each of the four items scores a feature of the mechanism: how far the count fell, when, whether there is new clotting, and whether something else explains it. HIT typically causes a large fall but seldom a very low count, and it clots; a profound thrombocytopenia with bleeding suggests another cause."], ["Why it matters", "A low score makes HIT very unlikely, so testing is not needed. Testing low-probability patients mostly produces false positives, each of which leads to an unnecessary switch of anticoagulant."], ["Common trap", "Scores drift upward when information is missing, and intensive care patients have many other reasons for a low count. Score it carefully before sending the test."]], "learn-treat": [["Mechanism", "Stopping heparin removes the trigger but not the antibody, which keeps activating platelets for days to weeks. Thrombin generation continues and the risk of clotting stays high. Warfarin started early lowers protein C, a natural anticoagulant with a short life, before it lowers the clotting factors, tipping the small vessels toward thrombosis."], ["Why it matters", "This is why a non-heparin anticoagulant at a treatment dose is needed even when no clot has been found, and why warfarin waits until the platelets have recovered."], ["Common trap", "A prophylactic dose of the alternative is not enough. Argatroban raises the INR on its own, which complicates the later change to warfarin."]], "learn-phases": [["Mechanism", "After heparin stops, the platelet count recovers first. The functional assay turns negative over weeks and the immunoassay over months. Once the antibody has gone, re-exposure does not cause immediate HIT, because a new response would again take days to form."], ["Why it matters", "That window is what allows a brief, planned heparin exposure for cardiac surgery in a patient with remote HIT, when no alternative is as well proven."], ["Common trap", "Recording a lifelong allergy with no phase attached, or the reverse: continuing heparin after such an operation. The exposure is limited to the operation itself."]]};
+  function add(){ Object.keys(D).forEach(function(id){ var c = document.getElementById(id); if (!c || c.querySelector(":scope > .deeper")) return; var host = c.matches(".card,.lsec,section,.chap") ? c : null; if (!host){ var n = c.nextElementSibling; while (n && !n.matches(".card")) n = n.nextElementSibling; host = n; } if (!host || host.querySelector(":scope > .deeper")) return; var d = document.createElement("details"); d.className = "deeper"; d.innerHTML = "<summary>Go deeper: mechanism and rationale</summary><div class=\"dpx\">" + D[id].map(function(r){ return "<div><span class=\"dl\">" + r[0] + "</span><p>" + r[1] + "</p></div>"; }).join("") + "</div>"; var last = host.querySelector(":scope > .row"); if (last) host.insertBefore(d, last); else host.appendChild(d); }); }
+  add(); document.addEventListener("click", function(){ setTimeout(add, 0); }); document.addEventListener("input", function(){ setTimeout(add, 0); });
 })();
 </script>
 </body>

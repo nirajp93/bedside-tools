@@ -106,6 +106,21 @@ footer p{margin:0 0 8px}
   #p-learn{max-width:720px;margin:0 auto}
 }
 @media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+/* cause-fix: ruled-out causes stay readable; the name greys, the reason does not fade */
+.cause.out,.cause.less,.cause.unl{opacity:1}
+.cause.less>span,.cause.unl>span{color:var(--muted)}
+.deeper{margin-top:14px;border-top:1px solid var(--line)}
+.deeper>summary{min-height:44px;display:flex;align-items:center;gap:8px;color:var(--accent);font-weight:600;font-size:15px;cursor:pointer;list-style:none}
+.deeper>summary::-webkit-details-marker{display:none}
+.deeper>summary::before{content:"+";font-family:var(--mono);font-size:18px;line-height:1;width:14px;text-align:center}
+.deeper[open]>summary::before{content:"\2212"}
+.deeper>summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.deeper .dpx{border:1px solid var(--line);border-radius:12px;padding:2px 12px;background:var(--card);text-align:left}
+.deeper .dpx>div{padding:10px 0;border-top:1px solid var(--line)}
+.deeper .dpx>div:first-child{border-top:0}
+.deeper .dl{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500;margin:0 0 3px}
+.deeper p{font-size:15px;line-height:1.45;color:var(--ink);margin:0 0 4px}
+.deeper p:last-child{margin-bottom:0}
 </style>
 </head>
 <body>
@@ -638,8 +653,8 @@ function svgOpen(vb, label){ return '<svg viewBox="' + vb + '" role="img" aria-l
 function tx(x, y, t, o){ o = o || {}; return '<text x="' + x + '" y="' + y + '" text-anchor="' + (o.a || 'middle') + '" style="' + (o.sans ? FS : FM) + ';font-size:' + (o.s || 11) + 'px;font-weight:' + (o.w || 400) + ';fill:' + (o.c || 'var(--ink)') + '">' + t + '</text>'; }
 function bx(x, y, w, h, t1, t2, st){
   var fill = st === 'hot' ? 'var(--warnbg)' : st === 'on' ? 'var(--card)' : 'var(--fill)', stroke = st === 'hot' ? 'var(--warn)' : st === 'on' ? 'var(--accent)' : 'var(--line)';
-  return '<g' + (st === 'dim' ? ' opacity=".45"' : '') + '><rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="10" fill="' + fill + '" stroke="' + stroke + '"' + (st === 'hot' || st === 'on' ? ' stroke-width="2"' : '') + '/>' +
-    tx(x + w / 2, y + (t2 ? h / 2 - 2 : h / 2 + 4), t1, {sans: 1, s: 12, w: 600}) + (t2 ? tx(x + w / 2, y + h / 2 + 12, t2, {s: 9.5, c: 'var(--muted)'}) : '') + '</g>';
+  return '<g' + (st === 'dim' ? ' opacity=".74"' : '') + '><rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="10" fill="' + fill + '" stroke="' + stroke + '"' + (st === 'hot' || st === 'on' ? ' stroke-width="2"' : '') + '/>' +
+    tx(x + w / 2, y + (t2 ? h / 2 - 2 : h / 2 + 4), t1, {sans: 1, s: 12, w: 600}) + (t2 ? tx(x + w / 2, y + h / 2 + 12, t2, {s: 10.5, c: 'var(--muted)'}) : '') + '</g>';
 }
 function mk(p){ return '<defs>' + [['n','var(--muted)'],['u','var(--warn)'],['a','var(--accent)']].map(function(k){ return '<marker id="' + p + k[0] + '" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="' + k[1] + '"/></marker>'; }).join('') + '</defs>'; }
 function ar(d, k, p){ var c = k === 'u' ? 'var(--warn)' : k === 'a' ? 'var(--accent)' : 'var(--muted)'; return '<path d="' + d + '" fill="none" stroke="' + c + '" stroke-width="2"' + (k === 'u' ? ' stroke-dasharray="5 4"' : '') + ' marker-end="url(#' + p + k + ')"/>'; }
@@ -692,14 +707,14 @@ var LEFT = {
 function hr(n){ return r1(n) + ' h'; }
 function leftSVG(k){
   var d = LEFT[k], pct = [100, 50, 25, 12.5, 6.3, 3.1], s = svgOpen('0 0 340 200', 'Share of ' + d.n + ' left after each half-life');
-  s += tx(8, 14, 'Drug left', {a: 'start', s: 10.5, c: 'var(--muted)'});
+  s += tx(332, 14, 'Share of the dose left', {a: 'end', s: 10.5, c: 'var(--muted)'});
   pct.forEach(function(v, n){ var x = 12 + n * 54, h = v * 1.2, y = 150 - h;
     s += '<rect x="' + x + '" y="' + y + '" width="40" height="' + Math.max(2, h) + '" rx="4" fill="' + (n < 2 ? 'var(--warn)' : n < 4 ? 'var(--muted)' : 'var(--line)') + '"/>';
     s += tx(x + 20, y - 5, (v >= 10 ? Math.round(v) : v) + '%', {s: 10.5, w: 600});
     var t = n === 0 ? 'dose' : d.h[0] === d.h[1] ? hr(d.h[0] * n) : r1(d.h[0] * n) + '–' + r1(d.h[1] * n) + ' h';
-    s += tx(x + 20, 166, t, {s: 9.5}) + tx(x + 20, 180, n === 0 ? '' : n + '×', {s: 9, c: 'var(--muted)'});
+    s += tx(x + 20, 166, t, {s: 10.5}) + tx(x + 20, 180, n === 0 ? '' : n + '×', {s: 10.5, c: 'var(--muted)'});
   });
-  s += tx(170, 196, 'time since last dose · number of half-lives', {s: 9.5, c: 'var(--muted)'});
+  s += tx(170, 196, 'time since last dose · number of half-lives', {s: 10.5, c: 'var(--muted)'});
   return s + '</svg>';
 }
 
@@ -713,7 +728,7 @@ function protSVG(k){
   var rows = [['ufh', 'Heparin', 100, 100, 'neutralised'], ['enox', 'Enoxaparin', 60, 60, 'about 60% at most'], ['dalt', 'Dalteparin', 60, 75, '60% to 75% at most'], ['fonda', 'Fondaparinux', 0, 0, 'none']], s = svgOpen('0 0 340 210', 'How much of each heparin protamine neutralises');
   s += tx(170, 14, 'Anti-Xa activity neutralised by protamine', {s: 10.5, c: 'var(--muted)'});
   rows.forEach(function(r, n){ var y = 26 + n * 46, on = r[0] === k;
-    s += '<g' + (on ? '' : ' opacity=".45"') + '>' + tx(8, y + 12, r[1], {a: 'start', sans: 1, s: 12.5, w: 600}) + tx(332, y + 12, r[4], {a: 'end', s: 10.5});
+    s += '<g' + (on ? '' : ' opacity=".74"') + '>' + tx(8, y + 12, r[1], {a: 'start', sans: 1, s: 12.5, w: 600}) + tx(332, y + 12, r[4], {a: 'end', s: 10.5});
     s += '<rect x="8" y="' + (y + 18) + '" width="324" height="14" rx="5" fill="var(--fill)" stroke="var(--line)"/>';
     if (r[3] > r[2]) s += '<rect x="8" y="' + (y + 18) + '" width="' + (r[3] * 3.24) + '" height="14" rx="5" fill="var(--accent)" opacity=".4"/>';
     if (r[2]) s += '<rect x="8" y="' + (y + 18) + '" width="' + (r[2] * 3.24) + '" height="14" rx="5" fill="var(--accent)"/>';
@@ -733,9 +748,9 @@ function restartSVG(k, p){
   s += '<path d="M24 20V150H330" fill="none" stroke="var(--line)" stroke-width="2"/>';
   s += '<path d="M24 34C' + (k === 'ich' ? '150 44,230 110,330 132' : '70 60,110 126,330 138') + '" fill="none" stroke="var(--warn)" stroke-width="3"/>';
   s += '<path d="M24 146C' + (steep ? '90 120,170 60,330 30' : '120 138,230 104,330 70') + '" fill="none" stroke="var(--accent)" stroke-width="3"/>';
-  s += tx(36, 22, 'risk of rebleeding', {a: 'start', s: 10, c: 'var(--warn)'}) + tx(326, steep ? 16 : 54, 'clots while off treatment', {a: 'end', s: 10, c: 'var(--accent)'});
+  s += tx(36, 22, 'risk of rebleeding', {a: 'start', s: 10.5, c: 'var(--warn)'}) + tx(326, steep ? 16 : 54, 'clots while off treatment', {a: 'end', s: 10.5, c: 'var(--accent)'});
   s += '<path d="M' + d.x + ' 62V150" stroke="var(--ink)" stroke-width="2" stroke-dasharray="4 4"/>';
-  s += tx(30, 166, 'restart: ' + d.lab, {a: 'start', s: 10, w: 600}) + tx(177, 184, 'time since the bleed · schematic, not to scale', {s: 9.5, c: 'var(--muted)'});
+  s += tx(30, 166, 'restart: ' + d.lab, {a: 'start', s: 10.5, w: 600}) + tx(177, 184, 'time since the bleed · schematic, not to scale', {s: 10.5, c: 'var(--muted)'});
   return s + '</svg>';
 }
 
@@ -889,6 +904,13 @@ $('practice').addEventListener('click', function(e){
   if (l != null){ var c2 = CASES[l]; st = {agent: c2.i.agent, sit: c2.i.sit, t: {}}; Object.keys(c2.i).forEach(function(k){ if (c2.i[k] === true) st.t[k] = true; }); drawInputs(); NUMS.forEach(function(k){ $(k).value = c2.i[k] != null ? c2.i[k] : ''; }); render(); show('t-tool'); window.scrollTo(0, 0); }
 });
 drawInputs(); render(); fromHash();
+})();
+</script>
+<script id="deeper-data">
+/* Go deeper: mechanism, rationale and the common trap for each Learn chapter. Text only; no doses or thresholds beyond the tool's own. */
+(function(){ var D = {"learn-sort": [["Mechanism", "Most bleeding on an anticoagulant stops with holding the drug, local control and supportive care. Reversal agents carry their own risk of clotting, so they are kept for bleeds that threaten life or function."], ["Why it matters", "A critical site is one where bleeding destroys function or cannot be controlled: the brain, spine, eye, pericardium, airway, a muscle compartment, and also the chest, abdomen and retroperitoneum."], ["Common trap", "Reversing an abnormal laboratory value in a patient who is not bleeding and needs no urgent procedure."]], "learn-where": [["Mechanism", "Each reversal matches the drug's mechanism. Warfarin leaves the blood short of clotting factors, so the answer is to replace them and restore their production. Dabigatran is neutralized by an antibody fragment that binds it. Factor Xa inhibitors are overcome with concentrated factors; the decoy form of factor Xa that bound them (andexanet) is no longer sold in the US. Heparin, a negatively charged chain, is bound by positively charged protamine."], ["Why it matters", "Specific agents remove the drug; non-specific ones add clotting factors to outweigh it. That difference explains their speed, completeness and cost."], ["Common trap", "Plasma for urgent warfarin reversal: the volume is large, it takes time to thaw and infuse, and the factor concentration is low."]], "learn-speed": [["Mechanism", "Concentrated factors work within minutes, but they are used up at the pace of their own half-lives, the shortest being a matter of hours. Vitamin K lets the liver make new factors, which takes many hours to show."], ["Why it matters", "Given together, one covers the present and the other covers the hours that follow."], ["Common trap", "Concentrate alone corrects the INR and then lets it rebound. Vitamin K alone is too slow for a major bleed."]], "learn-left": [["Mechanism", "These drugs are cleared at a rate proportional to their level, so each half-life halves what is left, and after about five little remains. Kidney impairment lengthens the half-life, most of all for dabigatran."], ["Why it matters", "The time since the last dose and the kidney function together tell you whether there is enough drug left to be worth reversing."], ["Common trap", "An uncertain last dose, an overdose, or an older patient with new kidney injury: assume more drug is present than the clock suggests."]], "learn-prot": [["Mechanism", "Protamine binds heparin chain by chain. Unfractionated heparin has long chains and is neutralized completely. Low-molecular-weight heparin has short chains, and its anti-Xa activity is only partly reversed. Fondaparinux, a five-sugar fragment, is not reversed at all."], ["Why it matters", "The dose depends on which heparin was given and how long ago, because heparin clears quickly on its own."], ["Common trap", "Too much protamine is itself an anticoagulant. Given fast it can cause hypotension and anaphylaxis, so it goes in slowly."]], "learn-labs": [["Mechanism", "Each clotting test responds to a different part of the cascade and to different drugs. The thrombin time is extremely sensitive to dabigatran. The PT and aPTT respond to factor Xa inhibitors unpredictably, depending on the reagent. A drug-calibrated anti-Xa assay measures them directly."], ["Why it matters", "So a normal result is only useful when the test is sensitive to the drug in question."], ["Common trap", "A normal INR in a patient taking a DOAC says nothing about how much drug is on board."]], "learn-restart": [["Mechanism", "The reason for anticoagulation has not gone away, and both the bleed and its reversal make clotting more likely in the days that follow."], ["Why it matters", "Restarting is therefore a decision to make actively, with a date, before the patient leaves, not something to leave open."], ["Common trap", "An anticoagulant stopped for a bleed and never restarted. The stroke or clot that follows is the cost of the omission."]]};
+  function add(){ Object.keys(D).forEach(function(id){ var c = document.getElementById(id); if (!c || c.querySelector(":scope > .deeper")) return; var host = c.matches(".card,.lsec,section,.chap") ? c : null; if (!host){ var n = c.nextElementSibling; while (n && !n.matches(".card")) n = n.nextElementSibling; host = n; } if (!host || host.querySelector(":scope > .deeper")) return; var d = document.createElement("details"); d.className = "deeper"; d.innerHTML = "<summary>Go deeper: mechanism and rationale</summary><div class=\"dpx\">" + D[id].map(function(r){ return "<div><span class=\"dl\">" + r[0] + "</span><p>" + r[1] + "</p></div>"; }).join("") + "</div>"; var last = host.querySelector(":scope > .row"); if (last) host.insertBefore(d, last); else host.appendChild(d); }); }
+  add(); document.addEventListener("click", function(){ setTimeout(add, 0); }); document.addEventListener("input", function(){ setTimeout(add, 0); });
 })();
 </script>
 </body>

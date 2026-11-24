@@ -54,7 +54,7 @@
 .pills{top:0}
 [hidden]{display:none!important}
 html{-webkit-text-size-adjust:100%}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5;padding-bottom:76px}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5;padding-bottom:calc(76px + env(safe-area-inset-bottom))}
 .wrap{max-width:720px;margin:0 auto;padding:0 16px}
 a{color:var(--accent)}
 .back{font-size:14px;text-decoration:none;display:inline-block;min-height:44px;line-height:44px}
@@ -106,6 +106,18 @@ a:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible,s
 footer{margin-top:24px;padding:16px 0 8px;border-top:1px solid var(--line);font-size:12.5px;color:var(--muted);line-height:1.6}
 footer p{margin:0 0 6px}
 footer strong{color:var(--ink)}
+.deeper{margin-top:14px;border-top:1px solid var(--line)}
+.deeper>summary{min-height:44px;display:flex;align-items:center;gap:8px;color:var(--accent);font-weight:600;font-size:15px;cursor:pointer;list-style:none}
+.deeper>summary::-webkit-details-marker{display:none}
+.deeper>summary::before{content:"+";font-family:var(--mono);font-size:18px;line-height:1;width:14px;text-align:center}
+.deeper[open]>summary::before{content:"\2212"}
+.deeper>summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.deeper .dpx{border:1px solid var(--line);border-radius:12px;padding:2px 12px;background:var(--card);text-align:left}
+.deeper .dpx>div{padding:10px 0;border-top:1px solid var(--line)}
+.deeper .dpx>div:first-child{border-top:0}
+.deeper .dl{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500;margin:0 0 3px}
+.deeper p{font-size:15px;line-height:1.45;color:var(--ink);margin:0 0 4px}
+.deeper p:last-child{margin-bottom:0}
 </style>
 <style id="vk-css">
 .vk-plate{margin-top:10px;border:1px solid var(--line);border-radius:12px;padding:6px;background:var(--card)}
@@ -138,6 +150,18 @@ footer strong{color:var(--ink)}
 .vk-sl input[type=range]{width:100%;min-height:44px;accent-color:var(--accent)}
 .vk-res{margin-top:8px}
 .vk-res .card{margin-bottom:8px}
+.vk-zone{margin:0 0 6px}
+.vk-zs{display:flex;gap:2px;height:8px}
+.vk-zs i{display:block;border-radius:99px;background:var(--line);min-width:4px}
+.vk-zs i.on{background:var(--accent)}
+.vk-zt{font-family:var(--mono);font-size:12px;color:var(--ink);margin:4px 0 0}
+.vk-deep{margin-top:10px;border:1px solid var(--line);border-radius:12px;padding:2px 12px;background:var(--card)}
+.vk-deep:empty{display:none}
+.vk-dr{padding:10px 0;border-top:1px solid var(--line)}
+.vk-dr:first-child{border-top:0}
+.vk-dr .label{margin:0 0 3px}
+.vk-dr p{font-size:15px;margin:0 0 4px}
+.vk-dr p:last-child{margin-bottom:0}
 .vk-flow .vk-dots{display:flex;gap:4px;margin:4px 0 12px}
 .vk-d{flex:1;height:4px;border-radius:99px;background:var(--line)}
 .vk-d.on{background:var(--accent)}
@@ -156,6 +180,9 @@ footer strong{color:var(--ink)}
 .vk-lab{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 6px}
 .vk-head{font-weight:600;margin:0 0 4px}
 .vk-chip:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+/* cause-fix: ruled-out causes stay readable; the name greys, the reason does not fade */
+.cause.out,.cause.less,.cause.unl{opacity:1}
+.cause.less>span,.cause.unl>span{color:var(--muted)}
 </style>
 </head>
 <body>
@@ -384,9 +411,9 @@ var FS = 'font-family:var(--sans)', FM = 'font-family:var(--mono)';
 function vcol(v){ return v === 'u' ? 'var(--warn)' : v === 'd' ? 'var(--accent)' : v === 'x' ? 'var(--bad)' : 'var(--muted)'; }
 function markers(p){ return '<defs>' + ['n','u','d','x'].map(function(k){ return '<marker id="' + p + k + '" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="' + vcol(k) + '"/></marker>'; }).join('') + '</defs>'; }
 function box(x, y, w, h, t1, t2, hot, dim){
-  return '<g' + (dim ? ' opacity=".45"' : '') + '><rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="10" fill="' + (hot ? 'var(--warnbg)' : 'var(--fill)') + '" stroke="' + (hot ? 'var(--warn)' : 'var(--line)') + '"' + (hot ? ' stroke-width="2"' : '') + '/>' +
+  return '<g' + (dim ? ' opacity=".74"' : '') + '><rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="10" fill="' + (hot ? 'var(--warnbg)' : 'var(--fill)') + '" stroke="' + (hot ? 'var(--warn)' : 'var(--line)') + '"' + (hot ? ' stroke-width="2"' : '') + '/>' +
     '<text x="' + (x + w / 2) + '" y="' + (y + (t2 ? h / 2 - 2 : h / 2 + 4)) + '" text-anchor="middle" style="' + FS + ';font-size:12px;font-weight:600;fill:var(--ink)">' + t1 + '</text>' +
-    (t2 ? '<text x="' + (x + w / 2) + '" y="' + (y + h / 2 + 12) + '" text-anchor="middle" style="' + FM + ';font-size:10px;fill:var(--muted)">' + t2 + '</text>' : '') + '</g>';
+    (t2 ? '<text x="' + (x + w / 2) + '" y="' + (y + h / 2 + 12) + '" text-anchor="middle" style="' + FM + ';font-size:10.5px;fill:var(--muted)">' + t2 + '</text>' : '') + '</g>';
 }
 function svgOpen(vb, label){ return '<svg viewBox="' + vb + '" role="img" aria-label="' + label + '" class="fig">'; }
 function line(d, v, w, p){ return '<path d="' + d + '" fill="none" stroke="' + vcol(v) + '" stroke-width="' + (w || (v === 'u' ? 4 : v === 'd' ? 1.5 : 2)) + '"' + (v === 'd' || v === 'x' ? ' stroke-dasharray="5 4"' : '') + ' marker-end="url(#' + p + (v || 'n') + ')"/>'; }
@@ -412,14 +439,14 @@ function originSVG(k, p){
   var h = svgOpen('0 0 340 270', 'Where the rhythm comes from: ' + ORIGIN[k].n) + markers(p);
   h += '<rect x="40" y="20" width="120" height="84" rx="26" fill="var(--fill)" stroke="var(--line)"/><rect x="180" y="20" width="120" height="84" rx="26" fill="var(--fill)" stroke="var(--line)"/>';
   h += tx(100, 96, 'right atrium', 10.5, 'var(--muted)', 400, 'middle', true) + tx(240, 96, 'left atrium', 10.5, 'var(--muted)', 400, 'middle', true);
-  h += '<rect x="286" y="28" width="44" height="14" rx="7" fill="var(--fill)" stroke="var(--line)"/><rect x="286" y="52" width="44" height="14" rx="7" fill="var(--fill)" stroke="var(--line)"/>' + tx(308, 82, 'pulm. veins', 9.5, k === 'af' ? 'var(--warn)' : 'var(--muted)', k === 'af' ? 700 : 400, 'middle', true);
+  h += '<rect x="286" y="28" width="44" height="14" rx="7" fill="var(--fill)" stroke="var(--line)"/><rect x="286" y="52" width="44" height="14" rx="7" fill="var(--fill)" stroke="var(--line)"/>' + tx(300, 82, 'pulm. veins', 10.5, k === 'af' ? 'var(--warn)' : 'var(--muted)', k === 'af' ? 700 : 400, 'middle', true);
   h += '<rect x="110" y="140" width="120" height="60" rx="22" fill="var(--fill)" stroke="var(--line)"/>' + tx(170, 176, 'ventricles', 11, 'var(--ink)', 600);
-  h += '<circle cx="170" cy="118" r="11" fill="var(--card)" stroke="var(--accent)" stroke-width="2"/>' + tx(170, 122, 'AV', 9.5, 'var(--accent)', 700, 'middle', true);
-  if (k === 'sinus') h += '<circle cx="62" cy="40" r="7" fill="var(--accent)"/>' + tx(84, 36, 'sinus node', 9.5, 'var(--accent)', 700, 'start', true) + line('M68 46 C100 70 130 96 158 112', 'n', 2, p) + line('M170 130 V150', 'n', 2, p);
+  h += '<circle cx="170" cy="118" r="11" fill="var(--card)" stroke="var(--accent)" stroke-width="2"/>' + tx(170, 122, 'AV', 10.5, 'var(--accent)', 700, 'middle', true);
+  if (k === 'sinus') h += '<circle cx="62" cy="40" r="7" fill="var(--accent)"/>' + tx(84, 36, 'sinus node', 10.5, 'var(--accent)', 700, 'start', true) + line('M68 46 C100 70 130 96 158 112', 'n', 2, p) + line('M170 130 V150', 'n', 2, p);
   else if (k === 'af'){
     [[288, 36, 250, 44], [288, 60, 244, 64], [250, 44, 214, 34], [244, 64, 206, 74], [214, 34, 196, 60], [206, 74, 184, 104], [150, 50, 110, 40], [110, 40, 84, 62], [84, 62, 124, 80], [124, 80, 158, 108]].forEach(function(a){ h += line('M' + a[0] + ' ' + a[1] + ' L' + a[2] + ' ' + a[3], 'u', 1.6, p); });
-    h += '<path d="M170 130 V150" fill="none" stroke="var(--muted)" stroke-width="2" stroke-dasharray="3 5" marker-end="url(#' + p + 'n)"/>' + tx(190, 140, 'irregular', 9.5, 'var(--muted)', 400, 'start', true);
-  } else h += '<path d="M100 34 a26 26 0 1 1 -1 0" fill="none" stroke="var(--warn)" stroke-width="3" marker-end="url(#' + p + 'u)"/>' + tx(100, 64, 'circuit', 9.5, 'var(--warn)', 700, 'middle', true) + line('M124 78 C140 96 150 106 160 112', 'n', 2, p) + line('M170 130 V150', 'n', 2, p);
+    h += '<path d="M170 130 V150" fill="none" stroke="var(--muted)" stroke-width="2" stroke-dasharray="3 5" marker-end="url(#' + p + 'n)"/>' + tx(190, 140, 'irregular', 10.5, 'var(--muted)', 400, 'start', true);
+  } else h += '<path d="M100 34 a26 26 0 1 1 -1 0" fill="none" stroke="var(--warn)" stroke-width="3" marker-end="url(#' + p + 'u)"/>' + tx(100, 64, 'circuit', 10.5, 'var(--warn)', 700, 'middle', true) + line('M124 78 C140 96 150 106 160 112', 'n', 2, p) + line('M170 130 V150', 'n', 2, p);
   return h + ecg(k, 250) + '</svg>';
 }
 
@@ -434,10 +461,10 @@ function laaSVG(k, p){
   var h = svgOpen('0 0 340 210', 'The left atrial appendage: ' + LAA[k].n) + markers(p);
   h += '<path d="M60 60 Q60 24 120 24 H200 Q244 24 244 60 V130 Q244 166 200 166 H120 Q60 166 60 130 Z" fill="var(--fill)" stroke="var(--line)"/>' + tx(150, 100, 'Left atrium', 12, 'var(--ink)', 600);
   h += '<path d="M244 56 Q300 40 312 76 Q322 112 286 118 Q262 120 244 104 Z" fill="' + (k === 'af' ? 'var(--warnbg)' : 'var(--fill)') + '" stroke="' + (k === 'af' ? 'var(--warn)' : 'var(--line)') + '"' + (k === 'af' ? ' stroke-width="2"' : '') + '/>' + tx(286, 142, 'appendage', 10.5, 'var(--muted)', 400, 'middle', true);
-  if (k === 'sinus') h += line('M290 84 C276 86 264 84 250 80', 'n', 2, p) + line('M150 130 V186', 'n', 2, p) + tx(160, 190, 'to the ventricle', 10, 'var(--muted)', 400, 'start', true);
-  if (k === 'af') h += '<circle cx="292" cy="82" r="11" fill="var(--bad)" opacity=".75"/>' + tx(292, 60, 'clot', 10, 'var(--bad)', 700, 'middle', true) + '<path d="M280 90 C230 130 190 150 150 186" fill="none" stroke="var(--bad)" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#' + p + 'x)"/>' + tx(160, 200, 'embolus to the brain', 10, 'var(--bad)', 700, 'start', true);
-  if (k === 'oac') h += '<circle cx="292" cy="82" r="11" fill="none" stroke="var(--muted)" stroke-dasharray="3 3"/>' + tx(292, 60, 'slow flow', 10, 'var(--muted)', 400, 'middle', true) + tx(150, 190, 'clot less likely', 10.5, 'var(--accent)', 700, 'middle', true);
-  if (k === 'closed') h += '<path d="M244 50 V110" stroke="var(--accent)" stroke-width="5"/>' + tx(232, 44, 'closed', 10, 'var(--accent)', 700, 'end', true);
+  if (k === 'sinus') h += line('M290 84 C276 86 264 84 250 80', 'n', 2, p) + line('M150 130 V186', 'n', 2, p) + tx(160, 190, 'to the ventricle', 10.5, 'var(--muted)', 400, 'start', true);
+  if (k === 'af') h += '<circle cx="292" cy="82" r="11" fill="var(--bad)" opacity=".75"/>' + tx(292, 60, 'clot', 10.5, 'var(--bad)', 700, 'middle', true) + '<path d="M280 90 C230 130 190 150 150 186" fill="none" stroke="var(--bad)" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#' + p + 'x)"/>' + tx(160, 200, 'embolus to the brain', 10.5, 'var(--bad)', 700, 'start', true);
+  if (k === 'oac') h += '<circle cx="292" cy="82" r="11" fill="none" stroke="var(--muted)" stroke-dasharray="3 3"/>' + tx(292, 60, 'slow flow', 10.5, 'var(--muted)', 400, 'middle', true) + tx(150, 190, 'clot less likely', 10.5, 'var(--accent)', 700, 'middle', true);
+  if (k === 'closed') h += '<path d="M244 50 V110" stroke="var(--accent)" stroke-width="5"/>' + tx(232, 44, 'closed', 10.5, 'var(--accent)', 700, 'end', true);
   return h + '</svg>';
 }
 
@@ -450,7 +477,7 @@ function ladderSVG(k){
   var d = LADDER[k], pts = [['Heart failure', 1], ['Hypertension', 1], ['Age 75 or older', 2], ['Diabetes', 1], ['Stroke, TIA or embolism', 2], ['Vascular disease', 1], ['Age 65 to 74', 1], ['Female sex', 1]];
   var h = svgOpen('0 0 340 250', 'CHA2DS2-VASc points and thresholds: ' + d.n);
   pts.forEach(function(r, i){ var y = 14 + i * 28; h += '<rect x="8" y="' + y + '" width="170" height="23" rx="7" fill="var(--fill)"/>' + tx(16, y + 16, r[0], 11, 'var(--ink)', 400, 'start') + tx(170, y + 16, '+' + r[1], 11.5, 'var(--ink)', 700, 'end', true); });
-  [['No recommendation', 'men 0 · women 1'], ['Reasonable · 2a', 'men 1 · women 2'], ['Anticoagulate · 1', 'men 2+ · women 3+']].forEach(function(r, i){ var y = 170 - i * 72, on = d.hot === i; h += '<rect x="196" y="' + y + '" width="136" height="62" rx="12" fill="' + (on ? 'var(--warnbg)' : 'var(--fill)') + '" stroke="' + (on ? 'var(--warn)' : 'var(--line)') + '"' + (on ? ' stroke-width="2"' : '') + '/>' + tx(264, y + 27, r[0], 11.5, 'var(--ink)', on ? 700 : 600) + tx(264, y + 45, r[1], 10, 'var(--muted)', 400, 'middle', true); });
+  [['No recommendation', 'men 0 · women 1'], ['Reasonable · 2a', 'men 1 · women 2'], ['Anticoagulate · 1', 'men 2+ · women 3+']].forEach(function(r, i){ var y = 170 - i * 72, on = d.hot === i; h += '<rect x="196" y="' + y + '" width="136" height="62" rx="12" fill="' + (on ? 'var(--warnbg)' : 'var(--fill)') + '" stroke="' + (on ? 'var(--warn)' : 'var(--line)') + '"' + (on ? ' stroke-width="2"' : '') + '/>' + tx(264, y + 27, r[0], 11.5, 'var(--ink)', on ? 700 : 600) + tx(264, y + 45, r[1], 10.5, 'var(--muted)', 400, 'middle', true); });
   return h + '</svg>';
 }
 
@@ -506,7 +533,7 @@ function gateSVG(k, p){
   h += '<rect x="112" y="98" width="76" height="34" rx="10" fill="var(--card)" stroke="var(--accent)" stroke-width="2"/>' + tx(150, 120, 'AV node', 11, 'var(--accent)', 700);
   h += line('M150 134 V156', d.drug ? 'd' : 'n', d.drug ? 1.5 : 2.5, p);
   if (d.drug) h += d.drug.split(' / ').map(function(w, n, a){ return tx(8, (a.length > 1 ? 112 : 120) + n * 14, w, 10.5, 'var(--accent)', 700, 'start', true); }).join('') + '<path d="M88 116 H108" fill="none" stroke="var(--accent)" stroke-width="2" marker-end="url(#' + p + 'd)"/>';
-  if (d.pre) h += '<path d="M262 72 C286 100 280 140 244 160" fill="none" stroke="var(--bad)" stroke-width="4" marker-end="url(#' + p + 'x)"/>' + tx(332, 112, 'accessory', 10, 'var(--bad)', 700, 'end', true) + tx(332, 126, 'pathway', 10, 'var(--bad)', 700, 'end', true);
+  if (d.pre) h += '<path d="M262 72 C286 100 280 140 244 160" fill="none" stroke="var(--bad)" stroke-width="4" marker-end="url(#' + p + 'x)"/>' + tx(332, 112, 'accessory', 10.5, 'var(--bad)', 700, 'end', true) + tx(332, 126, 'pathway', 10.5, 'var(--bad)', 700, 'end', true);
   return h + '</svg>';
 }
 
@@ -884,8 +911,8 @@ var VK = (function(){
   function mark(box, j){ var ok = false; box.querySelectorAll('.vk-opt').forEach(function(b, i){ b.disabled = true; if (b.getAttribute('data-ok') === '1') b.classList.add('right'); else if (i === j) b.classList.add('wrong'); if (i === j) ok = b.getAttribute('data-ok') === '1'; }); return ok; }
   function answer(key, j){ var box = document.querySelector('[data-vk-pred="' + key + '"]'), P = C.preds[key]; if (!box || box.getAttribute('data-done')) return; box.setAttribute('data-done', '1'); var ok = mark(box, j), a = box.querySelector('.vk-ans');
     a.innerHTML = '<p><b>' + (ok ? 'Right.' : 'Not quite.') + '</b> ' + P.why() + '</p>' + (typeof P.fig === 'function' ? P.fig() : P.fig ? '<button class="chip vk-chip" type="button" data-fig="' + P.fig[0] + '" data-state="' + (P.fig[1] || '') + '">' + VK_FIC + q(P.fig[2]) + '</button>' : ''); a.hidden = false; }
-  function slHtml(id){ var S = C.sliders[id]; return '<div class="vk-sl" data-vk-sl="' + id + '">' + S.ranges.map(function(r){ return '<label for="vk-' + id + '-' + r.key + '">' + r.label + ' <b data-vk-v="' + r.key + '"></b></label><input type="range" id="vk-' + id + '-' + r.key + '" data-vk-k="' + r.key + '" min="' + r.min + '" max="' + r.max + '" step="' + r.step + '" value="' + r.value + '">'; }).join('') + '<div class="vk-res" aria-live="polite"></div>' + (S.note ? '<p class="vk-src">' + S.note + '</p>' : '') + '</div>'; }
-  function slRun(w){ var S = C.sliders[w.getAttribute('data-vk-sl')], v = {}; S.ranges.forEach(function(r){ var el = w.querySelector('[data-vk-k="' + r.key + '"]'), x = +el.value, tx = (r.fmt ? r.fmt(x) : x) + (r.unit ? ' ' + r.unit : ''); v[r.key] = x; w.querySelector('[data-vk-v="' + r.key + '"]').textContent = tx; el.setAttribute('aria-valuetext', tx); }); w.querySelector('.vk-res').innerHTML = S.run(v); }
+  function slHtml(id){ var S = C.sliders[id]; return '<div class="vk-sl" data-vk-sl="' + id + '">' + S.ranges.map(function(r){ return '<label for="vk-' + id + '-' + r.key + '">' + r.label + ' <b data-vk-v="' + r.key + '"></b></label><input type="range" id="vk-' + id + '-' + r.key + '" data-vk-k="' + r.key + '" min="' + r.min + '" max="' + r.max + '" step="' + r.step + '" value="' + r.value + '">' + (r.zones ? '<div class="vk-zone" data-vk-z="' + r.key + '"></div>' : ''); }).join('') + '<div class="vk-res" aria-live="polite"></div><div class="vk-deep"></div>' + (S.note ? '<p class="vk-src">' + S.note + '</p>' : '') + '</div>'; }
+  function slRun(w){ var S = C.sliders[w.getAttribute('data-vk-sl')], v = {}; S.ranges.forEach(function(r){ var el = w.querySelector('[data-vk-k="' + r.key + '"]'), x = +el.value, tx = (r.fmt ? r.fmt(x) : x) + (r.unit ? ' ' + r.unit : ''); v[r.key] = x; w.querySelector('[data-vk-v="' + r.key + '"]').textContent = tx; el.setAttribute('aria-valuetext', tx); }); w.querySelector('.vk-res').innerHTML = S.run(v); S.ranges.forEach(function(r){ if (!r.zones) return; var Z = typeof r.zones === 'function' ? r.zones(v) : r.zones, x = v[r.key], on = Z.length - 1; Z.forEach(function(z, k){ if (x >= z[0] && x < z[1] && on === Z.length - 1) on = k; }); w.querySelector('[data-vk-z="' + r.key + '"]').innerHTML = '<div class="vk-zs" aria-hidden="true">' + Z.map(function(z, k){ return '<i' + (k === on ? ' class="on"' : '') + ' style="flex:' + Math.max(0.01, Math.min(z[1], r.max) - Math.max(z[0], r.min)) + '"></i>'; }).join('') + '</div><p class="vk-zt">' + Z[on][2] + '</p>'; }); w.querySelector('.vk-deep').innerHTML = S.deep ? S.deep(v).map(function(d){ return '<div class="vk-dr"><p class="label">' + d[0] + '</p>' + d[1] + '</div>'; }).join('') : ''; }
   function flowHtml(id){ var F = C.flows[id]; return '<div class="vk-flow" data-vk-flow="' + id + '"><p class="head vk-head">' + F.t + '</p><div class="vk-dots">' + F.steps.map(function(_, k){ return '<i class="vk-d' + (k ? '' : ' on') + '"></i>'; }).join('') + '</div><div class="vk-fb"></div></div>'; }
   function step(id, k){ var F = C.flows[id], S = F.steps[k], w = document.querySelector('[data-vk-flow="' + id + '"]'); if (!w || !S) return; FS[id] = k;
     w.querySelectorAll('.vk-d').forEach(function(d, j){ d.classList.toggle('on', j <= k); });
@@ -951,10 +978,22 @@ var VK = (function(){
                       {key: 'cr', label: 'Creatinine', min: 0.6, max: 4, step: 0.1, value: 1.4, unit: 'mg/dL', fmt: function(x){ return x.toFixed(1); }},
                       {key: 'sex', label: 'Sex', min: 0, max: 1, step: 1, value: 1, fmt: function(x){ return x ? 'Female' : 'Male'; }}],
         note: 'Cockcroft-Gault with actual body weight, then each label\'s dose rule: the same engine as the calculator. Assumes not on dialysis.',
+        deep: function(v){ var d = doacDoses({age: v.age, wt: v.wt, cr: v.cr, sex: v.sex ? 'f' : 'm'}); if (!d) return [];
+          return [['What is happening', '<p>Creatinine comes from muscle. An older or lighter patient makes less of it, so the same creatinine hides a lower clearance: drag age up or weight down and watch the clearance fall while the creatinine stays put.</p>'],
+            ['Why each drug reacts differently', '<p>The kidney clears each drug to a different degree: ' + ['dabi', 'edox', 'riva', 'apix'].filter(function(k){ return DRUGS[k]; }).map(function(k){ return DRUGS[k].n.toLowerCase() + ' about ' + DRUGS[k].kid + '%'; }).join(', ') + '. The more a drug depends on the kidney, the earlier its dose falls. Apixaban depends on it least, so its rule uses age, weight and creatinine together and needs two of the three.</p>'],
+            ['Why Cockcroft-Gault', '<p>The DOAC trials measured kidney function by Cockcroft-Gault clearance (apixaban\'s own rule uses serum creatinine), so the labels do too. An eGFR is indexed to body size and tends to read higher than this in small, elderly patients, which leads to overdosing.</p>'],
+            ['The common error', '<p>Reducing the dose "to be safe" when the criteria are not met. In observational data an off-label low dose (clearest for apixaban) was linked to more strokes with no drop in bleeding.</p>']]; },
         run: function(v){ var sex = v.sex ? 'f' : 'm', d = doacDoses({age: v.age, wt: v.wt, cr: v.cr, sex: sex}), b = kidneyBand(d.crcl, false);
           return '<p><b>CrCl ' + d.crcl.toFixed(1) + ' mL/min.</b>' + (b && b.text ? ' ' + b.text + ' (' + b.tier + ')' : '') + '</p><ul>' + d.rows.map(function(r){ return '<li><b>' + r.drug + ':</b> ' + r.dose + '. <span class="vk-src">' + r.note + '</span></li>'; }).join('') + '</ul>'; }}
     }
   });
+})();
+</script>
+<script id="deeper-data">
+/* Go deeper: mechanism, rationale and the common trap for each Learn chapter. Text only; no doses or thresholds beyond the tool's own. */
+(function(){ var D = {"learn-origin": [["Mechanism", "AF needs a trigger and a substrate. The triggers are rapid discharges, most often from the sleeves of heart muscle that extend into the pulmonary veins. The substrate is an atrium that is stretched and scarred enough to sustain many small circulating wavefronts. AF then changes the atrium electrically and structurally in ways that make more AF likely."], ["Why it matters", "This explains why isolating the pulmonary veins works best early, when triggers dominate, and less well once the substrate is advanced. It also explains why treating blood pressure, obesity and alcohol reduces AF (treating sleep apnea probably helps, though the trials are less certain): they act on the substrate."], ["Common trap", "Treating AF as only an electrical problem and leaving the conditions that remodel the atrium untreated."]], "learn-clot": [["Mechanism", "The left atrial appendage is a blind, ridged pouch. In AF it stops contracting, blood pools in it, and the atrial lining and the blood itself become more prone to clot. The clots that form are rich in fibrin, like venous clots."], ["Why it matters", "Fibrin-rich clot is the reason anticoagulants prevent most of these strokes and antiplatelet drugs prevent few. Paroxysmal AF carries somewhat less risk than persistent AF, but not little enough to change the decision, which rests on the risk score, not on the rhythm seen today."], ["Common trap", "Aspirin is not adequate stroke prevention in AF. And a return to sinus rhythm, after cardioversion or ablation, does not by itself remove the indication to anticoagulate."]], "learn-score": [["Mechanism", "Each item in the score marks more disease of the atrium and vessels and more stasis. Added together they estimate the yearly risk of stroke without treatment."], ["Why it matters", "Anticoagulation is worth it when the strokes prevented outweigh the serious bleeds caused. Bleeding risk scores are for finding causes of bleeding that can be corrected, not for withholding treatment."], ["Common trap", "Age and a previous stroke carry the most weight in the score, and older patients gain the most from treatment. A risk of falling is rarely a good reason to withhold it."]], "learn-gate": [["Mechanism", "The AV node conducts with slow, calcium-dependent action potentials and conducts less well the faster it is driven. It filters the hundreds of atrial impulses each minute down to a ventricular rate. Beta-blockers remove the sympathetic drive on the node, verapamil and diltiazem block its calcium channels, and digoxin increases vagal tone, which is weak when sympathetic drive is high."], ["Why it matters", "A fast rate in sepsis, bleeding, pulmonary embolism or pain is the node responding to the body's demand. Treat the cause first; slowing the rate alone can remove a needed compensation. Verapamil and diltiazem weaken contraction and are avoided when the ejection fraction is reduced."], ["Common trap", "AF conducted down an accessory pathway (fast, irregular, wide and changing QRS) is the exception. Blocking the node sends more impulses down the pathway and can cause ventricular fibrillation."]], "learn-clock": [["Mechanism", "After any return to sinus rhythm, the atrium's electrical activity recovers before its mechanical contraction. For days to weeks the appendage is still, and a new clot can form even where none existed before."], ["Why it matters", "This is why anticoagulation continues for weeks after cardioversion whatever the risk score, and why a clear transesophageal echo allows cardioversion but not stopping anticoagulation. It applies equally to electrical, drug and spontaneous conversion."], ["Common trap", "The time of onset is often unknown. AF is frequently silent, and symptoms starting yesterday do not prove the rhythm did."]], "learn-strategy": [["Mechanism", "Rate control accepts AF and limits the ventricular rate. Rhythm control restores the atrial contribution to filling, which matters most when the ventricle is stiff, and may slow atrial remodelling."], ["Why it matters", "The older trials found no advantage for rhythm control, partly because the drugs used to keep sinus rhythm had their own toxicity and anticoagulation was often stopped. Earlier treatment, safer drug choices and ablation changed the balance in the later trials."], ["Common trap", "A persistently fast rate can itself weaken the ventricle. In new heart failure with AF, consider that the tachycardia is the cause: the function can recover once rate or rhythm is controlled."]]};
+  function add(){ Object.keys(D).forEach(function(id){ var c = document.getElementById(id); if (!c || c.querySelector(":scope > .deeper")) return; var host = c.matches(".card,.lsec,section,.chap") ? c : null; if (!host){ var n = c.nextElementSibling; while (n && !n.matches(".card")) n = n.nextElementSibling; host = n; } if (!host || host.querySelector(":scope > .deeper")) return; var d = document.createElement("details"); d.className = "deeper"; d.innerHTML = "<summary>Go deeper: mechanism and rationale</summary><div class=\"dpx\">" + D[id].map(function(r){ return "<div><span class=\"dl\">" + r[0] + "</span><p>" + r[1] + "</p></div>"; }).join("") + "</div>"; var last = host.querySelector(":scope > .row"); if (last) host.insertBefore(d, last); else host.appendChild(d); }); }
+  add(); document.addEventListener("click", function(){ setTimeout(add, 0); }); document.addEventListener("input", function(){ setTimeout(add, 0); });
 })();
 </script>
 </body>

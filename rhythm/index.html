@@ -11,7 +11,7 @@
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 html{-webkit-text-size-adjust:100%}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5;padding-bottom:76px}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5;padding-bottom:calc(76px + env(safe-area-inset-bottom))}
 .wrap{max-width:720px;margin:0 auto;padding:0 16px}
 a{color:var(--accent)}
 button{font:inherit;color:inherit}
@@ -93,7 +93,7 @@ details.jump[open] summary span:last-child::after{content:""}
 .ctx button[aria-pressed=true]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:600}
 .btn{min-height:44px;padding:0 18px;border:1px solid var(--accent);border-radius:999px;background:var(--accent);color:var(--accent-ink);font-weight:600;font-size:14.5px;cursor:pointer}
 .btn.ghost{background:var(--card);color:var(--accent)}
-.btn[disabled]{opacity:.45;cursor:default}
+.btn[disabled]{opacity:.6;cursor:default}
 
 /* reference */
 .chips{display:flex;gap:6px;overflow-x:auto;padding:2px 0 12px;margin:0 -16px;padding-left:16px;padding-right:16px}
@@ -184,6 +184,18 @@ footer strong{color:var(--ink)}
 .rowb button{min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--ink);font:inherit;font-size:14px;cursor:pointer}
 #fscrim[hidden],#fsheet[hidden]{display:none}
 #v-learn summary{min-height:44px;line-height:44px;cursor:pointer}
+.deeper{margin-top:14px;border-top:1px solid var(--line)}
+.deeper>summary{min-height:44px;display:flex;align-items:center;gap:8px;color:var(--accent);font-weight:600;font-size:15px;cursor:pointer;list-style:none}
+.deeper>summary::-webkit-details-marker{display:none}
+.deeper>summary::before{content:"+";font-family:var(--mono);font-size:18px;line-height:1;width:14px;text-align:center}
+.deeper[open]>summary::before{content:"\2212"}
+.deeper>summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.deeper .dpx{border:1px solid var(--line);border-radius:12px;padding:2px 12px;background:var(--card);text-align:left}
+.deeper .dpx>div{padding:10px 0;border-top:1px solid var(--line)}
+.deeper .dpx>div:first-child{border-top:0}
+.deeper .dl{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500;margin:0 0 3px}
+.deeper p{font-size:15px;line-height:1.45;color:var(--ink);margin:0 0 4px}
+.deeper p:last-child{margin-bottom:0}
 </style>
 <style id="vk-css">
 .vk-plate{margin-top:10px;border:1px solid var(--line);border-radius:12px;padding:6px;background:var(--card)}
@@ -216,6 +228,18 @@ footer strong{color:var(--ink)}
 .vk-sl input[type=range]{width:100%;min-height:44px;accent-color:var(--accent)}
 .vk-res{margin-top:8px}
 .vk-res .card{margin-bottom:8px}
+.vk-zone{margin:0 0 6px}
+.vk-zs{display:flex;gap:2px;height:8px}
+.vk-zs i{display:block;border-radius:99px;background:var(--line);min-width:4px}
+.vk-zs i.on{background:var(--accent)}
+.vk-zt{font-family:var(--mono);font-size:12px;color:var(--ink);margin:4px 0 0}
+.vk-deep{margin-top:10px;border:1px solid var(--line);border-radius:12px;padding:2px 12px;background:var(--card)}
+.vk-deep:empty{display:none}
+.vk-dr{padding:10px 0;border-top:1px solid var(--line)}
+.vk-dr:first-child{border-top:0}
+.vk-dr .label{margin:0 0 3px}
+.vk-dr p{font-size:15px;margin:0 0 4px}
+.vk-dr p:last-child{margin-bottom:0}
 .vk-flow .vk-dots{display:flex;gap:4px;margin:4px 0 12px}
 .vk-d{flex:1;height:4px;border-radius:99px;background:var(--line)}
 .vk-d.on{background:var(--accent)}
@@ -234,6 +258,9 @@ footer strong{color:var(--ink)}
 .vk-lab{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 6px}
 .vk-head{font-weight:600;margin:0 0 4px}
 .vk-chip:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+/* cause-fix: ruled-out causes stay readable; the name greys, the reason does not fade */
+.cause.out,.cause.less,.cause.unl{opacity:1}
+.cause.less>span,.cause.unl>span{color:var(--muted)}
 </style>
 </head>
 <body>
@@ -886,9 +913,9 @@ var FS = 'font-family:var(--sans)', FM = 'font-family:var(--mono)';
 function vcol(v){ return v === 'u' ? 'var(--warn)' : v === 'd' ? 'var(--accent)' : v === 'x' ? 'var(--bad)' : 'var(--muted)'; }
 function markers(p){ return '<defs>' + ['n','u','d','x'].map(function(k){ return '<marker id="' + p + k + '" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="' + vcol(k) + '"/></marker>'; }).join('') + '</defs>'; }
 function box(x, y, w, h, t1, t2, hot, dim){
-  return '<g' + (dim ? ' opacity=".45"' : '') + '><rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="10" fill="' + (hot ? 'var(--warnbg)' : 'var(--fill)') + '" stroke="' + (hot ? 'var(--warn)' : 'var(--line)') + '"' + (hot ? ' stroke-width="2"' : '') + '/>' +
+  return '<g' + (dim ? ' opacity=".74"' : '') + '><rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="10" fill="' + (hot ? 'var(--warnbg)' : 'var(--fill)') + '" stroke="' + (hot ? 'var(--warn)' : 'var(--line)') + '"' + (hot ? ' stroke-width="2"' : '') + '/>' +
     '<text x="' + (x + w / 2) + '" y="' + (y + (t2 ? h / 2 - 2 : h / 2 + 4)) + '" text-anchor="middle" style="' + FS + ';font-size:12px;font-weight:600;fill:var(--ink)">' + t1 + '</text>' +
-    (t2 ? '<text x="' + (x + w / 2) + '" y="' + (y + h / 2 + 12) + '" text-anchor="middle" style="' + FM + ';font-size:10px;fill:var(--muted)">' + t2 + '</text>' : '') + '</g>';
+    (t2 ? '<text x="' + (x + w / 2) + '" y="' + (y + h / 2 + 12) + '" text-anchor="middle" style="' + FM + ';font-size:10.5px;fill:var(--muted)">' + t2 + '</text>' : '') + '</g>';
 }
 function svgOpen(vb, label){ return '<svg viewBox="' + vb + '" role="img" aria-label="' + label + '" class="fig">'; }
 function line(d, v, w, p){ return '<path d="' + d + '" fill="none" stroke="' + vcol(v) + '" stroke-width="' + (w || (v === 'u' ? 4 : v === 'd' ? 1.5 : 2)) + '"' + (v === 'd' || v === 'x' ? ' stroke-dasharray="5 4"' : '') + ' marker-end="url(#' + p + (v || 'n') + ')"/>'; }
@@ -900,17 +927,17 @@ function heart(label, o, p){
   var h = svgOpen('0 0 340 230', label) + markers(p);
   h += '<rect x="40" y="14" width="260" height="78" rx="30" fill="var(--fill)" stroke="var(--line)"/>' + tx(170, 30, 'atria', 10.5, 'var(--muted)', 400, 'middle', true);
   h += '<rect x="60" y="130" width="220" height="86" rx="34" fill="var(--fill)" stroke="var(--line)"/>' + tx(170, 208, 'ventricles', 10.5, 'var(--muted)', 400, 'middle', true);
-  h += '<circle cx="76" cy="44" r="9" fill="' + (o.sa ? 'var(--accent)' : 'var(--card)') + '" stroke="var(--accent)" stroke-width="2"/>' + tx(92, 40, 'SA', 9.5, 'var(--accent)', 700, 'start', true);
-  h += '<rect x="150" y="96" width="40" height="28" rx="9" fill="' + (o.av ? 'var(--warnbg)' : 'var(--card)') + '" stroke="' + (o.av ? 'var(--warn)' : 'var(--accent)') + '" stroke-width="2"/>' + tx(170, 114, 'AV', 10, o.av ? 'var(--warn)' : 'var(--accent)', 700, 'middle', true);
+  h += '<circle cx="76" cy="44" r="9" fill="' + (o.sa ? 'var(--accent)' : 'var(--card)') + '" stroke="var(--accent)" stroke-width="2"/>' + tx(92, 40, 'SA', 10.5, 'var(--accent)', 700, 'start', true);
+  h += '<rect x="150" y="96" width="40" height="28" rx="9" fill="' + (o.av ? 'var(--warnbg)' : 'var(--card)') + '" stroke="' + (o.av ? 'var(--warn)' : 'var(--accent)') + '" stroke-width="2"/>' + tx(170, 114, 'AV', 10.5, o.av ? 'var(--warn)' : 'var(--accent)', 700, 'middle', true);
   h += '<path d="M170 124 V150 M170 150 L120 186 M170 150 L220 186" fill="none" stroke="' + (o.his ? 'var(--warn)' : 'var(--muted)') + '" stroke-width="' + (o.his ? 3.5 : 2) + '"/>';
   if (o.sa) h += line('M84 50 C110 70 136 86 152 100', 'n', 2, p);
-  if (o.ventFocus) h += '<circle cx="232" cy="176" r="9" fill="var(--warn)"/>' + tx(246, 172, 'focus', 9.5, 'var(--warn)', 700, 'start', true);
-  if (o.ap) h += '<path d="M276 92 V130" stroke="var(--bad)" stroke-width="5"/>' + tx(290, 114, 'pathway', 9.5, 'var(--bad)', 700, 'start', true);
-  if (o.loop === 'node') h += '<circle cx="170" cy="110" r="24" fill="none" stroke="var(--warn)" stroke-width="3" stroke-dasharray="6 4"/>' + tx(204, 100, 'circuit', 9.5, 'var(--warn)', 700, 'start', true);
-  if (o.loop === 'ra') h += '<circle cx="100" cy="58" r="22" fill="none" stroke="var(--warn)" stroke-width="3" stroke-dasharray="6 4"/>' + tx(128, 78, 'circuit', 9.5, 'var(--warn)', 700, 'start', true);
+  if (o.ventFocus) h += '<circle cx="232" cy="176" r="9" fill="var(--warn)"/>' + tx(246, 172, 'focus', 10.5, 'var(--warn)', 700, 'start', true);
+  if (o.ap) h += '<path d="M276 92 V130" stroke="var(--bad)" stroke-width="5"/>' + tx(290, 114, 'pathway', 10.5, 'var(--bad)', 700, 'start', true);
+  if (o.loop === 'node') h += '<circle cx="170" cy="110" r="24" fill="none" stroke="var(--warn)" stroke-width="3" stroke-dasharray="6 4"/>' + tx(204, 100, 'circuit', 10.5, 'var(--warn)', 700, 'start', true);
+  if (o.loop === 'ra') h += '<circle cx="100" cy="58" r="22" fill="none" stroke="var(--warn)" stroke-width="3" stroke-dasharray="6 4"/>' + tx(128, 78, 'circuit', 10.5, 'var(--warn)', 700, 'start', true);
   if (o.loop === 'ap') h += '<path d="M276 96 C300 110 300 150 262 170 C230 186 190 170 176 126 M170 96 C180 70 250 60 276 92" fill="none" stroke="var(--warn)" stroke-width="3" stroke-dasharray="6 4"/>';
   if (o.loop === 'multi') [[124, 52], [160, 68], [220, 44], [250, 70]].forEach(function(c){ h += '<circle cx="' + c[0] + '" cy="' + c[1] + '" r="6" fill="var(--warn)"/>'; });
-  if (o.loop === 'vent') h += '<circle cx="216" cy="172" r="24" fill="none" stroke="var(--warn)" stroke-width="3" stroke-dasharray="6 4"/>' + tx(124, 176, 'circuit', 9.5, 'var(--warn)', 700, 'start', true);
+  if (o.loop === 'vent') h += '<circle cx="216" cy="172" r="24" fill="none" stroke="var(--warn)" stroke-width="3" stroke-dasharray="6 4"/>' + tx(124, 176, 'circuit', 10.5, 'var(--warn)', 700, 'start', true);
   if (o.blockAt === 'node') h += '<path d="M144 92 L196 128 M196 92 L144 128" stroke="var(--bad)" stroke-width="2.5"/>';
   if (o.blockAt === 'below') h += '<path d="M152 132 L188 148 M188 132 L152 148" stroke="var(--bad)" stroke-width="2.5"/>';
   if (o.drug) h += tx(8, o.drug[1] === 'av' ? 106 : 150, o.drug[0], 10.5, 'var(--accent)', 700, 'start', true) + '<path d="M' + (8 + o.drug[0].length * 6.6) + ' ' + (o.drug[1] === 'av' ? 110 : 154) + ' H' + (o.drug[1] === 'av' ? 146 : 110) + '" fill="none" stroke="var(--accent)" stroke-width="2" marker-end="url(#' + p + 'd)"/>';
@@ -1274,8 +1301,8 @@ var VK = (function(){
   function mark(box, j){ var ok = false; box.querySelectorAll('.vk-opt').forEach(function(b, i){ b.disabled = true; if (b.getAttribute('data-ok') === '1') b.classList.add('right'); else if (i === j) b.classList.add('wrong'); if (i === j) ok = b.getAttribute('data-ok') === '1'; }); return ok; }
   function answer(key, j){ var box = document.querySelector('[data-vk-pred="' + key + '"]'), P = C.preds[key]; if (!box || box.getAttribute('data-done')) return; box.setAttribute('data-done', '1'); var ok = mark(box, j), a = box.querySelector('.vk-ans');
     a.innerHTML = '<p><b>' + (ok ? 'Right.' : 'Not quite.') + '</b> ' + P.why() + '</p>' + (typeof P.fig === 'function' ? P.fig() : P.fig ? '<button class="chip vk-chip" type="button" data-fig="' + P.fig[0] + '" data-state="' + (P.fig[1] || '') + '">' + VK_FIC + q(P.fig[2]) + '</button>' : ''); a.hidden = false; }
-  function slHtml(id){ var S = C.sliders[id]; return '<div class="vk-sl" data-vk-sl="' + id + '">' + S.ranges.map(function(r){ return '<label for="vk-' + id + '-' + r.key + '">' + r.label + ' <b data-vk-v="' + r.key + '"></b></label><input type="range" id="vk-' + id + '-' + r.key + '" data-vk-k="' + r.key + '" min="' + r.min + '" max="' + r.max + '" step="' + r.step + '" value="' + r.value + '">'; }).join('') + '<div class="vk-res" aria-live="polite"></div>' + (S.note ? '<p class="vk-src">' + S.note + '</p>' : '') + '</div>'; }
-  function slRun(w){ var S = C.sliders[w.getAttribute('data-vk-sl')], v = {}; S.ranges.forEach(function(r){ var el = w.querySelector('[data-vk-k="' + r.key + '"]'), x = +el.value, tx = (r.fmt ? r.fmt(x) : x) + (r.unit ? ' ' + r.unit : ''); v[r.key] = x; w.querySelector('[data-vk-v="' + r.key + '"]').textContent = tx; el.setAttribute('aria-valuetext', tx); }); w.querySelector('.vk-res').innerHTML = S.run(v); }
+  function slHtml(id){ var S = C.sliders[id]; return '<div class="vk-sl" data-vk-sl="' + id + '">' + S.ranges.map(function(r){ return '<label for="vk-' + id + '-' + r.key + '">' + r.label + ' <b data-vk-v="' + r.key + '"></b></label><input type="range" id="vk-' + id + '-' + r.key + '" data-vk-k="' + r.key + '" min="' + r.min + '" max="' + r.max + '" step="' + r.step + '" value="' + r.value + '">' + (r.zones ? '<div class="vk-zone" data-vk-z="' + r.key + '"></div>' : ''); }).join('') + '<div class="vk-res" aria-live="polite"></div><div class="vk-deep"></div>' + (S.note ? '<p class="vk-src">' + S.note + '</p>' : '') + '</div>'; }
+  function slRun(w){ var S = C.sliders[w.getAttribute('data-vk-sl')], v = {}; S.ranges.forEach(function(r){ var el = w.querySelector('[data-vk-k="' + r.key + '"]'), x = +el.value, tx = (r.fmt ? r.fmt(x) : x) + (r.unit ? ' ' + r.unit : ''); v[r.key] = x; w.querySelector('[data-vk-v="' + r.key + '"]').textContent = tx; el.setAttribute('aria-valuetext', tx); }); w.querySelector('.vk-res').innerHTML = S.run(v); S.ranges.forEach(function(r){ if (!r.zones) return; var Z = typeof r.zones === 'function' ? r.zones(v) : r.zones, x = v[r.key], on = Z.length - 1; Z.forEach(function(z, k){ if (x >= z[0] && x < z[1] && on === Z.length - 1) on = k; }); w.querySelector('[data-vk-z="' + r.key + '"]').innerHTML = '<div class="vk-zs" aria-hidden="true">' + Z.map(function(z, k){ return '<i' + (k === on ? ' class="on"' : '') + ' style="flex:' + Math.max(0.01, Math.min(z[1], r.max) - Math.max(z[0], r.min)) + '"></i>'; }).join('') + '</div><p class="vk-zt">' + Z[on][2] + '</p>'; }); w.querySelector('.vk-deep').innerHTML = S.deep ? S.deep(v).map(function(d){ return '<div class="vk-dr"><p class="label">' + d[0] + '</p>' + d[1] + '</div>'; }).join('') : ''; }
   function flowHtml(id){ var F = C.flows[id]; return '<div class="vk-flow" data-vk-flow="' + id + '"><p class="head vk-head">' + F.t + '</p><div class="vk-dots">' + F.steps.map(function(_, k){ return '<i class="vk-d' + (k ? '' : ' on') + '"></i>'; }).join('') + '</div><div class="vk-fb"></div></div>'; }
   function step(id, k){ var F = C.flows[id], S = F.steps[k], w = document.querySelector('[data-vk-flow="' + id + '"]'); if (!w || !S) return; FS[id] = k;
     w.querySelectorAll('.vk-d').forEach(function(d, j){ d.classList.toggle('on', j <= k); });
@@ -1344,6 +1371,13 @@ var VK = (function(){
     },
     grids: { groups: {items: GROUPS.map(function(g){ return [g[0], group(g[1])]; })} }
   });
+})();
+</script>
+<script id="deeper-data">
+/* Go deeper: mechanism, rationale and the common trap for each Learn chapter. Text only; no doses or thresholds beyond the tool's own. */
+(function(){ var D = {"learn-cond": [["Mechanism", "The heart has a hierarchy of pacemakers. The sinus node is fastest and suppresses the others by driving them. If it fails or its impulses are blocked, the junction takes over, and below that the ventricle: each site slower and less dependable than the one above."], ["Why it matters", "The width of an escape rhythm shows where it comes from. Narrow means the junction, which is reasonably reliable. Wide means the ventricle, which is not, and is a reason to prepare pacing."], ["Common trap", "An escape rhythm is the only thing keeping the patient alive. Suppressing a ventricular escape with an antiarrhythmic can cause asystole."]], "learn-loop": [["Mechanism", "Tachycardias arise in three ways. Re-entry needs two pathways with different properties and a well-timed beat to start a circuit; it starts and stops abruptly. Increased automaticity is a focus firing faster; it warms up and cools down. Triggered activity comes from afterdepolarizations, as in torsades or digoxin toxicity."], ["Why it matters", "The mechanism predicts the response. A circuit that includes the AV node stops with a vagal maneuver or adenosine. A circuit confined to the atrium only slows for a moment, which exposes it. An automatic rhythm cannot be shocked away, because it simply restarts: treat what is driving it."], ["Common trap", "Cardioverting sinus tachycardia or multifocal atrial tachycardia achieves nothing and delays treating the cause."]], "learn-width": [["Mechanism", "A narrow QRS means the ventricles were activated through the fast conducting system, so the rhythm starts above them. A wide QRS means activation spread slowly from muscle cell to muscle cell: ventricular tachycardia, or a supraventricular rhythm with a bundle branch block or an accessory pathway."], ["Why it matters", "A wide regular tachycardia is ventricular until proven otherwise, most of all with a previous infarct or heart failure. The errors are not symmetrical: treating ventricular tachycardia as supraventricular (with verapamil, for example) can kill, while treating a supraventricular rhythm as ventricular rarely does harm."], ["Common trap", "A stable blood pressure does not make it supraventricular. And a very wide, slurred QRS should bring high potassium and sodium-channel-blocking drugs to mind."]], "learn-block": [["Mechanism", "The AV node conducts progressively more slowly as it tires and is under vagal control. Block here builds gradually (the PR lengthens before a beat drops), the escape rhythm is narrow, and atropine helps. Below the node, the conducting fibres work all or none: beats drop without warning, the escape is wide and slow, and atropine does not help and can worsen the block by speeding the atria."], ["Why it matters", "Where the block sits predicts whether it will progress to complete block and whether pacing is needed, far better than the pattern's name."], ["Common trap", "Two-to-one block cannot be classified from the pattern alone, because there is no run of PR intervals to compare. The QRS width, the PR of conducted beats and the setting decide. Block with an inferior infarct is usually in the node and passes; with an anterior infarct it is below the node and dangerous."]], "learn-qt": [["Mechanism", "Polymorphic ventricular tachycardia splits on the QT of the beats before it. With a long QT it is torsades, set off by afterdepolarizations. With a normal QT it is usually acute ischemia."], ["Why it matters", "The two are treated in opposite ways. Torsades needs magnesium, a faster heart rate and removal of the offending drug. Ischemic polymorphic VT needs the artery opened, a beta-blocker and often amiodarone."], ["Common trap", "Giving a QT-prolonging antiarrhythmic for torsades because the monitor shows ventricular tachycardia. Look at the QT in sinus rhythm first."]], "learn-drugs": [["Mechanism", "Antiarrhythmics are grouped by what they block. Sodium-channel blockers slow conduction in atrial and ventricular muscle and the conducting fibres. Beta-blockers remove sympathetic drive. Potassium-channel blockers prolong repolarization and so the refractory period. Calcium-channel blockers act on the nodes. Adenosine briefly opens potassium channels in the AV node and stops it for a few seconds."], ["Why it matters", "Nodal tissue depends on calcium channels and the rest of the heart on sodium channels. So rhythms that use the AV node respond to beta-blockers, calcium-channel blockers, adenosine and digoxin, and rhythms of the muscle respond to sodium- and potassium-channel blockers."], ["Common trap", "Sodium-channel blockers bind more at fast rates, so their toxicity (a widening QRS) appears during tachycardia, and the class Ic drugs (flecainide, propafenone) raise mortality in patients with a previous infarct or structural heart disease. Given for AF without a drug to block the node, they can organize it into flutter conducted one to one."]]};
+  function add(){ Object.keys(D).forEach(function(id){ var c = document.getElementById(id); if (!c || c.querySelector(":scope > .deeper")) return; var host = c.matches(".card,.lsec,section,.chap") ? c : null; if (!host){ var n = c.nextElementSibling; while (n && !n.matches(".card")) n = n.nextElementSibling; host = n; } if (!host || host.querySelector(":scope > .deeper")) return; var d = document.createElement("details"); d.className = "deeper"; d.innerHTML = "<summary>Go deeper: mechanism and rationale</summary><div class=\"dpx\">" + D[id].map(function(r){ return "<div><span class=\"dl\">" + r[0] + "</span><p>" + r[1] + "</p></div>"; }).join("") + "</div>"; var last = host.querySelector(":scope > .row"); if (last) host.insertBefore(d, last); else host.appendChild(d); }); }
+  add(); document.addEventListener("click", function(){ setTimeout(add, 0); }); document.addEventListener("input", function(){ setTimeout(add, 0); });
 })();
 </script>
 </body>

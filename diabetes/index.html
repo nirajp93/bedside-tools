@@ -128,6 +128,9 @@ footer p{margin:0 0 8px}
 @media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
 @media (max-width:480px){.grid{grid-template-columns:1fr 1fr}.checks{grid-template-columns:1fr}}
 @media (min-width:1000px){.wrap{max-width:980px}.cols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:0 18px;align-items:start}}
+/* cause-fix: ruled-out causes stay readable; the name greys, the reason does not fade */
+.cause.out,.cause.less,.cause.unl{opacity:1}
+.cause.less>span,.cause.unl>span{color:var(--muted)}
 </style>
 </head>
 <body>
@@ -830,7 +833,7 @@ var SV = 'xmlns="http://www.w3.org/2000/svg" class="fig" role="img"';
 function T(x, y, s, o){ o = o || {}; return '<text x="' + x + '" y="' + y + '" text-anchor="' + (o.a || 'middle') + '" style="font-family:var(--mono);font-size:' + (o.s || 11) + 'px" fill="' + (o.c || 'var(--ink)') + '"' + (o.w ? ' font-weight="600"' : '') + '>' + s + '</text>'; }
 function box(x, y, w, h, on, lab, sub){
   return '<rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="12" fill="' + (on ? 'var(--fill)' : 'var(--card)') + '" stroke="' + (on ? 'var(--accent)' : 'var(--line)') + '" stroke-width="' + (on ? 2 : 1) + '"/>' +
-    T(x + w / 2, y + h / 2 - (sub ? 2 : -4), lab, {c: on ? 'var(--accent)' : 'var(--muted)', w: on, s: 12}) + (sub ? T(x + w / 2, y + h / 2 + 14, sub, {c: on ? 'var(--ink)' : 'var(--muted)', s: 10}) : '');
+    T(x + w / 2, y + h / 2 - (sub ? 2 : -4), lab, {c: on ? 'var(--accent)' : 'var(--muted)', w: on, s: 12}) + (sub ? T(x + w / 2, y + h / 2 + 14, sub, {c: on ? 'var(--ink)' : 'var(--muted)', s: 10.5}) : '');
 }
 var SITES = {
   all: {on: ['brain', 'gut', 'panc', 'liver', 'muscle', 'fat', 'kidney'], sub: {}},
@@ -876,14 +879,14 @@ var FIG = {
         '<rect x="20" y="40" width="300" height="26" rx="8" fill="var(--fill)"/>' +
         '<rect x="20" y="40" width="' + (x(g) - 20) + '" height="26" rx="8" fill="var(--accent)" opacity=".25"/>' +
         '<line x1="' + x(th) + '" y1="30" x2="' + x(th) + '" y2="76" stroke="var(--warn)" stroke-width="2"/>' +
-        T(x(th), 24, 'threshold', {c: 'var(--warn)', s: 10}) +
-        T(x(g), 92, 'blood ' + (k === 'l' ? '140' : g), {s: 10}) +
+        T(x(th), 24, 'threshold', {c: 'var(--warn)', s: 10.5}) +
+        T(x(g), 92, 'blood ' + (k === 'l' ? '140' : g), {s: 10.5}) +
         '<line x1="' + x(g) + '" y1="66" x2="' + x(g) + '" y2="80" stroke="var(--ink)" stroke-width="1.5"/>' +
         T(20, 120, 'Glucose in urine', {a: 'start', c: 'var(--muted)', s: 11}) +
         '<rect x="20" y="128" width="300" height="18" rx="6" fill="var(--fill)"/>' +
         '<rect x="20" y="128" width="' + Math.min(300, spill * 1.6) + '" height="18" rx="6" fill="var(--warn)"/>' +
-        T(320, 160, k === 'n' ? 'none' : (k === 'l' ? 'less' : 'yes'), {a: 'end', c: 'var(--muted)', s: 10}) +
-        T(20, 108, '0', {a: 'start', c: 'var(--muted)', s: 9}) + T(320, 108, '300 mg/dL', {a: 'end', c: 'var(--muted)', s: 9}) + '</svg>';
+        T(320, 160, k === 'n' ? 'none' : (k === 'l' ? 'less' : 'yes'), {a: 'end', c: 'var(--muted)', s: 10.5}) +
+        T(20, 108, '0', {a: 'start', c: 'var(--muted)', s: 10.5}) + T(320, 108, '300 mg/dL', {a: 'end', c: 'var(--muted)', s: 10.5}) + '</svg>';
     }},
   curves: {title: 'How long each insulin lasts', states: [
       {k: 'all', l: 'All', c: 'Schematic action profiles. Typical ranges vary by dose and person; see each label.'},
@@ -905,11 +908,11 @@ var FIG = {
       var lp = {rapid: [2.2, 1.04], reg: [4.6, .84], nph: [8.6, .62], long: [16, .48]};
       var h = '<svg ' + SV + ' viewBox="0 0 340 170" aria-label="Insulin action over 24 hours">' +
         '<line x1="30" y1="140" x2="318" y2="140" stroke="var(--line)"/>';
-      [0, 6, 12, 18, 24].forEach(function(t){ h += T(30 + t * 12, 156, t + ' h', {c: 'var(--muted)', s: 9}); });
+      [0, 6, 12, 18, 24].forEach(function(t){ h += T(30 + t * 12, 156, t + ' h', {c: 'var(--muted)', s: 10.5}); });
       Object.keys(C).forEach(function(n){
         var hi = k === 'all' || k === n;
         h += '<path d="' + path(C[n]) + '" fill="none" stroke="' + col[n] + '" stroke-width="' + (hi ? 2.5 : 1) + '" opacity="' + (hi ? 1 : .3) + '"/>';
-        if (hi) h += T(30 + lp[n][0] * 12, 140 - lp[n][1] * 100 - 4, lab[n], {c: col[n], s: 10});
+        if (hi) h += T(30 + lp[n][0] * 12, 140 - lp[n][1] * 100 - 4, lab[n], {c: col[n], s: 10.5});
       });
       return h + '</svg>';
     }},
@@ -921,11 +924,11 @@ var FIG = {
       var y = function(g){ return 150 - (g - 50) * 0.6; };
       var a = over ? 230 : 160, b = over ? 105 : 140;
       return '<svg ' + SV + ' viewBox="0 0 340 170" aria-label="Glucose from bedtime to morning">' +
-        '<rect x="30" y="' + y(130) + '" width="290" height="' + (y(80) - y(130)) + '" fill="var(--okbg)"/>' + T(316, y(130) + 12, 'fasting goal 80–130', {a: 'end', c: 'var(--ok)', s: 9}) +
-        '<line x1="30" y1="' + y(70) + '" x2="320" y2="' + y(70) + '" stroke="var(--bad)" stroke-dasharray="4 4"/>' + T(316, y(70) + 12, '70', {a: 'end', c: 'var(--bad)', s: 9}) +
+        '<rect x="30" y="' + y(130) + '" width="290" height="' + (y(80) - y(130)) + '" fill="var(--okbg)"/>' + T(316, y(130) + 12, 'fasting goal 80–130', {a: 'end', c: 'var(--ok)', s: 10.5}) +
+        '<line x1="30" y1="' + y(70) + '" x2="320" y2="' + y(70) + '" stroke="var(--bad)" stroke-dasharray="4 4"/>' + T(316, y(70) + 12, '70', {a: 'end', c: 'var(--bad)', s: 10.5}) +
         '<path d="M50 ' + y(a) + ' C130 ' + y(a - 10) + ' 220 ' + y(b + (over ? -25 : 0)) + ' 300 ' + y(b) + '" fill="none" stroke="var(--accent)" stroke-width="2.5"/>' +
         '<circle cx="50" cy="' + y(a) + '" r="4" fill="var(--accent)"/><circle cx="300" cy="' + y(b) + '" r="4" fill="var(--accent)"/>' +
-        T(50, y(a) - 8, 'bedtime ' + a, {s: 10}) + T(300, y(b) - 8, 'waking ' + b, {s: 10}) +
+        T(50, y(a) - 8, 'bedtime ' + a, {s: 10.5}) + T(300, y(b) - 8, 'waking ' + b, {s: 10.5}) +
         T(175, 22, 'drop ' + (a - b) + ' mg/dL' + (over ? ' (≥50)' : ''), {c: over ? 'var(--bad)' : 'var(--ink)', w: true, s: 11}) + '</svg>';
     }},
   a1c: {title: 'Why A1C and CGM can disagree', states: [
@@ -935,9 +938,9 @@ var FIG = {
     svg: function(s){
       var k = FIG.a1c.states[s].k, w = k === 's' ? 150 : 270;
       var h = '<svg ' + SV + ' viewBox="0 0 340 130" aria-label="Red cell lifespan and glycation">' +
-        T(30, 22, 'red cell life', {a: 'start', c: 'var(--muted)', s: 10}) +
+        T(30, 22, 'red cell life', {a: 'start', c: 'var(--muted)', s: 10.5}) +
         '<rect x="30" y="32" width="270" height="22" rx="8" fill="var(--fill)"/>' +
-        '<rect x="30" y="32" width="' + w + '" height="22" rx="8" fill="var(--accent)" opacity=".3"/>' + T(30 + w, 70, k === 's' ? 'shorter' : '~120 days', {s: 10}) +
+        '<rect x="30" y="32" width="' + w + '" height="22" rx="8" fill="var(--accent)" opacity=".3"/>' + T(30 + w, 70, k === 's' ? 'shorter' : '~120 days', {s: 10.5}) +
         T(30, 98, 'A1C', {a: 'start', s: 11, w: true}) + T(110, 98, k === 's' ? 'reads low' : (k === 'v' ? 'may mislead' : 'tracks glucose'), {a: 'start', s: 11, c: k === 'n' ? 'var(--ok)' : 'var(--warn)'}) +
         T(30, 118, 'GMI (CGM)', {a: 'start', s: 11, w: true}) + T(110, 118, 'unaffected by red cells', {a: 'start', s: 11, c: 'var(--muted)'});
       return h + '</svg>';
@@ -947,19 +950,19 @@ var FIG = {
       var x = function(v){ return 20 + v * 75; };
       var seg = [[0, .6, 'var(--ok)', 'normal'], [.6, 1.5, 'var(--accent)', 'act'], [1.5, 3.0, 'var(--warn)', 'impending'], [3.0, 4.0, 'var(--bad)', 'probable DKA']];
       var h = '<svg ' + SV + ' viewBox="0 0 340 110" aria-label="Ketone bands">';
-      seg.forEach(function(q){ h += '<rect x="' + x(q[0]) + '" y="30" width="' + (x(q[1]) - x(q[0])) + '" height="24" fill="' + q[2] + '" opacity=".85"/>' + T((x(q[0]) + x(q[1])) / 2, 74, q[3], {s: 10, c: q[2]}); });
-      [0, .6, 1.5, 3.0].forEach(function(v){ h += T(x(v), 22, v, {s: 10, c: 'var(--muted)'}); });
-      return h + T(320, 22, 'mmol/L', {a: 'end', s: 9, c: 'var(--muted)'}) + '</svg>';
+      seg.forEach(function(q){ h += '<rect x="' + x(q[0]) + '" y="30" width="' + (x(q[1]) - x(q[0])) + '" height="24" fill="' + q[2] + '" opacity=".85"/>' + T((x(q[0]) + x(q[1])) / 2, 74, q[3], {s: 10.5, c: q[2]}); });
+      [0, .6, 1.5, 3.0].forEach(function(v){ h += T(x(v), 22, v, {s: 10.5, c: 'var(--muted)'}); });
+      return h + T(320, 22, 'mmol/L', {a: 'end', s: 10.5, c: 'var(--muted)'}) + '</svg>';
     }},
   hypo: {title: 'Levels of hypoglycemia', states: [{k: 'h', l: 'Levels', c: 'Level 1: under 70 and 54 or more. Level 2: under 54. Level 3: needs another person\'s help, at any number. Treat with glucose (usually 15 g; 5 to 10 g on AID), recheck in 15 minutes and repeat if still low. Any level 2 or 3 event means the plan changes (ADA Table 6.4, 6.15, 6.19).'}],
     svg: function(){
       var y = function(g){ return 20 + (130 - g) * 1.1; };
-      return '<svg ' + SV + ' viewBox="0 0 340 140" aria-label="Glucose levels defining hypoglycemia">' +
+      return '<svg ' + SV + ' viewBox="0 0 340 152" aria-label="Glucose levels defining hypoglycemia">' +
         '<rect x="90" y="' + y(130) + '" width="160" height="' + (y(70) - y(130)) + '" fill="var(--okbg)"/>' + T(170, y(100), 'target range', {c: 'var(--ok)', s: 11}) +
         '<rect x="90" y="' + y(70) + '" width="160" height="' + (y(54) - y(70)) + '" fill="var(--warnbg)"/>' + T(170, y(62) + 4, 'level 1 (54–69)', {c: 'var(--warn)', s: 11}) +
         '<rect x="90" y="' + y(54) + '" width="160" height="' + (y(40) - y(54)) + '" fill="var(--badbg)"/>' + T(170, y(47) + 4, 'level 2 (<54)', {c: 'var(--bad)', s: 11}) +
-        T(80, y(70) + 4, '70', {a: 'end', s: 10, c: 'var(--muted)'}) + T(80, y(54) + 4, '54', {a: 'end', s: 10, c: 'var(--muted)'}) +
-        T(260, y(54) + 4, 'level 3: needs help,', {a: 'start', s: 9, c: 'var(--bad)'}) + T(260, y(54) + 16, 'any number', {a: 'start', s: 9, c: 'var(--bad)'}) + '</svg>';
+        T(80, y(70) + 4, '70', {a: 'end', s: 10.5, c: 'var(--muted)'}) + T(80, y(54) + 4, '54', {a: 'end', s: 10.5, c: 'var(--muted)'}) +
+        T(170, y(40) + 18, 'level 3: needs another person\'s help, at any number', {s: 10.5, c: 'var(--bad)'}) + '</svg>';
     }}
 };
 var FIGS = Object.keys(FIG);

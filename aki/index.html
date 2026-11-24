@@ -110,6 +110,24 @@ footer p{margin:0 0 8px}
 .trial .k{font-family:var(--mono);font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);display:block}
 @media (max-width:420px){.grid{grid-template-columns:1fr 1fr}.checks{grid-template-columns:1fr}}
 @media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+.deeper{margin-top:14px;border-top:1px solid var(--line)}
+.deeper>summary{min-height:44px;display:flex;align-items:center;gap:8px;color:var(--accent);font-weight:600;font-size:15px;cursor:pointer;list-style:none}
+.deeper>summary::-webkit-details-marker{display:none}
+.deeper>summary::before{content:"+";font-family:var(--mono);font-size:18px;line-height:1;width:14px;text-align:center}
+.deeper[open]>summary::before{content:"\2212"}
+.deeper>summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.deeper .dpx{border:1px solid var(--line);border-radius:12px;padding:2px 12px;background:var(--card);text-align:left}
+.deeper .dpx>div{padding:10px 0;border-top:1px solid var(--line)}
+.deeper .dpx>div:first-child{border-top:0}
+.deeper .dl{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500;margin:0 0 3px}
+.deeper p{font-size:15px;line-height:1.45;color:var(--ink);margin:0 0 4px}
+.deeper p:last-child{margin-bottom:0}
+/* cause-fix: ruled-out causes stay readable; the name greys, the reason does not fade */
+.cause.out,.cause.less,.cause.unl{opacity:1}
+.cause.less>span,.cause.unl>span{color:var(--muted)}
+.plate{margin:12px 0 4px}
+.plate img{display:block;width:100%;height:auto;border-radius:10px;border:1px solid var(--line)}
+.plate figcaption{font-size:13px;color:var(--muted);margin-top:6px}
 </style>
 </head>
 <body>
@@ -184,7 +202,7 @@ footer p{margin:0 0 8px}
 
 <div class="panel" id="p-learn" role="tabpanel" aria-labelledby="t-learn">
   <div class="pills" id="pills"></div>
-  <div class="card chap" id="learn-where" data-pill="Where"><p class="label">1 · Three places to fail</p><h2>Before, inside, or after the kidney</h2><p class="sub">Pick a cause to see which part fails and what the urine shows.</p><div data-figure="where"></div></div>
+  <div class="card chap" id="learn-where" data-pill="Where"><p class="label">1 · Three places to fail</p><h2>Before, inside, or after the kidney</h2><figure class="plate" style="margin-left:0;margin-right:0"><img src="/media/aki/three-sites.webp" width="1010" height="460" loading="lazy" alt="Three panels. Left: a kidney whose renal artery narrows as it enters, carrying little blood. Middle: a glomerulus and its tubule, with injured tubular cells breaking off into the lumen. Right: a kidney, ureter and bladder with a stone lodged in the ureter and the renal pelvis swollen above it."><figcaption>Left to right: too little blood arriving, injury inside the nephron, and a blocked path out. Created with BioRender.com</figcaption></figure><p class="sub">Pick a cause to see which part fails and what the urine shows.</p><div data-figure="where"></div></div>
   <div class="card chap" id="learn-lag" data-pill="Creatinine lags"><p class="label">2 · The number is late</p><h2>Creatinine trails the injury</h2><p class="sub">Filtration can fall in an hour; creatinine takes days to catch up.</p><div data-figure="lag"></div></div>
   <div class="card chap" id="learn-tubule" data-pill="Sodium and urea"><p class="label">3 · Reading the tubule</p><h2>What FENa and FEUrea measure</h2><p class="sub">Pick a state. Watch what the tubule keeps and what reaches the urine.</p><div data-figure="tubule"></div></div>
   <div class="card chap" id="learn-sediment" data-pill="Microscope"><p class="label">4 · The urine sediment</p><h2>Casts are molds of the tubule</h2><p class="sub">Pick a finding.</p><div data-figure="sediment"></div></div>
@@ -505,7 +523,7 @@ var WHERE = {
   post: {n: 'Obstruction', hot: 'out', line: 'Outflow is blocked: prostate or bladder, both ureters, or one ureter of a single kidney.', urine: 'often bland; bladder scan or ultrasound shows it'}
 };
 function whereSVG(k, p){
-  var s = WHERE[k], h = svgOpen('0 0 340 236', 'Where the kidney fails: ' + s.n) + markers(p);
+  var s = WHERE[k], h = svgOpen('0 0 340 246', 'Where the kidney fails: ' + s.n) + markers(p);
   h += box(8, 92, 70, 52, 'Blood in', 'flow', s.hot === 'in' ? 'warn' : false);
   h += '<rect x="98" y="8" width="150" height="196" rx="16" fill="none" stroke="var(--muted)" stroke-dasharray="4 4"/>' + txt(173, 24, 'KIDNEY');
   h += box(108, 34, 130, 48, 'Glomerulus', 'filters', s.hot === 'glo' ? 'bad' : false);
@@ -516,7 +534,7 @@ function whereSVG(k, p){
   h += '<path d="M240 118H258" stroke="' + (s.hot === 'out' ? 'var(--warn)' : 'var(--muted)') + '" stroke-width="2.5" marker-end="url(#' + p + (s.hot === 'out' ? 'h' : 'a') + ')"/>';
   if (s.hot === 'out') h += '<path d="M290 150V168M282 162L290 170L298 162" fill="none" stroke="var(--warn)" stroke-width="2"/>' + txt(297, 186, 'blocked') ;
   else h += '<path d="M297 144V176" stroke="var(--muted)" stroke-width="2.5" marker-end="url(#' + p + 'a)"/>' + txt(297, 192, 'urine');
-  h += txt(170, 226, s.urine, FM + ';font-size:11px;fill:var(--ink)');
+  s.urine.split('; ').forEach(function(u, n, all){ h += txt(170, (all.length > 1 ? 222 : 230) + n * 15, u, FM + ';font-size:11px;fill:var(--ink)'); });
   return h + '</svg>';
 }
 
@@ -539,12 +557,12 @@ function lagLine(k){ var S = lagSeries(k); if (k === 'drop') return 'Filtration 
 function lagSVG(k, p){
   var S = lagSeries(k), X = function(t){ return 40 + t * 56; }, Y = function(c){ return 170 - c * 36; }, YG = function(g){ return 170 - g * 144; };
   var h = svgOpen('0 0 360 210', 'Creatinine lags behind filtration: ' + LAG[k].n);
-  for (var c = 0; c <= 4; c++) h += '<line x1="40" x2="320" y1="' + Y(c) + '" y2="' + Y(c) + '" stroke="var(--line)"/>' + txt(34, Y(c) + 4, String(c), FM + ';font-size:10px;fill:var(--muted)', 'end');
-  for (var d = 0; d <= 5; d++) h += txt(X(d), 186, 'day ' + d, FM + ';font-size:10px;fill:var(--muted)');
-  h += '<path d="M' + X(-0.3) + ' ' + YG(1) + 'L' + X(0) + ' ' + YG(1) + S.map(function(q){ return 'L' + X(q[0]).toFixed(1) + ' ' + YG(q[2]).toFixed(1); }).join('') + '" fill="none" stroke="var(--muted)" stroke-width="2" stroke-dasharray="5 4"/>' + txt(326, YG(1) + 4, '100%', FM + ';font-size:10px;fill:var(--muted)', 'start') + txt(326, YG(0.25) + 14, '25%', FM + ';font-size:10px;fill:var(--muted)', 'start');
+  for (var c = 0; c <= 4; c++) h += '<line x1="40" x2="320" y1="' + Y(c) + '" y2="' + Y(c) + '" stroke="var(--line)"/>' + txt(34, Y(c) + 4, String(c), FM + ';font-size:10.5px;fill:var(--muted)', 'end');
+  for (var d = 0; d <= 5; d++) h += txt(X(d), 186, 'day ' + d, FM + ';font-size:10.5px;fill:var(--muted)');
+  h += '<path d="M' + X(-0.3) + ' ' + YG(1) + 'L' + X(0) + ' ' + YG(1) + S.map(function(q){ return 'L' + X(q[0]).toFixed(1) + ' ' + YG(q[2]).toFixed(1); }).join('') + '" fill="none" stroke="var(--muted)" stroke-width="2" stroke-dasharray="5 4"/>' + txt(326, YG(1) + 4, '100%', FM + ';font-size:10.5px;fill:var(--muted)', 'start') + txt(326, YG(0.25) + 14, '25%', FM + ';font-size:10.5px;fill:var(--muted)', 'start');
   h += '<path d="' + S.map(function(q, n){ return (n ? 'L' : 'M') + X(q[0]).toFixed(1) + ' ' + Y(q[1]).toFixed(1); }).join('') + '" fill="none" stroke="var(--accent)" stroke-width="3"/>';
-  h += txt(44, 14, 'creatinine, mg/dL (solid) · filtration (dashed)', FM + ';font-size:10px;fill:var(--muted)', 'start');
-  h += txt(186, 204, 'schematic: one-compartment model, numbers illustrative', FM + ';font-size:9.5px;fill:var(--muted)');
+  h += txt(44, 14, 'creatinine, mg/dL (solid) · filtration (dashed)', FM + ';font-size:10.5px;fill:var(--muted)', 'start');
+  h += txt(186, 204, 'schematic model; numbers are illustrative', FM + ';font-size:10.5px;fill:var(--muted)');
   return h + '</svg>';
 }
 
@@ -556,17 +574,17 @@ var TUB = {
 function tubSVG(k, p){
   var s = TUB[k], h = svgOpen('0 0 340 230', 'Tubule handling of sodium and urea: ' + s.n) + markers(p);
   var st = function(v){ return v === 'u' ? 'var(--accent)' : v === 'x' ? 'var(--bad)' : 'var(--muted)'; };
-  h += '<circle cx="34" cy="60" r="20" fill="var(--fill)" stroke="var(--muted)"/>' + txt(34, 64, 'glom', FM + ';font-size:10px;fill:var(--ink)');
+  h += '<circle cx="34" cy="60" r="20" fill="var(--fill)" stroke="var(--muted)"/>' + txt(34, 64, 'glom', FM + ';font-size:10.5px;fill:var(--ink)');
   h += '<path d="M54 60H120 Q130 60 130 70 V140 Q130 160 150 160 Q170 160 170 140 V70 Q170 60 180 60 H250 V170 H300" fill="none" stroke="' + (k === 'atn' ? 'var(--bad)' : 'var(--ink)') + '" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" opacity=".18"/>';
   h += '<path d="M54 60H120 Q130 60 130 70 V140 Q130 160 150 160 Q170 160 170 140 V70 Q170 60 180 60 H250 V170 H300" fill="none" stroke="' + (k === 'atn' ? 'var(--bad)' : 'var(--muted)') + '" stroke-width="2"' + (k === 'atn' ? ' stroke-dasharray="6 4"' : '') + '/>';
   h += txt(98, 82, 'proximal'); h += txt(150, 182, 'loop'); h += txt(224, 82, 'distal'); h += txt(282, 188, 'collecting');
   /* reabsorption arrows back to blood (upward) */
-  [[82, 'Na + urea'], [210, 'Na']].forEach(function(a){ h += '<path d="M' + a[0] + ' 56V26" stroke="' + st(s.back) + '" stroke-width="' + (s.back === 'u' ? 3 : 1.5) + '"' + (s.back === 'd' ? ' stroke-dasharray="4 3"' : '') + ' marker-end="url(#' + p + 'a)"/>' + txt(a[0], 18, a[1], FM + ';font-size:10px;fill:var(--ink)'); });
-  h += '<path d="M178 120H206" stroke="' + st(s.loop) + '" stroke-width="' + (s.loop === 'u' ? 3 : 1.5) + '"' + (s.loop !== 'u' ? ' stroke-dasharray="4 3"' : '') + ' marker-end="url(#' + p + 'a)"/>' + txt(212, 124, 'Na', FM + ';font-size:10px;fill:var(--ink)', 'start');
-  if (s.loop === 'x') h += '<path d="M182 112L198 128M198 112L182 128" stroke="var(--bad)" stroke-width="3"/>' + txt(232, 124, 'blocked', FM + ';font-size:10px;fill:var(--bad)', 'start');
-  if (s.cast) h += '<rect x="226" y="96" width="14" height="40" rx="7" fill="var(--warn)" opacity=".7"/>' + txt(232, 150, 'cast', FM + ';font-size:10px;fill:var(--warn)');
-  h += '<rect x="8" y="198" width="160" height="26" rx="8" fill="var(--fill)"/>' + txt(88, 215, 'FENa ' + s.na, FM + ';font-size:10px;fill:var(--ink)');
-  h += '<rect x="174" y="198" width="160" height="26" rx="8" fill="var(--fill)"/>' + txt(254, 215, 'FEUrea ' + s.u, FM + ';font-size:10px;fill:var(--ink)');
+  [[82, 'Na + urea'], [210, 'Na']].forEach(function(a){ h += '<path d="M' + a[0] + ' 56V26" stroke="' + st(s.back) + '" stroke-width="' + (s.back === 'u' ? 3 : 1.5) + '"' + (s.back === 'd' ? ' stroke-dasharray="4 3"' : '') + ' marker-end="url(#' + p + 'a)"/>' + txt(a[0], 18, a[1], FM + ';font-size:10.5px;fill:var(--ink)'); });
+  h += '<path d="M178 120H206" stroke="' + st(s.loop) + '" stroke-width="' + (s.loop === 'u' ? 3 : 1.5) + '"' + (s.loop !== 'u' ? ' stroke-dasharray="4 3"' : '') + ' marker-end="url(#' + p + 'a)"/>' + txt(212, 124, 'Na', FM + ';font-size:10.5px;fill:var(--ink)', 'start');
+  if (s.loop === 'x') h += '<path d="M182 112L198 128M198 112L182 128" stroke="var(--bad)" stroke-width="3"/>' + txt(232, 124, 'blocked', FM + ';font-size:10.5px;fill:var(--bad)', 'start');
+  if (s.cast) h += '<rect x="226" y="96" width="14" height="40" rx="7" fill="var(--warn)" opacity=".7"/>' + txt(232, 150, 'cast', FM + ';font-size:10.5px;fill:var(--warn)');
+  h += '<rect x="8" y="198" width="160" height="26" rx="8" fill="var(--fill)"/>' + txt(88, 215, 'FENa ' + s.na, FM + ';font-size:10.5px;fill:var(--ink)');
+  h += '<rect x="174" y="198" width="160" height="26" rx="8" fill="var(--fill)"/>' + txt(254, 215, 'FEUrea ' + s.u, FM + ';font-size:10.5px;fill:var(--ink)');
   return h + '</svg>';
 }
 
@@ -586,7 +604,7 @@ function sedSVG(k, p){
   if (k === 'wbc'){ var w = ''; for (var q = 0; q < 5; q++){ var cx = 128 + q * 22, cy = q % 2 ? 86 : 74; w += '<circle cx="' + cx + '" cy="' + cy + '" r="10" fill="var(--card)" stroke="var(--accent)"/><circle cx="' + (cx - 3) + '" cy="' + (cy - 2) + '" r="3" fill="var(--accent)"/><circle cx="' + (cx + 3) + '" cy="' + (cy + 2) + '" r="3" fill="var(--accent)"/>'; } h += cast(w); }
   if (k === 'rtec'){ [[130, 64], [186, 92], [214, 58]].forEach(function(c){ h += '<rect x="' + (c[0] - 18) + '" y="' + (c[1] - 14) + '" width="36" height="28" rx="10" fill="var(--card)" stroke="var(--muted)"/><circle cx="' + c[0] + '" cy="' + c[1] + '" r="7" fill="var(--muted)"/>'; }); }
   if (k === 'bland'){ h += txt(170, 84, 'few cells, no casts', FM + ';font-size:11px;fill:var(--muted)'); }
-  h += txt(170, 152, 'drawn for this site, not to scale', FM + ';font-size:9.5px;fill:var(--muted)');
+  h += txt(170, 152, 'drawn for this site, not to scale', FM + ';font-size:10.5px;fill:var(--muted)');
   return h + '</svg>';
 }
 
@@ -872,6 +890,13 @@ function load(i){
   render(); show('t-tool'); window.scrollTo(0, 0);
 }
 fromHash();
+})();
+</script>
+<script id="deeper-data">
+/* Go deeper: mechanism, rationale and the common trap for each Learn chapter. Text only; no doses or thresholds beyond the tool's own. */
+(function(){ var D = {"learn-where": [["Mechanism", "Filtration needs three things: enough pressure arriving at the glomerulus, an intact filter and tubule, and an open path out. The pressure inside the glomerulus is set by two small arteries. Prostaglandins hold the incoming one open and angiotensin II holds the outgoing one tight. In any low-flow state both are already working at their limit."], ["Why it matters", "This is why an NSAID (the incoming artery narrows) or an ACE inhibitor or ARB (the outgoing artery relaxes) can drop filtration abruptly in volume depletion, heart failure or cirrhosis. The fall is hemodynamic and reverses when the drug stops. If low perfusion goes on, the tubule segments that normally live close to hypoxia die: prerenal injury becomes acute tubular necrosis."], ["Common trap", "Prerenal does not mean give fluid. Heart failure and cirrhosis are prerenal states with too much total body fluid. And obstruction has to affect both kidneys, or a single working kidney, to raise the creatinine; a normal urine volume does not exclude a partial obstruction."]], "learn-lag": [["Mechanism", "Muscle makes creatinine at a steady rate and filtration removes it. When filtration falls, production carries on and the level climbs until the amount filtered again equals the amount made. Reaching that new steady state takes days, and until then the creatinine understates the injury. Fluid given during resuscitation dilutes it and slows the rise further."], ["Why it matters", "An eGFR assumes a steady state, so it is not valid while the creatinine is moving. A creatinine that doubles within a day means filtration has fallen by far more than half. Dose kidney-cleared drugs for the filtration you infer, and watch the urine output, which changes sooner."], ["Common trap", "Low muscle mass (the elderly, cirrhosis, amputation) makes little creatinine, so a small rise hides a large loss. In the other direction, trimethoprim and cimetidine block creatinine secretion by the tubule and raise the level with no change in filtration."]], "learn-tubule": [["Mechanism", "A healthy tubule facing low perfusion is driven by angiotensin, aldosterone and sympathetic nerves to reclaim nearly all of the filtered sodium, so very little reaches the urine. An injured tubule cannot do this and sodium escapes. Urea is reabsorbed passively with water in the proximal tubule, upstream of where loop diuretics act, so it stays low in a prerenal state even on a diuretic."], ["Why it matters", "These indices test what the tubule is doing, not what caused the injury. A low value means an intact tubule holding on to sodium. That is the pattern of prerenal states, but also of early obstruction, contrast injury, rhabdomyolysis, glomerulonephritis and hepatorenal syndrome."], ["Common trap", "They were validated in patients making little urine. Chronic kidney disease raises the baseline, diuretics raise the sodium index, and in studies both perform only moderately. Treat the result as one clue, read with the history and the sediment."]], "learn-sediment": [["Mechanism", "Casts form in the distal tubule, where a protein secreted by the tubule itself (uromodulin) gels in concentrated, acidic urine and traps whatever is in the lumen. Nothing gives a hyaline cast; dead tubular cells give granular, muddy brown casts; red cells that crossed the glomerulus give red cell casts; white cells from an inflamed interstitium give white cell casts."], ["Why it matters", "A cast can only form inside the kidney, so its contents prove where the problem is. The sediment is the one bedside test that reads intrinsic injury directly: muddy brown casts mean tubular necrosis whatever the sodium index says, and red cell casts or misshapen red cells mean glomerulonephritis and an urgent workup."], ["Common trap", "Automated urinalysis reports casts poorly: look at a fresh spun sample or ask nephrology to. A bland sediment does not exclude tubular necrosis. A dipstick positive for blood with no red cells on microscopy points to myoglobin or free hemoglobin."]]};
+  function add(){ Object.keys(D).forEach(function(id){ var c = document.getElementById(id); if (!c || c.querySelector(":scope > .deeper")) return; var host = c.matches(".card,.lsec,section,.chap") ? c : null; if (!host){ var n = c.nextElementSibling; while (n && !n.matches(".card")) n = n.nextElementSibling; host = n; } if (!host || host.querySelector(":scope > .deeper")) return; var d = document.createElement("details"); d.className = "deeper"; d.innerHTML = "<summary>Go deeper: mechanism and rationale</summary><div class=\"dpx\">" + D[id].map(function(r){ return "<div><span class=\"dl\">" + r[0] + "</span><p>" + r[1] + "</p></div>"; }).join("") + "</div>"; var last = host.querySelector(":scope > .row"); if (last) host.insertBefore(d, last); else host.appendChild(d); }); }
+  add(); document.addEventListener("click", function(){ setTimeout(add, 0); }); document.addEventListener("input", function(){ setTimeout(add, 0); });
 })();
 </script>
 </body>

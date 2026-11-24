@@ -147,10 +147,10 @@ details .trial{margin:8px 0 12px}
 .tab{flex:none;padding:0 14px;white-space:nowrap}
 .node rect{fill:var(--card);stroke:var(--muted);stroke-width:1.2}
 .node text{fill:var(--ink);font-family:var(--mono);font-size:11.5px}
-.node .s{fill:var(--muted);font-size:10.5px}
+.node .s{fill:var(--muted);font-size:11px}
 .node.hi rect{stroke:var(--accent);stroke-width:2.4;fill:var(--fill)}
 .node.hi text{font-weight:700}
-.node.off{opacity:.55}
+.node.off{opacity:.72}
 .node.off rect{stroke-dasharray:3 3}
 .arr{stroke:var(--muted);stroke-width:1.4;fill:none}
 .arr.hi{stroke:var(--accent);stroke-width:2.4}
@@ -159,7 +159,7 @@ details .trial{margin:8px 0 12px}
 .bar{fill:var(--fill);stroke:var(--muted);stroke-width:1.2}
 .bar.a{fill:var(--accent);stroke:var(--accent)}
 .svt{fill:var(--ink);font-family:var(--mono);font-size:11.5px}
-.svm{fill:var(--muted);font-family:var(--mono);font-size:10.5px}
+.svm{fill:var(--muted);font-family:var(--mono);font-size:11px}
 .gap{stroke:var(--warn);stroke-width:2;fill:none}
 .cap{font-size:15px;margin:8px 0 0}
 .src{font-size:12.5px;color:var(--muted);margin:8px 0 0}
@@ -185,6 +185,24 @@ details .trial{margin:8px 0 12px}
   .tabs{margin:0 0 16px;padding:0}
   .tab{flex:1 1 auto}
 }
+/* cause-fix: ruled-out causes stay readable; the name greys, the reason does not fade */
+.cause.out,.cause.less,.cause.unl{opacity:1}
+.cause.less>span,.cause.unl>span{color:var(--muted)}
+.plate{margin:12px 0 4px}
+.plate img{display:block;width:100%;height:auto;border-radius:10px;border:1px solid var(--line)}
+.plate figcaption{font-size:13px;color:var(--muted);margin-top:6px}
+.deeper{margin-top:14px;border-top:1px solid var(--line)}
+.deeper>summary{min-height:44px;display:flex;align-items:center;gap:8px;color:var(--accent);font-weight:600;font-size:15px;cursor:pointer;list-style:none}
+.deeper>summary::-webkit-details-marker{display:none}
+.deeper>summary::before{content:"+";font-family:var(--mono);font-size:18px;line-height:1;width:14px;text-align:center}
+.deeper[open]>summary::before{content:"\2212"}
+.deeper>summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.deeper .dpx{border:1px solid var(--line);border-radius:12px;padding:2px 12px;background:var(--card);text-align:left}
+.deeper .dpx>div{padding:10px 0;border-top:1px solid var(--line)}
+.deeper .dpx>div:first-child{border-top:0}
+.deeper .dl{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500;margin:0 0 3px}
+.deeper p{font-size:15px;line-height:1.45;color:var(--ink);margin:0 0 4px}
+.deeper p:last-child{margin-bottom:0}
 </style>
 </head>
 <body>
@@ -697,6 +715,7 @@ var TRIALS = [
 ];
 function renderLearn(){
   $('learn').innerHTML = CHAPS.map(function(c, i){ return '<h2 class="lh" id="learn-' + c[2] + '">' + (i + 1) + '. ' + c[0] + '</h2><p class="lead">' + c[1] + '</p><div class="card inl" id="lf-' + c[2] + '">' + figBlock(c[2], c[3], 'lf-' + c[2]) + '<p class="use"><a href="#' + c[5] + '">Use it: ' + c[4] + ' →</a></p></div>'; }).join('');
+  (function(){ var pc = $('lf-portal'); if (pc) pc.insertAdjacentHTML('afterbegin', '<figure class="plate" style="margin-left:0;margin-right:0"><img src="/media/cirrhosis/portal-hypertension.webp" width="570" height="524" loading="lazy" alt="Front view of the upper abdomen. A nodular liver with a large portal vein entering it from below and sending swollen branches over the stomach, an enlarged spleen on the left side of the body, swollen winding veins around the lower esophagus and upper stomach, and fluid filling the lower abdomen."><figcaption>Pressure backs up from the scarred liver: the spleen enlarges, veins around the esophagus and stomach swell into varices, and fluid collects as ascites. Created with BioRender.com</figcaption></figure>'); })();
   $('trial-list').innerHTML = TRIALS.map(function(t){ return '<details class="tr tl"><summary>' + t[0] + '<span class="take">' + t[1] + '</span></summary><div class="trial"><p><span class="k">Question</span>' + t[2] + '</p><p><span class="k">Design</span>' + t[3] + '</p><p><span class="k">Result</span>' + t[4] + '</p><p><span class="k">What it changed</span>' + t[5] + '</p><p class="note">' + t[6] + ' · doi:' + t[7] + '</p></div></details>'; }).join('');
 }
 
@@ -744,6 +763,13 @@ function renderAll(){ renderScores(); renderFluid(); renderLvp(); renderBleed();
   $('scrim').addEventListener('click', closeFig);
   document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeFig(); if (e.key === 'Tab' && !$('sheet').hidden){ var f = $('sheet').querySelectorAll('button'), a = f[0], z = f[f.length - 1]; if (e.shiftKey && document.activeElement === a){ e.preventDefault(); z.focus(); } else if (!e.shiftKey && document.activeElement === z){ e.preventDefault(); a.focus(); } } });
   window.addEventListener('hashchange', fromHash); fromHash();
+})();
+</script>
+<script id="deeper-data">
+/* Go deeper: mechanism, rationale and the common trap for each Learn chapter. Text only; no doses or thresholds beyond the tool's own. */
+(function(){ var D = {"lf-portal": [["Mechanism", "Portal pressure is flow times resistance. Scar and nodules distort the liver's small vessels, and the cells around them contract, so resistance rises. The arteries of the gut then dilate, more blood flows into the portal vein, and the high pressure is sustained. Blood finds ways around the liver where portal and systemic veins meet: the lower esophagus and stomach, the rectum, the umbilicus."], ["Why it matters", "Each treatment acts on one term. Non-selective beta-blockers and acute vasoconstrictors reduce the inflow. Carvedilol also relaxes resistance inside the liver. A TIPS bypasses the resistance altogether."], ["Common trap", "A variceal bleed is a pressure problem, not a clotting problem. The INR does not predict bleeding in cirrhosis, and generous transfusion or plasma raises portal pressure and the risk of rebleeding."]], "lf-saag": [["Mechanism", "The gradient between serum and ascitic albumin tracks the pressure pushing fluid out of the portal bed: a wide gradient means portal hypertension. Total protein then separates the two common causes. In cirrhosis the scarred sinusoids hold protein back, so the fluid is low in protein; in heart failure the sinusoids are normal and leak it, so protein is high."], ["Why it matters", "Low-protein fluid has few of the proteins that coat bacteria for killing, so it is easily infected by organisms crossing from the gut. That infection is often silent, which is why ascites is sampled in every admitted patient and whenever the patient deteriorates."], ["Common trap", "Delaying the tap to correct the INR or platelets. The procedure is safe without that (overt DIC or hyperfibrinolysis is the exception), and delay in diagnosing infection is associated with higher mortality."]], "lf-hrs": [["Mechanism", "Dilated gut arteries hold so much blood that the rest of the arterial circulation is underfilled. The body responds with every salt- and water-retaining system at full strength, and the kidney's own arteries clamp down. The failure is one of blood supply, not of kidney structure, although it can sit on top of existing kidney disease."], ["Why it matters", "The treatments refill the arterial side: albumin expands it and a vasoconstrictor squeezes the gut bed to redirect blood. The usual triggers are infection, bleeding, a large paracentesis without albumin, over-diuresis and NSAIDs, and each is preventable or treatable."], ["Common trap", "Patients with cirrhosis have little muscle and make little creatinine. A value in the normal range can already represent a large loss of kidney function, so the change from baseline matters more than the number."]], "lf-nh3": [["Mechanism", "Ammonia is made in the gut from protein by bacteria and by the gut wall. A healthy liver removes it; with scarring and shunts it reaches the brain, where support cells convert it to glutamine and swell. Muscle is the other place ammonia is cleared, and the kidney makes more of it when potassium is low."], ["Why it matters", "Lactulose acidifies the colon, which traps ammonia as ammonium, and empties it; rifaximin reduces the bacteria that make it. An episode usually has a trigger. Most raise ammonia production or delivery (bleeding into the gut, constipation, low potassium or over-diuresis, a new shunt); others make the brain more sensitive (infection, a sedative)."], ["Common trap", "A high blood ammonia does not confirm or grade encephalopathy, and serial levels do not guide treatment; a normal level, though, should make you look for another diagnosis. And restricting protein does not help: it speeds muscle loss, and muscle is a place where ammonia is cleared."]]};
+  function add(){ Object.keys(D).forEach(function(id){ var c = document.getElementById(id); if (!c || c.querySelector(":scope > .deeper")) return; var host = c.matches(".card,.lsec,section,.chap") ? c : null; if (!host){ var n = c.nextElementSibling; while (n && !n.matches(".card")) n = n.nextElementSibling; host = n; } if (!host || host.querySelector(":scope > .deeper")) return; var d = document.createElement("details"); d.className = "deeper"; d.innerHTML = "<summary>Go deeper: mechanism and rationale</summary><div class=\"dpx\">" + D[id].map(function(r){ return "<div><span class=\"dl\">" + r[0] + "</span><p>" + r[1] + "</p></div>"; }).join("") + "</div>"; var last = host.querySelector(":scope > .row"); if (last) host.insertBefore(d, last); else host.appendChild(d); }); }
+  add(); document.addEventListener("click", function(){ setTimeout(add, 0); }); document.addEventListener("input", function(){ setTimeout(add, 0); });
 })();
 </script>
 </body>

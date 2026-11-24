@@ -114,6 +114,18 @@ footer p{margin:0 0 8px}
 .trial .k{font-family:var(--mono);font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);display:block}
 @media (max-width:420px){.grid{grid-template-columns:1fr 1fr}.checks{grid-template-columns:1fr}}
 @media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+.deeper{margin-top:14px;border-top:1px solid var(--line)}
+.deeper>summary{min-height:44px;display:flex;align-items:center;gap:8px;color:var(--accent);font-weight:600;font-size:15px;cursor:pointer;list-style:none}
+.deeper>summary::-webkit-details-marker{display:none}
+.deeper>summary::before{content:"+";font-family:var(--mono);font-size:18px;line-height:1;width:14px;text-align:center}
+.deeper[open]>summary::before{content:"\2212"}
+.deeper>summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.deeper .dpx{border:1px solid var(--line);border-radius:12px;padding:2px 12px;background:var(--card);text-align:left}
+.deeper .dpx>div{padding:10px 0;border-top:1px solid var(--line)}
+.deeper .dpx>div:first-child{border-top:0}
+.deeper .dl{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500;margin:0 0 3px}
+.deeper p{font-size:15px;line-height:1.45;color:var(--ink);margin:0 0 4px}
+.deeper p:last-child{margin-bottom:0}
 </style>
 <style id="vk-css">
 .vk-plate{margin-top:10px;border:1px solid var(--line);border-radius:12px;padding:6px;background:var(--card)}
@@ -146,6 +158,18 @@ footer p{margin:0 0 8px}
 .vk-sl input[type=range]{width:100%;min-height:44px;accent-color:var(--accent)}
 .vk-res{margin-top:8px}
 .vk-res .card{margin-bottom:8px}
+.vk-zone{margin:0 0 6px}
+.vk-zs{display:flex;gap:2px;height:8px}
+.vk-zs i{display:block;border-radius:99px;background:var(--line);min-width:4px}
+.vk-zs i.on{background:var(--accent)}
+.vk-zt{font-family:var(--mono);font-size:12px;color:var(--ink);margin:4px 0 0}
+.vk-deep{margin-top:10px;border:1px solid var(--line);border-radius:12px;padding:2px 12px;background:var(--card)}
+.vk-deep:empty{display:none}
+.vk-dr{padding:10px 0;border-top:1px solid var(--line)}
+.vk-dr:first-child{border-top:0}
+.vk-dr .label{margin:0 0 3px}
+.vk-dr p{font-size:15px;margin:0 0 4px}
+.vk-dr p:last-child{margin-bottom:0}
 .vk-flow .vk-dots{display:flex;gap:4px;margin:4px 0 12px}
 .vk-d{flex:1;height:4px;border-radius:99px;background:var(--line)}
 .vk-d.on{background:var(--accent)}
@@ -157,8 +181,11 @@ footer p{margin:0 0 8px}
 .vk-btn{min-height:44px;border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);border-radius:10px;padding:8px 14px;font:inherit;font-weight:600;cursor:pointer;margin-top:10px}
 .vk-btn.ghost{background:var(--card);color:var(--accent)}
 .vk-hot:focus-visible,.vk-opt:focus-visible,.vk-cell:focus-visible,.vk-btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-@media (max-width:479px){.vk-hot{width:20px;height:20px;font-size:11px}}
+@media (max-width:479px){.vk-hot{width:18px;height:18px;font-size:11px;border-width:1.5px}}
 @media (min-width:900px){.vk-grid{grid-template-columns:repeat(3,1fr)}.vk-hot{width:30px;height:30px}}
+/* cause-fix: ruled-out causes stay readable; the name greys, the reason does not fade */
+.cause.out,.cause.less,.cause.unl{opacity:1}
+.cause.less>span,.cause.unl>span{color:var(--muted)}
 </style>
 </head>
 <body>
@@ -754,9 +781,9 @@ function adhSVG(k, p){
   var h = svgOpen('0 0 340 250', 'ADH and the collecting duct: ' + s.n) + markers(p);
   h += box(8, 8, 150, 44, 'Osmolality sensor', 'osmolality low', s.adh === 'off' ? false : null);
   h += box(182, 8, 150, 44, 'Volume sensor', s.vol === 'd' ? 'filling low' : 'filling normal', s.vol === 'd' ? 'warn' : false);
-  h += arrow('M83 52 L148 92', on ? 'n' : 'd', p, on ? 1.5 : 2) + txt(96, 82, on ? 'overridden' : 'switch off', FM + ';font-size:10px;fill:' + (on ? 'var(--muted)' : 'var(--accent)'), 'end');
-  h += arrow('M257 52 L192 92', s.vol === 'd' ? 'u' : 'n', p, s.vol === 'd' ? 4 : 1.5) + (s.vol === 'd' ? txt(244, 82, 'switch on', FM + ';font-size:10px;fill:var(--warn)', 'start') : '');
-  if (s.adh === 'x') h += txt(318, 112, 'drug, tumor,', FM + ';font-size:10px;fill:var(--bad)', 'end') + txt(318, 124, 'lung, brain', FM + ';font-size:10px;fill:var(--bad)', 'end') + arrow('M262 116 L232 116', 'x', p, 2);
+  h += arrow('M83 52 L148 92', on ? 'n' : 'd', p, on ? 1.5 : 2) + txt(96, 82, on ? 'overridden' : 'switch off', FM + ';font-size:10.5px;fill:' + (on ? 'var(--muted)' : 'var(--accent)'), 'end');
+  h += arrow('M257 52 L192 92', s.vol === 'd' ? 'u' : 'n', p, s.vol === 'd' ? 4 : 1.5) + (s.vol === 'd' ? txt(244, 82, 'switch on', FM + ';font-size:10.5px;fill:var(--warn)', 'start') : '');
+  if (s.adh === 'x') h += txt(318, 112, 'drug, tumor,', FM + ';font-size:10.5px;fill:var(--bad)', 'end') + txt(318, 124, 'lung, brain', FM + ';font-size:10.5px;fill:var(--bad)', 'end') + arrow('M262 116 L232 116', 'x', p, 2);
   h += box(110, 96, 120, 40, on ? 'ADH on' : 'ADH off', s.adh === 'x' ? 'no reason' : on ? 'for volume' : k === 'thz' ? 'or low' : '', s.adh === 'x' ? 'bad' : on ? 'warn' : false);
   h += arrow('M170 136 L170 168', on ? 'u' : 'd', p);
   var duct = k === 'thz' ? 'cannot dilute' : on ? 'water channels open' : 'water channels shut';
@@ -788,13 +815,13 @@ function soluteSVG(k, p){
   var over = s.drink > lo;
   h += '<rect x="' + x0 + '" y="92" width="' + (s.drink * sc) + '" height="22" rx="6" fill="' + (over ? 'var(--bad)' : 'var(--ok)') + '"/>' + txt(x0 + s.drink * sc + 6, 108, s.drink + ' L', FM + ';font-size:11px;fill:var(--ink)', 'start');
   h += txt(x0, 136, 'Solute ' + s.sol + ' mOsm/day; each litre', FM + ';font-size:10.5px;fill:var(--muted)', 'start') + txt(x0, 150, 'needs 50–100 mOsm to carry it out', FM + ';font-size:10.5px;fill:var(--muted)', 'start');
-  h += txt(x0, 166, 'Illustrative numbers', FM + ';font-size:10px;fill:var(--muted)', 'start');
+  h += txt(x0, 166, 'Illustrative numbers', FM + ';font-size:10.5px;fill:var(--muted)', 'start');
   return h + '</svg>';
 }
 function brainSVG(k, p){
   var s = BRAIN[k];
   var h = svgOpen('0 0 340 190', 'Brain cell volume: ' + s.n);
-  h += '<circle cx="110" cy="92" r="62" fill="none" stroke="var(--muted)" stroke-width="3"/>' + txt(110, 172, 'skull', FM + ';font-size:10px;fill:var(--muted)');
+  h += '<circle cx="110" cy="92" r="62" fill="none" stroke="var(--muted)" stroke-width="3"/>' + txt(110, 172, 'skull', FM + ';font-size:10.5px;fill:var(--muted)');
   var col = s.hot === 'bad' ? 'var(--bad)' : s.hot ? 'var(--warn)' : 'var(--accent)';
   h += '<circle cx="110" cy="92" r="' + s.r + '" fill="var(--fill)" stroke="' + col + '" stroke-width="2"' + (k === 'fast' ? ' stroke-dasharray="4 3"' : '') + '/>';
   for (var n = 0; n < s.dots; n++){ var a = n / Math.max(1, s.dots) * Math.PI * 2; h += '<circle cx="' + (110 + Math.cos(a) * s.r * 0.5) + '" cy="' + (92 + Math.sin(a) * s.r * 0.5) + '" r="4" fill="var(--ink)"/>'; }
@@ -809,7 +836,7 @@ function guardSVG(k, p, pt, lim24, lim48){
   h += '<line x1="40" y1="150" x2="320" y2="150" stroke="var(--muted)"/><line x1="40" y1="20" x2="40" y2="150" stroke="var(--muted)"/>';
   [0, 12, 24, 36, 48].forEach(function(t){ h += txt(X(t), 166, t + ' h'); });
   [0, 5, 10, 15, 20].forEach(function(r){ h += txt(34, Y(r) + 4, '+' + r, null, 'end'); });
-  h += '<rect x="' + X(0) + '" y="' + Y(s.g[1]) + '" width="' + (X(24) - X(0)) + '" height="' + (Y(s.g[0]) - Y(s.g[1])) + '" fill="var(--okbg)"/>' + txt(X(12), (Y(s.g[1]) + Y(s.g[0])) / 2 + 4, 'goal by 24 h', FM + ';font-size:10px;fill:var(--ok)');
+  h += '<rect x="' + X(0) + '" y="' + Y(s.g[1]) + '" width="' + (X(24) - X(0)) + '" height="' + (Y(s.g[0]) - Y(s.g[1])) + '" fill="var(--okbg)"/>' + txt(X(12), (Y(s.g[1]) + Y(s.g[0])) / 2 + 4, 'goal by 24 h', FM + ';font-size:10.5px;fill:var(--ok)');
   h += '<path d="M' + X(0) + ' ' + Y(l24) + ' H' + X(24) + ' V' + Y(l48) + ' H' + X(48) + '" fill="none" stroke="var(--bad)" stroke-width="2" stroke-dasharray="6 4"/>';
   h += txt(X(0) + 4, Y(l24) - 5, 'limit +' + l24, FM + ';font-size:10.5px;fill:var(--bad)', 'start') + txt(X(48) - 2, Y(l48) - 5, '+' + l48 + ' by 48 h', FM + ';font-size:10.5px;fill:var(--bad)', 'end');
   if (!pt){
@@ -1028,8 +1055,8 @@ var VK = (function(){
   function mark(box, j){ var ok = false; box.querySelectorAll('.vk-opt').forEach(function(b, i){ b.disabled = true; if (b.getAttribute('data-ok') === '1') b.classList.add('right'); else if (i === j) b.classList.add('wrong'); if (i === j) ok = b.getAttribute('data-ok') === '1'; }); return ok; }
   function answer(key, j){ var box = document.querySelector('[data-vk-pred="' + key + '"]'), P = C.preds[key]; if (!box || box.getAttribute('data-done')) return; box.setAttribute('data-done', '1'); var ok = mark(box, j), a = box.querySelector('.vk-ans');
     a.innerHTML = '<p><b>' + (ok ? 'Right.' : 'Not quite.') + '</b> ' + P.why() + '</p>' + (P.fig ? '<button class="chip" type="button" data-fig="' + P.fig[0] + '" data-state="' + (P.fig[1] || '') + '">' + VK_FIC + q(P.fig[2]) + '</button>' : ''); a.hidden = false; }
-  function slHtml(id){ var S = C.sliders[id]; return '<div class="vk-sl" data-vk-sl="' + id + '">' + S.ranges.map(function(r){ return '<label for="vk-' + id + '-' + r.key + '">' + r.label + ' <b data-vk-v="' + r.key + '"></b></label><input type="range" id="vk-' + id + '-' + r.key + '" data-vk-k="' + r.key + '" min="' + r.min + '" max="' + r.max + '" step="' + r.step + '" value="' + r.value + '">'; }).join('') + '<div class="vk-res" aria-live="polite"></div>' + (S.note ? '<p class="vk-src">' + S.note + '</p>' : '') + '</div>'; }
-  function slRun(w){ var S = C.sliders[w.getAttribute('data-vk-sl')], v = {}; S.ranges.forEach(function(r){ var x = +w.querySelector('[data-vk-k="' + r.key + '"]').value; v[r.key] = x; w.querySelector('[data-vk-v="' + r.key + '"]').textContent = (r.fmt ? r.fmt(x) : x) + (r.unit ? ' ' + r.unit : ''); }); w.querySelector('.vk-res').innerHTML = S.run(v); }
+  function slHtml(id){ var S = C.sliders[id]; return '<div class="vk-sl" data-vk-sl="' + id + '">' + S.ranges.map(function(r){ return '<label for="vk-' + id + '-' + r.key + '">' + r.label + ' <b data-vk-v="' + r.key + '"></b></label><input type="range" id="vk-' + id + '-' + r.key + '" data-vk-k="' + r.key + '" min="' + r.min + '" max="' + r.max + '" step="' + r.step + '" value="' + r.value + '">' + (r.zones ? '<div class="vk-zone" data-vk-z="' + r.key + '"></div>' : ''); }).join('') + '<div class="vk-res" aria-live="polite"></div><div class="vk-deep"></div>' + (S.note ? '<p class="vk-src">' + S.note + '</p>' : '') + '</div>'; }
+  function slRun(w){ var S = C.sliders[w.getAttribute('data-vk-sl')], v = {}; S.ranges.forEach(function(r){ var x = +w.querySelector('[data-vk-k="' + r.key + '"]').value; v[r.key] = x; w.querySelector('[data-vk-v="' + r.key + '"]').textContent = (r.fmt ? r.fmt(x) : x) + (r.unit ? ' ' + r.unit : ''); }); w.querySelector('.vk-res').innerHTML = S.run(v); S.ranges.forEach(function(r){ if (!r.zones) return; var Z = typeof r.zones === 'function' ? r.zones(v) : r.zones, x = v[r.key], on = Z.length - 1; Z.forEach(function(z, k){ if (x >= z[0] && x < z[1] && on === Z.length - 1) on = k; }); w.querySelector('[data-vk-z="' + r.key + '"]').innerHTML = '<div class="vk-zs" aria-hidden="true">' + Z.map(function(z, k){ return '<i' + (k === on ? ' class="on"' : '') + ' style="flex:' + Math.max(0.01, Math.min(z[1], r.max) - Math.max(z[0], r.min)) + '"></i>'; }).join('') + '</div><p class="vk-zt">' + Z[on][2] + '</p>'; }); w.querySelector('.vk-deep').innerHTML = S.deep ? S.deep(v).map(function(d){ return '<div class="vk-dr"><p class="label">' + d[0] + '</p>' + d[1] + '</div>'; }).join('') : ''; }
   function flowHtml(id){ var F = C.flows[id]; return '<div class="vk-flow" data-vk-flow="' + id + '"><p class="head">' + F.t + '</p><div class="vk-dots">' + F.steps.map(function(_, k){ return '<i class="vk-d' + (k ? '' : ' on') + '"></i>'; }).join('') + '</div><div class="vk-fb"></div></div>'; }
   function step(id, k){ var F = C.flows[id], S = F.steps[k], w = document.querySelector('[data-vk-flow="' + id + '"]'); if (!w || !S) return; FS[id] = k;
     w.querySelectorAll('.vk-d').forEach(function(d, j){ d.classList.toggle('on', j <= k); });
@@ -1090,7 +1117,13 @@ VK.init({
   'learn-guard': {q: 'Chronic sodium 112, now 126 after 24 hours, no other risk factors. Within the limit?', a: function(){ var t = decide({na: 126, na0: 112, hrs: 24}).lim.track; return [['Over the limit: act now', t.over], ['Within the limit', !t.over]]; }, why: function(){ var o = decide({na: 126, na0: 112, hrs: 24}); return 'A rise of ' + o.lim.track.rise + ' in 24 h against a limit of ' + o.lim24 + '. ' + o.lim.why; }, fig: ['guard', 'std', 'The daily limit']}
  },
  sliders: {
-  track: {ranges: [{key: 'na', label: 'Sodium 24 h after a start of 116', min: 116, max: 134, step: 1, value: 124, unit: 'mmol/L'}], note: 'Runs this tool\'s correction tracker: chronic, no symptoms, standard risk.',
+  track: {ranges: [{key: 'na', label: 'Sodium 24 h after a start of 116', min: 116, max: 134, step: 1, value: 124, unit: 'mmol/L', zones: function(v){ var L = decide({na: v.na, na0: 116, hrs: 24}).lim.track.lim; return [[116, 116 + L - 2, 'Up less than ' + (L - 2) + ': within the limit'], [116 + L - 2, 116 + L + 0.5, 'Up ' + (L - 2) + ' to ' + L + ': close to the limit'], [116 + L + 0.5, 135, 'Up more than ' + L + ': over the limit']]; }}], note: 'Runs this tool\'s correction tracker: chronic, no symptoms, standard risk.',
+   deep: function(v){ var o = decide({na: v.na, na0: 116, hrs: 24}), t = o.lim.track;
+    var now = t.over ? '<p>Brain cells survived the low sodium by shedding potassium and organic solutes. Raise the sodium faster than they can rebuild those solutes and water leaves the cells; the myelin-making cells of the pons are the most vulnerable.</p><p>Osmotic demyelination typically declares itself 2 to 6 days later: slurred speech, trouble swallowing, weakness of all four limbs, and at worst a locked-in state.</p>'
+      : t.near ? '<p>The rise is close to what the adapted brain can follow. The usual reason a correction runs away is a water diuresis: once the trigger for ADH is gone (volume replaced, nausea treated, a drug stopped), dilute urine pours out and the sodium climbs with no further treatment.</p>'
+      : '<p>At this pace the brain rebuilds its solutes as the sodium rises, so cell volume stays stable. The danger now is ahead: a sudden jump in urine output means ADH has switched off and the sodium will speed up.</p>';
+    var act = t.over ? '<p>Stop everything that raises sodium, and get expert help about bringing it back under the limit (free water, desmopressin). Re-lowering after an overshoot is established practice.</p>' : t.near ? '<p>Check the sodium more often and watch the urine output. Do not aim for the limit: a reported rise of 8 can be 10 in reality.</p>' : '<p>Keep measuring. No formula predicts the rise reliably.</p>';
+    return [['What is happening', now], ['Why the limit', '<p>' + o.lim.why + '</p>'], ['At the bedside', act]]; },
    run: function(v){ var o = decide({na: v.na, na0: 116, hrs: 24}), t = o.lim.track; return '<div class="card"><p class="label">First 24 h</p><p class="head' + (t.over ? ' bad' : '') + '">Up ' + t.rise + ' of ' + t.lim + (t.over ? ': over the limit' : t.near ? ': close to the limit' : ': within the limit') + '</p><p class="sub">' + o.lim.goal + '</p></div>'; }}
  },
  flows: {
@@ -1105,6 +1138,13 @@ VK.init({
   causes: {items: CAUSES.map(function(c){ return [c[0], function(){ var r = []; Object.keys(c[1]).forEach(function(k){ var s = c[1][k]; var lab = RL[k] || k, why = s[1] && s[1].toLowerCase() !== lab.toLowerCase() && k !== 'osmNl' ? ' (' + s[1] + ')' : '', verb = s[0] === 'fav' ? 'favors it' : s[0] === 'out' ? (k === 'osmNl' ? 'argues strongly against it, unless urea or alcohol raise the measured osmolality' : k === 'cortOk' ? 'makes it unlikely' : 'argues strongly against it') : s[0] === 'unl' ? 'makes it unlikely' : null; if (verb) r.push('<p><b>' + lab + ':</b> ' + verb + why + '</p>'); }); return r.join('') || '<p>No single result decides it.</p>'; }]; })}
  }
 });
+</script>
+<script id="deeper-data">
+/* Go deeper: mechanism, rationale and the common trap for each Learn chapter. Text only; no doses or thresholds beyond the tool's own. */
+(function(){ var D = {"learn-water": [["Mechanism", "The serum sodium is a concentration: the body's exchangeable sodium and potassium divided by its total water. Water crosses cell membranes freely, so this one number sets the tonicity of every fluid compartment. A low sodium nearly always means too much water for the solute, not too little salt."], ["Why it matters", "Volume and concentration are separate axes. Volume is the amount of salt, judged at the bedside; concentration is the amount of water, read from the lab. A patient can be low on one, both or neither. Potassium sits in the numerator too: potassium given moves into cells, sodium moves out, and the serum sodium rises."], ["Common trap", "High glucose draws water out of cells and dilutes the sodium while the tonicity is high, not low. Very high lipids or protein cause a laboratory artifact with a normal measured osmolality. Neither is true hypotonic hyponatremia, and neither is treated as one."]], "learn-adh": [["Mechanism", "ADH puts water channels into the wall of the collecting duct, and water leaves the urine along the concentration gradient of the medulla. It has two triggers. Osmoreceptors respond to small rises in tonicity. Baroreceptors respond only to a large fall in effective circulating volume, but they override the osmoreceptors when they fire. Nausea, pain, many drugs, and lung and brain disease release ADH with neither trigger."], ["Why it matters", "The two urine tests read the switch. Urine osmolality says whether ADH is on. Urine sodium says why: low means the kidney senses too little volume, so the ADH is appropriate; high means volume is adequate and the ADH has no physiological reason."], ["Common trap", "The body gives up concentration to defend volume. That is why ADH stays on in heart failure and cirrhosis despite a falling sodium. Diuretics make the urine sodium unreadable, and thiazides also block the diluting segment directly."]], "learn-solute": [["Mechanism", "The kidney cannot excrete pure water. Even the most dilute urine it can make carries some solute, so the water it can clear in a day is capped by the solute available to carry it: mostly urea from protein, and salt. A person eating little of either has a low ceiling, and ordinary amounts of fluid can exceed it."], ["Why it matters", "This explains hyponatremia on a tea-and-toast or beer diet, and it explains treatment. Urea and salt tablets add solute and raise the ceiling. In SIAD the urine concentration is fixed high, so the salt in an infusion of saline is excreted in a small volume and the water stays: saline can lower the sodium."], ["Common trap", "In a low-solute state, giving solute (saline, or simply a meal) releases a brisk water diuresis. This is one of the settings where the sodium overshoots the limit fastest."]], "learn-brain": [["Mechanism", "The skull cannot expand. When the sodium falls quickly, water enters brain cells, they swell, and pressure rises. Within hours the cells push out electrolytes; over about two days they shed organic solutes as well, and their volume returns to normal. Rebuilding those organic solutes takes far longer than losing them. If tonicity rises faster than they can be rebuilt, the cells shrink and the myelin sheath is damaged."], ["Why it matters", "So duration reverses the danger. Acute hyponatremia threatens swelling and herniation and is treated fast. Chronic hyponatremia threatens demyelination and is treated slowly. When the duration is unknown, assume chronic, unless severe symptoms show the brain is swelling now."], ["Common trap", "Low potassium, alcohol use, malnutrition and liver disease leave the brain less able to rebuild its solutes. In these patients demyelination has followed corrections that would be safe in others, which is why they get the tighter limit."]], "learn-guard": [["Mechanism", "The limit is on the total rise in a day, not on the hourly rate. A quick rise of a few points early is safe and is enough to relieve brain swelling, provided the total for the day stays under the ceiling."], ["Why it matters", "An overshoot usually comes from the patient's own kidneys, not from what was infused. Once the reason for ADH is removed, dilute urine pours out and the sodium climbs on its own. A sudden rise in urine output is the warning."], ["Common trap", "Trusting a formula. Predictions of the rise are unreliable because they cannot foresee the urine. Measure the sodium often, and aim below the limit so that laboratory error cannot carry the true value past it."]]};
+  function add(){ Object.keys(D).forEach(function(id){ var c = document.getElementById(id); if (!c || c.querySelector(":scope > .deeper")) return; var host = c.matches(".card,.lsec,section,.chap") ? c : null; if (!host){ var n = c.nextElementSibling; while (n && !n.matches(".card")) n = n.nextElementSibling; host = n; } if (!host || host.querySelector(":scope > .deeper")) return; var d = document.createElement("details"); d.className = "deeper"; d.innerHTML = "<summary>Go deeper: mechanism and rationale</summary><div class=\"dpx\">" + D[id].map(function(r){ return "<div><span class=\"dl\">" + r[0] + "</span><p>" + r[1] + "</p></div>"; }).join("") + "</div>"; var last = host.querySelector(":scope > .row"); if (last) host.insertBefore(d, last); else host.appendChild(d); }); }
+  add(); document.addEventListener("click", function(){ setTimeout(add, 0); }); document.addEventListener("input", function(){ setTimeout(add, 0); });
+})();
 </script>
 </body>
 </html>

@@ -125,6 +125,24 @@ footer p{margin:0 0 8px}
 .rx{border-top:1px solid var(--line);padding:8px 0}
 .rx b{display:block;font-size:13px;font-family:var(--mono);letter-spacing:.04em;text-transform:uppercase;color:var(--muted);font-weight:500}
 @media (max-width:420px){.dgrid{grid-template-columns:repeat(2,minmax(0,1fr))}.sit{grid-template-columns:1fr}}
+.deeper{margin-top:14px;border-top:1px solid var(--line)}
+.deeper>summary{min-height:44px;display:flex;align-items:center;gap:8px;color:var(--accent);font-weight:600;font-size:15px;cursor:pointer;list-style:none}
+.deeper>summary::-webkit-details-marker{display:none}
+.deeper>summary::before{content:"+";font-family:var(--mono);font-size:18px;line-height:1;width:14px;text-align:center}
+.deeper[open]>summary::before{content:"\2212"}
+.deeper>summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.deeper .dpx{border:1px solid var(--line);border-radius:12px;padding:2px 12px;background:var(--card);text-align:left}
+.deeper .dpx>div{padding:10px 0;border-top:1px solid var(--line)}
+.deeper .dpx>div:first-child{border-top:0}
+.deeper .dl{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500;margin:0 0 3px}
+.deeper p{font-size:15px;line-height:1.45;color:var(--ink);margin:0 0 4px}
+.deeper p:last-child{margin-bottom:0}
+/* cause-fix: ruled-out causes stay readable; the name greys, the reason does not fade */
+.cause.out,.cause.less,.cause.unl{opacity:1}
+.cause.less>span,.cause.unl>span{color:var(--muted)}
+.plate{margin:12px 0 4px}
+.plate img{display:block;width:100%;height:auto;border-radius:10px;border:1px solid var(--line)}
+.plate figcaption{font-size:13px;color:var(--muted);margin-top:6px}
 </style>
 </head>
 <body>
@@ -175,7 +193,7 @@ footer p{margin:0 0 8px}
 
 <div class="panel" id="p-learn" role="tabpanel" aria-labelledby="t-learn">
   <div class="pills" id="pills"></div>
-  <div class="card chap" id="learn-axis" data-pill="The axis"><p class="label">1 · Why steroids switch the adrenal off</p><h2>The HPA axis and its brake</h2><p class="sub">Pick a state. Watch what happens to CRH, ACTH and the adrenal.</p><div data-figure="axis"></div></div>
+  <div class="card chap" id="learn-axis" data-pill="The axis"><p class="label">1 · Why steroids switch the adrenal off</p><h2>The HPA axis and its brake</h2><figure class="plate" style="margin-left:0;margin-right:0"><img src="/media/steroids/adrenal-cortex.webp" width="741" height="527" loading="lazy" alt="The same kidney and adrenal gland drawn twice, the gland cut to show an outer yellow cortex and an inner pink medulla. On the left the cortex is thick. On the right the cortex is thin and the gland is smaller. A small brain above shows the hypothalamus and pituitary."><figcaption>Left: a normal adrenal. Right: after weeks without ACTH the cortex, which makes cortisol, has thinned; the medulla is unchanged. Created with BioRender.com</figcaption></figure><p class="sub">Pick a state. Watch what happens to CRH, ACTH and the adrenal.</p><div data-figure="axis"></div></div>
   <div class="card chap" id="learn-potency" data-pill="Potency"><p class="label">2 · Not all steroids are equal</p><h2>Strength, salt and duration</h2><p class="sub">Pick what to compare.</p><div data-figure="potency"></div></div>
   <div class="card chap" id="learn-stress" data-pill="Stress"><p class="label">3 · Cover the stress</p><h2>More stress, more cortisol</h2><p class="sub">Pick a level of stress.</p><div data-figure="ladder"></div></div>
   <div class="card chap" id="learn-taper" data-pill="Coming off"><p class="label">4 · Coming off</p><h2>Big steps high, small steps low</h2><p class="sub">ACTH comes back first; the adrenal follows weeks to years later.</p><div data-figure="axis" data-state="taper"></div></div>
@@ -597,11 +615,11 @@ function axisSVG(k, p){
   h += arrow(135, 54, 135, 90, p, S.off) + arrow(135, 134, 135, 170, p, S.off);
   /* brake: cortisol feedback on the left */
   h += '<path d="M70 195 H40 V33 H66" fill="none" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#' + p + 'a)"/><line x1="40" y1="113" x2="66" y2="113" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#' + p + 'a)"/>';
-  h += txt(32, 120, 'brake', FM + ';font-size:10px;fill:var(--muted)', 'end') + txt(58, 28, '−', FS + ';font-size:14px;font-weight:700;fill:var(--ink)') + txt(58, 108, '−', FS + ';font-size:14px;font-weight:700;fill:var(--ink)');
+  h += txt(32, 120, 'brake', FM + ';font-size:10.5px;fill:var(--muted)', 'end') + txt(58, 28, '−', FS + ';font-size:14px;font-weight:700;fill:var(--ink)') + txt(58, 108, '−', FS + ';font-size:14px;font-weight:700;fill:var(--ink)');
   if (S.pill){
     h += '<rect x="226" y="' + (S.small ? 104 : 96) + '" width="' + (S.small ? 80 : 104) + '" height="' + (S.small ? 22 : 34) + '" rx="' + (S.small ? 11 : 17) + '" fill="var(--warnbg)" stroke="var(--warn)" stroke-width="2"/>';
     h += txt(226 + (S.small ? 40 : 52), S.small ? 119 : 117, S.small ? 'small dose' : 'steroid', FS + ';font-size:12px;font-weight:600;fill:var(--warn)');
-    h += txt(278, S.small ? 140 : 146, S.pill, FM + ';font-size:9.5px;fill:var(--muted)');
+    h += txt(278, S.small ? 140 : 146, S.pill, FM + ';font-size:10.5px;fill:var(--muted)');
     h += '<path d="M226 113 H204" fill="none" stroke="var(--warn)" stroke-width="2" marker-end="url(#' + p + 'h)"/><path d="M270 96 V33 H204" fill="none" stroke="var(--warn)" stroke-width="2" marker-end="url(#' + p + 'h)"/>';
   }
   if (S.stress){ h += box(226, 12, 104, 42, 'Illness, surgery', 'needs more', 'bad'); }
@@ -654,7 +672,7 @@ function ladSVG(k, p){
     h += '<rect x="' + x + '" y="' + y + '" width="76" height="' + hgt + '" rx="8" fill="' + (on ? (n === 3 ? 'var(--badbg)' : 'var(--warnbg)') : 'var(--fill)') + '" stroke="' + (on ? (n === 3 ? 'var(--bad)' : 'var(--warn)') : 'var(--line)') + '"' + (on ? ' stroke-width="2"' : '') + '/>';
     h += txt(x + 38, y + 18, s[0], FS + ';font-size:12px;font-weight:600;fill:var(--ink)');
     var parts = s[1].split(' + ');
-    parts.forEach(function(t, m){ h += txt(x + 38, y + 34 + m * 13, (m ? '+ ' : '') + t, FM + ';font-size:9.5px;fill:' + (on ? (n === 3 ? 'var(--bad)' : 'var(--warn)') : 'var(--muted)')); });
+    parts.forEach(function(t, m){ h += txt(x + 38, y + 34 + m * 13, (m ? '+ ' : '') + t, FM + ';font-size:10.5px;fill:' + (on ? (n === 3 ? 'var(--bad)' : 'var(--warn)') : 'var(--muted)')); });
   });
   h += txt(170, 215, 'hydrocortisone (HC) per day, ESE/ES 2024 Table 8');
   return h + '</svg>';
@@ -852,6 +870,13 @@ function load(i){
   touched = true; render(); show('t-tool'); window.scrollTo(0, 0);
 }
 fromHash();
+})();
+</script>
+<script id="deeper-data">
+/* Go deeper: mechanism, rationale and the common trap for each Learn chapter. Text only; no doses or thresholds beyond the tool's own. */
+(function(){ var D = {"learn-axis": [["Mechanism", "The hypothalamus releases CRH, the pituitary releases ACTH, and the adrenal makes cortisol, which feeds back to restrain both. A glucocorticoid given as a drug applies the same brake. ACTH is also what keeps the cortisol-making layer of the adrenal alive, so with ACTH suppressed for weeks that layer shrinks. The salt-retaining hormone, aldosterone, is controlled by the renin-angiotensin system and is spared."], ["Why it matters", "So adrenal insufficiency caused by steroids looks different from primary adrenal failure: no high potassium and no darkening of the skin. The danger is hypotension, because blood vessels need cortisol to respond to catecholamines."], ["Common trap", "Any route can suppress the axis: high-dose inhaled steroids, joint injections, potent creams, and above all an ordinary steroid combined with a drug that blocks its metabolism."]], "learn-potency": [["Mechanism", "The steroids differ in three independent properties: anti-inflammatory strength, salt-retaining effect, and how long the action lasts in tissue. Hydrocortisone is the body's own cortisol: weak, short, with some salt retention. Dexamethasone is strong, long-acting and has no salt-retaining effect."], ["Why it matters", "The choice follows the need. Replacing what the adrenal should make calls for hydrocortisone. Suppressing inflammation calls for prednisone or methylprednisolone. Long-acting steroids, and doses taken in the evening, suppress the axis more."], ["Common trap", "Hydrocortisone is measured by a cortisol assay; dexamethasone is not. That is why dexamethasone can be given before an ACTH stimulation test without spoiling it."]], "learn-stress": [["Mechanism", "Surgery and injury normally raise cortisol output several-fold, and severe illness raises cortisol levels. Cortisol maintains vessel tone and blood glucose under stress. A suppressed axis cannot mount that rise, and the result is an adrenal crisis: low blood pressure that does not respond to fluid or vasopressors."], ["Why it matters", "The dose is matched to the size of the stress. Too little is dangerous; a few days of too much costs very little."], ["Common trap", "A patient who is vomiting cannot absorb an oral stress dose. That is the moment for an injection, not for doubling the tablets."]], "learn-taper": [["Mechanism", "When the drug is withdrawn, the hypothalamus and pituitary recover first and ACTH rises above normal. The adrenal layer that had shrunk regrows more slowly under that stimulus."], ["Why it matters", "Above the body's normal output, the pace of a taper is limited by the disease flaring, so the steps can be large. Near normal output it is limited by adrenal recovery, so the steps are small and slow. A morning cortisol, read against the thresholds in this tool, shows whether the adrenal has recovered."], ["Common trap", "Aches, fatigue and low mood during a taper can occur with a recovered axis: steroid withdrawal. It feels like adrenal insufficiency while the cortisol can be adequate; the two often coexist, and a morning cortisol helps separate them."]]};
+  function add(){ Object.keys(D).forEach(function(id){ var c = document.getElementById(id); if (!c || c.querySelector(":scope > .deeper")) return; var host = c.matches(".card,.lsec,section,.chap") ? c : null; if (!host){ var n = c.nextElementSibling; while (n && !n.matches(".card")) n = n.nextElementSibling; host = n; } if (!host || host.querySelector(":scope > .deeper")) return; var d = document.createElement("details"); d.className = "deeper"; d.innerHTML = "<summary>Go deeper: mechanism and rationale</summary><div class=\"dpx\">" + D[id].map(function(r){ return "<div><span class=\"dl\">" + r[0] + "</span><p>" + r[1] + "</p></div>"; }).join("") + "</div>"; var last = host.querySelector(":scope > .row"); if (last) host.insertBefore(d, last); else host.appendChild(d); }); }
+  add(); document.addEventListener("click", function(){ setTimeout(add, 0); }); document.addEventListener("input", function(){ setTimeout(add, 0); });
 })();
 </script>
 </body>

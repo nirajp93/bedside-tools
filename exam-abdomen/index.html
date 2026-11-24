@@ -79,11 +79,11 @@ details.more ul{padding-left:18px}
 .lr{font-family:var(--mono);font-size:12px;padding:2px 7px;border-radius:6px;background:var(--fill);white-space:nowrap}
 .lr.up{color:var(--bad);background:var(--badbg)}
 .lr.down{color:var(--ok);background:var(--okbg)}
-.tag{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:2px 6px;border-radius:5px;background:var(--fill);color:var(--muted)}
+.tag{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:2px 6px;border-radius:5px;background:var(--fill);color:var(--muted)}
 .tri{display:inline-grid;grid-auto-flow:column;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--card)}
 .tri button{min-width:46px;min-height:44px;font-size:13px;color:var(--muted);border-left:1px solid var(--line)}
 .tri button:first-child{border-left:0}
-.tri button:disabled{opacity:.35;cursor:not-allowed}
+.tri button:disabled{opacity:.5;cursor:not-allowed}
 .tri button[aria-pressed=true][data-v="1"]{background:var(--badbg);color:var(--bad);font-weight:600}
 .tri button[aria-pressed=true][data-v="1"][data-low]{background:var(--okbg);color:var(--ok)}
 .tri button[aria-pressed=true][data-v="-1"]{background:var(--okbg);color:var(--ok);font-weight:600}
@@ -154,7 +154,7 @@ footer p{margin-top:8px}
 .abdfig .rg rect{fill:var(--card);stroke:var(--line);stroke-width:2;transition:fill .15s}
 .abdfig .rg:hover rect{fill:var(--fill)}
 .abdfig .rg.on rect{fill:var(--accent);stroke:var(--accent)}
-.abdfig .rg text{font-family:var(--mono);font-size:10px;fill:var(--ink);pointer-events:none}
+.abdfig .rg text{font-family:var(--mono);font-size:11px;fill:var(--ink);pointer-events:none}
 .abdfig .rg.on text{fill:var(--accent-ink,#fff)}
 .abdfig .rg:focus-visible rect{stroke:var(--ink);stroke-width:3}
 .dx{margin:8px 0 0;padding-left:18px}
@@ -167,8 +167,16 @@ footer p{margin-top:8px}
 .curvecap{font-size:13px;color:var(--muted);margin:4px 0 0}
 .extab{width:100%;border-collapse:collapse;font-size:14px;margin:8px 0}
 .extab th,.extab td{padding:6px;border-bottom:1px solid var(--line);text-align:left}
-.extab th{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:400}
+.extab th{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:400}
+.dp{margin-top:10px;border:1px solid var(--line);border-radius:12px;padding:2px 12px;background:var(--card);text-align:left}
+.dp:empty{display:none}
+.dp>div{padding:10px 0;border-top:1px solid var(--line)}
+.dp>div:first-child{border-top:0}
+.dp .dl{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500;margin:0 0 3px}
+.dp p{font-size:15px;line-height:1.45;color:var(--ink);margin:0 0 4px}
+.dp p:last-child{margin-bottom:0}
 </style>
+<script>function dpHtml(rows){ return rows.map(function(r){ return '<div><span class="dl">' + r[0] + '</span>' + r[1] + '</div>'; }).join(''); }</script>
 </head>
 <body>
 <header><div class="wrap">
@@ -187,6 +195,7 @@ footer p{margin-top:8px}
     <div class="pre"><label for="pre">Your probability before the exam</label><span class="v" id="prev"></span>
       <input type="range" id="pre" min="1" max="99" step="1" aria-describedby="prenote"></div>
     <p class="note" id="prenote"></p>
+    <div class="dp" id="prehow"><div><span class="dl">What the starting point is</span><p>How likely the diagnosis is in a patient like this one before you examine: the setting, the story, the age. It matters as much as the exam: the same finding lands very differently from 10% and from 60%.</p></div><div><span class="dl">What a likelihood ratio does</span><p>It multiplies the odds. As a rough guide between 10% and 90%, ratios of 2, 5 and 10 raise the probability by about 15, 30 and 45 points, and 0.5, 0.2 and 0.1 lower it by the same. A ratio near 1 changes nothing, however classic the finding.</p></div><div><span class="dl">Where the exam helps most</span><p>In the middle. At very low or very high starting points even a strong finding rarely moves the probability across a decision line, so examine hardest where you are least sure.</p></div></div>
     <p class="note" id="prehint">Your best guess from the history, before you examine. Unsure? Drag across the range you find plausible and watch the chart in the result.</p>
     <div class="minis"><button type="button" class="mini" id="prehelp">How to choose a starting number</button></div>
   </div>
@@ -349,7 +358,7 @@ var GRID=[["ruq","epi","luq"],["rf","umb","lf"],["rlq","sup","llq"]],SHORT={ruq:
 function mapSVG(){var g='<svg class="abdfig" viewBox="0 0 330 330" role="group" aria-label="Nine abdominal regions">';
  g+='<path d="M40 10 Q165 -6 290 10 L300 300 Q165 330 30 300 Z" fill="var(--fill)" stroke="var(--muted)" stroke-width="2"/>';
  GRID.forEach(function(row,ri){row.forEach(function(k,ci){var x=48+ci*80,y=24+ri*92;g+='<g class="rg'+(k===rk?" on":"")+'" data-r="'+k+'" tabindex="0" role="button" aria-pressed="'+(k===rk)+'" aria-label="'+esc(R[k].t)+'"><rect x="'+x+'" y="'+y+'" width="74" height="86" rx="10"/><text x="'+(x+37)+'" y="'+(y+47)+'" text-anchor="middle">'+SHORT[k]+'</text></g>'})});
- g+='<text x="4" y="326" style="font-family:var(--mono);font-size:9px" fill="var(--muted)">patient right</text><text x="326" y="326" text-anchor="end" style="font-family:var(--mono);font-size:9px" fill="var(--muted)">patient left</text></svg>';return g}
+ g+='<text x="4" y="326" style="font-family:var(--mono);font-size:10.5px" fill="var(--muted)">patient right</text><text x="326" y="326" text-anchor="end" style="font-family:var(--mono);font-size:10.5px" fill="var(--muted)">patient left</text></svg>';return g}
 function renderMap(){$("#mapsvg").innerHTML=mapSVG();var r=R[rk];
  $("#mapcard").innerHTML='<span class="kicker">Region</span><h3 style="margin-top:4px">'+esc(r.t)+'</h3><p class="muted" style="margin-top:6px">Usual causes</p><ul class="dx">'+r.dx.map(function(d){return '<li>'+esc(d)+'</li>'}).join("")+'</ul><p class="why"><b>Referred:</b> '+esc(r.ref)+'</p><p class="miss"><b>Do not miss:</b> '+esc(r.miss)+'</p>'}
 $("#mapsvg").addEventListener("click",function(e){var g=e.target.closest("[data-r]");if(!g)return;rk=g.getAttribute("data-r");renderMap();var n=$('#mapsvg [data-r="'+rk+'"]');if(n)n.focus()});
@@ -358,11 +367,11 @@ $("#missall").innerHTML='<span class="kicker">Anywhere in the abdomen: think of 
 renderMap();
 
 /* Figures */
-function figAorta(){return '<svg class="fig" viewBox="0 0 320 160" role="img" aria-label="Two hands measuring the width of the aortic pulsation above the umbilicus"><rect x="20" y="20" width="280" height="120" rx="14" fill="var(--fill)"/><circle cx="160" cy="118" r="4" fill="var(--muted)"/><text x="172" y="122" style="font-family:var(--mono);font-size:10px" fill="var(--muted)">umbilicus</text><rect x="153" y="30" width="28" height="80" rx="12" fill="var(--hrt-art)" opacity=".55"/><path d="M117 70 l30 0 M217 70 l-30 0" stroke="var(--ink)" stroke-width="10" stroke-linecap="round"/><path d="M151 52 L151 88 M183 52 L183 88" stroke="var(--accent)" stroke-dasharray="3 3"/><text x="296" y="136" text-anchor="end" style="font-family:var(--mono);font-size:9px" fill="var(--muted)">patient left →</text><text x="160" y="24" text-anchor="middle" style="font-family:var(--mono);font-size:10px" fill="var(--accent)">width between fingertips</text></svg><p class="figtext">Press deeply on each side of the pulsation, just above and left of the umbilicus, with the fingertips of both hands. Normal aortic width is about 2 to 2.5 cm; a width above about 3 cm suggests an aneurysm. The aorta divides at the level of the umbilicus, so feel above it.</p>'}
-function figCastell(){return '<svg class="fig" viewBox="0 0 320 170" role="img" aria-label="Castell\'s point on the left lower chest"><path d="M40 20 Q160 0 280 20 L290 160 L30 160 Z" fill="var(--fill)" stroke="var(--muted)" stroke-width="2"/>'+[0,1,2,3].map(function(i){return '<path d="M175 '+(40+i*22)+' Q 230 '+(46+i*22)+' 280 '+(62+i*22)+'" fill="none" stroke="var(--muted)" stroke-width="1.5"/>'}).join("")+'<line x1="235" y1="20" x2="235" y2="160" stroke="var(--accent)" stroke-dasharray="3 3"/><text x="231" y="34" text-anchor="end" style="font-family:var(--mono);font-size:9px" fill="var(--accent)">anterior axillary line</text><circle cx="235" cy="105" r="7" fill="var(--hrt-art)"/><text x="160" y="150" text-anchor="middle" style="font-family:var(--mono);font-size:10px" fill="var(--ink)">lowest intercostal space, patient\'s left</text></svg><p class="figtext">Patient supine. Percuss the lowest left intercostal space in the anterior axillary line, first as they breathe out, then at the end of a deep breath in. Resonant both times is normal; dull on inspiration is a positive sign. A full stomach or colon after a meal can cause false positives.</p>'}
-function figShift(){function belly(x,lab,dullL,dullR,side){var g='<g transform="translate('+x+',0)"><text x="70" y="14" text-anchor="middle" style="font-family:var(--mono);font-size:10px" fill="var(--ink)">'+lab+'</text>';
-  if(side){g+='<ellipse cx="70" cy="80" rx="46" ry="58" fill="var(--card)" stroke="var(--muted)" stroke-width="2"/><path d="M70 80 m-46 0 a46 58 0 0 0 92 0 Z" transform="rotate(0)" fill="var(--hrt-vein)" opacity=".45"/><text x="70" y="62" text-anchor="middle" style="font-family:var(--mono);font-size:9px" fill="var(--muted)">gas floats up</text><line x1="14" y1="80" x2="126" y2="80" stroke="var(--bad)" stroke-dasharray="3 3"/><text x="70" y="96" text-anchor="middle" style="font-family:var(--mono);font-size:9px" fill="var(--bad)">dull edge</text>'}
-  else{g+='<ellipse cx="70" cy="80" rx="58" ry="46" fill="var(--card)" stroke="var(--muted)" stroke-width="2"/><path d="M12 80 Q 14 116 40 122 L40 56 Q 18 62 12 80 Z M128 80 Q 126 116 100 122 L100 56 Q 122 62 128 80 Z" fill="var(--hrt-vein)" opacity=".45"/><line x1="40" y1="40" x2="40" y2="130" stroke="var(--bad)" stroke-dasharray="3 3"/><line x1="100" y1="40" x2="100" y2="130" stroke="var(--bad)" stroke-dasharray="3 3"/><text x="70" y="84" text-anchor="middle" style="font-family:var(--mono);font-size:9px" fill="var(--muted)">tympany</text>'}
+function figAorta(){return '<svg class="fig" viewBox="0 0 320 160" role="img" aria-label="Two hands measuring the width of the aortic pulsation above the umbilicus"><rect x="20" y="20" width="280" height="120" rx="14" fill="var(--fill)"/><circle cx="160" cy="118" r="4" fill="var(--muted)"/><text x="172" y="122" style="font-family:var(--mono);font-size:10.5px" fill="var(--muted)">umbilicus</text><rect x="153" y="30" width="28" height="80" rx="12" fill="var(--hrt-art)" opacity=".55"/><path d="M117 70 l30 0 M217 70 l-30 0" stroke="var(--ink)" stroke-width="10" stroke-linecap="round"/><path d="M151 52 L151 88 M183 52 L183 88" stroke="var(--accent)" stroke-dasharray="3 3"/><text x="296" y="136" text-anchor="end" style="font-family:var(--mono);font-size:10.5px" fill="var(--muted)">patient left →</text><text x="160" y="24" text-anchor="middle" style="font-family:var(--mono);font-size:10.5px" fill="var(--accent)">width between fingertips</text></svg><p class="figtext">Press deeply on each side of the pulsation, just above and left of the umbilicus, with the fingertips of both hands. Normal aortic width is about 2 to 2.5 cm; a width above about 3 cm suggests an aneurysm. The aorta divides at the level of the umbilicus, so feel above it.</p>'}
+function figCastell(){return '<svg class="fig" viewBox="0 0 320 170" role="img" aria-label="Castell\'s point on the left lower chest"><path d="M40 20 Q160 0 280 20 L290 160 L30 160 Z" fill="var(--fill)" stroke="var(--muted)" stroke-width="2"/>'+[0,1,2,3].map(function(i){return '<path d="M175 '+(40+i*22)+' Q 230 '+(46+i*22)+' 280 '+(62+i*22)+'" fill="none" stroke="var(--muted)" stroke-width="1.5"/>'}).join("")+'<line x1="235" y1="20" x2="235" y2="160" stroke="var(--accent)" stroke-dasharray="3 3"/><text x="231" y="34" text-anchor="end" style="font-family:var(--mono);font-size:10.5px" fill="var(--accent)">anterior axillary line</text><circle cx="235" cy="105" r="7" fill="var(--hrt-art)"/><text x="160" y="150" text-anchor="middle" style="font-family:var(--mono);font-size:10.5px" fill="var(--ink)">lowest intercostal space, patient\'s left</text></svg><p class="figtext">Patient supine. Percuss the lowest left intercostal space in the anterior axillary line, first as they breathe out, then at the end of a deep breath in. Resonant both times is normal; dull on inspiration is a positive sign. A full stomach or colon after a meal can cause false positives.</p>'}
+function figShift(){function belly(x,lab,dullL,dullR,side){var g='<g transform="translate('+x+',0)"><text x="70" y="14" text-anchor="middle" style="font-family:var(--mono);font-size:10.5px" fill="var(--ink)">'+lab+'</text>';
+  if(side){g+='<ellipse cx="70" cy="80" rx="46" ry="58" fill="var(--card)" stroke="var(--muted)" stroke-width="2"/><path d="M70 80 m-46 0 a46 58 0 0 0 92 0 Z" transform="rotate(0)" fill="var(--hrt-vein)" opacity=".45"/><text x="70" y="62" text-anchor="middle" style="font-family:var(--mono);font-size:10.5px" fill="var(--muted)">gas floats up</text><line x1="14" y1="80" x2="126" y2="80" stroke="var(--bad)" stroke-dasharray="3 3"/><text x="70" y="96" text-anchor="middle" style="font-family:var(--mono);font-size:10.5px" fill="var(--bad)">dull edge</text>'}
+  else{g+='<ellipse cx="70" cy="80" rx="58" ry="46" fill="var(--card)" stroke="var(--muted)" stroke-width="2"/><path d="M12 80 Q 14 116 40 122 L40 56 Q 18 62 12 80 Z M128 80 Q 126 116 100 122 L100 56 Q 122 62 128 80 Z" fill="var(--hrt-vein)" opacity=".45"/><line x1="40" y1="40" x2="40" y2="130" stroke="var(--bad)" stroke-dasharray="3 3"/><line x1="100" y1="40" x2="100" y2="130" stroke="var(--bad)" stroke-dasharray="3 3"/><text x="70" y="84" text-anchor="middle" style="font-family:var(--mono);font-size:10.5px" fill="var(--muted)">tympany</text>'}
   return g+'</g>'}
  return '<svg class="fig" viewBox="0 0 320 150" role="img" aria-label="Shifting dullness: fluid in the flanks lying flat, then pooling on the lower side">'+belly(10,"lying flat",1,1,false)+belly(170,"turned on side",0,0,true)+'</svg><p class="figtext">Lying flat, fluid settles in the flanks and gas-filled bowel floats to the middle: dull at the sides, tympanic centrally. Mark where the note changes. Turn the patient onto one side and wait: fluid pools in the lower flank and the bowel floats up, so the dull edge moves toward the umbilicus. Cross-section, viewed from the feet.</p>'}
 var FIGS={aorta:["Measuring the aorta",figAorta],castell:["Castell's sign",figCastell],shift:["Shifting dullness",figShift]};
@@ -409,15 +418,15 @@ function curveHTML(){
  a=d+"L"+X(0)+" "+Y(0)+"Z";
  var dx=X(s),dy=Y(p),right=dx<200,g='<svg class="curve" viewBox="0 0 300 138" role="img" aria-label="Chart of the result against your starting probability. Starting at '+s+' percent gives '+fmt(p)+' percent.">';
  g+='<path d="M'+X(0)+' '+Y(0)+'L'+X(100)+' '+Y(0)+'M'+X(0)+' '+Y(0)+'L'+X(0)+' '+Y(100)+'" stroke="var(--line)" stroke-width="2" fill="none"/>';
- [0,50,100].forEach(function(t){g+='<text x="'+X(t)+'" y="118" text-anchor="middle" style="font-family:var(--mono);font-size:9px" fill="var(--muted)">'+t+'</text><text x="28" y="'+(Y(t)+3)+'" text-anchor="end" style="font-family:var(--mono);font-size:9px" fill="var(--muted)">'+t+'</text>'});
- g+='<text x="'+X(50)+'" y="134" text-anchor="middle" style="font-family:var(--mono);font-size:9px" fill="var(--muted)">your starting probability →</text>';
- g+='<text x="'+(X(0)+4)+'" y="'+(Y(100)+3)+'" style="font-family:var(--mono);font-size:9px" fill="var(--muted)">result ↑</text>';
+ [0,50,100].forEach(function(t){g+='<text x="'+X(t)+'" y="118" text-anchor="middle" style="font-family:var(--mono);font-size:10.5px" fill="var(--muted)">'+t+'</text><text x="28" y="'+(Y(t)+3)+'" text-anchor="end" style="font-family:var(--mono);font-size:10.5px" fill="var(--muted)">'+t+'</text>'});
+ g+='<text x="'+X(50)+'" y="134" text-anchor="middle" style="font-family:var(--mono);font-size:10.5px" fill="var(--muted)">your starting probability →</text>';
+ g+='<text x="'+(X(0)+4)+'" y="'+(Y(100)+3)+'" style="font-family:var(--mono);font-size:10.5px" fill="var(--muted)">result ↑</text>';
  if(has)g+='<path d="'+a+'" fill="var(--accent)" opacity=".12"/>';
  g+='<path d="M'+X(0)+' '+Y(0)+'L'+X(100)+' '+Y(100)+'" stroke="var(--muted)" stroke-width="1.5" stroke-dasharray="2 4" fill="none"/>';
  if(has)g+='<path d="'+d+'" stroke="var(--accent)" stroke-width="2.5" fill="none" stroke-linejoin="round"/>';
  g+='<path d="M'+dx+' '+Y(0)+'L'+dx+' '+dy+'L'+X(0)+' '+dy+'" stroke="var(--ink)" stroke-width="1" stroke-dasharray="3 3" fill="none" opacity=".55"/>';
  g+='<circle cx="'+dx+'" cy="'+dy+'" r="6" fill="var(--accent)" stroke="var(--card)" stroke-width="2.5"/>';
- g+='<text x="'+(right?dx+10:dx-10)+'" y="'+(p>18?dy+14:dy-8)+'" text-anchor="'+(right?"start":"end")+'" style="font-family:var(--mono);font-size:10px;font-weight:600" fill="var(--ink)">'+s+'% → '+fmt(p)+'%</text></svg>';
+ g+='<text x="'+(right?dx+10:dx-10)+'" y="'+(p>18?dy+14:dy-8)+'" text-anchor="'+(right?"start":"end")+'" style="font-family:var(--mono);font-size:10.5px;font-weight:600" fill="var(--ink)">'+s+'% → '+fmt(p)+'%</text></svg>';
  g+='<p class="curvecap">'+(has?'Drag the slider (or the chart) and the dot rides the curve. The further the curve bows from the dotted line, the more these findings tell you.':'No findings marked yet, so the result equals your start (the dotted line). Mark a finding and a curve will bow away from it.')+'</p>';
  return g}
 var renderResultBase=renderResult;

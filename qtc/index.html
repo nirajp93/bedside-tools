@@ -138,7 +138,30 @@ footer p{margin:0 0 8px}
 }
 @media (max-width:380px){.checks{grid-template-columns:1fr}}
 @media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+.dp{margin-top:10px;border:1px solid var(--line);border-radius:12px;padding:2px 12px;background:var(--card);text-align:left}
+.dp:empty{display:none}
+.dp>div{padding:10px 0;border-top:1px solid var(--line)}
+.dp>div:first-child{border-top:0}
+.dp .dl{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500;margin:0 0 3px}
+.dp p{font-size:15px;line-height:1.45;color:var(--ink);margin:0 0 4px}
+.dp p:last-child{margin-bottom:0}
+.deeper{margin-top:14px;border-top:1px solid var(--line)}
+.deeper>summary{min-height:44px;display:flex;align-items:center;gap:8px;color:var(--accent);font-weight:600;font-size:15px;cursor:pointer;list-style:none}
+.deeper>summary::-webkit-details-marker{display:none}
+.deeper>summary::before{content:"+";font-family:var(--mono);font-size:18px;line-height:1;width:14px;text-align:center}
+.deeper[open]>summary::before{content:"\2212"}
+.deeper>summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.deeper .dpx{border:1px solid var(--line);border-radius:12px;padding:2px 12px;background:var(--card);text-align:left}
+.deeper .dpx>div{padding:10px 0;border-top:1px solid var(--line)}
+.deeper .dpx>div:first-child{border-top:0}
+.deeper .dl{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500;margin:0 0 3px}
+.deeper p{font-size:15px;line-height:1.45;color:var(--ink);margin:0 0 4px}
+.deeper p:last-child{margin-bottom:0}
+/* cause-fix: ruled-out causes stay readable; the name greys, the reason does not fade */
+.cause.out,.cause.less,.cause.unl{opacity:1}
+.cause.less>span,.cause.unl>span{color:var(--muted)}
 </style>
+<script>function dpHtml(rows){ return rows.map(function(r){ return '<div><span class="dl">' + r[0] + '</span>' + r[1] + '</div>'; }).join(''); }</script>
 </head>
 <body>
 <div class="wrap">
@@ -645,7 +668,7 @@ var AP = {
 function apSVG(k){
   var s = AP[k], p = s.plat, x0 = 40;
   var h = svgOpen('0 0 340 230', 'Ventricular action potential above an ECG beat: ' + s.n);
-  h += tx(8, 18, 'Cell', {a: 'start', s: 10, c: 'var(--muted)'}) + tx(8, 138, 'ECG', {a: 'start', s: 10, c: 'var(--muted)'});
+  h += tx(8, 18, 'Cell', {a: 'start', s: 10.5, c: 'var(--muted)'}) + tx(8, 138, 'ECG', {a: 'start', s: 10.5, c: 'var(--muted)'});
   /* action potential: rest at y 100, peak 26, plateau 40 */
   var endPlat = 150 + p, endRep = 200 + p;
   var ap = 'M' + x0 + ' 100 L' + (x0 + 22) + ' 100 L' + (x0 + 26) + ' 26 L' + (x0 + 34) + ' 40 L' + (x0 + 40) + ' 42 C ' + (x0 + 80) + ' 44 ' + (endPlat - 20) + ' 46 ' + endPlat + ' 52 ';
@@ -653,7 +676,7 @@ function apSVG(k){
   else ap += 'C ' + (endPlat + 22) + ' 64 ' + (endRep - 14) + ' 98 ' + endRep + ' 100 L 330 100';
   h += pth(ap, 'var(--accent)', 2.5);
   if (s.ead) h += '<circle cx="' + (endPlat + 30) + '" cy="58" r="12" fill="none" stroke="var(--bad)" stroke-width="2" stroke-dasharray="3 3"/>' + tx(endPlat + 30, 22, 'EAD', {s: 11, w: 700, c: 'var(--bad)'});
-  h += tx(x0 + 58, 34, 'plateau', {s: 10, c: 'var(--muted)', a: 'start'});
+  h += tx(x0 + 58, 34, 'plateau', {s: 10.5, c: 'var(--muted)', a: 'start'});
   /* ECG: baseline y 180 */
   var tH = s.k ? 10 : 24, tw = 46;
   var tStart = endPlat - 30, tPeak = endPlat + 10, tEnd = endRep + 4;
@@ -661,7 +684,7 @@ function apSVG(k){
   if (s.k) ecg += ' Q ' + (tEnd + 16) + ' 172 ' + (tEnd + 30) + ' 180';
   ecg += ' L 330 180';
   h += '<rect x="30" y="128" width="304" height="72" rx="6" fill="var(--ecg-paper)"/>' + pth(ecg, 'var(--ecg-ink)', 2);
-  if (s.k) h += tx(tEnd + 16, 166, 'U', {s: 10, c: 'var(--muted)'});
+  if (s.k) h += tx(tEnd + 16, 166, 'U', {s: 10.5, c: 'var(--muted)'});
   if (s.ead) h += pth('M' + (endPlat + 30) + ' 180 L' + (endPlat + 34) + ' 150 L' + (endPlat + 40) + ' 196 L' + (endPlat + 44) + ' 180', 'var(--bad)', 2);
   /* QT bracket */
   h += pth('M' + (x0 + 18) + ' 212 L' + (x0 + 18) + ' 220 L' + tEnd + ' 220 L' + tEnd + ' 212', 'var(--muted)', 1.5) + tx((x0 + 18 + tEnd) / 2, 216, '', {}) + tx((x0 + 18 + tEnd) / 2, 228, 'QT ' + (k === 'normal' ? '' : '(longer)'), {s: 11, w: 600});
@@ -689,16 +712,16 @@ function measSVG(k){
   }
   if (k === 'af'){
     h += pth(beat(14, 10, 104) + ' L 150 ' + base + beat(150, 10, 236).replace(/^M/, ' L') + ' L 334 ' + base, 'var(--ecg-ink)', 2);
-    h += tx(70, 30, 'after a short RR', {s: 10, c: 'var(--muted)'}) + tx(212, 30, 'after a long RR', {s: 10, c: 'var(--muted)'});
+    h += tx(70, 30, 'after a short RR', {s: 10.5, c: 'var(--muted)'}) + tx(212, 30, 'after a long RR', {s: 10.5, c: 'var(--muted)'});
     h += pth('M14 132 L104 132', 'var(--accent)', 2) + pth('M150 132 L236 132', 'var(--accent)', 2) + tx(270, 136, 'average', {s: 11, w: 600, c: 'var(--accent)'});
   } else {
     var w = k === 'wide' ? 34 : 12, tEnd = k === 'wide' ? 250 : 226;
     h += pth(beat(30, w, tEnd, k === 'uwave') + ' L 334 ' + base, 'var(--ecg-ink)', 2);
     if (k === 'tangent' || k === 'uwave') h += pth('M' + (tEnd - 34) + ' ' + (base - 42) + ' L' + (tEnd + 8) + ' ' + (base + 4), 'var(--accent)', 2, ' stroke-dasharray="5 4"');
     h += pth('M30 132 L' + tEnd + ' 132', 'var(--accent)', 2) + pth('M30 126 L30 138', 'var(--accent)', 2) + pth('M' + tEnd + ' 126 L' + tEnd + ' 138', 'var(--accent)', 2);
-    h += tx((30 + tEnd) / 2, 162, 'QT', {s: 12, w: 700, c: 'var(--accent)'});
+    h += tx((30 + tEnd) / 2, 152, 'QT', {s: 12, w: 700, c: 'var(--accent)'});
     if (k === 'uwave') h += tx(tEnd + 16, 90, 'U', {s: 11, w: 600});
-    if (k === 'wide') h += pth('M30 22 L' + (30 + w + 4) + ' 22', 'var(--warn)', 2) + tx(30 + w + 10, 26, 'wide QRS', {a: 'start', s: 10, c: 'var(--warn)'});
+    if (k === 'wide') h += pth('M30 22 L' + (30 + w + 4) + ' 22', 'var(--warn)', 2) + tx(30 + w + 10, 26, 'wide QRS', {a: 'start', s: 10.5, c: 'var(--warn)'});
   }
   return h + '</svg>';
 }
@@ -718,13 +741,13 @@ function tdpSVG(k){
   if (k === 'ssl'){
     d += sinus(14, 56) + pvc(88) + ' L150 ' + b + sinus(150, 84) + pvc(240) + ' L336 ' + b;
     h += pth(d, 'var(--ecg-ink)', 2);
-    h += tx(100, 26, 'early beat', {s: 10, c: 'var(--muted)'}) + tx(132, 120, 'pause', {s: 10, c: 'var(--muted)'}) + tx(196, 26, 'longer QT', {s: 10, c: 'var(--muted)'}) + tx(256, 26, 'R on T', {s: 10, w: 700, c: 'var(--bad)'});
+    h += tx(100, 26, 'early beat', {s: 10.5, c: 'var(--muted)'}) + tx(132, 120, 'pause', {s: 10.5, c: 'var(--muted)'}) + tx(196, 26, 'longer QT', {s: 10.5, c: 'var(--muted)'}) + tx(256, 26, 'R on T', {s: 10.5, w: 700, c: 'var(--bad)'});
   } else {
     d += sinus(14, 70) + ' L96 ' + b;
     var x = 96;
     for (var n = 0; n < 15; n++){ var amp = 10 + 34 * Math.abs(Math.sin(n / 15 * Math.PI * 1.5 + .4)); var sg = n % 2 ? 1 : -1; d += ' L' + (x + 6) + ' ' + (b + sg * amp) + ' L' + (x + 15) + ' ' + (b - sg * amp * .8); x += 15; }
     d += ' L336 ' + b;
-    h += pth(d, 'var(--ecg-ink)', 2) + tx(220, 24, 'twisting polymorphic VT', {s: 10, w: 700, c: 'var(--bad)'});
+    h += pth(d, 'var(--ecg-ink)', 2) + tx(220, 24, 'twisting polymorphic VT', {s: 10.5, w: 700, c: 'var(--bad)'});
   }
   return h + '</svg>';
 }
@@ -736,11 +759,11 @@ function rateSVG(qt, hr){
   var x = function(v){ return L + (v - 40) / (150 - 40) * (R - L); };
   var lo = 280, hi = 640, y = function(v){ return B - (Math.max(lo, Math.min(hi, v)) - lo) / (hi - lo) * (B - T); };
   var h = svgOpen('0 0 ' + W + ' ' + H, 'Corrected QT across heart rates for a QT of ' + qt + ' ms');
-  [300, 400, 500, 600].forEach(function(v){ h += pth('M' + L + ' ' + y(v) + ' L' + R + ' ' + y(v), 'var(--line)', 1) + tx(L - 4, y(v) + 4, v, {a: 'end', s: 10, c: 'var(--muted)'}); });
-  [40, 60, 85, 100, 150].forEach(function(v){ h += tx(x(v), B + 14, v, {s: 10, c: 'var(--muted)'}); });
-  h += tx((L + R) / 2, B + 30, 'heart rate /min', {s: 10, c: 'var(--muted)'});
+  [300, 400, 500, 600].forEach(function(v){ h += pth('M' + L + ' ' + y(v) + ' L' + R + ' ' + y(v), 'var(--line)', 1) + tx(L - 4, y(v) + 4, v, {a: 'end', s: 10.5, c: 'var(--muted)'}); });
+  [40, 60, 85, 100, 150].forEach(function(v){ h += tx(x(v), B + 14, v, {s: 10.5, c: 'var(--muted)'}); });
+  h += tx((L + R) / 2, B + 30, 'heart rate /min', {s: 10.5, c: 'var(--muted)'});
   h += '<rect x="' + x(60) + '" y="' + T + '" width="' + (x(85) - x(60)) + '" height="' + (B - T) + '" fill="var(--fill)"/>';
-  h += pth('M' + L + ' ' + y(500) + ' L' + R + ' ' + y(500), 'var(--bad)', 1, ' stroke-dasharray="4 4"') + tx(R, y(500) - 4, '500', {a: 'end', s: 10, c: 'var(--bad)'});
+  h += pth('M' + L + ' ' + y(500) + ' L' + R + ' ' + y(500), 'var(--bad)', 1, ' stroke-dasharray="4 4"') + tx(R, y(500) - 4, '500', {a: 'end', s: 10.5, c: 'var(--bad)'});
   var cols = {baz: 'var(--bad)', fri: 'var(--accent)', fra: 'var(--ok)'};
   ['baz', 'fri', 'fra'].forEach(function(k){
     var d = ''; for (var v = 40; v <= 150; v += 2){ var q = FORM[k].f(qt, 60 / v); d += (d ? ' L' : 'M') + x(v).toFixed(1) + ' ' + y(q).toFixed(1); }
@@ -752,7 +775,7 @@ function rateSVG(qt, hr){
 }
 function mountRate(host, qt0, hr0){
   var qt = qt0 || 400, hr = hr0 || 110;
-  host.innerHTML = '<div class="slider"><label for="' + host.id + '-hr">Rate</label><input type="range" id="' + host.id + '-hr" min="40" max="150" step="1" value="' + hr + '"><output id="' + host.id + '-hro"></output></div><div class="slider"><label for="' + host.id + '-qt">QT</label><input type="range" id="' + host.id + '-qt" min="280" max="560" step="5" value="' + qt + '"><output id="' + host.id + '-qto"></output></div><div class="fx"></div><div class="vals"></div><p class="line1"></p>';
+  host.innerHTML = '<div class="slider"><label for="' + host.id + '-hr">Rate</label><input type="range" id="' + host.id + '-hr" min="40" max="150" step="1" value="' + hr + '"><output id="' + host.id + '-hro"></output></div><div class="slider"><label for="' + host.id + '-qt">QT</label><input type="range" id="' + host.id + '-qt" min="280" max="560" step="5" value="' + qt + '"><output id="' + host.id + '-qto"></output></div><div class="fx"></div><div class="vals"></div><p class="line1"></p><div class="dp"></div>';
   function draw(){
     hr = +$(host.id + '-hr').value; qt = +$(host.id + '-qt').value;
     $(host.id + '-hro').textContent = hr + '/min'; $(host.id + '-qto').textContent = qt + ' ms';
@@ -761,6 +784,9 @@ function mountRate(host, qt0, hr0){
     host.querySelector('.vals').innerHTML = ['baz', 'fri', 'fra'].map(function(f){ return '<div class="score' + (f === k ? ' sel' : '') + '"><span>' + FORM[f].n + (f === k ? ' <small>(this tool uses)</small>' : '') + '</span><b>' + r0(FORM[f].f(qt, rr)) + ' ms</b></div>'; }).join('');
     var b = bazett(qt, rr), fr = fridericia(qt, rr);
     host.querySelector('.line1').textContent = hr > 85 ? 'At ' + hr + '/min Bazett reads ' + r0(b - fr) + ' ms longer than Fridericia: dividing by the square root of a short RR inflates the QTc.' : hr < 60 ? 'At ' + hr + '/min Bazett reads ' + r0(fr - b) + ' ms shorter than Fridericia, and can hide a long QT.' : hr === 60 ? 'At 60 a minute every formula returns the measured QT.' : 'At ' + hr + '/min Bazett reads ' + r0(b - fr) + ' ms longer than Fridericia. The gap grows with the rate; above 85 (outside the shaded band) this tool switches to Fridericia.';
+    host.querySelector('.dp').innerHTML = dpHtml([['Why the QT needs correcting', '<p>The action potential shortens as the heart speeds up, so a normal QT at 100 a minute is shorter than a normal QT at 60. Correction estimates what this QT would be at 60, so one cutoff can serve every rate.</p>'],
+      ['Why the formulas disagree', hr > 85 ? '<p>Bazett divides by the square root of the RR interval, which assumes the QT shortens more with rate than it really does. At ' + hr + ' a minute it therefore adds too much. Fridericia uses the cube root, which follows the real relation more closely at fast rates.</p>' : hr < 60 ? '<p>Below 60 the error reverses: Bazett subtracts too much and can make a long QT look acceptable. Slow rates are also when torsades is most likely, so the under-reading matters.</p>' : '<p>Near 60 a minute the RR interval is close to one second, so every formula barely changes the measured QT. The disagreement grows as the rate moves away from 60 in either direction.</p>'],
+      ['At the bedside', '<p>A long QTc in a tachycardic patient is often a Bazett artifact: check which formula the machine used before stopping a needed drug. The QT also takes a couple of minutes to settle after the rate changes, so measure during a steady rate.</p>']]);
   }
   host.addEventListener('input', draw); draw();
 }
@@ -885,6 +911,13 @@ $('practice').addEventListener('click', function(e){
 });
 window.__cases = CASES; window.__caseZone = caseZone;
 drawInputs(); render(); fromHash();
+})();
+</script>
+<script id="deeper-data">
+/* Go deeper: mechanism, rationale and the common trap for each Learn chapter. Text only; no doses or thresholds beyond the tool's own. */
+(function(){ var D = {"learn-ap": [["Mechanism", "The plateau of the action potential is a balance: calcium flowing in against potassium flowing out. The QT lengthens when the outward potassium current is reduced, which is what most QT-prolonging drugs and a low potassium do, or when the inward currents are increased."], ["Why it matters", "The channel carrying the main repolarizing current has an unusually large inner cavity that binds many unrelated molecules. That is why drugs from so many classes (antibiotics, antipsychotics, antiemetics, antiarrhythmics) share this one side effect."], ["Common trap", "A wide QRS lengthens the QT without any change in repolarization. In bundle branch block or a paced rhythm the measured QT overstates the risk and needs adjusting."]], "learn-measure": [["Mechanism", "The end of the T wave marks the moment the last ventricular cells finish repolarizing. The tangent method draws a line down the steepest part of the T wave's descent to the baseline, which gives a reproducible end point. A U wave is a separate deflection and is not part of the QT."], ["Why it matters", "Machine readings go wrong exactly where it matters: flat T waves, U waves, atrial fibrillation and noisy tracings. A long QTc that would change treatment deserves a measurement by hand."], ["Common trap", "In atrial fibrillation the QT changes with every beat. Average several beats instead of trusting one."]], "learn-stack": [["Mechanism", "The heart has several overlapping potassium currents, so losing part of one is normally covered by the others. This spare capacity is the repolarization reserve. Each risk factor removes some of it: a channel-blocking drug, low potassium or magnesium, a slow heart rate, female sex, heart failure, an inherited variant. Kidney or liver impairment and interacting drugs raise drug levels and deepen the block."], ["Why it matters", "This explains why the same drug is harmless in one patient and causes torsades in another, and it points to the first move: correct what can be corrected (potassium, magnesium, interacting drugs) before giving up a needed medicine."], ["Common trap", "Counting only the QT-prolonging drugs. A new drug that slows the metabolism of one already on the list can do more harm than a second QT drug."]], "learn-tdp": [["Mechanism", "When the plateau is prolonged, calcium channels have time to reopen and fire an extra beat during repolarization: an early afterdepolarization. Repolarization that is uneven across the heart wall lets that beat circulate. A pause makes the next beat's QT longer still, which is why torsades typically starts after a short-long-short sequence."], ["Why it matters", "The treatments follow from this. Magnesium suppresses afterdepolarizations even when the magnesium level is normal. A faster heart rate, from isoproterenol or pacing, shortens the QT and abolishes the pauses."], ["Common trap", "Treating torsades like ordinary ventricular tachycardia. Antiarrhythmics that prolong the QT make it worse. Polymorphic VT with a normal QT is a different disease, usually ischemia, with different treatment."]]};
+  function add(){ Object.keys(D).forEach(function(id){ var c = document.getElementById(id); if (!c || c.querySelector(":scope > .deeper")) return; var host = c.matches(".card,.lsec,section,.chap") ? c : null; if (!host){ var n = c.nextElementSibling; while (n && !n.matches(".card")) n = n.nextElementSibling; host = n; } if (!host || host.querySelector(":scope > .deeper")) return; var d = document.createElement("details"); d.className = "deeper"; d.innerHTML = "<summary>Go deeper: mechanism and rationale</summary><div class=\"dpx\">" + D[id].map(function(r){ return "<div><span class=\"dl\">" + r[0] + "</span><p>" + r[1] + "</p></div>"; }).join("") + "</div>"; var last = host.querySelector(":scope > .row"); if (last) host.insertBefore(d, last); else host.appendChild(d); }); }
+  add(); document.addEventListener("click", function(){ setTimeout(add, 0); }); document.addEventListener("input", function(){ setTimeout(add, 0); });
 })();
 </script>
 </body>

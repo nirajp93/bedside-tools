@@ -52,7 +52,7 @@
 .rowb button{min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--ink);font:inherit;font-size:14px;cursor:pointer}
 [hidden]{display:none!important}
 html{-webkit-text-size-adjust:100%}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5;padding-bottom:76px}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5;padding-bottom:calc(76px + env(safe-area-inset-bottom))}
 .wrap{max-width:720px;margin:0 auto;padding:0 16px}
 a{color:var(--accent)}
 .back{font-size:14px;text-decoration:none;display:inline-block;min-height:44px;line-height:44px}
@@ -87,7 +87,7 @@ h3{font-size:16px;margin:0;font-weight:600}
 .check .pts{font-family:var(--mono);font-size:12px;color:var(--muted);padding-top:2px}
 .stats{display:flex;flex-wrap:wrap;gap:8px}
 .stat{flex:1 1 96px;background:var(--fill);border-radius:10px;padding:8px 10px}
-.stat small{display:block;font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.stat small{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
 .stat b{font-family:var(--mono);font-size:19px;font-weight:600}
 .tier{align-self:flex-start;display:inline-block;font-family:var(--mono);font-size:11px;border:1px solid var(--line);border-radius:999px;padding:3px 9px;color:var(--muted)}
 .pill{display:inline-block;font-family:var(--mono);font-size:11px;padding:3px 9px;border-radius:999px;white-space:nowrap}
@@ -114,7 +114,7 @@ table.t tr.on td{background:var(--fill)}
 .cal{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px}
 .day{flex:none;width:86px;border:1px solid var(--line);border-radius:10px;padding:8px;font-size:12.5px;display:flex;flex-direction:column;gap:2px}
 .day b{font-family:var(--mono);font-size:12px}
-.day .tag{font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+.day .tag{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
 .day.off{background:var(--warnbg)} .day.off .tag{color:var(--warn)}
 .day.surg{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)} .day.surg .tag{color:var(--accent-ink)}
 .day.dose{background:var(--okbg)} .day.dose .tag{color:var(--ok)}
@@ -124,7 +124,7 @@ table.t tr.on td{background:var(--fill)}
 .track i{position:absolute;left:0;top:0;bottom:0;border-radius:99px}
 .track .soft{background:var(--warnbg);border:1px solid var(--warn)}
 .track .hard{background:var(--warn)}
-.axis{display:flex;justify-content:space-between;font-family:var(--mono);font-size:10.5px;color:var(--muted)}
+.axis{display:flex;justify-content:space-between;font-family:var(--mono);font-size:11px;color:var(--muted)}
 .flow{display:flex;flex-direction:column;gap:4px;font-size:14px}
 .flow span{background:var(--fill);border-radius:8px;padding:6px 10px}
 .flow b{font-family:var(--mono);font-weight:500;color:var(--muted);text-align:center;font-size:12px}
@@ -141,7 +141,7 @@ section.view{display:none;padding:4px 0 8px}
 section.view.on{display:block}
 nav.tabs{position:fixed;left:0;right:0;bottom:0;background:var(--bg);border-top:1px solid var(--line);z-index:20;padding-bottom:env(safe-area-inset-bottom)}
 nav.tabs .wrap{display:flex;padding:0}
-nav.tabs button{flex:1;min-height:60px;border:0;border-top:2px solid transparent;background:none;font-family:var(--mono);font-size:10.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);cursor:pointer;padding:0 2px}
+nav.tabs button{flex:1;min-height:60px;border:0;border-top:2px solid transparent;background:none;font-family:var(--mono);font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);cursor:pointer;padding:0 2px}
 nav.tabs button[aria-selected=true]{color:var(--accent);border-top-color:var(--accent)}
 a:focus-visible,button:focus-visible,summary:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 footer{margin-top:24px;padding:16px 0 8px;border-top:1px solid var(--line);font-size:12.5px;color:var(--muted);line-height:1.6}
@@ -152,6 +152,21 @@ footer strong{color:var(--ink)}
   .cols{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start}
   .cols>.stick{position:sticky;top:12px}
 }
+/* cause-fix: ruled-out causes stay readable; the name greys, the reason does not fade */
+.cause.out,.cause.less,.cause.unl{opacity:1}
+.cause.less>span,.cause.unl>span{color:var(--muted)}
+.deeper{margin-top:14px;border-top:1px solid var(--line)}
+.deeper>summary{min-height:44px;display:flex;align-items:center;gap:8px;color:var(--accent);font-weight:600;font-size:15px;cursor:pointer;list-style:none}
+.deeper>summary::-webkit-details-marker{display:none}
+.deeper>summary::before{content:"+";font-family:var(--mono);font-size:18px;line-height:1;width:14px;text-align:center}
+.deeper[open]>summary::before{content:"\2212"}
+.deeper>summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.deeper .dpx{border:1px solid var(--line);border-radius:12px;padding:2px 12px;background:var(--card);text-align:left}
+.deeper .dpx>div{padding:10px 0;border-top:1px solid var(--line)}
+.deeper .dpx>div:first-child{border-top:0}
+.deeper .dl{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500;margin:0 0 3px}
+.deeper p{font-size:15px;line-height:1.45;color:var(--ink);margin:0 0 4px}
+.deeper p:last-child{margin-bottom:0}
 </style>
 </head>
 <body>
@@ -544,7 +559,7 @@ function markers(p){ return '<defs>' + ['n','u','d','x'].map(function(k){ return
 function box(x, y, w, h, t1, t2, hot, dim){
   return '<g' + (dim ? ' opacity=".45"' : '') + '><rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="10" fill="' + (hot ? 'var(--warnbg)' : 'var(--fill)') + '" stroke="' + (hot ? 'var(--warn)' : 'var(--line)') + '"' + (hot ? ' stroke-width="2"' : '') + '/>' +
     '<text x="' + (x + w / 2) + '" y="' + (y + (t2 ? h / 2 - 2 : h / 2 + 4)) + '" text-anchor="middle" style="' + FS + ';font-size:12px;font-weight:600;fill:var(--ink)">' + t1 + '</text>' +
-    (t2 ? '<text x="' + (x + w / 2) + '" y="' + (y + h / 2 + 12) + '" text-anchor="middle" style="' + FM + ';font-size:10px;fill:var(--muted)">' + t2 + '</text>' : '') + '</g>';
+    (t2 ? '<text x="' + (x + w / 2) + '" y="' + (y + h / 2 + 12) + '" text-anchor="middle" style="' + FM + ';font-size:10.5px;fill:var(--muted)">' + t2 + '</text>' : '') + '</g>';
 }
 function svgOpen(vb, label){ return '<svg viewBox="' + vb + '" role="img" aria-label="' + label + '" class="fig">'; }
 function line(d, v, w, p){ return '<path d="' + d + '" fill="none" stroke="' + vcol(v) + '" stroke-width="' + (w || (v === 'u' ? 4 : v === 'd' ? 1.5 : 2)) + '"' + (v === 'd' || v === 'x' ? ' stroke-dasharray="5 4"' : '') + ' marker-end="url(#' + p + (v || 'n') + ')"/>'; }
@@ -583,7 +598,7 @@ function rcSVG(id){
   RCRI.forEach(function(r, i){ var y = 8 + i * 24; h += '<rect x="8" y="' + y + '" width="324" height="20" rx="6" fill="var(--fill)"/>' + tx(16, y + 14, r[0], 11, 'var(--ink)', 400, 'start') + tx(324, y + 14, '+1', 11, 'var(--ink)', 700, 'end', true); });
   [0, 1, 2, 3].forEach(function(n){ var x = 20 + n * 80, on = n === k, a = Math.round(RCRI_LEE[n] * 3.4), b = Math.round(RCRI_RECAL[n] * 3.4);
     h += '<rect x="' + x + '" y="' + (226 - a) + '" width="24" height="' + a + '" rx="4" fill="var(--accent)" opacity="' + (on ? '.75' : '.3') + '"/><rect x="' + (x + 28) + '" y="' + (226 - b) + '" width="24" height="' + b + '" rx="4" fill="var(--warn)" opacity="' + (on ? '.75' : '.3') + '"/>' + tx(x + 26, 242, n === 3 ? '3+' : n, 11, 'var(--ink)', on ? 700 : 400, 'middle', true); });
-  h += tx(8, 166, '1999 cohort', 10, 'var(--accent)', 700, 'start', true) + tx(92, 166, 'modern cohorts', 10, 'var(--warn)', 700, 'start', true);
+  h += tx(8, 166, '1999 cohort', 10.5, 'var(--accent)', 700, 'start', true) + tx(92, 166, 'modern cohorts', 10.5, 'var(--warn)', 700, 'start', true);
   return h + '</svg>';
 }
 
@@ -597,7 +612,7 @@ var FLOW = {
 function flowSVG(id){
   var d = FLOW[id], st = [['Emergency?', 'operate'], ['Active cardiac condition?', 'treat first'], ['Low risk?', 'operate'], ['Capacity 4 METs or more?', 'operate'], ['Normal peptide, or no change?', 'operate']];
   var h = svgOpen('0 0 340 250', 'The stepwise pathway: ' + d.n);
-  st.forEach(function(s, i){ var y = 6 + i * 48, on = d.hot === i; h += hotbox(8, y, 214, 38, on) + tx(18, y + 24, s[0], 11, 'var(--ink)', on ? 700 : 400, 'start') + '<path d="M224 ' + (y + 19) + ' H248" stroke="' + (on ? 'var(--warn)' : 'var(--muted)') + '" stroke-width="' + (on ? 2.5 : 1.5) + '"/>' + tx(254, y + 15, 'yes:', 9.5, 'var(--muted)', 400, 'start', true) + tx(254, y + 28, s[1], 10.5, on ? 'var(--warn)' : 'var(--ink)', 700, 'start', true); if (i < 4) h += '<path d="M40 ' + (y + 38) + ' V' + (y + 48) + '" stroke="var(--muted)" stroke-width="1.5"/>'; });
+  st.forEach(function(s, i){ var y = 6 + i * 48, on = d.hot === i; h += hotbox(8, y, 214, 38, on) + tx(18, y + 24, s[0], 11, 'var(--ink)', on ? 700 : 400, 'start') + '<path d="M224 ' + (y + 19) + ' H248" stroke="' + (on ? 'var(--warn)' : 'var(--muted)') + '" stroke-width="' + (on ? 2.5 : 1.5) + '"/>' + tx(254, y + 15, 'yes:', 10.5, 'var(--muted)', 400, 'start', true) + tx(254, y + 28, s[1], 10.5, on ? 'var(--warn)' : 'var(--ink)', 700, 'start', true); if (i < 4) h += '<path d="M40 ' + (y + 38) + ' V' + (y + 48) + '" stroke="var(--muted)" stroke-width="1.5"/>'; });
   return h + tx(332, 246, 'all no: stress test', 10.5, 'var(--ink)', 700, 'end', true) + '</svg>';
 }
 
@@ -611,7 +626,7 @@ function metsSVG(id){
   var h = svgOpen('0 0 340 130', 'Functional capacity: ' + d.n);
   h += '<rect x="20" y="50" width="300" height="18" rx="9" fill="var(--fill)" stroke="var(--line)"/><rect x="20" y="50" width="' + (X(d.m) - 20) + '" height="18" rx="9" fill="' + (d.m < 4 ? 'var(--warn)' : 'var(--ok)') + '" opacity=".5"/>';
   [[4, '4 METs', 'two flights'], [7, 'about 7', 'DASI 34']].forEach(function(t){ h += '<path d="M' + X(t[0]) + ' 40 V78" stroke="var(--ink)" stroke-width="1.5" stroke-dasharray="2 3"/>' + tx(X(t[0]), 32, t[1], 11, 'var(--ink)', 700, 'middle', true) + tx(X(t[0]), 94, t[2], 10, 'var(--muted)', 400, 'middle', true); });
-  return h + tx(20, 120, 'rest', 10, 'var(--muted)', 400, 'start', true) + tx(320, 120, '10 METs', 10, 'var(--muted)', 400, 'end', true) + '</svg>';
+  return h + tx(20, 120, 'rest', 10.5, 'var(--muted)', 400, 'start', true) + tx(320, 120, '10 METs', 10.5, 'var(--muted)', 400, 'end', true) + '</svg>';
 }
 
 var HOLD = {
@@ -629,7 +644,7 @@ function holdSVG(id){
   var h = svgOpen('0 0 340 120', 'Anticoagulant hold: ' + HOLD[id].n), w = 30;
   for (var k = -6; k <= 3; k++){ var x = 14 + (k + 6) * 31.5, c = k === 0 ? 'surg' : (k <= last || k >= res) ? 'dose' : 'off';
     h += '<rect x="' + x + '" y="34" width="' + w + '" height="40" rx="7" fill="' + (c === 'surg' ? 'var(--warnbg)' : c === 'dose' ? 'var(--accent)' : 'var(--fill)') + '"' + (c === 'dose' ? ' opacity=".45"' : '') + ' stroke="' + (c === 'surg' ? 'var(--warn)' : 'var(--line)') + '"/>' + tx(x + w / 2, 59, k === 0 ? 'OR' : (k > 0 ? '+' : '−') + Math.abs(k), 11, 'var(--ink)', k === 0 ? 700 : 400, 'middle', true); }
-  h += tx(14, 22, 'filled = dose taken', 10, 'var(--accent)', 700, 'start', true) + tx(326, 22, lab, 10.5, 'var(--ink)', 700, 'end', true) + tx(170, 100, 'days before and after surgery', 10, 'var(--muted)', 400, 'middle', true);
+  h += tx(14, 22, 'filled = dose taken', 10.5, 'var(--accent)', 700, 'start', true) + tx(326, 22, lab, 10.5, 'var(--ink)', 700, 'end', true) + tx(170, 100, 'days before and after surgery', 10.5, 'var(--muted)', 400, 'middle', true);
   return h + '</svg>';
 }
 
@@ -642,7 +657,7 @@ function waitSVG(id){
   if (w[3] > w[2]) h += '<rect x="20" y="40" width="' + (X(w[3]) - 20) + '" height="20" rx="10" fill="var(--warn)" opacity=".3"/>';
   h += '<rect x="20" y="40" width="' + Math.max(8, X(w[2]) - 20) + '" height="20" rx="10" fill="var(--bad)" opacity=".6"/>';
   [0, 3, 6, 9, 12].forEach(function(m){ h += tx(X(m), 78, m, 10.5, 'var(--muted)', 400, 'middle', true); });
-  h += tx(20, 28, 'do not operate electively', 10, 'var(--bad)', 700, 'start', true) + (w[3] > w[2] ? tx(320, 28, 'wait if surgery can', 10, 'var(--warn)', 700, 'end', true) : '') + tx(170, 98, 'months since the event', 10, 'var(--muted)', 400, 'middle', true);
+  h += tx(20, 28, 'do not operate electively', 10.5, 'var(--bad)', 700, 'start', true) + (w[3] > w[2] ? tx(320, 28, 'wait if surgery can', 10.5, 'var(--warn)', 700, 'end', true) : '') + tx(170, 98, 'months since the event', 10.5, 'var(--muted)', 400, 'middle', true);
   return h + '</svg>';
 }
 
@@ -907,6 +922,13 @@ G('trialbox').innerHTML = VT.TRIALS.map(function(t){ return '<div class="trial" 
 G('go-prac').addEventListener('click', function(){ showView('practice'); window.scrollTo(0, 0); });
 var w0 = wRender; wRender = function(){ w0(); G('wOut').insertAdjacentHTML('beforeend', VT.chipRow(VT.chipsWarf())); }; wRender();
 goHash();
+})();
+</script>
+<script id="deeper-data">
+/* Go deeper: mechanism, rationale and the common trap for each Learn chapter. Text only; no doses or thresholds beyond the tool's own. */
+(function(){ var D = {"learn-mi": [["Mechanism", "Surgery brings a surge of catecholamines and cortisol, a fast heart rate, swings in blood pressure, blood loss, and a blood that clots more readily. Most perioperative troponin rises are attributed to a mismatch of supply and demand; plaque rupture accounts for a substantial share of overt infarcts. It usually happens in the first two or three days and is usually silent, because analgesia masks the pain."], ["Why it matters", "Being silent, it is found only by measuring troponin in patients at risk. Opening stable coronary narrowings before surgery did not reduce death or infarction in the trial that tested it, so it is not done routinely; the usual indications (an acute coronary syndrome, left main disease) still apply."], ["Common trap", "A stent placed 'to get the patient through surgery' delays the operation and creates an antiplatelet problem without lowering the risk."]], "learn-rcri": [["Mechanism", "The six items mark two things: how stressful the operation is, and how little reserve the patient's heart, brain and kidneys have."], ["Why it matters", "The original event rates come from a cohort studied before routine troponin measurement, so they understate risk. Modern cohorts find more events at every score, which is why two sets of numbers are shown."], ["Common trap", "The score estimates risk; it does not order tests. A test is worth doing only when its result would change what is done."]], "learn-flow": [["Mechanism", "The questions are ordered by what changes management. An emergency goes ahead. An active cardiac condition is treated first. A low-risk operation or a patient with good functional capacity goes ahead. Testing comes last, and only if its result would alter care."], ["Why it matters", "The output of a preoperative evaluation is an estimate of risk and a plan to reduce it, not a clearance."], ["Common trap", "Ordering a stress test because the patient has risk factors, without asking what would be done differently with the result."]], "learn-mets": [["Mechanism", "One MET is the oxygen the body uses at rest. Surgery and recovery raise oxygen demand for days. Being able to sustain about four METs shows that the heart, lungs and circulation together have the reserve to meet that demand."], ["Why it matters", "Good functional capacity predicts a low risk even when risk factors are present, which is why it can end the workup."], ["Common trap", "A clinician's impression of capacity is unreliable; a structured questionnaire does better. And a patient limited by joints or balance has unknown capacity, not poor capacity."]], "learn-hold": [["Mechanism", "A DOAC's effect follows its level in the blood and is essentially gone after four to five half-lives; the half-life lengthens as kidney function falls. Warfarin's effect depends on the lifespan of clotting factors already made, so it takes days to wear off."], ["Why it matters", "The hold time is the product of two things: how much bleeding the operation risks and how fast this patient clears the drug. For most patients no heparin bridge is needed; bridging adds bleeding without preventing clots."], ["Common trap", "Restarting a full dose too soon after an operation with a high bleeding risk. The restart is timed by bleeding risk, not by a fixed day."]], "learn-wait": [["Mechanism", "A new stent is bare metal or polymer in contact with blood until the vessel lining grows over it. Stopping antiplatelet drugs during the clot-prone days around surgery can thrombose it, which is often fatal. After an infarct the muscle is still healing; after a stroke the brain's control of its own blood flow is impaired for months."], ["Why it matters", "These clocks are why elective surgery waits, and why time-sensitive surgery is a negotiated balance between the surgeon, the cardiologist and the patient."], ["Common trap", "Stopping both antiplatelet drugs for an elective operation inside the waiting period. Continuing aspirin through surgery is usually possible."]]};
+  function add(){ Object.keys(D).forEach(function(id){ var c = document.getElementById(id); if (!c || c.querySelector(":scope > .deeper")) return; var host = c.matches(".card,.lsec,section,.chap") ? c : null; if (!host){ var n = c.nextElementSibling; while (n && !n.matches(".card")) n = n.nextElementSibling; host = n; } if (!host || host.querySelector(":scope > .deeper")) return; var d = document.createElement("details"); d.className = "deeper"; d.innerHTML = "<summary>Go deeper: mechanism and rationale</summary><div class=\"dpx\">" + D[id].map(function(r){ return "<div><span class=\"dl\">" + r[0] + "</span><p>" + r[1] + "</p></div>"; }).join("") + "</div>"; var last = host.querySelector(":scope > .row"); if (last) host.insertBefore(d, last); else host.appendChild(d); }); }
+  add(); document.addEventListener("click", function(){ setTimeout(add, 0); }); document.addEventListener("input", function(){ setTimeout(add, 0); });
 })();
 </script>
 </body>

@@ -91,6 +91,18 @@ a.chip{text-decoration:none}
 @media (min-width:900px){.wrap{max-width:1040px}#p-calc:not([hidden]){display:grid;grid-template-columns:380px minmax(0,1fr);gap:20px;align-items:start}#p-why,#p-learn,#p-prac{max-width:720px;margin:0 auto}}
 [hidden]{display:none!important}
 @media (max-width:420px){.checks{grid-template-columns:1fr}}
+.deeper{margin-top:14px;border-top:1px solid var(--line)}
+.deeper>summary{min-height:44px;display:flex;align-items:center;gap:8px;color:var(--accent);font-weight:600;font-size:15px;cursor:pointer;list-style:none}
+.deeper>summary::-webkit-details-marker{display:none}
+.deeper>summary::before{content:"+";font-family:var(--mono);font-size:18px;line-height:1;width:14px;text-align:center}
+.deeper[open]>summary::before{content:"\2212"}
+.deeper>summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.deeper .dpx{border:1px solid var(--line);border-radius:12px;padding:2px 12px;background:var(--card);text-align:left}
+.deeper .dpx>div{padding:10px 0;border-top:1px solid var(--line)}
+.deeper .dpx>div:first-child{border-top:0}
+.deeper .dl{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500;margin:0 0 3px}
+.deeper p{font-size:15px;line-height:1.45;color:var(--ink);margin:0 0 4px}
+.deeper p:last-child{margin-bottom:0}
 </style>
 <style id="vk-css">
 .vk-plate{margin-top:10px;border:1px solid var(--line);border-radius:12px;padding:6px;background:var(--card)}
@@ -123,6 +135,18 @@ a.chip{text-decoration:none}
 .vk-sl input[type=range]{width:100%;min-height:44px;accent-color:var(--accent)}
 .vk-res{margin-top:8px}
 .vk-res .card{margin-bottom:8px}
+.vk-zone{margin:0 0 6px}
+.vk-zs{display:flex;gap:2px;height:8px}
+.vk-zs i{display:block;border-radius:99px;background:var(--line);min-width:4px}
+.vk-zs i.on{background:var(--accent)}
+.vk-zt{font-family:var(--mono);font-size:12px;color:var(--ink);margin:4px 0 0}
+.vk-deep{margin-top:10px;border:1px solid var(--line);border-radius:12px;padding:2px 12px;background:var(--card)}
+.vk-deep:empty{display:none}
+.vk-dr{padding:10px 0;border-top:1px solid var(--line)}
+.vk-dr:first-child{border-top:0}
+.vk-dr .label{margin:0 0 3px}
+.vk-dr p{font-size:15px;margin:0 0 4px}
+.vk-dr p:last-child{margin-bottom:0}
 .vk-flow .vk-dots{display:flex;gap:4px;margin:4px 0 12px}
 .vk-d{flex:1;height:4px;border-radius:99px;background:var(--line)}
 .vk-d.on{background:var(--accent)}
@@ -134,8 +158,11 @@ a.chip{text-decoration:none}
 .vk-btn{min-height:44px;border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);border-radius:10px;padding:8px 14px;font:inherit;font-weight:600;cursor:pointer;margin-top:10px}
 .vk-btn.ghost{background:var(--card);color:var(--accent)}
 .vk-hot:focus-visible,.vk-opt:focus-visible,.vk-cell:focus-visible,.vk-btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-@media (max-width:479px){.vk-hot{width:20px;height:20px;font-size:11px}}
+@media (max-width:479px){.vk-hot{width:18px;height:18px;font-size:11px;border-width:1.5px}}
 @media (min-width:900px){.vk-grid{grid-template-columns:repeat(3,1fr)}.vk-hot{width:30px;height:30px}}
+/* cause-fix: ruled-out causes stay readable; the name greys, the reason does not fade */
+.cause.out,.cause.less,.cause.unl{opacity:1}
+.cause.less>span,.cause.unl>span{color:var(--muted)}
 </style>
 </head>
 <body>
@@ -244,9 +271,9 @@ var FS = 'font-family:var(--sans)', FM = 'font-family:var(--mono)';
 function vcol(v){ return v === 'u' ? 'var(--warn)' : v === 'd' ? 'var(--accent)' : v === 'x' ? 'var(--bad)' : 'var(--muted)'; }
 function markers(p){ return '<defs>' + ['n','u','d','x'].map(function(k){ return '<marker id="' + p + k + '" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="' + vcol(k) + '"/></marker>'; }).join('') + '</defs>'; }
 function box(x, y, w, h, t1, t2, hot, dim){
-  return '<g' + (dim ? ' opacity=".45"' : '') + '><rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="10" fill="' + (hot ? 'var(--warnbg)' : 'var(--fill)') + '" stroke="' + (hot ? 'var(--warn)' : 'var(--line)') + '"' + (hot ? ' stroke-width="2"' : '') + '/>' +
+  return '<g' + (dim ? ' opacity=".74"' : '') + '><rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="10" fill="' + (hot ? 'var(--warnbg)' : 'var(--fill)') + '" stroke="' + (hot ? 'var(--warn)' : 'var(--line)') + '"' + (hot ? ' stroke-width="2"' : '') + '/>' +
     '<text x="' + (x + w / 2) + '" y="' + (y + (t2 ? h / 2 - 2 : h / 2 + 4)) + '" text-anchor="middle" style="' + FS + ';font-size:12px;font-weight:600;fill:var(--ink)">' + t1 + '</text>' +
-    (t2 ? '<text x="' + (x + w / 2) + '" y="' + (y + h / 2 + 12) + '" text-anchor="middle" style="' + FM + ';font-size:10px;fill:var(--muted)">' + t2 + '</text>' : '') + '</g>';
+    (t2 ? '<text x="' + (x + w / 2) + '" y="' + (y + h / 2 + 12) + '" text-anchor="middle" style="' + FM + ';font-size:10.5px;fill:var(--muted)">' + t2 + '</text>' : '') + '</g>';
 }
 function svgOpen(vb, label){ return '<svg viewBox="' + vb + '" role="img" aria-label="' + label + '" class="fig">'; }
 function line(d, v, w, p){ return '<path d="' + d + '" fill="none" stroke="' + vcol(v) + '" stroke-width="' + (w || (v === 'u' ? 4 : v === 'd' ? 1.5 : 2)) + '"' + (v === 'd' || v === 'x' ? ' stroke-dasharray="5 4"' : '') + ' marker-end="url(#' + p + (v || 'n') + ')"/>'; }
@@ -307,7 +334,7 @@ function mgplugSVG(k, p){
   var h = svgOpen('0 0 340 220', 'ROMK channel: ' + MGPLUG[k].n) + markers(p);
   h += tx(170, 22, 'Urine', 12, 'var(--muted)', 600) + tx(170, 208, 'Inside the cell', 12, 'var(--muted)', 600);
   h += '<rect x="20" y="78" width="118" height="54" rx="8" fill="var(--fill)" stroke="var(--line)"/><rect x="202" y="78" width="118" height="54" rx="8" fill="var(--fill)" stroke="var(--line)"/>' + tx(79, 110, 'cell membrane', 10.5, 'var(--muted)') + tx(261, 110, 'ROMK channel', 10.5, 'var(--muted)');
-  if (low){ h += line('M156 176 V44', 'u', 5, p) + line('M184 176 V44', 'u', 5, p) + tx(170, 60, '', 10); h += tx(250, 54, 'K pours out', 11.5, 'var(--warn)', 700, 'middle', true); }
+  if (low){ h += line('M156 176 V44', 'u', 5, p) + line('M184 176 V44', 'u', 5, p) + tx(170, 60, '', 10.5); h += tx(250, 54, 'K pours out', 11.5, 'var(--warn)', 700, 'middle', true); }
   else { h += '<circle cx="170" cy="128" r="17" fill="var(--accent)"/>' + tx(170, 132, 'Mg', 12, 'var(--accent-ink)', 700, 'middle', true) + line('M170 176 V150', 'x', 2, p) + line('M170 100 V46', 'd', null, p) + tx(250, 54, 'little K leaves', 11.5, 'var(--accent)', 700, 'middle', true); }
   h += tx(170, 192, 'K', 13, 'var(--ink)', 700, 'middle', true);
   return h + '</svg>';
@@ -386,7 +413,7 @@ var PHOSUSE = {
 function phosuseSVG(k){
   var d = PHOSUSE[k], names = [['Diaphragm', 'weak breathing'], ['Muscle, heart', 'weakness, rhabdo'], ['Red cells', 'oxygen release'], ['Brain', 'confusion']];
   var h = svgOpen('0 0 340 200', 'What phosphate is for: ' + d.n);
-  h += '<circle cx="170" cy="100" r="34" fill="var(--accent)"/>' + tx(170, 97, 'ATP', 14, 'var(--accent-ink)', 700, 'middle', true) + tx(170, 112, 'needs P', 10, 'var(--accent-ink)', 400, 'middle', true);
+  h += '<circle cx="170" cy="100" r="34" fill="var(--accent)"/>' + tx(170, 97, 'ATP', 14, 'var(--accent-ink)', 700, 'middle', true) + tx(170, 112, 'needs P', 10.5, 'var(--accent-ink)', 400, 'middle', true);
   [[8, 10], [212, 10], [8, 140], [212, 140]].forEach(function(xy, i){ h += box(xy[0], xy[1], 120, 50, names[i][0], names[i][1], d.hot === i, d.hot >= 0 && d.hot !== i); h += '<path d="M' + (i % 2 ? 212 : 128) + ' ' + (i < 2 ? 60 : 140) + ' L' + (i % 2 ? 196 : 144) + ' ' + (i < 2 ? 78 : 122) + '" stroke="var(--muted)" stroke-width="1.5"/>'; });
   return h + '</svg>';
 }
@@ -1015,8 +1042,8 @@ var VK = (function(){
   function mark(box, j){ var ok = false; box.querySelectorAll('.vk-opt').forEach(function(b, i){ b.disabled = true; if (b.getAttribute('data-ok') === '1') b.classList.add('right'); else if (i === j) b.classList.add('wrong'); if (i === j) ok = b.getAttribute('data-ok') === '1'; }); return ok; }
   function answer(key, j){ var box = document.querySelector('[data-vk-pred="' + key + '"]'), P = C.preds[key]; if (!box || box.getAttribute('data-done')) return; box.setAttribute('data-done', '1'); var ok = mark(box, j), a = box.querySelector('.vk-ans');
     a.innerHTML = '<p><b>' + (ok ? 'Right.' : 'Not quite.') + '</b> ' + P.why() + '</p>' + (P.fig ? '<button class="chip" type="button" data-fig="' + P.fig[0] + '" data-state="' + (P.fig[1] || '') + '">' + VK_FIC + q(P.fig[2]) + '</button>' : ''); a.hidden = false; }
-  function slHtml(id){ var S = C.sliders[id]; return '<div class="vk-sl" data-vk-sl="' + id + '">' + S.ranges.map(function(r){ return '<label for="vk-' + id + '-' + r.key + '">' + r.label + ' <b data-vk-v="' + r.key + '"></b></label><input type="range" id="vk-' + id + '-' + r.key + '" data-vk-k="' + r.key + '" min="' + r.min + '" max="' + r.max + '" step="' + r.step + '" value="' + r.value + '">'; }).join('') + '<div class="vk-res" aria-live="polite"></div>' + (S.note ? '<p class="vk-src">' + S.note + '</p>' : '') + '</div>'; }
-  function slRun(w){ var S = C.sliders[w.getAttribute('data-vk-sl')], v = {}; S.ranges.forEach(function(r){ var x = +w.querySelector('[data-vk-k="' + r.key + '"]').value; v[r.key] = x; w.querySelector('[data-vk-v="' + r.key + '"]').textContent = (r.fmt ? r.fmt(x) : x) + (r.unit ? ' ' + r.unit : ''); }); w.querySelector('.vk-res').innerHTML = S.run(v); }
+  function slHtml(id){ var S = C.sliders[id]; return '<div class="vk-sl" data-vk-sl="' + id + '">' + S.ranges.map(function(r){ return '<label for="vk-' + id + '-' + r.key + '">' + r.label + ' <b data-vk-v="' + r.key + '"></b></label><input type="range" id="vk-' + id + '-' + r.key + '" data-vk-k="' + r.key + '" min="' + r.min + '" max="' + r.max + '" step="' + r.step + '" value="' + r.value + '">' + (r.zones ? '<div class="vk-zone" data-vk-z="' + r.key + '"></div>' : ''); }).join('') + '<div class="vk-res" aria-live="polite"></div><div class="vk-deep"></div>' + (S.note ? '<p class="vk-src">' + S.note + '</p>' : '') + '</div>'; }
+  function slRun(w){ var S = C.sliders[w.getAttribute('data-vk-sl')], v = {}; S.ranges.forEach(function(r){ var x = +w.querySelector('[data-vk-k="' + r.key + '"]').value; v[r.key] = x; w.querySelector('[data-vk-v="' + r.key + '"]').textContent = (r.fmt ? r.fmt(x) : x) + (r.unit ? ' ' + r.unit : ''); }); w.querySelector('.vk-res').innerHTML = S.run(v); S.ranges.forEach(function(r){ if (!r.zones) return; var Z = typeof r.zones === 'function' ? r.zones(v) : r.zones, x = v[r.key], on = Z.length - 1; Z.forEach(function(z, k){ if (x >= z[0] && x < z[1] && on === Z.length - 1) on = k; }); w.querySelector('[data-vk-z="' + r.key + '"]').innerHTML = '<div class="vk-zs" aria-hidden="true">' + Z.map(function(z, k){ return '<i' + (k === on ? ' class="on"' : '') + ' style="flex:' + Math.max(0.01, Math.min(z[1], r.max) - Math.max(z[0], r.min)) + '"></i>'; }).join('') + '</div><p class="vk-zt">' + Z[on][2] + '</p>'; }); w.querySelector('.vk-deep').innerHTML = S.deep ? S.deep(v).map(function(d){ return '<div class="vk-dr"><p class="label">' + d[0] + '</p>' + d[1] + '</div>'; }).join('') : ''; }
   function flowHtml(id){ var F = C.flows[id]; return '<div class="vk-flow" data-vk-flow="' + id + '"><p class="head">' + F.t + '</p><div class="vk-dots">' + F.steps.map(function(_, k){ return '<i class="vk-d' + (k ? '' : ' on') + '"></i>'; }).join('') + '</div><div class="vk-fb"></div></div>'; }
   function step(id, k){ var F = C.flows[id], S = F.steps[k], w = document.querySelector('[data-vk-flow="' + id + '"]'); if (!w || !S) return; FS[id] = k;
     w.querySelectorAll('.vk-d').forEach(function(d, j){ d.classList.toggle('on', j <= k); });
@@ -1075,7 +1102,14 @@ VK.init({
   'learn-phos': {q: 'Feeding restarts after a week of starvation. Which low level is the hallmark of refeeding?', a: function(){ return [['Phosphate (often with potassium and magnesium)', 1], ['Sodium', 0], ['Calcium', 0]]; }, why: function(){ return REFEED.feeding.line; }, fig: ['refeed', 'feeding', 'Refeeding: where phosphate goes']}
  },
  sliders: {
-  k: {ranges: [{key: 'k', label: 'Serum potassium', min: 1.8, max: 4.2, step: 0.1, value: 2.9, unit: 'mEq/L', fmt: function(x){ return x.toFixed(1); }}], note: 'Runs this tool\'s potassium engine: general ward, oral route, normal kidney function, no symptoms. Below 2.5 it switches to IV, 40 mEq at a time with a recheck after each.',
+  k: {ranges: [{key: 'k', label: 'Serum potassium', min: 1.8, max: 4.2, step: 0.1, value: 2.9, unit: 'mEq/L', fmt: function(x){ return x.toFixed(1); }, zones: [[1.8, 2.45, 'Under 2.5: severe'], [2.45, 3.05, '2.5 to 3.0: moderate'], [3.05, 3.45, '3.1 to 3.4: mild'], [3.45, 4.3, '3.5 or more: at target']]}], note: 'Runs this tool\'s potassium engine: general ward, oral route, normal kidney function, no symptoms. Below 2.5 it switches to IV, 40 mEq at a time with a recheck after each.',
+   deep: function(v){ var t = kNeed({k: v.k}).tier;
+    if (t === 'none') return [['What is happening', '<p>At target. Nearly all of the body\'s potassium sits inside cells, so the serum level stays normal until a sizeable part of the store is gone. A normal level in a patient on a loop diuretic can still be on its way down.</p>']];
+    var now = '<p>Nearly all of the body\'s potassium is inside cells; the serum level is a small window onto a large store. A small fall in the number means a large total deficit, which is why the doses look big next to it.</p>' +
+      (t === 'severe' ? '<p>At this level the muscle and heart cell membranes are hyperpolarized and repolarization is slowed: weakness, ileus, rhabdomyolysis, and ventricular arrhythmia. On the ECG: flat T waves, U waves, ST depression.</p>' : t === 'moderate' ? '<p>Often silent, though weakness and cramps can begin at this level; it also sensitizes the heart: more ectopy, and more risk with digoxin, a long QT or ischemia.</p>' : '<p>Usually silent. It matters most when the heart is vulnerable (ischemia, heart failure, digoxin, a long QT).</p>');
+    return [['What is happening', now],
+     ['Why the route', t === 'severe' ? '<p>IV, because at this level the heart is at risk and delivery has to be certain and monitored; oral can be given alongside. The infusion is rate-limited because potassium entering a vein reaches the heart before it has spread into cells: too fast and the serum level spikes dangerously.</p>' : '<p>Oral, because the gut absorbs potassium almost completely and delivers it slowly enough to be safe. IV is for severe levels, symptoms, or a gut that cannot be used.</p>'],
+     ['Why magnesium first', '<p>Magnesium inside the collecting-duct cell normally plugs the potassium channel (ROMK). When magnesium is low the channel leaks, potassium pours into the urine, and replacement fails until the magnesium is repaired.</p>']]; },
    run: function(v){ var o = compute({k: v.k, route: 'po'}).k; if (!o) return ''; return '<div class="card"><p class="label">Potassium</p><p class="head">' + o.head + '</p>' + (o.lines.length ? '<p class="sub">' + o.lines.filter(function(x, j){ return j === 0 || /^Recheck/.test(x); }).join(' ') + '</p>' : '') + (o.guards[0] ? '<div class="guard">' + o.guards[0] + '</div>' : '') + '</div>'; }}
  },
  flows: {
@@ -1086,6 +1120,13 @@ VK.init({
   ]}
  }
 });
+</script>
+<script id="deeper-data">
+/* Go deeper: mechanism, rationale and the common trap for each Learn chapter. Text only; no doses or thresholds beyond the tool's own. */
+(function(){ var D = {"learn-store": [["Mechanism", "The sodium-potassium pump keeps nearly all of the body's potassium inside cells. Insulin, beta-2 stimulation (albuterol, epinephrine) and alkalosis drive it in. Lack of insulin, acidosis, cell breakdown and a high tonicity let it out. These shifts move the serum level within minutes and leave the body's total unchanged."], ["Why it matters", "One number hides two different problems. In a shift the total is normal and the level comes back once the cause is removed; a severe or symptomatic shift is still treated, with small doses. In a deficit the total is low. Replacing a shift as if it were a deficit overshoots when the shift reverses."], ["Common trap", "In ketoacidosis and other states that push potassium out of cells, the serum level overstates the store. During refeeding or an insulin infusion it understates how fast the level is about to fall."]], "learn-rate": [["Mechanism", "Potassium given into a vein first mixes with a few litres of plasma. Until it has spread into the far larger space inside cells, the level in the blood reaching the heart is briefly much higher than the eventual result. In a small vein a concentrated solution also injures the wall."], ["Why it matters", "So there are two separate limits. The rate limit protects the heart and is the reason for a monitor at faster rates. The concentration limit protects the vein and is the reason stronger solutions need a central line."], ["Common trap", "Mixing potassium in a dextrose solution. Dextrose releases insulin, insulin drives potassium into cells, and the level can fall despite the infusion. Use saline as the carrier."]], "learn-kidney": [["Mechanism", "In the collecting duct sodium enters the cell through a channel that aldosterone controls. That leaves the urine side negative, and the charge pulls potassium out through its own channel. Potassium loss therefore needs two things at once: sodium arriving at the collecting duct and aldosterone. Normally they move in opposite directions (when volume is low, aldosterone is high but little sodium arrives), which protects potassium."], ["Why it matters", "Anything that raises both together wastes potassium: loop and thiazide diuretics, primary aldosteronism, and vomiting, where bicarbonate reaches the collecting duct as an anion that cannot be reabsorbed while volume depletion raises aldosterone."], ["Common trap", "In vomiting the potassium is lost in the urine, not in the vomit. When the cause of a low potassium is unclear, a urine potassium separates loss through the kidney from loss through the gut or a shift."]], "learn-mg": [["Mechanism", "Magnesium inside the collecting-duct cell blocks the potassium channel from within, so when magnesium is low the channel leaks. Magnesium is also needed for the parathyroid gland to release its hormone and for that hormone to act, so a low magnesium lowers calcium as well."], ["Why it matters", "A low potassium or low calcium that will not correct is a magnesium problem until proven otherwise. Most magnesium is inside cells and bone, so the serum level understates a deficit: in high-risk patients (alcohol use, diuretics, long-term acid suppression, diarrhea) a low-normal level does not exclude one."], ["Common trap", "The kidney spills magnesium when the blood level rises abruptly, so much of a fast IV dose is lost in the urine within hours. Slower replacement over a longer time retains more."]], "learn-ecg": [["Mechanism", "Low potassium outside the cell paradoxically weakens the potassium currents that end each beat, so repolarization is slow and uneven: the T wave flattens, a U wave appears, and the ST segment sags. Low magnesium adds to this and favours the early afterdepolarizations that trigger torsades."], ["Why it matters", "The ECG shows what the level is doing to the heart, which the number alone cannot. Changes on the tracing raise the urgency at any level."], ["Common trap", "A U wave that merges with the T wave is easily measured as a long QT. The risk is real either way, but check the potassium and magnesium before blaming a drug."]], "learn-phos": [["Mechanism", "Phosphate is the raw material of ATP and of the compound in red cells that lets hemoglobin release oxygen. Starvation empties the body's store while the serum level stays normal. Feeding releases insulin; cells take up glucose and with it phosphate, potassium and magnesium; the serum levels fall within days. Thiamine is consumed at the same time."], ["Why it matters", "Severe hypophosphatemia is an energy failure: weak muscles including the diaphragm, a heart that pumps poorly, breakdown of muscle and red cells, and less oxygen released to tissue."], ["Common trap", "A normal phosphate before feeding says nothing about what it will do afterwards. In a patient at risk, check after feeding starts, and give thiamine before the glucose."]]};
+  function add(){ Object.keys(D).forEach(function(id){ var c = document.getElementById(id); if (!c || c.querySelector(":scope > .deeper")) return; var host = c.matches(".card,.lsec,section,.chap") ? c : null; if (!host){ var n = c.nextElementSibling; while (n && !n.matches(".card")) n = n.nextElementSibling; host = n; } if (!host || host.querySelector(":scope > .deeper")) return; var d = document.createElement("details"); d.className = "deeper"; d.innerHTML = "<summary>Go deeper: mechanism and rationale</summary><div class=\"dpx\">" + D[id].map(function(r){ return "<div><span class=\"dl\">" + r[0] + "</span><p>" + r[1] + "</p></div>"; }).join("") + "</div>"; var last = host.querySelector(":scope > .row"); if (last) host.insertBefore(d, last); else host.appendChild(d); }); }
+  add(); document.addEventListener("click", function(){ setTimeout(add, 0); }); document.addEventListener("input", function(){ setTimeout(add, 0); });
+})();
 </script>
 </body>
 </html>

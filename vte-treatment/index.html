@@ -106,6 +106,24 @@ footer p{margin:0 0 8px}
   #p-learn{max-width:720px;margin:0 auto}
 }
 @media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+/* cause-fix: ruled-out causes stay readable; the name greys, the reason does not fade */
+.cause.out,.cause.less,.cause.unl{opacity:1}
+.cause.less>span,.cause.unl>span{color:var(--muted)}
+.plate{margin:12px 0 4px}
+.plate img{display:block;width:100%;height:auto;border-radius:10px;border:1px solid var(--line)}
+.plate figcaption{font-size:13px;color:var(--muted);margin-top:6px}
+.deeper{margin-top:14px;border-top:1px solid var(--line)}
+.deeper>summary{min-height:44px;display:flex;align-items:center;gap:8px;color:var(--accent);font-weight:600;font-size:15px;cursor:pointer;list-style:none}
+.deeper>summary::-webkit-details-marker{display:none}
+.deeper>summary::before{content:"+";font-family:var(--mono);font-size:18px;line-height:1;width:14px;text-align:center}
+.deeper[open]>summary::before{content:"\2212"}
+.deeper>summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.deeper .dpx{border:1px solid var(--line);border-radius:12px;padding:2px 12px;background:var(--card);text-align:left}
+.deeper .dpx>div{padding:10px 0;border-top:1px solid var(--line)}
+.deeper .dpx>div:first-child{border-top:0}
+.deeper .dl{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500;margin:0 0 3px}
+.deeper p{font-size:15px;line-height:1.45;color:var(--ink);margin:0 0 4px}
+.deeper p:last-child{margin-bottom:0}
 </style>
 </head>
 <body>
@@ -221,7 +239,7 @@ footer p{margin:0 0 8px}
 
 <div class="panel" id="p-learn" role="tabpanel" aria-labelledby="t-learn">
   <div class="pills" id="pills"></div>
-  <div class="card chap" id="learn-phases" data-pill="Phases"><p class="label">1 · The plan</p><h2>Three phases, one drug or two</h2><p class="sub">Pick a drug to see what each phase looks like.</p><div data-figure="phases"></div></div>
+  <div class="card chap" id="learn-phases" data-pill="Phases"><p class="label">1 · The plan</p><h2>Three phases, one drug or two</h2><figure class="plate" style="margin-left:0;margin-right:0"><img src="/media/vte-treatment/clot-path.webp" width="632" height="537" loading="lazy" alt="Two panels. Left: a vein cut open lengthwise with a red clot sitting in the pocket behind a valve leaflet. Right: a torso showing the large central vein running up to the right side of the heart, with a clot fragment in the vein on its way up."><figcaption>Left: clot forms in the still blood behind a vein valve. Right: a fragment travels up the vena cava to the right heart and on to the lungs. Created with BioRender.com</figcaption></figure><p class="sub">Pick a drug to see what each phase looks like.</p><div data-figure="phases"></div></div>
   <div class="card chap" id="learn-cascade" data-pill="Where drugs act"><p class="label">2 · Mechanism</p><h2>Where each anticoagulant acts</h2><div data-figure="cascade"></div></div>
   <div class="card chap" id="learn-bridge" data-pill="Warfarin bridge"><p class="label">3 · Warfarin</p><h2>Why warfarin needs a bridge</h2><div data-figure="bridge"></div></div>
   <div class="card chap" id="learn-rv" data-pill="The RV"><p class="label">4 · Pulmonary embolism</p><h2>The right ventricle decides</h2><div data-figure="rv"></div></div>
@@ -552,8 +570,8 @@ function svgOpen(vb, label){ return '<svg viewBox="' + vb + '" role="img" aria-l
 function tx(x, y, t, o){ o = o || {}; return '<text x="' + x + '" y="' + y + '" text-anchor="' + (o.a || 'middle') + '" style="' + (o.sans ? FS : FM) + ';font-size:' + (o.s || 11) + 'px;font-weight:' + (o.w || 400) + ';fill:' + (o.c || 'var(--ink)') + '">' + t + '</text>'; }
 function bx(x, y, w, h, t1, t2, st){
   var fill = st === 'hot' ? 'var(--warnbg)' : st === 'on' ? 'var(--card)' : 'var(--fill)', stroke = st === 'hot' ? 'var(--warn)' : st === 'on' ? 'var(--accent)' : 'var(--line)';
-  return '<g' + (st === 'dim' ? ' opacity=".4"' : '') + '><rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="10" fill="' + fill + '" stroke="' + stroke + '"' + (st === 'hot' || st === 'on' ? ' stroke-width="2"' : '') + '/>' +
-    tx(x + w / 2, y + (t2 ? h / 2 - 2 : h / 2 + 4), t1, {sans: 1, s: 12, w: 600}) + (t2 ? tx(x + w / 2, y + h / 2 + 12, t2, {s: 10, c: 'var(--muted)'}) : '') + '</g>';
+  return '<g' + (st === 'dim' ? ' opacity=".74"' : '') + '><rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="10" fill="' + fill + '" stroke="' + stroke + '"' + (st === 'hot' || st === 'on' ? ' stroke-width="2"' : '') + '/>' +
+    tx(x + w / 2, y + (t2 ? h / 2 - 2 : h / 2 + 4), t1, {sans: 1, s: 12, w: 600}) + (t2 ? tx(x + w / 2, y + h / 2 + 12, t2, {s: 10.5, c: 'var(--muted)'}) : '') + '</g>';
 }
 function mk(p){ return '<defs>' + [['n','var(--muted)'],['u','var(--warn)'],['x','var(--bad)'],['a','var(--accent)']].map(function(k){ return '<marker id="' + p + k[0] + '" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="' + k[1] + '"/></marker>'; }).join('') + '</defs>'; }
 function ar(d, k, p, w){ var c = k === 'u' ? 'var(--warn)' : k === 'x' ? 'var(--bad)' : k === 'a' ? 'var(--accent)' : 'var(--muted)'; return '<path d="' + d + '" fill="none" stroke="' + c + '" stroke-width="' + (w || (k === 'n' ? 2 : 3)) + '"' + (k === 'x' ? ' stroke-dasharray="5 4"' : '') + ' marker-end="url(#' + p + k + ')"/>'; }
@@ -570,7 +588,7 @@ function phasesSVG(k){
   var xs = [6, 118, 230], names = ['Start', 'To 3–6 months', 'Extended'];
   h += '<path d="M10 30H330" stroke="var(--line)" stroke-width="2"/>';
   xs.forEach(function(x, n){ h += '<circle cx="' + (x + 52) + '" cy="30" r="5" fill="' + (n === 0 ? 'var(--accent)' : 'var(--card)') + '" stroke="var(--accent)" stroke-width="2"/>' + tx(x + 52, 16, names[n], {s: 10.5, c: 'var(--muted)'}) + bx(x, 48, 104, 60, s.b[n][0], s.b[n][1], n === 0 ? 'on' : null); });
-  h += tx(170, 132, 'the first weeks carry the highest risk of recurrence', {s: 10, c: 'var(--muted)'});
+  h += tx(170, 132, 'the first weeks carry the highest risk of recurrence', {sans: 1, s: 11, c: 'var(--muted)'});
   return h + '</svg>';
 }
 var CASC = {
@@ -591,8 +609,8 @@ function cascSVG(k, p){
   h += '<path d="M232 126L186 104" fill="none" stroke="' + (s.xa ? 'var(--bad)' : 'var(--line)') + '" stroke-width="' + (s.xa ? 4 : 1.5) + '"/><path d="M232 142L186 170" fill="none" stroke="' + (s.iia ? 'var(--bad)' : 'var(--line)') + '" stroke-width="' + (s.iia ? (s.iia < 1 ? 1.5 : 4) : 1.5) + '"' + (s.iia && s.iia < 1 ? ' stroke-dasharray="4 4"' : '') + '/>';
   if (s.xa) h += blockMark(184, 100);
   if (s.iia === 1) h += blockMark(184, 174);
-  if (s.dxa) h += blockMark(22, 98) + tx(22, 126, 'drug', {s: 10, c: 'var(--bad)', w: 700});
-  if (s.diia) h += blockMark(22, 176) + tx(22, 204, 'drug', {s: 10, c: 'var(--bad)', w: 700});
+  if (s.dxa) h += blockMark(22, 98) + tx(22, 126, 'drug', {s: 10.5, c: 'var(--bad)', w: 700});
+  if (s.diia) h += blockMark(22, 176) + tx(22, 204, 'drug', {s: 10.5, c: 'var(--bad)', w: 700});
   if (s.liver) h += bx(214, 8, 118, 44, 'Liver', 'makes fewer factors', 'hot') + ar('M214 26H186', 'x', p);
   return h + '</svg>';
 }
@@ -605,9 +623,9 @@ var HALF = [['Factor VII', 5, '4–6 h', 0], ['Protein C', 8, '8 h', 1], ['Facto
 function bridgeSVG(k){
   var s = BRIDGE[k], h = svgOpen('0 0 340 228', 'Warfarin and clotting factor levels: ' + s.n);
   HALF.forEach(function(f, n){ var y = 10 + n * 32, frac = Math.pow(0.5, s.t / f[1]), w = Math.max(3, 150 * frac);
-    h += tx(4, y + 15, f[0], {a: 'start', sans: 1, s: 12, w: 600}) + tx(4, y + 27, 'half-life ' + f[2], {a: 'start', s: 9.5, c: 'var(--muted)'});
+    h += tx(4, y + 15, f[0], {a: 'start', sans: 1, s: 12, w: 600}) + tx(4, y + 27, 'half-life ' + f[2], {a: 'start', s: 10.5, c: 'var(--muted)'});
     h += '<rect x="110" y="' + (y + 4) + '" width="150" height="16" rx="4" fill="var(--fill)"/><rect x="110" y="' + (y + 4) + '" width="' + w + '" height="16" rx="4" fill="' + (f[3] ? 'var(--ok)' : 'var(--accent)') + '"/>' + tx(268, y + 16, Math.round(frac * 100) + '%', {a: 'start', s: 11}); });
-  h += tx(170, 221, 'schematic: as if synthesis stopped completely', {s: 9.5, c: 'var(--muted)'});
+  h += tx(170, 221, 'schematic: as if synthesis stopped completely', {s: 10.5, c: 'var(--muted)'});
   return h + '</svg><div class="key" style="display:flex;gap:12px;font-size:12px;color:var(--muted);margin-top:4px"><span><i style="display:inline-block;width:8px;height:8px;border-radius:2px;background:var(--accent);margin-right:4px"></i>clotting factor</span><span><i style="display:inline-block;width:8px;height:8px;border-radius:2px;background:var(--ok);margin-right:4px"></i>natural anticoagulant</span></div>';
 }
 var RV = {
@@ -645,7 +663,7 @@ function recurSVG(k){
   var s = RECUR[k], vals = [['After surgery', 3], ['Nonsurgical trigger', 15], ['Unprovoked', 30]], h = svgOpen('0 0 340 170', 'Recurrence within 5 years of stopping anticoagulation');
   vals.forEach(function(v, n){ var x = 30 + n * 104, bh = v[1] * 3.6, on = n === s.v;
     h += '<rect x="' + x + '" y="' + (130 - bh) + '" width="72" height="' + bh + '" rx="6" fill="' + (on ? 'var(--accent)' : 'var(--line)') + '"/>' + tx(x + 36, 122 - bh, v[1] + '%', {s: 14, w: 700}) + tx(x + 36, 148, v[0], {sans: 1, s: 11.5, w: on ? 700 : 400}); });
-  h += '<path d="M20 130H320" stroke="var(--muted)"/>' + tx(170, 166, 'recurrence within 5 years of stopping', {s: 10, c: 'var(--muted)'});
+  h += '<path d="M20 130H320" stroke="var(--muted)"/>' + tx(170, 166, 'recurrence within 5 years of stopping', {s: 10.5, c: 'var(--muted)'});
   return h + '</svg>';
 }
 var FIGS = {
@@ -869,6 +887,13 @@ $('practice').addEventListener('click', function(e){
   if (l != null){ var c2 = CASES[l]; NUMS.forEach(function(k){ $(k).value = c2.i[k] != null ? c2.i[k] : ''; }); st = {clot: c2.i.clot, prov: c2.i.prov || null, t: {}}; Object.keys(c2.i).forEach(function(k){ if (c2.i[k] === true) st.t[k] = true; }); drawInputs(); render(); show('t-tool'); window.scrollTo(0, 0); }
 });
 drawInputs(); render(); fromHash();
+})();
+</script>
+<script id="deeper-data">
+/* Go deeper: mechanism, rationale and the common trap for each Learn chapter. Text only; no doses or thresholds beyond the tool's own. */
+(function(){ var D = {"learn-phases": [["Mechanism", "In the first days to weeks the clot is active: it can extend and break off, so anticoagulation is at its most intense. Over the following months the body's own fibrinolysis dissolves or organizes the clot while the drug prevents extension. Beyond that, treatment only prevents a new clot."], ["Why it matters", "This is why apixaban and rivaroxaban begin with a higher dose and why dabigatran and edoxaban follow several days of a parenteral drug."], ["Common trap", "Skipping the lead-in or loading phase, or forgetting to step the dose down when it ends."]], "learn-cascade": [["Mechanism", "Anticoagulants do not dissolve clot. They block thrombin, or its production, so that no new fibrin forms, and the body's own fibrinolysis gains the upper hand."], ["Why it matters", "Symptoms therefore improve over days, not hours, and a clot that still shows on imaging weeks later is not a treatment failure."], ["Common trap", "Only thrombolytic drugs dissolve clot, and they are kept for a threat to life or limb because of the bleeding they cause."]], "learn-bridge": [["Mechanism", "Warfarin lowers every vitamin K dependent protein at the pace of its half-life. Protein C, a natural anticoagulant, falls within hours; prothrombin takes days. For the first few days the balance tips toward clotting, while the INR rises early from the fall of factor VII alone and overstates the protection."], ["Why it matters", "This is why a parenteral anticoagulant overlaps for at least several days and until the INR has been in range for a day."], ["Common trap", "Stopping the heparin the first time the INR reaches 2."]], "learn-rv": [["Mechanism", "The right ventricle is thin-walled and built for low pressure. A sudden obstruction, with added constriction of the lung's vessels, raises the pressure it must pump against. It dilates, pushes the septum into the left ventricle and reduces left ventricular filling, so output and blood pressure fall. A stretched wall at a low blood pressure is poorly perfused, the right ventricle becomes ischemic, and the cycle feeds itself."], ["Why it matters", "Signs of right ventricular strain on imaging and in the blood mark patients who are on that path; a low blood pressure means it is under way."], ["Common trap", "Large fluid boluses stretch a failing right ventricle further, and sedation with positive-pressure ventilation can precipitate arrest. Give fluid cautiously and prepare before intubating."]], "learn-recur": [["Mechanism", "When a clot follows a temporary trigger such as surgery, the risk falls to a low level once the trigger has gone. When there was no trigger, or the trigger persists (active cancer), the tendency to clot remains."], ["Why it matters", "Extending treatment does not lower the risk that follows stopping; it only postpones it. So the real choice is between a finite course of three to six months and no planned stop date."], ["Common trap", "Extending a finite course to one or two years as a compromise. Recurrence resumes when treatment stops, so it adds bleeding exposure without lasting protection."]], "learn-wrong": [["Mechanism", "Each exception has a mechanism. In antiphospholipid syndrome DOACs prevented arterial clots less well than warfarin. DOACs cross the placenta. Severe liver disease alters their metabolism and the clotting system itself. Strong enzyme inducers lower their levels. After bariatric surgery absorption is unpredictable."], ["Why it matters", "A DOAC is the default only once these have been excluded."], ["Common trap", "Missing an interacting drug. Rifampin and several antiseizure drugs can lower a DOAC to an ineffective level with no warning."]]};
+  function add(){ Object.keys(D).forEach(function(id){ var c = document.getElementById(id); if (!c || c.querySelector(":scope > .deeper")) return; var host = c.matches(".card,.lsec,section,.chap") ? c : null; if (!host){ var n = c.nextElementSibling; while (n && !n.matches(".card")) n = n.nextElementSibling; host = n; } if (!host || host.querySelector(":scope > .deeper")) return; var d = document.createElement("details"); d.className = "deeper"; d.innerHTML = "<summary>Go deeper: mechanism and rationale</summary><div class=\"dpx\">" + D[id].map(function(r){ return "<div><span class=\"dl\">" + r[0] + "</span><p>" + r[1] + "</p></div>"; }).join("") + "</div>"; var last = host.querySelector(":scope > .row"); if (last) host.insertBefore(d, last); else host.appendChild(d); }); }
+  add(); document.addEventListener("click", function(){ setTimeout(add, 0); }); document.addEventListener("input", function(){ setTimeout(add, 0); });
 })();
 </script>
 </body>

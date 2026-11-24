@@ -51,7 +51,7 @@ details p{margin:0 0 8px;font-size:15px}
 .ddx{list-style:none;padding:0;margin:6px 0 0}
 .ddx li{display:flex;gap:10px;align-items:baseline;padding:7px 0;border-top:1px solid var(--line);font-size:15px;margin:0}
 .ddx li:first-child{border-top:0}
-.dg{flex:none;font-family:var(--mono);font-size:10.5px;letter-spacing:.04em;text-transform:uppercase;border-radius:999px;padding:2px 7px;border:1px solid var(--line);color:var(--muted);min-width:64px;text-align:center}
+.dg{flex:none;font-family:var(--mono);font-size:11px;letter-spacing:.04em;text-transform:uppercase;border-radius:999px;padding:2px 7px;border:1px solid var(--line);color:var(--muted);min-width:64px;text-align:center}
 .dg.k{color:var(--bad);border-color:var(--bad);background:var(--badbg)}
 .dg.u{color:var(--warn);border-color:var(--warn);background:var(--warnbg)}
 .ddx small{color:var(--muted);font-size:13.5px;display:block}
@@ -127,7 +127,18 @@ footer p{margin:0 0 8px}
   .plist{grid-template-columns:repeat(4,1fr)}
   #p-learn,#p-practice{max-width:780px;margin:0 auto}
 }
+.dp{margin-top:10px;border:1px solid var(--line);border-radius:12px;padding:2px 12px;background:var(--card);text-align:left}
+.dp:empty{display:none}
+.dp>div{padding:10px 0;border-top:1px solid var(--line)}
+.dp>div:first-child{border-top:0}
+.dp .dl{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500;margin:0 0 3px}
+.dp p{font-size:15px;line-height:1.45;color:var(--ink);margin:0 0 4px}
+.dp p:last-child{margin-bottom:0}
+/* cause-fix: ruled-out causes stay readable; the name greys, the reason does not fade */
+.cause.out,.cause.less,.cause.unl{opacity:1}
+.cause.less>span,.cause.unl>span{color:var(--muted)}
 </style>
+<script>function dpHtml(rows){ return rows.map(function(r){ return '<div><span class="dl">' + r[0] + '</span>' + r[1] + '</div>'; }).join(''); }</script>
 </head>
 <body>
 <div class="wrap">
@@ -639,27 +650,30 @@ function figShock(){
     '<p class="figsrc">Standard physiology; hemodynamic patterns as in Vincent and De Backer, N Engl J Med 2013.</p>';
 }
 function figO2(){
-  var p = FIG.o2.p, W = 320, H = 190, x0 = 40, y0 = 160, xs = 260 / 100, ys = 140 / 100, d = '';
+  var p = FIG.o2.p, W = 320, H = 200, x0 = 40, y0 = 160, xs = 260 / 100, ys = 140 / 100, d = '';
   for (var q = 1; q <= 100; q++){ d += (q === 1 ? 'M' : 'L') + (x0 + q * xs).toFixed(1) + ' ' + (y0 - o2sat(q) * ys).toFixed(1) + ' '; }
   var sx = x0 + p * xs, sy = y0 - o2sat(p) * ys, sat = o2sat(p);
   var svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Oxygen tension ' + p + ' mm Hg gives saturation about ' + Math.round(sat) + ' percent">' +
     '<rect x="' + x0 + '" y="20" width="' + (60 * xs) + '" height="140" fill="var(--warnbg)"/>' +
-    '<text x="' + (x0 + 64) + '" y="152" font-size="10" fill="var(--warn)" style="font-family:var(--mono)">STEEP: UNDER 60</text>' +
+    '<text x="' + (x0 + 64) + '" y="152" font-size="10.5" fill="var(--warn)" style="font-family:var(--mono)">STEEP: UNDER 60</text>' +
     '<line x1="' + x0 + '" y1="' + y0 + '" x2="' + (x0 + 260) + '" y2="' + y0 + '" stroke="var(--muted)"/>' +
     '<line x1="' + x0 + '" y1="20" x2="' + x0 + '" y2="' + y0 + '" stroke="var(--muted)"/>' +
     '<path d="' + d + '" fill="none" stroke="var(--accent)" stroke-width="2.5"/>' +
     '<line x1="' + sx + '" y1="' + y0 + '" x2="' + sx + '" y2="' + sy + '" stroke="var(--ink)" stroke-dasharray="3 3"/>' +
     '<line x1="' + x0 + '" y1="' + sy + '" x2="' + sx + '" y2="' + sy + '" stroke="var(--ink)" stroke-dasharray="3 3"/>' +
     '<circle cx="' + sx + '" cy="' + sy + '" r="5" fill="var(--accent)"/>' +
-    '<text x="' + (x0 + 130) + '" y="182" text-anchor="middle" font-size="11" fill="var(--muted)" style="font-family:var(--mono)">PaO2 (mm Hg)</text>' +
+    '<text x="' + (x0 + 130) + '" y="192" text-anchor="middle" font-size="11" fill="var(--muted)" style="font-family:var(--mono)">PaO2 (mm Hg)</text>' +
     '<text x="12" y="95" font-size="11" fill="var(--muted)" style="font-family:var(--mono)" transform="rotate(-90 12 95)" text-anchor="middle">SpO2 %</text>' +
-    [0,50,100].map(function(v){ return '<text x="' + (x0 + v * xs) + '" y="172" font-size="10" text-anchor="middle" fill="var(--muted)" style="font-family:var(--mono)">' + v + '</text>'; }).join('') +
-    [50,90].map(function(v){ return '<text x="' + (x0 - 4) + '" y="' + (y0 - v * ys + 3) + '" font-size="10" text-anchor="end" fill="var(--muted)" style="font-family:var(--mono)">' + v + '</text>'; }).join('') +
+    [0,50,100].map(function(v){ return '<text x="' + (x0 + v * xs) + '" y="172" font-size="10.5" text-anchor="middle" fill="var(--muted)" style="font-family:var(--mono)">' + v + '</text>'; }).join('') +
+    [50,90].map(function(v){ return '<text x="' + (x0 - 4) + '" y="' + (y0 - v * ys + 3) + '" font-size="10.5" text-anchor="end" fill="var(--muted)" style="font-family:var(--mono)">' + v + '</text>'; }).join('') +
     '</svg>';
   var note = p >= 80 ? 'Flat part: more oxygen adds little saturation.' : p >= 60 ? 'The shoulder: saturation about 90%. Below this it falls fast.' : 'The cliff: a small fall in oxygen tension costs a lot of saturation.';
   return '<div class="sl"><label for="o2r" class="note">Oxygen tension (PaO2)</label><input type="range" id="o2r" min="20" max="100" step="1" value="' + p + '"></div>' +
     '<p class="readout">PaO2 ' + p + ' mm Hg → SpO2 about ' + Math.round(sat) + '%</p>' + svg +
     '<p class="figcap">' + note + ' Fever, acidosis and high carbon dioxide shift the curve right (less saturation for the same tension).</p>' +
+    '<div class="dp">' + dpHtml([['Why the curve bends', '<p>Hemoglobin binds oxygen cooperatively: each oxygen that binds makes the next bind more easily. That gives the flat top, where hemoglobin is nearly full, and the steep middle, where it loads and unloads with small changes in tension.</p>'],
+      ['What is happening', p >= 80 ? '<p>On the flat part the oximeter is a late alarm. Oxygen tension can fall a long way with the saturation barely moving, so a patient on oxygen reading in the high 90s may have lost most of their reserve. Watch how much oxygen it takes to hold the number, not only the number.</p>' : p >= 60 ? '<p>At the shoulder there is no reserve left above the patient. The next fall in tension lands on the steep part.</p>' : '<p>On the steep part every small fall in tension strips oxygen from hemoglobin. The amount of oxygen the blood carries depends almost entirely on saturation, so delivery to the tissues is now falling as fast as the number.</p>'],
+      ['Why a right shift helps the tissues', '<p>Working tissue is warm, acidic and rich in carbon dioxide, and all three loosen the grip of hemoglobin on oxygen. The same shift that lowers the saturation reading releases more oxygen where it is needed.</p>']]) + '</div>' +
     '<p class="figsrc">Curve from the Severinghaus equation (J Appl Physiol 1979), normal pH and temperature.</p>';
 }
 var TRIAGE = [

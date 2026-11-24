@@ -117,7 +117,30 @@ input[type=range]{width:100%;min-height:44px;accent-color:var(--accent)}
   #p-learn,#p-prac{max-width:720px;margin:0 auto}
 }
 @media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+.dp{margin-top:10px;border:1px solid var(--line);border-radius:12px;padding:2px 12px;background:var(--card);text-align:left}
+.dp:empty{display:none}
+.dp>div{padding:10px 0;border-top:1px solid var(--line)}
+.dp>div:first-child{border-top:0}
+.dp .dl{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500;margin:0 0 3px}
+.dp p{font-size:15px;line-height:1.45;color:var(--ink);margin:0 0 4px}
+.dp p:last-child{margin-bottom:0}
+/* cause-fix: ruled-out causes stay readable; the name greys, the reason does not fade */
+.cause.out,.cause.less,.cause.unl{opacity:1}
+.cause.less>span,.cause.unl>span{color:var(--muted)}
+.deeper{margin-top:14px;border-top:1px solid var(--line)}
+.deeper>summary{min-height:44px;display:flex;align-items:center;gap:8px;color:var(--accent);font-weight:600;font-size:15px;cursor:pointer;list-style:none}
+.deeper>summary::-webkit-details-marker{display:none}
+.deeper>summary::before{content:"+";font-family:var(--mono);font-size:18px;line-height:1;width:14px;text-align:center}
+.deeper[open]>summary::before{content:"\2212"}
+.deeper>summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.deeper .dpx{border:1px solid var(--line);border-radius:12px;padding:2px 12px;background:var(--card);text-align:left}
+.deeper .dpx>div{padding:10px 0;border-top:1px solid var(--line)}
+.deeper .dpx>div:first-child{border-top:0}
+.deeper .dl{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500;margin:0 0 3px}
+.deeper p{font-size:15px;line-height:1.45;color:var(--ink);margin:0 0 4px}
+.deeper p:last-child{margin-bottom:0}
 </style>
+<script>function dpHtml(rows){ return rows.map(function(r){ return '<div><span class="dl">' + r[0] + '</span>' + r[1] + '</div>'; }).join(''); }</script>
 </head>
 <body>
 <div class="wrap">
@@ -197,10 +220,10 @@ input[type=range]{width:100%;min-height:44px;accent-color:var(--accent)}
   <div class="card chap" id="learn-grade" data-pill="Grade"><p class="label">3 · Grading</p><h2>CTRCD: mild, moderate, severe</h2><p class="sub">Baseline LVEF 60%. Drag the LVEF now, and add a strain fall or a biomarker rise. The grade comes from the same rules as the Results tab.</p>
     <input type="range" id="lg-ef" min="30" max="65" step="1" value="52" aria-label="LVEF now">
     <div class="states wrapit" id="lg-tog" role="group" aria-label="Other findings"></div>
-    <div id="lg-fig"></div><p class="head" id="lg-head"></p><p class="line1" id="lg-line"></p></div>
+    <div id="lg-fig"></div><p class="head" id="lg-head"></p><p class="line1" id="lg-line"></p><div class="dp" id="lg-dp"></div></div>
   <div class="card chap" id="learn-gls" data-pill="Strain"><p class="label">4 · Strain</p><h2>Strain falls before the ejection fraction</h2><p class="sub">Global longitudinal strain is negative: about -20% is normal, and closer to zero is worse. What counts is the relative fall from the patient's own baseline. Baseline -20%: drag the value now.</p>
     <input type="range" id="lgl" min="-22" max="-10" step="0.5" value="-17" aria-label="GLS now">
-    <p class="head" id="lgl-head"></p><p class="line1" id="lgl-line"></p></div>
+    <p class="head" id="lgl-head"></p><p class="line1" id="lgl-line"></p><div class="dp" id="lgl-dp"></div></div>
   <div class="card chap" id="learn-dose" data-pill="Dose"><p class="label">5 · Cumulative dose</p><h2>Anthracycline injury adds up</h2><p class="sub">Convert any anthracycline to doxorubicin equivalents, then see where it sits on the dose ladder.</p>
     <div class="grid"><div class="field"><label for="ld-drug">Drug</label><select id="ld-drug"></select></div><div class="field"><label for="ld-dose">Cumulative mg/m²</label><input id="ld-dose" inputmode="decimal" autocomplete="off" value="300"></div></div>
     <div id="ld-fig"></div><p class="line1" id="ld-line"></p></div>
@@ -712,8 +735,8 @@ function svgOpen(vb, label){ return '<svg viewBox="' + vb + '" role="img" aria-l
 function tx(x, y, t, o){ o = o || {}; return '<text x="' + x + '" y="' + y + '" text-anchor="' + (o.a || 'middle') + '" style="' + (o.sans ? FS : FM) + ';font-size:' + (o.s || 11) + 'px;font-weight:' + (o.w || 400) + ';fill:' + (o.c || 'var(--ink)') + '">' + t + '</text>'; }
 function bx(x, y, w, h, t1, t2, stt){
   var fill = stt === 'hot' ? 'var(--warnbg)' : stt === 'on' ? 'var(--card)' : stt === 'bad' ? 'var(--badbg)' : 'var(--fill)', stroke = stt === 'hot' ? 'var(--warn)' : stt === 'on' ? 'var(--accent)' : stt === 'bad' ? 'var(--bad)' : 'var(--line)';
-  return '<g' + (stt === 'dim' ? ' opacity=".4"' : '') + '><rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="10" fill="' + fill + '" stroke="' + stroke + '"' + (stt && stt !== 'dim' ? ' stroke-width="2"' : '') + '/>' +
-    tx(x + w / 2, y + (t2 ? h / 2 - 2 : h / 2 + 4), t1, {sans: 1, s: 12, w: 600}) + (t2 ? tx(x + w / 2, y + h / 2 + 12, t2, {s: 10, c: 'var(--muted)'}) : '') + '</g>';
+  return '<g' + (stt === 'dim' ? ' opacity=".74"' : '') + '><rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="10" fill="' + fill + '" stroke="' + stroke + '"' + (stt && stt !== 'dim' ? ' stroke-width="2"' : '') + '/>' +
+    tx(x + w / 2, y + (t2 ? h / 2 - 2 : h / 2 + 4), t1, {sans: 1, s: 12, w: 600}) + (t2 ? tx(x + w / 2, y + h / 2 + 12, t2, {s: 10.5, c: 'var(--muted)'}) : '') + '</g>';
 }
 function mk(p){ return '<defs><marker id="' + p + 'a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--accent)"/></marker></defs>'; }
 function ar(x1, y1, x2, y2, p){ return '<path d="M' + x1 + ' ' + y1 + 'L' + x2 + ' ' + y2 + '" fill="none" stroke="var(--accent)" stroke-width="2" marker-end="url(#' + p + 'a)"/>'; }
@@ -722,8 +745,8 @@ function ar(x1, y1, x2, y2, p){ return '<path d="M' + x1 + ' ' + y1 + 'L' + x2 +
 var RISKD = {low: {n: 'Low', line: 'No factors, or one 1-point factor. Expected CTRCD under 2%.'}, mod: {n: 'Moderate', line: 'Medium factors totalling 2 to 4 points. Expected 2 to 9%.'}, high: {n: 'High', line: 'Any high factor, or medium points 5 or more. Expected 10 to 19%.'}, vh: {n: 'Very high', line: 'Any very-high factor, such as earlier heart failure or CTRCD. Expected 20% or more.'}};
 function riskSVG(k, p){
   var s = svgOpen('0 0 340 210', 'Risk ladder, ' + RISKD[k].n), xs = [10, 92, 174, 256], ys = [150, 112, 74, 36];
-  LV.forEach(function(l, n){ var on = l === k; s += '<rect x="' + xs[n] + '" y="' + ys[n] + '" width="74" height="' + (190 - ys[n]) + '" rx="8" fill="' + (on ? (l === 'vh' ? 'var(--badbg)' : l === 'high' ? 'var(--warnbg)' : l === 'low' ? 'var(--okbg)' : 'var(--fill)') : 'var(--fill)') + '" stroke="' + (on ? (l === 'vh' ? 'var(--bad)' : l === 'high' ? 'var(--warn)' : l === 'low' ? 'var(--ok)' : 'var(--accent)') : 'var(--line)') + '" stroke-width="' + (on ? 2 : 1) + '"/>' + tx(xs[n] + 37, ys[n] + 18, RISKD[l].n, {sans: 1, s: 11.5, w: on ? 700 : 500}) + tx(xs[n] + 37, ys[n] + 34, RATE[l], {s: 10, c: 'var(--muted)'}); });
-  s += tx(170, 205, 'Expected CV toxicity by level (HFA-ICOS, expert guidance)', {s: 10, c: 'var(--muted)'});
+  LV.forEach(function(l, n){ var on = l === k; s += '<rect x="' + xs[n] + '" y="' + ys[n] + '" width="74" height="' + (190 - ys[n]) + '" rx="8" fill="' + (on ? (l === 'vh' ? 'var(--badbg)' : l === 'high' ? 'var(--warnbg)' : l === 'low' ? 'var(--okbg)' : 'var(--fill)') : 'var(--fill)') + '" stroke="' + (on ? (l === 'vh' ? 'var(--bad)' : l === 'high' ? 'var(--warn)' : l === 'low' ? 'var(--ok)' : 'var(--accent)') : 'var(--line)') + '" stroke-width="' + (on ? 2 : 1) + '"/>' + tx(xs[n] + 37, ys[n] + 18, RISKD[l].n, {sans: 1, s: 11.5, w: on ? 700 : 500}) + tx(xs[n] + 37, ys[n] + 34, RATE[l], {s: 10.5, c: 'var(--muted)'}); });
+  s += tx(170, 205, 'Expected CV toxicity by level (HFA-ICOS, expert guidance)', {sans: 1, s: 11, c: 'var(--muted)'});
   return s + '</svg>';
 }
 
@@ -749,23 +772,23 @@ function mechSVG(k, p){
   s += '<path d="M125 58 C 120 85, 112 110, 118 140" fill="none" stroke="' + (on('vessel') ? 'var(--bad)' : 'var(--hrt-art)') + '" stroke-width="' + (on('vessel') ? 5 : 3) + '" stroke-linecap="round"/>';
   if (z === 'immune') [[95, 100], [140, 110], [110, 125], [150, 88], [88, 82]].forEach(function(c){ s += '<circle cx="' + c[0] + '" cy="' + c[1] + '" r="6" fill="var(--accent)" stroke="var(--card)"/>'; });
   s += tx(125, 190, MECHZ[z], {s: 11.5, w: 700, c: 'var(--ink)'});
-  s += tx(125, 207, 'ovals: atria · red line: coronary artery', {s: 9.5, c: 'var(--muted)'});
+  s += tx(125, 207, 'ovals: atria · red line: coronary artery', {sans: 1, s: 11, c: 'var(--muted)'});
   var y = 14;
   d.c.forEach(function(t, n){ s += bx(198, y + n * 62, 138, 44, t.length > 20 ? t.slice(0, t.lastIndexOf(' ', 20)) : t, t.length > 20 ? t.slice(t.lastIndexOf(' ', 20) + 1) : '', n === 2 ? 'hot' : 'on'); if (n < 2) s += ar(267, y + n * 62 + 46, 267, y + n * 62 + 58, p); });
-  s += tx(170, 240, 'Tap a drug: the highlighted part is its target', {s: 10, c: 'var(--muted)'});
+  s += tx(170, 240, 'Tap a drug: the highlighted part is its target', {s: 10.5, c: 'var(--muted)'});
   return s + '</svg>';
 }
 
 /* CTRCD ladder: LVEF bands. state = mild | moderate | severe */
 var GRD = {mild: {n: 'Mild', line: 'LVEF 50% or more, plus a relative strain fall over 15% and/or a new troponin or NP rise. Anthracycline: continue. HER2: continue.'}, moderate: {n: 'Moderate', line: 'LVEF 40–49% with a fall of 10 points or more, or a smaller fall plus strain or biomarker change. Anthracycline: interrupt. HER2: continue with ACE inhibitor or ARB and beta-blocker.'}, severe: {n: 'Severe', line: 'New LVEF under 40%. Interrupt either drug and start heart failure therapy.'}};
 function gradeSVG(k, p, ef){
-  var s = svgOpen('0 0 340 150', 'LVEF bands for CTRCD grade'), X0 = 20, W = 300;
+  var s = svgOpen('0 0 340 160', 'LVEF bands for CTRCD grade'), X0 = 20, W = 300;
   function px(v){ return X0 + (v - 25) / 45 * W; }
   [['severe', 25, 40], ['moderate', 40, 50], ['mild', 50, 70]].forEach(function(b){ var on = b[0] === k; s += '<rect x="' + px(b[1]) + '" y="40" width="' + (px(b[2]) - px(b[1])) + '" height="44" fill="' + (on ? (b[0] === 'severe' ? 'var(--badbg)' : 'var(--warnbg)') : 'var(--fill)') + '" stroke="' + (on ? (b[0] === 'severe' ? 'var(--bad)' : 'var(--warn)') : 'var(--line)') + '" stroke-width="' + (on ? 2 : 1) + '"/>' + tx((px(b[1]) + px(b[2])) / 2, 67, GRD[b[0]].n, {sans: 1, s: 12, w: on ? 700 : 500}); });
-  [25, 40, 50, 60, 70].forEach(function(v){ s += tx(px(v), 102, v + '%', {s: 10, c: 'var(--muted)'}); });
-  s += tx(px(60), 32, 'baseline 60', {s: 10, c: 'var(--muted)'}) + '<line x1="' + px(60) + '" y1="36" x2="' + px(60) + '" y2="88" stroke="var(--muted)" stroke-dasharray="3 3"/>';
+  [25, 40, 50, 60, 70].forEach(function(v){ s += tx(px(v), 102, v + '%', {s: 10.5, c: 'var(--muted)'}); });
+  s += tx(px(60), 32, 'baseline 60', {s: 10.5, c: 'var(--muted)'}) + '<line x1="' + px(60) + '" y1="35" x2="' + px(60) + '" y2="40" stroke="var(--muted)" stroke-width="2"/><line x1="' + px(60) + '" y1="84" x2="' + px(60) + '" y2="90" stroke="var(--muted)" stroke-width="2"/>';
   if (ef != null){ s += '<path d="M' + px(ef) + ' 92 l-6 10 h12z" fill="var(--accent)"/>' + tx(px(ef), 120, 'now ' + ef, {s: 11, w: 700, c: 'var(--accent)'}); }
-  s += tx(170, 142, 'Mild needs strain or biomarker change; moderate 40–49 needs a 10-point fall or one of them', {s: 9, c: 'var(--muted)'});
+  s += tx(170, 138, 'Mild needs a strain or biomarker change.', {sans: 1, s: 11, c: 'var(--muted)'}) + tx(170, 152, 'Moderate at 40–49 needs a 10-point fall or one of them.', {sans: 1, s: 11, c: 'var(--muted)'});
   return s + '</svg>';
 }
 
@@ -775,9 +798,9 @@ function doseSVG(k, p, val){
   var s = svgOpen('0 0 340 120', 'Cumulative doxorubicin-equivalent dose ladder'), X0 = 16, W = 308;
   function px(v){ return X0 + Math.min(v, 500) / 500 * W; }
   [['d0', 0, 100], ['d100', 100, 250], ['d250', 250, 400], ['d400', 400, 500]].forEach(function(b){ var on = b[0] === k; s += '<rect x="' + px(b[1]) + '" y="30" width="' + (px(b[2]) - px(b[1])) + '" height="36" fill="' + (on ? (b[0] === 'd400' ? 'var(--badbg)' : b[0] === 'd0' ? 'var(--okbg)' : 'var(--warnbg)') : 'var(--fill)') + '" stroke="' + (on ? 'var(--accent)' : 'var(--line)') + '" stroke-width="' + (on ? 2 : 1) + '"/>' + tx((px(b[1]) + px(b[2])) / 2, 53, DOSE[b[0]].n, {s: 10.5, w: on ? 700 : 400}); });
-  [0, 100, 250, 400].forEach(function(v){ s += tx(px(v), 82, String(v), {s: 10, c: 'var(--muted)'}); });
+  [0, 100, 250, 400].forEach(function(v){ s += tx(px(v), 82, String(v), {s: 10.5, c: 'var(--muted)'}); });
   if (val != null) s += '<path d="M' + px(val) + ' 26 l-6 -10 h12z" fill="var(--accent)"/>' + tx(Math.min(px(val), 300), 12, val + ' mg/m²', {s: 10.5, w: 700, c: 'var(--accent)'});
-  s += tx(170, 108, 'Doxorubicin-equivalent mg/m² (ESC Table 5 and Table 12)', {s: 10, c: 'var(--muted)'});
+  s += tx(170, 108, 'Doxorubicin-equivalent mg/m² (ESC Table 5 and Table 12)', {sans: 1, s: 11, c: 'var(--muted)'});
   return s + '</svg>';
 }
 
@@ -821,6 +844,9 @@ function drawLG(){
   $('lg-fig').innerHTML = gradeSVG(g.kind === 'asx' ? st : '', 'lg', ef);
   $('lg-head').textContent = g.kind === 'asx' ? 'LVEF ' + ef + '%: ' + g.sev + ' CTRCD' : g.kind === 'none' ? 'LVEF ' + ef + '%: no CTRCD' : 'LVEF ' + ef + '%: below normal, criteria not met';
   $('lg-line').textContent = g.kind === 'asx' ? GWHY[g.by] : g.kind === 'none' ? 'An LVEF of 50% or more with no strain or biomarker change is not CTRCD.' : 'In the 40s with a fall under 10 points, it takes a strain or biomarker change to call it moderate.';
+  $('lg-dp').innerHTML = dpHtml([['What the ejection fraction misses', '<p>The ejection fraction falls late. When some muscle cells are injured the rest work harder, and the ventricle keeps ejecting the same fraction until a good deal of reserve is gone. Strain and troponin move first' + (LG.gls || LG.bio ? ', which is why the change you switched on counts even with the ejection fraction where it is.' : ': switch one on to see it change the grade.') + '</p>'],
+    ['Why the grade asks for a 10-point fall', '<p>Echo ejection fraction varies by several points between studies and readers. A fall of 10 points or more is larger than that noise; a smaller fall needs a second signal (strain or a biomarker) before it is believed.</p>'],
+    ['Why grade at all', '<p>The grade sets how hard to push: the mildest grade usually means continuing cancer treatment with heart protection and closer watching, while the higher grades open the question of interrupting it. Stopping effective cancer therapy for a measurement error is the harm the rules are built to avoid.</p>']]);
 }
 $('lg-ef').addEventListener('input', drawLG);
 $('lg-tog').addEventListener('click', function(e){ var b = e.target.closest('[data-v]'); if (!b) return; var k = b.getAttribute('data-v'); LG[k] = !LG[k]; drawLG(); });
@@ -828,6 +854,9 @@ function drawGLS(){
   var v = +$('lgl').value, f = glsFall(-20, v);
   $('lgl-head').textContent = 'GLS ' + v + '%: relative fall ' + f + '%';
   $('lgl-line').textContent = f > 15 ? 'Over 15%: a significant fall. With LVEF still 50% or more, that is mild CTRCD.' : f > 0 ? '15% or less: within measurement variation. Same machine and reader next time.' : 'No fall.';
+  $('lgl-dp').innerHTML = dpHtml([['What strain measures', '<p>How much the muscle shortens from base to apex with each beat, as a percentage. That lengthwise shortening is done by the fibres just under the inner lining, which are the first to suffer from toxic or ischemic injury.</p>'],
+    ['Why it falls before the ejection fraction', '<p>When the lengthwise fibres weaken, the circular fibres in the mid-wall squeeze harder and keep the ejection fraction normal. Strain looks at the injured layer directly, so it shows damage while the ejection fraction is still compensated.</p>'],
+    ['Why a relative fall, on the same machine', '<p>Vendors compute strain differently, so absolute values are not interchangeable and people start from different baselines. Comparing each patient with their own baseline on the same machine removes both problems.</p>']]);
 }
 $('lgl').addEventListener('input', drawGLS);
 $('ld-drug').innerHTML = Object.keys(ANTH).map(function(k){ return '<option value="' + k + '">' + ANTH[k][0] + ' (× ' + ANTH[k][1] + ')</option>'; }).join('');
@@ -911,6 +940,13 @@ $('practice').addEventListener('click', function(e){
 window.__cases = CASES; window.__caseAnswer = caseAnswer; window.__pin = pin;
 
 drawPlanInputs(); renderPlan(); drawCheckInputs(); renderCheck(); drawLG(); drawGLS(); drawLD(); drawWhy(); fromHash();
+})();
+</script>
+<script id="deeper-data">
+/* Go deeper: mechanism, rationale and the common trap for each Learn chapter. Text only; no doses or thresholds beyond the tool's own. */
+(function(){ var D = {"learn-risk": [["Mechanism", "Toxicity is the product of the drug and the heart it meets. A heart with less reserve (a low ejection fraction, earlier heart failure, previous anthracycline or chest radiation) tolerates the same injury worse, and age, hypertension and diabetes add to that."], ["Why it matters", "Baseline risk sets how closely to watch and whether to start protective treatment before the first dose, when prevention works best."], ["Common trap", "Treating high baseline risk as a reason to withhold effective cancer therapy. It is a reason to protect and monitor."]], "learn-mech": [["Mechanism", "Anthracyclines damage DNA and mitochondria in heart muscle cells and kill them; the loss is cumulative and largely permanent. HER2-targeted therapy blocks a survival signal, causing dysfunction with little cell death that often recovers. Checkpoint inhibitors release T cells that then attack heart muscle. VEGF inhibitors injure the vessel lining and raise blood pressure. Fluoropyrimidines cause coronary spasm."], ["Why it matters", "Timing and reversibility follow from the mechanism, and so does the surveillance: imaging over months and years for anthracyclines, vigilance in the first weeks for checkpoint inhibitors, blood pressure for VEGF inhibitors, chest pain during infusion for fluoropyrimidines."], ["Common trap", "HER2 therapy given after an anthracycline. The earlier injury removes the reserve that would have hidden the second one."]], "learn-dose": [["Mechanism", "Each anthracycline dose kills some heart muscle cells, and they are not replaced. The injury adds up over a lifetime, and the risk of heart failure climbs steeply at high cumulative doses. Chest radiation adds to it."], ["Why it matters", "The lifetime dose has to travel with the patient, across regimens and decades. Protective options such as dexrazoxane and liposomal formulations exist for those who need more."], ["Common trap", "There is no dose below which the risk is zero, and heart failure can first appear years after treatment ends."]], "learn-ici": [["Mechanism", "Checkpoint inhibitor myocarditis is T cells infiltrating the heart muscle. It usually appears in the first weeks to months. Troponin rises, and the conduction system is often involved: heart block and ventricular arrhythmias, sometimes with a normal ejection fraction. Skeletal muscle and the neuromuscular junction can be attacked at the same time."], ["Why it matters", "It is uncommon and often fatal, so it is treated on suspicion: hold the drug and start high-dose glucocorticoids while the workup proceeds."], ["Common trap", "A normal ejection fraction does not exclude it. And look for the companions: a raised CK, weakness, double vision or drooping eyelids point to myositis or myasthenia alongside."]]};
+  function add(){ Object.keys(D).forEach(function(id){ var c = document.getElementById(id); if (!c || c.querySelector(":scope > .deeper")) return; var host = c.matches(".card,.lsec,section,.chap") ? c : null; if (!host){ var n = c.nextElementSibling; while (n && !n.matches(".card")) n = n.nextElementSibling; host = n; } if (!host || host.querySelector(":scope > .deeper")) return; var d = document.createElement("details"); d.className = "deeper"; d.innerHTML = "<summary>Go deeper: mechanism and rationale</summary><div class=\"dpx\">" + D[id].map(function(r){ return "<div><span class=\"dl\">" + r[0] + "</span><p>" + r[1] + "</p></div>"; }).join("") + "</div>"; var last = host.querySelector(":scope > .row"); if (last) host.insertBefore(d, last); else host.appendChild(d); }); }
+  add(); document.addEventListener("click", function(){ setTimeout(add, 0); }); document.addEventListener("input", function(){ setTimeout(add, 0); });
 })();
 </script>
 </body>

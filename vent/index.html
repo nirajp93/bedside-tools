@@ -109,6 +109,24 @@ tr.mark td{font-weight:700;color:var(--accent)}
   #p-learn{max-width:720px;margin:0 auto}
 }
 @media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+.deeper{margin-top:14px;border-top:1px solid var(--line)}
+.deeper>summary{min-height:44px;display:flex;align-items:center;gap:8px;color:var(--accent);font-weight:600;font-size:15px;cursor:pointer;list-style:none}
+.deeper>summary::-webkit-details-marker{display:none}
+.deeper>summary::before{content:"+";font-family:var(--mono);font-size:18px;line-height:1;width:14px;text-align:center}
+.deeper[open]>summary::before{content:"\2212"}
+.deeper>summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.deeper .dpx{border:1px solid var(--line);border-radius:12px;padding:2px 12px;background:var(--card);text-align:left}
+.deeper .dpx>div{padding:10px 0;border-top:1px solid var(--line)}
+.deeper .dpx>div:first-child{border-top:0}
+.deeper .dl{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500;margin:0 0 3px}
+.deeper p{font-size:15px;line-height:1.45;color:var(--ink);margin:0 0 4px}
+.deeper p:last-child{margin-bottom:0}
+/* cause-fix: ruled-out causes stay readable; the name greys, the reason does not fade */
+.cause.out,.cause.less,.cause.unl{opacity:1}
+.cause.less>span,.cause.unl>span{color:var(--muted)}
+.plate{margin:12px 0 4px}
+.plate img{display:block;width:100%;height:auto;border-radius:10px;border:1px solid var(--line)}
+.plate figcaption{font-size:13px;color:var(--muted);margin-top:6px}
 </style>
 </head>
 <body>
@@ -236,7 +254,7 @@ tr.mark td{font-weight:700;color:var(--accent)}
 
 <div class="panel" id="p-learn" role="tabpanel" aria-labelledby="t-learn">
   <div class="pills" id="pills"></div>
-  <div class="card chap" id="learn-size" data-pill="Size"><p class="label">1 · Size the breath</p><h2>Lungs follow height, not weight</h2><p>Two men of 175 cm have the same size lungs whether they weigh 60 kg or 120 kg. Tap a weight to see what 6 mL/kg would give if you used it.</p><div class="states wrapit" id="sizeseg" role="group" aria-label="Weight used"></div><p class="line1" id="sizeout"></p></div>
+  <div class="card chap" id="learn-size" data-pill="Size"><p class="label">1 · Size the breath</p><h2>Lungs follow height, not weight</h2><figure class="plate" style="margin-left:0;margin-right:0"><img src="/media/vent/alveoli-ards.webp" width="942" height="572" loading="lazy" alt="Two clusters of alveoli. On the left they are round, open and air-filled with thin walls and capillaries. On the right most are flooded with pink fluid containing white cells, lined by a pink membrane, or collapsed, and only one or two still hold much air."><figcaption>Left: healthy alveoli. Right: ARDS. Most units are flooded or collapsed, so each breath goes to the few that remain open. Created with BioRender.com</figcaption></figure><p>Two men of 175 cm have the same size lungs whether they weigh 60 kg or 120 kg. Tap a weight to see what 6 mL/kg would give if you used it.</p><div class="states wrapit" id="sizeseg" role="group" aria-label="Weight used"></div><p class="line1" id="sizeout"></p></div>
   <div class="card chap" id="learn-press" data-pill="Pressures"><p class="label">2 · Pressures</p><h2>One breath, three numbers</h2><div data-figure="press"></div></div>
   <div class="card chap" id="learn-dp" data-pill="Driving pressure"><p class="label">3 · Driving pressure</p><h2>The number that tracked with survival</h2><p>Plateau minus PEEP is the pressure swing of each breath. In a pooled analysis of nine trials, each 7 cm H2O more went with 41% higher mortality, and 36% higher when the tidal volume and plateau were already in the safe range.</p><p class="line1">One small trial of limiting driving pressure (STAMINA, 2025) found no benefit, so 15 is a working mark, not a rule.</p><div class="chips"><button class="chip" data-fig="press" data-state="comp">See it on the pressure trace</button></div></div>
   <div class="card chap" id="learn-co2" data-pill="CO2"><p class="label">4 · Permissive hypercapnia</p><h2>A high CO2 is the price of a small breath</h2><p>In ARDS the protocol answers a falling pH with rate first. Tap a pH.</p><div class="states wrapit" id="phseg" role="group" aria-label="pH band"></div><p class="line1" id="phout"></p><p class="line1">This does not apply in brain injury or after cardiac arrest, where the CO2 is kept normal.</p></div>
@@ -555,8 +573,8 @@ function svgOpen(vb, label){ return '<svg viewBox="' + vb + '" role="img" aria-l
 function tx(x, y, t, o){ o = o || {}; return '<text x="' + x + '" y="' + y + '" text-anchor="' + (o.a || 'middle') + '" style="' + (o.sans ? FS : FM) + ';font-size:' + (o.s || 11) + 'px;font-weight:' + (o.w || 400) + ';fill:' + (o.c || 'var(--ink)') + '">' + t + '</text>'; }
 function bx(x, y, w, h, t1, t2, st){
   var fill = st === 'hot' ? 'var(--warnbg)' : st === 'on' ? 'var(--card)' : 'var(--fill)', stroke = st === 'hot' ? 'var(--warn)' : st === 'on' ? 'var(--accent)' : 'var(--line)';
-  return '<g' + (st === 'dim' ? ' opacity=".45"' : '') + '><rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="10" fill="' + fill + '" stroke="' + stroke + '"' + (st === 'hot' || st === 'on' ? ' stroke-width="2"' : '') + '/>' +
-    tx(x + w / 2, y + (t2 ? h / 2 - 2 : h / 2 + 4), t1, {sans: 1, s: 12, w: 600}) + (t2 ? tx(x + w / 2, y + h / 2 + 12, t2, {s: 9.5, c: 'var(--muted)'}) : '') + '</g>';
+  return '<g' + (st === 'dim' ? ' opacity=".74"' : '') + '><rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="10" fill="' + fill + '" stroke="' + stroke + '"' + (st === 'hot' || st === 'on' ? ' stroke-width="2"' : '') + '/>' +
+    tx(x + w / 2, y + (t2 ? h / 2 - 2 : h / 2 + 4), t1, {sans: 1, s: 12, w: 600}) + (t2 ? tx(x + w / 2, y + h / 2 + 12, t2, {s: 10.5, c: 'var(--muted)'}) : '') + '</g>';
 }
 
 var PRESS = {
@@ -568,18 +586,18 @@ var PRESS = {
 function pressSVG(k){
   var d = PRESS[k], Y = function(p){ return 178 - p * 3.6; }, s = svgOpen('0 0 360 200', 'Airway pressure over one breath: ' + d.n);
   s += '<line x1="34" y1="' + Y(0) + '" x2="346" y2="' + Y(0) + '" stroke="var(--line)"/><line x1="34" y1="16" x2="34" y2="' + Y(0) + '" stroke="var(--line)"/>';
-  [0, 10, 20, 30, 40].forEach(function(p){ s += tx(28, Y(p) + 3, p, {a: 'end', s: 9, c: 'var(--muted)'}); });
-  s += '<line x1="34" y1="' + Y(d.peep) + '" x2="346" y2="' + Y(d.peep) + '" stroke="var(--muted)" stroke-dasharray="3 4"/>' + tx(344, Y(d.peep) + 12, 'set PEEP ' + d.peep, {a: 'end', s: 9.5, c: 'var(--muted)'});
+  [0, 10, 20, 30, 40].forEach(function(p){ s += tx(28, Y(p) + 3, p, {a: 'end', s: 10.5, c: 'var(--muted)'}); });
+  s += '<line x1="34" y1="' + Y(d.peep) + '" x2="346" y2="' + Y(d.peep) + '" stroke="var(--muted)" stroke-dasharray="3 4"/>' + tx(344, Y(d.peep) + 12, 'set PEEP ' + d.peep, {a: 'end', s: 10.5, c: 'var(--muted)'});
   var step = d.peak - d.plat;
   var pts = [[40, d.base], [80, d.base], [80, d.base + step], [150, d.peak], [150, d.plat], [215, d.plat], [232, d.base + (d.plat - d.base) * 0.25], [252, d.base + (d.plat - d.base) * 0.05], [270, d.base], [340, d.base]];
   s += '<path d="' + pts.map(function(p, n){ return (n ? 'L' : 'M') + p[0] + ' ' + r1(Y(p[1])); }).join('') + '" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linejoin="round"/>';
   s += '<circle cx="150" cy="' + Y(d.peak) + '" r="4" fill="' + (d.hot === 'gap' ? 'var(--warn)' : 'var(--accent)') + '"/>' + tx(144, Y(d.peak) - 7, 'peak ' + d.peak, {a: 'end', s: 10.5, w: 600});
-  s += tx(184, Y(d.plat) - 7, 'plateau ' + d.plat, {s: 10.5, w: 600}) + tx(184, Y(d.plat) + 14, 'hold', {s: 9, c: 'var(--muted)'});
+  s += tx(184, Y(d.plat) - 7, 'plateau ' + d.plat, {s: 10.5, w: 600}) + tx(184, Y(d.plat) + 14, 'hold', {s: 10.5, c: 'var(--muted)'});
   var c2 = d.hot === 'dp' ? 'var(--warn)' : 'var(--ink)';
   s += '<path d="M300 ' + Y(d.plat) + 'h8M304 ' + Y(d.plat) + 'V' + Y(d.peep) + 'M300 ' + Y(d.peep) + 'h8" stroke="' + c2 + '" stroke-width="1.5" fill="none"/><line x1="215" y1="' + Y(d.plat) + '" x2="300" y2="' + Y(d.plat) + '" stroke="var(--line)" stroke-dasharray="2 3"/>';
   s += tx(298, (Y(d.plat) + Y(d.peep)) / 2 + 3, 'driving ' + (d.plat - d.peep), {a: 'end', s: 10.5, w: 600, c: c2});
-  if (d.hot === 'base') s += tx(56, Y(d.base) - 6, 'total ' + d.base, {s: 10, w: 600, c: 'var(--warn)'});
-  s += tx(190, 196, 'cm H2O · illustrative values', {s: 9, c: 'var(--muted)'});
+  if (d.hot === 'base') s += tx(56, Y(d.base) - 6, 'total ' + d.base, {s: 10.5, w: 600, c: 'var(--warn)'});
+  s += tx(190, 196, 'cm H2O · illustrative values', {s: 10.5, c: 'var(--muted)'});
   return s + '</svg>';
 }
 
@@ -589,7 +607,7 @@ var FLOW = {
 };
 function flowSVG(k){
   var trap = k === 'trap', s = svgOpen('0 0 360 170', 'Flow over two breaths: ' + FLOW[k].n), z = 80;
-  s += '<line x1="20" y1="' + z + '" x2="346" y2="' + z + '" stroke="var(--muted)"/>' + tx(22, 16, 'flow in', {a: 'start', s: 9.5, c: 'var(--muted)'}) + tx(22, 160, 'flow out', {a: 'start', s: 9.5, c: 'var(--muted)'});
+  s += '<line x1="20" y1="' + z + '" x2="346" y2="' + z + '" stroke="var(--muted)"/>' + tx(22, 16, 'flow in', {a: 'start', s: 10.5, c: 'var(--muted)'}) + tx(22, 160, 'flow out', {a: 'start', s: 10.5, c: 'var(--muted)'});
   function breath(x){ return 'L' + x + ' 34L' + (x + 40) + ' 34L' + (x + 40) + ' ' + (z + 62) + (trap ? 'Q' + (x + 70) + ' ' + (z + 30) + ' ' + (x + 150) + ' ' + (z + 22) : 'Q' + (x + 62) + ' ' + (z + 8) + ' ' + (x + 110) + ' ' + z + 'L' + (x + 150) + ' ' + z); }
   s += '<path d="M30 ' + z + breath(30) + breath(180) + '" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linejoin="round"/>';
   s += '<circle cx="180" cy="' + (trap ? z + 22 : z) + '" r="5" fill="none" stroke="var(--warn)" stroke-width="2"/>' + tx(trap ? 150 : 180, trap ? z + 46 : z - 10, trap ? 'still flowing out' : 'back to zero', {s: 10.5, w: 600, c: trap ? 'var(--warn)' : 'var(--ink)'});
@@ -799,6 +817,13 @@ $('practice').addEventListener('click', function(e){
     show(TABOF[c2.tab]); window.scrollTo(0, 0); }
 });
 renderSetup(); renderAssess(); drawLib(); fromHash();
+})();
+</script>
+<script id="deeper-data">
+/* Go deeper: mechanism, rationale and the common trap for each Learn chapter. Text only; no doses or thresholds beyond the tool's own. */
+(function(){ var D = {"learn-size": [["Mechanism", "Lung size follows height and sex, not weight. In ARDS much of the lung is flooded or collapsed, so the part still taking air is small. A breath sized for a whole lung overstretches the part that is open, and the stretch itself inflames and injures it."], ["Why it matters", "This is why tidal volume is set per kilogram of predicted, not actual, body weight. Using the measured weight gives a patient with obesity a breath far too large for their lungs."], ["Common trap", "Short patients, and so most often women, are the ones who receive oversized breaths when height is guessed or a default volume is left in place."]], "learn-press": [["Mechanism", "The peak pressure is what it takes to push gas down the airways and stretch the lung. During a brief pause at the end of inspiration, with no gas flowing, the airway part drops out and what remains is the plateau: the pressure actually distending the alveoli. PEEP is the pressure the breath starts from."], ["Why it matters", "The gap between peak and plateau localizes a problem. A wide gap is resistance: bronchospasm, secretions, a kinked or bitten tube. Both high is stiffness: pneumothorax, edema, ARDS, a tube in one main bronchus, a tense abdomen, trapped air."], ["Common trap", "The plateau is only valid when the patient is passive; breathing effort distorts it. A stiff chest wall (obesity, ascites) raises it without the lung being overstretched."]], "learn-dp": [["Mechanism", "Driving pressure is the tidal volume divided by the compliance of the respiratory system. Compliance reflects how much lung is still open, so the number scales the breath to the working lung instead of to body size."], ["Why it matters", "It explains why a correctly sized breath can still be too much: in severe ARDS so little lung is open that even a small volume produces a large pressure swing."], ["Common trap", "The evidence is an association in pooled trial data. It shows which patients do worse; it does not prove that deliberately lowering the number saves lives."]], "learn-co2": [["Mechanism", "A smaller breath clears less carbon dioxide. Raising the rate compensates until the lungs no longer have time to empty. Over days the kidneys retain bicarbonate and the pH recovers."], ["Why it matters", "The trade is deliberate: a moderately acid pH is tolerated better than a lung injured by large breaths."], ["Common trap", "Carbon dioxide dilates the brain's vessels and constricts the lung's. A high level is dangerous with raised intracranial pressure and is poorly tolerated by a failing right ventricle."]], "learn-trap": [["Mechanism", "If the time allowed for breathing out is shorter than the lungs need, the next breath starts before the last has left. Volume and pressure build up breath by breath. The raised pressure in the chest blocks blood returning to the heart, so the blood pressure falls; it also overstretches the lung and makes it harder for the patient to trigger a breath."], ["Why it matters", "The treatment is time to exhale: a slower rate, a smaller breath, a shorter inspiration, and bronchodilators. In a collapsing patient, disconnecting the ventilator and letting the chest empty is both the test and the treatment."], ["Common trap", "Hypotension soon after intubating a patient with asthma or COPD is trapped air until proven otherwise. On the screen, expiratory flow that has not returned to zero before the next breath gives it away."]], "learn-ladder": [["Mechanism", "Low oxygen in ARDS comes from shunt: blood flowing past alveoli that are flooded or collapsed and take no air. Extra oxygen does little for blood that never meets gas. PEEP holds alveoli open. Turning prone evens out the stretch across the lung and matches air to blood flow better. Paralysis removes fighting and strong efforts that add injury."], ["Why it matters", "Each step up is more effective for oxygenation but carries more risk or work, so each is added only when the previous one is not enough."], ["Common trap", "Chasing the oxygen number with settings that injure the lung. And prone positioning, the step with the strongest survival evidence, is often delayed or not used."]]};
+  function add(){ Object.keys(D).forEach(function(id){ var c = document.getElementById(id); if (!c || c.querySelector(":scope > .deeper")) return; var host = c.matches(".card,.lsec,section,.chap") ? c : null; if (!host){ var n = c.nextElementSibling; while (n && !n.matches(".card")) n = n.nextElementSibling; host = n; } if (!host || host.querySelector(":scope > .deeper")) return; var d = document.createElement("details"); d.className = "deeper"; d.innerHTML = "<summary>Go deeper: mechanism and rationale</summary><div class=\"dpx\">" + D[id].map(function(r){ return "<div><span class=\"dl\">" + r[0] + "</span><p>" + r[1] + "</p></div>"; }).join("") + "</div>"; var last = host.querySelector(":scope > .row"); if (last) host.insertBefore(d, last); else host.appendChild(d); }); }
+  add(); document.addEventListener("click", function(){ setTimeout(add, 0); }); document.addEventListener("input", function(){ setTimeout(add, 0); });
 })();
 </script>
 </body>
