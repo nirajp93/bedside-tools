@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sedation, analgesia and delirium · bedside.tools</title>
+<meta name="description" content="ICU sedation: treat pain first, pick the lightest depth that works, choose propofol or dexmedetomidine, screen for delirium, and paralyse safely, with the reasoning in diagrams.">
+<script src="/theme.js"></script>
+<style>
+:root{--bg:#FBFBFA;--card:#FFFFFF;--ink:#111113;--muted:#55555D;--line:#ECECEE;--accent:#2B4BDB;--warn:#9A3B00;--warnbg:#FFF6EC}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5}
+.mono{font-family:var(--mono)}
+.wrap{max-width:720px;margin:0 auto;padding:20px 16px 48px}
+a{color:var(--accent)}
+.back{font-size:14px;text-decoration:none;display:inline-block;min-height:44px;line-height:44px}
+h1{font-size:26px;margin:4px 0 4px;letter-spacing:-.01em}
+.purpose{color:var(--muted);margin:0 0 20px}
+.tabs{display:flex;gap:6px;margin-bottom:16px}
+.tab{flex:1;min-width:0;min-height:44px;border:1px solid var(--line);background:var(--card);border-radius:14px;padding:0 2px;font:inherit;font-size:14px;font-weight:600;color:var(--muted);cursor:pointer}
+.tab[aria-selected="true"]{border-color:var(--accent);color:var(--accent)}
+.panel{display:none}.panel.on{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
+.card h2{font-size:18px;margin:0 0 4px}
+.label{font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+.head{font-family:var(--mono);font-size:16.5px;font-weight:600;margin:0 0 4px;overflow-wrap:anywhere}
+.dose{font-family:var(--mono);font-size:14.5px;display:block;overflow-wrap:anywhere}
+.sub{font-size:14px;color:var(--muted);margin:4px 0 0}
+.note{font-size:14px;color:var(--muted)}
+.guard{border-left:3px solid var(--warn);background:var(--warnbg);padding:8px 10px;border-radius:0 10px 10px 0;margin-top:8px;font-size:14.5px}
+.tier{display:inline-block;font-family:var(--mono);font-size:11px;border:1px solid var(--line);border-radius:999px;padding:2px 8px;color:var(--muted);margin:6px 6px 0 0}
+.whyline{margin:10px 0 0;font-size:14.5px;color:var(--muted)}
+.whyline b{color:var(--ink);font-weight:600}
+details.more{margin-top:10px;border-top:1px solid var(--line);padding-top:4px}
+summary{cursor:pointer;color:var(--accent);font-weight:600;min-height:44px;line-height:44px}
+details p{margin:0 0 8px;font-size:15px}
+.tab:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+/* ladder */
+.ladder{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:12px;align-items:stretch}
+.rungs{display:grid;gap:3px}
+.rung{display:grid;grid-template-columns:30px minmax(0,1fr) auto;align-items:center;gap:6px;min-height:44px;border:1px solid transparent;border-radius:10px;padding:0 8px;font:inherit;font-size:13.5px;color:var(--ink);background:transparent;cursor:pointer;text-align:left}
+.rung b{font-family:var(--mono);font-weight:600}
+.rung.band{background:var(--okbg)}
+.rung[aria-pressed="true"]{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.04em;text-transform:uppercase;border-radius:999px;padding:1px 7px;background:var(--accent);color:var(--accent-ink)}
+.read{display:flex;flex-direction:column;justify-content:center;min-width:0}
+.read .big{font-family:var(--mono);font-size:22px;font-weight:600;line-height:1.15;overflow-wrap:anywhere}
+.read p{margin:6px 0 0;font-size:14px;color:var(--muted)}
+.seg{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.sbtn{min-height:44px;min-width:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--ink);font:inherit;font-size:14px;cursor:pointer}
+.sbtn[aria-pressed="true"]{border-color:var(--accent);color:var(--accent);font-weight:600}
+.field{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+.field label{font-size:14px;color:var(--muted)}
+.field input{width:96px;min-height:44px;border:1px solid var(--line);border-radius:10px;padding:8px 10px;font:inherit;font-family:var(--mono);background:var(--card);color:var(--ink)}
+.line{display:grid;grid-template-columns:62px minmax(0,1fr);gap:10px;padding:12px 0;border-top:1px solid var(--line)}
+.line:first-of-type{border-top:0;padding-top:0}
+.line .k{font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);padding-top:3px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.chip{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--fill);color:var(--ink);font:inherit;font-size:14px;cursor:pointer}
+.chip i{width:9px;height:9px;border-radius:2px;background:var(--accent);flex:none}
+.scrim{position:fixed;inset:0;background:var(--scrim);z-index:20}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:21;max-height:90vh;overflow-y:auto;background:var(--card);border:1px solid var(--line);border-bottom:0;border-radius:20px 20px 0 0;padding:8px 16px 24px;max-width:560px;margin:0 auto}
+.sheethead{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.sheethead h2{font-size:18px;margin:0}
+.xbtn{min-height:44px;min-width:44px;border:0;background:transparent;color:var(--accent);font:inherit;font-weight:600;cursor:pointer}
+.fig{display:block;width:100%;max-width:460px;height:auto;margin:0 auto}
+.fig text{font-family:var(--mono)}
+.line1{font-size:15px;margin:10px 0 0}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:6px 6px 6px 0;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:var(--mono);font-size:11.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);font-weight:500}
+.tw{overflow-x:auto}
+.kv{display:grid;grid-template-columns:104px minmax(0,1fr);gap:4px 10px;font-size:14.5px;margin-top:8px}
+.kv span:nth-child(odd){font-family:var(--mono);font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);padding-top:3px}
+.conv{font-family:var(--mono);font-size:14px;background:var(--fill);border-radius:10px;padding:8px 10px;margin-top:10px;overflow-wrap:anywhere}
+.btn{min-height:44px;border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);border-radius:10px;padding:8px 14px;font:inherit;font-weight:600;cursor:pointer}
+.btn.ghost{background:var(--card);color:var(--accent)}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.ans{margin-top:10px;border-top:1px solid var(--line);padding-top:10px}
+.pills{position:sticky;top:0;z-index:5;background:var(--bg);display:flex;gap:6px;overflow-x:auto;margin:0 -16px 12px;padding:8px 16px;border-bottom:1px solid var(--line);scrollbar-width:none}
+.pills::-webkit-scrollbar{display:none}
+.pill{flex:none;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--muted);font:inherit;font-size:14px;cursor:pointer;white-space:nowrap}
+.pill[aria-current="true"]{border-color:var(--accent);color:var(--accent);font-weight:600}
+.chap{scroll-margin-top:70px}
+.trial{border-left:3px solid var(--accent);padding-left:12px;margin-top:14px}
+.trial p{margin:0 0 6px;font-size:15px}
+.trial .k{font-family:var(--mono);font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);display:block}
+.cause{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:8px 0;border-top:1px solid var(--line);font-size:15px}
+.cause small{color:var(--muted);font-size:13px;text-align:right;flex:0 1 56%}
+.cause.less>span{color:var(--muted)}
+.cause.fav>span{font-weight:700}
+.cause.fav>span:before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--accent);margin-right:8px}
+.step{border-top:1px solid var(--line);padding:12px 0}
+.step:first-of-type{border-top:0;padding-top:0}
+.step>b{display:block;margin-bottom:2px}
+.zone{display:flex;height:12px;border-radius:999px;overflow:hidden;margin:12px 0 4px;border:1px solid var(--line)}
+.zone span{display:block;background:var(--fill)}
+.zone span.on{background:var(--accent)}
+.zname{font-family:var(--mono);font-size:13px;font-weight:600}
+input[type=range]{width:100%;min-height:44px;accent-color:var(--accent)}
+.dp{border:1px solid var(--line);border-radius:12px;padding:2px 12px;margin-top:10px}
+.dp>div{padding:9px 0;border-top:1px solid var(--line)}
+.dp>div:first-child{border-top:0}
+.dp .dl{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:2px}
+.dp p{margin:0;font-size:14.5px}
+.grid4{display:grid;grid-template-columns:minmax(0,2.3fr) repeat(4,minmax(0,1fr));gap:4px;font-size:13px;margin-top:10px}
+.grid4 div{padding:7px 2px;border-radius:8px;background:var(--fill);text-align:center;font-family:var(--mono)}
+.grid4 .h{background:transparent;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.04em}
+.grid4 .n{text-align:left;font-family:var(--sans);font-weight:600;background:transparent;padding-left:0;font-size:12.5px}
+footer{margin-top:28px;font-size:13.5px;color:var(--muted)}
+footer p{margin:0 0 8px}
+.deeper{margin-top:14px;border-top:1px solid var(--line)}
+.deeper>summary{min-height:44px;display:flex;align-items:center;gap:8px;color:var(--accent);font-weight:600;font-size:15px;cursor:pointer;list-style:none}
+.deeper>summary::-webkit-details-marker{display:none}
+.deeper>summary::before{content:"+";font-family:var(--mono);font-size:18px;line-height:1;width:14px;text-align:center}
+.deeper[open]>summary::before{content:"\2212"}
+.deeper .dpx{border:1px solid var(--line);border-radius:12px;padding:2px 12px;background:var(--card)}
+.deeper .dpx>div{padding:10px 0;border-top:1px solid var(--line)}
+.deeper .dpx>div:first-child{border-top:0}
+.deeper .dl{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0 0 3px}
+.deeper p{font-size:15px;line-height:1.45;margin:0}
+@media (max-width:420px){.ladder{grid-template-columns:1fr}.read{padding-top:4px}}
+@media (min-width:900px){
+  .wrap{max-width:1040px}
+  #p-plan.on{display:grid;grid-template-columns:400px minmax(0,1fr);gap:20px;align-items:start}
+  #p-drugs.on .dgrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;align-items:start}
+  #p-drugs.on .dgrid .card{margin-bottom:0}
+  #p-del,#p-learn,#p-prac{max-width:720px;margin:0 auto}
+}
+@media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="/">← bedside.tools</a>
+<h1>Sedation, analgesia and delirium</h1>
+<p class="purpose">Pain first, the lightest depth that works, the right drug, and a daily look for delirium.</p>
+
+<div class="tabs" role="tablist">
+  <button class="tab" role="tab" id="t-plan" aria-selected="true" aria-controls="p-plan">Plan</button>
+  <button class="tab" role="tab" id="t-drugs" aria-selected="false" aria-controls="p-drugs">Drugs</button>
+  <button class="tab" role="tab" id="t-del" aria-selected="false" aria-controls="p-del">Delirium</button>
+  <button class="tab" role="tab" id="t-learn" aria-selected="false" aria-controls="p-learn">Learn</button>
+  <button class="tab" role="tab" id="t-prac" aria-selected="false" aria-controls="p-prac">Practice</button>
+</div>
+
+<div class="panel on" id="p-plan" role="tabpanel" aria-labelledby="t-plan">
+  <div>
+    <div class="card" id="rass">
+      <p class="label">Tap RASS now</p>
+      <div class="ladder"><div class="rungs" id="rungs"></div><div class="read" id="read"></div></div>
+      <p class="label" style="margin-top:14px">Target</p>
+      <div class="seg" id="tseg" style="margin-top:0"></div>
+      <div class="seg" id="rseg" hidden></div>
+    </div>
+    <div class="card" id="patient">
+      <p class="label">What else is true</p>
+      <div class="field"><label for="wt">Weight, kg</label><input id="wt" type="number" inputmode="decimal" min="30" max="250" placeholder="kg"></div>
+      <div class="seg" id="ticks" style="margin-top:0"></div>
+      <p class="note" style="margin:10px 0 0">Doses use the weight you enter. In obesity the right weight differs by drug: ask pharmacy.</p>
+    </div>
+  </div>
+  <div>
+    <div id="plan-out"></div>
+    <div class="card" id="paralysis">
+      <p class="label">If you are asked to paralyse</p>
+      <div class="guard" style="margin-top:0">Deep sedation and analgesia first. A paralytic does nothing for awareness or pain.</div>
+      <p class="head" style="margin-top:10px">ARDS, P/F under 150, still hypoxemic or off ventilation targets despite sedation</p>
+      <span class="dose" id="nmb-dose"></span>
+      <p class="whyline"><b>Why:</b> paralysis removes dyssynchrony and lowers oxygen use, but two large trials disagree on survival, so it is for the patient who is failing sedation, and for as short a time as possible.</p>
+      <div class="chips"><button class="chip" data-fig="tof"><i></i>Train-of-four</button></div>
+      <details class="more"><summary>More</summary>
+        <p>Optimize the ventilator and sedation first. Not routinely beyond 48 hours. A fixed dose without twitch monitoring, or titration to train-of-four, are both acceptable; the trials used a fixed high-dose infusion, and the label rate shown here is titrated. Paralysis while prone is optional.</p>
+        <p>Aim for RASS −4 to −5 before the first dose (expert practice; the guideline accepts scale-based or other assessment). The scale cannot be scored once the patient is paralysed.</p>
+        <p>Eye lubrication, clot prophylaxis and a daily decision to continue. <a href="/vent/#assess">Ventilator: ARDS next steps</a> · <a href="/vte-ppx/">VTE prophylaxis</a></p>
+        <span class="tier">SCCM 2026 · conditional, low</span><span class="tier">Dosing strategy, prone: conditional, very low</span><span class="tier">Doses: FDA labels</span><span class="tier">Eye care, RASS target: expert practice</span>
+      </details>
+    </div>
+  </div>
+</div>
+
+<div class="panel" id="p-drugs" role="tabpanel" aria-labelledby="t-drugs">
+  <div class="card" id="drug-weight"><div class="field" style="margin:0"><label for="wt2">Weight, kg</label><input id="wt2" type="number" inputmode="decimal" min="30" max="250" placeholder="kg"><span class="note">Doses convert as you type.</span></div></div>
+  <div class="card" id="effects">
+    <p class="label">What each drug does</p>
+    <div class="grid4" id="effgrid"></div>
+    <p class="note" style="margin:10px 0 0">Standard pharmacology. Breathing, blood pressure, heart rate and pain relief: ↓ lowers, ↑ raises, – little effect.</p>
+    <div class="chips"><button class="chip" data-fig="rec"><i></i>Where each drug acts</button><button class="chip" data-fig="offset"><i></i>Offset after stopping</button></div>
+  </div>
+  <div class="dgrid" id="druglist"></div>
+</div>
+
+<div class="panel" id="p-del" role="tabpanel" aria-labelledby="t-del">
+  <div class="card" id="cam">
+    <p class="label">CAM-ICU, step by step</p>
+    <div id="cam-steps"></div>
+    <div id="cam-out"></div>
+    <details class="more"><summary>More</summary>
+      <p>Screen every patient regularly with the CAM-ICU or the ICDSC (good practice statement). The ICDSC is an eight-item checklist scored over a shift; 4 or more is delirium.</p>
+      <p>Most ICU delirium is hypoactive: quiet, drowsy, inattentive. It is missed unless you test attention.</p>
+      <span class="tier">PADIS 2018 · good practice statement</span><span class="tier">Ely 2001 · Bergeron 2001</span>
+    </details>
+  </div>
+  <div class="card" id="causes">
+    <p class="label">Why is this patient delirious? Tap what you found</p>
+    <div class="seg" id="findseg" style="margin-top:0"></div>
+    <div id="causebox" style="margin-top:10px"></div>
+    <p class="note" style="margin:10px 0 0">Expert practice. Delirium usually has more than one cause; keep looking after the first.</p>
+  </div>
+  <div class="card" id="del-treat">
+    <p class="label">Treating delirium</p>
+    <p class="head">Fix causes and use the non-drug bundle. No routine antipsychotic.</p>
+    <span class="dose">Reorient · glasses and hearing aids · daylight, dark quiet nights · mobilize · lighten sedation</span>
+    <p class="whyline"><b>Why:</b> in two large placebo-controlled trials haloperidol did not improve the primary outcome (delirium-free days in one, days alive and out of hospital in the other), so drugs are for distress or dangerous agitation, not for the diagnosis.</p>
+    <div class="guard">Agitation that is blocking weaning or extubation: dexmedetomidine. Check the QTc before and during any antipsychotic. <a href="/qtc/">QT risk checker</a></div>
+    <details class="more"><summary>More</summary>
+      <p><b>What the guidelines say.</b> 2018: suggest not routinely using haloperidol or an atypical antipsychotic. 2025: unable to recommend for or against antipsychotics. No drug is recommended just to prevent delirium (2018). Melatonin is suggested over no melatonin (2025); the guideline gives no dose.</p>
+      <p><b>What the trials used</b> (not a recommendation). Haloperidol 2.5 mg IV three times daily plus 2.5 mg as needed, at most 20 mg a day (AID-ICU). Quetiapine 50 mg every 12 hours, raised by 50 mg per dose each day to at most 200 mg every 12 hours (a 36-patient pilot).</p>
+      <p><b>Haloperidol's label.</b> Intramuscular only, 2 to 5 mg, at most 20 mg a day. It is not approved for intravenous use; if given IV, monitor the ECG for QTc prolongation and arrhythmias.</p>
+      <p>Stop any antipsychotic before the patient leaves the ICU unless there is a reason to continue.</p>
+      <span class="tier">PADIS 2018 · conditional, low</span><span class="tier">PADIS 2025 · no recommendation</span><span class="tier">Non-drug bundle · conditional, low</span>
+    </details>
+  </div>
+</div>
+
+<div class="panel" id="p-learn" role="tabpanel" aria-labelledby="t-learn">
+  <div class="pills" id="pills"></div>
+  <div class="card chap" id="learn-pain" data-pill="Pain">
+    <h2>Pain drives agitation</h2>
+    <p>A patient who cannot speak shows pain as restlessness and fighting the ventilator. Score it, treat it, then decide whether any sedative is needed. Tap each row to score.</p>
+    <div id="cpot"></div>
+    <p class="line1" id="cpot-out"></p>
+  </div>
+  <div class="card chap" id="learn-depth" data-pill="Depth">
+    <h2>Light beats deep</h2>
+    <p>Light sedation means the patient wakes to voice. It shortens time on the ventilator. Tap a level to see what it looks like at the bedside.</p>
+    <div data-figure="rassfig"></div>
+  </div>
+  <div class="card chap" id="learn-benzo" data-pill="Benzodiazepines">
+    <h2>Why not a benzodiazepine infusion</h2>
+    <p>Midazolam and lorazepam accumulate, wake slowly and are linked to more delirium. They keep three jobs: alcohol or benzodiazepine withdrawal, seizures, and deep sedation when propofol cannot be used.</p>
+    <div class="chips"><button class="chip" data-fig="offset"><i></i>Offset after stopping</button></div>
+  </div>
+  <div class="card chap" id="learn-choice" data-pill="Propofol or dex">
+    <h2>Propofol or dexmedetomidine</h2>
+    <p>Propofol can take a patient to any depth and stops breathing as it goes. Dexmedetomidine gives a rousable, sleep-like state and has little effect on the drive to breathe, but it is unreliable for deep sedation and it slows the heart.</p>
+    <div data-figure="rec"></div>
+  </div>
+  <div class="card chap" id="learn-prop" data-pill="Propofol dose">
+    <h2>How much propofol is too much</h2>
+    <label for="pslide" class="note">Propofol rate, mcg/kg/min</label>
+    <input type="range" id="pslide" min="0" max="100" step="5" value="25">
+    <div id="pslide-out"></div>
+  </div>
+  <div class="card chap" id="learn-del" data-pill="Delirium">
+    <h2>Delirium is inattention</h2>
+    <p>Delirium is an acute, fluctuating failure of attention. The agitated form is obvious. The quiet form is far more common and is found only by testing. Each day of it is linked to worse outcomes, and the things that cause it are mostly things we do.</p>
+    <div class="row"><button class="btn ghost" id="go-cam">Run the CAM-ICU</button></div>
+  </div>
+  <div class="card chap" id="learn-anti" data-pill="Antipsychotics">
+    <h2>What antipsychotics do and do not do</h2>
+    <p>They calm. They have not been shown to shorten delirium or coma. That is why they are kept for distressing symptoms or dangerous agitation, at a low dose, with a stop date.</p>
+  </div>
+  <div class="card chap" id="learn-nmb" data-pill="Paralysis">
+    <h2>Paralysis hides everything</h2>
+    <p>A paralysed patient cannot move, grimace or breathe against you, so pain and awareness are invisible. Sedate deeply first. When the dose is titrated, the nerve stimulator shows how much block there is.</p>
+    <div data-figure="tof"></div>
+  </div>
+  <div class="card" id="trials">
+    <p class="label">The trials behind this</p>
+    <div id="trialbox"></div>
+  </div>
+  <div class="row"><button class="btn" id="go-prac">Practice cases</button></div>
+</div>
+
+<div class="panel" id="p-prac" role="tabpanel" aria-labelledby="t-prac">
+  <div id="practice"></div>
+</div>
+
+<div class="scrim" id="scrim" hidden></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-t" hidden>
+  <div class="sheethead"><h2 id="sheet-t"></h2><button class="xbtn" id="sheet-x">Close</button></div>
+  <div id="sheet-b"></div>
+</div>
+
+<footer>
+<p>For education only. Not a substitute for clinical judgment.</p>
+<p>Privacy: everything runs in your browser. Nothing you enter is sent anywhere or stored, and there are no analytics. Do not enter names, record numbers, or dates of birth.</p>
+<p><b>Last reviewed:</b> 24 November 2026</p>
+<p><b>Sources:</b> SCCM PADIS guideline 2018 (Devlin, Crit Care Med 2018;46:e825) and its 2025 focused update (Lewis, Crit Care Med 2025;53:e711); SCCM pain, agitation and delirium guideline 2013, dose tables 3, 4 and 6 (Barr, Crit Care Med 2013;41:263); SCCM neuromuscular blockade in ARDS guideline 2026 (Erstad, Crit Care Med 2026;54:634); FDA labels for propofol, dexmedetomidine, midazolam, lorazepam, fentanyl, haloperidol, cisatracurium and rocuronium; RASS (Sessler 2002), CPOT (Gélinas 2006), CAM-ICU (Ely 2001), ICDSC (Bergeron 2001); trials cited on the Learn tab. Evidence tier is shown on each card. Adjust drug concentrations, order sets and triglyceride monitoring to your institution.</p>
+</footer>
+</div>
+
+<script>
+(function(){
+'use strict';
+function $(id){ return document.getElementById(id); }
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function r0(x){ return Math.round(x); }
+function r1(x){ return Math.round(x * 10) / 10; }
+function sig(x){ return x >= 100 ? r0(x) : x >= 10 ? r0(x) : r1(x); }
+function rng2(a, b, u){ return sig(a) + '–' + sig(b) + ' ' + u; }
+
+/* ---------- Data: every number here is in the decision table ---------- */
+var RASS = [[4,'Combative','Violent, a danger to staff'],[3,'Very agitated','Pulls at tubes and lines, aggressive'],[2,'Agitated','Frequent purposeless movement, fights the ventilator'],[1,'Restless','Anxious, movements not aggressive'],[0,'Alert and calm',''],[-1,'Drowsy','Wakes to voice, eye contact for more than 10 seconds'],[-2,'Light sedation','Wakes briefly to voice, eye contact under 10 seconds'],[-3,'Moderate sedation','Moves or opens eyes to voice, no eye contact'],[-4,'Deep sedation','No response to voice; moves or opens eyes to touch'],[-5,'Unarousable','No response to voice or touch']];
+var LIGHT = [-2, 1], DEEP = [-5, -4];
+var REASONS = [['nmb','Paralysis'],['ards','ARDS dyssynchrony'],['icp','Raised ICP'],['se','Status epilepticus']];
+var TICKS = [['intub','Intubated'],['pain','Significant pain'],['pressor','On a pressor or MAP under 65'],['brady','Heart rate under 50 or heart block'],['wd','Alcohol or benzodiazepine withdrawal'],['sz','Seizures'],['extub','Extubation within 24 h'],['agdel','Agitated delirium blocking weaning'],['bzinf','On a benzodiazepine infusion'],['pris','Propofol warning: high dose over 48 h with acidosis, rising CK or arrhythmia'],['liver','Liver failure'],['kidney','Kidney failure']];
+var D = { /* doses: PAD 2013 Tables 3, 4, 6; FDA labels */
+  fentB:[0.35,0.5], fentI:[0.7,10], hmB:[0.2,0.6], hmI:[0.5,3], morB:[2,4], morI:[2,30],
+  propStart:5, propStep:[5,10], propUsual:[5,50], propCeil:4, prisRate:5, prisH:48, propKcal:1.1, propConc:10,
+  dex:[0.2,0.7], dexLoad:1, dexMax13:1.5,
+  midL:[0.01,0.05], midI:[0.02,0.1], lorL:[0.02,0.04], lorLmax:2, lorI:[0.01,0.1], lorImax:10,
+  ketB:0.5, ketI:[1,2], ket13L:[0.1,0.5], ket13I:[0.05,0.4],
+  cisB:[0.15,0.2], cisI:3, cisR:[0.5,10.2], rocB:[0.6,1.2], rocI:[10,12]
+};
+function mgh(mcgkgmin, w){ return mcgkgmin * w * 60 / 1000; }
+
+/* ---------- Engine ---------- */
+function plan(i){
+  var o = {prompt:false, pain:null, depth:null, drug:null, guards:[], why:'', more:[], tiers:[], figs:[]};
+  var w = i.wt > 0 ? i.wt : null;
+  if (i.rass == null){ o.prompt = true; return o; }
+  var band = i.target === 'deep' ? DEEP : LIGHT;
+  /* Pain */
+  if (i.pain){
+    var d = [w ? 'Fentanyl ' + rng2(D.fentB[0]*w, D.fentB[1]*w, 'mcg') + ' IV every 0.5–1 h' : 'Fentanyl 0.35–0.5 mcg/kg IV every 0.5–1 h',
+             w ? 'or infusion ' + rng2(D.fentI[0]*w, D.fentI[1]*w, 'mcg/h') : 'or infusion 0.7–10 mcg/kg/h',
+             'Hydromorphone 0.2–0.6 mg IV every 1–2 h'];
+    if (!i.kidney) d.push('Morphine 2–4 mg IV every 1–2 h');
+    o.pain = {head:'Treat pain before changing sedation', dose:d};
+    if (i.kidney) o.guards.push('Kidney failure: not morphine; its active metabolite accumulates. Hydromorphone also accumulates: smaller doses.');
+    o.more.push('Add acetaminophen (650 mg IV every 4 h to 1,000 mg every 6 h, at most 4 g a day) to lower the opioid dose. Add gabapentin, pregabalin or carbamazepine for neuropathic pain. Low-dose ketamine (0.5 mg/kg once, then 1–2 mcg/kg/min) is an option after surgery. IV lidocaine and NSAIDs are not routine adjuncts.');
+    o.tiers.push('Pain first: good practice statement');
+  } else {
+    o.pain = {head:'Score pain first, every time', dose:['CPOT above 2 is significant pain. Ask the patient who can answer.']};
+  }
+  o.figs.push(['cpotfig','CPOT']);
+  if (i.liver) o.guards.push('Liver failure: opioids and midazolam accumulate, so use smaller doses and longer intervals. Reduce dexmedetomidine.');
+  /* Depth */
+  var benzoOK = !!(i.wd || i.sz), seiz = !!(i.sz || (i.target === 'deep' && i.reason === 'se'));
+  var gap = i.rass > band[1] ? i.rass - band[1] : i.rass < band[0] ? i.rass - band[0] : 0;
+  var tname = i.target === 'deep' ? 'deep target (−4 to −5)' : 'light target (−2 to +1)';
+  var here = 'RASS ' + fmt(i.rass) + ' · ' + tname;
+  var risk = !i.intub && i.rass <= -3;
+  if (i.target === 'deep' && !i.intub && gap <= 0) o.depth = {head:'Deeply sedated without a secured airway: secure the airway now or lighten', dose:[here]};
+  else if (risk) o.depth = {head:'Deeper than target: hold sedatives', dose:[here, 'Hold sedatives; recheck RASS']};
+  else if (gap === 0) o.depth = {head:'At target: keep the lowest dose that holds it', dose:[here]};
+  else if (gap < 0) o.depth = {head:'Deeper than target: halve or pause the sedative', dose:[here, i.wd ? 'No awakening trial during alcohol withdrawal; hold doses until rousable' : 'Awakening trial if the safety screen passes; recheck RASS']};
+  else if (i.target === 'deep') o.depth = {head:'Lighter than the deep target', dose:[here, !i.intub ? 'Do not deepen until the airway is secured' : i.pressor ? 'Raise the infusion in steps until RASS −4 to −5; no bolus on a pressor' : 'Bolus and raise the sedative until RASS −4 to −5']};
+  else o.depth = {head:'More agitated than target: find the cause first', dose:[here, 'Pain · delirium · ventilator dyssynchrony · withdrawal · full bladder · hypoxemia']};
+  o.gap = gap;
+  if (i.target !== 'deep' && gap < 0 && !i.wd && !risk) o.more.push('Awakening trial screen: no active seizures, no alcohol withdrawal, no paralytic, no myocardial ischaemia in 24 h, no raised intracranial pressure, not on rising doses for agitation. If the patient fails, restart at half the previous dose.');
+  if (i.target === 'deep' && i.reason === 'nmb') o.guards.push('Reach RASS −4 to −5 before the first paralytic dose and do not lighten sedation during the block; the scale cannot be scored once the block is on.');
+  /* Drug */
+  var prop = w ? 'Propofol: start ' + D.propStart + ' mcg/kg/min = ' + sig(mgh(D.propStart, w)) + ' mg/h; usual ' + rng2(mgh(D.propUsual[0], w), mgh(D.propUsual[1], w), 'mg/h') : 'Propofol: start 5 mcg/kg/min; usual 5–50 mcg/kg/min';
+  var dex = w ? 'Dexmedetomidine: 0.2–0.7 mcg/kg/h = ' + rng2(D.dex[0]*w, D.dex[1]*w, 'mcg/h') : 'Dexmedetomidine: 0.2–0.7 mcg/kg/h';
+  var mid = w ? 'Midazolam: ' + rng2(D.midI[0]*w, D.midI[1]*w, 'mg/h') + (i.pressor ? '' : ' after ' + rng2(D.midL[0]*w, D.midL[1]*w, 'mg')) : 'Midazolam: ' + (i.pressor ? '' : '0.01–0.05 mg/kg, then ') + '0.02–0.1 mg/kg/h';
+  var lor = w ? 'Lorazepam: ' + lorDose(w) + ' IV, repeat as needed' : 'Lorazepam: 0.02–0.04 mg/kg (at most 2 mg) IV, repeat as needed';
+  function low(x){ return x.charAt(0).toLowerCase() + x.slice(1); }
+  if (i.pris) o.guards.unshift('Possible propofol infusion syndrome: stop propofol now and change agent. Check lactate, CK, triglycerides, potassium and an ECG.');
+  if (i.target === 'deep' && !i.intub){
+    o.drug = {head:'Secure the airway before deep sedation', dose:['No sedative infusion to a deep target without a protected airway'], rule:'C7'};
+    o.why = 'Deep sedation removes airway reflexes and the drive to breathe, so the airway comes first.';
+    o.tiers.push('Expert practice');
+  } else if (risk){
+    o.drug = {head:'No sedative: stop or hold sedatives and assess the airway', dose:['Look for another cause of the low level of consciousness'], rule:'C7'};
+    o.why = 'A patient this deeply sedated without a tube may not protect the airway, so more sedative is the wrong direction.';
+    o.tiers.push('Expert practice');
+    o.guards.push('Not intubated and RASS −3 or deeper: the airway is at risk. Stop sedatives, look for another cause, and call for help if the patient cannot protect the airway.');
+  } else if (i.target === 'deep'){
+    o.drug = i.pris ? {head:'Deep sedation without propofol: midazolam', dose:[mid], rule:'C2'} : {head:'Propofol; dexmedetomidine is unreliable at this depth', dose:[prop, 'If propofol is not tolerated: ' + low(mid)], rule:'C2'};
+    if ((benzoOK || seiz) && !i.pris) o.drug.dose.push('Withdrawal or seizures: add a benzodiazepine');
+    o.why = i.pris ? 'The warning signs rule out propofol and dexmedetomidine is unreliable for deep sedation, which leaves midazolam.' : 'Dexmedetomidine is unreliable for deep sedation; the 2025 update says to consider another agent when deep sedation is required.';
+    o.tiers.push('PADIS 2025 · guideline text'); o.tiers.push('Midazolam fallback: expert practice');
+  } else if (benzoOK){
+    o.drug = {head:'A benzodiazepine is indicated here', dose:[lor].concat(i.intub ? [mid] : []).concat(i.intub && !i.pris ? ['Propofol if intubated and not controlled'] : []), rule:'C5'};
+    o.why = 'Withdrawal and seizures are the exceptions to the no-benzodiazepine rule: here the benzodiazepine treats the cause.';
+    o.tiers.push('Expert practice');
+    if (gap < 0) o.guards.push('Already deeper than target: hold further benzodiazepine until the patient is rousable.');
+    if (i.wd) o.guards.push('Alcohol withdrawal is dosed to symptoms and often needs repeated or larger doses than the sedation dose shown. Follow your withdrawal protocol.');
+  } else if (!i.intub && i.brady){
+    o.drug = {head:'No sedative infusion: treat the cause', dose:['Analgesia and non-drug measures first', 'If a sedative is unavoidable: small intermittent doses in a monitored bed'], rule:'C7'};
+    o.why = 'Without a secured airway a propofol infusion is unsafe, and bradycardia rules out dexmedetomidine.';
+    o.tiers.push('Expert practice');
+  } else if (!i.intub){
+    o.drug = {head:'Dexmedetomidine, or small intermittent doses', dose:[dex, 'No propofol infusion without a secured airway'], rule:'C7'};
+    o.why = 'Propofol stops breathing as the dose rises and its ICU indication is intubated, ventilated patients. Dexmedetomidine has little effect on the drive to breathe, but airway reflexes can be lost and this use is off-label: monitored bed only.';
+    o.tiers.push('Propofol: FDA label'); o.tiers.push('Dexmedetomidine here: expert practice, off-label');
+  } else if (i.brady){
+    o.drug = i.pris ? {head:'Avoid dexmedetomidine and propofol; use small intermittent doses', dose:['Analgesia first; ' + low(lor)], rule:'C3'} : {head:'Propofol; avoid dexmedetomidine', dose:[prop], rule:'C3'};
+    o.why = i.pris ? 'Bradycardia rules out dexmedetomidine and the warning signs rule out propofol, so use analgesia and small intermittent doses.' : 'Dexmedetomidine raises the risk of bradycardia (about 6 more cases per 100 patients) and its label reports sinus arrest.';
+    if (i.pris) o.tiers.push('Expert practice'); else { o.tiers.push('PADIS 2025 · moderate certainty'); o.tiers.push('FDA label'); }
+  } else if (i.extub || i.agdel){
+    o.drug = {head:'Dexmedetomidine', dose:[dex, 'It does not need to be stopped for extubation'], rule:'C6'};
+    o.why = i.agdel ? 'Dexmedetomidine is suggested when agitated delirium is preventing weaning or extubation; it sedates with little effect on the drive to breathe.' : 'Dexmedetomidine sedates with little effect on the drive to breathe, so it can run through extubation.';
+    if (i.agdel) o.tiers.push('PADIS 2018 · conditional, low'); o.tiers.push('FDA label');
+  } else {
+    o.drug = i.pris ? {head:'Dexmedetomidine', dose:[dex], rule:'C1'} : {head:'Propofol or dexmedetomidine', dose:[prop, dex, 'Prefer dexmedetomidine when light sedation or less delirium is the priority'], rule:'C1'};
+    o.why = i.pris ? 'The warning signs rule out propofol; dexmedetomidine is the other agent suggested over a benzodiazepine infusion.' : 'Both shorten time on the ventilator compared with a benzodiazepine infusion; dexmedetomidine adds less delirium at the cost of more bradycardia.';
+    o.tiers.push('PADIS 2018 · conditional, low'); if (!i.pris) o.tiers.push('PADIS 2025 · conditional, moderate');
+  }
+  if (i.pris && /^Dexmedetomidine/.test(o.drug.head)) o.guards.push('Check heart rate and rhythm before starting dexmedetomidine: infusion syndrome causes slow rhythms and heart failure.');
+  if (seiz) o.guards.push('For active seizures give the status epilepticus dose (lorazepam 4 mg IV slowly, repeated once after 10–15 minutes) and follow a seizure protocol; the doses on this page are sedation doses.');
+  if (i.bzinf && !benzoOK && i.target !== 'deep' && !risk){ o.drug.head = 'Change the benzodiazepine infusion. ' + o.drug.head; }
+  if (i.bzinf && !benzoOK) o.guards.push('If the benzodiazepine ran for days, taper it. Stopping abruptly can cause withdrawal.');
+  if (i.pressor) o.guards.push('On a pressor: no loading dose or bolus of propofol, dexmedetomidine or midazolam; start infusions at the lowest rate and expect the pressure to fall. Give any intermittent dose slowly at the low end. Do not withhold seizure treatment.');
+  if (i.kidney && (benzoOK || seiz || i.bzinf || i.target === 'deep')) o.guards.push('Kidney failure: midazolam\'s active metabolite accumulates; a lorazepam infusion carries propylene glycol.');
+  if (gap > 0 && i.target !== 'deep' && !i.pain && !benzoOK) o.why = 'Agitation is a symptom. ' + o.why;
+  o.more.push('Propofol: raise by 5–10 mcg/kg/min at least 5 minutes apart. Do not exceed 4 mg/kg/h' + (w ? ' (' + sig(D.propCeil * w) + ' mg/h)' : '') + ' unless benefit outweighs risk. Dexmedetomidine: the label range is 0.2–0.7 mcg/kg/h for up to 24 hours; the 2013 guideline allows up to 1.5 mcg/kg/h as tolerated. The label\'s loading dose (1 mcg/kg over 10 minutes) is best skipped in unstable patients.');
+  o.figs.push(['rec','Where each drug acts']);
+  return o;
+}
+function lorDose(w){ var a = Math.min(D.lorLmax, D.lorL[0]*w), b = Math.min(D.lorLmax, D.lorL[1]*w); return a === b ? sig(b) + ' mg' : rng2(a, b, 'mg'); }
+function fmt(n){ return n > 0 ? '+' + n : n < 0 ? '−' + Math.abs(n) : '0'; }
+
+function cam(i){ /* Ely 2001: feature 1 and 2 and (3 or 4) */
+  if (i.rass != null && i.rass <= -4) return {k:'na', head:'Cannot assess at RASS ' + fmt(i.rass), sub:'Too deeply sedated to test attention. Recheck when RASS is −3 or lighter.'};
+  if (i.f1 == null) return {k:'wait', step:1};
+  if (!i.f1) return {k:'neg', head:'CAM-ICU negative', sub:'No acute change or fluctuation in mental status.'};
+  if (i.err2 == null) return {k:'wait', step:2};
+  if (i.err2 <= 2) return {k:'neg', head:'CAM-ICU negative', sub:'Attention is intact (2 or fewer errors).'};
+  var f3 = i.rass != null ? i.rass !== 0 : i.f3;
+  if (f3 == null) return {k:'wait', step:3};
+  if (f3) return {k:'pos', head:'CAM-ICU positive: delirium', sub:'Acute change, inattention and an altered level of consciousness' + (i.rass != null ? ' (RASS ' + fmt(i.rass) + ')' : '') + '. ' + (i.rass != null && i.rass < 0 ? 'This is the hypoactive form.' : '')};
+  if (i.err4 == null) return {k:'wait', step:4};
+  if (i.err4 > 1) return {k:'pos', head:'CAM-ICU positive: delirium', sub:'Acute change, inattention and disorganized thinking.'};
+  return {k:'neg', head:'CAM-ICU negative', sub:'Inattentive, but alert and thinking is organized. Recheck next shift.'};
+}
+
+/* ---------- State and Plan tab ---------- */
+var st = {rass:null, target:'light', reason:'nmb', wt:null, intub:true};
+function inputs(){ var i = {}; Object.keys(st).forEach(function(k){ i[k] = st[k]; }); return i; }
+function inBand(n){ var b = st.target === 'deep' ? DEEP : LIGHT; return n >= b[0] && n <= b[1]; }
+function drawLadder(){
+  $('rungs').innerHTML = RASS.map(function(r){ return '<button class="rung' + (inBand(r[0]) ? ' band' : '') + '" data-r="' + r[0] + '" aria-pressed="' + (st.rass === r[0]) + '"><b>' + fmt(r[0]) + '</b><span>' + esc(r[1]) + '</span>' + (st.rass === r[0] ? '<span class="tag">Now</span>' : '<span></span>') + '</button>'; }).join('');
+  var h;
+  if (st.rass == null) h = '<span class="big">Where is the patient now?</span><p>The shaded band is the target. Light sedation means waking to voice.</p>';
+  else { var o = plan(inputs()); var g = o.gap; var row = RASS.filter(function(r){ return r[0] === st.rass; })[0];
+    h = '<span class="big">' + (g === 0 ? 'At target' : Math.abs(g) + (g < 0 ? ' too deep' : ' too agitated')) + '</span><p>' + esc(row[2] || 'Calm, attends to you.') + '</p>'; }
+  $('read').innerHTML = h;
+  $('tseg').innerHTML = [['light','Light, −2 to +1'],['deep','Deep, −4 to −5']].map(function(t){ return '<button class="sbtn" data-t="' + t[0] + '" aria-pressed="' + (st.target === t[0]) + '">' + t[1] + '</button>'; }).join('');
+  $('rseg').hidden = st.target !== 'deep';
+  $('rseg').innerHTML = REASONS.map(function(t){ return '<button class="sbtn" data-rs="' + t[0] + '" aria-pressed="' + (st.reason === t[0]) + '">' + t[1] + '</button>'; }).join('');
+}
+function drawTicks(){ $('ticks').innerHTML = TICKS.map(function(t){ return '<button class="sbtn" data-k="' + t[0] + '" aria-pressed="' + (!!st[t[0]]) + '">' + esc(t[1]) + '</button>'; }).join(''); }
+function planHtml(o, noIds){
+  if (o.prompt) return '<div class="card"' + (noIds ? '' : ' id="plan"') + '><p class="label">Plan</p><p class="note" style="margin:0">Tap the patient\'s RASS on the ladder to build the plan: pain, depth, then drug.</p></div>';
+  function ln(k, x){ return '<div class="line"><span class="k">' + k + '</span><div><p class="head">' + esc(x.head) + '</p>' + x.dose.map(function(d){ return '<span class="dose">' + esc(d) + '</span>'; }).join('') + '</div></div>'; }
+  var pris = o.guards.length && /propofol infusion syndrome/.test(o.guards[0]);
+  return '<div class="card"' + (noIds ? '' : ' id="plan"') + '><p class="label">Plan</p>' +
+    (pris ? '<div class="guard" style="margin:0 0 12px">' + esc(o.guards[0]) + '</div>' : '') +
+    ln('Pain', o.pain) + ln('Depth', o.depth) + ln('Drug', o.drug) +
+    o.guards.slice(pris ? 1 : 0).map(function(g){ return '<div class="guard">' + esc(g) + '</div>'; }).join('') +
+    '<p class="whyline"><b>Why:</b> ' + esc(o.why) + '</p>' +
+    (noIds ? '' : '<div class="chips">' + o.figs.map(function(f){ return '<button class="chip" data-fig="' + f[0] + '"><i></i>' + esc(f[1]) + '</button>'; }).join('') + '</div>') +
+    '<details class="more"><summary>More</summary>' + o.more.map(function(m){ return '<p>' + esc(m) + '</p>'; }).join('') + o.tiers.map(function(t){ return '<span class="tier">' + esc(t) + '</span>'; }).join('') + '<p style="margin-top:8px"><a href="/pressors/">Pressors</a> · <a href="/vent/">Ventilator</a> · <a href="/qtc/">QT risk</a></p></details></div>';
+}
+function render(){
+  drawLadder(); drawTicks();
+  $('plan-out').innerHTML = planHtml(plan(inputs()));
+  var w = st.wt;
+  $('nmb-dose').textContent = w ? 'Cisatracurium ' + rng2(D.cisB[0]*w, D.cisB[1]*w, 'mg') + ' IV, then ' + sig(D.cisI * w * 60 / 1000) + ' mg/h (3 mcg/kg/min; reported range 0.5–10.2)' : 'Cisatracurium 0.15–0.2 mg/kg IV, then 3 mcg/kg/min (reported range 0.5–10.2)';
+  drawDrugs(); drawCam();
+}
+$('rungs').addEventListener('click', function(e){ var b = e.target.closest('[data-r]'); if (b){ st.rass = +b.getAttribute('data-r'); render(); } });
+$('tseg').addEventListener('click', function(e){ var t = e.target.getAttribute('data-t'); if (t){ st.target = t; render(); } });
+$('rseg').addEventListener('click', function(e){ var t = e.target.getAttribute('data-rs'); if (t){ st.reason = t; render(); } });
+$('ticks').addEventListener('click', function(e){ var k = e.target.getAttribute('data-k'); if (k){ st[k] = !st[k]; render(); } });
+function setW(v){ var n = parseFloat(v); st.wt = n >= 30 && n <= 250 ? n : null; }
+$('wt').addEventListener('input', function(){ setW(this.value); $('wt2').value = this.value; render(); });
+$('wt2').addEventListener('input', function(){ setW(this.value); $('wt').value = this.value; render(); });
+
+/* ---------- Drugs tab ---------- */
+var EFF = [['Propofol','↓','↓↓','↓','–'],['Dexmedetomidine','–','↓','↓↓','some'],['Midazolam','↓','↓','–','–'],['Fentanyl','↓↓','↓','↓','↑↑'],['Ketamine','–','↑','↑','↑']];
+$('effgrid').innerHTML = ['','Breath','BP','Pulse','Pain'].map(function(h){ return '<div class="h">' + h + '</div>'; }).join('') + EFF.map(function(r){ return '<div class="n">' + r[0] + '</div>' + r.slice(1).map(function(c){ return '<div>' + c + '</div>'; }).join(''); }).join('');
+function drawDrugs(){
+  var w = st.wt;
+  function conv(s){ return w ? '<div class="conv">' + s + '</div>' : ''; }
+  var L = [
+   {id:'d-prop', n:'Propofol', use:'Any depth; first choice for deep sedation', dose:'Start 5 mcg/kg/min. Raise by 5–10 mcg/kg/min, at least 5 min apart. Usual 5–50 mcg/kg/min.', c: w ? 'At ' + w + ' kg: start ' + sig(mgh(5,w)) + ' mg/h · usual ' + rng2(mgh(5,w), mgh(50,w), 'mg/h') + ' · label ceiling ' + sig(4*w) + ' mg/h' : '', on:'1–2 min', watch:'Hypotension, apnoea, high triglycerides, pancreatitis, infusion syndrome. 1.1 kcal/mL as fat. Bolus (10–20 mg) only when hypotension is unlikely.', g:'Do not exceed 4 mg/kg/h unless benefit outweighs risk. Infusion syndrome is linked to more than 5 mg/kg/h for more than 48 h.', src:'FDA label · PAD 2013 Table 6'},
+   {id:'d-dex', n:'Dexmedetomidine', use:'Light sedation, agitated delirium, through extubation', dose:'0.2–0.7 mcg/kg/h. Skip the loading dose in unstable patients.', c: w ? 'At ' + w + ' kg: ' + rng2(0.2*w, 0.7*w, 'mcg/h') : '', on:'5–10 min', watch:'Bradycardia, sinus arrest, hypotension; brief hypertension with a loading dose. Tolerance, withdrawal and fever with longer use. Reduce in liver impairment and over age 65.', g:'Unreliable for deep sedation. Avoid with a heart rate under 50 or heart block (expert practice; the label advises caution in advanced heart block).', more:'Label: up to 0.7 mcg/kg/h, not beyond 24 hours. The 2013 guideline allows up to 1.5 mcg/kg/h as tolerated, and trials have run it for days.', src:'FDA label · PAD 2013 Table 6'},
+   {id:'d-mid', n:'Midazolam', use:'Withdrawal, seizures, deep sedation when propofol cannot be used', dose:'Load 0.01–0.05 mg/kg over several minutes, then 0.02–0.1 mg/kg/h.', c: w ? 'At ' + w + ' kg: load ' + rng2(0.01*w, 0.05*w, 'mg') + ' · ' + rng2(0.02*w, 0.1*w, 'mg/h') : '', on:'2–5 min', watch:'Respiratory depression, hypotension, delirium. Accumulates with long infusions, obesity, age, heart and liver failure.', g:'Kidney failure: the active metabolite accumulates to about ten times the parent drug.', src:'PAD 2013 Table 6 · FDA label'},
+   {id:'d-lor', n:'Lorazepam', use:'Withdrawal, seizures; intermittent doses', dose:'0.02–0.04 mg/kg (at most 2 mg), then 0.02–0.06 mg/kg every 2–6 h as needed, or 0.01–0.1 mg/kg/h (at most 10 mg/h).', c: w ? 'At ' + w + ' kg: ' + lorDose(w) + ' per dose' : '', on:'15–20 min', watch:'Respiratory depression, hypotension, delirium.', g:'Infusions carry propylene glycol: lactic acidosis, high osmolality, hypotension, more likely in kidney impairment. The label advises against use in liver or kidney failure. These are sedation doses, not seizure doses.', src:'PAD 2013 Table 6 · FDA label'},
+   {id:'d-fent', n:'Fentanyl', use:'First-line opioid; less hypotension than morphine', dose:'0.35–0.5 mcg/kg IV every 0.5–1 h, or 0.7–10 mcg/kg/h.', c: w ? 'At ' + w + ' kg: ' + rng2(0.35*w, 0.5*w, 'mcg') + ' per dose · ' + rng2(0.7*w, 10*w, 'mcg/h') : '', on:'1–2 min', watch:'Accumulates with long infusions and liver impairment. Chest wall rigidity with fast, large doses. Serotonin syndrome with serotonergic drugs.', src:'PAD 2013 Table 3 · FDA label'},
+   {id:'d-hm', n:'Hydromorphone and morphine', use:'Alternatives to fentanyl', dose:'Hydromorphone 0.2–0.6 mg IV every 1–2 h, or 0.5–3 mg/h. Morphine 2–4 mg IV every 1–2 h, or 2–30 mg/h.', c:'', on:'Hydromorphone 5–15 min; morphine 5–10 min', watch:'Both accumulate in liver and kidney impairment. Morphine releases histamine.', g:'Kidney failure: avoid morphine; its active metabolite accumulates.', src:'PAD 2013 Table 3'},
+   {id:'d-ket', n:'Ketamine', use:'Opioid-sparing adjunct after surgery', dose:'0.5 mg/kg IV once, then 1–2 mcg/kg/min.', c: w ? 'At ' + w + ' kg: ' + sig(0.5*w) + ' mg, then ' + rng2(mgh(1,w), mgh(2,w), 'mg/h') : '', on:'30–40 s', watch:'Hallucinations and other psychological disturbances.', more:'The 2013 table gives a wider range: 0.1–0.5 mg/kg, then 0.05–0.4 mg/kg/h.', src:'PADIS 2018 · conditional, very low'},
+   {id:'d-nmb', n:'Cisatracurium and rocuronium', use:'Paralysis, after deep sedation', dose:'Cisatracurium 0.15–0.2 mg/kg, then 3 mcg/kg/min (range 0.5–10.2). Rocuronium 0.6–1.2 mg/kg for rapid sequence intubation; infusion 10–12 mcg/kg/min.', c: w ? 'At ' + w + ' kg: cisatracurium ' + rng2(0.15*w, 0.2*w, 'mg') + ', then ' + sig(mgh(3,w)) + ' mg/h · rocuronium ' + rng2(0.6*w, 1.2*w, 'mg') : '', on:'Rocuronium about 1 min; cisatracurium about 2–3 min', watch:'Cisatracurium clears without the liver or kidney. Rocuronium lasts about 1.5 times longer in liver disease and has not been studied for long-term ICU use. Prolonged weakness with long use, more so with steroids.', g:'No effect on consciousness or pain. Never without sedation and analgesia.', src:'FDA labels'}
+  ];
+  $('druglist').innerHTML = L.map(function(d){ return '<div class="card" id="' + d.id + '"><h2>' + esc(d.n) + '</h2><p class="sub" style="margin:0 0 6px">' + esc(d.use) + '</p><span class="dose">' + esc(d.dose) + '</span>' + conv(esc(d.c)) + (d.g ? '<div class="guard">' + esc(d.g) + '</div>' : '') + '<details class="more"><summary>More</summary><div class="kv"><span>Onset</span><span>' + esc(d.on) + '</span><span>Watch for</span><span>' + esc(d.watch) + '</span></div>' + (d.more ? '<p style="margin-top:8px">' + esc(d.more) + '</p>' : '') + '<span class="tier">' + esc(d.src) + '</span></details></div>'; }).join('');
+}
+
+/* ---------- Delirium tab ---------- */
+var cs = {};
+function drawCam(){
+  var i = {rass: st.rass, f1: cs.f1, err2: cs.err2, f3: cs.f3, err4: cs.err4}, r = cam(i);
+  function yn(key, a, b){ return '<div class="seg">' + [[true,a],[false,b]].map(function(x){ return '<button class="sbtn" data-cam="' + key + '" data-v="' + x[0] + '" aria-pressed="' + (cs[key] === x[0]) + '">' + x[1] + '</button>'; }).join('') + '</div>'; }
+  function num(key, n){ var h = '<div class="seg">'; for (var k = 0; k <= n; k++) h += '<button class="sbtn" data-cam="' + key + '" data-v="' + k + '" aria-pressed="' + (cs[key] === k) + '">' + k + (k === n ? '+' : '') + '</button>'; return h + '</div>'; }
+  var steps = [];
+  if (r.k === 'na'){ $('cam-steps').innerHTML = ''; }
+  else {
+    steps.push('<div class="step"><b>1 · Acute change or fluctuating course</b><span class="note">Different from baseline, or RASS has varied in the last 24 hours?</span>' + yn('f1','Yes','No') + '</div>');
+    if (cs.f1) steps.push('<div class="step"><b>2 · Inattention</b><span class="note">"Squeeze my hand when I say A": S A V E A H A A R T. Count errors (missed A, or squeeze on another letter).</span>' + num('err2', 4) + '</div>');
+    if (cs.f1 && cs.err2 > 2 && st.rass == null) steps.push('<div class="step"><b>3 · Altered level of consciousness</b><span class="note">Is RASS anything other than 0 right now?</span>' + yn('f3','Yes','No') + '</div>');
+    if (cs.f1 && cs.err2 > 2 && (st.rass === 0 || (st.rass == null && cs.f3 === false))) steps.push('<div class="step"><b>4 · Disorganized thinking</b><span class="note">Four yes/no questions (Will a stone float on water? Are there fish in the sea? Does one pound weigh more than two? Can you use a hammer to pound a nail?) and a two-step command. Count errors.</span>' + num('err4', 3) + '</div>');
+    $('cam-steps').innerHTML = steps.join('');
+  }
+  $('cam-out').innerHTML = r.k === 'wait' ? '' : '<div class="step"><p class="head">' + esc(r.head) + '</p><p class="sub">' + esc(r.sub) + '</p>' + (r.k === 'pos' ? '<p class="whyline"><b>Why:</b> delirium is diagnosed by inattention with an acute change, plus either an altered level of consciousness or disorganized thinking.</p>' : '') + '</div>' + (st.rass != null ? '<p class="note" style="margin:6px 0 0">Using RASS ' + fmt(st.rass) + ' from the Plan tab.</p>' : '');
+}
+$('cam').addEventListener('click', function(e){ var k = e.target.getAttribute('data-cam'); if (!k) return; var v = e.target.getAttribute('data-v'); cs[k] = v === 'true' ? true : v === 'false' ? false : +v; if (k === 'f1'){ delete cs.err2; delete cs.f3; delete cs.err4; } if (k === 'err2'){ delete cs.f3; delete cs.err4; } drawCam(); });
+var FIND = [['drug','New sedative, opioid or anticholinergic'],['inf','Fever or new infection'],['gas','Low oxygen or high CO2'],['etoh','Heavy alcohol use, day 2 to 4'],['met','Sodium, glucose, urea or calcium off'],['ret','Full bladder or no stool for days'],['sleep','Awake all night'],['pain','Pain score high']];
+var CAUSES = [['Drugs','drug','Benzodiazepines, opioids, anticholinergics, steroids: stop or reduce'],['Infection','inf','Look for a source; sepsis often shows as delirium first'],['Hypoxemia or hypercapnia','gas','Blood gas; treat the lungs, not the agitation'],['Withdrawal','etoh','Alcohol, benzodiazepines, opioids, nicotine'],['Metabolic','met','Correct slowly; check liver and kidney function'],['Retention and constipation','ret','Bladder scan; bowel regimen'],['Sleep loss','sleep','Lights, noise, clustered care at night'],['Pain','pain','Score and treat; see the Plan tab'],['Immobility and restraints','','Mobilize; remove lines and restraints that are not needed']];
+var fs = {};
+function drawCauses(){
+  $('findseg').innerHTML = FIND.map(function(f){ return '<button class="sbtn" data-f="' + f[0] + '" aria-pressed="' + (!!fs[f[0]]) + '">' + esc(f[1]) + '</button>'; }).join('');
+  var any = Object.keys(fs).some(function(k){ return fs[k]; });
+  $('causebox').innerHTML = CAUSES.map(function(c){ var on = c[1] && fs[c[1]]; return '<div class="cause ' + (on ? 'fav' : any ? 'less' : '') + '"><span>' + esc(c[0]) + '</span><small>' + esc(c[2]) + '</small></div>'; }).join('');
+}
+$('findseg').addEventListener('click', function(e){ var f = e.target.getAttribute('data-f'); if (f){ fs[f] = !fs[f]; drawCauses(); } });
+
+/* ---------- Figures ---------- */
+function svg(h, vb){ return '<svg class="fig" viewBox="0 0 350 ' + vb + '" role="img" aria-hidden="true">' + h + '</svg>'; }
+function tx(x, y, s, o){ o = o || {}; return '<text x="' + x + '" y="' + y + '" font-size="' + (o.z || 11.5) + '" text-anchor="' + (o.a || 'start') + '" fill="' + (o.f || 'var(--ink)') + '"' + (o.b ? ' font-weight="600"' : '') + ' style="font-family:var(--mono)">' + esc(s) + '</text>'; }
+var CP = [['Face',['Relaxed','Tense, frowning','Grimacing']],['Body movement',['None','Guarding, slow','Restless, pulling at tubes']],['Ventilator',['Tolerating','Coughing but tolerating','Fighting the ventilator']],['Muscle tension',['Relaxed','Tense, rigid','Very tense or rigid']]];
+var REC = {gaba:{n:'Propofol, benzodiazepines', x:60, r:'GABA-A', line:'They open the GABA-A chloride channel across the brain. Depth has no ceiling: sedation, then anaesthesia, then apnoea.'},
+  a2:{n:'Dexmedetomidine', x:140, r:'α2', line:'It switches off the locus coeruleus, the brainstem\'s arousal centre, through α2 receptors. The result resembles sleep: rousable, breathing largely preserved, heart rate slowed.'},
+  mu:{n:'Opioids', x:220, r:'μ', line:'They act at μ receptors in the pain pathways and brainstem: strong analgesia, and a slower respiratory rate as the dose rises.'},
+  nmda:{n:'Ketamine', x:300, r:'NMDA', line:'It blocks NMDA receptors: analgesia and dissociation with breathing and blood pressure maintained.'}};
+var FIGS = {
+  rec:{t:'Where each drug acts', states:['gaba','a2','mu','nmda'], data:REC, svg:function(k){
+    var h = '<rect x="10" y="78" width="330" height="20" rx="10" fill="var(--fill)" stroke="var(--line)"/>' + tx(175, 142, 'receptors in the neuron membrane', {a:'middle', f:'var(--muted)', z:10.5});
+    Object.keys(REC).forEach(function(q){ var r = REC[q], on = q === k; h += '<rect x="' + (r.x - 30) + '" y="52" width="60" height="72" rx="10" fill="' + (on ? 'var(--accent)' : 'var(--card)') + '" stroke="' + (on ? 'var(--accent)' : 'var(--muted)') + '" opacity="' + (on ? 1 : 0.8) + '"/>' + tx(r.x, 92, r.r, {a:'middle', b:1, f: on ? 'var(--accent-ink)' : 'var(--ink)', z:12}); });
+    var r = REC[k]; h += '<path d="M' + r.x + ' 22 V46" stroke="var(--accent)" stroke-width="2"/><path d="M' + (r.x - 5) + ' 40 L' + r.x + ' 48 L' + (r.x + 5) + ' 40" fill="none" stroke="var(--accent)" stroke-width="2"/>' + tx(Math.min(Math.max(r.x, 90), 260), 15, r.n, {a:'middle', b:1});
+    return svg(h, 150); }},
+  offset:{t:'Offset after stopping an infusion', states:['h6','h12'], data:{h6:{n:'After 6 hours', line:'After a 6-hour fentanyl infusion the level takes about 200 minutes to halve. Remifentanil takes 3 to 4 minutes however long it ran.', v:200}, h12:{n:'After 12 hours', line:'After 12 hours fentanyl takes about 300 minutes to halve, and it keeps lengthening, unpredictably in organ failure. This is why long infusions wake slowly.', v:300}}, svg:function(k){
+    var v = FIGS.offset.data[k].v, sc = 0.8;
+    var h = tx(10, 24, 'Fentanyl', {b:1}) + '<rect x="10" y="32" width="' + (v * sc) + '" height="22" rx="5" fill="var(--accent)"/>' + tx(18 + v * sc, 48, v + ' min') +
+      tx(10, 88, 'Remifentanil', {b:1}) + '<rect x="10" y="96" width="' + Math.max(4, 3.5 * sc) + '" height="22" rx="2" fill="var(--accent)"/>' + tx(22, 112, '3–4 min') +
+      tx(10, 142, 'Time for the drug level to halve after the infusion stops', {f:'var(--muted)', z:10.5});
+    return svg(h, 150); }},
+  tof:{t:'Train-of-four', states:['t4','t2','t0'], data:{t4:{n:'4 twitches', line:'Four equal twitches: little or no block. The patient can move and breathe.', v:4}, t2:{n:'1–2 twitches', line:'One or two twitches: most receptors are blocked. A common target when the dose is titrated (expert practice).', v:2}, t0:{n:'0 twitches', line:'No twitches: complete block. More drug adds nothing; lower the rate until a twitch returns.', v:0}}, svg:function(k){
+    var v = FIGS.tof.data[k].v, h = tx(10, 18, 'Four stimuli to the ulnar nerve, 0.5 s apart', {f:'var(--muted)', z:10.5});
+    for (var n = 0; n < 4; n++){ var on = n < v, ht = on ? 70 - n * (v === 4 ? 0 : 14) : 6; h += '<rect x="' + (50 + n * 70) + '" y="' + (110 - ht) + '" width="34" height="' + ht + '" rx="4" fill="' + (on ? 'var(--accent)' : 'var(--fill)') + '" stroke="var(--line)"/>' + tx(67 + n * 70, 128, String(n + 1), {a:'middle', f:'var(--muted)'}); }
+    h += '<path d="M30 110 H320" stroke="var(--muted)"/>' + tx(175, 146, 'thumb twitches seen', {a:'middle', f:'var(--muted)', z:10.5});
+    return svg(h, 152); }},
+  rassfig:{t:'RASS', states:RASS.map(function(r){ return 'r' + r[0]; }), data:(function(){ var o = {}; RASS.forEach(function(r){ o['r' + r[0]] = {n: fmt(r[0]), line: r[1] + (r[2] ? ': ' + r[2].charAt(0).toLowerCase() + r[2].slice(1) + '.' : '.') + (r[0] >= -2 && r[0] <= 1 ? ' Inside the light band.' : r[0] <= -4 ? ' Deep: the CAM-ICU cannot be scored here.' : '')}; }); return o; })(), svg:function(k){
+    var cur = +k.slice(1), h = '<rect x="' + (20 + 3 * 31) + '" y="30" width="' + (4 * 31) + '" height="34" rx="8" fill="var(--okbg)"/>' + tx(20 + 5 * 31, 24, 'light band', {a:'middle', f:'var(--ok)', z:10.5});
+    RASS.forEach(function(r, n){ var x = 20 + n * 31 + 15.5, on = r[0] === cur; h += '<circle cx="' + x + '" cy="47" r="12" fill="' + (on ? 'var(--accent)' : 'var(--card)') + '" stroke="' + (on ? 'var(--accent)' : 'var(--muted)') + '"/>' + tx(x, 51, fmt(r[0]), {a:'middle', z:10.5, b:on, f: on ? 'var(--accent-ink)' : 'var(--ink)'}); });
+    h += tx(20, 84, 'agitated', {f:'var(--muted)', z:10.5}) + tx(330, 84, 'unarousable', {a:'end', f:'var(--muted)', z:10.5});
+    return svg(h, 92); }},
+  cpotfig:{t:'CPOT: pain when the patient cannot tell you', states:['a'], data:{a:{n:'Score', line:'Four domains, each 0 to 2, total 0 to 8. Above 2 is significant pain. For an extubated patient the ventilator row becomes vocalization.'}}, svg:function(){
+    var h = ''; CP.forEach(function(c, n){ var y = 14 + n * 34; h += tx(10, y + 14, c[0], {b:1}) + tx(130, y + 6, '0 ' + c[1][0], {z:10.5, f:'var(--muted)'}) + tx(130, y + 19, '2 ' + c[1][2], {z:10.5}) ; }); return svg(h, 146); }}
+};
+function mountFig(host, id, state){
+  var F = FIGS[id];
+  function draw(k){ var d = F.data[k]; host.innerHTML = (F.states.length > 1 ? '<div class="seg" style="margin:0 0 10px">' + F.states.map(function(x){ return '<button class="sbtn" data-k="' + x + '" aria-pressed="' + (x === k) + '">' + esc(F.data[x].n) + '</button>'; }).join('') + '</div>' : '') + F.svg(k) + '<p class="line1">' + esc(d.line) + '</p>'; }
+  host.onclick = function(e){ var k = e.target.getAttribute && e.target.getAttribute('data-k'); if (k && F.data[k]) draw(k); };
+  draw(state && F.data[state] ? state : F.states[id === 'rassfig' ? 6 : 0]);
+}
+var lastFocus = null;
+function openSheet(fig){ lastFocus = document.activeElement; $('sheet-t').textContent = FIGS[fig].t; mountFig($('sheet-b'), fig); $('scrim').hidden = false; $('sheet').hidden = false; $('sheet').scrollTop = 0; $('sheet-x').focus(); }
+function closeSheet(){ if ($('sheet').hidden) return; $('scrim').hidden = true; $('sheet').hidden = true; if (lastFocus && lastFocus.focus) lastFocus.focus(); }
+$('sheet-x').addEventListener('click', closeSheet); $('scrim').addEventListener('click', closeSheet);
+document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeSheet(); });
+document.addEventListener('click', function(e){ var c = e.target.closest && e.target.closest('[data-fig]'); if (c) openSheet(c.getAttribute('data-fig')); });
+document.querySelectorAll('[data-figure]').forEach(function(h){ mountFig(h, h.getAttribute('data-figure')); });
+
+/* ---------- Learn: CPOT scorer and propofol slider ---------- */
+var cp = [0,0,0,0];
+function drawCpot(){
+  $('cpot').innerHTML = CP.map(function(c, n){ return '<div class="step"><b>' + c[0] + '</b><div class="seg" style="margin-top:6px">' + c[1].map(function(l, v){ return '<button class="sbtn" data-cp="' + n + '" data-v="' + v + '" aria-pressed="' + (cp[n] === v) + '">' + v + ' · ' + esc(l) + '</button>'; }).join('') + '</div></div>'; }).join('');
+  var s = cp[0] + cp[1] + cp[2] + cp[3];
+  $('cpot-out').innerHTML = '<span class="mono"><b>CPOT ' + s + ' of 8.</b></span> ' + (s > 2 ? 'Significant pain: treat before touching the sedative.' : 'Not significant pain. Rescore after any procedure and before raising sedation.');
+}
+$('cpot').addEventListener('click', function(e){ var n = e.target.getAttribute('data-cp'); if (n != null){ cp[+n] = +e.target.getAttribute('data-v'); drawCpot(); } });
+var PZ = [[0,5,'Off or below the starting rate'],[5,55,'Usual range'],[55,70,'Above the usual range'],[70,85,'Above the label ceiling (4 mg/kg/h)'],[85,101,'Infusion-syndrome range (over 5 mg/kg/h); it can occur at lower rates']];
+function pzone(v){ for (var k = 0; k < PZ.length; k++) if (v >= PZ[k][0] && v < PZ[k][1]) return k; return PZ.length - 1; }
+function dpHtml(rows){ return '<div class="dp">' + rows.map(function(r){ return '<div><span class="dl">' + r[0] + '</span><p>' + esc(r[1]) + '</p></div>'; }).join('') + '</div>'; }
+function drawSlide(){
+  var v = +$('pslide').value, z = pzone(v), w = st.wt, mgkg = r1(v * 60 / 1000);
+  var per = w ? sig(mgh(v, w)) + ' mg/h · ' + r0(mgh(v, w) / D.propConc * 24 * D.propKcal) + ' kcal/day as fat at ' + w + ' kg' : 'Enter a weight on the Plan tab for mg/h and kcal/day';
+  var rows = [
+    ['What is happening', z === 0 ? 'Little or no sedation.' : z === 1 ? 'GABA-A effect rises with dose: calmer, then asleep, with blood pressure and breathing falling together.' : z === 2 ? 'A patient needing this much is either undertreated for pain, agitated from another cause, or needs deep sedation.' : z === 3 ? 'The fat load is large and vasodilation is marked. The dose is past what the label allows without a stated reason.' : 'The fat and drug load can poison the cell\'s energy supply: acidosis, muscle breakdown, arrhythmia and heart failure.'],
+    ['Why the rule', z <= 1 ? 'Start at 5 mcg/kg/min and move in steps of 5–10 at least 5 minutes apart, because the peak effect takes minutes to appear.' : z === 2 ? 'Most adults need 5–50 mcg/kg/min. Needing more is a prompt to look again, not just to turn it up.' : z === 3 ? 'The label says not to exceed 4 mg/kg/h (67 mcg/kg/min) unless benefit outweighs risk.' : 'The label links infusion syndrome to more than 5 mg/kg/h (83 mcg/kg/min) for more than 48 hours.'],
+    ['At the bedside', z === 0 ? 'If the patient is calm here, the infusion may not be needed.' : z === 1 ? 'Watch the pressure after each step. Count the calories against the feed.' : z === 2 ? 'Treat pain, check the ventilator, add a second agent before going higher.' : z === 3 ? 'Add or change agent. Check triglycerides. Set a time limit.' : 'Change agent. Check lactate, CK, triglycerides, potassium and an ECG.']
+  ];
+  $('pslide-out').innerHTML = '<p class="head" style="margin-top:6px">' + v + ' mcg/kg/min = ' + mgkg + ' mg/kg/h</p><span class="dose">' + esc(per) + '</span><div class="zone">' + PZ.map(function(p, k){ return '<span class="' + (k === z ? 'on' : '') + '" style="width:' + (Math.min(p[1], 100) - p[0]) + '%"></span>'; }).join('') + '</div><span class="zname">' + esc(PZ[z][2]) + '</span>' + dpHtml(rows);
+}
+$('pslide').addEventListener('input', drawSlide);
+
+/* ---------- Trials ---------- */
+var TRIALS = [
+ {q:'Does a daily pause in sedation help? (Kress)', d:'Randomized, 128 ventilated adults; infusions stopped daily until awake against stopping at the clinician\'s discretion.', r:'Ventilation 4.9 against 7.3 days; ICU stay 6.4 against 9.9 days.', c:'Sedation became something to interrupt and justify every day. One centre.', cite:'Kress JP et al. N Engl J Med 2000;342:1471', doi:'10.1056/NEJM200005183422002'},
+ {q:'Wake up and breathe? (ABC)', d:'Randomized, 336 patients; daily sedation pause paired with the breathing trial against the trial alone.', r:'Days breathing unassisted 14.7 against 11.6; death at one year hazard ratio 0.68 (0.50 to 0.92).', c:'The awakening trial and the breathing trial are done together.', cite:'Girard TD et al. Lancet 2008;371:126', doi:'10.1016/S0140-6736(08)60105-1'},
+ {q:'Dexmedetomidine against midazolam or propofol? (MIDEX and PRODEX)', d:'Two randomized double-blind trials, about 500 patients each, light to moderate sedation for more than 24 hours.', r:'Ventilation 123 against 164 hours with midazolam (P = 0.03); 97 against 118 hours with propofol (P = 0.24). More hypotension (20.6% against 11.6%) and bradycardia (14.2% against 5.2%) than midazolam.', c:'Dexmedetomidine beat midazolam on time ventilated but not propofol, and patients could communicate better.', cite:'Jakob SM et al. JAMA 2012;307:1151', doi:'10.1001/jama.2012.304'},
+ {q:'Dexmedetomidine early, for everyone? (SPICE III)', d:'Randomized, 3,904 ventilated adults analysed; dexmedetomidine as the main sedative against usual care.', r:'Death at 90 days 29.1% in both groups. More bradycardia and hypotension with dexmedetomidine.', c:'No survival benefit from using it first in all patients.', cite:'Shehabi Y et al. N Engl J Med 2019;380:2506', doi:'10.1056/NEJMoa1904710'},
+ {q:'Dexmedetomidine or propofol in sepsis? (MENDS2)', d:'Randomized, double-blind, 422 ventilated adults with sepsis, light sedation targets.', r:'Days alive without delirium or coma 10.7 against 10.8; death at 90 days 38% against 39%.', c:'With light sedation done well, the two drugs gave the same outcomes.', cite:'Hughes CG et al. N Engl J Med 2021;384:1424', doi:'10.1056/NEJMoa2024922'},
+ {q:'Alpha-2 agonist or propofol? (A2B)', d:'Randomized, 1,404 ventilated adults; dexmedetomidine or clonidine against propofol.', r:'Time to extubation: hazard ratio 1.09 (0.96 to 1.25) for dexmedetomidine. More agitation (relative risk 1.54) and severe bradycardia (1.62).', c:'No faster extubation with dexmedetomidine, and more agitation and bradycardia.', cite:'Walsh TS et al. JAMA 2025;334:32', doi:'10.1001/jama.2025.7200'},
+ {q:'No sedation at all? (NONSEDA)', d:'Randomized, 700 ventilated patients; no sedation against light sedation with daily interruption.', r:'Death at 90 days 42.4% against 37.0% (difference 5.4 points, −2.2 to 12.2).', c:'No significant difference in mortality between no sedation and light sedation with a daily pause.', cite:'Olsen HT et al. N Engl J Med 2020;382:1103', doi:'10.1056/NEJMoa1906759'},
+ {q:'Do antipsychotics shorten delirium? (MIND-USA)', d:'Randomized, double-blind, 566 patients with delirium; haloperidol or ziprasidone against placebo. 89% had hypoactive delirium.', r:'Days alive without delirium or coma 7.9 (haloperidol), 8.7 (ziprasidone), 8.5 (placebo).', c:'Neither drug shortened delirium.', cite:'Girard TD et al. N Engl J Med 2018;379:2506', doi:'10.1056/NEJMoa1808217'},
+ {q:'Haloperidol for ICU delirium? (AID-ICU)', d:'Randomized, blinded, 1,000 patients; haloperidol 2.5 mg IV three times daily plus as needed against placebo.', r:'Days alive and out of hospital at 90 days 35.8 against 32.9 (difference 2.9, −1.2 to 7.0). Death 36.3% against 43.3%.', c:'The primary outcome was not better; the lower mortality is a secondary finding that needs confirming.', cite:'Andersen-Ranberg NC et al. N Engl J Med 2022;387:2425', doi:'10.1056/NEJMoa2211868'},
+ {q:'Quetiapine for delirium? (pilot)', d:'Randomized, double-blind, 36 patients; quetiapine 50 mg every 12 hours, titrated, against placebo, both with as-needed haloperidol.', r:'Time to first resolution of delirium 1.0 against 4.5 days.', c:'Weak evidence: a small pilot. It is the source of the usual quetiapine regimen.', cite:'Devlin JW et al. Crit Care Med 2010;38:419', doi:'10.1097/CCM.0b013e3181b9e302'},
+ {q:'Early paralysis? (ACURASYS and ROSE)', d:'ACURASYS: 340 patients, P/F under 150, cisatracurium for 48 hours. ROSE: 1,006 patients, against lighter sedation.', r:'ACURASYS: adjusted 90-day hazard ratio 0.68 (0.48 to 0.98); crude deaths 31.6% against 40.7%. ROSE: 42.5% against 42.8%.', c:'Paralysis moved from routine to selective.', cite:'Papazian L et al. N Engl J Med 2010;363:1107', doi:'10.1056/NEJMoa1005372', cite2:'Moss M et al. N Engl J Med 2019;380:1997', doi2:'10.1056/NEJMoa1901686'}
+];
+$('trialbox').innerHTML = TRIALS.map(function(t){ return '<div class="trial"><p><b>' + esc(t.q) + '</b></p><p><span class="k">Design</span>' + esc(t.d) + '</p><p><span class="k">Result</span>' + esc(t.r) + '</p><p><span class="k">What it changed</span>' + esc(t.c) + '</p><p class="mono" style="font-size:13px"><a href="https://doi.org/' + t.doi + '" rel="noopener">' + esc(t.cite) + '</a>' + (t.cite2 ? ' · <a href="https://doi.org/' + t.doi2 + '" rel="noopener">' + esc(t.cite2) + '</a>' : '') + '</p></div>'; }).join('');
+
+/* ---------- Practice ---------- */
+var CASES = [
+ {t:'Fighting the ventilator', s:'Day 2 of pneumonia, intubated, 70 kg. RASS +2, grimacing and rigid, CPOT 5. The nurse asks to raise the propofol.', q:'What comes first?', i:{rass:2, target:'light', wt:70, intub:true, pain:true}},
+ {t:'Asleep on midazolam', s:'COPD exacerbation, intubated, 80 kg, on a midazolam infusion since the emergency department. RASS −4. No seizures, no alcohol history.', q:'What do you change?', i:{rass:-4, target:'light', wt:80, intub:true, bzinf:true}},
+ {t:'Slow on dexmedetomidine', s:'Septic shock improving, intubated, 90 kg, RASS −1 on dexmedetomidine. Heart rate has fallen to 42.', q:'What now?', i:{rass:-1, target:'light', wt:90, intub:true, brady:true}},
+ {t:'Day 3 of high-dose propofol', s:'Severe ARDS, paralysed, 75 kg, propofol at 90 mcg/kg/min for three days. New lactic acidosis and a rising CK.', q:'What is this, and what do you do?', i:{rass:-5, target:'deep', reason:'nmb', wt:75, intub:true, pris:true}},
+ {t:'Ready for the tube to come out, but agitated', s:'Day 5, passing breathing trials, 65 kg. Each time sedation stops she becomes agitated and delirious, RASS +2, and the trial is abandoned.', q:'Which sedative?', i:{rass:2, target:'light', wt:65, intub:true, agdel:true, extub:true}},
+ {t:'Paralysed and light', s:'ARDS with P/F 110, 85 kg, team about to start cisatracurium. RASS −2 on propofol, on norepinephrine.', q:'What must happen before the paralytic?', i:{rass:-2, target:'deep', reason:'nmb', wt:85, intub:true, pressor:true}}
+];
+var POINT = ['Pain is the commonest cause of agitation. Treat it, then reassess; the sedative may not need to change.','A benzodiazepine infusion with no seizure or withdrawal indication is the thing to fix, and RASS −4 is deeper than a light target.','Bradycardia is dexmedetomidine\'s main harm. Change agent.','High dose for more than 48 hours with acidosis and a rising CK is propofol infusion syndrome until proven otherwise.','Agitated delirium that is blocking extubation is the one delirium indication for dexmedetomidine.','Deep sedation comes before paralysis, and a pressor means no boluses.'];
+$('practice').innerHTML = CASES.map(function(c, n){ return '<div class="card"><p class="label">Case ' + (n + 1) + '</p><h2>' + esc(c.t) + '</h2><p>' + esc(c.s) + '</p><p><b>' + esc(c.q) + '</b></p><div class="row"><button class="btn" data-ans="' + n + '">Show the answer</button><button class="btn ghost" data-load="' + n + '">Open in the tool</button></div><div class="ans" id="ans' + n + '" hidden></div></div>'; }).join('');
+$('practice').addEventListener('click', function(e){
+  var a = e.target.getAttribute('data-ans'), l = e.target.getAttribute('data-load');
+  if (a != null){ var box = $('ans' + a); box.innerHTML = '<p>' + esc(POINT[a]) + '</p>' + planHtml(plan(CASES[a].i), true); box.hidden = false; e.target.hidden = true; }
+  if (l != null){ var i = CASES[l].i; st = {rass:null, target:'light', reason:'nmb', wt:null, intub:true}; Object.keys(i).forEach(function(k){ st[k] = i[k]; }); $('wt').value = $('wt2').value = i.wt; render(); show('t-plan'); window.scrollTo(0, 0); }
+});
+
+/* ---------- Tabs, pills ---------- */
+var tabs = [['t-plan','p-plan'],['t-drugs','p-drugs'],['t-del','p-del'],['t-learn','p-learn'],['t-prac','p-prac']];
+function show(t){ tabs.forEach(function(p){ var on = p[0] === t; $(p[0]).setAttribute('aria-selected', String(on)); $(p[1]).classList.toggle('on', on); }); }
+tabs.forEach(function(p){ $(p[0]).addEventListener('click', function(){ show(p[0]); }); });
+function fromHash(){ var id = location.hash.slice(1); if (!id) return; var el = $(id); if (!el) return; var pan = el.closest('.panel'); if (pan) tabs.forEach(function(p){ if (p[1] === pan.id) show(p[0]); }); el.scrollIntoView(); }
+window.addEventListener('hashchange', fromHash);
+(function(){
+  var chaps = [].slice.call(document.querySelectorAll('.chap'));
+  $('pills').innerHTML = chaps.map(function(c, n){ return '<button class="pill" data-go="' + c.id + '" aria-current="' + (n === 0) + '">' + (n + 1) + ' ' + esc(c.getAttribute('data-pill')) + '</button>'; }).join('');
+  $('pills').addEventListener('click', function(e){ var g = e.target.getAttribute('data-go'); if (g) $(g).scrollIntoView(); });
+  function mark(id){ [].forEach.call($('pills').children, function(b){ var on = b.getAttribute('data-go') === id; b.setAttribute('aria-current', String(on)); if (on) $('pills').scrollLeft = Math.max(0, b.offsetLeft - 60); }); }
+  if ('IntersectionObserver' in window){ var io = new IntersectionObserver(function(es){ es.forEach(function(en){ if (en.isIntersecting) mark(en.target.id); }); }, {rootMargin:'-30% 0px -60% 0px'}); chaps.forEach(function(c){ io.observe(c); }); }
+  $('go-prac').addEventListener('click', function(){ show('t-prac'); window.scrollTo(0, 0); });
+  $('go-cam').addEventListener('click', function(){ show('t-del'); window.scrollTo(0, 0); });
+})();
+render(); drawCauses(); drawCpot(); drawSlide(); fromHash();
+window.__sed = {plan: plan, cam: cam};
+})();
+</script>
+<script id="deeper-data">
+/* Go deeper: mechanism, rationale and the common trap for each Learn chapter. Text only; no doses or thresholds beyond the tool's own. */
+(function(){ var D = {
+"learn-pain": [["Mechanism", "Tissue injury, tubes, turning and suctioning all generate pain signals that a sedated patient cannot report. The body still responds: catecholamines rise, the patient moves and fights the ventilator, and the picture looks like agitation."], ["Why it matters", "A sedative quietens the movement without treating the cause, so the dose climbs and the patient ends up deeply sedated and still in pain. Scoring pain with a behavioural scale and treating it first often removes the need for more sedative."], ["Common trap", "Reading heart rate and blood pressure as a pain score. Vital signs are a cue to assess, not a measurement of pain."]],
+"learn-depth": [["Mechanism", "Deep sedation removes cough, movement and the drive to breathe, so the ventilator does all the work, the diaphragm weakens, and the patient cannot be assessed for readiness to breathe or for delirium."], ["Why it matters", "Trials comparing lighter with deeper targets found shorter ventilation with lighter sedation, which is why light sedation is the default and deep sedation needs a stated reason."], ["Common trap", "Leaving the first night's deep sedation running. Depth chosen for intubation is rarely the depth needed the next morning."]],
+"learn-benzo": [["Mechanism", "Benzodiazepines are fat soluble and build up in tissue during an infusion. Midazolam also has an active metabolite cleared by the kidney. When the infusion stops, drug returns from tissue to blood and the effect lingers."], ["Why it matters", "Slow, unpredictable waking prolongs ventilation, and benzodiazepine exposure is linked to delirium. Propofol and dexmedetomidine are therefore suggested over benzodiazepines for routine sedation."], ["Common trap", "Stopping a long benzodiazepine infusion abruptly. Dependence develops within days, and withdrawal looks like agitation or delirium."]],
+"learn-choice": [["Mechanism", "Propofol enhances GABA-A inhibition throughout the brain, with no ceiling to its effect. Dexmedetomidine acts on alpha-2 receptors in the brainstem arousal centre and produces a state closer to natural sleep, with little effect on the respiratory centre."], ["Why it matters", "The choice follows the goal. Dexmedetomidine suits a light, rousable patient and can continue through extubation. Propofol is needed when the target is deep. Large trials found similar survival with either."], ["Common trap", "Raising dexmedetomidine to chase deep sedation. It is unreliable there, and the heart rate often falls first."]],
+"learn-prop": [["Mechanism", "Propofol is carried in a fat emulsion and, at high doses for long periods, appears to impair the cell's use of fatty acids for energy. Heart and skeletal muscle are affected first, giving acidosis, muscle breakdown, arrhythmia and heart failure."], ["Why it matters", "The syndrome is rare but often fatal, and the only treatment is to stop the drug and support the patient. That is why the label sets a rate ceiling and why unexplained acidosis on propofol prompts a change of agent."], ["Common trap", "Forgetting that propofol is also food. Its fat calories count toward the feeding target."]],
+"learn-del": [["Mechanism", "Delirium is acute brain dysfunction from illness, drugs and the ICU environment acting together. Attention fails first, which is why the bedside test is a test of attention."], ["Why it matters", "It cannot be seen without testing, and most cases are the quiet form. Finding it prompts a search for a reversible cause and a review of sedatives."], ["Common trap", "Calling a drowsy, cooperative patient settled. A patient at RASS −1 with an acute change who cannot follow the letters test is delirious."]],
+"learn-anti": [["Mechanism", "Antipsychotics block dopamine receptors and reduce agitation and distressing perceptions. They do not correct the illness, drug effect or sleep loss that produced the delirium."], ["Why it matters", "In placebo-controlled trials haloperidol and ziprasidone did not shorten delirium, so the 2018 guideline advised against routine use and the 2025 update could not recommend for or against. In practice they are kept for symptoms that distress or endanger the patient."], ["Common trap", "The drug started for one bad night is still prescribed at discharge. Give every antipsychotic a stop date."]],
+"learn-nmb": [["Mechanism", "Neuromuscular blockers occupy the acetylcholine receptor on muscle so the nerve signal cannot trigger contraction. They do not cross into the brain: awareness and pain are untouched."], ["Why it matters", "Every sign used to judge sedation depends on muscle. Once the patient is paralysed those signs are gone, so depth is secured beforehand and, in usual practice, sedation is not reduced while the block is on."], ["Common trap", "Turning sedation down because the paralysed patient looks comfortable."]]
+};
+  function add(){ Object.keys(D).forEach(function(id){ var host = document.getElementById(id); if (!host || host.querySelector(":scope > .deeper")) return; var d = document.createElement("details"); d.className = "deeper"; d.innerHTML = "<summary>Go deeper: mechanism and rationale</summary><div class=\"dpx\">" + D[id].map(function(r){ return "<div><span class=\"dl\">" + r[0] + "</span><p>" + r[1] + "</p></div>"; }).join("") + "</div>"; host.appendChild(d); }); }
+  add();
+})();
+</script>
+</body>
+</html>
