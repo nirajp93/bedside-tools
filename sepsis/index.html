@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sepsis and septic shock · bedside.tools</title>
+<meta name="description" content="Sepsis and septic shock in the first hours: shock or not, the first-hour list in order, the fluid volume and what to check before more, when to start norepinephrine, source control, and what the US SEP-1 measure asks for.">
+<script src="/theme.js"></script>
+<style>
+:root{--bg:#FBFBFA;--card:#FFFFFF;--ink:#111113;--muted:#55555D;--line:#ECECEE;--accent:#2B4BDB;--warn:#9A3B00;--warnbg:#FFF6EC}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5}
+.mono{font-family:var(--mono)}
+.wrap{max-width:720px;margin:0 auto;padding:20px 16px 48px}
+a{color:var(--accent)}
+.back{font-size:14px;text-decoration:none;display:inline-block;min-height:44px;line-height:44px}
+h1{font-size:26px;margin:4px 0 4px;letter-spacing:-.01em}
+.purpose{color:var(--muted);margin:0 0 20px}
+.tabs{display:flex;gap:6px;margin-bottom:16px}
+.tab{flex:1;min-width:0;min-height:44px;border:1px solid var(--line);background:var(--card);border-radius:14px;padding:0 4px;font:inherit;font-size:15px;font-weight:600;color:var(--muted);cursor:pointer}
+.tab[aria-selected="true"]{border-color:var(--accent);color:var(--accent)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
+.label{font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.field{display:flex;flex-direction:column;justify-content:flex-end}
+.field label{display:block;font-size:13px;color:var(--muted);margin-bottom:4px}
+.field input,.field select{width:100%;min-height:44px;border:1px solid var(--line);border-radius:10px;padding:8px 10px;font:inherit;font-family:var(--mono);background:var(--card);color:var(--ink)}
+.field input:focus,.field select:focus,.tab:focus-visible,.chk:focus-within,button:focus-visible,summary:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.checks{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.chk{display:flex;align-items:center;gap:10px;min-height:44px;border:1px solid var(--line);border-radius:10px;padding:6px 10px;font-size:14px;cursor:pointer}
+.chk input{width:20px;height:20px;accent-color:var(--accent);flex:none}
+.card h2{font-size:18px;margin:0 0 2px}
+.sub{font-size:14px;color:var(--muted);margin:0}
+.card ul{margin:6px 0 0;padding-left:20px}
+.card li{margin-bottom:4px}
+.guard{border-left:3px solid var(--warn);background:var(--warnbg);padding:8px 10px;border-radius:0 10px 10px 0;margin-top:8px;font-size:14.5px}
+.tier{display:inline-block;font-family:var(--mono);font-size:11px;border:1px solid var(--line);border-radius:999px;padding:2px 8px;color:var(--muted);margin:6px 6px 0 0}
+details{margin-top:10px;border-top:1px solid var(--line);padding-top:8px}
+.whyline{margin:10px 0 0;font-size:14.5px;color:var(--muted)}
+.whyline b{color:var(--ink);font-weight:600}
+summary{cursor:pointer;color:var(--accent);font-weight:600;min-height:44px;line-height:44px}
+details p{margin:0 0 8px;font-size:15px}
+.btn{min-height:44px;border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);border-radius:10px;padding:8px 14px;font:inherit;font-weight:600;cursor:pointer}
+.btn.ghost{background:var(--card);color:var(--accent)}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.note{font-size:14px;color:var(--muted)}
+.links{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:8px;font-size:14.5px}
+.links a{display:inline-flex;align-items:center;min-height:44px}
+.tl{position:relative;padding-left:26px;margin-top:6px}
+.tl:before{content:"";position:absolute;left:8px;top:10px;bottom:10px;width:2px;background:var(--line)}
+.st{position:relative;padding:6px 0 10px}
+.st:before{content:"";position:absolute;left:-24px;top:11px;width:12px;height:12px;border-radius:50%;background:var(--card);border:2px solid var(--muted)}
+.st.now:before{background:var(--accent);border-color:var(--accent)}
+.st.done:before{background:var(--ok);border-color:var(--ok)}
+.st .when{font-family:var(--mono);font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+.st b{display:block}
+.st small{color:var(--muted);font-size:13.5px;display:block}
+.st.done b{color:var(--muted)}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:6px 6px 6px 0;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:var(--mono);font-size:11.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);font-weight:500}
+.case h2{font-size:17px}
+.ans{margin-top:10px;border-top:1px solid var(--line);padding-top:10px}
+footer{margin-top:28px;font-size:13.5px;color:var(--muted)}
+footer p{margin:0 0 8px}
+.panel{display:none}.panel.on{display:block}
+.fig{display:block;width:100%;max-width:460px;height:auto;margin:0 auto}
+.states{display:flex;gap:6px;overflow-x:auto;margin:10px -16px;padding:2px 16px 6px;scrollbar-width:none}
+.states::-webkit-scrollbar{display:none}
+.states.wrapit{flex-wrap:wrap;overflow:visible;margin:10px 0;padding:0}
+.sbtn{flex:none;min-height:44px;min-width:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--ink);font:inherit;font-size:14px;cursor:pointer;white-space:nowrap}
+.sbtn[aria-pressed="true"]{border-color:var(--accent);color:var(--accent);font-weight:600}
+.line1{font-size:15px;margin:10px 0 0}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.chip{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--fill);color:var(--ink);font:inherit;font-size:14px;cursor:pointer;text-align:left}
+.chip svg{flex:none;color:var(--accent)}
+.scrim{position:fixed;inset:0;background:var(--scrim);z-index:20}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:21;max-height:90vh;overflow-y:auto;background:var(--card);border:1px solid var(--line);border-bottom:0;border-radius:20px 20px 0 0;padding:8px 16px 24px;max-width:560px;margin:0 auto}
+.sheethead{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.sheethead h2{font-size:18px;margin:0}
+.xbtn{min-height:44px;min-width:44px;border:0;background:transparent;color:var(--accent);font:inherit;font-weight:600;cursor:pointer}
+.pills{position:sticky;top:0;z-index:5;background:var(--bg);display:flex;gap:6px;overflow-x:auto;margin:0 -16px 12px;padding:8px 16px;border-bottom:1px solid var(--line);scrollbar-width:none}
+.pills::-webkit-scrollbar{display:none}
+.pill{flex:none;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--muted);font:inherit;font-size:14px;cursor:pointer;white-space:nowrap}
+.pill[aria-current="true"]{border-color:var(--accent);color:var(--accent);font-weight:600}
+.chap{scroll-margin-top:70px}
+.cause{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:8px 0;border-top:1px solid var(--line);font-size:15px}
+.cause small{color:var(--muted);font-size:13px;text-align:right;flex:0 1 58%}
+.cause.less>span{color:var(--muted)}
+.cause.fav span{font-weight:700}
+.cause.fav span:before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--accent);margin-right:8px}
+.trial{border-left:3px solid var(--accent);padding-left:12px}
+.trial p{margin:0 0 6px;font-size:15px}
+.trial .k{font-family:var(--mono);font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);display:block}
+.sl input[type=range]{width:100%;min-height:44px;accent-color:var(--accent)}
+.sl label{display:flex;justify-content:space-between;font-size:13px;color:var(--muted);margin-top:8px}
+.sl label b{font-family:var(--mono);color:var(--ink)}
+.zs{display:flex;gap:2px;height:8px;margin-top:4px}
+.zs i{display:block;border-radius:99px;background:var(--line)}
+.zs i.on{background:var(--accent)}
+.zt{font-family:var(--mono);font-size:12.5px;color:var(--ink);margin:6px 0 0}
+.dp{margin-top:10px;border:1px solid var(--line);border-radius:12px;padding:2px 12px;background:var(--card)}
+.dp>div{padding:10px 0;border-top:1px solid var(--line)}
+.dp>div:first-child{border-top:0}
+.dp .label{margin:0 0 3px}
+.dp p{font-size:15px;margin:0}
+.clock{font-family:var(--mono);font-size:14px;margin:8px 0 0}
+.deeper{margin-top:14px;border-top:1px solid var(--line)}
+.deeper>summary{min-height:44px;display:flex;align-items:center;gap:8px;color:var(--accent);font-weight:600;font-size:15px;cursor:pointer;list-style:none;line-height:1.3}
+.deeper>summary::-webkit-details-marker{display:none}
+.deeper>summary::before{content:"+";font-family:var(--mono);font-size:18px;line-height:1;width:14px;text-align:center}
+.deeper[open]>summary::before{content:"\2212"}
+.deeper .dpx{border:1px solid var(--line);border-radius:12px;padding:2px 12px;background:var(--card);text-align:left}
+.deeper .dpx>div{padding:10px 0;border-top:1px solid var(--line)}
+.deeper .dpx>div:first-child{border-top:0}
+.deeper .dl{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500;margin:0 0 3px}
+.deeper p{font-size:15px;line-height:1.45;color:var(--ink);margin:0 0 4px}
+.plate{margin-top:10px;border:1px solid var(--line);border-radius:12px;padding:6px;background:var(--card)}
+.plate img{display:block;width:100%;height:auto;border-radius:8px}
+.credit{display:block;font-family:var(--mono);font-size:11px;color:var(--muted);text-align:right;margin:4px 2px 0}
+@media (min-width:900px){
+  .wrap{max-width:1040px}
+  #p-tool.on{display:grid;grid-template-columns:380px minmax(0,1fr);gap:20px;align-items:start}
+  #p-src.on{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;align-items:start}
+  #p-learn{max-width:720px;margin:0 auto}
+}
+@media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="/">← bedside.tools</a>
+<h1>Sepsis and septic shock</h1>
+<p class="purpose">The first hours: shock or not, what to do first, how much fluid and what to check before more, when to start a pressor, and the source.</p>
+
+<div class="tabs" role="tablist">
+  <button class="tab" role="tab" id="t-tool" aria-selected="true" aria-controls="p-tool">Manage</button>
+  <button class="tab" role="tab" id="t-src" aria-selected="false" aria-controls="p-src">Source</button>
+  <button class="tab" role="tab" id="t-learn" aria-selected="false" aria-controls="p-learn">Learn</button>
+  <button class="tab" role="tab" id="t-prac" aria-selected="false" aria-controls="p-prac">Practice</button>
+</div>
+
+<div class="panel on" id="p-tool" role="tabpanel" aria-labelledby="t-tool">
+  <div id="inputs">
+  <div class="card" id="infection">
+    <p class="label">Infection</p>
+    <p class="sub">How likely is infection?</p>
+    <div class="states wrapit" id="likeseg" role="group" aria-label="How likely is infection"></div>
+    <p class="sub" style="margin-top:6px">Suspected source</p>
+    <div class="states wrapit" id="srcseg" role="group" aria-label="Suspected source"></div>
+  </div>
+  <div class="card" id="numbers">
+    <p class="label">Pressure and perfusion</p>
+    <div class="grid">
+      <div class="field"><label for="map">Mean pressure (mm Hg)</label><input id="map" inputmode="decimal" autocomplete="off"></div>
+      <div class="field"><label for="sbp">Systolic (mm Hg)</label><input id="sbp" inputmode="decimal" autocomplete="off"></div>
+      <div class="field"><label for="lac">Lactate (mmol/L)</label><input id="lac" inputmode="decimal" autocomplete="off"></div>
+      <div class="field"><label for="press">Vasopressor running</label><select id="press"><option value="none">None</option><option value="ne">Norepinephrine</option><option value="ne2">Norepinephrine + vasopressin or more</option></select></div>
+    </div>
+    <div class="checks" id="ticks-p"></div>
+  </div>
+  <div class="card" id="fluids">
+    <p class="label">Fluids</p>
+    <div class="grid">
+      <div class="field"><label for="wt">Weight (kg)</label><input id="wt" inputmode="decimal" autocomplete="off"></div>
+      <div class="field"><label for="given">Crystalloid given so far (mL)</label><input id="given" inputmode="decimal" autocomplete="off"></div>
+    </div>
+    <div class="checks" id="ticks-f"></div>
+  </div>
+  <div class="card" id="clockin">
+    <p class="label">Done so far</p>
+    <div class="grid">
+      <div class="field"><label for="mins">Minutes since sepsis was recognized</label><input id="mins" inputmode="decimal" autocomplete="off"></div>
+      <div class="field"></div>
+    </div>
+    <div class="checks" id="ticks-d"></div>
+  </div>
+  </div>
+  <div id="out"></div>
+</div>
+
+<div class="panel" id="p-src" role="tabpanel" aria-labelledby="t-src">
+  <div>
+  <div class="card" id="workup">
+    <p class="label">Workup</p>
+    <h2>Send first, then by result</h2>
+    <p class="sub">First, while treatment starts:</p>
+    <ul id="wu-first"></ul>
+    <p class="sub" style="margin-top:10px">Then, guided by the first results and the exam:</p>
+    <ul id="wu-then"></ul>
+  </div>
+  <div class="card" id="mimics">
+    <p class="label">Not sepsis?</p>
+    <h2>Mimics to keep in mind</h2>
+    <ul id="mimiclist"></ul>
+    <p class="note" style="margin:8px 0 0">Expert practice. Sepsis is a clinical diagnosis; no single test rules it in or out (Surviving Sepsis 2026, good practice statement).</p>
+  </div>
+  </div>
+  <div class="card" id="narrow">
+    <p class="label">Narrow the source</p>
+    <h2>Where is the infection?</h2>
+    <p class="sub">Tap a finding. Sources it points away from fade, with the reason. Faded means less likely, not excluded.</p>
+    <div class="states wrapit" id="narseg" role="group" aria-label="Finding"></div>
+    <div id="narout"></div>
+    <p class="note" style="margin:10px 0 0">Expert practice, not a graded guideline. Surviving Sepsis 2026: rapidly look for a source that needs emergency control (good practice statement).</p>
+  </div>
+</div>
+
+<div class="panel" id="p-learn" role="tabpanel" aria-labelledby="t-learn">
+  <div class="pills" id="pills"></div>
+  <div class="card chap" id="learn-def" data-pill="Definitions"><p class="label">1 · Words</p><h2>Sepsis is organ dysfunction; shock is a subset</h2><div id="plate-summary"></div><div data-figure="def"></div><p class="sub" style="margin-top:10px">Screening: the 2026 guideline recommends NEWS, NEWS2, MEWS or SIRS over qSOFA as a single screening tool (strong, moderate). qSOFA (breathing 22 or more, any confusion, systolic 100 or less) flags risk of a poor outcome; it is not a definition, and not meeting it should not delay treatment.</p></div>
+  <div class="card chap" id="learn-shock" data-pill="Shock"><p class="label">2 · Physiology</p><h2>Why the pressure falls</h2><p class="sub">Tap a state. Most septic shock is several at once.</p><div data-figure="shock"></div></div>
+  <div class="card chap" id="learn-lactate" data-pill="Lactate"><p class="label">3 · Lactate</p><h2>Lactate rises without low oxygen too</h2><div data-figure="lactate"></div><p class="sub" style="margin-top:10px">Capillary refill moves within minutes and can be used alongside lactate and other measures of perfusion (2026: conditional, low).</p></div>
+  <div class="card chap" id="learn-starling" data-pill="More fluid?"><p class="label">4 · Fluid responsiveness</p><h2>Will the next bolus help?</h2><p class="sub">Drag the filling. A bolus helps only on the steep part of the curve.</p><div class="sl" id="starsl"></div></div>
+  <div class="card chap" id="learn-fluids" data-pill="Fluid trials"><p class="label">5 · Fluids</p><h2>How much and which fluid: what the trials found</h2><div data-figure="bars"></div></div>
+  <div class="card chap" id="learn-clock" data-pill="First 6 hours"><p class="label">6 · Timing</p><h2>The first six hours</h2><p class="sub">Two clocks: the guideline and the US quality measure. Tap one.</p><div data-figure="clock"></div></div>
+  <div class="card chap" id="trials" data-pill="Trials"><p class="label">7 · Trials</p><h2>The trials behind the practice</h2><div id="trialbox"></div><div class="row"><button class="btn" id="go-prac">Try the practice cases</button></div></div>
+</div>
+
+<div class="panel" id="p-prac" role="tabpanel" aria-labelledby="t-prac">
+  <div id="practice"></div>
+</div>
+
+<div class="scrim" id="scrim" hidden></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-t" hidden>
+  <div class="sheethead"><h2 id="sheet-t"></h2><button class="xbtn" id="sheet-x">Close</button></div>
+  <div id="sheet-b"></div>
+</div>
+
+<footer>
+  <p><strong>For education only. Not a substitute for clinical judgment.</strong> Built to the Surviving Sepsis Campaign 2026 guideline and the Sepsis-3 definitions. Antibiotic regimens and vasopressor doses are in the empiric antibiotics and pressors tools. Order sets, sepsis alerts, fluid products and who reviews SEP-1 vary, so adjust to your institution. Evidence tiers are shown as strength and certainty (strong or conditional; high, moderate, low or very low) or good practice statement; rows marked expert practice are not from a graded guideline. The SEP-1 card describes a US reporting measure, not a guideline.</p>
+  <p>Privacy: everything runs in your browser. Nothing you enter is sent anywhere or stored, and there are no analytics. Do not enter names, record numbers, or dates of birth.</p>
+  <p class="mono">Last reviewed: 2026-11-24</p>
+  <p><strong>Sources:</strong> Prescott HC et al., Surviving Sepsis Campaign: international guidelines for management of sepsis and septic shock 2026, Crit Care Med 2026;54:725 and Intensive Care Med 2026;52:863 (statements, remarks and rationale) · Evans L et al., Surviving Sepsis Campaign 2021, Intensive Care Med 2021;47:1181 · Singer M et al., The third international consensus definitions for sepsis and septic shock (Sepsis-3), JAMA 2016;315:801 · Centers for Medicare &amp; Medicaid Services, SEP-1 Severe Sepsis and Septic Shock: Management Bundle (CBE #0500), specifications manual v5.18a for 2026 discharges, as described in CMS Hospital IQR training material · Trials: Rivers E et al., N Engl J Med 2001;345:1368 · ProCESS Investigators, N Engl J Med 2014;370:1683 · ARISE Investigators, N Engl J Med 2014;371:1496 · Mouncey PR et al., N Engl J Med 2015;372:1301 · Semler MW et al., N Engl J Med 2018;378:829 · Brown RM et al., Am J Respir Crit Care Med 2019;200:1487 · Zampieri FG et al., JAMA 2021;326:818 · Finfer S et al., N Engl J Med 2022;386:815 · Meyhoff TS et al., N Engl J Med 2022;386:2459 · NHLBI PETAL Network, N Engl J Med 2023;388:499 · Hernández G et al., JAMA 2019;321:654 · Hernandez G et al., JAMA 2025;334:1988 · Asfar P et al., N Engl J Med 2014;370:1583 · Permpikul C et al., Am J Respir Crit Care Med 2019;199:1097 · Venkatesh B et al., N Engl J Med 2018;378:797 · Annane D et al., N Engl J Med 2018;378:809 · Dulhunty JM et al., JAMA 2024;332:629 · Abdul-Aziz MH et al., JAMA 2024;332:638 · Caironi P et al., N Engl J Med 2014;370:1412 · Seymour CW et al., N Engl J Med 2017;376:2235 · Liu VX et al., Am J Respir Crit Care Med 2017;196:856.</p>
+</footer>
+</div>
+<script id="engine">
+/* Data and decision engine: no page access here, so the practice cases and the audits run the same code. */
+function has(v){ return v != null; }
+function r50(n){ return Math.round(n / 50) * 50; }
+function fmt(n){ return String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
+
+var LIKE = [['possible','Possible'],['probable','Probable or definite']];
+var SRC = [['lung','Lung'],['urine','Urinary tract'],['abd','Abdomen or biliary'],['skin','Skin or soft tissue'],['line','Line or device'],['cns','Brain or meninges'],['unk','Not yet clear']];
+var SRCN = {}; SRC.forEach(function(s){ SRCN[s[0]] = s[1]; });
+var TICKS_P = [['ams','New confusion or drowsiness'],['uo','Low urine output'],['crt','Slow capillary refill or mottling'],['low','Systolic well below the patient\'s usual'],['age65','Age 65 or older']];
+var TICKS_F = [['hf','Heart failure'],['esrd','Dialysis or kidney failure'],['cirr','Cirrhosis'],['tbi','Traumatic brain injury']];
+var TICKS_D = [['cx','Blood cultures drawn'],['abx','Antibiotics given']];
+
+var T = {
+  ssc26: 'Surviving Sepsis 2026',
+  s3: 'Sepsis-3 (2016)'
+};
+
+var WHY = {
+  shock: 'In the Sepsis-3 cohorts, needing a vasopressor with a lactate over 2 carried a hospital mortality over 40%.',
+  hypo: 'Low pressure with suspected infection is treated as shock until it responds to fluid; if it does not, it is septic shock.',
+  hypoperf: 'A lactate of 4 or more with infection marks poor tissue perfusion even when the pressure looks normal.',
+  sepsis: 'A rise of 2 or more SOFA points with infection carried about 10% mortality, so organ dysfunction, not fever, is what marks sepsis.',
+  abxNow: 'Each hour of delay was linked with higher mortality, most in shock (about 1.8% absolute per hour in shock in one large cohort).',
+  abxPossible: 'A short, rapid workup first avoids treating mimics with antibiotics; the 3-hour limit keeps any delay short if infection stays likely.',
+  fluid: 'Vasodilation and leaky capillaries leave the heart underfilled; early crystalloid restores the volume it pumps from.',
+  fluidHF: 'Falling short of 30 mL/kg was linked with higher mortality in cohorts that included heart and kidney failure, so give it in steps and stop only for signs of overload.',
+  fluidAfter: 'After initial fluid, restrictive and liberal strategies had similar mortality (CLOVERS, CLASSIC), so further fluid follows reassessment, not a fixed volume.',
+  lactate: 'Lactate also rises from adrenaline-driven glycolysis and slower clearance, so trend it alongside the exam rather than give fluid until it normalizes.',
+  onp: 'In Sepsis-3, adding a lactate over 2 to the need for a vasopressor picked out the group with hospital mortality over 40%.',
+  press: 'The main fault is lost vessel tone; norepinephrine restores it, and waiting for more fluid only prolongs the low pressure.',
+  pressUp: 'Vasopressin works on a different receptor, so it adds pressure without more adrenergic drive.',
+  source: 'Antibiotics cannot sterilize an undrained abscess, an obstructed kidney or an infected line.',
+  later: 'Broad cover is a bridge to a diagnosis; narrowing once results return keeps its benefit without prolonging it.'
+};
+
+var SOURCE = {
+  lung: ['Chest imaging; look for empyema or a large effusion that needs drainage.'],
+  urine: ['Image for obstruction or abscess (ultrasound or CT) if there is flank pain, a stone history, poor response or kidney injury: an obstructed infected kidney needs drainage.','Remove or replace a long-standing urinary catheter.'],
+  abd: ['Imaging (ultrasound for the biliary tree, CT for the rest) and early surgical or interventional review: cholangitis, perforation, abscess and ischemic bowel need drainage or surgery.'],
+  skin: ['Pain out of proportion, crepitus, bullae or rapid spread: call surgery now for necrotizing infection; imaging must not delay it.','Drain any abscess.'],
+  line: ['Remove an intravascular device that may be the source promptly, after other access is working.','Culture blood from the line and a peripheral site.'],
+  cns: ['Lumbar puncture when safe (imaging first if focal signs, papilledema or reduced consciousness); do not delay antibiotics for either.','Imaging for abscess or empyema.'],
+  unk: ['Examine every line, wound and pressure area; image the chest; urinalysis; abdominal imaging if no source is found.']
+};
+var ANAER = {abd: 'include', skin: 'necrotizing', cns: 'abscess', lung: 'no', urine: 'no', line: 'no', unk: 'no'};
+
+/* Classify. i = {like, src, map, sbp, lac, press, wt, given, mins, ams, uo, crt, low, age65, hf, esrd, cirr, tbi, cx, abx} */
+function state(i){
+  var s = {};
+  s.onP = i.press === 'ne' || i.press === 'ne2';
+  s.lowP = (has(i.map) && i.map < 65) || (has(i.sbp) && i.sbp < 90) || !!i.low;
+  s.hypoperf = s.lowP || (has(i.lac) && i.lac >= 4) || s.onP;
+  s.tgt = i.age65 ? {lo: 60, hi: 65, txt: '60 to 65'} : {lo: 65, hi: 70, txt: '65'};
+  s.below = has(i.map) ? i.map < s.tgt.lo : (has(i.sbp) ? i.sbp < 90 : !!i.low);
+  s.above = has(i.map) && i.map > s.tgt.hi;
+  s.od = s.lowP || (has(i.lac) && i.lac > 2) || !!i.ams || !!i.uo;
+  if (s.onP && has(i.lac) && i.lac > 2) s.cls = 'shock';
+  else if (s.onP) s.cls = 'onp';
+  else if (s.lowP) s.cls = 'hypo';
+  else if (has(i.lac) && i.lac >= 4) s.cls = 'hypoperf';
+  else if (s.od) s.cls = 'sepsis';
+  else s.cls = 'none';
+  s.shocky = s.onP || s.lowP || (has(i.lac) && i.lac >= 4);
+  s.target = has(i.wt) && i.wt > 0 ? r50(30 * i.wt) : null;
+  s.given = has(i.given) ? i.given : 0;
+  s.done30 = s.target != null && s.given >= s.target;
+  return s;
+}
+function anyInput(i){ return !!(i.like || i.src || has(i.map) || has(i.sbp) || has(i.lac) || (i.press && i.press !== 'none') || i.ams || i.uo || i.crt || i.low); }
+
+function classCard(i, s){
+  var c = {id: 'c-class', label: 'Where the patient is'};
+  if (s.cls === 'shock'){ c.head = 'Septic shock'; c.sub = 'On a vasopressor with lactate ' + i.lac + ' mmol/L.'; c.why = WHY.shock; c.chips = [['shock', 'vaso', 'Why the pressure falls']]; c.more = ['Sepsis-3: septic shock is sepsis needing a vasopressor to keep mean pressure 65 or more, with lactate over 2 mmol/L, despite adequate volume resuscitation.']; }
+  else if (s.cls === 'onp'){ c.head = 'On a vasopressor: septic shock if lactate is over 2'; c.sub = 'Send a lactate to complete the label; treat as septic shock meanwhile.'; c.why = WHY.onp; c.chips = [['shock', 'vaso', 'Why the pressure falls']]; c.more = ['Sepsis-3: septic shock is sepsis needing a vasopressor to keep mean pressure 65 or more, with lactate over 2 mmol/L, despite adequate volume resuscitation.']; }
+  else if (s.cls === 'hypo'){ c.head = 'Sepsis with low pressure: treat as septic shock'; c.sub = (has(i.map) && i.map < 65 ? 'Mean pressure ' + i.map + '. ' : '') + (has(i.sbp) && i.sbp < 90 ? 'Systolic ' + i.sbp + '. ' : '') + (i.low ? 'Systolic well below usual. ' : '') + 'The Sepsis-3 label of septic shock applies if a vasopressor is still needed after fluid and lactate is over 2.'; c.why = WHY.hypo; c.chips = [['shock', 'vaso', 'Why the pressure falls']]; c.more = ['The 2026 guideline counts low pressure (for example mean under 65 or systolic under 90), pressure well below the patient\'s usual, or raised lactate as signs of hypoperfusion.']; }
+  else if (s.cls === 'hypoperf'){ c.head = 'Sepsis with hypoperfusion'; c.sub = 'Lactate ' + i.lac + ' mmol/L with pressure holding.'; c.why = WHY.hypoperf; c.chips = [['lactate', 'hypox', 'Why lactate rises']]; c.more = ['Lactate of 4 or more is the trigger for 30 mL/kg in the US SEP-1 measure and in earlier sepsis bundles; the 2026 guideline gives raised lactate as one sign of hypoperfusion without a fixed cut-off.']; }
+  else if (s.cls === 'sepsis'){ c.head = 'Sepsis likely: organ dysfunction or hypoperfusion present'; c.sub = [i.ams ? 'new confusion' : null, i.uo ? 'low urine output' : null, has(i.lac) && i.lac > 2 ? 'lactate ' + i.lac : null].filter(Boolean).join(', ').replace(/^./, function(x){ return x.toUpperCase(); }) + '.'; c.why = WHY.sepsis; c.chips = [['def', 'sepsis', 'Sepsis and shock in words']]; c.more = ['Sepsis-3: sepsis is life-threatening organ dysfunction caused by a dysregulated host response to infection, identified as an acute rise of 2 or more SOFA points. A raised lactate signals hypoperfusion rather than a SOFA item.']; }
+  else { c.head = 'No organ dysfunction entered yet'; c.sub = 'Check the SOFA domains: platelets, bilirubin, creatinine and urine output, oxygenation (PaO2/FiO2), mental status, and pressure. Infection without organ dysfunction is not sepsis, but recheck: it can change within hours.'; c.chips = [['def', 'sepsis', 'Sepsis and shock in words']]; }
+  c.tiers = ['Definitions: Sepsis-3 consensus (2016)'];
+  return c;
+}
+
+function abxPlan(i, s){
+  var p = {};
+  if (i.abx){ p.mode = 'given'; return p; }
+  if (s.shocky){ p.mode = 'now'; p.why = WHY.abxNow; p.limit = 60; }
+  else if (i.like === 'probable'){ p.mode = 'now'; p.why = WHY.abxNow; p.limit = 60; }
+  else if (i.like === 'possible'){ p.mode = 'three'; p.why = WHY.abxPossible; p.limit = 180; }
+  else { p.mode = 'ask'; }
+  if (p.limit && has(i.mins)){
+    var left = p.limit - i.mins;
+    p.clock = p.mode === 'now' ? (left > 0 ? i.mins + ' min since recognition: give now.' : i.mins + ' min since recognition: past the 1-hour window, give now.') : (left > 0 ? Math.floor(left / 60) + ' h ' + (left % 60) + ' min left of the 3 hours from first suspicion.' : 'Past 3 hours from first suspicion: decide now; give antibiotics if infection is still likely.');
+  }
+  return p;
+}
+
+function abxCard(i, s){
+  var p = abxPlan(i, s), c = {id: 'c-abx', label: 'Antibiotics'};
+  var anaer = ANAER[i.src || 'unk'];
+  var common = ['After a loading dose, give a beta-lactam as a prolonged infusion rather than a bolus (strong, moderate).', 'Cover a resistant organism only when the risk is high: known colonization or prior infection with it, long broad-spectrum antibiotic courses, long hospital stays.', anaer === 'include' ? 'Abdominal source: include anaerobic cover.' : anaer === 'necrotizing' ? 'Skin: include anaerobic cover if necrotizing infection is possible.' : anaer === 'abscess' ? 'Brain: include anaerobic cover if abscess or empyema is possible.' : 'No anaerobic risk from this source: anaerobic cover is not needed (the 2026 guideline lists intra-abdominal, deep pelvic, necrotizing soft tissue, head and neck, and brain abscess or empyema).', 'No routine empiric antifungal.'];
+  if (p.mode === 'given'){ c.head = 'Antibiotics given'; c.sub = 'Next: the source, then narrowing when results return.'; c.list = common.slice(0, 1); c.tiers = ['Surviving Sepsis 2026: prolonged infusion strong, moderate']; return c; }
+  if (p.mode === 'ask'){ c.head = 'Pick how likely infection is'; c.sub = 'Shock, or probable sepsis: within 1 hour. Possible sepsis without shock: rapid workup, then within 3 hours if infection is still likely.'; c.empty = true; return c; }
+  if (p.mode === 'now'){ c.head = 'Antibiotics now, ideally within 1 hour of recognition'; c.sub = s.shocky ? 'Possible septic shock: do not wait for results.' : 'Probable or definite sepsis.'; }
+  else { c.head = 'Rapid workup first; antibiotics within 3 hours if infection is still likely'; c.sub = 'Possible sepsis without shock. If infection becomes unlikely, hold antibiotics and keep watching closely.'; }
+  c.clock = p.clock;
+  c.list = [i.cx ? 'Blood cultures: drawn.' : 'Blood cultures as soon as possible, ideally before the first dose, drawn quickly so antibiotics are not delayed (strong, low).'].concat(common);
+  c.why = p.why;
+  c.links = [['/abx-empiric/#syndromes', 'Regimen by source: empiric antibiotics']];
+  c.chips = [['clock', 'ssc', 'The first six hours']];
+  c.tiers = p.mode === 'now' ? ['Within 1 hour: strong, very low', 'Cultures: strong, low', 'Resistant and anaerobic cover: conditional, very low'] : ['Rapid assessment: good practice statement', 'Within 3 hours: conditional, very low', 'Cultures: strong, low'];
+  return c;
+}
+
+function fluidCard(i, s){
+  var c = {id: 'c-fluid', label: 'Fluids'};
+  var hfx = i.hf || i.esrd;
+  var type = i.tbi ? 'Use 0.9% saline (traumatic brain injury); avoid albumin.' : 'Balanced crystalloid (lactated Ringer\'s or Plasma-Lyte) over 0.9% saline (conditional, moderate).';
+  var alb = i.cirr ? 'Cirrhosis: albumin may be appropriate alongside crystalloid (remark); crystalloid alone is the default for others.' : 'Crystalloid alone over adding albumin (conditional, moderate); albumin may fit after large crystalloid volumes. Never starches; not gelatin.';
+  var wtLine = 'Weight: actual body weight; adjusted or ideal body weight if BMI is over 30; actual weight if underweight (2026 remark).';
+  if (s.hypoperf){
+    if (s.target == null){ c.head = 'At least 30 mL/kg of crystalloid in the first 3 hours'; c.sub = 'Enter the weight for the volume.'; c.empty = false; c.list = [type, wtLine]; c.why = hfx ? WHY.fluidHF : WHY.fluid; c.tiers = ['30 mL/kg: conditional, low']; return c; }
+    if (!s.done30){
+      c.head = 'Crystalloid ' + fmt(s.target) + ' mL in the first 3 hours (30 mL/kg)';
+      c.sub = s.given > 0 ? 'Given ' + fmt(s.given) + ' mL: about ' + fmt(s.target - s.given) + ' mL to go.' : 'Start now; give it as boluses and reassess after each.';
+      c.list = [type, hfx ? 'Heart or kidney failure: aim for the same volume in boluses, reassessing lungs, oxygen and the pressure after each. Stop short only for signs of overload, and then write the volume given and the reason in one order or note (SEP-1).' : 'Give as boluses and recheck pressure, capillary refill and breathing after each.', wtLine, alb];
+      c.why = hfx ? WHY.fluidHF : WHY.fluid;
+      if (s.below && !s.onP) c.guards = ['Pressure still low after the first bolus: start norepinephrine now, peripherally if needed. Do not wait to finish 30 mL/kg.'];
+      c.chips = [['shock', 'hypo', 'Why the circulation is underfilled'], ['bars', 'vol', 'How much fluid: trials']];
+      c.tiers = ['30 mL/kg: conditional, low', 'Balanced over saline: conditional, moderate', 'Albumin: conditional, moderate'];
+      return c;
+    }
+    c.head = 'Initial ' + fmt(s.target) + ' mL given: further fluid only after reassessment';
+    c.sub = 'Still hypoperfused. Liberal or restrictive further fluid are both acceptable (conditional, low); decide on the patient in front of you.';
+    c.list = ['Before each further bolus: a dynamic test (passive leg raise or a small fluid challenge, with stroke volume, pulse pressure or its variation) rather than the exam or central pressure alone.', 'Capillary refill and a repeat lactate as adjuncts; do not give fluid just to normalize lactate.', type, alb];
+    if (s.below && !s.onP) c.guards = ['Pressure below target after the initial volume: norepinephrine now; do not delay it for more fluid.'];
+    c.why = WHY.fluidAfter;
+    c.chips = [['bars', 'vol', 'Restrictive or liberal: trials']];
+    c.tiers = ['Liberal or restrictive: conditional, low', 'Dynamic measures: conditional, low', 'Capillary refill: conditional, low'];
+    return c;
+  }
+  if (has(i.lac) && i.lac > 2){
+    c.head = 'Raised lactate, pressure holding: consider fluid and repeat the lactate';
+    c.sub = 'Lactate ' + i.lac + '. No fixed volume; give fluid if the exam or a dynamic test says it will help.';
+    c.list = ['Repeat lactate to guide resuscitation (conditional, low).', type, i.crt ? 'Slow capillary refill: a sign of poor perfusion; recheck after each bolus.' : 'Use capillary refill alongside lactate (conditional, low).'];
+    c.why = WHY.lactate;
+    c.chips = [['lactate', 'beta', 'Why lactate rises']];
+    c.tiers = ['Serial lactate: conditional, low', 'Capillary refill: conditional, low'];
+    return c;
+  }
+  if (i.crt){ c.head = 'Slow capillary refill: check lactate and pressure'; c.sub = 'A sign of poor perfusion. Send lactate; give fluid if a dynamic test says it will help.'; c.list = [type]; c.why = WHY.fluid; c.tiers = ['Capillary refill as an adjunct: conditional, low']; return c; }
+  if (has(i.map) || has(i.sbp) || has(i.lac)){ c.head = 'No fluid target from these numbers'; c.sub = 'Pressure and lactate are not in the hypoperfusion range. Give fluid by need (intake, losses) and recheck if anything changes.'; c.empty = true; return c; }
+  return null;
+}
+
+function pLine(i){ return has(i.map) ? 'Mean pressure ' + i.map + '. ' : has(i.sbp) ? 'Systolic ' + i.sbp + '. ' : 'Systolic well below usual. '; }
+function pressCard(i, s){
+  if (!has(i.map) && !has(i.sbp) && !s.onP && !i.low) return null;
+  var c = {id: 'c-press', label: 'Pressure'};
+  var tgt = 'Target mean pressure ' + s.tgt.txt + (i.age65 ? ' (age 65 or older: conditional, low).' : ' (strong, moderate).');
+  var steroid = 'Septic shock: IV corticosteroids are suggested (conditional, low); dose and timing in the pressors and steroids tools.';
+  var aline = 'Arterial line when the dose is moderate to high, rising, or more than one pressor is running, or cuff readings are unreliable.';
+  var L = [['/pressors/#running', 'Doses and next step: pressors'], ['/steroids/#situation', 'Hydrocortisone: steroids']];
+  if (!s.onP && s.below){
+    c.head = s.done30 ? 'Start norepinephrine now' : 'Norepinephrine now if the pressure stays low after the first bolus';
+    c.sub = pLine(i) + tgt;
+    c.list = ['Start through a good peripheral vein rather than wait for a central line (conditional, very low).', 'Unstable or falling pressure: start it alongside fluid, not after.', 'Norepinephrine first (strong, high against dopamine).'];
+    c.guards = ['Do not delay a vasopressor to give more fluid when the pressure stays low.'];
+    c.why = WHY.press; c.links = L.slice(0, 1); c.chips = [['shock', 'vaso', 'Why the pressure falls'], ['clock', 'ssc', 'Bolus, then pressor']];
+    c.tiers = ['Bolus then vasopressor: conditional, very low', 'Peripheral start: conditional, very low', 'Norepinephrine first: strong'];
+    return c;
+  }
+  if (s.onP && s.below){
+    c.head = i.press === 'ne2' ? 'Below target on two drugs: escalate and look for a missed cause' : 'Below target on norepinephrine: escalate, and add vasopressin as the dose climbs';
+    c.sub = (has(i.map) ? 'Mean pressure ' + i.map + '. ' : '') + tgt;
+    c.list = [i.press === 'ne2' ? 'Next: epinephrine if the pressure stays inadequate (conditional, very low); check the source, bleeding, the heart (echo), and adrenal function.' : 'Add vasopressin on escalating norepinephrine rather than keep escalating (conditional, moderate).', steroid, aline];
+    c.why = i.press === 'ne2' ? 'A missed cause is more likely than a missing drug.' : WHY.pressUp;
+    c.links = L; c.tiers = ['Add vasopressin: conditional, moderate', 'Steroids: conditional, low', 'Add epinephrine: conditional, very low'];
+    return c;
+  }
+  if (s.onP){
+    c.head = s.above ? 'Above target: bring the dose down' : 'At target: hold the dose';
+    c.sub = (has(i.map) ? 'Mean pressure ' + i.map + '. ' : 'Enter the mean pressure. ') + tgt;
+    c.list = [steroid, aline];
+    c.links = L; c.tiers = ['MAP 65: strong, moderate', 'Steroids: conditional, low'];
+    return c;
+  }
+  c.head = 'Pressure at target: no vasopressor needed now'; c.sub = (has(i.map) ? 'Mean pressure ' + i.map + '. ' : '') + tgt; c.empty = true;
+  return c;
+}
+
+function sourceCard(i, s){
+  if (!i.src) return null;
+  var c = {id: 'c-source', label: 'Source'};
+  c.head = i.src === 'unk' ? 'Find the source now' : 'Source: ' + SRCN[i.src].toLowerCase() + '. Look for anything to drain or remove';
+  c.sub = 'Control it early, ideally within 6 hours of diagnosis (conditional, very low).';
+  c.list = SOURCE[i.src];
+  c.why = WHY.source;
+  c.links = [['#narrow', 'Narrow the source']];
+  c.tiers = ['Look for a source needing urgent control: good practice statement', 'Within 6 hours: conditional, very low', 'Source-specific steps: expert practice'];
+  return c;
+}
+
+function laterCard(i, s){
+  var c = {id: 'c-later', label: 'Hours 6 to 72'};
+  c.head = 'Admit, narrow, set a stop date';
+  c.list = ['ICU within 6 hours for those who need it (conditional, low).', 'Narrow when the organism and susceptibilities are known (strong, very low); consider it when cultures stay negative (conditional, very low); stop if another diagnosis explains the picture (good practice).', 'Shorter courses once the source is controlled (conditional, very low); procalcitonin with clinical judgment helps decide when to stop, not when to start.', 'After the acute phase of shock, remove excess fluid: diuretics, then ultrafiltration if needed (conditional, very low).', 'Insulin when glucose is 180 mg/dL or more (strong, moderate); restrictive transfusion (strong, moderate); drug VTE prophylaxis, low molecular weight heparin preferred (strong, moderate).'];
+  c.why = WHY.later;
+  c.links = [['/abx-empiric/#narrow', 'De-escalation by result: empiric antibiotics']];
+  c.tiers = ['Surviving Sepsis 2026'];
+  return c;
+}
+
+function hourCard(i, s, p){
+  var steps = [];
+  steps.push({w: 'Now', t: 'Start treatment and resuscitation', d: 'Begin immediately (good practice statement).', st: 'now'});
+  steps.push({w: 'Now', t: i.cx ? 'Blood cultures drawn' : 'Blood cultures, ideally before antibiotics', d: i.cx ? '' : 'Quickly, so antibiotics are not delayed.', st: i.cx ? 'done' : 'now'});
+  steps.push({w: 'Now', t: has(i.lac) ? 'Lactate ' + i.lac + (i.lac > 2 ? ': repeat it to guide resuscitation' : '') : 'Lactate', d: has(i.lac) ? '' : 'Measure it (conditional, low).', st: has(i.lac) ? (i.lac > 2 ? 'now' : 'done') : 'now'});
+  steps.push({w: p.mode === 'three' ? 'By 3 h' : 'By 1 h', t: p.mode === 'given' ? 'Antibiotics given' : p.mode === 'three' ? 'Rapid workup; antibiotics if still likely' : p.mode === 'ask' ? 'Antibiotics: 1 or 3 hours, by likelihood' : 'Antibiotics', d: p.clock || '', st: p.mode === 'given' ? 'done' : 'now'});
+  if (s.hypoperf) steps.push({w: 'By 3 h', t: s.target ? 'Crystalloid ' + fmt(s.target) + ' mL' + (s.done30 ? ' given' : '') : 'Crystalloid 30 mL/kg', d: s.done30 ? '' : 'Reassess after each bolus.', st: s.done30 ? 'done' : 'now'});
+  if (s.below && !s.onP) steps.push({w: 'When low', t: 'Norepinephrine if pressure stays low after the first bolus', d: '', st: 'now'});
+  if (i.src) steps.push({w: 'By 6 h', t: 'Source control', d: SRCN[i.src], st: ''});
+  steps.push({w: 'By 6 h', t: 'ICU review; repeat lactate if it was raised', d: '', st: ''});
+  return {id: 'c-hour', label: 'First hours, in order', head: 'Checklist', steps: steps, chips: [['clock', 'ssc', 'The first six hours']]};
+}
+
+function sepCard(i, s){
+  if (!anyInput(i)) return null;
+  var sh = (has(i.map) && i.map < 65) || (has(i.sbp) && i.sbp < 90) || (has(i.lac) && i.lac >= 4);
+  var c = {id: 'c-sep1', label: 'US quality measure, not a guideline'};
+  c.head = 'SEP-1 asks for';
+  c.list = ['Within 3 hours of severe sepsis: initial lactate' + (has(i.lac) ? ' (done)' : '') + '; blood cultures before antibiotics' + (i.cx ? ' (done)' : '') + '; broad-spectrum antibiotics' + (i.abx ? ' (done)' : '') + '.', 'Within 6 hours: repeat lactate if the first was over 2.'];
+  if (sh) c.list = c.list.concat(['Hypotension (systolic under 90 or mean under 65) or initial lactate 4 or more: 30 mL/kg crystalloid within 3 hours' + (s.target ? ' (' + fmt(s.target) + ' mL)' : '') + '. A smaller ordered volume counts if one order or note states the volume and the reason (for example heart failure, kidney failure, concern for overload).', 'Hypotension persisting after the fluid: vasopressor within 6 hours.', 'Hypotension persisting or initial lactate 4 or more: repeat and document a volume status and perfusion assessment within 6 hours.']);
+  c.more = ['Severe sepsis in SEP-1: suspected infection, 2 or more SIRS criteria, and organ dysfunction (for example systolic under 90 or mean under 65, creatinine over 2.0, bilirubin over 2, platelets under 100,000, INR over 1.5, lactate over 2, or a new need for invasive or non-invasive ventilation).', 'SEP-1 is reported in the Hospital Inpatient Quality Reporting program and counts in Hospital Value-Based Purchasing. It is a documentation standard, not a treatment rule, and it uses older terms (severe sepsis) than Sepsis-3.'];
+  c.tiers = ['CMS SEP-1, specifications v5.18a (2026 discharges)'];
+  c.chips = [['clock', 'sep', 'The SEP-1 clock']];
+  return c;
+}
+
+function decide(i){
+  var s = state(i);
+  if (!anyInput(i)) return {s: s, cards: [{id: 'c-empty', label: 'Start', head: 'Enter what you know', sub: 'Pick how likely infection is, then the pressure and lactate. Every card updates as you type.', empty: true}]};
+  var p = abxPlan(i, s);
+  var cards = [classCard(i, s), hourCard(i, s, p), abxCard(i, s), fluidCard(i, s), pressCard(i, s), sourceCard(i, s), laterCard(i, s), sepCard(i, s)].filter(Boolean);
+  return {s: s, p: p, cards: cards};
+}
+
+/* Source narrowing (expert practice) */
+var NSRC = [['lung','Lung'],['urine','Urinary tract'],['abd','Abdomen or biliary'],['skin','Skin or soft tissue'],['line','Line or device'],['cns','Brain or meninges'],['endo','Endocarditis']];
+var FIND = {
+  cxr: {n: 'New infiltrate on chest imaging', fav: ['lung'], why: {lung: 'A new infiltrate with fever and cough fits pneumonia; look for an effusion to tap.'}},
+  ua: {n: 'Pyuria with flank pain', fav: ['urine'], why: {urine: 'Flank pain with pyuria points to the kidney; image if obstruction is possible. Pyuria alone does not prove a urinary source.'}},
+  ruq: {n: 'RUQ pain or cholestatic liver tests', fav: ['abd'], why: {abd: 'Fits cholangitis or another biliary or abdominal source; ultrasound or CT, then drainage.'}},
+  skin: {n: 'Spreading redness, pain out of proportion', fav: ['skin'], why: {skin: 'Pain beyond the visible redness, crepitus or bullae suggest necrotizing infection: surgery now.'}},
+  line: {n: 'Central line or device, nothing else found', fav: ['line'], why: {line: 'With no other source, the line is the usual suspect; culture it and plan removal.'}},
+  cns: {n: 'Headache, stiff neck, new confusion', fav: ['cns'], why: {cns: 'Meningitis needs antibiotics now and a lumbar puncture when safe.'}},
+  bc: {n: 'S. aureus, viridans strep or enterococcus in blood', fav: ['endo', 'line'], why: {endo: 'These organisms are typical of endocarditis: echocardiogram.', line: 'S. aureus also comes from lines; look at every device.'}}
+};
+function narrowRows(k){
+  return NSRC.map(function(x){
+    if (!k) return {name: x[1], why: '', st: ''};
+    var F = FIND[k], on = F.fav.indexOf(x[0]) >= 0;
+    return {name: x[1], why: on ? F.why[x[0]] : 'Less likely with this finding; not excluded.', st: on ? 'fav' : 'less'};
+  });
+}
+var WU_FIRST = ['Blood cultures, two sets, ideally before antibiotics', 'Lactate', 'Blood count, chemistry with creatinine, liver tests, coagulation (the SOFA labs)', 'Urinalysis and urine culture', 'Chest imaging', 'Blood gas if breathing or mental status is off'];
+var WU_THEN = ['Sputum or tracheal culture if pneumonia', 'Ultrasound or CT of abdomen and pelvis if abdominal signs or no source found', 'Renal ultrasound if obstruction is possible', 'Lumbar puncture if meningitis is possible', 'Echocardiogram if S. aureus, viridans streptococci or enterococcus grow, or a new murmur', 'Procalcitonin later, to help decide when to stop antibiotics (not to start them)'];
+var MIMICS = ['Pulmonary embolism', 'Cardiogenic shock or acute coronary syndrome', 'Bleeding or other volume loss', 'Pancreatitis', 'Adrenal crisis', 'Anaphylaxis', 'Diabetic ketoacidosis', 'Drug reaction or toxic ingestion'];
+</script>
+<script id="figs">
+/* Figures: site-drawn SVG, shared colour names only. */
+var FM = 'font-family:var(--mono)', FSn = 'font-family:var(--sans)';
+function svgOpen(vb, label){ return '<svg viewBox="' + vb + '" role="img" aria-label="' + label + '" class="fig">'; }
+function tx(x, y, t, o){ o = o || {}; return '<text x="' + x + '" y="' + y + '" text-anchor="' + (o.a || 'middle') + '" style="' + (o.sans ? FSn : FM) + ';font-size:' + (o.s || 11.5) + 'px;font-weight:' + (o.w || 400) + ';fill:' + (o.c || 'var(--ink)') + '">' + t + '</text>'; }
+function rect(x, y, w, h, st){ var s = st === 'hot' ? 'fill:var(--card);stroke:var(--accent);stroke-width:2.5' : st === 'dim' ? 'fill:var(--fill);stroke:var(--line);stroke-width:1.5' : 'fill:var(--card);stroke:var(--muted);stroke-width:1.5'; return '<rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="10" style="' + s + '"/>'; }
+function arrow(x1, y1, x2, y2, hot){ var c = hot ? 'var(--accent)' : 'var(--muted)'; var a = Math.atan2(y2 - y1, x2 - x1), l = 7; return '<line x1="' + x1 + '" y1="' + y1 + '" x2="' + x2 + '" y2="' + y2 + '" style="stroke:' + c + ';stroke-width:' + (hot ? 2.5 : 1.5) + '"/><path d="M' + x2 + ' ' + y2 + ' L' + (x2 - l * Math.cos(a - 0.45)) + ' ' + (y2 - l * Math.sin(a - 0.45)) + ' L' + (x2 - l * Math.cos(a + 0.45)) + ' ' + (y2 - l * Math.sin(a + 0.45)) + ' Z" style="fill:' + c + '"/>'; }
+
+var FIGS = {
+  def: {t: 'Sepsis and shock in words', states: ['sepsis', 'shock'], data: {
+    sepsis: {n: 'Sepsis', line: 'Infection plus a dysregulated response that injures organs: an acute rise of 2 or more SOFA points.'},
+    shock: {n: 'Septic shock', line: 'Sepsis needing a vasopressor to keep mean pressure 65 or more, with lactate over 2, despite adequate fluid.'}},
+    svg: function(k){
+      var sh = k === 'shock';
+      var h = svgOpen('0 0 360 250', 'Chain from infection to organ dysfunction to septic shock');
+      h += rect(20, 14, 320, 40, 'hot') + tx(180, 39, 'Infection', {w: 600});
+      h += arrow(180, 56, 180, 72, true);
+      h += rect(20, 74, 320, 40, 'hot') + tx(180, 99, 'Dysregulated host response', {w: 600});
+      h += arrow(180, 116, 180, 132, true);
+      h += rect(20, 134, 320, 46, 'hot') + tx(180, 154, 'Organ dysfunction = SEPSIS', {w: 700}) + tx(180, 171, 'SOFA rise of 2 or more', {c: 'var(--muted)'});
+      h += arrow(180, 182, 180, 198, sh);
+      h += rect(20, 200, 320, 46, sh ? 'hot' : 'dim') + tx(180, 220, 'SEPTIC SHOCK', {w: 700, c: sh ? 'var(--ink)' : 'var(--muted)'}) + tx(180, 237, 'pressor for MAP 65 + lactate over 2', {c: 'var(--muted)'});
+      return h + '</svg>';
+    }},
+  shock: {t: 'Why the pressure falls', states: ['norm', 'vaso', 'hypo', 'myo'], data: {
+    norm: {n: 'Normal', line: 'Pressure is cardiac output times the tightness of the small arteries; the veins hold a reserve that returns blood to the heart.'},
+    vaso: {n: 'Vasodilation', line: 'Inflammation relaxes the small arteries: resistance falls, so pressure falls even when output is high (warm shock). Norepinephrine restores tone.'},
+    hypo: {n: 'Underfilled', line: 'Veins relax and hold more blood, and capillaries leak fluid into tissues, so less blood returns to the heart. This is what the first fluid treats.'},
+    myo: {n: 'Weak heart', line: 'Septic cardiomyopathy reduces the squeeze in some patients; output cannot rise to meet the low resistance. Echo helps; an inotrope may be added.'}},
+    svg: function(k){
+      var h = svgOpen('0 0 360 260', 'Circulation in septic shock: heart, arterioles, capillaries and veins');
+      var heart = k === 'myo' ? 'hot' : 'on', art = k === 'vaso' ? 'hot' : 'on', ven = k === 'hypo' ? 'hot' : 'on';
+      h += rect(14, 92, 92, 70, heart) + tx(60, 120, 'HEART', {w: 700}) + tx(60, 139, k === 'myo' ? 'squeeze low' : 'output', {c: k === 'myo' ? 'var(--accent)' : 'var(--muted)'});
+      var aw = k === 'vaso' ? 28 : 12;
+      h += '<rect x="132" y="' + (62 - aw / 2) + '" width="116" height="' + aw + '" rx="' + aw / 2 + '" style="fill:var(--fill);stroke:' + (art === 'hot' ? 'var(--accent)' : 'var(--muted)') + ';stroke-width:' + (art === 'hot' ? 2.5 : 1.5) + '"/>';
+      h += tx(190, 18, 'ARTERIOLES', {w: 700}) + tx(190, 34, k === 'vaso' ? 'wide: resistance low' : 'tone sets resistance', {c: k === 'vaso' ? 'var(--accent)' : 'var(--muted)'});
+      h += arrow(80, 90, 130, 64, false);
+      h += rect(262, 92, 84, 70, k === 'hypo' ? 'hot' : 'on') + tx(304, 120, 'CAPILLARY', {w: 700, s: 11}) + tx(304, 139, k === 'hypo' ? 'leaking' : 'exchange', {c: k === 'hypo' ? 'var(--accent)' : 'var(--muted)'});
+      if (k === 'hypo') [0, 1, 2].forEach(function(n){ h += '<circle cx="' + (282 + n * 20) + '" cy="176" r="4" style="fill:var(--accent)"/>'; });
+      h += arrow(250, 64, 296, 90, false);
+      var vh = k === 'hypo' ? 44 : 26;
+      h += '<rect x="122" y="' + (206 - vh / 2) + '" width="124" height="' + vh + '" rx="12" style="fill:var(--fill);stroke:' + (ven === 'hot' ? 'var(--accent)' : 'var(--muted)') + ';stroke-width:' + (ven === 'hot' ? 2.5 : 1.5) + '"/>';
+      h += tx(184, 210, 'VEINS', {w: 700}) + tx(184, 252, k === 'hypo' ? 'pooling: less return' : 'reserve returns blood', {c: k === 'hypo' ? 'var(--accent)' : 'var(--muted)'});
+      h += arrow(300, 164, 250, 200, false) + arrow(122, 206, 70, 166, k === 'hypo');
+      return h + '</svg>';
+    }},
+  lactate: {t: 'Why lactate rises', states: ['hypox', 'beta', 'clear'], data: {
+    hypox: {n: 'Low oxygen delivery', line: 'With too little oxygen, mitochondria cannot take pyruvate, so it is turned into lactate. This is the classic reading, but not the only one.'},
+    beta: {n: 'Adrenaline drive', line: 'Stress catecholamines (and epinephrine infusions) speed glycolysis through beta-2 receptors faster than mitochondria use pyruvate, so lactate rises even with enough oxygen.'},
+    clear: {n: 'Slow clearance', line: 'The liver normally clears most lactate. Poor liver blood flow or liver disease slows clearance, so the level stays high.'}},
+    svg: function(k){
+      var h = svgOpen('0 0 360 250', 'Glucose to pyruvate to lactate, with mitochondria and liver clearance');
+      h += rect(20, 14, 140, 40, k === 'beta' ? 'hot' : 'on') + tx(90, 39, 'Glucose', {w: 600});
+      h += arrow(90, 56, 90, 92, k === 'beta') + tx(100, 80, k === 'beta' ? 'faster (beta-2)' : 'glycolysis', {a: 'start', c: k === 'beta' ? 'var(--accent)' : 'var(--muted)'});
+      h += rect(20, 94, 140, 40, 'on') + tx(90, 119, 'Pyruvate', {w: 600});
+      h += arrow(162, 114, 198, 114, false);
+      h += rect(200, 94, 140, 40, k === 'hypox' ? 'dim' : 'on') + tx(270, 113, 'Mitochondria', {w: 600, c: k === 'hypox' ? 'var(--muted)' : 'var(--ink)'}) + tx(270, 127, k === 'hypox' ? 'short of oxygen' : 'need oxygen', {c: k === 'hypox' ? 'var(--accent)' : 'var(--muted)', s: 11});
+      h += arrow(90, 136, 90, 172, k !== 'clear');
+      h += rect(20, 174, 140, 40, k === 'clear' ? 'on' : 'hot') + tx(90, 199, 'LACTATE', {w: 700});
+      h += arrow(162, 194, 198, 194, false);
+      h += rect(200, 174, 140, 40, k === 'clear' ? 'dim' : 'on') + tx(270, 193, 'Liver clears', {w: 600, c: k === 'clear' ? 'var(--muted)' : 'var(--ink)'}) + tx(270, 207, k === 'clear' ? 'slowed' : 'most of it', {c: k === 'clear' ? 'var(--accent)' : 'var(--muted)', s: 11});
+      h += tx(180, 240, k === 'hypox' ? 'More made: oxygen-limited' : k === 'beta' ? 'More made: oxygen not limiting' : 'Same made, less removed', {c: 'var(--accent)', w: 600});
+      return h + '</svg>';
+    }},
+  bars: {t: 'Fluid trials', states: ['vol', 'type', 'target'], data: {
+    vol: {n: 'How much', line: 'After initial fluid, less fluid (restrictive) and more fluid (liberal) gave similar mortality. Neither trial found more harm with the restrictive approach.'},
+    type: {n: 'Which fluid', line: 'Balanced fluids against saline: small or no differences in large blinded trials; the SMART sepsis subgroup (a secondary analysis) favored balanced fluid.'},
+    target: {n: 'What to aim for', line: 'Targeting capillary refill rather than lactate clearance: fewer deaths that did not reach significance (P = 0.06), and less organ failure at 72 hours.'}},
+    svg: function(k){
+      var D = {
+        vol: [['CLOVERS: death by day 90', 'restrictive', 14.0, 'liberal', 14.9], ['CLASSIC: death by day 90', 'restrictive', 42.3, 'standard', 42.1]],
+        type: [['BaSICS: death by day 90', 'balanced', 26.4, 'saline', 27.2], ['PLUS: death by day 90', 'Plasma-Lyte', 21.8, 'saline', 22.0], ['SMART sepsis subgroup: 30 days', 'balanced', 26.3, 'saline', 31.2]],
+        target: [['ANDROMEDA-SHOCK: 28 days', 'capillary refill', 34.9, 'lactate', 43.4]]
+      }[k];
+      var H = 24 + D.length * 74, h = svgOpen('0 0 360 ' + H, 'Mortality bars from fluid trials'), y = 10, sc = 190 / 50;
+      D.forEach(function(r){
+        h += tx(10, y + 14, r[0], {a: 'start', w: 600});
+        h += '<rect x="110" y="' + (y + 22) + '" width="' + (r[2] * sc) + '" height="16" rx="4" style="fill:var(--accent)"/>' + tx(104, y + 35, r[1], {a: 'end', s: 11}) + tx(114 + r[2] * sc, y + 35, r[2].toFixed(1) + '%', {a: 'start', s: 11});
+        h += '<rect x="110" y="' + (y + 44) + '" width="' + (r[4] * sc) + '" height="16" rx="4" style="fill:var(--muted)"/>' + tx(104, y + 57, r[3], {a: 'end', s: 11}) + tx(114 + r[4] * sc, y + 57, r[4].toFixed(1) + '%', {a: 'start', s: 11});
+        y += 74;
+      });
+      return h + tx(180, H - 4, 'Scale 0 to 50%. Different trials.', {c: 'var(--muted)', s: 11}) + '</svg>';
+    }},
+  clock: {t: 'The first six hours', states: ['ssc', 'sep'], data: {
+    ssc: {n: 'Surviving Sepsis 2026', line: 'Start at once. The antibiotic window depends on how likely sepsis is and whether there is shock. Fluid and pressor follow the patient, not the clock.'},
+    sep: {n: 'SEP-1 (US measure)', line: 'A reporting measure with fixed windows from severe sepsis presentation. Document the reason if you give less than 30 mL/kg.'}},
+    svg: function(k){
+      var R = k === 'ssc' ? [
+        ['0 h', ['Begin treatment and resuscitation', 'Blood cultures, lactate']],
+        ['1 h', ['Antibiotics: shock, or sepsis', 'probable or definite']],
+        ['3 h', ['Antibiotics: possible sepsis, no', 'shock, if infection still likely', 'At least 30 mL/kg if hypoperfused']],
+        ['6 h', ['Source control ideally done', 'ICU if needed']]
+      ] : [
+        ['0 h', ['Severe sepsis presentation', '(infection + SIRS + organ dysfunction)']],
+        ['3 h', ['Lactate; blood cultures before', 'antibiotics; antibiotics', 'Hypotension or lactate 4+: 30 mL/kg']],
+        ['6 h', ['Repeat lactate if over 2', 'Pressor if hypotension persists', 'Reassess volume and perfusion']]
+      ];
+      var H = 14 + R.reduce(function(a, r){ return a + 20 + r[1].length * 17; }, 0), h = svgOpen('0 0 360 ' + H, 'Timeline of the first six hours'), y = 12;
+      h += '<line x1="54" y1="14" x2="54" y2="' + (H - 12) + '" style="stroke:var(--line);stroke-width:3"/>';
+      R.forEach(function(r){
+        h += '<circle cx="54" cy="' + (y + 8) + '" r="7" style="fill:var(--accent)"/>' + tx(36, y + 12, r[0], {a: 'end', w: 700});
+        r[1].forEach(function(l, n){ h += tx(72, y + 12 + n * 17, l, {a: 'start', sans: true, s: 13}); });
+        y += 20 + r[1].length * 17;
+      });
+      return h + '</svg>';
+    }}
+};
+
+var TRIALS = [
+  {q: 'Does a 6-hour protocol save lives? (Rivers, EGDT)', d: 'Randomized, single center, 263 emergency patients with severe sepsis or septic shock; early goal-directed therapy against standard care.', r: 'In-hospital deaths 30.5% against 46.5% (P = 0.009).', c: 'Started the era of early, protocolized resuscitation. Single center.', cite: 'Rivers E et al. N Engl J Med 2001;345:1368', doi: '10.1056/NEJMoa010307'},
+  {q: 'Is the protocol still needed? (ProCESS, ARISE, ProMISe)', d: 'Three randomized trials, 1,341 (US), 1,600 (Australia and New Zealand) and 1,260 (England) patients; goal-directed protocol against usual care.', r: 'No mortality difference in any: ProCESS 21.0% against 18.9% usual care; ARISE 18.6% against 18.8%; ProMISe 29.5% against 29.2%.', c: 'Early recognition, antibiotics and fluid matter; central lines and ScvO2 targets for everyone do not.', cite: 'ProCESS, N Engl J Med 2014;370:1683 · ARISE, N Engl J Med 2014;371:1496 · ProMISe, N Engl J Med 2015;372:1301', doi: '10.1056/NEJMoa1401602'},
+  {q: 'Balanced fluid or saline? (SMART)', d: 'Cluster-randomized crossover, 15,802 critically ill adults in 5 ICUs at one center.', r: 'Death, new dialysis or persistent kidney injury by 30 days 14.3% against 15.4% (odds ratio 0.91, 95% CI 0.84 to 0.99). Sepsis subgroup (secondary analysis): 30-day death 26.3% against 31.2%.', c: 'Pushed balanced crystalloids as the default.', cite: 'Semler MW et al. N Engl J Med 2018;378:829 · Brown RM et al. Am J Respir Crit Care Med 2019;200:1487', doi: '10.1056/NEJMoa1711584'},
+  {q: 'Balanced fluid or saline, blinded? (BaSICS and PLUS)', d: 'Randomized, double blind: BaSICS 11,052 patients in 75 Brazilian ICUs; PLUS 5,037 in 53 Australian and New Zealand ICUs.', r: 'Death by 90 days: BaSICS 26.4% against 27.2% (hazard ratio 0.97, 95% CI 0.90 to 1.05); PLUS 21.8% against 22.0%.', c: 'No clear difference; the 2026 guideline still suggests balanced fluid, now at moderate certainty.', cite: 'Zampieri FG et al. JAMA 2021;326:818 · Finfer S et al. N Engl J Med 2022;386:815', doi: '10.1001/jama.2021.11684'},
+  {q: 'Less fluid in septic shock? (CLASSIC)', d: 'Randomized, 1,554 ICU patients with septic shock after at least 1 L of fluid; restrictive against standard fluid.', r: 'Death by 90 days 42.3% against 42.1% (difference 0.1 points, 95% CI −4.7 to 4.9). Median ICU fluid 1,798 against 3,811 mL.', c: 'Less fluid was not harmful, and not better.', cite: 'Meyhoff TS et al. N Engl J Med 2022;386:2459', doi: '10.1056/NEJMoa2202707'},
+  {q: 'Pressor first or more fluid? (CLOVERS)', d: 'Randomized, 1,563 patients in 60 US hospitals with sepsis-induced hypotension after 1 to 3 L of fluid; restrictive (earlier vasopressor) against liberal fluid for 24 hours.', r: 'Death before discharge home by day 90 14.0% against 14.9% (difference −0.9 points, 95% CI −4.4 to 2.6).', c: 'Either path is acceptable after the initial fluid: the 2026 suggestion.', cite: 'NHLBI PETAL Network. N Engl J Med 2023;388:499', doi: '10.1056/NEJMoa2212663'},
+  {q: 'Capillary refill or lactate as the target? (ANDROMEDA-SHOCK)', d: 'Randomized, 424 patients with septic shock in 28 ICUs; 8 hours of resuscitation targeting capillary refill against lactate clearance.', r: 'Death by 28 days 34.9% against 43.4% (hazard ratio 0.75, 95% CI 0.55 to 1.02; P = 0.06). Less organ failure at 72 hours.', c: 'Capillary refill is a reasonable guide alongside other measures.', cite: 'Hernández G et al. JAMA 2019;321:654', doi: '10.1001/jama.2019.0071'},
+  {q: 'A personalized capillary refill protocol? (ANDROMEDA-SHOCK-2)', d: 'Randomized, 1,501 patients in 86 centers within 4 hours of septic shock; a capillary refill-targeted protocol (pulse pressure, diastolic pressure, fluid responsiveness, echo) against usual care.', r: 'Win ratio 1.16 (95% CI 1.02 to 1.33; P = 0.04) on a ranked outcome of death, then time on organ support, then hospital stay; the gain was mainly shorter organ support.', c: 'Supports structured perfusion-guided resuscitation; no clear mortality difference on its own.', cite: 'Hernandez G et al. JAMA 2025;334:1988', doi: '10.1001/jama.2025.20402'},
+  {q: 'Does early norepinephrine help? (CENSER)', d: 'Randomized, double blind, single center, 310 adults with sepsis and hypotension; early low-dose norepinephrine with fluid against standard care.', r: 'Shock controlled by 6 hours in 76.1% against 48.4%. Less pulmonary edema (14.4% against 27.7%) and arrhythmia (11% against 20%).', c: 'Supports starting norepinephrine early. Single center; mortality not different.', cite: 'Permpikul C et al. Am J Respir Crit Care Med 2019;199:1097', doi: '10.1164/rccm.201806-1034OC'},
+  {q: 'Is a higher pressure target better? (SEPSISPAM)', d: 'Randomized, open label, 776 patients with septic shock; mean pressure 80 to 85 against 65 to 70.', r: 'Deaths at 28 days 36.6% against 34.0% (hazard ratio 1.07, 95% CI 0.84 to 1.38). More new atrial fibrillation with the higher target.', c: 'The default target stayed at 65.', cite: 'Asfar P et al. N Engl J Med 2014;370:1583', doi: '10.1056/NEJMoa1312173'},
+  {q: 'Hydrocortisone in septic shock? (ADRENAL and APROCCHSS)', d: 'Randomized: ADRENAL 3,800 ventilated patients, hydrocortisone against placebo; APROCCHSS 1,241 patients, hydrocortisone plus fludrocortisone against placebo.', r: 'Death by 90 days: ADRENAL 27.9% against 28.8% (odds ratio 0.95, 95% CI 0.82 to 1.10), shock resolved sooner; APROCCHSS 43.0% against 49.1% (relative risk 0.88, 95% CI 0.78 to 0.99).', c: 'Steroids shorten shock; any survival effect is small and uncertain, hence a conditional, low-certainty suggestion.', cite: 'Venkatesh B et al. N Engl J Med 2018;378:797 · Annane D et al. N Engl J Med 2018;378:809', doi: '10.1056/NEJMoa1705835'},
+  {q: 'Continuous beta-lactam infusion? (BLING III)', d: 'Randomized, open label, 7,202 patients with sepsis in 104 ICUs; continuous against intermittent piperacillin-tazobactam or meropenem.', r: 'Death by 90 days 24.9% against 26.8% (odds ratio 0.91, 95% CI 0.81 to 1.01; P = 0.08). Pooled with 17 other trials: relative risk 0.86 (95% credible interval 0.72 to 0.98).', c: 'Prolonged infusion is now a strong 2026 recommendation.', cite: 'Dulhunty JM et al. JAMA 2024;332:629 · Abdul-Aziz MH et al. JAMA 2024;332:638', doi: '10.1001/jama.2024.9779'},
+  {q: 'Does each hour count? (Seymour; Liu)', d: 'Observational: 49,331 patients in 149 New York hospitals; 35,000 patients in 21 California emergency departments.', r: 'Odds of death rose 4% per hour to antibiotics (odds ratio 1.04, 95% CI 1.03 to 1.06) but not per hour to the fluid bolus. In California, about 1.8% absolute per hour in shock and 0.3 to 0.4% in sepsis without shock.', c: 'The basis for the 1-hour window in shock. Observational, so not proof of cause.', cite: 'Seymour CW et al. N Engl J Med 2017;376:2235 · Liu VX et al. Am J Respir Crit Care Med 2017;196:856', doi: '10.1056/NEJMoa1703058'}
+];
+
+var CASES = [
+  {t: 'Cough and fever, pressure fine', s: 'A 46-year-old with 2 days of cough and fever. Mean pressure 78, systolic 118, lactate 1.4, alert. Recognized 40 minutes ago; no cultures or antibiotics yet. 80 kg.', q: 'How fast do antibiotics need to go in?', i: {like: 'possible', src: 'lung', map: 78, sbp: 118, lac: 1.4, wt: 80, mins: 40}, p: 'Possible sepsis without shock: a rapid workup, then antibiotics within 3 hours of first suspicion if infection is still likely. No fluid target from these numbers.'},
+  {t: 'Urosepsis, low pressure on arrival', s: 'A 63-year-old with flank pain and rigors. Mean pressure 58, systolic 82, lactate 4.6, confused. 70 kg. Recognized 15 minutes ago; nothing given yet.', q: 'What goes in first, and how much fluid?', i: {like: 'probable', src: 'urine', map: 58, sbp: 82, lac: 4.6, wt: 70, given: 0, mins: 15, ams: true}, p: 'Treat as septic shock: blood cultures, then antibiotics now (within 1 hour); 2,100 mL of balanced crystalloid in boluses within 3 hours; norepinephrine if the pressure stays low after the first bolus, without waiting for the full volume; image the kidney for obstruction.'},
+  {t: 'Pneumonia with heart failure', s: 'A 71-year-old with heart failure and pneumonia. Mean pressure 62, systolic 88, lactate 3.1. 70 kg; 500 mL given. Lungs have a few crackles.', q: 'Does heart failure change the fluid plan?', i: {like: 'probable', src: 'lung', map: 62, sbp: 88, lac: 3.1, wt: 70, given: 500, hf: true, age65: true}, p: 'Same target (2,100 mL, about 1,600 to go), given in boluses with a recheck of lungs, oxygen and pressure after each. Stop short only for signs of overload, and then write the volume and the reason. Mean pressure 62 is within 60 to 65 for age 65 or older, so no pressor for pressure alone yet; start norepinephrine if it falls below 60.'},
+  {t: 'Still low on two drugs', s: 'A 54-year-old with perforated diverticulitis, cultures and antibiotics given, 2,400 mL in, on norepinephrine and vasopressin. Mean pressure 55, lactate 5.0. 80 kg.', q: 'What next?', i: {like: 'probable', src: 'abd', map: 55, lac: 5, wt: 80, given: 2400, press: 'ne2', cx: true, abx: true}, p: 'Septic shock, below target on two drugs: add epinephrine (doses in the pressors tool), IV corticosteroids are suggested, an arterial line, look for a missed cause, and source control (surgery or drainage) ideally within 6 hours.'},
+  {t: 'Cultures negative at 72 hours', s: 'A 58-year-old treated for sepsis from presumed pneumonia. Now mean pressure 74, lactate 1.2, off pressors. Cultures negative at 72 hours; CT shows a pulmonary embolism and no consolidation.', q: 'What happens to the antibiotics?', i: {like: 'possible', src: 'lung', map: 74, lac: 1.2, cx: true, abx: true}, p: 'Stop the antibiotics: another diagnosis explains the picture (good practice statement). If infection were still likely with negative cultures, de-escalation would be suggested; a shorter course is preferred once a source is controlled.'},
+  {t: 'The wrong source', s: 'A 67-year-old started on antibiotics for pneumonia in the emergency department. Next morning: right upper quadrant pain, bilirubin rising, mean pressure 63, lactate 2.8. Chest film clear.', q: 'What has been missed?', i: {like: 'probable', src: 'abd', map: 63, lac: 2.8, cx: true, abx: true, age65: true}, p: 'A biliary source (cholangitis): ultrasound or CT and drainage, ideally within 6 hours. Antibiotics cannot sterilize an obstructed bile duct. Mean pressure 63 is low enough for 30 mL/kg (hypoperfusion) but within the 60 to 65 range for age 65 or older.'}
+];
+</script>
+<script>
+(function(){
+var $ = function(id){ return document.getElementById(id); };
+function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+var ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M7 15l3-4 3 3 2-2 2 3"/></svg>';
+function chip(fig, state, label){ return '<button class="chip" type="button" data-fig="' + fig + '" data-state="' + (state || '') + '">' + ICON + esc(label || FIGS[fig].t) + '</button>'; }
+function cardHTML(c){
+  var h = '<div class="card" id="' + c.id + '"><p class="label">' + esc(c.label) + '</p><h2>' + esc(c.head) + '</h2>';
+  if (c.sub) h += '<p class="sub">' + esc(c.sub) + '</p>';
+  if (c.clock) h += '<p class="clock">' + esc(c.clock) + '</p>';
+  if (c.steps) h += '<div class="tl">' + c.steps.map(function(s){ return '<div class="st' + (s.st ? ' ' + s.st : '') + '"><span class="when">' + esc(s.w) + (s.st === 'done' ? ' · done' : '') + '</span><b>' + esc(s.t) + '</b>' + (s.d ? '<small>' + esc(s.d) + '</small>' : '') + '</div>'; }).join('') + '</div>';
+  if (c.list) h += '<ul>' + c.list.map(function(s){ return '<li>' + esc(s) + '</li>'; }).join('') + '</ul>';
+  h += (c.guards || []).map(function(g){ return '<div class="guard">' + esc(g) + '</div>'; }).join('');
+  if (c.why) h += '<p class="whyline"><b>Why:</b> ' + esc(c.why) + '</p>';
+  if (c.links) h += '<div class="links">' + c.links.map(function(l){ return '<a href="' + l[0] + '">' + esc(l[1]) + ' →</a>'; }).join('') + '</div>';
+  if (c.chips && c.chips.length) h += '<div class="chips">' + c.chips.map(function(x){ return chip(x[0], x[1], x[2]); }).join('') + '</div>';
+  if ((c.more && c.more.length) || (c.tiers && c.tiers.length)) h += '<details><summary>More</summary>' + (c.more || []).map(function(m){ return '<p>' + esc(m) + '</p>'; }).join('') + (c.tiers || []).map(function(t){ return '<span class="tier">' + esc(t) + '</span>'; }).join('') + '</details>';
+  return h + '</div>';
+}
+
+/* Inputs */
+var st = {like: null, src: null, t: {}};
+var NUMS = ['map','sbp','lac','wt','given','mins'];
+var ALLT = TICKS_P.concat(TICKS_F, TICKS_D);
+function read(){
+  var i = {like: st.like, src: st.src, press: $('press').value};
+  NUMS.forEach(function(k){ var v = parseFloat($(k).value); i[k] = isFinite(v) && v >= 0 ? v : null; });
+  ALLT.forEach(function(t){ if (st.t[t[0]]) i[t[0]] = true; });
+  return i;
+}
+function seg(host, list, sel){ $(host).innerHTML = list.map(function(x){ return '<button class="sbtn" type="button" data-v="' + x[0] + '" aria-pressed="' + (x[0] === sel) + '">' + esc(x[1]) + '</button>'; }).join(''); }
+function ticks(host, list){ $(host).innerHTML = list.map(function(t){ return '<label class="chk"><input type="checkbox" data-t="' + t[0] + '"' + (st.t[t[0]] ? ' checked' : '') + '>' + esc(t[1]) + '</label>'; }).join(''); }
+function drawInputs(){ seg('likeseg', LIKE, st.like); seg('srcseg', SRC, st.src); ticks('ticks-p', TICKS_P); ticks('ticks-f', TICKS_F); ticks('ticks-d', TICKS_D); }
+function build(i){ var o = decide(i); return {o: o, html: o.cards.map(cardHTML).join('')}; }
+function render(){ $('out').innerHTML = build(read()).html; }
+$('likeseg').addEventListener('click', function(e){ var v = e.target.getAttribute('data-v'); if (v){ st.like = st.like === v ? null : v; drawInputs(); render(); } });
+$('srcseg').addEventListener('click', function(e){ var v = e.target.getAttribute('data-v'); if (v){ st.src = st.src === v ? null : v; drawInputs(); render(); } });
+$('inputs').addEventListener('change', function(e){ var t = e.target.getAttribute && e.target.getAttribute('data-t'); if (t){ st.t[t] = e.target.checked; } render(); });
+$('inputs').addEventListener('input', render);
+
+/* Tabs */
+var tabs = [['t-tool','p-tool'],['t-src','p-src'],['t-learn','p-learn'],['t-prac','p-prac']];
+function show(t){ tabs.forEach(function(p){ var on = p[0] === t; $(p[0]).setAttribute('aria-selected', String(on)); $(p[1]).classList.toggle('on', on); }); }
+tabs.forEach(function(p){ $(p[0]).addEventListener('click', function(){ show(p[0]); }); });
+function fromHash(){ var id = location.hash.slice(1); if (!id) return; var el = $(id); if (!el) return; var pan = el.closest('.panel'); if (pan) tabs.forEach(function(p){ if (p[1] === pan.id) show(p[0]); }); el.scrollIntoView(); }
+window.addEventListener('hashchange', fromHash);
+
+/* Figures and the sheet */
+function mountFig(host, id, state){
+  var F = FIGS[id];
+  function draw(k){
+    var d = F.data[k];
+    host.innerHTML = '<div class="states" role="group" aria-label="' + esc(F.t) + '">' + F.states.map(function(x){ return '<button class="sbtn" type="button" data-k="' + x + '" aria-pressed="' + (x === k) + '">' + esc(F.data[x].n) + '</button>'; }).join('') + '</div>' + F.svg(k) + '<p class="line1">' + esc(d.line) + '</p>';
+  }
+  host.onclick = function(e){ var k = e.target.getAttribute && e.target.getAttribute('data-k'); if (k) draw(k); };
+  draw(state && F.data[state] ? state : F.states[0]);
+}
+var lastFocus = null;
+function openSheet(fig, state){
+  lastFocus = document.activeElement;
+  $('sheet-t').textContent = FIGS[fig].t;
+  mountFig($('sheet-b'), fig, state);
+  $('scrim').hidden = false; $('sheet').hidden = false; $('sheet').scrollTop = 0; $('sheet-x').focus();
+}
+function closeSheet(){ if ($('sheet').hidden) return; $('scrim').hidden = true; $('sheet').hidden = true; if (lastFocus && lastFocus.focus) lastFocus.focus(); }
+$('sheet-x').addEventListener('click', closeSheet); $('scrim').addEventListener('click', closeSheet);
+document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeSheet(); });
+document.addEventListener('click', function(e){ var c = e.target.closest && e.target.closest('[data-fig]'); if (c) openSheet(c.getAttribute('data-fig'), c.getAttribute('data-state')); });
+document.querySelectorAll('[data-figure]').forEach(function(h){ mountFig(h, h.getAttribute('data-figure'), h.getAttribute('data-state')); });
+document.addEventListener('click', function(e){ var a = e.target.closest && e.target.closest('a[href="#narrow"]'); if (a){ e.preventDefault(); show('t-src'); $('narrow').scrollIntoView(); } });
+
+/* Source tab */
+$('wu-first').innerHTML = WU_FIRST.map(function(s){ return '<li>' + esc(s) + '</li>'; }).join('');
+$('wu-then').innerHTML = WU_THEN.map(function(s){ return '<li>' + esc(s) + '</li>'; }).join('');
+$('mimiclist').innerHTML = MIMICS.map(function(s){ return '<li>' + esc(s) + '</li>'; }).join('');
+var narSel = null;
+function drawNarrow(){
+  $('narseg').innerHTML = Object.keys(FIND).map(function(k){ return '<button class="sbtn" type="button" data-v="' + k + '" aria-pressed="' + (k === narSel) + '">' + esc(FIND[k].n) + '</button>'; }).join('');
+  $('narout').innerHTML = narrowRows(narSel).map(function(r){ return '<div class="cause' + (r.st ? ' ' + r.st : '') + '"><span>' + esc(r.name) + '</span><small>' + esc(r.why) + '</small></div>'; }).join('');
+}
+$('narseg').addEventListener('click', function(e){ var v = e.target.getAttribute('data-v'); if (v){ narSel = narSel === v ? null : v; drawNarrow(); } });
+drawNarrow();
+
+/* Learn: fluid-responsiveness slider (explains itself) */
+var SZ = [[0, 35, 'Steep part: fluid-responsive'], [35, 70, 'Flattening: smaller gain'], [70, 101, 'Flat part: not fluid-responsive']];
+function sv(x){ return 100 * (1 - Math.exp(-x / 30)); }
+function starRows(x){
+  var gain = Math.round(sv(Math.min(x + 10, 100)) - sv(x)), z = x < 35 ? 0 : x < 70 ? 1 : 2;
+  var what = ['The heart is underfilled. A bolus stretches the muscle and stroke volume rises: here a standard bolus raises stroke volume by about ' + gain + ' points on this 100-point curve.', 'Filling is near adequate. The same bolus raises stroke volume by only about ' + gain + ' points.', 'The heart is full. The same bolus raises stroke volume by about ' + gain + ' points; filling pressure rises and fluid moves into the lungs and tissues.'][z];
+  var rule = 'Static numbers (central venous pressure, the exam alone) cannot tell where on this curve a patient sits; a dynamic test can. That is why the 2026 guideline suggests dynamic measures (conditional, low).';
+  var bed = ['Fluid is likely to help: give a bolus and recheck pressure, capillary refill and stroke volume.', 'Test before giving: a passive leg raise or a small fluid challenge with stroke volume or pulse pressure measured before and after.', 'Stop giving fluid. If perfusion is still poor, the answer is a vasopressor (and look at the heart), not more volume.'][z];
+  return [['What is happening', what], ['Why the rule', rule], ['At the bedside', bed]];
+}
+function starSVG(x){
+  var h = svgOpen('0 0 360 190', 'Frank-Starling curve: filling against stroke volume'), pts = [];
+  for (var p = 0; p <= 100; p += 4) pts.push((40 + p * 3) + ',' + (160 - sv(p) * 1.35));
+  h += '<rect x="40" y="18" width="105" height="142" style="fill:var(--fill)"/>';
+  h += '<line x1="40" y1="160" x2="345" y2="160" style="stroke:var(--muted);stroke-width:1.5"/><line x1="40" y1="160" x2="40" y2="14" style="stroke:var(--muted);stroke-width:1.5"/>';
+  h += '<polyline points="' + pts.join(' ') + '" style="fill:none;stroke:var(--accent);stroke-width:2.5"/>';
+  var cx = 40 + x * 3, cy = 160 - sv(x) * 1.35;
+  h += '<circle cx="' + cx + '" cy="' + cy + '" r="7" style="fill:var(--accent);stroke:var(--card);stroke-width:2"/>';
+  h += tx(192, 182, 'Filling (preload)', {c: 'var(--muted)'}) + tx(14, 90, 'Stroke volume', {c: 'var(--muted)', a: 'middle'}).replace('<text ', '<text transform="rotate(-90 14 90)" ');
+  h += tx(92, 34, 'steep', {c: 'var(--muted)'}) + tx(300, 72, 'flat', {c: 'var(--muted)'});
+  return h + '</svg>';
+}
+(function(){
+  var w = $('starsl');
+  w.innerHTML = '<div id="starfig"></div><label for="starx">Filling <b id="starv"></b></label><input type="range" id="starx" min="0" max="100" step="1" value="20"><div class="zs" aria-hidden="true">' + SZ.map(function(z){ return '<i style="flex:' + (Math.min(z[1], 100) - z[0]) + '"></i>'; }).join('') + '</div><p class="zt" id="starz"></p><div class="dp" id="stardp"></div><p class="note" style="margin:8px 0 0">Teaching curve, not patient data.</p>';
+  function run(){
+    var x = +$('starx').value, z = x < 35 ? 0 : x < 70 ? 1 : 2;
+    $('starfig').innerHTML = starSVG(x);
+    $('starv').textContent = x + ' of 100';
+    $('starx').setAttribute('aria-valuetext', x + ' of 100, ' + SZ[z][2]);
+    [].forEach.call(w.querySelectorAll('.zs i'), function(el, k){ el.classList.toggle('on', k === z); });
+    $('starz').textContent = SZ[z][2];
+    $('stardp').innerHTML = starRows(x).map(function(r){ return '<div><p class="label">' + esc(r[0]) + '</p><p>' + esc(r[1]) + '</p></div>'; }).join('');
+  }
+  $('starx').addEventListener('input', run); run();
+})();
+
+/* Learn tab */
+(function(){
+  var chaps = [].slice.call(document.querySelectorAll('.chap'));
+  $('pills').innerHTML = chaps.map(function(c, n){ return '<button class="pill" type="button" data-go="' + c.id + '" aria-current="' + (n === 0) + '">' + (n + 1) + ' ' + esc(c.getAttribute('data-pill')) + '</button>'; }).join('');
+  $('pills').addEventListener('click', function(e){ var g = e.target.getAttribute('data-go'); if (g) $(g).scrollIntoView(); });
+  function mark(id){ [].forEach.call($('pills').children, function(b){ var on = b.getAttribute('data-go') === id; b.setAttribute('aria-current', String(on)); if (on) $('pills').scrollLeft = Math.max(0, b.offsetLeft - 60); }); }
+  if ('IntersectionObserver' in window){
+    var io = new IntersectionObserver(function(es){ es.forEach(function(en){ if (en.isIntersecting) mark(en.target.id); }); }, {rootMargin: '-30% 0px -60% 0px'});
+    chaps.forEach(function(c){ io.observe(c); });
+  }
+  $('trialbox').innerHTML = TRIALS.map(function(t){ return '<div class="trial" style="margin-top:14px"><p><b>' + esc(t.q) + '</b></p><p><span class="k">Design</span>' + esc(t.d) + '</p><p><span class="k">Result</span>' + esc(t.r) + '</p><p><span class="k">What it changed</span>' + esc(t.c) + '</p><p class="mono" style="font-size:13px"><a href="https://doi.org/' + t.doi + '" rel="noopener">' + esc(t.cite) + '</a></p></div>'; }).join('');
+  $('go-prac').addEventListener('click', function(){ show('t-prac'); window.scrollTo(0, 0); });
+})();
+
+/* Practice: cases run through the same engine */
+$('practice').innerHTML = CASES.map(function(c, n){
+  return '<div class="card case"><p class="label">Case ' + (n + 1) + '</p><h2>' + esc(c.t) + '</h2><p>' + esc(c.s) + '</p><p><b>' + esc(c.q) + '</b></p><div class="row"><button class="btn" type="button" data-ans="' + n + '">Show the answer</button><button class="btn ghost" type="button" data-load="' + n + '">Open in the tool</button></div><div class="ans" id="ans' + n + '" hidden></div></div>';
+}).join('');
+function caseInput(c){ var inp = {press: 'none'}; Object.keys(c.i).forEach(function(k){ inp[k] = c.i[k]; }); NUMS.forEach(function(k){ if (inp[k] === undefined) inp[k] = null; }); return inp; }
+$('practice').addEventListener('click', function(e){
+  var a = e.target.getAttribute('data-ans'), l = e.target.getAttribute('data-load');
+  if (a != null){ var c = CASES[a], box = $('ans' + a), b = build(caseInput(c)); box.innerHTML = '<p>' + esc(c.p) + '</p>' + b.html.replace(/ id="[^"]*"/g, ''); box.hidden = false; e.target.hidden = true; }
+  if (l != null){ var c2 = CASES[l]; st = {like: c2.i.like || null, src: c2.i.src || null, t: {}}; ALLT.forEach(function(t){ if (c2.i[t[0]]) st.t[t[0]] = true; }); drawInputs(); $('press').value = c2.i.press || 'none'; NUMS.forEach(function(k){ $(k).value = c2.i[k] != null ? c2.i[k] : ''; }); render(); show('t-tool'); window.scrollTo(0, 0); }
+});
+drawInputs(); render(); fromHash();
+})();
+</script>
+<script id="deeper-data">
+/* Go deeper: mechanism, rationale and the common trap for each Learn chapter. Text only; no doses or thresholds beyond the tool's own. */
+(function(){ var D = {"learn-def": [["Mechanism", "Infection triggers inflammation and clotting pathways meant to contain it. In sepsis that response is out of proportion and injures the host: leaky vessels, microvascular clots, mitochondrial dysfunction and organ failure."], ["Why it matters", "Defining sepsis by organ dysfunction rather than by fever or white count picks out the patients at real risk of dying, which is why the SOFA rise of 2 or more replaced the older SIRS-based label."], ["Common trap", "Using qSOFA as a screen. It flags risk of a poor outcome in someone already suspected of infection, but it misses many early cases; the 2026 guideline recommends NEWS, MEWS or SIRS over qSOFA as a single screening tool."]], "learn-shock": [["Mechanism", "Nitric oxide and other mediators relax the small arteries and veins, capillaries leak, and in some patients the heart squeezes less. Pressure falls because resistance falls, the heart is underfilled, or output cannot rise."], ["Why it matters", "Each part has a different fix: fluid for underfilling, norepinephrine for lost tone, an inotrope for a weak heart. Most patients need the first two together, which is why a pressor is not delayed for more fluid."], ["Common trap", "Assuming warm skin and a good pulse mean the circulation is fine. In vasodilatory shock output can be high while organs are still underperfused."]], "learn-lactate": [["Mechanism", "Lactate is made from pyruvate. It rises when oxygen is short, when catecholamines speed glycolysis through beta-2 receptors, and when the liver clears it more slowly."], ["Why it matters", "A raised lactate marks risk whatever its cause, and a falling lactate suggests resuscitation is working, so the 2026 guideline suggests serial lactate to guide resuscitation."], ["Common trap", "Giving fluid until lactate is normal. After the initial bolus, further fluid should follow perfusion and fluid responsiveness, not the lactate value alone; an epinephrine infusion can raise lactate by itself."]], "learn-starling": [["Mechanism", "Stretching heart muscle increases the force of the next beat, up to a point. On the steep part of the curve more filling raises stroke volume; on the flat part it only raises filling pressure."], ["Why it matters", "Many patients in shock do not gain output from a further bolus, and fluid that does not help adds edema in the lungs, gut and kidneys. A dynamic test tells the two apart."], ["Common trap", "Reading central venous pressure or a single blood pressure as a guide to volume. Neither shows where the patient sits on the curve; a passive leg raise with a stroke volume measurement does."]], "learn-fluids": [["Mechanism", "Saline carries more chloride than plasma, which can cause a hyperchloremic acidosis and may reduce kidney blood flow; balanced solutions are closer to plasma."], ["Why it matters", "After the first liters, the trials found no mortality difference between more and less fluid, so the decision rests on the patient: lungs, oxygen, perfusion and response to the last bolus."], ["Common trap", "Reading CLOVERS and CLASSIC as permission to withhold the first fluid. Both enrolled patients who had already received initial fluid, usually 1 L or more."]], "learn-clock": [["Mechanism", "In shock, organ injury builds hour by hour, and untreated infection keeps driving it; early antibiotics and restored perfusion stop both."], ["Why it matters", "Observational data link each hour of antibiotic delay with higher mortality, most clearly in shock, which is why the window is 1 hour in shock and 3 hours for possible sepsis without shock."], ["Common trap", "Treating SEP-1 as the guideline. It is a documentation measure with fixed windows; the guideline allows a rapid workup first when sepsis is only possible and there is no shock."]]};
+  function add(){ Object.keys(D).forEach(function(id){ var c = document.getElementById(id); if (!c || c.querySelector(":scope > .deeper")) return; var d = document.createElement("details"); d.className = "deeper"; d.innerHTML = "<summary>Go deeper: mechanism and rationale</summary><div class=\"dpx\">" + D[id].map(function(r){ return "<div><span class=\"dl\">" + r[0] + "</span><p>" + r[1] + "</p></div>"; }).join("") + "</div>"; c.appendChild(d); }); }
+  add();
+})();
+</script>
+</body>
+</html>
