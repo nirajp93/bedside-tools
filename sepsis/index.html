@@ -340,14 +340,14 @@ function abxCard(i, s){
   var common = ['After a loading dose, give a beta-lactam as a prolonged infusion rather than a bolus (strong, moderate).', 'Cover a resistant organism only when the risk is high: known colonization or prior infection with it, long broad-spectrum antibiotic courses, long hospital stays.', anaer === 'include' ? 'Abdominal source: include anaerobic cover.' : anaer === 'necrotizing' ? 'Skin: include anaerobic cover if necrotizing infection is possible.' : anaer === 'abscess' ? 'Brain: include anaerobic cover if abscess or empyema is possible.' : 'No anaerobic risk from this source: anaerobic cover is not needed (the 2026 guideline lists intra-abdominal, deep gynecological or obstetric, necrotizing soft tissue, head and neck, and brain abscess or empyema).', 'No routine empiric antifungal (conditional, low).'];
   if (p.mode === 'given'){ c.head = 'Antibiotics given'; c.sub = 'Next: the source, then narrowing when results return.'; c.list = common.slice(0, 1); c.tiers = ['Surviving Sepsis 2026: prolonged infusion strong, moderate']; return c; }
   if (p.mode === 'ask'){ c.head = 'Pick how likely infection is'; c.sub = 'Shock, or probable sepsis: within 1 hour. Possible sepsis without shock: rapid workup, then within 3 hours if infection is still likely.'; c.empty = true; return c; }
-  if (p.mode === 'now'){ c.head = 'Antibiotics now, ideally within 1 hour of recognition'; c.sub = (s.onP || s.lowP) ? 'Possible septic shock: do not wait for results.' : s.shocky ? 'Hypoperfusion (lactate 4 or more): do not wait for results.' : 'Probable or definite sepsis.'; }
+  if (p.mode === 'now'){ c.head = 'Antibiotics now, ideally within 1 hour of recognition'; c.sub = (s.onP || s.lowP) ? 'Possible septic shock: do not wait for results.' : s.shocky ? 'Hypoperfusion (lactate 4 or more): give now rather than wait for results (expert practice; the guideline\'s timing statements do not address a high lactate with normal pressure).' : 'Probable or definite sepsis.'; }
   else { c.head = 'Rapid workup first; antibiotics within 3 hours if infection is still likely'; c.sub = 'Possible sepsis without shock. If infection becomes unlikely, hold antibiotics and keep watching closely.'; }
   c.clock = p.clock;
   c.list = [i.cx ? 'Blood cultures: drawn.' : 'Blood cultures as soon as possible, ideally before the first dose, drawn quickly so antibiotics are not delayed (strong, low).'].concat(common);
   c.why = p.why;
   c.links = [['/abx-empiric/#syndromes', 'Regimen by source: empiric antibiotics']];
   c.chips = [['clock', 'ssc', 'The first six hours']];
-  c.tiers = p.mode === 'now' ? ['Within 1 hour: strong, very low', 'Cultures: strong, low', 'Resistant and anaerobic cover: conditional, very low'] : ['Rapid assessment: good practice statement', 'Within 3 hours: conditional, very low', 'Cultures: strong, low'];
+  c.tiers = p.mode === 'now' ? [(!s.onP && !s.lowP && i.like !== 'probable') ? 'Lactate 4 or more, normal pressure: expert practice' : 'Within 1 hour: strong, very low', 'Cultures: strong, low', 'Resistant and anaerobic cover: conditional, very low'] : ['Rapid assessment: good practice statement', 'Within 3 hours: conditional, very low', 'Cultures: strong, low'];
   return c;
 }
 
@@ -397,7 +397,7 @@ function pressCard(i, s){
   if (!has(i.map) && !has(i.sbp) && !s.onP && !i.low) return null;
   var c = {id: 'c-press', label: 'Pressure'};
   var tgt = 'Target mean pressure ' + s.tgt.txt + (i.age65 ? ' (age 65 or older: conditional, low).' : ' (strong, moderate).');
-  var steroid = 'Septic shock: IV corticosteroids are suggested (conditional, low); dose and timing in the pressors and steroids tools.';
+  var steroid = 'Septic shock with an ongoing vasopressor need: IV corticosteroids are suggested (conditional, low); dose and timing in the pressors and steroids tools.';
   var aline = 'Arterial line when the dose is moderate to high, rising, or more than one pressor is running, or cuff readings are unreliable.';
   var L = [['/pressors/#running', 'Doses and next step: pressors'], ['/steroids/#situation', 'Hydrocortisone: steroids']];
   if (!s.onP && s.below){
@@ -424,7 +424,7 @@ function pressCard(i, s){
     c.links = L; c.tiers = [i.age65 ? 'MAP 60 to 65 at 65 or older: conditional, low' : 'MAP 65: strong, moderate', 'Steroids: conditional, low'];
     return c;
   }
-  if (s.lowP){ c.head = 'Low pressure: reassess after each bolus; norepinephrine if hypotension persists'; c.sub = pLine(i) + tgt + (i.age65 ? ' The 60 to 65 range is a target once on a vasopressor, not a reason to withhold one.' : ''); c.list = ['Start through a good peripheral vein rather than wait for a central line (conditional, very low).', 'Norepinephrine first (strong, high against dopamine).']; c.why = WHY.press; c.links = L.slice(0, 1); c.tiers = ['Bolus then vasopressor: conditional, very low', 'Peripheral start: conditional, very low']; return c; }
+  if (s.lowP){ c.head = 'Low pressure: reassess after each bolus; norepinephrine if hypotension persists'; c.sub = (has(i.map) ? 'Mean pressure ' + i.map + '. ' : '') + (has(i.sbp) && i.sbp < 90 ? 'Systolic ' + i.sbp + '. ' : '') + (i.low ? 'Systolic well below usual. ' : '') + tgt + (i.age65 ? ' The 60 to 65 range is a target once on a vasopressor, not a reason to withhold one.' : ''); c.list = ['Start through a good peripheral vein rather than wait for a central line (conditional, very low).', 'Norepinephrine first (strong, high against dopamine).']; c.why = WHY.press; c.links = L.slice(0, 1); c.tiers = ['Bolus then vasopressor: conditional, very low', 'Peripheral start: conditional, very low']; return c; }
   c.head = 'Pressure at target: no vasopressor needed now'; c.sub = (has(i.map) ? 'Mean pressure ' + i.map + '. ' : '') + tgt; c.empty = true;
   return c;
 }
@@ -458,7 +458,7 @@ function hourCard(i, s, p){
   steps.push({w: 'Now', t: has(i.lac) ? 'Lactate ' + i.lac + (i.lac > 2 ? ': repeat it to guide resuscitation' : '') : 'Lactate', d: has(i.lac) ? '' : 'Measure it (conditional, low).', st: has(i.lac) ? (i.lac > 2 ? 'now' : 'done') : 'now'});
   steps.push({w: p.mode === 'three' ? 'By 3 h' : 'By 1 h', t: p.mode === 'given' ? 'Antibiotics given' : p.mode === 'three' ? 'Rapid workup; antibiotics if still likely' : p.mode === 'ask' ? 'Antibiotics: 1 or 3 hours, by likelihood' : 'Antibiotics', d: p.clock || '', st: p.mode === 'given' ? 'done' : 'now'});
   if (s.hypoperf) steps.push({w: 'By 3 h', t: s.target ? 'Crystalloid ' + fmt(s.target) + ' mL' + (s.done30 ? ' given' : '') : 'Crystalloid 30 mL/kg', d: s.done30 ? '' : 'Reassess after each bolus.', st: s.done30 ? 'done' : 'now'});
-  if (s.below && !s.onP) steps.push({w: 'When low', t: 'Norepinephrine if pressure stays low after the first bolus', d: '', st: 'now'});
+  if ((s.below || s.lowP) && !s.onP) steps.push({w: 'When low', t: 'Norepinephrine if pressure stays low after the first bolus', d: '', st: 'now'});
   if (i.src) steps.push({w: 'By 6 h', t: 'Source control', d: SRCN[i.src], st: ''});
   steps.push({w: 'By 6 h', t: 'ICU review; repeat lactate if it was raised', d: '', st: ''});
   return {id: 'c-hour', label: 'First hours, in order', head: 'Checklist', steps: steps, chips: [['clock', 'ssc', 'The first six hours']]};
@@ -616,7 +616,7 @@ var FIGS = {
 };
 
 var PLATES = {
-  summary: {t: 'Sepsis on one page', src: '/media/sepsis/summary.webp', w: 1024, h: 411, alt: 'Four panels: a lung with bacteria and immune cells in the air sacs; a small blood vessel with fluid leaking out between its lining cells; the heart; and the kidney, liver and brain.', cap: 'Infection in one place (here, pneumonia) sets off a body-wide response: vessels relax and leak, the heart can weaken, and distant organs (kidney, liver, brain) start to fail. That organ failure is what makes it sepsis.'},
+  summary: {t: 'Sepsis on one page', src: '/media/sepsis/summary.webp', w: 1024, h: 411, alt: 'Four panels: a lung with bacteria and immune cells in the air sacs; a small blood vessel with fluid leaking out between its lining cells; the heart; and the kidney, liver and brain.', cap: 'Infection in one place (here, pneumonia) sets off a body-wide response: vessels leak, the heart can weaken, and distant organs (kidney, liver, brain) start to fail. That organ failure is what makes it sepsis.'},
   leak: {t: 'Leaky capillaries', src: '/media/sepsis/leak.webp', w: 982, h: 545, alt: 'Two panels. Left, normal: a small artery wrapped in smooth muscle and a capillary with an intact wall. Right, septic shock: gaps between the capillary lining cells, fluid and small particles escaping into swollen surrounding tissue, and white cells stuck to the vessel wall.', cap: 'In septic shock, gaps open between the cells lining the capillaries. Plasma escapes into the tissues (edema) and white cells stick to the wall, so less of the infused fluid stays in the circulation.'}
 };
 function plateHTML(id){ var P = PLATES[id]; return '<div class="plate"><img src="' + P.src + '" alt="' + P.alt + '" width="' + P.w + '" height="' + P.h + '" loading="lazy"><span class="credit">Created with BioRender.com</span></div><p class="line1">' + P.cap + '</p>'; }
