@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Oxygen, high flow and NIV · bedside.tools</title>
+<meta name="description" content="Oxygen targets, what each device really delivers, high flow or NIV by cause, the ROX index, and the signs that mean intubate now, with the reasoning in diagrams.">
+<script src="/theme.js"></script>
+<style>
+:root{--bg:#FBFBFA;--card:#FFFFFF;--ink:#111113;--muted:#55555D;--line:#ECECEE;--accent:#2B4BDB;--warn:#9A3B00;--warnbg:#FFF6EC}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5}
+.mono{font-family:var(--mono)}
+.wrap{max-width:720px;margin:0 auto;padding:20px 16px 48px}
+a{color:var(--accent)}
+.back{font-size:14px;text-decoration:none;display:inline-block;min-height:44px;line-height:44px}
+h1{font-size:26px;margin:4px 0 4px;letter-spacing:-.01em}
+.purpose{color:var(--muted);margin:0 0 20px}
+.tabs{display:flex;gap:6px;margin-bottom:16px}
+.tab{flex:1;min-width:0;min-height:44px;border:1px solid var(--line);background:var(--card);border-radius:14px;padding:0 2px;font:inherit;font-size:14px;font-weight:600;color:var(--muted);cursor:pointer}
+.tab[aria-selected="true"]{border-color:var(--accent);color:var(--accent)}
+.panel{display:none}.panel.on{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
+.card.alert{border-color:var(--warn);background:var(--warnbg)}
+.card.alert .label{color:var(--warn)}
+.card h2{font-size:18px;margin:0 0 4px}
+.label{font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+.head{font-family:var(--mono);font-size:16.5px;font-weight:600;margin:0 0 4px;overflow-wrap:anywhere}
+.big{font-family:var(--mono);font-size:22px;font-weight:600}
+.sub{font-size:14.5px;color:var(--muted);margin:4px 0 0}
+.note{font-size:14px;color:var(--muted)}
+.guard{border-left:3px solid var(--warn);background:var(--warnbg);padding:8px 10px;border-radius:0 10px 10px 0;margin-top:8px;font-size:14.5px}
+.card.alert .guard{background:var(--card)}
+.tier{display:inline-block;font-family:var(--mono);font-size:11px;border:1px solid var(--line);border-radius:999px;padding:2px 8px;color:var(--muted);margin:6px 6px 0 0;background:var(--card)}
+.whyline{margin:10px 0 0;font-size:14.5px;color:var(--muted)}
+.whyline b{color:var(--ink);font-weight:600}
+ul.list{margin:8px 0 0;padding-left:20px;font-size:15px}
+ul.list li{margin-bottom:4px}
+ul.list small{color:var(--muted);font-size:13px}
+details.more{margin-top:10px;border-top:1px solid var(--line);padding-top:4px}
+summary{cursor:pointer;color:var(--accent);font-weight:600;min-height:44px;line-height:44px}
+details p{margin:0 0 8px;font-size:15px}
+.tab:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.seg{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.sbtn{min-height:44px;min-width:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--ink);font:inherit;font-size:14px;cursor:pointer;text-align:left}
+.sbtn[aria-pressed="true"]{border-color:var(--accent);color:var(--accent);font-weight:600;box-shadow:inset 0 0 0 1px var(--accent)}
+.fields{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:6px}
+.fld{display:flex;flex-direction:column;gap:4px;min-width:0}
+.fld label{font-size:13px;color:var(--muted)}
+.fld input{width:100%;min-height:44px;border:1px solid var(--line);border-radius:10px;padding:8px 10px;font:inherit;font-family:var(--mono);background:var(--card);color:var(--ink)}
+.grp{border-top:1px solid var(--line);padding-top:12px;margin-top:14px}
+.grp:first-of-type{border-top:0;padding-top:0;margin-top:0}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.chip{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--fill);color:var(--ink);font:inherit;font-size:14px;cursor:pointer}
+.chip i{width:9px;height:9px;border-radius:2px;background:var(--accent);flex:none}
+.scrim{position:fixed;inset:0;background:var(--scrim);z-index:20}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:21;max-height:90vh;overflow-y:auto;background:var(--card);border:1px solid var(--line);border-bottom:0;border-radius:20px 20px 0 0;padding:8px 16px 24px;max-width:560px;margin:0 auto}
+.sheethead{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.sheethead h2{font-size:18px;margin:0}
+.xbtn{min-height:44px;min-width:44px;border:0;background:transparent;color:var(--accent);font:inherit;font-weight:600;cursor:pointer}
+.fig{display:block;width:100%;max-width:460px;height:auto;margin:0 auto}
+.line1{font-size:15px;margin:10px 0 0}
+.plate{margin-top:10px;border:1px solid var(--line);border-radius:12px;padding:6px;background:var(--card)}
+.plate img{display:block;width:100%;height:auto;border-radius:8px}
+.credit{display:block;font-family:var(--mono);font-size:11px;color:var(--muted);text-align:right;margin:4px 2px 0}
+.plate figcaption{font-size:13.5px;color:var(--muted);margin:6px 2px 0}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:7px 6px 7px 0;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:var(--mono);font-size:11.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);font-weight:500}
+td small{display:block;color:var(--muted);font-size:12.5px;margin-top:2px}
+.tw{overflow-x:auto}
+.calc{font-family:var(--mono);font-size:14px;background:var(--fill);border-radius:10px;padding:8px 10px;margin-top:10px;overflow-wrap:anywhere}
+.btn{min-height:44px;border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);border-radius:10px;padding:8px 14px;font:inherit;font-weight:600;cursor:pointer}
+.btn.ghost{background:var(--card);color:var(--accent)}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.ans{margin-top:10px;border-top:1px solid var(--line);padding-top:10px}
+.ans .card{margin-bottom:10px}
+.pills{position:sticky;top:0;z-index:5;background:var(--bg);display:flex;gap:6px;overflow-x:auto;margin:0 -16px 12px;padding:8px 16px;border-bottom:1px solid var(--line);scrollbar-width:none}
+.pills::-webkit-scrollbar{display:none}
+.pill{flex:none;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--muted);font:inherit;font-size:14px;cursor:pointer;white-space:nowrap}
+.pill[aria-current="true"]{border-color:var(--accent);color:var(--accent);font-weight:600}
+.chap{scroll-margin-top:70px}
+.trial{border-left:3px solid var(--accent);padding-left:12px;margin-top:14px}
+.trial p{margin:0 0 6px;font-size:15px}
+.trial .k{font-family:var(--mono);font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);display:block}
+.zone{display:flex;height:12px;border-radius:999px;overflow:hidden;margin:12px 0 4px;border:1px solid var(--line)}
+.zone span{display:block;background:var(--fill)}
+.zone span.on{background:var(--accent)}
+.zname{font-family:var(--mono);font-size:13px;font-weight:600}
+input[type=range]{width:100%;min-height:44px;accent-color:var(--accent)}
+.dp{border:1px solid var(--line);border-radius:12px;padding:2px 12px;margin-top:10px}
+.dp>div{padding:9px 0;border-top:1px solid var(--line)}
+.dp>div:first-child{border-top:0}
+.dp .dl{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:2px}
+.dp p{margin:0;font-size:14.5px}
+footer{margin-top:28px;font-size:13.5px;color:var(--muted)}
+footer p{margin:0 0 8px}
+.deeper{margin-top:14px;border-top:1px solid var(--line)}
+.deeper>summary{min-height:44px;display:flex;align-items:center;gap:8px;color:var(--accent);font-weight:600;font-size:15px;cursor:pointer;list-style:none;line-height:1.3}
+.deeper>summary::-webkit-details-marker{display:none}
+.deeper>summary::before{content:"+";font-family:var(--mono);font-size:18px;line-height:1;width:14px;text-align:center}
+.deeper[open]>summary::before{content:"\2212"}
+.deeper .dpx{border:1px solid var(--line);border-radius:12px;padding:2px 12px;background:var(--card)}
+.deeper .dpx>div{padding:10px 0;border-top:1px solid var(--line)}
+.deeper .dpx>div:first-child{border-top:0}
+.deeper .dl{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0 0 3px}
+.deeper p{font-size:15px;line-height:1.45;margin:0}
+@media (max-width:420px){.fields{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (min-width:900px){
+  .wrap{max-width:1040px}
+  #p-assess.on{display:grid;grid-template-columns:420px minmax(0,1fr);gap:20px;align-items:start}
+  #p-dev.on{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;align-items:start}
+  #p-dev.on .card{margin-bottom:0}
+  #p-learn,#p-prac{max-width:720px;margin:0 auto}
+}
+@media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="/">← bedside.tools</a>
+<h1>Oxygen, high flow and NIV</h1>
+<p class="purpose">The right saturation, the right device, high flow or NIV for the cause, and the signs that mean intubate now.</p>
+<div class="tabs" role="tablist">
+  <button class="tab" role="tab" id="t-assess" aria-selected="true" aria-controls="p-assess">Assess</button>
+  <button class="tab" role="tab" id="t-dev" aria-selected="false" aria-controls="p-dev">Devices</button>
+  <button class="tab" role="tab" id="t-learn" aria-selected="false" aria-controls="p-learn">Learn</button>
+  <button class="tab" role="tab" id="t-prac" aria-selected="false" aria-controls="p-prac">Practice</button>
+</div>
+
+<div class="panel on" id="p-assess" role="tabpanel" aria-labelledby="t-assess">
+  <div>
+    <div class="card" id="inputs">
+      <div class="grp" id="cause-grp">
+        <p class="label">Why is the patient short of oxygen</p>
+        <div class="seg" id="cause"></div>
+        <div id="ext-grp" hidden>
+          <p class="note" style="margin:10px 0 0">High risk: over 65, heart or lung disease, obesity, hypercapnia on the breathing trial, prolonged ventilation, weak cough or airway problems.</p>
+          <div class="seg" id="ext"></div>
+        </div>
+      </div>
+      <div class="grp" id="device-grp">
+        <p class="label">On now</p>
+        <div class="seg" id="device"></div>
+        <div class="fields">
+          <div class="fld" id="flow-f"><label for="flow">Flow, L/min</label><input id="flow" type="number" inputmode="decimal" min="0" max="80" autocomplete="off"></div>
+          <div class="fld" id="fio2-f"><label for="fio2">FiO2, %</label><input id="fio2" type="number" inputmode="decimal" min="21" max="100" autocomplete="off"></div>
+          <div class="fld"><label for="hrs">Hours on it</label><input id="hrs" type="number" inputmode="decimal" min="0" max="240" autocomplete="off"></div>
+        </div>
+      </div>
+      <div class="grp" id="vitals">
+        <p class="label">Numbers</p>
+        <div class="fields">
+          <div class="fld"><label for="spo2">SpO2, %</label><input id="spo2" type="number" inputmode="decimal" min="50" max="100" autocomplete="off"></div>
+          <div class="fld"><label for="rr">Resp. rate</label><input id="rr" type="number" inputmode="decimal" min="4" max="70" autocomplete="off"></div>
+          <div class="fld"><label for="ph">pH</label><input id="ph" type="number" inputmode="decimal" step="0.01" min="6.8" max="7.8" autocomplete="off"></div>
+          <div class="fld"><label for="paco2">PaCO2, mm Hg</label><input id="paco2" type="number" inputmode="decimal" min="10" max="150" autocomplete="off"></div>
+          <div class="fld"><label for="pao2">PaO2, mm Hg</label><input id="pao2" type="number" inputmode="decimal" min="20" max="600" autocomplete="off"></div>
+        </div>
+        <p class="note" style="margin:8px 0 0">Blood gas values are optional. A venous gas gives pH and a rough PaCO2, not PaO2.</p>
+      </div>
+      <div class="grp" id="flags-grp">
+        <p class="label">Tick anything true</p>
+        <div class="seg" id="flags"></div>
+      </div>
+      <div class="row"><button class="btn ghost" id="clear">Clear</button></div>
+    </div>
+  </div>
+  <div id="results" aria-live="polite"></div>
+</div>
+
+<div class="panel" id="p-dev" role="tabpanel" aria-labelledby="t-dev">
+  <div class="card" id="targets">
+    <p class="label">Oxygen targets</p>
+    <div class="tw"><table>
+      <tr><th>Who</th><th>SpO2</th><th>Grade</th></tr>
+      <tr><td>Most acutely ill adults</td><td class="mono">92–96%</td><td>TSANZ 2015 · C<small>BMJ 2018: strong, stop oxygen above 96%</small></td></tr>
+      <tr><td>At risk of CO2 retention: COPD, obesity hypoventilation, neuromuscular or chest wall disease, cystic fibrosis, bronchiectasis</td><td class="mono">88–92%</td><td>BTS 2017 · A for COPD, D for others</td></tr>
+      <tr><td>After cardiac arrest</td><td class="mono">90–98%</td><td>AHA 2025 · 2a, B-R<small>100% until it can be measured: 1, B-R</small></td></tr>
+      <tr><td>ARDS on the ventilator</td><td><a href="/vent/#gas">Ventilator</a></td><td>ARDS Network</td></tr>
+    </table></div>
+    <p class="note" style="margin:10px 0 0">The British guideline uses 94–98% for most patients; the Australian and New Zealand guideline, and the rest of this site, use 92–96%. In critical illness (shock, sepsis, major trauma), or with SpO2 under 85% and no CO2 retention risk, start a reservoir mask at 15 L/min, then step down (BTS 2017 E2, D1).</p>
+    <div class="chips"><button class="chip" data-fig="curve"><i></i>Oxygen curve</button><button class="chip" data-fig="shunt"><i></i>Why oxygen fixes some low saturations</button></div>
+  </div>
+  <div class="card" id="ladder">
+    <p class="label">The device ladder</p>
+    <div class="tw"><table>
+      <tr><th>Device</th><th>Flow</th><th>FiO2 delivered</th></tr>
+      <tr><td>Nasal cannula</td><td class="mono">1–6 L/min</td><td>About 24–50%; cannot be predicted<small>Rough rule: 21% + 4% per L/min (used in Duan 2022; not validated)</small></td></tr>
+      <tr><td>Simple face mask</td><td class="mono">5–10 L/min</td><td>40–60%, varies with breathing</td></tr>
+      <tr><td>Venturi mask</td><td>As printed on the valve</td><td>Fixed: 24, 28, 31, 35, 40 or 60%<small>24% at 2–3 L/min, 28% at 4 L/min. Rate over 30: raise the flow; the FiO2 stays the same.</small></td></tr>
+      <tr><td>Reservoir (non-rebreather) mask</td><td class="mono">15 L/min</td><td>60–90%, varies with fit and breathing</td></tr>
+      <tr><td>High-flow nasal cannula</td><td class="mono">up to 60 L/min</td><td>Set on the blender, delivered close to set when flow meets demand</td></tr>
+      <tr><td>CPAP or bilevel NIV</td><td>Machine</td><td>Set on the machine</td></tr>
+    </table></div>
+<figure class="plate" style="margin:10px 0 0"><img src="/media/oxygen-niv/devices.webp" alt="Six panels of the same patient in profile wearing, in order: a nasal cannula; a simple face mask; a Venturi mask with a coloured valve on the tubing; a reservoir mask with the bag below the chin; high-flow nasal cannula with wide prongs and a thick heated tube; a full face NIV mask with head straps." width="1024" height="572" loading="lazy"><figcaption>Top row: nasal cannula, simple mask, Venturi mask. Bottom row: reservoir mask, high-flow nasal cannula, full face NIV mask.</figcaption><span class="credit">Created with BioRender.com</span></figure>
+    <p class="note" style="margin:10px 0 0">Source: BTS 2017, section 10. Consider high flow instead of a reservoir mask in respiratory failure without hypercapnia (BTS good practice point).</p>
+    <div class="chips"><button class="chip" data-fig="ladderfig"><i></i>Device ladder</button></div>
+  </div>
+  <div class="card" id="hfnc">
+    <p class="label">Setting up high flow</p>
+    <ul class="list">
+      <li>Start at 50 L/min, 37 °C.</li>
+      <li>FiO2 high enough to reach the target, then titrate down.</li>
+      <li>Wean the FiO2 to 0.40 first, then the flow.</li>
+      <li>Back to standard oxygen once FiO2 is 0.40 or less and flow 30 L/min or less.</li>
+    </ul>
+    <p class="note" style="margin:8px 0 0">From the awake-prone meta-trial protocol (BMJ Open 2020), expert practice. FLORALI used 50 L/min with FiO2 1.0 at the start.</p>
+    <div class="chips"><button class="chip" data-fig="hffig"><i></i>How high flow works</button></div>
+  </div>
+  <div class="card" id="niv-settings">
+    <p class="label">Starting NIV and CPAP</p>
+    <div class="tw"><table>
+      <tr><th>Cause</th><th>Start</th></tr>
+      <tr><td>Hypercapnic (COPD, obesity hypoventilation, neuromuscular)</td><td>Bilevel. Inspiratory pressure about 15, raised to 20–30 within 10–30 min. Expiratory at least 3 to clear exhaled gas.<small>BTS/ICS 2016. Obesity hypoventilation often needs high inspiratory and expiratory pressures.</small></td></tr>
+      <tr><td>Cardiogenic pulmonary edema</td><td>CPAP 5–15, or bilevel 8–20 over 4–10, starting low.<small>Ranges used in 3CPO (2008); starting low is expert practice.</small></td></tr>
+      <tr><td>Hypoxemic, no hypercapnia</td><td>PEEP 5–10 with little pressure support; watch tidal volume.<small>Expert practice. Tidal volume over 9 mL/kg predicted weight at 1 h predicted intubation (FLORALI post hoc, 2018).</small></td></tr>
+    </table></div>
+    <p class="note" style="margin:10px 0 0">Pressures in cm H2O. In hypercapnia, raise the pressures before the oxygen (BTS/ICS R4). Adjust to your institution's machines and respiratory therapy protocol.</p>
+    <div class="chips"><button class="chip" data-fig="nivfig"><i></i>CPAP and bilevel</button></div>
+  </div>
+  <div class="card" id="bycause">
+    <p class="label">High flow or NIV, by cause</p>
+    <div class="tw"><table id="causetable"></table></div>
+  </div>
+  <div class="card" id="contra">
+    <p class="label">Before NIV: contraindications</p>
+    <p class="head">Do not use NIV</p>
+    <ul class="list">
+      <li>Respiratory or cardiac arrest, or about to arrest</li>
+      <li>Cannot protect the airway: coma, seizures <small>(hypoxemic failure; in hypercapnia, NIV in ICU with intubation ready)</small></li>
+      <li>Copious secretions the patient cannot clear <small>(hypoxemic failure; in hypercapnia, NIV in ICU with intubation ready)</small></li>
+      <li>Shock not responding to fluids or vasopressors <small>(hypoxemic failure; in hypercapnia, NIV in ICU with intubation ready)</small></li>
+      <li>No mask will fit: facial trauma, burns, deformity, fixed upper airway obstruction</li>
+    </ul>
+    <p class="head" style="margin-top:12px">Use with caution</p>
+    <ul class="list">
+      <li>Vomiting or upper GI bleeding</li>
+      <li>Undrained pneumothorax</li>
+      <li>Agitated, cannot cooperate</li>
+    </ul>
+    <p class="note" style="margin:10px 0 0">Arrest: BTS/ICS 2016 R33 (D). No interface: R34 (D). Airway, secretions and shock: the major intubation criteria of Duan 2022 (hypoxemic patients); in hypercapnic coma, NIV in ICU with intubation ready is an option (BTS/ICS). Drain a pneumothorax before NIV (BTS/ICS); the rest of the caution list is expert practice. BTS/ICS: few contraindications are absolute; adverse features raise the risk of failure and should prompt high-dependency or ICU care (R3, C).</p>
+  </div>
+  <div class="card" id="failure">
+    <p class="label">Failing: when to intubate</p>
+    <p class="head">Any one: intubate now</p>
+    <ul class="list">
+      <li>Arrest or peri-arrest</li>
+      <li>Cannot protect the airway, or copious secretions <small>(hypoxemic failure; in hypercapnia, NIV in ICU with intubation ready)</small></li>
+      <li>Shock despite fluids and vasopressors <small>(hypoxemic failure; in hypercapnia, NIV in ICU with intubation ready)</small></li>
+      <li>Hypoxemic failure: P/F under 100 on NIV or high flow</li>
+      <li>Hypercapnic failure: acidosis persisting or worsening, or pH and rate not improving, despite optimised NIV</li>
+    </ul>
+    <p class="head" style="margin-top:12px">Hypoxemic failure: three or more</p>
+    <ul class="list">
+      <li>P/F under 150</li><li>Rate over 35</li><li>Respiratory muscle fatigue not improving</li><li>pH under 7.35</li>
+    </ul>
+    <p class="note" style="margin:10px 0 0">Hypoxemic criteria from Duan 2022 (a study protocol in hypoxemic patients; not for hypercapnic patients on NIV). Hypercapnic criteria from BTS/ICS 2016 (R30, R32 A; R33 D); in hypercapnia, drowsiness and severe acidosis call for NIV in ICU with intubation ready, not automatic intubation. On high flow, also the ROX index. Recheck 1–2 hours after any start (expert practice); in hypercapnia, better pH and rate within 4 hours predict success.</p>
+    <p class="note" style="margin:6px 0 0">Preparing to intubate: preoxygenate with high flow or NIV rather than a standard mask (ATS 2026, strong). <a href="/vent/#situation">Ventilator: starting settings</a> · <a href="/sedation/">Sedation</a></p>
+  </div>
+</div>
+
+<div class="panel" id="p-learn" role="tabpanel" aria-labelledby="t-learn">
+  <div class="pills" id="pills" role="navigation" aria-label="Chapters"></div>
+  <div class="card chap" id="learn-curve" data-pill="The curve">
+    <h2>The oxygen curve has a cliff</h2>
+    <p>Saturation stays high until the PaO2 nears 60, then falls fast. Targets sit just above the cliff edge. Tap a saturation.</p>
+    <div data-figure="curve"></div>
+  </div>
+  <div class="card chap" id="learn-why" data-pill="Shunt">
+    <h2>Why oxygen fixes some low saturations and not others</h2>
+    <p>Mismatch responds to oxygen, shunt barely does, and hypoventilation responds while CO2 keeps climbing.</p>
+    <div data-figure="shunt"></div>
+  </div>
+  <div class="card chap" id="learn-ladder" data-pill="Devices">
+    <h2>What each device really delivers</h2>
+    <p>A low-flow device gives less than the patient breathes in, so room air dilutes it, more so the faster they breathe.</p>
+    <figure class="plate" style="margin:10px 0 0"><img src="/media/oxygen-niv/devices.webp" alt="Six panels of the same patient in profile wearing, in order: a nasal cannula; a simple face mask; a Venturi mask with a coloured valve on the tubing; a reservoir mask with the bag below the chin; high-flow nasal cannula with wide prongs and a thick heated tube; a full face NIV mask with head straps." width="1024" height="572" loading="lazy"><figcaption>Top row: nasal cannula, simple mask, Venturi mask. Bottom row: reservoir mask, high-flow nasal cannula, full face NIV mask.</figcaption><span class="credit">Created with BioRender.com</span></figure>
+    <div data-figure="ladderfig"></div>
+  </div>
+  <div class="card chap" id="learn-hfnc" data-pill="High flow">
+    <h2>How high flow works</h2>
+    <p>Enough flow to match the breath, washout of the upper airway, and a little pressure.</p>
+    <div data-figure="hffig"></div>
+  </div>
+  <div class="card chap" id="learn-niv" data-pill="CPAP and bilevel">
+    <h2>CPAP holds the lungs open; bilevel also breathes with them</h2>
+    <p>One pressure all the way through, or a higher pressure on the way in. Tap to compare.</p>
+    <div data-figure="nivfig"></div>
+  </div>
+  <div class="card chap" id="learn-rox" data-pill="ROX">
+    <h2>The ROX index</h2>
+    <p>ROX = (SpO2 ÷ FiO2) ÷ respiratory rate, with FiO2 as a fraction. Validated in pneumonia on high flow. Move the slider.</p>
+    <div class="seg" id="roxt"></div>
+    <label for="roxs" class="note" style="display:block;margin-top:10px">ROX value</label>
+    <input type="range" id="roxs" min="1" max="10" step="0.1" value="4">
+    <div id="roxs-out"></div>
+  </div>
+  <div class="card chap" id="learn-late" data-pill="Late intubation">
+    <h2>Why waiting can hurt</h2>
+    <p>Non-invasive support buys time; it does not treat the cause. Patients who fail and are intubated late have done worse in observational studies, so each start comes with a time to look again and a line that means stop.</p>
+    <ul class="list">
+      <li>High flow failing, intubated at 48 h or later: ICU mortality 66.7% against 39.2% when intubated earlier (Kang 2015, one centre, retrospective).</li>
+      <li>De novo pneumonia on NIV: each extra hour before intubation went with lower survival (Carrillo 2012).</li>
+      <li>NIV failures at high risk (HACOR over 5 at 1 h): hospital mortality 66% when intubated within 12 h against 79% later (Duan 2017).</li>
+    </ul>
+  </div>
+  <div class="card" id="trials">
+    <p class="label">The trials behind this</p>
+    <div id="trialbox"></div>
+  </div>
+  <div class="row"><button class="btn" id="go-prac">Practice cases</button></div>
+</div>
+
+<div class="panel" id="p-prac" role="tabpanel" aria-labelledby="t-prac">
+  <div id="practice"></div>
+</div>
+
+<div class="scrim" id="scrim" hidden></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-t" hidden>
+  <div class="sheethead"><h2 id="sheet-t"></h2><button class="xbtn" id="sheet-x">Close</button></div>
+  <div id="sheet-b"></div>
+</div>
+
+<footer>
+<p>For education only. Not a substitute for clinical judgment. Built to national and international guidelines for adults before intubation. Who may start NIV or high flow, where it may run, and the machines used vary, so adjust to your institution and work with your respiratory therapist. Rows marked expert practice come from trial protocols or reviews, not graded guidelines. Evidence tiers are shown as strength and certainty (ATS, ERS, ESICM, ACP), grade (BTS, TSANZ), or class and level (AHA).</p>
+<p>Privacy: everything runs in your browser. Nothing you enter is sent anywhere or stored, and there are no analytics. Do not enter names, record numbers, or dates of birth.</p>
+<p><b>Last reviewed:</b> 25 November 2026</p>
+<p><b>Sources:</b> Goel NN et al., ATS guideline on noninvasive respiratory support, Am J Respir Crit Care Med 2026;212:2135 (abstract and published summaries reviewed; certainty ratings as reported) · Rochwerg B et al., ERS/ATS guideline on noninvasive ventilation for acute respiratory failure, Eur Respir J 2017;50:1602426 · Oczkowski S et al., ERS guideline on high-flow nasal cannula, Eur Respir J 2022;59:2101574 · Qaseem A et al., ACP guideline on high-flow nasal oxygen, Ann Intern Med 2021;174:977 (abstract reviewed) · Grasselli G et al., ESICM guidelines on ARDS, Intensive Care Med 2023;49:727 · Davidson AC et al., BTS/ICS guideline on acute hypercapnic respiratory failure, Thorax 2016;71 Suppl 2:ii1 · O'Driscoll BR et al., BTS guideline for oxygen use in adults, Thorax 2017;72 Suppl 1:ii1 · Beasley R et al., TSANZ oxygen guidelines, Respirology 2015;20:1182 · Siemieniuk RAC et al., BMJ rapid recommendation on oxygen therapy, BMJ 2018;363:k4169 · Hirsch KG et al., 2025 AHA guidelines Part 11: post-cardiac arrest care, Circulation 2025;152:S673 · Matthay MA et al., global definition of ARDS, Am J Respir Crit Care Med 2024;209:37 · Rice TW et al., SpO2/FiO2 and PaO2/FiO2, Chest 2007;132:410 · Roca O et al., J Crit Care 2016;35:200 and Am J Respir Crit Care Med 2019;199:1368 · Duan J et al., Intensive Care Med 2017;43:192 and Crit Care 2022;26:196 · Frat JP et al., Crit Care Med 2018;46:208 · Severinghaus JW, J Appl Physiol 1979;46:599 · Parke RL et al., Respir Care 2011;56:1151 · Möller W et al., J Appl Physiol 2015;118:1525 and 2017;122:191 · Wettstein RB et al., Respir Care 2005;50:604 · Ehrmann S et al., awake-prone meta-trial protocol, BMJ Open 2020;10:e041520 · Carrillo A et al., Intensive Care Med 2012;38:458 · Dumas G et al., Am J Respir Crit Care Med 2021;204:187 · Trials: listed with DOIs on the Learn tab. Trial and some guideline numbers were checked against PubMed abstracts where the full text could not be read.</p>
+</footer>
+</div>
+
+<script>
+(function(){
+'use strict';
+function $(id){ return document.getElementById(id); }
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function r0(x){ return Math.round(x); }
+function r2(x){ return Math.round(x * 100) / 100; }
+function has(x){ return x != null && !isNaN(x); }
+
+/* ---------- Data: every number here is in the decision table ---------- */
+var T = {
+  gen:[92,96], hyper:[88,92], arrest:[90,98],
+  ncMax:6, ncBase:0.21, ncPerL:0.04,
+  roxLow:4.88, roxHigh:{2:2.85, 6:3.47, 12:3.85},
+  sfMaxSat:97, sfA:64, sfB:0.84, sfArds:315,
+  copdPh:7.35, copdCo2:45, ivPh:7.15, hfncPh:7.25,
+  majPf:100, minPf:150, minRr:35, minPh:7.35, minCount:3,
+  ffRr:25, hfFlow:50, hfTemp:37, hfWeanF:0.40, hfWeanFlow:30
+};
+var CAUSES = [
+  ['hypox','Pneumonia or other new hypoxemia'],['cpe','Cardiogenic pulmonary edema'],['copd','COPD exacerbation'],['ohs','Obesity hypoventilation'],
+  ['nmd','Neuromuscular or chest wall'],['asthma','Asthma'],['immuno','Immunocompromised, hypoxemic'],['postext','After extubation']
+];
+var EXTS = [['low','Low risk'],['high','High risk'],['fail','Already failing']];
+var DEVICES = [['ra','Room air'],['nc','Nasal cannula'],['mask','Simple mask'],['venturi','Venturi'],['nrb','Reservoir mask'],['hfnc','High flow'],['niv','NIV or CPAP']];
+var FLAGS = [
+  ['arrest','Arrest or about to arrest'],['airway','Cannot protect airway (coma, seizures)'],['secr','Copious secretions'],['shock','Shock despite fluids or pressors'],
+  ['face','No mask will fit (face trauma, burns, airway obstruction)'],['vomit','Vomiting or upper GI bleeding'],['ptx','Undrained pneumothorax'],['agit','Agitated, cannot cooperate'],
+  ['fatigue','Tiring: fatigue not improving'],['risk','Other CO2 retention risk (COPD, obesity, CF)'],['postarrest','After cardiac arrest']
+];
+var HYPERC = {copd:1, ohs:1, nmd:1};
+var NAME = {hypox:'new hypoxemic failure', cpe:'cardiogenic pulmonary edema', copd:'COPD exacerbation', ohs:'obesity hypoventilation', nmd:'neuromuscular or chest wall disease', asthma:'asthma', immuno:'immunocompromised hypoxemic failure', postext:'after extubation'};
+
+/* ---------- Engine ---------- */
+function fio2Of(i){
+  var d = i.dev;
+  if (d === 'ra') return {f:0.21, how:'room air'};
+  if (d === 'nc'){
+    if (!has(i.flow)) return {f:null, why:'Enter the cannula flow for a rough FiO2.'};
+    if (i.flow > T.ncMax || i.flow <= 0) return {f:null, why:'Nasal cannula is used at 1 to 6 L/min; above that, move up the ladder.'};
+    return {f:r2(T.ncBase + T.ncPerL * i.flow), est:true, how:'rough nasal cannula estimate'};
+  }
+  if (d === 'mask') return {f:null, why:'A simple mask gives 40 to 60%, too variable to calculate with.'};
+  if (d === 'nrb') return {f:null, why:'A reservoir mask gives 60 to 90%, too variable to calculate with.'};
+  if (d === 'venturi' || d === 'hfnc' || d === 'niv'){
+    if (!has(i.fio2) || i.fio2 < 21 || i.fio2 > 100) return {f:null, why:'Enter the set FiO2 (21 to 100%).'};
+    return {f:r2(i.fio2 / 100), how:'set FiO2'};
+  }
+  return {f:null};
+}
+function roxBand(rox, hrs){
+  if (!has(hrs) || hrs < 2) return {t:null};
+  var t = hrs >= 12 ? 12 : hrs >= 6 ? 6 : 2;
+  var hi = T.roxHigh[t];
+  var z = rox < hi ? 0 : rox >= T.roxLow ? 2 : 1;
+  return {t:t, hi:hi, z:z, beyond: hrs > 12};
+}
+function target(i){
+  var hyper = !!HYPERC[i.cause] || (i.cause !== 'asthma' && (i.flags.risk || (has(i.paco2) && i.paco2 > 45)));
+  if (i.flags.postarrest) return {r:T.arrest, key:'arrest', src:['AHA 2025 · 2a, B-R'], hyper:hyper};
+  if (hyper) return {r:T.hyper, key:'hyper', src:['BTS 2017 · A (COPD), D (others)','BTS/ICS 2016 R24 · A'], hyper:true};
+  return {r:T.gen, key:'gen', src:['TSANZ 2015 · C','BMJ 2018 · strong: stop above 96%'], hyper:false};
+}
+
+function supportFor(i){
+  var c = i.cause, s = {mode:'none', niv:false, tiers:[], more:[]};
+  var conv = i.dev && i.dev !== 'hfnc' && i.dev !== 'niv';
+  if (c === 'hypox'){
+    var below = has(i.spo2) && i.spo2 < T.gen[0];
+    var need = (conv && (below || (has(i.rr) && i.rr > T.ffRr))) || i.dev === 'mask' || i.dev === 'nrb';
+    s.head = i.dev === 'hfnc' ? 'Continue high flow and track the ROX index' : i.dev === 'niv' ? 'On NIV: high flow is the usual first choice; watch closely' : need ? 'Start high-flow nasal cannula' : 'Standard oxygen for now; high flow if it is not enough';
+    if (need && i.dev !== 'hfnc') s.sub = 'Low saturation on standard oxygen, a mask, or a rate over 25 means standard oxygen is not enough (FLORALI enrolled patients with rate over 25).';
+    s.mode = 'hfnc'; s.niv = i.dev === 'niv'; s.std = !need && conv;
+    s.why = 'high flow delivers close to the FiO2 you set, washes CO2 out of the upper airway and adds a little pressure; in trials it led to fewer intubations than standard oxygen.';
+    s.tiers = ['High flow over standard oxygen: ATS 2026 · strong','ESICM 2023 · strong, moderate','ERS 2022 · conditional, moderate'];
+    s.more = ['NIV or CPAP over standard oxygen is a reasonable alternative with close monitoring (ATS 2026, conditional, low certainty as reported). ERS/ATS 2017 and ESICM 2023 make no recommendation either way.',
+      'High flow over NIV: ERS 2022 (conditional, very low) and ACP 2021 (conditional, low) favour high flow; ATS 2026 and ESICM 2023 make no recommendation. In COVID-19, ESICM suggests CPAP or NIV can be considered instead of high flow to reduce intubation (weak, high) and CPAP over standard oxygen (weak, low).',
+      'High flow lowers intubation; ESICM found no effect on mortality (high certainty).'];
+  } else if (c === 'cpe'){
+    s.head = 'CPAP or bilevel NIV, with treatment for the edema'; s.mode = 'cpe'; s.niv = true;
+    s.why = 'positive pressure lowers left ventricular afterload and preload and reopens flooded alveoli.';
+    s.tiers = ['ERS/ATS 2017 · strong, moderate'];
+    s.more = ['In 3CPO, NIV relieved breathlessness and acidosis faster than oxygen, with no difference in 7-day mortality; CPAP and bilevel did equally well.',
+      'Treat the cause: nitrates and diuretics. <a href="/hf/">Heart failure: acute</a>'];
+  } else if (c === 'copd' || c === 'ohs'){
+    var ohs = c === 'ohs';
+    if (!has(i.ph) || !has(i.paco2)){
+      s.head = 'Send a blood gas: the NIV decision rests on pH and PaCO2'; s.mode = 'controlled';
+      s.why = 'NIV helps when CO2 has built up enough to make the blood acidic; without the gas you cannot tell.';
+      s.more = ['Meanwhile, controlled oxygen to 88 to 92% with a Venturi mask (24 or 28%) or low-flow cannula.'];
+      s.tiers = ['BTS 2017 · A'];
+    } else if (i.ph <= T.copdPh && i.paco2 > T.copdCo2){
+      s.head = i.dev === 'niv' ? 'Continue bilevel NIV: optimise and reassess' : 'Start bilevel NIV'; s.mode = 'nivh'; s.niv = true;
+      s.sub = 'pH ' + i.ph + ' and PaCO2 ' + i.paco2 + ': acute respiratory acidosis.';
+      if (i.ph < T.hfncPh) s.guard = i.dev === 'niv' ? 'pH under 7.25 on NIV: keep in ICU or high-dependency care with intubation immediately available (BTS/ICS R26 · B).' : 'pH under 7.25: start NIV without delay, in ICU or high-dependency care with intubation immediately available. Severe acidosis alone does not rule out a trial of NIV (BTS/ICS R26 · B).';
+      s.why = 'pressure support raises tidal volume and rests tired muscles, so CO2 falls; this is the indication with the strongest evidence for NIV.';
+      s.tiers = ohs ? ['BTS/ICS 2016 R57 · B (same criteria as COPD)','ATS 2026 · strong (hypercapnic failure)'] : ['ERS/ATS 2017 · strong, high','ATS 2026 · strong'];
+      s.more = ['ERS/ATS 2017 criteria: pH 7.35 or less, PaCO2 over 45 and rate over 20 to 24 despite standard treatment. BTS/ICS 2016 (R25, A): pH under 7.35 and PaCO2 over 6.5 kPa (49 mm Hg) that persist after optimal medical treatment.',
+        'A patient judged to need intubation gets a trial of NIV first unless deteriorating immediately (ERS/ATS 2017, strong, moderate).',
+        'If NIV cannot be tolerated: high flow only for milder hypercapnia (pH above 7.25), watched closely and ready to escalate (ATS 2026, conditional). ERS 2022 suggests trying NIV before high flow (conditional, low).'];
+      if (ohs) s.more.push('Obesity hypoventilation: expect to need high inspiratory and expiratory pressures; manage in high-dependency or intensive care, consider a volume-assured mode, and treat fluid overload (BTS/ICS 2016).');
+    } else if (i.paco2 > T.copdCo2){
+      s.head = 'No NIV: hypercapnia without acidosis'; s.mode = 'controlled';
+      s.sub = 'Controlled oxygen to 88 to 92%, treat the exacerbation, repeat the gas if the patient worsens.';
+      s.why = 'without acidosis NIV has not been shown to help, and it adds discomfort and cost.';
+      s.tiers = ['ERS/ATS 2017 · conditional, low'];
+    } else {
+      s.head = 'No hypercapnia on this gas: NIV not needed now'; s.mode = 'controlled';
+      s.sub = 'Controlled oxygen; repeat the gas if the patient tires or oxygen needs rise.';
+    }
+  } else if (c === 'nmd'){
+    if (has(i.paco2) && i.paco2 > T.copdCo2){ s.head = 'Hypercapnia: trial NIV now; do not wait for acidosis'; s.mode = 'nivh'; s.niv = true; }
+    else { s.head = 'Watch for hypercapnia: NIV early if PaCO2 rises, or vital capacity falls under 1 L with rate over 20'; s.mode = 'controlled'; }
+    s.why = 'weak respiratory muscles fail suddenly, and acidosis comes late.';
+    s.tiers = ['BTS/ICS 2016 R50 · D'];
+    s.more = ['Consider NIV when vital capacity is under 1 L and rate over 20 (R51, D).',
+      'A weak cough or bulbar weakness means secretions and aspiration: involve the ICU early and plan the airway (expert practice).'];
+  } else if (c === 'asthma'){
+    s.head = 'Treat the bronchospasm; NIV is not advised for hypercapnic asthma'; s.mode = 'controlled';
+    s.sub = 'A rising PaCO2, a tiring patient or falling consciousness needs ICU review for intubation.';
+    s.why = 'NIV has not been shown to help acute asthma, and a hypercapnic patient may need intubation instead.';
+    s.tiers = ['BTS/ICS 2016 R39 · C','ERS/ATS 2017 · no recommendation'];
+  } else if (c === 'immuno'){
+    s.head = 'High flow, or early NIV, with a set time to decide'; s.mode = 'hfnc'; s.niv = true;
+    s.why = 'support may avoid intubation, but late intubation in these patients has been linked to higher mortality.';
+    s.tiers = ['ERS/ATS 2017 early NIV · conditional, moderate'];
+    s.more = ['The 2017 recommendation is dated: a later trial of early NIV (Lemiale 2015, cited in the guideline) showed no mortality benefit.',
+      'HIGH (2018): high flow did not lower mortality against standard oxygen. RENOVATE (2025): high flow was not shown non-inferior to NIV in this small subgroup, stopped early.',
+      'Each day from ICU admission to intubation went with higher mortality (odds ratio 1.38, Dumas 2021, observational).'];
+  } else if (c === 'postext'){
+    if (i.ext === 'fail'){
+      s.head = 'Failing after extubation: do not start NIV; reintubate if needed'; s.mode = 'none'; s.alert = true;
+      s.why = 'NIV for established failure after extubation delayed reintubation without benefit in trials.';
+      s.tiers = ['ERS/ATS 2017 · conditional, low','BTS/ICS 2016 R72 · B'];
+    } else if (i.ext === 'high'){
+      s.head = 'NIV straight after extubation, alternating with high flow'; s.mode = 'nivx'; s.niv = true;
+      s.why = 'in high-risk patients, NIV started at once, between spells of high flow, prevented reintubation.';
+      s.tiers = ['ERS/ATS 2017 · conditional, low','ERS 2022 NIV over high flow · conditional, moderate','ATS 2026 · conditional'];
+      s.more = ['HIGH-WEAN (2019): NIV alternating with high flow against high flow alone, reintubation 11.8% against 18.2%.',
+        'If NIV is contraindicated or not tolerated, high flow is the fallback: in Hernández 2016 it was non-inferior to NIV with fewer withdrawals.'];
+    } else {
+      s.head = 'High flow after extubation'; s.mode = 'hfnc';
+      s.why = 'in low-risk patients, high flow for 24 hours after extubation lowered reintubation against standard oxygen.';
+      s.tiers = ['ERS 2022 · conditional, low','ATS 2026 · conditional','ACP 2021 · conditional, low (not split by risk)'];
+      s.more = ['Hernández 2016: reintubation within 72 hours 4.9% against 12.2%.'];
+    }
+  }
+  if (s.mode === 'controlled' && (HYPERC[c] || c === 'asthma') && i.dev === 'nc') s.more.push('Consider a Venturi mask (24 or 28%) for a predictable FiO2.');
+  return s;
+}
+
+function settingsFor(mode, i){
+  if (mode === 'hfnc') return {label:'Setting up high flow', head:'50 L/min, 37 °C, FiO2 to target', list:['Start FiO2 high enough to reach the target, then titrate down.','Wean the FiO2 to 0.40 first, then the flow.','Back to standard oxygen at FiO2 0.40 or less and flow 30 L/min or less.'], tiers:['Trial protocol · expert practice'], figs:[['hffig','How high flow works']]};
+  if (mode === 'nivh') return {label:'Starting bilevel NIV', head:'Inspiratory about 15, up to 20–30 within 10–30 min; expiratory at least 3', list:['Oxygen to 88 to 92%; raise the pressures before the oxygen.', i.cause === 'ohs' ? 'Obesity hypoventilation: expect high inspiratory and expiratory pressures.' : 'Larger patients and worse acidosis need higher pressures, sooner.','Full face mask first (BTS/ICS R2 · D); stay with the patient for the first hour.'], tiers:['BTS/ICS 2016 · text and R4 (A)','First hour · expert practice'], figs:[['nivfig','CPAP and bilevel']]};
+  if (mode === 'cpe') return {label:'Starting CPAP or NIV', head:'CPAP 5–15, or bilevel 8–20 over 4–10, starting low', list:['Titrate to work of breathing and saturation.','Watch the blood pressure: pressure lowers preload.'], tiers:['3CPO ranges','Starting low · expert practice'], figs:[['nivfig','CPAP and bilevel']]};
+  if (mode === 'nivo') return {label:'NIV in hypoxemic failure', head:'PEEP 5–10 with little pressure support', list:['Watch tidal volume: over 9 mL/kg predicted weight at 1 h predicted intubation.','High flow is the usual first choice; on NIV, set the time to decide.'], tiers:['PEEP · expert practice','Tidal volume: Frat 2018'], figs:[['nivfig','CPAP and bilevel']]};
+  if (mode === 'nivx') return {label:'Starting NIV after extubation', head:'Low pressures, alternating with high flow', list:['PEEP 5 to 10 with modest pressure support (expert practice).','Watch tidal volume: over 9 mL/kg predicted weight in hypoxemic patients predicted failure.'], tiers:['Expert practice'], figs:[['nivfig','CPAP and bilevel']]};
+  return null;
+}
+
+function engine(i){
+  var cards = [], tg = target(i), fo = fio2Of(i), sup = i.cause ? supportFor(i) : null;
+  var hyperPath = !!HYPERC[i.cause] || i.cause === 'asthma';
+  var onSupport = i.dev === 'hfnc' || i.dev === 'niv';
+  var pf = has(i.pao2) && fo.f ? r0(i.pao2 / fo.f) : null;
+  var sf = null, pfEst = null;
+  if (fo.f && has(i.spo2) && i.spo2 <= T.sfMaxSat){ sf = r0(i.spo2 / fo.f); pfEst = r0((sf - T.sfA) / T.sfB); }
+  var rox = null, rb = null;
+  if (i.dev === 'hfnc' && fo.f && has(i.spo2) && has(i.rr) && i.rr > 0){ rox = r2((i.spo2 / fo.f) / i.rr); rb = roxBand(rox, i.hrs); }
+
+  /* 1. Failure: intubate now, or failing signs */
+  var major = [], minor = [], watch = [];
+  if (i.flags.arrest) major.push('arrest or peri-arrest');
+  var hx = !!HYPERC[i.cause], hxSoft = [];
+  [['airway','cannot protect the airway'],['secr','copious secretions'],['shock','shock despite fluids or vasopressors']].forEach(function(x){ if (i.flags[x[0]]) (hx ? hxSoft : major).push(x[1]); });
+  if (hxSoft.length) watch.push('Hypercapnic failure with ' + hxSoft.join(', ') + ': NIV only in ICU with intubation immediately available, or intubate (BTS/ICS 2016: few absolute contraindications).');
+  if (!hyperPath && onSupport && pf != null && pf < T.majPf) major.push('P/F ' + pf + ' on ' + (i.dev === 'hfnc' ? 'high flow' : 'NIV'));
+  if (!hyperPath && onSupport){
+    if (pf != null && pf < T.minPf) minor.push('P/F under 150');
+    if (has(i.rr) && i.rr > T.minRr) minor.push('rate over 35');
+    if (i.flags.fatigue) minor.push('fatigue not improving');
+    if (has(i.ph) && i.ph < T.minPh) minor.push('pH under 7.35');
+  }
+  if (hyperPath && i.dev === 'niv' && has(i.hrs) && i.hrs >= 1 && has(i.ph) && i.ph < T.copdPh && i.ph >= 0) watch.push('Still acidotic after ' + i.hrs + ' h of NIV: check the mask leak, synchrony and pressures now. If pH and rate are not improving, or are worse, move to intubation (BTS/ICS R30, R32 · A).');
+  if (hyperPath && has(i.ph) && i.ph < T.ivPh && i.dev !== 'niv' && !hx) watch.push('pH ' + i.ph + ': severe acidosis; ICU review for intubation now.');
+  if (hyperPath && i.dev !== 'niv' && i.flags.fatigue) watch.push('Tiring with CO2 retention: get a blood gas and ICU review now.');
+  if (rb && rb.t && rb.z === 0) watch.push('ROX ' + rox + ' is under ' + rb.hi + ' at ' + rb.t + ' h: high flow is likely to fail. Decide on intubation now with the ICU team (Roca 2019).');
+  if (!hyperPath && onSupport && minor.length && minor.length < T.minCount) watch.push(minor.length + ' of 4 failure signs (' + minor.join(', ') + '). Three or more mean intubate (Duan 2022). Recheck within the hour (expert practice).');
+  if (pf == null && pfEst != null && pfEst < T.majPf && onSupport && !hyperPath) watch.push('Estimated P/F about ' + pfEst + ': send an arterial gas now.');
+  var now = major.length > 0 || minor.length >= T.minCount;
+  var hardC = ['arrest','face'].concat(HYPERC[i.cause] ? [] : ['airway','secr','shock']).some(function(k){ return i.flags[k]; });
+  if (now){
+    var why = major.concat(minor.length >= T.minCount ? [minor.length + ' failure signs: ' + minor.join(', ')] : []);
+    cards.push({id:'c-intubate', alert:true, label:'Intubate now', head:'Do not delay intubation', sub:'Because: ' + why.join('; ') + '.',
+      guards: watch.filter(function(w){ return w.indexOf('ROX') === 0; }),
+      why:'once support is failing, waiting has been linked to higher mortality in observational studies.',
+      more:['Call for help early. Preoxygenate with high flow or NIV rather than a standard mask (ATS 2026, strong). <a href="/vent/#situation">Ventilator: starting settings</a> · <a href="/sedation/">Sedation</a>',
+        hyperPath ? 'Hypercapnic criteria from BTS/ICS 2016 (R32 A, R33 D).' : 'Criteria from Duan 2022: one major, or more than two minor, in hypoxemic patients on NIV; the same signs are used here for high flow (expert practice).'],
+      tiers:[hyperPath ? 'BTS/ICS 2016' : 'Duan 2022 study criteria','Arrest: BTS/ICS R33 · D'], figs:[]});
+  } else if (watch.length){
+    cards.push({id:'c-watch', alert:true, label:'Failing signs', head:'Decide on escalation now', list:watch,
+      why:'once support is failing, waiting has been linked to higher mortality in observational studies.',
+      more: i.dev === 'hfnc' ? ['Kang 2015: intubation 48 h or more into failing high flow, ICU mortality 66.7% against 39.2% (retrospective).'] : [], tiers: hyperPath ? ['BTS/ICS 2016 R30, R32 · A'] : i.dev === 'hfnc' ? ['Roca 2019','Duan 2022 study criteria','Recheck timing · expert practice'] : ['Duan 2022 study criteria','Recheck timing · expert practice'], figs:[]});
+  }
+
+  /* 2. Target */
+  if (i.cause || has(i.spo2)){
+    var lo = tg.r[0], hi = tg.r[1], tc = {id:'c-target', label:'Oxygen target', head:'SpO2 ' + lo + ' to ' + hi + '%', guards:[], tiers:tg.src, figs:[['curve','Oxygen curve'],['shunt','Why oxygen fixes some low saturations']]};
+    if (!has(i.spo2)) tc.sub = 'Enter the SpO2 to compare.';
+    else if (i.spo2 < lo) tc.sub = 'SpO2 ' + i.spo2 + '% is below the range: step up support.';
+    else if (i.spo2 > hi && i.dev && i.dev !== 'ra'){ tc.sub = 'SpO2 ' + i.spo2 + '% is above the range: turn the oxygen down.'; if (tg.key === 'hyper') tc.guards.push(has(i.paco2) && i.paco2 <= 45 && (!has(i.ph) || i.ph >= 7.35) ? 'PaCO2 is normal on this gas: BTS 2017 allows 94 to 98% unless the patient has needed NIV or ventilation for hypercapnia before; repeat the gas if oxygen is raised.' : 'Too much oxygen raises CO2 in this patient. Bring the saturation down to 88 to 92% now.'); }
+    else if (i.dev === 'ra') tc.sub = 'SpO2 ' + i.spo2 + '% on room air: no oxygen needed at this saturation.';
+    else tc.sub = 'SpO2 ' + i.spo2 + '% is in range.';
+    tc.why = tg.key === 'hyper' ? 'high oxygen raises CO2 in patients who retain it (less drive to breathe, worse matching of air and blood flow), so the target is lower.' :
+      tg.key === 'arrest' ? 'after cardiac arrest both too little and too much oxygen have been linked to brain injury; the range avoids both.' :
+      'below about 92% the curve turns steep and reserve is thin; above 96% more oxygen adds risk without benefit.';
+    tc.more = tg.key === 'arrest' ? ['100% oxygen until saturation can be measured reliably (1, B-R). PaCO2 35 to 45 (1, B-R). Pulse oximetry may hide hypoxemia in darker skin (2b, C-LD). <a href="/vent/#situation">Ventilator: after cardiac arrest</a>'] :
+      tg.key === 'hyper' ? ['Pending a blood gas, aim for 88 to 92% in anyone at risk of CO2 retention: COPD, obesity hypoventilation, neuromuscular or chest wall disease, cystic fibrosis, bronchiectasis (BTS 2017 A3). On NIV, keep 88 to 92% and raise the pressures before the oxygen (BTS/ICS R4).'] :
+      ['BTS 2017 uses 94 to 98% (grade D); TSANZ 2015 uses 92 to 96% (grade C), as does the rest of this site. The BMJ 2018 recommendation is strong: stop oxygen above 96%; 90 to 94% seems reasonable.',
+       'TSANZ does not cover ICU or surgical patients; it advises senior review at FiO2 0.40 or more and ICU review at 0.50 or more (D). Exceptions: carbon monoxide poisoning (high-concentration oxygen); bleomycin or paraquat (lower targets).',
+       'IOTA (2018): liberal oxygen raised in-hospital mortality (relative risk 1.21). In ventilated ICU patients, conservative targets (UK-ROX, ICU-ROX, PILOT) did as well as usual care. ARDS: <a href="/vent/#gas">Ventilator</a>'];
+    cards.push(tc);
+  }
+
+  /* 3. Device: what it delivers */
+  if (i.dev){
+    var dn = {ra:'Room air', nc:'Nasal cannula', mask:'Simple mask', venturi:'Venturi mask', nrb:'Reservoir mask', hfnc:'High flow', niv:'NIV or CPAP'}[i.dev];
+    var dc = {id:'c-device', label:'On now', head: dn + (fo.f ? ': FiO2 ' + (fo.est ? 'about ' : '') + r0(fo.f * 100) + '%' : ''), tiers:['BTS 2017 §10'], figs:[['ladderfig','Device ladder']], more:[]};
+    if (fo.est) dc.sub = 'A rough rule (21% plus 4% per L/min, not validated); real values vary widely with breathing.';
+    else if (fo.why) dc.sub = fo.why;
+    if (i.dev === 'hfnc' && has(i.flow) && i.flow < T.hfWeanFlow) dc.sub = (dc.sub ? dc.sub + ' ' : '') + 'Flow under 30 L/min adds little pressure or washout.';
+    dc.why = 'a low-flow device gives less than the patient breathes in, so room air dilutes it, more so the faster they breathe.';
+    if (i.dev === 'venturi') dc.more.push('Raising the oxygen flow into a Venturi mask does not raise the FiO2; raise it above the printed minimum only if the rate is over 30.');
+    dc.more.push('Ladder: nasal cannula, then simple or Venturi mask, then reservoir mask, then high flow, then NIV or CPAP by cause. Consider high flow instead of a reservoir mask when there is no hypercapnia (BTS good practice point).');
+    cards.push(dc);
+  }
+
+  /* 4. What to use for this cause */
+  if (sup){
+    var nivOnly = sup.mode === 'cpe' || sup.mode === 'nivh' || sup.mode === 'nivx' || (sup.mode === 'hfnc' && i.dev === 'niv');
+    if (now || (hardC && nivOnly)){
+      sup = {alert:true, head: now ? 'Intubate: do not escalate non-invasive support' : 'NIV is contraindicated here: get ICU help now; intubation is likely', sub:'Without these findings, the usual advice: ' + sup.head + '.', why: now ? 'once support is failing, waiting has been linked to higher mortality in observational studies.' : 'NIV in a patient who cannot protect the airway or keep a mask on risks aspiration and a delayed, harder intubation.', more:[], tiers:sup.tiers, mode:'none', niv:sup.niv, blocked:true};
+    }
+    else if (hardC && sup.niv){ sup.niv = false; sup.sub = (sup.sub ? sup.sub + ' ' : '') + 'NIV is contraindicated here: high flow only.'; sup.noNiv = true; }
+    cards.push({id:'c-support', alert:!!sup.alert, label:'For ' + NAME[i.cause], head:sup.head, sub:sup.sub, guards: sup.guard ? [sup.guard] : [], why:sup.why, more:sup.more, tiers:sup.tiers, figs: sup.mode === 'hfnc' ? [['hffig','How high flow works']] : sup.niv ? [['nivfig','CPAP and bilevel']] : []});
+    var se = sup.std ? null : settingsFor(sup.mode === 'hfnc' && i.dev === 'niv' ? 'nivo' : sup.mode, i);
+    if (se) cards.push({id:'c-settings', label:se.label, head:se.head, list:se.list, tiers:se.tiers, figs:se.figs, more:['Adjust to your institution\'s machines and respiratory therapy protocol.']});
+  }
+
+  /* 5. ROX */
+  if (i.dev === 'hfnc'){
+    var rc = {id:'c-rox', label:'ROX index', figs:[], tiers:['Roca 2019 · validated in pneumonia'], more:['ROX = (SpO2 ÷ FiO2) ÷ rate, FiO2 as a fraction. Cut-offs: 4.88 or more at 2, 6 or 12 h means lower risk; under 2.85 at 2 h, 3.47 at 6 h or 3.85 at 12 h means failure is likely. Between the two, recheck within 1 to 2 h (expert practice).']};
+    if (rox == null){ rc.head = 'Enter SpO2, FiO2 and rate'; rc.sub = 'Measured at 2, 6 and 12 hours on high flow.'; }
+    else {
+      rc.head = 'ROX ' + rox; rc.calc = '(' + i.spo2 + ' ÷ ' + fo.f + ') ÷ ' + i.rr + ' = ' + rox;
+      if (!rb.t) rc.sub = 'Under 2 hours on high flow: the first validated check is at 2 hours.';
+      else {
+        rc.sub = (rb.z === 0 ? 'Under ' + rb.hi + ' at ' + rb.t + ' h: high risk that high flow fails.' : rb.z === 2 ? '4.88 or more at ' + rb.t + ' h: lower risk of intubation.' : 'Between ' + rb.hi + ' and 4.88 at ' + rb.t + ' h: uncertain; recheck within 1 to 2 hours.') + (rb.beyond ? ' Beyond 12 hours, outside the validated times: the 12 h cut-offs are used.' : '');
+        rc.why = 'a low SpO2/FiO2 with a fast rate means the patient is working hard and still not oxygenating.';
+      }
+      if (i.spo2 > T.sfMaxSat) rc.guards = ['SpO2 above 97% sits on the flat of the curve; the index is less informative there.'];
+      if (i.cause && i.cause !== 'hypox') rc.more.push('Validated in pneumonia; less tested for ' + NAME[i.cause] + '.');
+      rc.figs = [];
+    }
+    cards.push(rc);
+  }
+
+  /* 6. S/F and P/F */
+  if (i.dev && has(i.spo2) && fo.f && !(i.dev === 'ra' && i.spo2 > T.sfMaxSat)){
+    var sc = {id:'c-sf', label:'Oxygenation', tiers:['Rice 2007','Global ARDS definition 2024'], more:[]};
+    if (pf != null){ sc.head = 'P/F ' + pf; sc.calc = i.pao2 + ' ÷ ' + fo.f + ' = ' + pf; }
+    if (fo.f && i.spo2 > T.sfMaxSat){ sc.sub = 'SpO2 above 97%: the SpO2/FiO2 ratio no longer tracks PaO2. Lower the FiO2 to the target or send a gas.'; if (pf == null) sc.head = 'SpO2/FiO2 not valid above 97%'; }
+    else if (sf != null){
+      if (pf == null){ sc.head = 'SpO2/FiO2 ' + sf + ' · estimated P/F about ' + pfEst; }
+      sc.sub = (pf != null ? 'SpO2/FiO2 ' + sf + ' (estimated P/F about ' + pfEst + '). ' : '') + 'An estimate' + (fo.est ? ', and the FiO2 itself is a rough guess on a cannula' : '') + '; a blood gas settles it.';
+      sc.calc = sc.calc || '(' + sf + ' − 64) ÷ 0.84 = ' + pfEst;
+      if (sf <= T.sfArds && (onSupport && (i.dev === 'niv' || (has(i.flow) && i.flow >= 30)))) sc.more.push('SpO2/FiO2 of 315 or less on high flow at 30 L/min or more, or on NIV, meets the oxygen criterion of the 2024 global ARDS definition (with bilateral opacities and no other cause). <a href="/vent/#gas">Ventilator: ARDS</a>');
+    }
+    if (!sc.head) sc.head = fo.why || 'Enter the FiO2';
+    sc.why = 'above 97% the oximeter sits on the flat of the curve, so the ratio stops tracking PaO2; at or below it, SpO2/FiO2 235 is about P/F 200 and 315 about P/F 300.';
+    sc.more.unshift('P/F ≈ (SpO2/FiO2 − 64) ÷ 0.84, from ventilated ARDS patients with SpO2 97% or less (Rice 2007). A guide, not a substitute for a gas.');
+    cards.push(sc);
+  }
+
+  /* 7. NIV safety check, on by default */
+  if (!now && ((sup && (sup.niv || sup.noNiv)) || i.dev === 'niv')){
+    var hard = [], soft = [];
+    var hx2 = !!HYPERC[i.cause];
+    [['arrest','Arrest or about to arrest'],['airway','Cannot protect the airway'],['secr','Copious secretions'],['shock','Shock despite fluids or pressors'],['face','No mask will fit']].forEach(function(x){ if (i.flags[x[0]]) ((hx2 && (x[0] === 'airway' || x[0] === 'secr' || x[0] === 'shock')) ? soft : hard).push(x[1]); });
+    [['vomit','Vomiting or upper GI bleeding'],['ptx','Undrained pneumothorax (drain it first)'],['agit','Agitated, cannot cooperate']].forEach(function(x){ if (i.flags[x[0]]) soft.push(x[1]); });
+    var cc = {id:'c-contra', label:'Before NIV', tiers:['BTS/ICS 2016 R33, R34 · D','Caution list · expert practice'], figs:[], more:['BTS/ICS: few contraindications are absolute; adverse features raise the risk of failure and should prompt high-dependency or ICU care (R3, C).']};
+    if (hard.length){ cc.alert = true; cc.head = 'NIV is contraindicated'; cc.list = hard.concat(soft.map(function(s){ return s + ' (caution)'; })); }
+    else if (soft.length){ cc.head = 'Use NIV with caution'; cc.list = soft; cc.sub = hx2 ? 'In hypercapnic failure these are high risk, not absolute: NIV only in ICU with intubation immediately available.' : 'Only with close watch and a plan to intubate.'; }
+    else { cc.head = 'Check none of these before starting'; cc.list = ['Arrest or about to arrest','Cannot protect the airway','Copious secretions','Shock despite fluids or pressors','No mask will fit']; cc.sub = 'Tick any that apply above.'; }
+    cards.push(cc);
+  }
+
+  /* 8. Recheck */
+  if (sup && sup.mode !== 'none' && !sup.blocked){
+    var rl = ['Rate, SpO2 and FiO2' + (sup.mode === 'hfnc' && !sup.std && i.dev !== 'niv' ? ' (ROX at 2 hours on high flow)' : ''), 'Work of breathing, accessory muscles, mental status'];
+    if (sup.mode === 'nivh' || sup.mode === 'controlled' && HYPERC[i.cause]) rl.push('A blood gas: pH and PaCO2. Better pH and rate within 4 hours predict NIV success (BTS/ICS 2016).');
+    if (!sup.noNiv && (sup.mode === 'nivx' || sup.mode === 'cpe' || (sup.niv && !HYPERC[i.cause]))) rl.push('On NIV: tidal volume, leak, tolerance');
+    rl.push('A time and a line: write down what will mean intubate');
+    cards.push({id:'c-recheck', label:'Recheck', head:'In 1 to 2 hours', list:rl, tiers:['Expert practice'], figs:[], more:['Hypoxemic patients: HACOR (heart rate, acidosis, consciousness, oxygenation, rate) over 5 at 1 h predicted NIV failure (Duan 2017). Tidal volume over 9 mL/kg predicted weight at 1 h predicted intubation (Frat 2018).'],
+      why:'non-invasive support buys time, so each start needs an early, planned look.'});
+  }
+  return cards;
+}
+
+/* ---------- Render ---------- */
+function tierHtml(ts){ return (ts || []).map(function(t){ return '<span class="tier">' + esc(t) + '</span>'; }).join(''); }
+function cardHtml(c, noIds){
+  var h = '<div class="card' + (c.alert ? ' alert' : '') + '"' + (noIds ? '' : ' id="' + c.id + '"') + '><p class="label">' + esc(c.label) + '</p><p class="head">' + esc(c.head) + '</p>';
+  if (c.sub) h += '<p class="sub">' + esc(c.sub) + '</p>';
+  if (c.list && c.list.length) h += '<ul class="list">' + c.list.map(function(l){ return '<li>' + esc(l) + '</li>'; }).join('') + '</ul>';
+  if (c.calc) h += '<div class="calc">' + esc(c.calc) + '</div>';
+  (c.guards || []).forEach(function(g){ h += '<div class="guard">' + esc(g) + '</div>'; });
+  if (c.why) h += '<p class="whyline"><b>Why:</b> ' + esc(c.why.charAt(0).toUpperCase() + c.why.slice(1)) + '</p>';
+  if (!noIds && c.figs && c.figs.length) h += '<div class="chips">' + c.figs.map(function(f){ return '<button class="chip" data-fig="' + f[0] + '"><i></i>' + esc(f[1]) + '</button>'; }).join('') + '</div>';
+  if ((c.more && c.more.length) || (c.tiers && c.tiers.length)) h += '<details class="more"><summary>More</summary>' + (c.more || []).map(function(m){ return '<p>' + m + '</p>'; }).join('') + tierHtml(c.tiers) + '</details>';
+  return h + '</div>';
+}
+function resultsHtml(i, noIds){
+  var cs = engine(i);
+  if (!cs.length) return '<div class="card"><p class="label">Start here</p><p class="head">Pick the cause and what the patient is on</p><p class="sub">Add the SpO2, rate and any blood gas. The cards build as you go: target, device, high flow or NIV, settings, ROX, and when to intubate.</p></div>';
+  return cs.map(function(c){ return cardHtml(c, noIds); }).join('');
+}
+
+var st;
+function blank(){ return {cause:null, ext:'high', dev:null, flow:null, fio2:null, hrs:null, spo2:null, rr:null, ph:null, paco2:null, pao2:null, flags:{}}; }
+st = blank();
+var NUMS = ['flow','fio2','hrs','spo2','rr','ph','paco2','pao2'];
+function segHtml(arr, cur, attr){ return arr.map(function(a){ return '<button class="sbtn" ' + attr + '="' + a[0] + '" aria-pressed="' + (cur === a[0]) + '">' + esc(a[1]) + '</button>'; }).join(''); }
+function render(){
+  $('cause').innerHTML = segHtml(CAUSES, st.cause, 'data-c');
+  $('ext').innerHTML = segHtml(EXTS, st.ext, 'data-e');
+  $('ext-grp').hidden = st.cause !== 'postext';
+  $('device').innerHTML = segHtml(DEVICES, st.dev, 'data-d');
+  $('flags').innerHTML = FLAGS.map(function(f){ return '<button class="sbtn" data-f="' + f[0] + '" aria-pressed="' + !!st.flags[f[0]] + '">' + esc(f[1]) + '</button>'; }).join('');
+  $('flow-f').hidden = !(st.dev === 'nc' || st.dev === 'mask' || st.dev === 'nrb' || st.dev === 'hfnc');
+  $('fio2-f').hidden = !(st.dev === 'venturi' || st.dev === 'hfnc' || st.dev === 'niv');
+  NUMS.forEach(function(k){ var v = st[k]; $(k).value = has(v) ? v : ''; });
+  $('results').innerHTML = resultsHtml(st);
+}
+function readNums(){ NUMS.forEach(function(k){ var v = $(k).value.trim(); st[k] = v === '' ? null : parseFloat(v); }); $('results').innerHTML = resultsHtml(st); }
+NUMS.forEach(function(k){ $(k).addEventListener('input', readNums); });
+$('inputs').addEventListener('click', function(e){
+  var b = e.target.closest && e.target.closest('button'); if (!b) return;
+  var c = b.getAttribute('data-c'), x = b.getAttribute('data-e'), d = b.getAttribute('data-d'), f = b.getAttribute('data-f');
+  if (c) st.cause = st.cause === c ? null : c;
+  else if (x) st.ext = x;
+  else if (d) st.dev = st.dev === d ? null : d;
+  else if (f) st.flags[f] = !st.flags[f];
+  else if (b.id === 'clear') st = blank();
+  else return;
+  render();
+});
+
+/* ---------- Cause table (Devices tab), same wording as the engine ---------- */
+(function(){
+  var rows = [
+    ['New hypoxemia (pneumonia)','High flow','ATS 2026 strong; ESICM 2023 strong, moderate; ERS 2022 conditional, moderate. NIV or CPAP: ATS 2026 conditional.'],
+    ['Cardiogenic pulmonary edema','CPAP or bilevel NIV','ERS/ATS 2017 strong, moderate'],
+    ['COPD, pH 7.35 or less and PaCO2 over 45','Bilevel NIV','ERS/ATS 2017 strong, high; ATS 2026 strong'],
+    ['COPD, hypercapnia without acidosis','No NIV','ERS/ATS 2017 conditional, low'],
+    ['Obesity hypoventilation','NIV on COPD criteria, high pressures','BTS/ICS 2016 R57, B'],
+    ['Neuromuscular or chest wall','NIV early, before acidosis','BTS/ICS 2016 R50, R51, D'],
+    ['Asthma with hypercapnia','No NIV; ICU review','BTS/ICS 2016 R39, C; ERS/ATS 2017 none'],
+    ['Immunocompromised, hypoxemic','High flow or early NIV, time-limited','ERS/ATS 2017 conditional, moderate (dated)'],
+    ['After extubation, high risk','NIV alternating with high flow','ERS/ATS 2017 conditional, low; ERS 2022 conditional, moderate; ATS 2026 conditional'],
+    ['After extubation, low risk','High flow','ERS 2022 conditional, low; ATS 2026 conditional; ACP 2021 conditional, low'],
+    ['Failing after extubation','No NIV; reintubate','ERS/ATS 2017 conditional, low; BTS/ICS R72, B'],
+    ['Before intubation','Preoxygenate with high flow or NIV','ATS 2026 strong']
+  ];
+  $('causetable').innerHTML = '<tr><th>Cause</th><th>Use</th></tr>' + rows.map(function(r){ return '<tr><td>' + esc(r[0]) + '</td><td><b>' + esc(r[1]) + '</b><small>' + esc(r[2]) + '</small></td></tr>'; }).join('');
+})();
+
+/* ---------- Figures (site SVG) ---------- */
+function tx(x, y, s, o){ o = o || {}; return '<text x="' + x + '" y="' + y + '"' + (o.a ? ' text-anchor="' + o.a + '"' : '') + ' style="font-family:var(--mono);font-size:' + (o.z || 11.5) + 'px;fill:' + (o.f || 'var(--ink)') + (o.b ? ';font-weight:600' : '') + '">' + esc(s) + '</text>'; }
+function svg(inner, h, label){ return '<svg class="fig" viewBox="0 0 350 ' + h + '" role="img" aria-label="' + esc(label || '') + '">' + inner + '</svg>'; }
+function sev(p){ return 100 / (23400 / (p * p * p + 150 * p) + 1); }
+function invSev(s){ var lo = 1, hi = 300; for (var k = 0; k < 60; k++){ var m = (lo + hi) / 2; if (sev(m) < s) lo = m; else hi = m; } return (lo + hi) / 2; }
+var CURVE_PTS = [98,96,92,90,88];
+var FIGS = {
+  curve:{t:'The oxygen curve', states:CURVE_PTS.map(function(s){ return 's' + s; }), data:(function(){ var o = {}; CURVE_PTS.forEach(function(s){ var p = r0(invSev(s)); o['s' + s] = {n:s + '%', line:'SpO2 ' + s + '% matches a PaO2 of about ' + p + ' mm Hg on the standard curve (pH 7.4, 37 °C; Severinghaus 1979). ' + (s >= 96 ? 'Near the flat top: more oxygen barely moves the saturation, and the oximeter cannot show how high PaO2 has gone.' : s >= 92 ? 'The low end of the usual target: just above the steep part.' : 'On the steep part: a small fall in PaO2 now drops the saturation fast.') + ' SpO2 is not SaO2: poor perfusion, darker skin and carbon monoxide can mislead.'}; }); return o; })(),
+    svg:function(k){
+      var s = +k.slice(1), X = function(p){ return 46 + p / 120 * 284; }, Y = function(v){ return 170 - v / 100 * 150; }, d = '';
+      for (var p = 1; p <= 120; p += 1) d += (p === 1 ? 'M' : 'L') + X(p).toFixed(1) + ' ' + Y(sev(p)).toFixed(1);
+      var pp = invSev(s), h = '<rect x="' + X(0) + '" y="' + Y(96) + '" width="284" height="' + (Y(92) - Y(96)) + '" fill="var(--okbg)"/>';
+      h += '<path d="M46 20 V170 H330" fill="none" stroke="var(--muted)"/>' + '<path d="' + d + '" fill="none" stroke="var(--accent)" stroke-width="2.5"/>';
+      h += '<path d="M' + X(pp).toFixed(1) + ' 170 V' + Y(s).toFixed(1) + ' H46" fill="none" stroke="var(--ink)" stroke-dasharray="4 3"/>' + '<circle cx="' + X(pp).toFixed(1) + '" cy="' + Y(s).toFixed(1) + '" r="5" fill="var(--ink)"/>';
+      h += tx(40, Y(100) + 4, '100', {a:'end', z:10.5, f:'var(--muted)'}) + tx(40, Y(50) + 4, '50', {a:'end', z:10.5, f:'var(--muted)'}) + tx(40, 174, '0', {a:'end', z:10.5, f:'var(--muted)'});
+      [0,30,60,90,120].forEach(function(v){ h += tx(X(v), 186, String(v), {a:'middle', z:10.5, f:'var(--muted)'}); });
+      h += tx(188, 202, 'PaO2, mm Hg', {a:'middle', z:10.5, f:'var(--muted)'}) + tx(52, 14, 'SpO2 %', {z:10.5, f:'var(--muted)'}) + tx(52, Y(94) + 4, 'target 92–96', {z:10.5, f:'var(--ok)'});
+      h += X(pp) > 230 ? tx(X(pp) - 8, Y(s) + 20, 'PaO2 ≈ ' + r0(pp), {a:'end', z:11.5, b:1}) : tx(X(pp) + 8, Y(s) + 18, 'PaO2 ≈ ' + r0(pp), {z:11.5, b:1});
+      return svg(h, 208, 'Oxyhemoglobin dissociation curve');
+    }},
+  shunt:{t:'Why oxygen fixes some low saturations', states:['vq','shunt','hypo'], data:{
+      vq:{n:'Mismatch', line:'Some alveoli get too little air for their blood flow. Extra oxygen raises the oxygen in those alveoli, so the saturation climbs. COPD and asthma behave mostly like this; pneumonia mixes mismatch with shunt.'},
+      shunt:{n:'Shunt', line:'Blood passes alveoli full of fluid or collapsed, so added oxygen never meets it and the saturation barely rises. It needs pressure to reopen alveoli, or intubation: ARDS, lobar collapse, flooding.'},
+      hypo:{n:'Hypoventilation', line:'Too little air moves in and out. Oxygen corrects the saturation, but CO2 keeps rising unseen: check a blood gas. It needs ventilation, not just oxygen.'}},
+    svg:function(k){
+      var fill = k === 'shunt' ? 'var(--hrt-cavity)' : 'var(--card)', narrow = k === 'vq', hypo = k === 'hypo';
+      var h = '<path d="M175 20 V' + (hypo ? 54 : 60) + '" stroke="var(--muted)" stroke-width="' + (hypo ? 2 : narrow ? 3 : 8) + '"/>' + tx(186, 34, hypo ? 'small breaths' : narrow ? 'narrowed airway' : 'airway', {z:10.5, f:'var(--muted)'});
+      h += '<circle cx="175" cy="95" r="38" fill="' + fill + '" stroke="var(--ink)" stroke-width="1.5"/>';
+      h += tx(175, 92, k === 'shunt' ? 'flooded' : 'alveolus', {a:'middle', z:11}) + tx(175, 107, k === 'shunt' ? 'no gas in' : hypo ? 'CO2 rises' : 'low oxygen', {a:'middle', z:10.5, f:'var(--muted)'});
+      h += '<path d="M20 150 H330" stroke="var(--hrt-vein)" stroke-width="10" stroke-linecap="round"/>' + '<path d="M175 133 V145" stroke="var(--ink)"/>';
+      h += tx(20, 175, 'blood in', {z:10.5, f:'var(--muted)'}) + tx(330, 175, 'blood out', {a:'end', z:10.5, f:'var(--muted)'});
+      h += tx(175, 196, k === 'vq' ? 'Add oxygen: saturation rises' : k === 'shunt' ? 'Add oxygen: barely rises' : 'Add oxygen: rises, CO2 still high', {a:'middle', z:11.5, b:1});
+      return svg(h, 204, 'Alveolus and capillary');
+    }},
+  ladderfig:{t:'Device ladder', states:['nc','mask','venturi','nrb','hfnc','niv'], data:{
+      nc:{n:'Cannula', line:'1 to 6 L/min gives about 24 to 50%, and the real FiO2 cannot be predicted (BTS 2017).', r:[24,50]},
+      mask:{n:'Mask', line:'5 to 10 L/min gives about 40 to 60%, varying with breathing.', r:[40,60]},
+      venturi:{n:'Venturi', line:'A fixed 24, 28, 31, 35, 40 or 60% whatever the oxygen flow: the choice when CO2 retention is a risk.', r:[24,60]},
+      nrb:{n:'Reservoir', line:'15 L/min gives about 60 to 90%, depending on fit and breathing.', r:[60,90]},
+      hfnc:{n:'High flow', line:'Up to 60 L/min of warmed, humidified gas; the FiO2 is set on the blender (21 to 100%) and is close to what is breathed when flow meets demand.', r:[21,100]},
+      niv:{n:'NIV', line:'Pressure as well as oxygen, FiO2 set on the machine (21 to 100%).', r:[21,100]}},
+    svg:function(k){
+      var X = function(v){ return 110 + (v - 20) / 80 * 220; }, h = '', keys = ['nc','mask','venturi','nrb','hfnc','niv'];
+      keys.forEach(function(d, n){ var y = 14 + n * 28, r = FIGS.ladderfig.data[d].r, on = d === k;
+        h += tx(10, y + 13, FIGS.ladderfig.data[d].n, {z:11, b:on});
+        h += '<rect x="' + X(r[0]).toFixed(1) + '" y="' + (y + 2) + '" width="' + (X(r[1]) - X(r[0])).toFixed(1) + '" height="16" rx="5" fill="' + (on ? 'var(--accent)' : 'var(--fill)') + '" stroke="var(--line)"/>'; });
+      [21,40,60,80,100].forEach(function(v){ h += tx(X(v), 186, v + '%', {a:'middle', z:10.5, f:'var(--muted)'}); });
+      h += tx(220, 200, 'FiO2 delivered', {a:'middle', z:10.5, f:'var(--muted)'});
+      return svg(h, 206, 'FiO2 range by device');
+    }},
+  hffig:{t:'How high flow works', states:['flow','wash','peep'], data:{
+      flow:{n:'Matched flow', line:'A breathless patient can draw in more than standard devices supply, so room air is pulled in and the FiO2 falls. At high flow, delivered gas meets demand, so what is set is close to what is breathed.'},
+      wash:{n:'Washout', line:'Fresh gas flushes CO2 out of the nose and throat between breaths, so less is rebreathed; clearance rises with flow (Möller 2015, 2017).'},
+      peep:{n:'Pressure', line:'With the mouth closed, airway pressure was about 1.9, 2.6 and 3.3 cm H2O at 30, 40 and 50 L/min after cardiac surgery, and lower with the mouth open (Parke 2011).'}},
+    svg:function(k){
+      var h = '';
+      if (k === 'peep'){
+        [[30,1.93],[40,2.58],[50,3.31]].forEach(function(p, n){ var x = 80 + n * 90, ht = p[1] / 4 * 120; h += '<rect x="' + x + '" y="' + (160 - ht).toFixed(1) + '" width="50" height="' + ht.toFixed(1) + '" rx="4" fill="var(--accent)"/>' + tx(x + 25, 178, p[0] + ' L/min', {a:'middle', z:10.5, f:'var(--muted)'}) + tx(x + 25, 152 - ht, String(p[1]), {a:'middle', z:11, b:1}); });
+        h += '<path d="M60 160 H320" stroke="var(--muted)"/>' + tx(60, 24, 'cm H2O, mouth closed', {z:10.5, f:'var(--muted)'});
+        return svg(h, 190, 'Airway pressure by flow');
+      }
+      h += '<path d="M40 150 C40 60 110 30 170 30 C240 30 300 70 300 150" fill="none" stroke="var(--ink)" stroke-width="1.5"/>' + tx(170, 50, 'nose and throat', {a:'middle', z:10.5, f:'var(--muted)'});
+      if (k === 'flow'){
+        h += '<path d="M70 120 H140" stroke="var(--accent)" stroke-width="6"/><path d="M140 112 L156 120 L140 128 Z" fill="var(--accent)"/>' + tx(70, 108, 'set gas', {z:10.5, b:1});
+        h += '<path d="M200 120 H270" stroke="var(--accent)" stroke-width="6"/><path d="M270 112 L286 120 L270 128 Z" fill="var(--accent)"/>' + tx(200, 108, 'breathed in', {z:10.5, b:1});
+        h += tx(170, 168, 'no room air drawn in', {a:'middle', z:11.5, b:1});
+      } else {
+        for (var n = 0; n < 6; n++) h += '<circle cx="' + (90 + n * 32) + '" cy="' + (100 + (n % 2) * 18) + '" r="7" fill="var(--fill)" stroke="var(--muted)"/>';
+        h += tx(170, 82, 'CO2 flushed out', {a:'middle', z:11, b:1}) + '<path d="M120 140 H220" stroke="var(--accent)" stroke-width="4"/><path d="M220 134 L232 140 L220 146 Z" fill="var(--accent)"/>';
+        h += tx(170, 168, 'less dead space each breath', {a:'middle', z:11.5, b:1});
+      }
+      return svg(h, 180, 'High-flow mechanism');
+    }},
+  nivfig:{t:'CPAP and bilevel', states:['cpap','bi'], data:{
+      cpap:{n:'CPAP', line:'One pressure through the whole breath: it holds alveoli open and lowers the work of the left ventricle. It does not add to each breath, so it does little for CO2. The 8 shown is an example.'},
+      bi:{n:'Bilevel', line:'A higher inspiratory pressure on each breath and a lower expiratory one. The difference is pressure support: it makes each breath bigger, so CO2 is blown off. Example 15 over 5.'}},
+    svg:function(k){
+      var Y = function(p){ return 160 - p * 7; }, d = 'M40 ' + Y(k === 'cpap' ? 8 : 5);
+      for (var n = 0; n < 3; n++){ var x = 40 + n * 88; if (k === 'cpap') d += ' H' + (x + 88); else d += ' H' + (x + 14) + ' V' + Y(15) + ' H' + (x + 52) + ' V' + Y(5) + ' H' + (x + 88); }
+      var h = '<path d="M40 20 V160 H330" fill="none" stroke="var(--muted)"/>' + '<path d="' + d + '" fill="none" stroke="var(--accent)" stroke-width="2.5"/>';
+      h += tx(34, Y(0) + 4, '0', {a:'end', z:10.5, f:'var(--muted)'}) + tx(34, Y(10) + 4, '10', {a:'end', z:10.5, f:'var(--muted)'}) + tx(34, Y(20) + 4, '20', {a:'end', z:10.5, f:'var(--muted)'});
+      h += tx(185, 178, 'time (three breaths)', {a:'middle', z:10.5, f:'var(--muted)'}) + tx(44, 16, 'cm H2O', {z:10.5, f:'var(--muted)'});
+      if (k === 'bi') h += '<path d="M318 ' + Y(15) + ' H326 V' + Y(5) + ' H318" fill="none" stroke="var(--ink)"/>' + tx(330, Y(15) - 8, 'support', {a:'end', z:10.5, b:1}) + tx(56, Y(15) - 8, 'inspiratory 15', {z:10.5}) + tx(250, Y(5) + 16, 'expiratory 5', {a:'middle', z:10.5});
+      else h += tx(185, Y(8) - 8, 'CPAP 8', {a:'middle', z:10.5, b:1});
+      return svg(h, 186, 'Airway pressure over time');
+    }}
+};
+function mountFig(host, id){
+  var F = FIGS[id];
+  function draw(k){ var d = F.data[k]; host.innerHTML = '<div class="seg" style="margin:0 0 10px">' + F.states.map(function(x){ return '<button class="sbtn" data-k="' + x + '" aria-pressed="' + (x === k) + '">' + esc(F.data[x].n) + '</button>'; }).join('') + '</div>' + F.svg(k) + '<p class="line1">' + esc(d.line) + '</p>'; }
+  host.onclick = function(e){ var b = e.target.closest && e.target.closest('[data-k]'); if (b && F.data[b.getAttribute('data-k')]) draw(b.getAttribute('data-k')); };
+  draw(id === 'curve' ? 's92' : F.states[0]);
+}
+var lastFocus = null;
+function openSheet(fig){ lastFocus = document.activeElement; $('sheet-t').textContent = FIGS[fig].t; mountFig($('sheet-b'), fig); $('scrim').hidden = false; $('sheet').hidden = false; $('sheet').scrollTop = 0; $('sheet-x').focus(); }
+function closeSheet(){ if ($('sheet').hidden) return; $('scrim').hidden = true; $('sheet').hidden = true; if (lastFocus && lastFocus.focus) lastFocus.focus(); }
+$('sheet-x').addEventListener('click', closeSheet); $('scrim').addEventListener('click', closeSheet);
+document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeSheet(); });
+document.addEventListener('click', function(e){ var c = e.target.closest && e.target.closest('[data-fig]'); if (c) openSheet(c.getAttribute('data-fig')); });
+document.querySelectorAll('[data-figure]').forEach(function(h){ mountFig(h, h.getAttribute('data-figure')); });
+
+/* ---------- Learn: ROX slider ---------- */
+var roxT = 6;
+function dpHtml(rows){ return '<div class="dp">' + rows.map(function(r){ return '<div><span class="dl">' + r[0] + '</span><p>' + esc(r[1]) + '</p></div>'; }).join('') + '</div>'; }
+function drawRox(){
+  $('roxt').innerHTML = [2,6,12].map(function(t){ return '<button class="sbtn" data-t="' + t + '" aria-pressed="' + (t === roxT) + '">' + t + ' h on high flow</button>'; }).join('');
+  var v = +$('roxs').value, b = roxBand(v, roxT), hi = b.hi;
+  var names = ['High risk: high flow likely to fail','Uncertain: between the cut-offs','Lower risk of intubation'];
+  var rows = [
+    ['What is happening', b.z === 0 ? 'Oxygenation is poor for the FiO2 given and the rate is fast: the patient is working hard and still not oxygenating.' : b.z === 1 ? 'Neither reassuring nor alarming: oxygenation and effort are in between.' : 'Good oxygenation for the FiO2, with a manageable rate.'],
+    ['Why the rule', b.z === 0 ? 'In the validation cohort, values under ' + hi + ' at ' + roxT + ' h predicted high-flow failure.' : b.z === 1 ? 'The study gave no rule for values between ' + hi + ' and 4.88.' : 'ROX 4.88 or more at 2, 6 or 12 hours went with a lower risk of intubation.'],
+    ['At the bedside', b.z === 0 ? 'Decide on intubation with the ICU team now; waiting once support fails has been linked to higher mortality.' : b.z === 1 ? 'Recheck within 1 to 2 hours (expert practice) and watch the trend: patients who failed had a smaller rise in ROX over 12 hours.' : 'Continue, keep rechecking, and wean the FiO2 first, then the flow.']
+  ];
+  var span = 10 - 1, w0 = (hi - 1) / span * 100, w1 = (4.88 - hi) / span * 100, w2 = 100 - w0 - w1;
+  $('roxs-out').innerHTML = '<p class="head" style="margin-top:6px">ROX ' + v.toFixed(1) + ' at ' + roxT + ' h</p><div class="zone">' + [w0, w1, w2].map(function(w, k){ return '<span class="' + (k === b.z ? 'on' : '') + '" style="width:' + w.toFixed(1) + '%"></span>'; }).join('') + '</div><span class="zname">' + esc(names[b.z]) + '</span>' + dpHtml(rows);
+}
+$('roxs').addEventListener('input', drawRox);
+$('roxt').addEventListener('click', function(e){ var t = e.target.getAttribute('data-t'); if (t){ roxT = +t; drawRox(); } });
+
+/* ---------- Trials (numbers from the papers or their PubMed abstracts) ---------- */
+var TRIALS = [
+ {q:'High flow, standard oxygen or NIV for hypoxemic failure? (FLORALI)', d:'Randomized, 310 adults without hypercapnia, P/F 300 or less.', r:'Intubation by day 28: 38% high flow, 47% standard oxygen, 50% NIV (P = 0.18). Ventilator-free days 24, 22 and 19. Death at 90 days higher with standard oxygen (hazard ratio 2.01) and with NIV (2.50) than with high flow.', c:'High flow became the first step in de novo hypoxemic failure, though the primary outcome was not significant.', cite:'Frat JP et al. N Engl J Med 2015;372:2185', doi:'10.1056/NEJMoa1503326'},
+ {q:'Can a bedside index predict high-flow failure? (ROX)', d:'Prospective multicentre cohort, pneumonia on high flow; validation cohort of 191, of whom 35.6% were intubated.', r:'4.88 or more at 2, 6 or 12 h: lower risk. Under 2.85, 3.47 and 3.85 at 2, 6 and 12 h: failure likely. Accuracy rose with time (area under the curve 0.68 to 0.76).', c:'A simple, repeatable trigger to reconsider high flow. Observational, pneumonia only.', cite:'Roca O et al. Am J Respir Crit Care Med 2019;199:1368', doi:'10.1164/rccm.201803-0589OC'},
+ {q:'High flow for immunocompromised patients? (HIGH)', d:'Randomized, 776 immunocompromised adults with hypoxemic failure, 32 ICUs.', r:'Death at 28 days 35.6% against 36.1%. Intubation 38.7% against 43.8%, not significant.', c:'No survival benefit from high flow over standard oxygen in this group.', cite:'Azoulay E et al. JAMA 2018;320:2099', doi:'10.1001/jama.2018.14282'},
+ {q:'Helmet NIV or high flow? (HENIVOT)', d:'Randomized, 109 patients with COVID-19 and P/F 200 or less; helmet NIV then high flow, against high flow alone.', r:'Days free of respiratory support 20 against 18 (P = 0.26). Intubation 30% against 51%. In-hospital death 24% against 25%.', c:'Fewer intubations with the helmet, but the primary outcome did not differ. Small, COVID-19 only.', cite:'Grieco DL et al. JAMA 2021;325:1731', doi:'10.1001/jama.2021.4682'},
+ {q:'Is high flow as good as NIV across causes? (RENOVATE)', d:'Bayesian randomized non-inferiority trial, 33 hospitals, 1,766 analysed.', r:'Intubation or death by day 7: 39% against 38%. Non-inferior for non-immunocompromised hypoxemia, cardiogenic edema, COVID-19 and COPD with acidosis; not shown for immunocompromised patients (16 of 28 against 8 of 22), where enrolment stopped.', c:'High flow is a reasonable alternative to NIV for most groups. The subgroup results lean on the Bayesian method.', cite:'RENOVATE Investigators (Maia IS et al.). JAMA 2025;333:875', doi:'10.1001/jama.2024.26244'},
+ {q:'High flow after extubation, low risk? (Hernández)', d:'Randomized, 527 patients at low risk of reintubation; high flow or standard oxygen for 24 h.', r:'Reintubation within 72 h 4.9% against 12.2%.', c:'High flow became routine after extubation in low-risk patients.', cite:'Hernández G et al. JAMA 2016;315:1354', doi:'10.1001/jama.2016.2711'},
+ {q:'High flow or NIV after extubation, high risk? (Hernández)', d:'Randomized non-inferiority trial, 604 patients at high risk; high flow or NIV for 24 h.', r:'Reintubation 22.8% against 19.1%, non-inferior. Therapy withdrawn for adverse effects 0% against 42.9%.', c:'High flow is an option when NIV is not tolerated.', cite:'Hernández G et al. JAMA 2016;316:1565', doi:'10.1001/jama.2016.14194'},
+ {q:'NIV alternating with high flow, high risk? (HIGH-WEAN)', d:'Randomized, 641 patients over 65 or with heart or lung disease, 30 ICUs.', r:'Reintubation by day 7: 11.8% against 18.2% with high flow alone.', c:'Prophylactic NIV, between spells of high flow, for high-risk extubations.', cite:'Thille AW et al. JAMA 2019;322:1465', doi:'10.1001/jama.2019.14901'},
+ {q:'NIV for cardiogenic pulmonary edema? (3CPO)', d:'Randomized, 1,069 patients; oxygen, CPAP 5 to 15, or bilevel 8 to 20 over 4 to 10.', r:'Death at 7 days 9.8% oxygen against 9.5% NIV. Death or intubation: CPAP 11.7% against bilevel 11.1%. Faster relief of breathlessness and acidosis with NIV.', c:'NIV relieves symptoms faster without a mortality benefit; CPAP and bilevel are equivalent.', cite:'Gray A et al. N Engl J Med 2008;359:142', doi:'10.1056/NEJMoa0707992'},
+ {q:'NIV on the ward for COPD? (Plant)', d:'Randomized, 236 patients with COPD exacerbation and mild to moderate acidosis, 14 hospitals.', r:'Met intubation criteria 15% against 27%. In-hospital death 10% against 20%.', c:'Acidotic COPD exacerbations get early NIV.', cite:'Plant PK et al. Lancet 2000;355:1931', doi:'10.1016/S0140-6736(00)02323-0'},
+ {q:'Is liberal oxygen harmful? (IOTA)', d:'Systematic review and meta-analysis, 25 randomized trials, 16,037 acutely ill adults.', r:'Liberal oxygen raised in-hospital death, relative risk 1.21 (1.03 to 1.43).', c:'The upper limit of 96% in the BMJ 2018 recommendation.', cite:'Chu DK et al. Lancet 2018;391:1693', doi:'10.1016/S0140-6736(18)30479-3'},
+ {q:'Conservative oxygen on the ventilator? (ICU-ROX)', d:'Randomized, 1,000 ventilated adults; conservative oxygen against usual care.', r:'Ventilator-free days 21.3 against 22.1. Death at 180 days 35.7% against 34.5%.', c:'No difference.', cite:'Mackle D et al. N Engl J Med 2020;382:989', doi:'10.1056/NEJMoa1903297'},
+ {q:'PaO2 60 or 90 in hypoxemic failure? (HOT-ICU)', d:'Randomized, 2,928 ICU patients with acute hypoxemic failure.', r:'Death at 90 days 42.9% against 42.4%.', c:'A lower target was as safe as a higher one.', cite:'Schjørring OL et al. N Engl J Med 2021;384:1301', doi:'10.1056/NEJMoa2032510'},
+ {q:'SpO2 target 90, 94 or 98%? (PILOT)', d:'Cluster-crossover trial, 2,541 ventilated adults.', r:'Ventilator-free days 20, 21 and 21. Death by day 28 34.8%, 34.0% and 33.2%.', c:'No target was better.', cite:'Semler MW et al. N Engl J Med 2022;387:1759', doi:'10.1056/NEJMoa2208415'},
+ {q:'Conservative oxygen at scale? (UK-ROX)', d:'Randomized, 16,500 ventilated adults in 97 ICUs; SpO2 target 90% (88 to 92) against usual care.', r:'Death at 90 days 35.4% against 34.9%.', c:'Less oxygen with no difference in survival.', cite:'Martin DS et al. JAMA 2025;334:398', doi:'10.1001/jama.2025.9663'},
+ {q:'Does late intubation after high flow cost lives? (Kang)', d:'Retrospective, one centre, 175 patients intubated after high flow failed.', r:'ICU death 39.2% when intubated within 48 h against 66.7% later.', c:'The basis for watching closely and not waiting. Weak evidence: observational.', cite:'Kang BJ et al. Intensive Care Med 2015;41:623', doi:'10.1007/s00134-015-3693-5'}
+];
+$('trialbox').innerHTML = TRIALS.map(function(t){ return '<div class="trial"><p><b>' + esc(t.q) + '</b></p><p><span class="k">Design</span>' + esc(t.d) + '</p><p><span class="k">Result</span>' + esc(t.r) + '</p><p><span class="k">What it changed</span>' + esc(t.c) + '</p><p class="mono" style="font-size:13px"><a href="https://doi.org/' + t.doi + '" rel="noopener">' + esc(t.cite) + '</a></p></div>'; }).join('');
+
+/* ---------- Practice ---------- */
+var CASES = [
+ {t:'Pneumonia on 6 litres', s:'Day 1 of pneumonia, no lung disease. Nasal cannula 6 L/min, SpO2 88%, rate 32, talking in short sentences.', q:'What next?', i:{cause:'hypox', dev:'nc', flow:6, spo2:88, rr:32}},
+ {t:'COPD and a gas', s:'COPD exacerbation on nasal cannula 4 L/min. SpO2 95%, rate 26. Gas: pH 7.28, PaCO2 68.', q:'Two things to change?', i:{cause:'copd', dev:'nc', flow:4, spo2:95, rr:26, ph:7.28, paco2:68}},
+ {t:'Pink froth', s:'Sudden breathlessness, crackles to the apices, hypertensive. Reservoir mask, SpO2 86%, rate 34. Alert and protecting the airway.', q:'What support?', i:{cause:'cpe', dev:'nrb', flow:15, spo2:86, rr:34}},
+ {t:'Six hours of high flow', s:'Pneumonia on high flow 50 L/min, FiO2 70%, for 6 hours. SpO2 90%, rate 38.', q:'What does the ROX say?', i:{cause:'hypox', dev:'hfnc', flow:50, fio2:70, hrs:6, spo2:90, rr:38}},
+ {t:'Just extubated', s:'72 years old with heart failure, extubated an hour ago after 5 days of ventilation. Nasal cannula 2 L/min, SpO2 94%, rate 20.', q:'What support now?', i:{cause:'postext', ext:'high', dev:'nc', flow:2, spo2:94, rr:20}},
+ {t:'Drowsy on the mask', s:'Pneumonia on NIV, FiO2 60%, for 3 hours. Now hard to rouse, and has vomited into the mask. SpO2 89%, rate 36.', q:'What now?', i:{cause:'hypox', dev:'niv', fio2:60, hrs:3, spo2:89, rr:36, flags:{airway:true, vomit:true}}}
+];
+var POINT = ['High flow: standard oxygen is failing (low saturation at 6 L/min and a fast rate). The cannula FiO2 is only a rough guess, so the estimated P/F is too.',
+  'Turn the oxygen down to 88 to 92%, and start bilevel NIV: pH 7.28 with PaCO2 68 is acute respiratory acidosis, the strongest indication NIV has.',
+  'CPAP or bilevel NIV, with nitrates and diuretics. No contraindication ticked.',
+  'ROX (90 ÷ 0.70) ÷ 38 = 3.38, under 3.47 at 6 hours: high flow is likely to fail. Decide on intubation now.',
+  'High risk (age and heart failure): NIV straight away, alternating with high flow, rather than waiting for failure.',
+  'Cannot protect the airway: intubate now. Vomiting is also a reason to take the mask off.'];
+$('practice').innerHTML = CASES.map(function(c, n){ return '<div class="card"><p class="label">Case ' + (n + 1) + '</p><h2>' + esc(c.t) + '</h2><p>' + esc(c.s) + '</p><p><b>' + esc(c.q) + '</b></p><div class="row"><button class="btn" data-ans="' + n + '">Show the answer</button><button class="btn ghost" data-load="' + n + '">Open in the tool</button></div><div class="ans" id="ans' + n + '" hidden></div></div>'; }).join('');
+function caseState(n){ var s = blank(), i = CASES[n].i; Object.keys(i).forEach(function(k){ s[k] = k === 'flags' ? JSON.parse(JSON.stringify(i[k])) : i[k]; }); return s; }
+$('practice').addEventListener('click', function(e){
+  var a = e.target.getAttribute('data-ans'), l = e.target.getAttribute('data-load');
+  if (a != null){ var box = $('ans' + a); box.innerHTML = '<p>' + esc(POINT[a]) + '</p>' + resultsHtml(caseState(+a), true); box.hidden = false; e.target.hidden = true; }
+  if (l != null){ st = caseState(+l); render(); show('t-assess'); window.scrollTo(0, 0); }
+});
+
+/* ---------- Tabs, pills ---------- */
+var tabs = [['t-assess','p-assess'],['t-dev','p-dev'],['t-learn','p-learn'],['t-prac','p-prac']];
+function show(t){ tabs.forEach(function(p){ var on = p[0] === t; $(p[0]).setAttribute('aria-selected', String(on)); $(p[1]).classList.toggle('on', on); }); }
+tabs.forEach(function(p){ $(p[0]).addEventListener('click', function(){ show(p[0]); }); });
+function fromHash(){ var id = location.hash.slice(1); if (!id) return; var el = $(id); if (!el) return; var pan = el.closest('.panel'); if (pan) tabs.forEach(function(p){ if (p[1] === pan.id) show(p[0]); }); el.scrollIntoView(); }
+window.addEventListener('hashchange', fromHash);
+(function(){
+  var chaps = [].slice.call(document.querySelectorAll('.chap'));
+  $('pills').innerHTML = chaps.map(function(c, n){ return '<button class="pill" data-go="' + c.id + '" aria-current="' + (n === 0) + '">' + (n + 1) + ' ' + esc(c.getAttribute('data-pill')) + '</button>'; }).join('');
+  $('pills').addEventListener('click', function(e){ var g = e.target.getAttribute('data-go'); if (g) $(g).scrollIntoView(); });
+  function mark(id){ [].forEach.call($('pills').children, function(b){ var on = b.getAttribute('data-go') === id; b.setAttribute('aria-current', String(on)); if (on) $('pills').scrollLeft = Math.max(0, b.offsetLeft - 60); }); }
+  if ('IntersectionObserver' in window){ var io = new IntersectionObserver(function(es){ es.forEach(function(en){ if (en.isIntersecting) mark(en.target.id); }); }, {rootMargin:'-30% 0px -60% 0px'}); chaps.forEach(function(c){ io.observe(c); }); }
+  $('go-prac').addEventListener('click', function(){ show('t-prac'); window.scrollTo(0, 0); });
+})();
+render(); drawRox(); fromHash();
+window.__o2 = {engine: engine, rox: roxBand, sev: invSev, cases: CASES, caseState: caseState};
+})();
+</script>
+<script id="deeper-data">
+/* Go deeper: mechanism, rationale and the common trap for each Learn chapter. Text only; no doses or thresholds beyond the tool's own. */
+(function(){ var D = {
+"learn-curve": [["Mechanism", "Hemoglobin binds oxygen cooperatively: each oxygen bound makes the next easier. That gives the S shape, flat at the top and steep below a PaO2 of about 60."], ["Why it matters", "Targets sit just above the steep part, with a margin. Above it, extra oxygen adds little saturation and the oximeter cannot show how high the PaO2 has gone."], ["Common trap", "Reading SpO2 as if it were the arterial saturation. Poor perfusion, darker skin, carbon monoxide and methemoglobin can all make the number wrong; a blood gas settles it."]],
+"learn-why": [["Mechanism", "In mismatch, poorly ventilated alveoli still receive some gas, so raising the FiO2 raises their oxygen. In shunt, blood passes alveoli that receive no gas at all, so the added oxygen never reaches it. In hypoventilation, CO2 builds up in the alveoli and displaces oxygen."], ["Why it matters", "A saturation that barely moves with more oxygen points to shunt, which needs pressure to reopen alveoli or a ventilator. Hypoventilation needs more breathing, not more oxygen."], ["Common trap", "A good saturation on oxygen can hide a rising CO2. In anyone drowsy or at risk of retaining CO2, check a blood gas."]],
+"learn-ladder": [["Mechanism", "A breathless patient pulls in more gas per second than a cannula or mask supplies, and the gap is filled with room air. The faster and deeper the breathing, the lower the real FiO2."], ["Why it matters", "The FiO2 on a low-flow device is a guess, so ratios built on it are guesses too. Venturi masks and high flow deliver a known FiO2."], ["Common trap", "Turning up the oxygen flow on a Venturi mask to raise the FiO2. It does not; change the valve instead."]],
+"learn-hfnc": [["Mechanism", "High flow meets the patient's demand so little room air is drawn in, flushes CO2 out of the nose and throat, adds a small positive pressure that falls when the mouth opens, and delivers warm, humidified gas that is easier to tolerate."], ["Why it matters", "Breathing becomes easier and oxygenation more reliable; in trials this meant fewer intubations than standard oxygen in hypoxemic failure."], ["Common trap", "Letting high flow hide a failing patient. A good saturation on a high FiO2 with a fast rate is not success: track the ROX index and set a time to decide."]],
+"learn-niv": [["Mechanism", "Positive pressure keeps alveoli open and raises the pressure around the heart, which lowers left ventricular afterload and venous return. Bilevel adds a higher pressure on each breath, so each breath is bigger and more CO2 leaves."], ["Why it matters", "That is why the evidence is strongest in acidotic COPD (CO2 removal) and cardiogenic pulmonary edema (afterload and recruitment), and weaker in new hypoxemic failure."], ["Common trap", "In hypercapnia, turning up the oxygen instead of the pressures. In hypoxemic failure, large breaths on NIV are a warning sign, not a success."]],
+"learn-rox": [["Mechanism", "The index combines how well the patient oxygenates for the oxygen given with how hard they are breathing to do it."], ["Why it matters", "It gives an early, repeatable trigger to reconsider high flow before the patient is exhausted."], ["Common trap", "Using FiO2 as a percentage instead of a fraction, using it outside pneumonia without caution, or calculating it with an SpO2 near 100%, where the ratio flattens."]],
+"learn-late": [["Mechanism", "A patient struggling against failing support breathes with large swings in chest pressure and tires. Those swings may themselves worsen lung injury, a hypothesis not yet proven."], ["Why it matters", "Observational studies link delayed intubation with higher mortality, so every start of non-invasive support comes with a recheck time and a line that means intubate."], ["Common trap", "Reading a better saturation after more support as improvement when the rate and effort have not changed."]]
+};
+  function add(){ Object.keys(D).forEach(function(id){ var host = document.getElementById(id); if (!host || host.querySelector(":scope > .deeper")) return; var d = document.createElement("details"); d.className = "deeper"; d.innerHTML = "<summary>Go deeper: mechanism and rationale</summary><div class=\"dpx\">" + D[id].map(function(r){ return "<div><span class=\"dl\">" + r[0] + "</span><p>" + r[1] + "</p></div>"; }).join("") + "</div>"; host.appendChild(d); }); }
+  add();
+})();
+</script>
+</body>
+</html>
