@@ -172,7 +172,7 @@ footer p{margin:0 0 8px}
       <p class="whyline"><b>Why:</b> paralysis removes dyssynchrony and lowers oxygen use, but two large trials disagree on survival, so it is for the patient who is failing sedation, and for as short a time as possible.</p>
       <div class="chips"><button class="chip" data-fig="tof"><i></i>Train-of-four</button></div>
       <details class="more"><summary>More</summary>
-        <p>Optimize the ventilator and sedation first. Not routinely beyond 48 hours. A fixed dose without twitch monitoring, or titration to train-of-four, are both acceptable. Paralysis while prone is optional.</p>
+        <p>Optimize the ventilator and sedation first. Not routinely beyond 48 hours. A fixed dose without twitch monitoring, or titration to train-of-four, are both acceptable; the trials used a fixed high-dose infusion, and the label rate shown here is titrated. Paralysis while prone is optional.</p>
         <p>Aim for RASS −4 to −5 before the first dose (expert practice; the guideline accepts scale-based or other assessment). The scale cannot be scored once the patient is paralysed.</p>
         <p>Eye lubrication, clot prophylaxis and a daily decision to continue. <a href="/vent/#assess">Ventilator: ARDS next steps</a> · <a href="/vte-ppx/">VTE prophylaxis</a></p>
         <span class="tier">SCCM 2026 · conditional, low</span><span class="tier">Dosing strategy, prone: conditional, very low</span><span class="tier">Doses: FDA labels</span><span class="tier">Eye care, RASS target: expert practice</span>
@@ -344,13 +344,16 @@ function plan(i){
   var gap = i.rass > band[1] ? i.rass - band[1] : i.rass < band[0] ? i.rass - band[0] : 0;
   var tname = i.target === 'deep' ? 'deep target (−4 to −5)' : 'light target (−2 to +1)';
   var here = 'RASS ' + fmt(i.rass) + ' · ' + tname;
-  if (gap === 0) o.depth = {head:'At target: keep the lowest dose that holds it', dose:[here]};
+  var risk = !i.intub && i.rass <= -3;
+  if (i.target === 'deep' && !i.intub && gap <= 0) o.depth = {head:'Deeply sedated without a secured airway: secure the airway now or lighten', dose:[here]};
+  else if (risk) o.depth = {head:'Deeper than target: hold sedatives', dose:[here, 'Hold sedatives; recheck RASS']};
+  else if (gap === 0) o.depth = {head:'At target: keep the lowest dose that holds it', dose:[here]};
   else if (gap < 0) o.depth = {head:'Deeper than target: halve or pause the sedative', dose:[here, i.wd ? 'No awakening trial during alcohol withdrawal; hold doses until rousable' : 'Awakening trial if the safety screen passes; recheck RASS']};
   else if (i.target === 'deep') o.depth = {head:'Lighter than the deep target', dose:[here, !i.intub ? 'Do not deepen until the airway is secured' : i.pressor ? 'Raise the infusion in steps until RASS −4 to −5; no bolus on a pressor' : 'Bolus and raise the sedative until RASS −4 to −5']};
   else o.depth = {head:'More agitated than target: find the cause first', dose:[here, 'Pain · delirium · ventilator dyssynchrony · withdrawal · full bladder · hypoxemia']};
   o.gap = gap;
-  if (i.target !== 'deep' && gap < 0 && !i.wd) o.more.push('Awakening trial screen: no active seizures, no alcohol withdrawal, no paralytic, no myocardial ischaemia in 24 h, no raised intracranial pressure, not on rising doses for agitation. If the patient fails, restart at half the previous dose.');
-  if (i.target === 'deep' && i.reason === 'nmb') o.guards.push('Keep RASS −4 to −5 before and throughout paralysis. The scale cannot be scored once the block is on.');
+  if (i.target !== 'deep' && gap < 0 && !i.wd && !risk) o.more.push('Awakening trial screen: no active seizures, no alcohol withdrawal, no paralytic, no myocardial ischaemia in 24 h, no raised intracranial pressure, not on rising doses for agitation. If the patient fails, restart at half the previous dose.');
+  if (i.target === 'deep' && i.reason === 'nmb') o.guards.push('Reach RASS −4 to −5 before the first paralytic dose and do not lighten sedation during the block; the scale cannot be scored once the block is on.');
   /* Drug */
   var prop = w ? 'Propofol: start ' + D.propStart + ' mcg/kg/min = ' + sig(mgh(D.propStart, w)) + ' mg/h; usual ' + rng2(mgh(D.propUsual[0], w), mgh(D.propUsual[1], w), 'mg/h') : 'Propofol: start 5 mcg/kg/min; usual 5–50 mcg/kg/min';
   var dex = w ? 'Dexmedetomidine: 0.2–0.7 mcg/kg/h = ' + rng2(D.dex[0]*w, D.dex[1]*w, 'mcg/h') : 'Dexmedetomidine: 0.2–0.7 mcg/kg/h';
@@ -362,10 +365,15 @@ function plan(i){
     o.drug = {head:'Secure the airway before deep sedation', dose:['No sedative infusion to a deep target without a protected airway'], rule:'C7'};
     o.why = 'Deep sedation removes airway reflexes and the drive to breathe, so the airway comes first.';
     o.tiers.push('Expert practice');
+  } else if (risk){
+    o.drug = {head:'No sedative: stop or hold sedatives and assess the airway', dose:['Look for another cause of the low level of consciousness'], rule:'C7'};
+    o.why = 'A patient this deeply sedated without a tube may not protect the airway, so more sedative is the wrong direction.';
+    o.tiers.push('Expert practice');
+    o.guards.push('Not intubated and RASS −3 or deeper: the airway is at risk. Stop sedatives, look for another cause, and call for help if the patient cannot protect the airway.');
   } else if (i.target === 'deep'){
     o.drug = i.pris ? {head:'Deep sedation without propofol: midazolam', dose:[mid], rule:'C2'} : {head:'Propofol; dexmedetomidine is unreliable at this depth', dose:[prop, 'If propofol is not tolerated: ' + low(mid)], rule:'C2'};
-    if (benzoOK || seiz) o.drug.dose.push('Withdrawal or seizures: add a benzodiazepine');
-    o.why = 'Dexmedetomidine is unreliable for deep sedation; the 2025 update says to consider another agent when deep sedation is required.';
+    if ((benzoOK || seiz) && !i.pris) o.drug.dose.push('Withdrawal or seizures: add a benzodiazepine');
+    o.why = i.pris ? 'The warning signs rule out propofol and dexmedetomidine is unreliable for deep sedation, which leaves midazolam.' : 'Dexmedetomidine is unreliable for deep sedation; the 2025 update says to consider another agent when deep sedation is required.';
     o.tiers.push('PADIS 2025 · guideline text'); o.tiers.push('Midazolam fallback: expert practice');
   } else if (benzoOK){
     o.drug = {head:'A benzodiazepine is indicated here', dose:[lor].concat(i.intub ? [mid] : []).concat(i.intub && !i.pris ? ['Propofol if intubated and not controlled'] : []), rule:'C5'};
@@ -395,10 +403,10 @@ function plan(i){
     o.tiers.push('PADIS 2018 · conditional, low'); if (!i.pris) o.tiers.push('PADIS 2025 · conditional, moderate');
   }
   if (i.pris && /^Dexmedetomidine/.test(o.drug.head)) o.guards.push('Check heart rate and rhythm before starting dexmedetomidine: infusion syndrome causes slow rhythms and heart failure.');
-  if (seiz) o.guards.push('These are sedation doses. For active seizures give the status epilepticus dose (lorazepam 4 mg IV slowly, repeated once after 10–15 minutes) and follow a seizure protocol.');
-  if (i.bzinf && !benzoOK && i.target !== 'deep'){ o.drug.head = 'Change the benzodiazepine infusion. ' + o.drug.head; }
+  if (seiz) o.guards.push('For active seizures give the status epilepticus dose (lorazepam 4 mg IV slowly, repeated once after 10–15 minutes) and follow a seizure protocol; the doses on this page are sedation doses.');
+  if (i.bzinf && !benzoOK && i.target !== 'deep' && !risk){ o.drug.head = 'Change the benzodiazepine infusion. ' + o.drug.head; }
   if (i.bzinf && !benzoOK) o.guards.push('If the benzodiazepine ran for days, taper it. Stopping abruptly can cause withdrawal.');
-  if (i.pressor) o.guards.push('On a pressor: no loading dose or bolus of any sedative. Start at the lowest rate and expect the pressure to fall.');
+  if (i.pressor) o.guards.push('On a pressor: no loading dose or bolus of propofol, dexmedetomidine or midazolam; start infusions at the lowest rate and expect the pressure to fall. Give any intermittent dose slowly at the low end. Do not withhold seizure treatment.');
   if (i.kidney && (benzoOK || seiz || i.bzinf || i.target === 'deep')) o.guards.push('Kidney failure: midazolam\'s active metabolite accumulates; a lorazepam infusion carries propylene glycol.');
   if (gap > 0 && i.target !== 'deep' && !i.pain && !benzoOK) o.why = 'Agitation is a symptom. ' + o.why;
   o.more.push('Propofol: raise by 5–10 mcg/kg/min at least 5 minutes apart. Do not exceed 4 mg/kg/h' + (w ? ' (' + sig(D.propCeil * w) + ' mg/h)' : '') + ' unless benefit outweighs risk. Dexmedetomidine: the label range is 0.2–0.7 mcg/kg/h for up to 24 hours; the 2013 guideline allows up to 1.5 mcg/kg/h as tolerated. The label\'s loading dose (1 mcg/kg over 10 minutes) is best skipped in unstable patients.');
