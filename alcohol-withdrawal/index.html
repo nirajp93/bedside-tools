@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Alcohol withdrawal · bedside.tools</title>
+<meta name="description" content="Inpatient alcohol withdrawal: risk (PAWSS), severity (CIWA-Ar), symptom-triggered, front-loading or fixed dosing, seizures, resistant withdrawal, thiamine and Wernicke, and medication for alcohol use disorder at discharge.">
+<script src="/theme.js"></script>
+<style>
+:root{--bg:#FBFBFA; --card:#FFFFFF; --ink:#111113; --muted:#55555D; --line:#ECECEE; --accent:#2B4BDB; --warn:#9A3B00; --warnbg:#FFF6EC}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5;padding-bottom:calc(76px + env(safe-area-inset-bottom))}
+.wrap{max-width:720px;margin:0 auto;padding:0 16px}
+a{color:var(--accent)}
+button{font:inherit;color:inherit}
+.back{font-size:14px;text-decoration:none;display:inline-block;min-height:44px;line-height:44px}
+h1{font-size:26px;margin:0 0 4px;letter-spacing:-.01em}
+h2{font-size:18px;margin:0}
+h3{font-size:15px;margin:0}
+.purpose{color:var(--muted);margin:0 0 16px}
+.mono{font-family:var(--mono)}
+.label{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin:0 0 14px;display:flex;flex-direction:column;gap:12px}
+.card p{margin:0}
+.muted{color:var(--muted);font-size:14px}
+.tier{display:inline-block;font-family:var(--mono);font-size:11px;border:1px solid var(--line);border-radius:999px;padding:1px 8px;color:var(--muted);vertical-align:1px}
+.guard{border-left:3px solid var(--warn);background:var(--warnbg);padding:10px 12px;border-radius:0 10px 10px 0;font-size:14.5px}
+.guard b{color:var(--warn)}
+.note{background:var(--fill);border-radius:10px;padding:10px 12px;font-size:14px}
+ul.plain{margin:0;padding-left:20px}
+ul.plain li{margin-bottom:6px}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);text-align:left;padding:8px 6px;border-bottom:1px solid var(--line);font-weight:500}
+td{padding:9px 6px;border-bottom:1px solid var(--line);vertical-align:top}
+tr:last-child td{border-bottom:0}
+.tblwrap{overflow-x:auto}
+details.more{border-top:1px solid var(--line);padding-top:4px}
+details.more summary{cursor:pointer;color:var(--accent);font-weight:600;font-size:14px;min-height:44px;line-height:44px}
+details.more p,details.more li{font-size:14.5px}
+details.more p{margin:0 0 8px}
+details.jump{border:1px solid var(--line);border-radius:12px;background:var(--card);margin:0 0 14px}
+details.jump summary{display:flex;justify-content:space-between;align-items:center;min-height:48px;padding:0 14px;font-size:14.5px;cursor:pointer;list-style:none}
+details.jump summary::-webkit-details-marker{display:none}
+details.jump summary span:last-child{color:var(--accent);font-weight:600}
+.gal{padding:0 12px 14px;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.tile{min-height:56px;border:1px solid var(--line);border-radius:12px;background:var(--card);padding:8px;font-size:14px;text-align:left;cursor:pointer;line-height:1.3}
+.tile b{display:block}
+.tile small{color:var(--muted);font-size:12.5px}
+.tile[aria-pressed=true]{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.step{display:grid;gap:6px}
+.step .hd{font-size:14.5px;font-weight:600}
+.step .hd i{font-style:normal;font-family:var(--mono);color:var(--muted);margin-right:8px}
+.seg{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.seg.three{grid-template-columns:1fr 1fr 1fr}
+.seg button,.ctx button{min-height:44px;border:1px solid var(--line);border-radius:10px;background:var(--card);font-size:14px;padding:4px 8px;cursor:pointer;line-height:1.25}
+.ctx{display:flex;flex-wrap:wrap;gap:6px}
+.ctx button{border-radius:999px;padding:0 14px;font-size:13.5px}
+.seg button[aria-pressed=true],.ctx button[aria-pressed=true]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:600}
+.nums{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.nums label{display:grid;gap:4px;font-size:13px;color:var(--muted)}
+.nums input{min-height:44px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);font-family:var(--mono);font-size:16px;padding:0 10px;width:100%}
+.derived{font-family:var(--mono);font-size:13px;color:var(--muted)}
+.dxlist{display:grid;gap:8px;margin:0 0 14px}
+.dx{border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:var(--card);display:grid;gap:2px}
+.dx .top{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+.dx b{font-size:15px}
+.dx .st{font-family:var(--mono);font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+.dx.lik{border-color:var(--accent)}
+.dx.lik .st{color:var(--accent)}
+.dx.less b{color:var(--muted)}
+.dx small{font-size:13px;color:var(--ink);line-height:1.4}
+.answer{border-color:var(--accent)}
+.big{font-size:19px;font-weight:600;line-height:1.3}
+.acts{margin:0;padding-left:20px;display:grid;gap:8px}
+.acts li{font-size:15px}
+.why{font-size:14.5px}
+.why b{font-weight:600}
+.btn{min-height:44px;padding:0 18px;border:1px solid var(--accent);border-radius:999px;background:var(--accent);color:var(--accent-ink);font-weight:600;font-size:14.5px;cursor:pointer}
+.btn.ghost{background:var(--card);color:var(--accent)}
+.bad{border-color:var(--bad)}
+.bad .label{color:var(--bad)}
+.alarm{border:1px solid var(--bad);background:var(--badbg);border-radius:12px;padding:12px;display:grid;gap:6px}
+.alarm .label{color:var(--bad)}
+.alarm p{margin:0;font-size:15px}
+.fchips{display:flex;flex-wrap:wrap;gap:6px}
+.fchip{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--fill);color:var(--ink);font:inherit;font-size:14px;cursor:pointer;text-align:left}
+.fchip svg{flex:none;color:var(--accent)}
+.chips{display:flex;gap:6px;overflow-x:auto;padding:2px 16px 12px;margin:0 -16px;scrollbar-width:none}
+.chips a{flex:none;min-height:44px;display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:999px;background:var(--card);padding:0 14px;font-size:13.5px;text-decoration:none;color:var(--ink)}
+.ref .card,.chap{scroll-margin-top:70px}
+.pgrid{display:grid;gap:6px}
+.prow{display:grid;grid-template-columns:1.25fr repeat(5,1fr);gap:4px;align-items:center;text-align:left;border:1px solid var(--line);border-radius:10px;background:var(--card);padding:6px 8px;min-height:44px;cursor:pointer;font-size:13px}
+.prow.h{border:0;background:none;cursor:default;font-family:var(--mono);font-size:10.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);padding:0 8px;min-height:0}
+.prow b{font-size:13.5px}
+.prow span{font-family:var(--mono);text-align:center}
+.prow[aria-expanded=true]{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.pout{font-size:14.5px;border-left:3px solid var(--accent);padding:2px 0 2px 12px}
+.pout:empty{display:none}
+section.view{display:none;padding:4px 0 8px}
+section.view.on{display:block}
+nav.tabs{position:fixed;left:0;right:0;bottom:0;background:var(--bg);border-top:1px solid var(--line);z-index:20;padding-bottom:env(safe-area-inset-bottom)}
+nav.tabs .wrap{display:flex;padding:0}
+nav.tabs button{flex:1;min-height:60px;border:0;border-top:2px solid transparent;background:none;font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);cursor:pointer}
+nav.tabs button[aria-selected=true]{color:var(--accent);border-top-color:var(--accent)}
+a:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+footer{margin-top:24px;padding:16px 0 8px;border-top:1px solid var(--line);font-size:12.5px;color:var(--muted);line-height:1.6}
+footer p{margin:0 0 6px}
+footer strong{color:var(--ink)}
+.fig{display:block;width:100%;max-width:460px;height:auto;margin:0 auto}
+.fig text{font-family:var(--mono)}
+.states{display:flex;gap:6px;overflow-x:auto;margin:10px -16px;padding:2px 16px 6px;scrollbar-width:none}
+.states::-webkit-scrollbar{display:none}
+.sbtn{flex:none;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--ink);font:inherit;font-size:14px;cursor:pointer;white-space:nowrap}
+.sbtn[aria-pressed="true"]{border-color:var(--accent);color:var(--accent);font-weight:600}
+.line1{font-size:15px;margin:10px 0 0}
+.labs6{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:10px}
+.lab{background:var(--fill);border-radius:10px;padding:6px 8px}
+.lab span{display:block;font-size:12px;color:var(--muted)}
+.lab b{font-family:var(--mono);font-size:13.5px}
+.fscrim{position:fixed;inset:0;background:var(--scrim);z-index:30}
+.fsheet{position:fixed;left:0;right:0;bottom:0;z-index:31;max-height:90vh;overflow-y:auto;background:var(--card);border:1px solid var(--line);border-bottom:0;border-radius:20px 20px 0 0;padding:8px 16px 24px;max-width:560px;margin:0 auto}
+.fsheethead{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.fxbtn{min-height:44px;min-width:44px;border:0;background:transparent;color:var(--accent);font:inherit;font-weight:600;cursor:pointer}
+.lpills{position:sticky;top:0;z-index:5;background:var(--bg);display:flex;gap:6px;overflow-x:auto;margin:0 -16px 12px;padding:8px 16px;border-bottom:1px solid var(--line);scrollbar-width:none}
+.lpills::-webkit-scrollbar{display:none}
+.lpill{flex:none;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--muted);font:inherit;font-size:14px;cursor:pointer;white-space:nowrap}
+.card.chap{display:block}
+.card.chap>*+*{margin-top:10px}
+.lead{font-size:14px;color:var(--muted);margin:0}
+.cause{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:8px 0;border-top:1px solid var(--line);font-size:15px}
+.cause small{color:var(--ink);font-size:13px;text-align:right;flex:0 1 52%}
+.cause.out span{color:var(--muted);text-decoration:line-through}
+.cause.less span{color:var(--muted)}
+.cause.fav span{font-weight:700}
+.cause.fav span:before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--accent);margin-right:8px}
+.trial{border-left:3px solid var(--accent);padding-left:12px;margin-top:14px}
+.trial p{margin:0 0 6px;font-size:15px}
+.trial .k{font-family:var(--mono);font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);display:block}
+.zs{display:flex;gap:2px;height:8px;margin-top:8px}
+.zs i{display:block;border-radius:99px;background:var(--line);flex:1}
+.zs i.on{background:var(--accent)}
+.zt{font-family:var(--mono);font-size:12px;margin:4px 0 0}
+.sl{margin-top:8px}
+.sl label{display:flex;justify-content:space-between;font-size:13px;color:var(--muted)}
+.sl label b{font-family:var(--mono);color:var(--ink)}
+.sl input[type=range]{width:100%;min-height:44px;accent-color:var(--accent)}
+.dp{margin-top:10px;border:1px solid var(--line);border-radius:12px;padding:2px 12px;background:var(--card)}
+.dp>div{padding:10px 0;border-top:1px solid var(--line)}
+.dp>div:first-child{border-top:0}
+.dp p{font-size:15px;margin:2px 0 0}
+.dp p.label{font-size:11px}
+.deeper{margin-top:14px;border-top:1px solid var(--line)}
+.deeper>summary{min-height:44px;display:flex;align-items:center;gap:8px;color:var(--accent);font-weight:600;font-size:15px;cursor:pointer;list-style:none}
+.deeper>summary::-webkit-details-marker{display:none}
+.deeper>summary::before{content:"+";font-family:var(--mono);font-size:18px;line-height:1;width:14px;text-align:center}
+.deeper[open]>summary::before{content:"\2212"}
+.deeper .dpx{border:1px solid var(--line);border-radius:12px;padding:2px 12px;background:var(--card)}
+.deeper .dpx>div{padding:10px 0;border-top:1px solid var(--line)}
+.deeper .dpx>div:first-child{border-top:0}
+.deeper .dl{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0 0 3px}
+.deeper p{font-size:15px;line-height:1.45;margin:0}
+.pagemsg{background:var(--fill);border-radius:10px;padding:10px 12px;font-size:15px}
+.opts{display:grid;gap:8px}
+.opt{min-height:44px;text-align:left;border:1px solid var(--line);border-radius:10px;background:var(--card);font-size:15px;padding:8px 12px;cursor:pointer}
+.opt.right{border-color:var(--ok);color:var(--ok);font-weight:600}
+.opt.wrong{border-color:var(--bad);color:var(--bad);text-decoration:line-through}
+.verdict{border-radius:10px;padding:10px 12px;font-weight:600}
+.verdict.ok{background:var(--okbg);color:var(--ok)} .verdict.no{background:var(--badbg);color:var(--bad)}
+.rowb{display:flex;gap:8px;flex-wrap:wrap}
+.vk-plate{border:1px solid var(--line);border-radius:12px;padding:6px;background:var(--card)}
+.vk-plate img{display:block;width:100%;height:auto;border-radius:8px}
+.vk-pw{position:relative}
+.vk-hot{position:absolute;transform:translate(-50%,-50%);width:26px;height:26px;border-radius:50%;border:2px solid var(--card);background:var(--accent);color:var(--accent-ink);font-family:var(--mono);font-size:12px;font-weight:700;padding:0;cursor:pointer}
+.vk-hot[aria-pressed=true]{background:var(--card);color:var(--accent);box-shadow:0 0 0 2px var(--accent)}
+.vk-list{display:grid;gap:6px;margin-top:10px}
+.vk-list button{min-height:44px;text-align:left;border:1px solid var(--line);border-radius:10px;background:var(--card);font-size:14px;padding:6px 10px;cursor:pointer}
+.vk-list button[aria-pressed=true]{border-color:var(--accent);color:var(--accent);font-weight:600}
+.vk-credit{display:block;font-family:var(--mono);font-size:11px;color:var(--muted);text-align:right;margin:4px 2px 0}
+@media (min-width:1000px){
+  .wrap{max-width:1040px}
+  .readgrid{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
+  .readgrid>div:last-child{position:sticky;top:12px}
+  .ref .cols{columns:2;column-gap:20px}
+  .ref .cols .card{break-inside:avoid;display:block}
+  .ref .cols .card>*+*{margin-top:12px}
+  .gal{grid-template-columns:repeat(4,1fr)}
+}
+.sel{min-height:44px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);font:inherit;font-size:14px;padding:0 8px;width:100%}
+.ciwa{display:grid;gap:8px}
+.ciwa label{display:grid;grid-template-columns:1fr 96px;gap:8px;align-items:center;font-size:14px}
+.ciwa small{display:block;color:var(--muted);font-size:12.5px;line-height:1.3}
+.total{font-family:var(--mono);font-size:15px}
+.dose{font-family:var(--mono);font-size:14px}
+.tl{margin-top:8px}
+</style>
+</head>
+<body>
+<header class="wrap">
+  <a class="back" href="/">← bedside.tools</a>
+  <h1>Alcohol withdrawal</h1>
+  <p class="purpose">Risk, severity, which dosing approach, and what to do when it escalates.</p>
+</header>
+
+<main class="wrap">
+
+<section class="view on" id="v-start">
+  <div class="readgrid">
+    <div>
+      <div class="card" id="story">
+        <p class="label">1 · The story</p>
+        <div class="nums"><label>Hours since last drink<input id="hrs" type="number" inputmode="numeric" min="0" max="400" placeholder="h"></label><label>Age<input id="age" type="number" inputmode="numeric" min="16" max="110" placeholder="years"></label></div>
+        <div class="ctx" data-multi="hx"></div>
+        <p class="hd" style="margin:4px 0 0;font-size:14.5px;font-weight:600">Can the patient answer the CIWA-Ar questions?</p>
+        <div class="seg" data-k="comm"><button type="button" data-v="yes" aria-pressed="true">Yes</button><button type="button" data-v="no" aria-pressed="false">No: delirious, intubated, language</button></div>
+      </div>
+
+      <div class="card" id="pawss">
+        <p class="label">2 · Risk of complicated withdrawal (PAWSS)</p>
+        <p class="muted">Score only if there was any alcohol in the last 30 days, or a positive blood alcohol on admission.</p>
+        <div class="ctx" data-multi="pw"></div>
+        <p class="total" id="pwt"></p>
+      </div>
+
+      <div class="card" id="ciwa">
+        <p class="label">3 · Severity now (CIWA-Ar)</p>
+        <div class="ciwa" id="ciwaf"></div>
+        <p class="total" id="cwt"></p>
+      </div>
+
+      <div class="card" id="given">
+        <p class="label">4 · Benzodiazepine in the last 3 to 4 hours</p>
+        <div class="nums"><label>Diazepam<input id="dzp" type="number" inputmode="numeric" min="0" max="2000" placeholder="mg"></label><label>Lorazepam<input id="lzp" type="number" inputmode="decimal" min="0" max="400" placeholder="mg"></label></div>
+      </div>
+
+      <div class="card" id="labs">
+        <p class="label">5 · Labs and signs</p>
+        <div class="ctx" data-multi="lab"></div>
+        <p class="hd" style="margin:4px 0 0;font-size:14.5px;font-weight:600">Wernicke signs (Caine criteria)</p>
+        <div class="ctx" data-multi="wk"></div>
+      </div>
+      <div class="rowb"><button class="btn ghost" id="reset" type="button">Clear</button></div>
+    </div>
+    <div id="out" aria-live="polite"></div>
+  </div>
+</section>
+
+<section class="view ref" id="v-ref">
+  <nav class="chips" aria-label="Reference sections">
+    <a href="#doses">Doses</a><a href="#phenobarb">Phenobarbital</a><a href="#thiamine-ref">Thiamine</a><a href="#timeline">Timeline</a><a href="#avoid">Avoid</a><a href="#discharge">Discharge</a>
+  </nav>
+  <div class="cols">
+    <div class="card" id="doses">
+      <h2>Benzodiazepine sample regimens</h2>
+      <p class="muted">Examples from the ASAM 2020 guideline (Appendix V and glossary) and US labels. Adjust to your institution's protocol.</p>
+      <div class="tblwrap"><table>
+        <tr><th>Approach</th><th>Regimen</th></tr>
+        <tr><td>Symptom-triggered</td><td><span class="dose">Chlordiazepoxide 25–100 mg PO</span> when CIWA-Ar is 10 or more (mild 25–50, moderate 50–100, severe 75–100); reassess every 1–4 h for 24 h. <span class="tier">ASAM 2020</span></td></tr>
+        <tr><td>Symptom-triggered, short-acting</td><td><span class="dose">Oxazepam 15 mg PO</span> for CIWA-Ar 8–15, <span class="dose">30 mg</span> for over 15. <span class="tier">ASAM 2020 glossary</span></td></tr>
+        <tr><td>Front-loading</td><td><span class="dose">Diazepam 20 mg PO every hour</span> until CIWA-Ar under 10; or <span class="dose">diazepam 20 mg PO every 2 h for 3 doses</span>; or <span class="dose">chlordiazepoxide 50–100 mg PO every 1–2 h</span> until CIWA-Ar under 10. <span class="tier">ASAM 2020</span></td></tr>
+        <tr><td>Fixed schedule</td><td><span class="dose">Chlordiazepoxide 25–100 mg</span> every 4–6 h on day 1, every 6–8 h on day 2, every 8–12 h on day 3, at bedtime on day 4 (optional day 5), lowering the daily total by 25–50% each day. <span class="tier">ASAM 2020</span></td></tr>
+        <tr><td>IV diazepam (label)</td><td><span class="dose">10 mg IM or IV</span>, then 5–10 mg in 3–4 h if needed. <span class="tier">FDA label</span></td></tr>
+        <tr><td>Lorazepam</td><td>Neither the ASAM guideline nor the US label gives a withdrawal dose. Use your institution's protocol. <span class="tier">Not sourced here</span></td></tr>
+      </table></div>
+      <p class="muted">The chlordiazepoxide label maximum is 300 mg a day; front-loading can exceed it and belongs in a monitored setting. Labels advise lower doses in older or debilitated patients.</p>
+    </div>
+    <div class="card" id="phenobarb">
+      <h2>Phenobarbital: regimens that have been used</h2>
+      <p>Only for clinicians experienced with it; IV phenobarbital only in highly supervised settings (ICU, CCU). Barbiturates are not preferred over benzodiazepines. <span class="tier">ASAM 2020</span></p>
+      <ul class="plain">
+        <li>Single dose with a benzodiazepine protocol: <span class="dose">10 mg/kg IV over 30 min</span>. <span class="tier">Rosenson 2013 trial; ASAM Appendix V</span></li>
+        <li>ICU adjunct once the protocol's maximum diazepam step (120 mg) has been reached: <span class="dose">60, then 120, then 240 mg IV every 30 min</span> to RASS 0 to −2. <span class="tier">ASAM Appendix V sample</span></li>
+        <li>ICU monotherapy: <span class="dose">130 mg IV every 30 min</span> to RASS 0 to −1. <span class="tier">ASAM Appendix V sample</span></li>
+      </ul>
+      <p class="guard"><b>Phenobarbital on top of large benzodiazepine doses</b> adds respiratory depression: continuous monitoring, airway plan ready. The US injection is an unapproved product with no withdrawal indication.</p>
+    </div>
+    <div class="card" id="thiamine-ref">
+      <h2>Thiamine</h2>
+      <p>Give thiamine before any carbohydrate in an at-risk patient. <span class="tier">EFNS 2010</span></p>
+      <p>Prevention: <span class="dose">100 mg IV or IM daily for 3–5 days</span>. <span class="tier">ASAM 2020</span></p>
+      <p>Suspected Wernicke (2 of 4: dietary deficiency, eye signs, cerebellar signs, altered mental state or mild memory impairment): <span class="dose">200 mg three times daily, preferably IV</span> <span class="tier">EFNS 2010</span>; ASAM's ICU discussion gives <span class="dose">200–500 mg IV every 8 h</span>; <span class="tier">ASAM 2020</span>; keep it parenteral for at least 5 days. <span class="tier">NICE CG100</span></p>
+    </div>
+    <div class="card" id="timeline">
+      <h2>Timeline after the last drink</h2>
+      <div id="tlfig"></div>
+      <p class="muted">ASAM 2020 section II.A. Delirium tremens timing differs within the guideline (another section says 24–48 h); treat the hours as typical, not fixed. Delirium lasting more than 72 h should prompt a check for drug-induced (benzodiazepine) delirium and other causes. <span class="tier">ASAM 2020</span></p>
+    </div>
+    <div class="card" id="avoid">
+      <h2>What not to use</h2>
+      <ul class="plain">
+        <li>Beta-blockers to prevent or treat withdrawal seizures; they can mask signs and lower the seizure threshold. <span class="tier">ASAM 2020</span></li>
+        <li>Oral or IV alcohol. <span class="tier">ASAM 2020</span></li>
+        <li>Baclofen for withdrawal. <span class="tier">ASAM 2020</span></li>
+        <li>Phenytoin for withdrawal seizures. <span class="tier">ASAM 2020</span></li>
+        <li>Antipsychotics alone; only as an add-on for hallucinations or agitation not controlled by benzodiazepines, after a QTc check (<a href="/qtc/">QT tool</a>). <span class="tier">ASAM 2020</span></li>
+        <li>Dexmedetomidine or propofol as the treatment: dexmedetomidine is an add-on only and does not treat seizures; propofol only in patients already on a ventilator. <span class="tier">ASAM 2020</span></li>
+        <li>Valproate in liver disease or in women who could become pregnant. <span class="tier">ASAM 2020</span></li>
+        <li>Magnesium as a withdrawal treatment (give it only for a low magnesium). <span class="tier">ASAM 2020</span></li>
+      </ul>
+    </div>
+    <div class="card" id="discharge">
+      <h2>At discharge: treat the alcohol use disorder</h2>
+      <p><span class="dose">Naltrexone 50 mg PO once daily</span>: not with opioids, acute hepatitis or liver failure. <span class="tier">FDA label; APA 2018, 1B</span></p>
+      <p><span class="dose">Acamprosate 666 mg PO three times daily</span>; 333 mg three times daily when creatinine clearance is 30–50; contraindicated at 30 or less. Start once withdrawal is over. <span class="tier">FDA label; APA 2018, 1B</span></p>
+      <p>Topiramate or gabapentin if those are not tolerated or preferred. <span class="tier">APA 2018, 2C</span></p>
+    </div>
+  </div>
+</section>
+
+<section class="view" id="v-learn">
+  <div class="lpills" id="lpills"></div>
+  <div class="card chap" id="learn-gaba" data-pill="Brake and pedal"><p class="label">1 · Mechanism</p><h2>The brake and the accelerator</h2><p class="lead">Alcohol boosts the brain's brake (GABA) and blocks its accelerator (glutamate). Each state shows the balance.</p><div data-figure="gaba"></div></div>
+  <div class="card chap" id="learn-time" data-pill="Timeline"><p class="label">2 · When</p><h2>What appears, hour by hour</h2><div id="tlfig2"></div><p class="line1">Enter the hours since the last drink on Start and the marker moves.</p></div>
+  <div class="card chap" id="learn-kindle" data-pill="Kindling"><p class="label">3 · Why it worsens</p><h2>Each withdrawal makes the next one worse</h2><div data-figure="kindle"></div></div>
+  <div class="card chap" id="learn-thiamine" data-pill="Thiamine first"><p class="label">4 · Thiamine</p><h2>Why thiamine comes before glucose</h2><div data-figure="thia"></div></div>
+  <div class="card chap" id="narrow" data-pill="Is it withdrawal?"><p class="label">5 · Workup that narrows</p><h2>Is it withdrawal, or something else?</h2>
+    <p class="lead"><b>Send first:</b> glucose, electrolytes with magnesium and phosphate, liver tests, blood count, blood alcohol, urine drug screen. <b>Only if the picture does not fit:</b> head CT (fall, focal signs, first or focal seizure), lumbar puncture (fever with confusion), ammonia, TSH, a toxicology consult. Tap a result.</p>
+    <div class="states" id="nw-results" role="group" aria-label="Results"></div>
+    <div id="nw-causes"></div>
+    <p class="line1" id="nw-next"></p>
+  </div>
+  <div class="card chap" id="trials" data-pill="Trials"><p class="label">6 · Evidence</p><h2>Four studies worth knowing</h2><div id="trialbox"></div></div>
+  <div class="rowb"><button class="btn ghost" id="go-prac" type="button">Practice cases</button></div>
+</section>
+
+<section class="view" id="v-practice">
+  <div id="practice"></div>
+</section>
+
+<div class="fscrim" id="fscrim" hidden></div>
+<div class="fsheet" id="fsheet" role="dialog" aria-modal="true" aria-labelledby="fsheet-t" hidden>
+  <div class="fsheethead"><h2 id="fsheet-t"></h2><button class="fxbtn" id="fsheet-x" type="button">Close</button></div>
+  <div id="fsheet-b"></div>
+</div>
+
+<footer>
+  <p><strong>For education only. Not a substitute for clinical judgment.</strong> Doses are the guideline's sample regimens and US label doses; use your institution's withdrawal protocol and pharmacy.</p>
+  <p>Privacy: everything runs in your browser. Nothing you enter is sent anywhere or stored, and there are no analytics. Do not enter names, record numbers, or dates of birth.</p>
+  <p class="mono">Last reviewed: 2026-11-26</p>
+  <p><strong>Sources:</strong> American Society of Addiction Medicine, Clinical Practice Guideline on Alcohol Withdrawal Management, J Addict Med 2020;14(3S Suppl 1):1–72 (recommendation numbers and Appendix V sample regimens) · Maldonado JR et al., Prediction of Alcohol Withdrawal Severity Scale (PAWSS), Alcohol Alcohol 2015;50:509 · Sullivan JT et al., CIWA-Ar, Br J Addict 1989;84:1353 · Galvin R et al., EFNS guidelines for Wernicke encephalopathy, Eur J Neurol 2010;17:1408 · NICE CG100, Alcohol-use disorders: physical complications · Reus VI et al., APA practice guideline for the pharmacological treatment of alcohol use disorder, Am J Psychiatry 2018;175:86 · US prescribing information (DailyMed): chlordiazepoxide, diazepam tablets and injection, oxazepam, lorazepam, phenobarbital sodium injection, dexmedetomidine, naltrexone, acamprosate · Trials: Saitz R et al., JAMA 1994;272:519 · D'Onofrio G et al., N Engl J Med 1999;340:915 · Rosenson J et al., J Emerg Med 2013;44:592 · Gold JA et al., Crit Care Med 2007;35:724. Evidence tiers are shown beside each recommendation.</p>
+</footer>
+</main>
+
+<nav class="tabs" role="tablist"><div class="wrap">
+  <button role="tab" aria-selected="true" data-v="start">Start</button>
+  <button role="tab" aria-selected="false" data-v="ref">Reference</button>
+  <button role="tab" aria-selected="false" data-v="learn">Learn</button>
+  <button role="tab" aria-selected="false" data-v="practice">Practice</button>
+</div></nav>
+
+<script id="engine">
+/* ---------- engine: data and rules shared by Start, Learn and Practice ---------- */
+const tg = t => ` <span class="tier">${t}</span>`;
+const HX = [['psz', 'Past withdrawal seizure'], ['pdt', 'Past delirium tremens'], ['sz', 'Seizure in this episode'], ['del', 'Delirium now'], ['hall', 'Hallucinations'], ['liver', 'Severe liver disease'], ['opi', 'Takes opioids'], ['resp', 'Lung disease or sleep apnea']];
+/* PAWSS (Maldonado 2015): 10 items, 1 point each; 4 or more = high risk */
+const PW = [['intox', 'Drunk in the last 30 days'], ['rehab', 'Past alcohol treatment'], ['wd', 'Past withdrawal'], ['black', 'Past blackouts'], ['wsz', 'Past withdrawal seizure'], ['wdt', 'Past delirium tremens'], ['downer', 'Alcohol with benzodiazepines or barbiturates (90 days)'], ['other', 'Alcohol with other drugs (90 days)'], ['bal', 'Blood alcohol 200 mg/dL or more on arrival'], ['auto', 'Heart rate over 120, tremor, sweating, agitation or nausea']];
+const PW_CUT = 4;
+/* CIWA-Ar (Sullivan 1989): 9 items 0-7, orientation 0-4, maximum 67 */
+const CI = [['nv', 'Nausea and vomiting', 7, '0 none · 4 nausea with dry heaves · 7 constant vomiting'], ['trem', 'Tremor', 7, '0 none · 4 moderate, arms extended · 7 severe'], ['sweat', 'Sweats', 7, '0 none · 4 beads on forehead · 7 drenching'], ['anx', 'Anxiety', 7, '0 at ease · 4 guarded · 7 panic'], ['agit', 'Agitation', 7, '0 normal · 4 fidgety · 7 pacing, thrashing'], ['tact', 'Touch disturbances', 7, '0 none · 3 moderate · 4 moderately severe hallucinations · 7 continuous'], ['aud', 'Hearing disturbances', 7, '0 none · 3 moderate · 4 moderately severe hallucinations · 7 continuous'], ['vis', 'Visual disturbances', 7, '0 none · 3 moderate · 4 moderately severe hallucinations · 7 continuous'], ['head', 'Headache', 7, '0 none · 4 moderately severe · 7 extremely severe'], ['ori', 'Orientation', 4, '0 oriented · 1 unsure of date · 2 date off by 2 days or less · 3 more than 2 days · 4 place or person']];
+const CIWA_MILD = 10, CIWA_SEV = 19;
+const LABS = [['mg', 'Magnesium low'], ['k', 'Potassium low'], ['phos', 'Phosphate low'], ['glu', 'Glucose low'], ['na', 'Sodium low']];
+const WK = [['diet', 'Poor diet or malnutrition'], ['eye', 'Eye signs (nystagmus, gaze palsy)'], ['cereb', 'Unsteady gait or limbs'], ['mental', 'Confusion or memory loss']];
+/* resistant withdrawal: no agreed definition; requires symptoms persisting despite these doses (ASAM VI.D); ASAM summarises proposals of more than 150-200 mg diazepam or 30-40 mg lorazepam in the first 3-4 h */
+const RES_DZP = 150, RES_LZP = 30;
+
+function ciwaBand(t) { return t == null ? null : t < CIWA_MILD ? 'mild' : t < CIWA_SEV ? 'moderate' : 'severe'; }
+
+function assess(i) {
+  const hx = k => (i.hx || []).includes(k);
+  const pw = (i.pw || []).length;
+  const ci = i.ci ? Object.values(i.ci).reduce((a, b) => a + b, 0) : null;
+  const ciOk = i.comm !== 'no';
+  const band = ciOk ? ciwaBand(ci) : null;
+  const complicated = hx('sz') || hx('del');
+  const bigDose = (i.dzp || 0) > RES_DZP || (i.lzp || 0) > RES_LZP;
+  const resistant = bigDose && ((i.hx || []).includes('del') || (i.ci && ciwaBand(Object.values(i.ci).reduce((a, b) => a + b, 0)) === 'severe' && i.comm !== 'no'));
+  const highRisk = pw >= PW_CUT || hx('psz') || hx('pdt') || (i.pw || []).includes('wsz') || (i.pw || []).includes('wdt');
+  const wk = (i.wk || []).length;
+  let ap;
+  const empty = ci == null && pw === 0 && !(i.hx || []).length && ciOk && !bigDose;
+  if (empty) ap = 'start';
+  else if (resistant || hx('del')) ap = 'icu';
+  else if (hx('sz')) ap = 'seizure';
+  else if (band === 'severe') ap = 'frontload';
+  else if (highRisk) ap = 'frontload';
+  else if (!ciOk) ap = 'fixed';
+  else if (band === 'mild' && !highRisk) ap = 'mild';
+  else ap = 'symptom';
+  return {pw, ci, ciOk, band, complicated, resistant, bigDose, highRisk, wk, wernicke: wk >= 2, ap, hx};
+}
+
+const APPROACH = {
+  start: {t: 'Score the patient first', a: [
+    `Score PAWSS for risk and CIWA-Ar for severity (or note that the patient cannot answer), then the dosing approach appears here.` + tg('ASAM 2020')],
+    why: 'The approach depends on risk and severity; no dose is suggested until they are known.'},
+  mild: {t: 'Mild withdrawal, low risk', a: [
+    `Supportive care with CIWA-Ar monitoring; benzodiazepine, carbamazepine or gabapentin are options if symptoms need treatment.` + tg('ASAM 2020'),
+    `Re-score if symptoms change; treat when CIWA-Ar reaches 10. With a risk factor such as acute illness or severe coronary disease, give at least one preventive dose.` + tg('ASAM 2020')],
+    why: 'CIWA-Ar under 10 with no high-risk features: most patients settle without medication, but scores can rise over the first 2 days.'},
+  symptom: {t: 'Symptom-triggered dosing', a: [
+    `<span class="dose">Chlordiazepoxide 25–100 mg PO</span> each time CIWA-Ar is 10 or more (mild 25–50, moderate 50–100, severe 75–100).` + tg('ASAM 2020'),
+    `Score every 1–4 h for 24 h, then less often as scores fall.` + tg('ASAM 2020'),
+    `Liver disease or older age: a shorter-acting agent with less liver metabolism (see below).` + tg('ASAM 2020')],
+    why: 'Dosing only when symptoms are present gives less drug and a shorter course than a fixed schedule, when nurses can score reliably.'},
+  frontload: {t: 'Front-loading (high risk or severe)', a: [
+    `<span class="dose">Diazepam 20 mg PO every hour</span> until CIWA-Ar is under 10, or <span class="dose">chlordiazepoxide 50–100 mg PO every 1–2 h</span> until CIWA-Ar is under 10.` + tg('ASAM 2020 sample regimens'),
+    `High-risk patients are front-loaded before symptoms build.` + tg('ASAM 2020'),
+    `Then symptom-triggered doses; a monitored bed if doses climb.` + tg('ASAM 2020')],
+    why: 'Long-acting diazepam or chlordiazepoxide loaded early tapers itself as it is cleared, covering the window when seizures and delirium tremens occur.'},
+  fixed: {t: 'Fixed schedule with objective signs', a: [
+    `The patient cannot answer CIWA-Ar items: do not use CIWA-Ar. Track RASS, CAM-ICU or another objective scale (<a href="/sedation/">sedation tool</a>).` + tg('ASAM 2020'),
+    `Fixed taper, for example <span class="dose">chlordiazepoxide 25–100 mg</span> by mouth or tube every 4–6 h on day 1, lowering the daily total by 25–50% each day; hold for sedation.` + tg('ASAM 2020 sample regimen'),
+    `Delirium is complicated withdrawal: see the escalation card.` + tg('ASAM 2020')],
+    why: 'Symptom-triggered dosing depends on the patient reporting symptoms; when they cannot, a schedule with objective sedation checks is safer.'},
+  seizure: {t: 'Withdrawal seizure', a: [
+    `A fast-acting benzodiazepine now: <span class="dose">lorazepam 2 mg IV</span> cut recurrence in a trial; diazepam is the alternative. Ongoing seizure: <a href="/rrt/#seizure">status epilepticus card</a>.` + tg('ASAM 2020; D\'Onofrio 1999'),
+    `No phenytoin: it does not prevent withdrawal seizures.` + tg('ASAM 2020'),
+    `First seizure, focal, prolonged, or after a fall: look for another cause (glucose, sodium, head CT).` + tg('Expert practice')],
+    why: 'Withdrawal seizures come from too little GABA tone; a benzodiazepine replaces it, whereas sodium-channel drugs act elsewhere.'},
+  icu: {t: 'Complicated or resistant withdrawal', a: [
+    `ICU-level care. Escalate benzodiazepine boluses; add phenobarbital only with experienced clinicians and monitoring (<a href="#phenobarb">regimens</a>).` + tg('ASAM 2020'),
+    `Propofol only if already on a ventilator; dexmedetomidine only as an add-on: it does not treat seizures.` + tg('ASAM 2020'),
+    `Delirium beyond 72 h: check first for delirium caused by the sedatives themselves, then other causes.` + tg('ASAM 2020')],
+    why: 'Resistance reflects GABA receptors that respond less to benzodiazepines; phenobarbital acts at a different site on the receptor and also blocks glutamate.'}
+};
+</script>
+
+<script id="figs">
+/* ---------- figures (inline SVG) ---------- */
+function svgWrap(inner, h) { return `<svg class="fig" viewBox="0 0 350 ${h}" role="img" aria-label="diagram">${inner}</svg>`; }
+const txt = (x, y, s, o = {}) => `<text x="${x}" y="${y}" style="font-family:var(--mono);font-size:${o.fs || 12}px" fill="${o.c || 'var(--ink)'}" text-anchor="${o.a || 'middle'}" font-weight="${o.b ? 700 : 400}">${s}</text>`;
+/* GABA (brake) and glutamate (accelerator) balance */
+const GABAS = {
+  base: {n: 'No alcohol', g: 1, u: 1, line: 'Brake and accelerator balanced.'},
+  drink: {n: 'Drinking for months', g: 1, u: 1, adapt: 1, line: 'Alcohol strengthens GABA and blocks glutamate; the brain adapts with fewer, less sensitive GABA receptors and more glutamate receptors, so it feels balanced while drinking.'},
+  stop: {n: 'Abrupt stop', g: .45, u: 1.6, line: 'The alcohol is gone but the adaptation is not: weak brake, strong accelerator. Tremor, sweating, seizures and delirium follow.'},
+  benzo: {n: 'Benzodiazepine', g: 1, u: 1.6, line: 'Benzodiazepines strengthen the remaining GABA receptors, restoring the brake while the brain re-adapts over days.'},
+  pb: {n: 'Phenobarbital', g: 1.1, u: 1.15, line: 'Phenobarbital acts at a different site on the GABA receptor and also dampens glutamate, which is why it can work when benzodiazepines are not enough.'}
+};
+function figGaba(k) {
+  const s = GABAS[k];
+  const bar = (x, label, v, c) => `<rect x="${x}" y="${130 - 80 * Math.min(v, 1.7) / 1.7}" width="70" height="${80 * Math.min(v, 1.7) / 1.7}" rx="8" fill="${c}"/>` + txt(x + 35, 150, label, {fs: 11.5});
+  const tilt = Math.max(-14, Math.min(14, (s.u - s.g) * 16));
+  return svgWrap(
+    bar(40, 'GABA brake', s.g, s.g < .8 ? 'var(--bad)' : 'var(--accent)') +
+    bar(240, 'Glutamate', s.u, s.u > 1.3 ? 'var(--bad)' : 'var(--accent)') +
+    `<line x1="130" y1="${70 + tilt}" x2="220" y2="${70 - tilt}" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/><path d="M175 72 l-10 22 h20 z" fill="var(--muted)"/>` +
+    txt(175, 178, s.u - s.g > .3 ? 'Excitation wins' : 'Balanced', {fs: 12, b: 1, c: s.u - s.g > .3 ? 'var(--bad)' : 'var(--ok)'}), 190);
+}
+/* Kindling: threshold falls with each withdrawal episode */
+const KINS = {
+  one: {n: 'First withdrawal', h: [1], line: 'A first withdrawal is usually mild.'},
+  three: {n: 'Third', h: [1, 1.35, 1.7], line: 'Each episode leaves the brain more excitable, so the next withdrawal is more severe.'},
+  many: {n: 'Many', h: [1, 1.35, 1.7, 2.05, 2.4], line: 'After repeated withdrawals, seizures and delirium tremens become more likely: one reason past seizures and delirium tremens predict the next.'}
+};
+function figKindle(k) {
+  const s = KINS[k];
+  let b = `<line x1="20" y1="140" x2="330" y2="140" stroke="var(--line)" stroke-width="1.5"/><line x1="20" y1="58" x2="330" y2="58" stroke="var(--warn)" stroke-dasharray="5 4"/>` + txt(326, 52, 'seizure threshold', {a: 'end', fs: 11, c: 'var(--warn)'});
+  s.h.forEach((v, j) => { const h = 80 * v / 2.4 * 1.05; b += `<rect x="${30 + j * 60}" y="${140 - h}" width="40" height="${h}" rx="6" fill="${140 - h < 58 ? 'var(--bad)' : 'var(--accent)'}"/>` + txt(50 + j * 60, 158, `#${j + 1}`, {fs: 11.5}); });
+  return svgWrap(b + txt(175, 178, 'severity of each withdrawal', {fs: 11, c: 'var(--muted)'}), 186);
+}
+/* Thiamine: the cofactor for pyruvate dehydrogenase */
+const THIS = {
+  ok: {n: 'Thiamine present', blocked: 0, line: 'Thiamine is the cofactor that lets pyruvate from glucose enter the mitochondria for energy.'},
+  low: {n: 'Thiamine low, glucose given', blocked: 1, line: 'Glucose without thiamine pushes pyruvate into a blocked gate: brain cells in the most active regions run out of energy (Wernicke).'},
+  rep: {n: 'Thiamine first', blocked: 0, line: 'Thiamine first reopens the gate, so glucose can then be used safely.'}
+};
+function figThia(k) {
+  const s = THIS[k];
+  const box = (x, label, on) => `<rect x="${x}" y="40" width="90" height="40" rx="10" fill="${on ? 'var(--badbg)' : 'var(--fill)'}" stroke="${on ? 'var(--bad)' : 'var(--line)'}" stroke-width="1.5"/>` + txt(x + 45, 65, label, {fs: 11.5, c: on ? 'var(--bad)' : 'var(--ink)'});
+  return svgWrap(box(10, 'Glucose', 0) + `<line x1="100" y1="60" x2="128" y2="60" stroke="var(--muted)" stroke-width="2"/>` + box(130, 'Pyruvate', s.blocked) +
+    `<line x1="220" y1="60" x2="248" y2="60" stroke="${s.blocked ? 'var(--bad)' : 'var(--muted)'}" stroke-width="2" stroke-dasharray="${s.blocked ? '4 4' : '0'}"/>` + box(250, 'Energy', 0) +
+    txt(234, 104, s.blocked ? 'gate shut' : 'thiamine gate', {fs: 11, c: s.blocked ? 'var(--bad)' : 'var(--ok)'}), 120);
+}
+const FIGS = {
+  gaba: {t: 'Brake and accelerator', states: GABAS, draw: figGaba, def: 'drink'},
+  kindle: {t: 'Kindling', states: KINS, draw: figKindle, def: 'three'},
+  thia: {t: 'Thiamine first', states: THIS, draw: figThia, def: 'low'}
+};
+function mountFig(el, name, state) {
+  const F0 = FIGS[name]; let cur = state || F0.def; const keys = Object.keys(F0.states);
+  function draw() {
+    el.innerHTML = `<div class="states" role="group" aria-label="States">${keys.map(k => `<button class="sbtn" type="button" data-s="${k}" aria-pressed="${k === cur}">${F0.states[k].n}</button>`).join('')}</div>${F0.draw(cur)}<p class="line1">${F0.states[cur].line}</p>`;
+    el.querySelectorAll('.sbtn').forEach(b => b.onclick = () => { cur = b.dataset.s; draw(); });
+  }
+  draw();
+}
+/* Timeline (ASAM 2020 II.A): onset 6-24 h; seizures 8-48 h (peak about 24 h); hallucinosis from 12-24 h, settling by 24-48 h; delirium tremens 72-96 h */
+const TL = [['Tremor, sweats, anxiety', 6, 24], ['Seizures (peak ~24 h)', 8, 48], ['Hallucinosis', 12, 48], ['Delirium tremens', 72, 96]];
+function figTime(h) {
+  const X = v => 20 + v / 120 * 310, top = 26, row = 38, base = top + TL.length * row + 6;
+  let b = `<line x1="20" y1="${base}" x2="330" y2="${base}" stroke="var(--line)" stroke-width="1.5"/>`;
+  [0, 24, 48, 72, 96, 120].forEach(v => b += `<line x1="${X(v)}" y1="${base - 4}" x2="${X(v)}" y2="${base + 4}" stroke="var(--muted)"/>` + txt(X(v), base + 18, v, {fs: 11}));
+  TL.forEach(([n, a, z], j) => {
+    const y = top + j * row, on = h != null && h >= a && h <= z;
+    b += txt(20, y + 8, n, {fs: 11, a: 'start', c: on ? 'var(--warn)' : 'var(--ink)', b: on});
+    b += `<rect x="${X(a)}" y="${y + 14}" width="${X(z) - X(a)}" height="12" rx="6" fill="${on ? 'var(--warn)' : 'var(--accent)'}" opacity="${on ? 1 : .55}"/>`;
+  });
+  if (h != null) { const x = X(Math.min(h, 120)); b += TL.map((_, j) => `<line x1="${x}" y1="${top + j * row + 11}" x2="${x}" y2="${top + j * row + 29}" stroke="var(--bad)" stroke-width="2"/>`).join('') + `<path d="M${x - 5} ${base + 1} h10 l-5 -8 z" fill="var(--bad)"/>` + txt(330, 12, `now ${h} h`, {fs: 11, a: 'end', c: 'var(--bad)', b: 1}); }
+  return svgWrap(b + txt(175, base + 34, 'hours since last drink', {fs: 11, c: 'var(--muted)'}), base + 42);
+}
+</script>
+
+<script id="ui">
+const $ = id => document.getElementById(id);
+const IN = {comm: 'yes', hx: [], pw: [], lab: [], wk: [], ci: null};
+function numv(id) { const v = $(id).value.trim(); return v === '' || isNaN(+v) ? null : +v; }
+function readIn() { return Object.assign({}, IN, {hrs: numv('hrs'), age: numv('age'), dzp: numv('dzp'), lzp: numv('lzp')}); }
+const fill = (k, arr) => document.querySelector(`[data-multi="${k}"]`).innerHTML = arr.map(([v, n]) => `<button type="button" data-v="${v}" aria-pressed="false">${n}</button>`).join('');
+fill('hx', HX); fill('pw', PW); fill('lab', LABS); fill('wk', WK);
+$('ciwaf').innerHTML = CI.map(([k, n, mx, hint]) => `<label for="c-${k}"><span>${n}<small>${hint}</small></span><select class="sel" id="c-${k}" data-k="${k}"><option value="">–</option>${Array.from({length: mx + 1}, (_, j) => `<option value="${j}">${j}</option>`).join('')}</select></label>`).join('');
+document.querySelectorAll('[data-multi]').forEach(g => g.addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  const a = IN[g.dataset.multi], v = b.dataset.v, ix = a.indexOf(v);
+  if (ix >= 0) a.splice(ix, 1); else a.push(v);
+  b.setAttribute('aria-pressed', String(ix < 0)); render();
+}));
+document.querySelectorAll('.seg[data-k]').forEach(g => g.addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  IN[g.dataset.k] = b.dataset.v;
+  g.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', String(x === b))); render();
+}));
+$('ciwaf').addEventListener('change', () => {
+  const sels = [...document.querySelectorAll('#ciwaf select')];
+  IN.ci = sels.some(s => s.value !== '') ? Object.fromEntries(sels.map(s => [s.dataset.k, s.value === '' ? 0 : +s.value])) : null;
+  render();
+});
+['hrs', 'age', 'dzp', 'lzp'].forEach(id => $(id).addEventListener('input', render));
+$('reset').onclick = () => {
+  Object.assign(IN, {comm: 'yes', hx: [], pw: [], lab: [], wk: [], ci: null});
+  ['hrs', 'age', 'dzp', 'lzp'].forEach(id => $(id).value = '');
+  document.querySelectorAll('#ciwaf select').forEach(s => s.value = '');
+  document.querySelectorAll('#v-start [data-multi] button').forEach(b => b.setAttribute('aria-pressed', 'false'));
+  document.querySelectorAll('.seg[data-k=comm] button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.v === 'yes')));
+  render();
+};
+
+const ICON = '<svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><rect x="1.5" y="2.5" width="13" height="11" rx="2" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M4 10l2.5-3 2 2 3-4" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>';
+const chip = (fig, st, label) => `<button class="fchip" type="button" data-fig="${fig}" data-st="${st}">${ICON}${label}</button>`;
+const card = o => `<div class="card${o.cls ? ' ' + o.cls : ''}"${o.id ? ` id="${o.id}"` : ''}><p class="label">${o.label}</p><p class="big">${o.head}</p>${o.body || ''}${o.why ? `<p class="why"><b>Why:</b> ${o.why}</p>` : ''}${o.chips ? `<div class="fchips">${o.chips}</div>` : ''}${o.more ? `<details class="more"><summary>More</summary>${o.more}</details>` : ''}</div>`;
+
+function render() {
+  const i = readIn(), r = assess(i);
+  $('pwt').textContent = `PAWSS ${r.pw} of 10 · ${r.pw >= PW_CUT ? 'high risk (4 or more)' : 'below 4'}`;
+  $('cwt').textContent = !r.ciOk ? 'Not valid: the patient cannot answer the questions.' : r.ci == null ? 'Score the items (blank items count as 0).' : `CIWA-Ar ${r.ci} of 67 · ${r.band}`;
+  let h = '';
+  // guards first
+  const g = [];
+  if (r.hx('opi') || r.hx('resp')) g.push(`<b>Breathing risk.</b> ${r.hx('opi') ? 'Opioids' : 'Lung disease or sleep apnea'} plus benzodiazepines: closer monitoring of breathing and sedation.${tg('ASAM 2020')}`);
+  if (r.resistant && (i.dzp || i.lzp)) g.push(`<b>Large benzodiazepine doses given.</b> Adding phenobarbital deepens respiratory depression; continuous monitoring and an airway plan. Repeated high-dose IV lorazepam or diazepam can cause hyponatremia and metabolic acidosis.${tg('ASAM 2020')}`);
+  if (IN.lab.includes('glu')) g.push(`<b>Low glucose:</b> treat it now; give thiamine just before or with the glucose, never delaying the glucose.${tg('EFNS 2010; expert practice')}`);
+  if (g.length) h += `<div style="display:grid;gap:10px;margin:0 0 14px">${g.map(x => `<div class="guard">${x}</div>`).join('')}</div>`;
+  // risk and severity
+  const sev = !r.ciOk ? 'CIWA-Ar not valid here' : r.band ? `CIWA-Ar ${r.ci}: ${r.band}` : 'CIWA-Ar not scored';
+  const risk = r.highRisk ? 'high risk of complicated withdrawal' : (i.age || 0) > 65 ? 'age over 65 (a listed risk factor)' : 'no high-risk feature entered';
+  const riskWhy = r.pw >= PW_CUT ? `PAWSS ${r.pw}: a score of 4 or more identified complicated withdrawal with high accuracy in the validation cohort.` : r.hx('psz') || r.hx('pdt') ? 'A past withdrawal seizure or delirium tremens is the strongest predictor of another.' : (i.age || 0) > 65 ? 'Age over 65 is a listed risk factor for complicated withdrawal; older patients also need smaller doses of shorter-acting agents.' : '';
+  h += card({id: 'risk', label: 'Risk and severity', head: `${sev}; ${risk}`, why: riskWhy || (r.band ? (r.band === 'severe' ? 'A CIWA-Ar of 19 or more is severe withdrawal.' : r.band === 'moderate' ? 'A CIWA-Ar of 10 to 18 is moderate withdrawal and needs treatment.' : 'A CIWA-Ar under 10 is mild.') : ''),
+    chips: chip('tl', '', 'Timeline'),
+    more: `<p>PAWSS (Maldonado 2015): 10 items, one point each; 4 or more predicted complicated withdrawal (sensitivity 93.1%, 95% CI 77.2 to 99.2; specificity 99.5%) in 403 medical and surgical inpatients at one centre, with few complicated cases.${tg('Validation study')}</p><p>CIWA-Ar bands: under 10 mild, 10 to 18 moderate, 19 or more severe; seizures or delirium make it complicated.${tg('ASAM 2020')}</p><p>ASAM risk factors also include past withdrawal seizures or delirium tremens and age over 65.${tg('ASAM 2020')}</p>`});
+  // approach
+  const A0 = APPROACH[r.ap];
+  let acts = A0.a.slice();
+  if (r.ap === 'frontload' && !r.ciOk) acts[0] = acts[0].replace(/until CIWA-Ar is under 10/g, 'until calm (RASS 0 to −1)') + ` CIWA-Ar is not valid here: use RASS and objective signs, in a monitored bed.` + tg('Expert practice for the RASS end point');
+  if (r.ap === 'frontload' && (r.hx('liver') || (i.age || 0) > 65)) acts.splice(1, 0, `Long-acting diazepam and chlordiazepoxide accumulate with liver disease or age: smaller doses with a sedation check before each, or a shorter-acting agent per your protocol.` + tg('ASAM 2020; FDA labels'));
+  if (r.bigDose && !r.resistant) acts.push(`Large doses already given but symptoms are controlled: this is not resistant withdrawal. Watch for over-sedation as the drug accumulates.` + tg('ASAM 2020'));
+  const A = Object.assign({}, A0, {a: acts});
+  h += card({id: 'approach', cls: 'answer', label: 'What to do now', head: A.t, body: `<ol class="acts">${A.a.map(x => `<li>${x}</li>`).join('')}</ol>` + (r.ap !== 'frontload' && (r.hx('liver') || (i.age || 0) > 65) ? `<p class="guard"><b>${r.hx('liver') ? 'Severe liver disease' : 'Older patient'}:</b> use a benzodiazepine with less liver metabolism (oxazepam, lorazepam: no active metabolites) and smaller doses; long-acting agents can accumulate.${tg('ASAM 2020; pharmacology')}</p>` : ''),
+    why: A.why, chips: chip('gaba', r.ap === 'icu' ? 'pb' : 'benzo', 'Brake and accelerator'),
+    more: `<p>Labels advise lower doses in older or debilitated patients (diazepam injection 2–5 mg; chlordiazepoxide started low).${tg('FDA labels')}</p><p>Benzodiazepines are first line for withdrawal and for preventing seizures and delirium tremens; longer-acting agents are preferred, and diazepam or chlordiazepoxide for front-loading.${tg('ASAM 2020')}</p><p>All sample regimens are on the <a href="#doses">Reference tab</a>. No US guideline or label gives a lorazepam withdrawal dose; use your protocol.</p>`});
+  // seizure card also with frontload if seizure (approach covers)
+  // thiamine
+  const tw = r.wernicke;
+  h += card({id: 'thiamine', cls: tw ? 'bad' : '', label: 'Thiamine', head: tw ? 'Suspected Wernicke: high-dose IV thiamine' : 'Thiamine before glucose',
+    body: tw ? `<p><span class="dose">200 mg three times daily, preferably IV</span>${tg('EFNS 2010')}; ASAM's ICU discussion gives 200–500 mg IV every 8 h${tg('ASAM 2020')}; parenteral for at least 5 days.${tg('NICE CG100')}</p>` : `<p><span class="dose">100 mg IV or IM daily for 3–5 days</span>.${tg('ASAM 2020')}</p>`,
+    why: tw ? `${r.wk} of 4 Caine criteria: two are enough to suspect Wernicke, which is often missed with the classic triad.` : 'Heavy drinking depletes thiamine; glucose without it can precipitate Wernicke encephalopathy.',
+    chips: chip('thia', tw ? 'low' : 'rep', 'Thiamine first')});
+  // electrolytes
+  if (IN.lab.length) h += card({id: 'lytes', label: 'Electrolytes', head: 'Replace: ' + IN.lab.filter(x => x !== 'glu').map(x => ({mg: 'magnesium', k: 'potassium', phos: 'phosphate', na: 'sodium (slowly)'})[x]).filter(Boolean).join(', ') || 'Glucose', body: `<p>Doses and correction limits: <a href="/electrolytes/">electrolytes tool</a>${IN.lab.includes('na') ? ', <a href="/hyponatremia/">hyponatremia tool</a> (malnourished drinkers are at high risk of overcorrection)' : ''}.</p>`, why: IN.lab.includes('mg') ? 'Low magnesium is common and should be corrected, though magnesium does not treat the withdrawal itself.' : 'Drinking and poor intake deplete potassium, phosphate and magnesium, and refeeding lowers them further.'});
+  // hallucinations / agitation
+  if (r.hx('hall')) h += card({id: 'halluc', label: 'Hallucinations', head: 'Benzodiazepine first; antipsychotic only as an add-on', body: `<p>Check the QTc first (<a href="/qtc/">QT tool</a>).${tg('ASAM 2020')}</p>`, why: 'Antipsychotics do not treat the withdrawal and can lower the seizure threshold; they are for hallucinations or agitation not controlled by benzodiazepines.'});
+  // mimics
+  h += `<div class="card" id="mimics"><p class="label">Could it be something else?</p><p>Low glucose, Wernicke, hepatic encephalopathy, infection or meningitis, head injury or subdural bleed, benzodiazepine or other sedative withdrawal, stimulant or anticholinergic toxicity, thyrotoxicosis.${tg('Expert practice')}</p><p class="muted">See Learn: "Is it withdrawal, or something else?"</p></div>`;
+  h += `<div class="card" id="dc-now"><p class="label">Before discharge</p><p>Offer medication for alcohol use disorder: naltrexone or acamprosate first (<a href="#discharge">doses</a>).${tg('APA 2018, 1B')}</p></div>`;
+  $('out').innerHTML = h;
+  drawTimelines(i.hrs);
+}
+function drawTimelines(hh) { $('tlfig').innerHTML = figTime(hh); $('tlfig2').innerHTML = figTime(hh); }
+
+/* sheets */
+let lastFocus = null;
+function openSheet(title, html, after) { lastFocus = document.activeElement; $('fsheet-t').textContent = title; $('fsheet-b').innerHTML = html; $('fscrim').hidden = false; $('fsheet').hidden = false; if (after) after($('fsheet-b')); $('fsheet-x').focus(); }
+function closeSheet() { $('fscrim').hidden = true; $('fsheet').hidden = true; if (lastFocus) lastFocus.focus(); }
+$('fsheet-x').onclick = closeSheet; $('fscrim').onclick = closeSheet;
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('fsheet').hidden) closeSheet(); });
+document.addEventListener('click', e => {
+  const c = e.target.closest('.fchip'); if (!c) return;
+  const f = c.dataset.fig, s = c.dataset.st;
+  if (f === 'tl') openSheet('Timeline', figTime(readIn().hrs) + '<p class="line1">ASAM 2020: onset 6–24 h; seizures 8–48 h, peak about 24 h; hallucinosis from 12–24 h; delirium tremens typically 72–96 h.</p>');
+  else openSheet(FIGS[f].t, '<div id="sf"></div>', el => mountFig(el.querySelector('#sf'), f, s));
+});
+
+/* tabs */
+function showTab(v) { document.querySelectorAll('section.view').forEach(s => s.classList.toggle('on', s.id === 'v-' + v)); document.querySelectorAll('nav.tabs button').forEach(b => b.setAttribute('aria-selected', String(b.dataset.v === v))); }
+document.querySelectorAll('nav.tabs button').forEach(b => b.onclick = () => { showTab(b.dataset.v); window.scrollTo(0, 0); });
+$('go-prac').onclick = () => { showTab('practice'); window.scrollTo(0, 0); };
+function hashTab() { const h = location.hash.slice(1); if (!h) return; const el = document.getElementById(h); if (!el) return; const sec = el.closest('section.view'); if (sec) showTab(sec.id.slice(2)); setTimeout(() => el.scrollIntoView(), 0); }
+window.addEventListener('hashchange', hashTab);
+document.querySelector('#v-ref .chips').addEventListener('click', e => { const a = e.target.closest('a'); if (!a) return; e.preventDefault(); document.querySelector(a.getAttribute('href')).scrollIntoView({behavior: 'smooth'}); });
+
+/* Learn */
+document.querySelectorAll('[data-figure]').forEach(el => mountFig(el, el.dataset.figure));
+$('lpills').innerHTML = [...document.querySelectorAll('#v-learn .chap')].map(c => `<button class="lpill" type="button" data-to="${c.id}">${c.dataset.pill}</button>`).join('');
+$('lpills').onclick = e => { const b = e.target.closest('.lpill'); if (b) $(b.dataset.to).scrollIntoView({behavior: 'smooth'}); };
+const CAUSES = {wd: 'Alcohol withdrawal', glu: 'Low glucose', wk: 'Wernicke encephalopathy', he: 'Hepatic encephalopathy', cns: 'Meningitis or encephalitis', bleed: 'Subdural or other head bleed', tox: 'Stimulant or anticholinergic toxicity', sed: 'Other sedative withdrawal', thy: 'Thyrotoxicosis'};
+const RES = {
+  gluN: {n: 'Glucose normal', out: ['glu'], why: {glu: 'Normal glucose excludes it.'}},
+  tsh: {n: 'TSH normal', out: ['thy'], why: {thy: 'Normal TSH makes thyrotoxicosis very unlikely.'}},
+  ct: {n: 'Head CT normal', less: ['bleed'], why: {bleed: 'No bleed now; repeat if a fall or anticoagulant and the picture changes.'}},
+  udsN: {n: 'Urine drug screen negative', less: ['tox', 'sed'], why: {tox: 'Less likely, though many drugs are not on the screen.', sed: 'Less likely, though many sedatives are not detected.'}},
+  ast: {n: 'Asterixis, high ammonia, cirrhosis', fav: ['he'], why: {he: 'Points to hepatic encephalopathy, which benzodiazepines worsen.'}},
+  lp: {n: 'Fever with stiff neck', fav: ['cns'], why: {cns: 'Needs a lumbar puncture; withdrawal alone does not cause neck stiffness.'}},
+  eye: {n: 'Nystagmus and ataxia', fav: ['wk'], why: {wk: 'Two Caine signs: treat as Wernicke now.'}},
+  time: {n: 'Last drink 48 h ago, tremor, sweating', fav: ['wd'], why: {wd: 'Fits the withdrawal timeline.'}}
+};
+let nwSel = [];
+function drawNarrow() {
+  $('nw-results').innerHTML = Object.keys(RES).map(k => `<button class="sbtn" type="button" data-r="${k}" aria-pressed="${nwSel.includes(k)}">${RES[k].n}</button>`).join('');
+  const st = {}, why = {};
+  nwSel.forEach(k => { const r = RES[k]; ['fav', 'less', 'out'].forEach(x => (r[x] || []).forEach(c => { st[c] = st[c] === 'out' ? 'out' : x; why[c] = r.why[c]; })); });
+  $('nw-causes').innerHTML = Object.keys(CAUSES).map(c => `<div class="cause ${st[c] || ''}"><span>${CAUSES[c]}</span><small>${why[c] || ''}</small></div>`).join('');
+  const left = Object.keys(CAUSES).filter(c => st[c] !== 'out' && st[c] !== 'less');
+  $('nw-next').textContent = nwSel.length ? `Still in play: ${left.map(c => CAUSES[c]).join(', ')}.` : 'No result tapped yet: every cause is in play.';
+}
+$('nw-results').addEventListener('click', e => { const b = e.target.closest('.sbtn'); if (!b) return; const k = b.dataset.r; nwSel = nwSel.includes(k) ? nwSel.filter(x => x !== k) : nwSel.concat(k); drawNarrow(); });
+drawNarrow();
+const TRIALS = [
+  {n: 'Symptom-triggered dosing (Saitz), 1994', q: 'Does dosing by CIWA-Ar score beat a fixed schedule?', d: 'Randomised, double-blind, 101 patients in a VA inpatient detoxification unit; past seizures and major medical illness excluded.', r: 'Median treatment 9 h vs 68 h; chlordiazepoxide 100 mg vs 425 mg; no difference in severity, seizures or delirium tremens.', c: 'Symptom-triggered dosing became preferred where staff can score reliably. Not tested in medically ill inpatients.', cite: 'Saitz R et al. JAMA 1994;272:519.', doi: ''},
+  {n: 'Lorazepam after a withdrawal seizure (D\'Onofrio), 1999', q: 'Does IV lorazepam prevent a second withdrawal seizure?', d: 'Randomised, double-blind, 186 emergency patients after a witnessed withdrawal seizure.', r: 'Recurrent seizure within 6 h: 3 of 100 with lorazepam 2 mg IV vs 21 of 86 with placebo.', c: 'A benzodiazepine after a withdrawal seizure.', cite: 'D\'Onofrio G et al. N Engl J Med 1999;340:915.', doi: '10.1056/NEJM199903253401203'},
+  {n: 'Phenobarbital in the ED (Rosenson), 2013', q: 'Does one dose of IV phenobarbital with a lorazepam protocol reduce ICU admission?', d: 'Randomised, double-blind; 102 of 198 enrolled patients analysed. Small.', r: 'ICU admission 8% vs 25% (difference 17%, 95% CI 4 to 32) with phenobarbital 10 mg/kg IV.', c: 'Supports phenobarbital as an adjunct in monitored settings; small single-centre trial.', cite: 'Rosenson J et al. J Emerg Med 2013;44:592.', doi: '10.1016/j.jemermed.2012.07.056'},
+  {n: 'Escalating doses in the ICU (Gold), 2007', q: 'Does a protocol of rapidly escalating benzodiazepines with phenobarbital reduce intubation in severe withdrawal?', d: 'Before-after cohort, 54 vs 41 ICU patients. Not randomised.', r: 'Intubation 47% to 22%; more diazepam given (total 248 to 562 mg).', c: 'Supports early, aggressive dosing in resistant withdrawal; observational.', cite: 'Gold JA et al. Crit Care Med 2007;35:724.', doi: '10.1097/01.CCM.0000256841.28351.80'}
+];
+$('trialbox').innerHTML = TRIALS.map(t => `<div class="trial"><p><b>${t.n}</b></p><p><span class="k">Question</span>${t.q}</p><p><span class="k">Design</span>${t.d}</p><p><span class="k">Result</span>${t.r}</p><p><span class="k">What it changed</span>${t.c}</p><p class="muted">${t.cite}${t.doi ? ` <a href="https://doi.org/${t.doi}">doi:${t.doi}</a>` : ' PMID 8046805.'}</p></div>`).join('');
+document.addEventListener('DOMContentLoaded', () => {
+  const DEEP = JSON.parse(document.getElementById('deeper-data').textContent);
+  document.querySelectorAll('#v-learn .chap').forEach(c => { const d = DEEP[c.id]; if (!d) return;
+    c.insertAdjacentHTML('beforeend', `<details class="deeper"><summary>Go deeper: mechanism and rationale</summary><div class="dpx"><div><span class="dl">Mechanism</span><p>${d.m}</p></div><div><span class="dl">Why it matters</span><p>${d.w}</p></div><div><span class="dl">Common trap</span><p>${d.t}</p></div></div></details>`); });
+});
+
+/* Practice */
+const CASES = [
+  {s: 'Admitted with pneumonia. Last drink 20 h ago. No past withdrawal problems; PAWSS 2. CIWA-Ar 6. Answers questions well.', i: {comm: 'yes', pw: ['intox', 'wd'], ci: {trem: 2, anx: 2, sweat: 2}}},
+  {s: 'Last drink 18 h ago. PAWSS 3, no seizures or delirium tremens in the past. CIWA-Ar 14.', i: {comm: 'yes', pw: ['intox', 'wd', 'black'], ci: {trem: 4, sweat: 3, anx: 3, agit: 2, head: 2}}},
+  {s: 'Past withdrawal seizure and delirium tremens. Last drink 12 h ago. PAWSS 6. CIWA-Ar 8 so far.', i: {comm: 'yes', hx: ['psz', 'pdt'], pw: ['intox', 'wd', 'wsz', 'wdt', 'rehab', 'black'], ci: {trem: 3, anx: 3, sweat: 2}}},
+  {s: 'Last drink 24 h ago; a generalized seizure on the ward, now post-ictal.', i: {comm: 'yes', hx: ['sz'], pw: ['intox', 'wd']}},
+  {s: 'Day 4 after admission, agitated and disoriented, pulling at lines. Diazepam 200 mg given in the last 3 h without effect.', i: {comm: 'no', hx: ['del'], pw: ['intox', 'wd', 'wdt'], dzp: 200}},
+  {s: 'Intubated after surgery; known heavy drinker; last drink 30 h ago; no history of complicated withdrawal.', i: {comm: 'no', pw: ['intox']}}
+];
+const OPTS = [['mild', 'Supportive care, keep scoring'], ['symptom', 'Symptom-triggered dosing'], ['frontload', 'Front-loading'], ['fixed', 'Fixed schedule with objective signs'], ['seizure', 'Withdrawal seizure path'], ['icu', 'Complicated or resistant: escalate in ICU']];
+let ci = 0;
+function drawCase() {
+  const c = CASES[ci], r = assess(Object.assign({hx: [], pw: [], wk: []}, c.i)), a = r.ap;
+  $('practice').innerHTML = `<div class="card"><p class="label">Case ${ci + 1} of ${CASES.length}</p><p class="pagemsg">${c.s}</p><p><b>What now?</b></p><div class="opts">${OPTS.map(([k, n]) => `<button class="opt" type="button" data-k="${k}">${n}</button>`).join('')}</div><div id="cfb"></div></div>`;
+  $('practice').querySelector('.opts').onclick = e => {
+    const b = e.target.closest('.opt'); if (!b) return;
+    $('practice').querySelectorAll('.opt').forEach(o => { o.disabled = true; if (o.dataset.k === a) o.classList.add('right'); });
+    if (b.dataset.k !== a) b.classList.add('wrong');
+    $('cfb').innerHTML = `<p class="verdict ${b.dataset.k === a ? 'ok' : 'no'}">${b.dataset.k === a ? 'Right' : 'Not quite'}: ${APPROACH[a].t}</p><p>${APPROACH[a].why}</p><p class="muted">PAWSS ${r.pw}${r.ci != null && r.ciOk ? ` · CIWA-Ar ${r.ci}` : ''}${!r.ciOk ? ' · CIWA-Ar not valid' : ''}</p><div class="rowb"><button class="btn" type="button" id="nextc">${ci < CASES.length - 1 ? 'Next case' : 'Start again'}</button></div>`;
+    $('nextc').onclick = () => { ci = (ci + 1) % CASES.length; drawCase(); $('practice').scrollIntoView(); };
+  };
+}
+drawCase();
+render();
+hashTab();
+</script>
+
+<script id="deeper-data" type="application/json">
+{
+  "learn-gaba": {"m": "Chronic alcohol enhances GABA-A signalling and inhibits NMDA glutamate receptors; the brain compensates by down-regulating GABA-A function and up-regulating NMDA receptors. Stopping alcohol unmasks this, leaving net excitation.", "w": "Treatment replaces the missing GABA tone with a cross-tolerant drug and lets the brain re-adapt over days, rather than chasing each symptom.", "t": "Treating tremor and tachycardia with a beta-blocker or clonidine alone: it hides the signs without preventing seizures or delirium."},
+  "learn-time": {"m": "Symptoms track how long the adaptation outlasts the alcohol: autonomic signs come first, seizures within the first two days, and delirium later in a minority.", "w": "The hours since the last drink tell you what is still ahead and how long to keep watching.", "t": "Assuming a patient is past the danger because day 1 was quiet; delirium tremens can appear days later."},
+  "learn-kindle": {"m": "Repeated withdrawals sensitise excitatory pathways, so each episode lowers the threshold for the next seizure or delirium.", "w": "History of past seizures or delirium tremens is the strongest predictor and pushes towards front-loading.", "t": "Under-treating a patient whose previous withdrawals were severe because current symptoms look mild."},
+  "learn-thiamine": {"m": "Thiamine pyrophosphate is a cofactor for pyruvate dehydrogenase and other enzymes of glucose metabolism; without it, metabolically active brain regions fail.", "w": "Thiamine given before or with glucose protects the brain; Wernicke is often missed because the full triad is uncommon.", "t": "Waiting for all three classic signs before treating; two of four Caine criteria are enough to suspect it."},
+  "narrow": {"m": "Withdrawal is a diagnosis of timing and exclusion: the same tremor, sweating and confusion arise from infection, bleeding, metabolic and toxic causes.", "w": "Benzodiazepines can worsen some mimics (hepatic encephalopathy, head injury), so checking them changes treatment.", "t": "Labelling every confused drinker as withdrawal and missing a subdural or meningitis."},
+  "trials": {"m": "The trials compared dosing strategies and add-ons, not benzodiazepines versus placebo for withdrawal.", "w": "They explain why symptom-triggered dosing, a benzodiazepine after a seizure, and phenobarbital as an adjunct are used.", "t": "Applying symptom-triggered dosing to sick inpatients who cannot report symptoms; the trial excluded them."}
+}
+</script>
+</body>
+</html>
