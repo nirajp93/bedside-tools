@@ -343,7 +343,7 @@ function targetCard(i, s){
     c.sub = ({enceph: 'Encephalopathy or PRES', retina: 'Retinal hemorrhage or papilledema (malignant hypertension)', aki: 'Acute kidney injury or thrombotic microangiopathy', edema: 'Acute pulmonary edema', acs: 'Acute coronary syndrome'})[s.organ] + (has(S) ? '. From ' + S + ', that is a fall of about ' + Math.round((S - 140) / S * 100) + '%.' : '.') + '';
     c.why = s.organ === 'edema' ? WHY.edema : s.organ === 'acs' ? WHY.acs : WHY.compelling;
     c.more = ['The 2025 guideline lists encephalopathy or PRES, retinal hemorrhage or papilledema, acute kidney injury, pulmonary edema and ACS among the compelling conditions for under 140 in the first hour; the ESC 2019 position paper gives under 140 immediately for pulmonary edema and ACS.', 'ESC 2019 is gentler for some: encephalopathy, mean pressure down 20 to 25% immediately; malignant hypertension with kidney injury or TMA, mean pressure down 20 to 25% over several hours.'];
-    c.tiers = [s.severe ? 'Compelling condition, under 140 in the first hour: 2025 AHA/ACC 1, C-LD' : 'Under 140 immediately: ESC 2019 (consensus)', s.organ === 'edema' ? 'IV nitroglycerin or nitroprusside in decompensated HF: 2022 HF 2b, B-NR' : s.organ === 'acs' ? 'Under 140 immediately in ACS: ESC 2019 (consensus)' : 'Gentler MAP targets: ESC 2019 (consensus)'];
+    c.tiers = [s.severe ? 'Compelling condition, under 140 in the first hour: 2025 AHA/ACC 1, C-LD' : 'Under 140 immediately: ESC 2019 (consensus)', s.organ === 'edema' ? 'IV nitroglycerin or nitroprusside in decompensated HF: 2022 HF 2b, B-NR' : s.organ === 'acs' ? (s.severe ? 'Under 140 immediately in ACS: ESC 2019 (consensus)' : 'Nitroglycerin, beta-blocker: see the ACS guideline') : 'Gentler MAP targets: ESC 2019 (consensus)'];
     if (s.organ === 'edema') c.chips = [['afterload', 'high', 'Afterload floods the lungs']];
     else c.chips = [['stairs', 'comp', 'The three speeds of lowering']];
   } else if (s.organ === 'ais'){
@@ -448,6 +448,7 @@ function workupCard(i, s){
   var c = {id: 'c-workup', label: 'Find the injury', head: 'What to check in the first hour'};
   c.list = ['Repeat the pressure in both arms (a big difference suggests dissection).', 'Neurological exam, and CT head if there is any deficit, confusion or severe headache.', 'Eyes: look for retinal hemorrhage, exudates or papilledema.', 'ECG and troponin; chest film if breathless.', 'Creatinine, potassium, urinalysis for blood and protein; blood count with smear, LDH and haptoglobin if TMA is possible.', 'Pregnancy test in anyone who could be pregnant; up to 6 weeks postpartum counts.', 'Drugs: cocaine, amphetamines, stopped clonidine or beta-blockers, MAO inhibitors, decongestants, NSAIDs.'];
   c.why = 'The organ injured, not the number, decides how fast and how far to lower the pressure.';
+  c.chips = [['plate:organs', '', 'The organs at risk']];
   c.tiers = ['Evaluate neurologic, cardiac, aortic, retinal and kidney injury: 2025 AHA/ACC text', 'Individual tests: expert practice'];
   return c;
 }
@@ -571,7 +572,11 @@ var FIGS = {
       return h + '</svg>';
     }}
 };
-var PLATES = {};
+var PLATES = {
+  organs: {w: 1024, h: 308, t: 'Organs injured in a hypertensive emergency', src: '/media/htn-emergency/organs.webp',
+    alt: 'Five panels. A brain from the side with swelling at the back. A retina with flame-shaped hemorrhages, pale exudates and cotton-wool spots, and a blurred optic disc. A heart between two fluid-filled lungs. The aorta with a tear in its inner wall and a dark false channel. A kidney cut open with clots in its vessels (schematic).',
+    cap: 'Brain (encephalopathy or PRES, often at the back of the brain), eye (hemorrhages, exudates and cotton-wool spots, papilledema), heart and lungs (pulmonary edema), aorta (dissection) and kidney (injury, with clots in small vessels in thrombotic microangiopathy; drawn schematically).'}
+};
 function plateHTML(id){ var P = PLATES[id]; return '<div class="plate"><img src="' + P.src + '" alt="' + P.alt + '" width="' + P.w + '" height="' + P.h + '" loading="lazy"><span class="credit">Created with BioRender.com</span></div><p class="line1">' + P.cap + '</p>'; }
 </script>
 <script>
@@ -579,7 +584,7 @@ function plateHTML(id){ var P = PLATES[id]; return '<div class="plate"><img src=
 var $ = function(id){ return document.getElementById(id); };
 function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
 var ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M7 15l3-4 3 3 2-2 2 3"/></svg>';
-function chip(fig, state, label){ return '<button class="chip" type="button" data-fig="' + fig + '" data-state="' + (state || '') + '">' + ICON + esc(label || FIGS[fig].t) + '</button>'; }
+function chip(fig, state, label){ if (fig.indexOf('plate:') === 0) return '<button class="chip" type="button" data-plate="' + fig.slice(6) + '">' + ICON + esc(label) + '</button>'; return '<button class="chip" type="button" data-fig="' + fig + '" data-state="' + (state || '') + '">' + ICON + esc(label || FIGS[fig].t) + '</button>'; }
 function doseHTML(d){
   var D = d.D;
   return '<div class="dose' + (d.out ? ' out' : '') + '"><b class="n">' + esc(D.n) + (d.second ? ' <span class="tier">second line</span>' : '') + '</b>' +
@@ -638,7 +643,7 @@ function openSheet(fig, state){ lastFocus = document.activeElement; $('sheet-t')
 function closeSheet(){ if ($('sheet').hidden) return; $('scrim').hidden = true; $('sheet').hidden = true; if (lastFocus && lastFocus.focus) lastFocus.focus(); }
 $('sheet-x').addEventListener('click', closeSheet); $('scrim').addEventListener('click', closeSheet);
 document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeSheet(); });
-document.addEventListener('click', function(e){ var c = e.target.closest && e.target.closest('[data-fig]'); if (c) openSheet(c.getAttribute('data-fig'), c.getAttribute('data-state')); });
+document.addEventListener('click', function(e){ var c = e.target.closest && e.target.closest('[data-fig]'); if (c) openSheet(c.getAttribute('data-fig'), c.getAttribute('data-state')); var q = e.target.closest && e.target.closest('[data-plate]'); if (q){ lastFocus = document.activeElement; var id = q.getAttribute('data-plate'); $('sheet-t').textContent = PLATES[id].t; $('sheet-b').onclick = null; $('sheet-b').innerHTML = plateHTML(id); $('scrim').hidden = false; $('sheet').hidden = false; $('sheet').scrollTop = 0; $('sheet-x').focus(); } });
 if (!Object.keys(PLATES).length) $('credit-line').hidden = true;
 document.querySelectorAll('[data-figure]').forEach(function(h){ mountFig(h, h.getAttribute('data-figure'), h.getAttribute('data-state')); });
 document.addEventListener('click', function(e){ var a = e.target.closest && e.target.closest('a[href^="#"]'); if (a && !a.classList.contains('back')){ var id = a.getAttribute('href').slice(1); if (goTo(id)) e.preventDefault(); } });
