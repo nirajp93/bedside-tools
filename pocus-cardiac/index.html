@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Cardiac Ultrasound · bedside.tools</title>
+<meta name="description" content="Focused cardiac ultrasound: how to get each view, the anatomy on the screen, and how to read the five bedside questions.">
+<script src="/theme.js"></script>
+<style>
+/* Colours: shared site names only. Dark values and extras (--fill --hrt-* --us-*) live in /theme.js. */
+:root{--bg:#FBFBFA; --card:#FFFFFF; --ink:#111113; --muted:#55555D; --line:#ECECEE; --accent:#2B4BDB; --warn:#9A3B00; --warnbg:#FFF6EC}
+:root{--r:14px}
+*{box-sizing:border-box;margin:0;padding:0}
+[hidden]{display:none!important}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.45;padding-bottom:calc(76px + env(safe-area-inset-bottom))}
+a{color:var(--accent);text-decoration:none}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;-webkit-tap-highlight-color:transparent}
+button:focus-visible,a:focus-visible,[tabindex]:focus-visible,summary:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+h1,h2,h3{font-weight:600;letter-spacing:-.01em;line-height:1.15;text-wrap:balance}
+h1{font-size:26px} h2{font-size:21px} h3{font-size:18px}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.kicker{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.wrap{max-width:720px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+
+header{border-bottom:1px solid var(--line)}
+header .wrap{padding-block:8px 14px}
+.back{font-size:14px;color:var(--accent);display:inline-flex;align-items:center;min-height:44px}
+header p{font-size:15px;color:var(--muted);margin-top:4px}
+
+nav.tabs{position:fixed;left:0;right:0;bottom:0;background:var(--bg);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom);z-index:20}
+nav.tabs .wrap{display:flex;padding-block:0}
+nav.tabs button{flex:1;min-height:56px;color:var(--muted);font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;border-top:2px solid transparent}
+nav.tabs button[aria-selected=true]{color:var(--accent);border-top-color:var(--accent)}
+section.view{display:none;padding-block:14px 28px}
+section.view.on{display:grid;gap:14px}
+.lede{font-size:15px;color:var(--muted)}
+
+.seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:4px;padding:4px;background:var(--line);border-radius:12px}
+.seg button{min-height:44px;padding:0 8px;border-radius:9px;font-size:14px;font-weight:500;color:var(--muted)}
+.seg button[aria-pressed=true]{background:var(--card);color:var(--ink);font-weight:600}
+
+.views{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin-inline:-16px;padding-inline:16px}
+.views::-webkit-scrollbar{display:none}
+.views button{flex:none;min-height:44px;padding:0 13px;border-radius:999px;font-size:14px;color:var(--muted);border:1px solid transparent;white-space:nowrap}
+.views button[aria-pressed=true]{color:var(--ink);font-weight:600;border-color:var(--line);background:var(--card)}
+
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r)}
+.card.pad{padding:16px}
+.figcard{overflow:hidden}
+.fig{position:relative;aspect-ratio:6/5;background:var(--us-bg);touch-action:pan-y;user-select:none;-webkit-user-select:none}
+.fig canvas,.fig svg{position:absolute;inset:0;width:100%;height:100%;display:block}
+.fig .pill{position:absolute;top:8px;font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;padding:3px 7px;border-radius:6px;pointer-events:none}
+.fig .pill.l{left:8px;background:var(--us-halo);color:var(--us-ink)}
+.fig .pill.r{right:8px;background:var(--card);color:var(--ink);border:1px solid var(--line)}
+.handle{position:absolute;top:0;bottom:0;width:44px;margin-left:-22px;display:flex;align-items:center;justify-content:center;cursor:ew-resize;touch-action:none}
+.handle::before{content:"";position:absolute;top:0;bottom:0;left:50%;width:2px;margin-left:-1px;background:var(--us-mark)}
+.handle i{position:relative;width:34px;height:34px;border-radius:50%;background:var(--us-mark);box-shadow:0 0 0 3px var(--us-halo)}
+.handle i::before,.handle i::after{content:"";width:7px;height:7px;border-left:2px solid var(--us-halo);border-bottom:2px solid var(--us-halo);position:absolute;top:13px}
+.handle i::before{transform:rotate(45deg);left:8px}
+.handle i::after{transform:rotate(-135deg);right:8px}
+
+.dg .bgr{fill:var(--card)} .dg .sector{fill:var(--fill)}
+.dg .cav{fill:var(--hrt-cavity)} .dg .mus{fill:var(--hrt-muscle)} .dg .tis{fill:var(--body)}
+.dg .art{fill:var(--hrt-cavity);stroke:var(--hrt-art);stroke-width:4}
+.dg .leaf{fill:none;stroke:var(--hrt-line);stroke-width:2.5;stroke-linecap:round}
+.dg .peri{fill:none;stroke:var(--ink);stroke-width:2.5;stroke-linecap:round}
+.dg .fluid{fill:var(--accent);fill-opacity:.28;stroke:var(--accent);stroke-width:1.5}
+.dg text{font-family:var(--mono);font-size:13px;font-weight:500;fill:var(--hrt-line);text-anchor:middle}
+.dg text.fl{fill:var(--accent);font-size:11.5px}
+.hl .halo{fill:none;stroke:var(--us-halo);stroke-width:6;stroke-linejoin:round;stroke-linecap:round;stroke-opacity:.75}
+.hl .mark{fill:var(--us-mark);fill-opacity:.16;stroke:var(--us-mark);stroke-width:2.5;stroke-linejoin:round;stroke-linecap:round}
+.hl .mark.ln{fill:none}
+.hl .hit{fill:transparent;stroke:transparent;stroke-width:14;pointer-events:all;cursor:pointer}
+.hl{touch-action:pan-y}
+
+.under{padding:12px 14px 14px;display:grid;gap:10px}
+.info{font-size:15px;min-height:44px}
+.info b{font-weight:600}
+.info.idle{color:var(--muted)}
+.chips{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin-inline:-14px;padding-inline:14px}
+.chips::-webkit-scrollbar{display:none}
+.chips button{flex:none;white-space:nowrap;min-height:44px;padding:0 12px;border:1px solid var(--line);border-radius:999px;background:var(--card);font-size:14px}
+.chips button[aria-pressed=true]{background:var(--ink);border-color:var(--ink);color:var(--bg);font-weight:500}
+.note{font-size:13px;color:var(--muted)}
+
+.row{display:grid;grid-template-columns:86px 1fr;gap:12px;padding:13px 14px;border-top:1px solid var(--line);font-size:15px}
+.row:first-child{border-top:0}
+.row .k{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);padding-top:3px}
+
+.cmp p{font-size:15px;margin-top:8px;min-height:66px}
+.cmp .seg{margin-top:10px}
+
+/* Read tab */
+.q h3{display:flex;gap:10px;align-items:baseline}
+.q h3 .n{font-family:var(--mono);font-size:13px;color:var(--muted);font-weight:500}
+.q .ans{font-size:16px;margin-top:8px}
+.why{font-size:15px;margin-top:10px}
+.why b{font-weight:600}
+details.more{margin-top:8px;border-top:1px dashed var(--line);padding-top:2px}
+details.more summary{min-height:44px;display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);cursor:pointer;list-style:none}
+details.more summary::-webkit-details-marker{display:none}
+details.more summary::before{content:"";width:7px;height:7px;border-right:1.5px solid var(--accent);border-bottom:1.5px solid var(--accent);transform:rotate(-45deg);transition:transform .15s}
+details.more[open] summary::before{transform:rotate(45deg)}
+details.more p,details.more li{font-size:14px;margin-bottom:6px}
+details.more ul{padding-left:18px}
+.tier{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.warnbox{background:var(--warnbg);color:var(--warn);border-radius:10px;padding:10px 12px;font-size:14px;margin-top:10px}
+
+.ivc{margin-top:12px;display:grid;gap:10px}
+.ivc label{display:flex;justify-content:space-between;align-items:baseline;font-size:14px}
+.ivc label b{font-family:var(--mono);font-size:17px;font-weight:500}
+.ivc input[type=range]{width:100%;height:44px;accent-color:var(--accent)}
+.zones{display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
+.zones span{min-height:44px;border-radius:9px;background:var(--fill);color:var(--muted);display:grid;place-items:center;text-align:center;font-family:var(--mono);font-size:15px;line-height:1.1}
+.zones span small{display:block;font-size:11px;letter-spacing:.04em}
+.zones span.on{background:var(--ink);color:var(--bg)}
+.zones.off span{opacity:.74}
+.toggle{min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);font-size:14px;justify-self:start}
+.toggle[aria-pressed=true]{background:var(--warnbg);border-color:var(--warnbg);color:var(--warn);font-weight:500}
+.dp{display:grid;gap:0;border-top:1px solid var(--line);margin-top:2px}
+.dp div{display:grid;grid-template-columns:104px 1fr;gap:10px;padding:10px 0;border-bottom:1px solid var(--line);font-size:14px}
+.dp div:last-child{border-bottom:0}
+.dp div span:first-child{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding-top:2px}
+.limits li{font-size:15px;margin-bottom:8px}
+.limits ul{padding-left:18px;margin-top:8px}
+
+footer{max-width:720px;margin:8px auto 0;padding:16px max(16px,env(safe-area-inset-right,0px)) 24px max(16px,env(safe-area-inset-left,0px));border-top:1px solid var(--line);font-size:13px;color:var(--muted)}
+footer p{margin-bottom:8px}
+
+@media (min-width:900px){
+  .wrap,footer{max-width:980px}
+  #views.on{grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);align-items:start}
+  #views.on>.views,#views.on>.lede{grid-column:1/-1}
+  #views.on>.figcard{grid-row:span 3}
+  #read.on{grid-template-columns:1fr 1fr;align-items:start}
+  #read.on>.lede{grid-column:1/-1}
+}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <a class="back" href="/">← bedside.tools</a>
+  <h1>Cardiac ultrasound</h1>
+  <p>Get the view, then read it. Adds to the exam; does not replace an echocardiogram.</p>
+</div></header>
+
+<main class="wrap">
+<section class="view on" id="views" aria-labelledby="t-views">
+  <div class="views" role="group" aria-label="View" id="viewpick"></div>
+
+  <div class="card figcard" id="figure">
+    <div class="fig" id="fig">
+      <canvas id="scan" width="720" height="600"></canvas>
+      <svg class="dg" id="diagram" viewBox="0 0 360 300" role="img"></svg>
+      <svg class="hl" id="hl" viewBox="0 0 360 300"></svg>
+      <span class="pill l" id="pillL">Scan</span>
+      <span class="pill r" id="pillR">Anatomy</span>
+      <div class="handle" id="handle" role="slider" tabindex="0" aria-label="Scan to anatomy" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50"><i></i></div>
+    </div>
+    <div class="under">
+      <p class="info idle" id="info" aria-live="polite"></p>
+      <div class="chips" id="chips" role="group" aria-label="Structures"></div>
+    </div>
+  </div>
+
+  <div class="card" id="how"></div>
+  <p class="note">Probe position and poor-view fixes are expert practice, not guideline statements. The scan side is a drawn stand-in until the licensed clips are added.</p>
+
+  <div class="cmp" id="compare" hidden>
+    <span class="kicker">Same view</span>
+    <h3>Where is the fluid?</h3>
+    <div class="seg" role="group" aria-label="Finding" id="states">
+      <button type="button" data-s="normal" aria-pressed="true">None</button>
+      <button type="button" data-s="peri" aria-pressed="false">Pericardial</button>
+      <button type="button" data-s="pleural" aria-pressed="false">Pleural</button>
+    </div>
+    <p id="stateText" aria-live="polite"></p>
+  </div>
+</section>
+
+<section class="view" id="read" aria-labelledby="t-read">
+  <p class="lede">Five questions a focused exam can answer, and what it cannot.</p>
+
+  <div class="card pad q" id="q-lv">
+    <h3><span class="n">1</span>How well does the LV squeeze?</h3>
+    <p class="ans">Say it in broad words: hyperdynamic, normal, reduced or severely reduced. Judge it in at least two views. No ejection-fraction number.</p>
+    <p class="why"><b>Why:</b> broad categories are what a focused exam supports. A number implies a precision it does not have.</p>
+    <details class="more"><summary>More</summary>
+      <p>What to watch: the walls thicken, the inner edge moves inward, and the front mitral leaflet opens toward the septum. <span class="tier">Expert practice.</span></p>
+      <p>E-point septal separation (M-mode at the mitral tips in the long-axis view): over 7 mm was 100% sensitive (95% CI 63 to 100) and 52% specific (39 to 65) for an EF of 30% or less. Read it one way only: 7 mm or less makes a severely reduced EF unlikely. <span class="tier">Single centre, convenience sample (McKaigney 2014).</span></p>
+      <p>An apical view cut short of the true apex makes the LV look better than it is.</p>
+      <p class="tier">ASE 2013 focused cardiac ultrasound statement; international FoCUS recommendations 2014 (consensus).</p>
+    </details>
+  </div>
+
+  <div class="card pad q" id="q-rv">
+    <h3><span class="n">2</span>Is the RV big, and is the septum flat?</h3>
+    <p class="ans">The RV should look no more than two-thirds the size of the LV, and the LV should form the apex. A septum that flattens in systole means pressure load; in diastole, volume load; in both, pressure with or without volume.</p>
+    <p class="why"><b>Why:</b> the septum bows toward whichever ventricle has the lower pressure at that moment.</p>
+    <div class="warnbox">A normal-looking RV does not exclude pulmonary embolism. Pooled sensitivity of right heart strain on echo was 53%, specificity 83%.</div>
+    <details class="more"><summary>More</summary>
+      <p>TAPSE (M-mode through the lateral tricuspid annulus, RV-focused apical view): over 1.7 cm normal; 1.3 to 1.7 mild; 1.0 to 1.3 moderate; 1.0 or less severe. Never read it alone: it misleads after cardiac surgery, with pacing leads or catheters, in constriction, with severe tricuspid regurgitation, or with a misaligned cursor.</p>
+      <p>RV basal diameter under 4.1 cm is normal (end-diastole, RV-focused view). RV free wall under 5 mm is normal; a thick wall points to long-standing load but is not specific. RV size needs more than one view.</p>
+      <p class="tier">ASE right heart guideline 2025. Embolism figures: Fields 2017, meta-analysis.</p>
+    </details>
+  </div>
+
+  <div class="card pad q" id="q-eff">
+    <h3><span class="n">3</span>Is there fluid around the heart?</h3>
+    <p class="ans">A dark band around the heart, measured at end-diastole: 10 to 20 mm is moderate, over 20 mm is large. In the long-axis view pericardial fluid lies in front of the descending aorta; pleural fluid lies behind it.</p>
+    <p class="why"><b>Why:</b> size does not define tamponade. Pressure does, and a small fluid collection that arrives fast can be enough.</p>
+    <div class="warnbox">Tamponade is neither a bedside nor an ultrasound diagnosis alone. An effusion on the screen is not tamponade until the patient fits.</div>
+    <details class="more"><summary>More</summary>
+      <p>Signs that support tamponade: the right atrium collapses in systole (earliest); the right ventricle collapses in diastole (high specificity); the IVC is full with little change on breathing (high sensitivity); mitral and tricuspid inflow swing with breathing more than normal.</p>
+      <p class="tier">Size: ESC 2025 myocarditis and pericarditis guideline. Signs: Alerhand 2019, narrative review. Aorta landmark: expert practice.</p>
+    </details>
+  </div>
+
+  <div class="card pad q" id="q-ivc">
+    <h3><span class="n">4</span>What does the IVC say about right atrial pressure?</h3>
+    <div class="ivc">
+      <label for="ivcd"><span>IVC diameter, end-expiration</span><b class="mono" id="ivcdv"></b></label>
+      <input type="range" id="ivcd" min="0.8" max="3.2" step="0.1" value="1.8">
+      <label><span>Collapse with a sniff</span></label>
+      <div class="seg" role="group" aria-label="Collapse with a sniff" id="ivcc">
+        <button type="button" data-c="1" aria-pressed="true">50% or more</button>
+        <button type="button" data-c="0" aria-pressed="false">Under 50%</button>
+      </div>
+      <button type="button" class="toggle" id="ivcv" aria-pressed="false">On a ventilator</button>
+      <div class="zones" id="zones" aria-hidden="true">
+        <span data-z="3">3<small>mm Hg</small></span><span data-z="8">8<small>mm Hg</small></span><span data-z="15">15<small>mm Hg</small></span><span data-z="20">20<small>consider</small></span>
+      </div>
+      <p class="ans" id="ivcans" aria-live="polite"></p>
+      <div class="dp" id="ivcdp"></div>
+    </div>
+    <details class="more"><summary>More</summary>
+      <p>Measure in the subcostal long-axis view, 0.5 to 3 cm from the right atrium. Use a sniff; quiet breathing if the patient cannot sniff. M-mode times the change better.</p>
+      <p>A large IVC can be normal in young adults, athletes and pregnancy.</p>
+      <p class="tier">ASE right heart guideline 2025.</p>
+    </details>
+  </div>
+
+  <div class="card pad q" id="q-valve">
+    <h3><span class="n">5</span>Is there an obvious valve problem?</h3>
+    <p class="ans">Flag only: a leaflet that is thick, fixed or flailing, or a large colour jet. Do not grade it. Any flag means a formal echo.</p>
+    <p class="why"><b>Why:</b> a focused exam finds the obvious and misses the rest.</p>
+    <details class="more"><summary>More</summary>
+      <p>Ten hospitalists with hand-carried ultrasound, 354 inpatients: LV function matched the cardiologist's read exactly in 59% with ultrasound against 46% by exam, and within one level in 88% against 67%. There was no gain for aortic stenosis, aortic regurgitation or mitral regurgitation.</p>
+      <p class="tier">ASE 2013 (grading valve lesions is not appropriate for a focused exam); Martin 2009, single centre.</p>
+    </details>
+  </div>
+
+  <div class="card pad limits" id="limits">
+    <span class="kicker">Limits</span>
+    <h3>What this exam does not settle</h3>
+    <ul>
+      <li>A new abnormal finding, or a normal scan in a patient who is still unexplained, gets a formal echo.</li>
+      <li>Do not call these at the bedside: aortic dissection, hypertrophic cardiomyopathy, regional wall motion abnormality, LV aneurysm or thrombus, masses, vegetations. A scan that looks normal does not exclude them.</li>
+      <li>Pulmonary pressures, diastolic function and constriction are outside a focused exam.</li>
+    </ul>
+    <p class="tier">ASE 2013; international FoCUS recommendations 2014.</p>
+  </div>
+</section>
+</main>
+
+<nav class="tabs" role="tablist" aria-label="Sections"><div class="wrap">
+  <button type="button" role="tab" id="t-views" aria-controls="views" aria-selected="true">Views</button>
+  <button type="button" role="tab" id="t-read" aria-controls="read" aria-selected="false">Read</button>
+</div></nav>
+
+<footer>
+  <p>For education only. Not a substitute for clinical judgment.</p>
+  <p>Last reviewed: draft, not yet audited.</p>
+  <p>Sources: Mukherjee M, Rudski LG, et al. Guidelines for the echocardiographic assessment of the right heart in adults. J Am Soc Echocardiogr 2025;38:141-86, doi:10.1016/j.echo.2025.01.006 (guideline). Spencer KT, et al. Focused cardiac ultrasound: recommendations from the American Society of Echocardiography. J Am Soc Echocardiogr 2013;26:567-81 (expert consensus). Via G, et al. International evidence-based recommendations for focused cardiac ultrasound. J Am Soc Echocardiogr 2014;27:683.e1-33, doi:10.1016/j.echo.2014.05.001 (consensus). 2025 ESC guidelines for the management of myocarditis and pericarditis. Eur Heart J 2025;46:3952-4041, doi:10.1093/eurheartj/ehaf192 (guideline). McKaigney CJ, et al. Am J Emerg Med 2014;32:493-7, doi:10.1016/j.ajem.2014.01.045 (observational). Alerhand S, Carter JM. Am J Emerg Med 2019;37:321-6, doi:10.1016/j.ajem.2018.11.004 (review). Fields JM, et al. J Am Soc Echocardiogr 2017;30:714-23, doi:10.1016/j.echo.2017.03.004 (meta-analysis). Martin LD, et al. Am J Med 2009;122:35-41, doi:10.1016/j.amjmed.2008.07.022 (observational).</p>
+  <p>Probe positions, image fixes and structure descriptions are expert practice. The ultrasound pictures on this page are drawings, not patient images.</p>
+  <p>Privacy: everything runs in your browser. Nothing you enter is sent anywhere or stored, and there are no analytics. Do not enter names, record numbers, or dates of birth.</p>
+</footer>
+
+<script>
+(function(){
+"use strict";
+var $=function(s){return document.querySelector(s)}, $$=function(s){return Array.prototype.slice.call(document.querySelectorAll(s))};
+var SECTOR="M180 8 L4.5 232.6 A285 285 0 0 0 355.5 232.6 Z";
+function circ(cx,cy,r){return "M"+(cx-r)+" "+cy+" A"+r+" "+r+" 0 1 0 "+(cx+r)+" "+cy+" A"+r+" "+r+" 0 1 0 "+(cx-r)+" "+cy+"Z"}
+
+/* One record per view. Geometry is shared by the scan stand-in and the anatomy layer, so the two always line up.
+   kind: cav (blood-filled), mus (muscle), tis (solid organ), art (vessel in cross or long section), ln (thin bright line). */
+var VIEWS=[
+{id:"plax",name:"Long axis",full:"Parasternal long axis",tf:[1,0,0],
+ answers:"LV squeeze, fluid around the heart, a first look at the mitral and aortic valves.",
+ probe:"Left sternal border, 3rd or 4th space. Marker to the right shoulder. Patient rolled to the left.",
+ fix:"Slide one space up or down, roll further left, breathe out and hold.",
+ decor:[{k:"mus",d:"M96 54 C140 40 220 40 262 56 L258 68 C220 54 140 54 100 66Z"}],
+ S:[
+ {id:"rv",n:"RV outflow",kind:"cav",d:"M100 68 C140 56 220 56 258 70 C262 84 250 94 226 96 C170 92 110 98 74 110 C78 92 86 78 100 68Z",lab:"RV",lx:176,ly:84,tip:"Nearest the probe, so it sits at the top of the screen."},
+ {id:"ivs",n:"Septum",kind:"mus",d:"M70 112 C110 100 170 94 226 97 L226 115 C172 112 114 118 72 131Z",tip:"The bright band between the two ventricles; it thickens in systole."},
+ {id:"lv",n:"LV",kind:"cav",d:"M70 133 C114 120 172 114 228 117 L228 137 C222 139 216 141 212 143 C204 152 198 162 196 170 C200 178 206 186 212 194 C168 184 110 192 66 192 C50 178 54 150 70 133Z",lab:"LV",lx:124,ly:160,tip:"The apex is off the screen to the left in this view."},
+ {id:"av",n:"Aortic valve",kind:"ln",d:"M229 100 Q241 118 229 118 M229 136 Q241 118 229 118",tip:"Two thin leaflets that open flat against the aortic walls in systole."},
+ {id:"ao",n:"Aortic root",kind:"art",d:"M230 99 C260 96 296 100 322 108 L318 140 C292 132 260 132 230 137Z",lab:"Ao",lx:278,ly:122,tip:"Its front wall continues from the septum, its back wall from the mitral valve."},
+ {id:"mv",n:"Mitral valve",kind:"ln",d:"M213 144 L192 166 M213 196 L196 176",tip:"The front leaflet swings up toward the septum early in diastole."},
+ {id:"la",n:"LA",kind:"cav",d:"M214 146 C240 138 296 140 320 150 C332 176 322 204 294 214 C258 222 226 212 213 196 C204 182 204 160 214 146Z",lab:"LA",lx:266,ly:182,tip:"Behind the aortic root, at the lower right."},
+ {id:"pw",n:"Back wall",kind:"mus",d:"M64 194 C110 194 168 186 213 198 C240 214 272 220 296 216 L300 226 C262 236 226 230 208 216 C166 204 110 212 68 212Z",tip:"Posterior LV wall. It thickens and moves toward the septum in systole."},
+ {id:"peri",n:"Pericardium",kind:"ln",peri:1,d:"M56 216 C110 218 170 208 210 222 C246 242 290 240 326 226",tip:"The brightest line on the screen, lying on the back wall of the heart."},
+ {id:"dao",n:"Descending aorta",kind:"art",d:circ(266,266,11),tip:"A circle behind the left atrium. Fluid in front of it is pericardial; fluid behind it is pleural."}
+ ],
+ states:{
+  normal:{text:"No dark band. The pericardium lies directly on the back wall."},
+  peri:{text:"A dark band between the back wall and the pericardium, in front of the descending aorta. Measured at end-diastole: 10 to 20 mm is moderate, over 20 mm is large.",
+        fluid:"M62 215 C110 215 168 207 208 219 C244 237 284 235 318 223 L323 238 C286 252 240 252 204 238 C166 226 112 234 64 234Z",
+        peri:"M62 236 C112 236 166 228 204 240 C240 254 286 254 324 240",label:["pericardial fluid",118,254],sel:"peri"},
+  pleural:{text:"A dark space that tracks behind the descending aorta. That is pleural fluid, not pericardial.",
+        fluid:"M96 268 C150 254 214 258 242 280 C262 294 304 282 340 250 L352 300 L92 300Z",label:["pleural fluid",236,287],sel:"dao",behind:1}
+ }},
+{id:"psax",name:"Short axis",full:"Parasternal short axis, papillary muscle level",tf:[1,0,0],
+ answers:"LV squeeze all the way round, the shape of the septum, fluid on every side.",
+ probe:"From the long-axis view, turn the probe 90 degrees clockwise so the marker points to the left shoulder.",
+ fix:"If the LV looks oval the cut is oblique: rotate the probe, do not tilt it.",
+ decor:[{k:"ln",d:"M124 190 C90 160 108 96 168 85 C188 82 204 90 210 104",w:5,g:150}],
+ S:[
+ {id:"rv",n:"RV",kind:"cav",d:"M128.2 186.6 C96 160 112 100 168 90 C186 87 200 94 206.6 108.2 A64 64 0 0 0 128.2 186.6Z",lab:"RV",lx:138,ly:128,tip:"A crescent wrapped around the front of the LV."},
+ {id:"lvw",n:"LV wall",kind:"mus",d:circ(190,170,62),tip:"Every part of the ring should thicken and move inward together."},
+ {id:"ivs",n:"Septum",kind:"mus",d:"M130.1 186 A62 62 0 0 1 206 110.1 L201.4 127.5 A44 44 0 0 0 147.5 181.4Z",tip:"The part of the ring facing the RV. It should stay curved like the rest of the circle."},
+ {id:"lv",n:"LV",kind:"cav",d:circ(190,170,44),lab:"LV",lx:190,ly:160,tip:"Round in a true short-axis cut."},
+ {id:"pm",n:"Papillary muscles",kind:"mus",d:circ(166,196,9)+" "+circ(214,194,9),tip:"Two bumps inside the cavity. Seeing both means the level is right."},
+ {id:"peri",n:"Pericardium",kind:"ln",d:"M122 216 C150 252 232 254 260 214",tip:"The bright line behind the LV."}
+ ]},
+{id:"sub",name:"Subcostal",full:"Subcostal four-chamber",tf:[0.85,18.5,45],
+ answers:"Fluid around the heart, RV size, and a view when the chest windows fail.",
+ probe:"Below the xiphoid, probe nearly flat, marker to the patient's left, hand on top of the probe. Knees bent.",
+ fix:"Add depth, ask for a breath in and hold, and slide toward the patient's right to look through the liver.",
+ decor:[{k:"mus",d:"M156 200 C186 210 230 212 272 200 C302 188 316 162 308 138 L318 138 C328 168 310 200 276 212 C232 224 184 222 154 212Z"}],
+ S:[
+ {id:"liv",n:"Liver",kind:"tis",d:"M60 60 C120 30 240 30 300 60 L304 108 C250 82 130 80 66 98Z",lab:"Liver",lx:180,ly:64,tip:"The window. The heart is seen through it."},
+ {id:"peri",n:"Pericardium",kind:"ln",d:"M68 102 C130 84 250 86 306 118",tip:"The bright line between the liver and the RV. Fluid shows here first in this view."},
+ {id:"ra",n:"RA",kind:"cav",d:"M70 110 C84 92 124 90 150 100 C156 118 152 136 142 148 C116 152 84 146 70 132Z",lab:"RA",lx:110,ly:122,tip:"Upper left, next to the liver."},
+ {id:"rv",n:"RV",kind:"cav",d:"M158 100 C200 92 262 100 300 122 C282 136 220 140 156 144 C158 130 160 114 158 100Z",lab:"RV",lx:222,ly:120,tip:"The chamber nearest the probe, lying against the liver."},
+ {id:"ivs",n:"Septum",kind:"mus",d:"M156 146 C220 142 282 138 302 124 L306 136 C284 152 222 156 156 158Z",tip:"Runs across the screen between the two ventricles."},
+ {id:"la",n:"LA",kind:"cav",d:"M72 158 C96 152 128 154 148 160 C156 178 150 196 136 206 C108 210 82 200 72 184Z",lab:"LA",lx:110,ly:182,tip:"Lower left, deep to the right atrium."},
+ {id:"lv",n:"LV",kind:"cav",d:"M158 162 C222 158 280 154 304 140 C312 160 300 184 270 196 C228 208 184 206 158 198 C154 186 154 172 158 162Z",lab:"LV",lx:228,ly:180,tip:"Deep to the RV, on the far side of the septum."},
+ {id:"tv",n:"Tricuspid valve",kind:"ln",d:"M154 102 L156 142",tip:"Between the right atrium and RV."},
+ {id:"mv",n:"Mitral valve",kind:"ln",d:"M154 162 L156 198",tip:"Between the left atrium and LV."}
+ ]},
+{id:"ivc",name:"IVC",full:"Subcostal IVC, long axis",tf:[0.85,27,30],
+ answers:"IVC size and how much it collapses, for right atrial pressure. Measure 0.5 to 3 cm from the atrium at end-expiration.",
+ probe:"From the subcostal view, centre the right atrium, then turn the marker toward the head.",
+ fix:"Check it is the IVC and not the aorta: the IVC enters the right atrium and receives a hepatic vein.",
+ decor:[],
+ S:[
+ {id:"liv",n:"Liver",kind:"tis",d:"M30 70 C110 40 250 40 330 80 L330 262 C240 250 120 250 30 262Z",lab:"Liver",lx:120,ly:120,tip:"Surrounds the IVC and the hepatic veins."},
+ {id:"ivc",n:"IVC",kind:"cav",d:"M40 170 C100 166 180 168 250 172 L250 196 C180 192 100 194 40 198Z",lab:"IVC",lx:120,ly:187,tip:"A thin-walled tube running into the right atrium. It narrows when the patient sniffs."},
+ {id:"hv",n:"Hepatic vein",kind:"cav",d:"M196 169 C200 150 190 130 170 116 L180 110 C204 126 214 148 210 169Z",tip:"Joins the IVC just before the atrium. The aorta has no such branch here."},
+ {id:"ra",n:"RA",kind:"cav",d:"M250 160 C280 150 320 160 330 190 C322 214 280 220 250 206Z",lab:"RA",lx:292,ly:190,tip:"Where the IVC ends. Seeing the junction proves the vessel is the IVC."},
+ {id:"site",n:"Where to measure",kind:"ln",d:"M222 171 L222 195",tip:"0.5 to 3 cm from the right atrium, just past the hepatic vein, at end-expiration."},
+ {id:"ao",n:"Aorta (look-alike)",kind:"art",d:"M60 226 C140 222 220 226 300 232 L300 250 C220 244 140 240 60 244Z",lab:"Ao",lx:150,ly:239,tip:"Deeper, thick-walled and pulsatile, and it does not enter the right atrium."}
+ ]},
+{id:"a4c",name:"Apical",full:"Apical four-chamber",tf:[1.15,-27,-8],
+ answers:"RV size against LV size, and both atria. Harder to get; a view cut short of the apex makes the LV look better than it is.",
+ probe:"At the apical impulse, marker to the patient's left. Steep left side-lying.",
+ fix:"A round apex means the view is cut short: move one space down and further out to the side.",
+ decor:[{k:"mus",d:"M192 52 C236 48 256 100 252 154 C250 170 244 180 238 186 L230 180 C236 172 240 164 240 152 C244 104 226 60 192 62Z"},
+        {k:"mus",d:"M178 66 C146 74 124 114 122 152 C122 166 126 176 130 184 L138 178 C134 172 132 164 132 150 C134 116 150 84 178 76Z"}],
+ S:[
+ {id:"lv",n:"LV",kind:"cav",d:"M192 62 C226 60 244 104 240 152 C238 166 234 174 228 180 L192 180Z",lab:"LV",lx:214,ly:126,tip:"On the right of the screen. It should form the apex."},
+ {id:"rv",n:"RV",kind:"cav",d:"M176 76 C150 84 134 116 132 150 C132 164 134 172 138 178 L176 178Z",lab:"RV",lx:156,ly:140,tip:"On the left. No more than two-thirds the size of the LV, and its tip stops short of the apex."},
+ {id:"ivs",n:"Septum",kind:"mus",d:"M178 74 C182 66 188 62 192 62 L192 182 L178 182Z",tip:"Should stand straight up the middle of the screen."},
+ {id:"tv",n:"Tricuspid valve",kind:"ln",d:"M176 176 L160 184 M138 176 L156 184",tip:"Sits a little closer to the apex than the mitral valve. That identifies the right side."},
+ {id:"mv",n:"Mitral valve",kind:"ln",d:"M192 182 L210 190 M228 182 L212 190",tip:"Between the left atrium and LV."},
+ {id:"ra",n:"RA",kind:"cav",d:"M174 186 C154 184 134 190 130 206 C128 228 142 244 160 246 C172 244 176 230 176 212Z",lab:"RA",lx:152,ly:218,tip:"Bottom left."},
+ {id:"la",n:"LA",kind:"cav",d:"M194 190 C214 186 236 190 242 206 C246 228 232 246 212 248 C198 246 192 232 192 214Z",lab:"LA",lx:217,ly:220,tip:"Bottom right."},
+ {id:"ias",n:"Atrial septum",kind:"ln",d:"M184 190 L184 244",tip:"Thin, and often drops out of the picture in this view."}
+ ]}
+];
+
+var view=VIEWS[0], state="normal", sel=null, pos=50;
+function tfAttr(v){return "matrix("+v.tf[0]+" 0 0 "+v.tf[0]+" "+v.tf[1]+" "+v.tf[2]+")"}
+function st(){return view.states?view.states[state]:null}
+function dOf(s){var x=st();return (s.peri&&x&&x.peri)?x.peri:s.d}
+function find(id){return view.S.filter(function(x){return x.id===id})[0]}
+
+function diagram(){
+  var x=st(),h='<rect class="bgr" width="360" height="300"/><path class="sector" d="'+SECTOR+'"/>';
+  h+='<clipPath id="sc"><path d="'+SECTOR+'"/></clipPath><g clip-path="url(#sc)"><g transform="'+tfAttr(view)+'">';
+  if(x&&x.fluid&&x.behind)h+='<path class="fluid" d="'+x.fluid+'"/>';
+  view.decor.forEach(function(d){h+=d.k==="ln"?'<path class="leaf" d="'+d.d+'"/>':'<path class="mus" d="'+d.d+'"/>'});
+  view.S.forEach(function(s){
+    var cls=s.kind==="ln"?(s.id==="peri"?"peri":"leaf"):s.kind;
+    if(s.peri&&x&&x.fluid&&!x.behind)h+='<path class="fluid" d="'+x.fluid+'"/>';
+    h+='<path class="'+cls+'" d="'+dOf(s)+'"/>';
+  });
+  h+='</g></g><g transform="'+tfAttr(view)+'">';
+  view.S.forEach(function(s){if(s.lab)h+='<text x="'+s.lx+'" y="'+(s.ly+4)+'">'+s.lab+'</text>'});
+  if(x&&x.label)h+='<text class="fl" x="'+x.label[1]+'" y="'+x.label[2]+'">'+x.label[0]+'</text>';
+  return h+'</g>';
+}
+function highlight(){
+  var h='<g transform="'+tfAttr(view)+'">';
+  if(sel){var s=find(sel);if(s){h+='<path class="halo" d="'+dOf(s)+'"/><path class="mark'+(s.kind==="ln"?" ln":"")+'" d="'+dOf(s)+'"/>'}}
+  var big=view.S.filter(function(x){return x.kind!=="ln"}),thin=view.S.filter(function(x){return x.kind==="ln"});
+  /* largest first so that small structures stay tappable on top */
+  big.concat(thin).forEach(function(x){h+='<path class="hit" data-id="'+x.id+'" d="'+dOf(x)+'"/>'});
+  return h+'</g>';
+}
+
+/* Scan stand-in: the same geometry drawn as a B-mode picture. Replaced by licensed frames in /media/pocus/. */
+function rng(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function g(v){return "rgb("+v+","+v+","+v+")"}
+function drawScan(){
+  var c=$("#scan"),x=c.getContext("2d"),xs=st();
+  x.setTransform(1,0,0,1,0,0);x.globalAlpha=1;x.fillStyle=g(5);x.fillRect(0,0,720,600);
+  x.setTransform(2,0,0,2,0,0);
+  x.save();x.clip(new Path2D(SECTOR));
+  var grd=x.createLinearGradient(0,8,0,293);grd.addColorStop(0,g(120));grd.addColorStop(.1,g(74));grd.addColorStop(.6,g(52));grd.addColorStop(1,g(30));
+  x.fillStyle=grd;x.fillRect(0,0,360,300);
+  x.transform(view.tf[0],0,0,view.tf[0],view.tf[1],view.tf[2]);
+  function soft(fn,blur,col){x.save();x.shadowColor=col;x.shadowBlur=blur;fn();x.restore()}
+  function fill(d,v,b){soft(function(){x.fillStyle=g(v);x.fill(new Path2D(d))},b,g(v))}
+  function line(d,v,w,b){soft(function(){x.strokeStyle=g(v);x.lineWidth=w;x.lineCap="round";x.stroke(new Path2D(d))},b,g(v))}
+  if(xs&&xs.fluid&&xs.behind)fill(xs.fluid,4,6);
+  view.decor.forEach(function(d){if(d.k==="ln")line(d.d,d.g||150,d.w||4,5);else fill(d.d,150,8)});
+  view.S.forEach(function(s){
+    if(s.kind==="tis")fill(s.d,96,6);
+    else if(s.kind==="mus")fill(s.d,s.id==="ivs"?168:158,7);
+    else if(s.kind==="cav")fill(s.d,7,5);
+    else if(s.kind==="art"){fill(s.d,8,3);line(s.d,180,2.6,4)}
+  });
+  if(xs&&xs.fluid&&!xs.behind)fill(xs.fluid,4,3);
+  view.S.forEach(function(s){
+    if(s.kind!=="ln"||s.id==="site")return;
+    if(s.id==="peri")line(dOf(s),240,5,6);else line(s.d,215,2.4,3);
+  });
+  x.restore();
+  var im=x.getImageData(0,0,720,600),d=im.data,r=rng(7);
+  for(var yy=0;yy<600;yy+=2){for(var xx=0;xx<720;xx+=2){
+    var a=r(),b=r(),m=0.5+0.95*a*Math.sqrt(b+0.2);
+    for(var dy=0;dy<2;dy++)for(var dx=0;dx<2;dx++){
+      var i=((yy+dy)*720+(xx+dx))*4,v=d[i];
+      if(v>6){v=Math.min(255,v*m*1.25+(a-0.5)*8);d[i]=d[i+1]=d[i+2]=v<0?0:v}
+    }}}
+  x.putImageData(im,0,0);
+  var o=document.createElement("canvas");o.width=360;o.height=300;o.getContext("2d").drawImage(c,0,0,360,300);
+  x.setTransform(1,0,0,1,0,0);x.globalAlpha=.75;x.drawImage(o,0,0,720,600);x.globalAlpha=1;
+  x.setTransform(2,0,0,2,0,0);
+  x.fillStyle=g(150);
+  for(var t=1;t<=5;t++){x.fillRect(352,8+t*46,5,1)}
+  x.beginPath();x.arc(196,14,3.2,0,6.3);x.fill();
+}
+
+function setPos(p){pos=Math.max(0,Math.min(100,p));
+  $("#diagram").style.clipPath="inset(0 0 0 "+pos+"%)";$("#handle").style.left=pos+"%";
+  $("#handle").setAttribute("aria-valuenow",Math.round(pos));$("#pillL").hidden=pos<14;$("#pillR").hidden=pos>86}
+function paintFig(){
+  $("#diagram").innerHTML=diagram();
+  $("#diagram").setAttribute("aria-label","Labelled anatomy: "+view.full);
+  $("#scan").setAttribute("aria-label","Ultrasound stand-in drawing: "+view.full);
+  $("#hl").innerHTML=highlight();
+  setPos(pos);
+  var info=$("#info"),s=sel&&find(sel);
+  if(s){info.className="info";info.innerHTML="<b>"+s.n+".</b> "+s.tip}
+  else{info.className="info idle";info.textContent=view.full+". Drag the handle; tap any structure to name it."}
+  $("#chips").innerHTML=view.S.map(function(s){return '<button type="button" data-id="'+s.id+'" aria-pressed="'+(sel===s.id)+'">'+s.n+'</button>'}).join("");
+}
+function paintView(){
+  $("#viewpick").innerHTML=VIEWS.map(function(v){return '<button type="button" data-v="'+v.id+'" aria-pressed="'+(v===view)+'">'+v.name+'</button>'}).join("");
+  $("#how").innerHTML='<div class="row"><span class="k">Answers</span><span>'+view.answers+'</span></div><div class="row"><span class="k">Probe</span><span>'+view.probe+'</span></div><div class="row"><span class="k">Poor view</span><span>'+view.fix+'</span></div>';
+  $("#compare").hidden=!view.states;
+  if(view.states){$("#stateText").textContent=st().text;$$("#states button").forEach(function(b){b.setAttribute("aria-pressed",String(b.dataset.s===state))})}
+  drawScan();paintFig();
+}
+
+$("#viewpick").addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;
+  view=VIEWS.filter(function(v){return v.id===b.dataset.v})[0];state="normal";sel=null;pos=50;paintView()});
+$("#states").addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;state=b.dataset.s;sel=st().sel||null;paintView()});
+$("#chips").addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;sel=sel===b.dataset.id?null:b.dataset.id;paintFig()});
+$("#hl").addEventListener("click",function(e){var t=e.target.closest("[data-id]");if(!t)return;var id=t.getAttribute("data-id");sel=sel===id?null:id;paintFig();
+  var c=document.querySelector('#chips button[data-id="'+id+'"]');if(c&&c.scrollIntoView)c.scrollIntoView({block:"nearest",inline:"center"})});
+var dragging=false,fig=$("#fig"),hd=$("#handle");
+function fromX(cx){var r=fig.getBoundingClientRect();setPos((cx-r.left)/r.width*100)}
+hd.addEventListener("pointerdown",function(e){dragging=true;hd.setPointerCapture(e.pointerId);e.preventDefault()});
+hd.addEventListener("pointermove",function(e){if(dragging)fromX(e.clientX)});
+hd.addEventListener("pointerup",function(){dragging=false});
+hd.addEventListener("pointercancel",function(){dragging=false});
+hd.addEventListener("keydown",function(e){var step=e.key==="ArrowLeft"?-5:e.key==="ArrowRight"?5:e.key==="Home"?-100:e.key==="End"?100:0;if(!step)return;e.preventDefault();setPos(pos+step)});
+
+/* tabs */
+$$("nav.tabs button").forEach(function(b){b.addEventListener("click",function(){
+  $$("nav.tabs button").forEach(function(x){x.setAttribute("aria-selected",String(x===b))});
+  $$("section.view").forEach(function(s){s.classList.toggle("on",s.id===b.getAttribute("aria-controls"))});
+  window.scrollTo(0,0)})});
+function openHash(){var id=location.hash.slice(1);if(!id)return;var el=document.getElementById(id);if(!el)return;var sec=el.closest("section.view");
+  if(sec&&!sec.classList.contains("on")){var t=document.getElementById("t-"+sec.id);if(t)t.click()}
+  if(el!==sec)el.scrollIntoView()}
+window.addEventListener("hashchange",openHash);
+
+/* IVC to right atrial pressure (ASE right heart guideline 2025) */
+function ivcEngine(d,collapses,vent){
+  var big=d>2.1;
+  if(vent)return {z:null,ans:big?"On positive-pressure ventilation the collapse rule does not apply, and a large IVC does not give a number. Use other signs or a measured pressure.":"On positive-pressure ventilation the collapse rule does not apply. An IVC of 2.1 cm or less still suggests a right atrial pressure under 10 mm Hg.",
+    rows:[["What is happening","The ventilator raises chest pressure on inspiration, so the IVC no longer empties the way it does with a spontaneous breath."],["Why the rule","Collapse was validated in people breathing on their own. Only the size cut-off carries over."],["At the bedside","Do not chart 3, 8 or 15 from collapse. Look at hepatic vein flow, the atrial septum, or measure the pressure."]]};
+  var z=(!big&&collapses)?3:(big&&!collapses)?15:8;
+  var ans=z===3?"About 3 mm Hg (range 0 to 5). Normal.":z===15?"About 15 mm Hg (range 10 to 20). High.":"About 8 mm Hg (range 5 to 10). In between: the size and the collapse disagree.";
+  var rows=z===3?[["What is happening","A normal-sized IVC that empties on a sniff: right atrial pressure is low enough for inspiration to pull blood through."],["Why the rule","2.1 cm and 50% are the cut-offs the guideline assigns to a normal pressure."],["At the bedside","A small, nearly flat IVC with a small hyperdynamic LV fits low filling."]]
+   :z===15?[["What is happening","A wide IVC that barely moves: right atrial pressure is high enough to hold it open through inspiration."],["Why the rule","Both markers point the same way, so the guideline assigns the high value."],["At the bedside","Look for the cause on the same scan: a poor LV, a large RV, or fluid around the heart."]]
+   :[["What is happening",big?"The IVC is wide but still collapses.":"The IVC is normal in size but does not collapse."],["Why the rule","When size and collapse disagree the guideline assigns the middle value and asks for supporting signs."],["At the bedside","A large IVC that collapses can be normal in young adults, athletes and pregnancy."]];
+  var extra=(big&&!collapses&&d>2.5)?true:false;
+  return {z:z,ans:ans,rows:rows,extra:extra};
+}
+function paintIvc(){
+  var d=parseFloat($("#ivcd").value),c=$('#ivcc button[aria-pressed=true]').dataset.c==="1",v=$("#ivcv").getAttribute("aria-pressed")==="true";
+  var r=ivcEngine(d,c,v);
+  $("#ivcdv").textContent=d.toFixed(1)+" cm";
+  $("#zones").classList.toggle("off",v);
+  $$("#zones span").forEach(function(s){var z=+s.dataset.z;s.classList.toggle("on",!v&&(z===r.z||(z===20&&r.extra)))});
+  $("#ivcans").textContent=r.ans+(r.extra?" Over 2.5 cm with no change at all and dilated hepatic veins: 20 mm Hg can be considered.":"");
+  $("#ivcdp").innerHTML=r.rows.map(function(x){return "<div><span>"+x[0]+"</span><span>"+x[1]+"</span></div>"}).join("");
+  $$("#ivcc button").forEach(function(b){b.disabled=v});
+}
+$("#ivcd").addEventListener("input",paintIvc);
+$("#ivcc").addEventListener("click",function(e){var b=e.target.closest("button");if(!b||b.disabled)return;$$("#ivcc button").forEach(function(x){x.setAttribute("aria-pressed",String(x===b))});paintIvc()});
+$("#ivcv").addEventListener("click",function(){var b=$("#ivcv");b.setAttribute("aria-pressed",String(b.getAttribute("aria-pressed")!=="true"));paintIvc()});
+
+window.__ivcEngine=ivcEngine;
+paintView();paintIvc();openHash();
+})();
+</script>
+</body>
+</html>
