@@ -48,7 +48,18 @@ A tool adds nothing for this and must work with no connection after one load. **
 
 ## Header and footer
 
-- Header: a small "← bedside.tools" link to `/`, the tool name, a one-line purpose. **[checked: link]**
+- Header: `<a class="back" href="/">← bedside.tools</a>`, the tool name, a one-line purpose. **[checked: link]**
+  `theme.js` replaces that link with the site's navigation bar, which stays at the top of every tool: Back
+  (one step: the previous tab, then the previous page), the bedside.tools mark (home), and the tool's name
+  once the heading has scrolled away (tap: back to the top). The link stays in the page for when scripts are
+  off. A tool builds no navigation of its own.
+- Tabs: the main tab row is `role="tablist"` holding `role="tab"` buttons with `aria-selected`. `theme.js`
+  relies on that to make each tab change one Back step and to fade the edge of a row that scrolls sideways.
+- Sticky elements: `top:var(--bt-bar,0px)` (or `calc(var(--bt-bar,0px) + Npx)`), never `top:0`, so they sit
+  under the navigation bar. Keep `z-index` under 10 for sticky rows; sheets and their scrims are 20 or more.
+- Taps: `theme.js` gives every control its pressed state, removes the double-tap wait, and keeps fields at
+  16 px on phones (a smaller field makes a phone zoom the page). A tool adds no `:active` or tap-highlight
+  rules. Controls are real `<button>`, `<a>`, `<summary>`, `<select>`, `<input>` or `<label>` elements.
 - Footer, as plain paragraphs (theme.js collapses them into one "Disclaimers and sources" dropdown; do not
   build a dropdown in the tool): **[checked]**
   - `For education only. Not a substitute for clinical judgment.`
