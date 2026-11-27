@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Emergent dialysis and CRRT · bedside.tools</title>
+<meta name="description" content="Emergent dialysis in acute kidney injury: whether to start now, intermittent or continuous, access, circuit anticoagulation, reading a CRRT prescription, citrate accumulation, and drug dosing principles on CRRT.">
+<script src="/theme.js"></script>
+<style>
+:root{--bg:#FBFBFA;--card:#FFFFFF;--ink:#111113;--muted:#55555D;--line:#ECECEE;--accent:#2B4BDB;--warn:#9A3B00;--warnbg:#FFF6EC}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5}
+.mono{font-family:var(--mono)}
+.wrap{max-width:720px;margin:0 auto;padding:20px 16px 48px}
+a{color:var(--accent)}
+.back{font-size:14px;text-decoration:none;display:inline-block;min-height:44px;line-height:44px}
+h1{font-size:26px;margin:4px 0 4px;letter-spacing:-.01em}
+.purpose{color:var(--muted);margin:0 0 20px}
+.tabs{display:flex;gap:6px;margin-bottom:16px}
+.tab{flex:1;min-width:0;min-height:44px;border:1px solid var(--line);background:var(--card);border-radius:14px;padding:0 4px;font:inherit;font-size:15px;font-weight:600;color:var(--muted);cursor:pointer}
+.tab[aria-selected="true"]{border-color:var(--accent);color:var(--accent)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
+.label{font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+.grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.field{display:flex;flex-direction:column;justify-content:flex-end}
+.field label{display:block;font-size:13px;color:var(--muted);margin-bottom:4px}
+.field input{width:100%;min-height:44px;border:1px solid var(--line);border-radius:10px;padding:8px 10px;font:inherit;font-family:var(--mono);background:var(--card);color:var(--ink)}
+.field input:focus,.tab:focus-visible,.chk:focus-within,button:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.checks{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.chk{display:flex;align-items:center;gap:10px;min-height:44px;border:1px solid var(--line);border-radius:10px;padding:6px 10px;font-size:14px;cursor:pointer}
+.chk input{width:20px;height:20px;accent-color:var(--accent);flex:none}
+.q{font-size:13px;color:var(--muted);margin:14px 0 0}
+.seg{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.card h2{font-size:18px;margin:0 0 2px}
+.head{font-family:var(--mono);font-size:17px;font-weight:600;margin:6px 0 4px;overflow-wrap:anywhere}
+.head.bad{color:var(--bad)}.head.okc{color:var(--ok)}.head.wn{color:var(--warn)}
+.sub{font-size:14px;color:var(--muted);margin:0}
+.card ul,.card ol{margin:6px 0 0;padding-left:20px}
+.card li{margin-bottom:4px}
+.guard{border-left:3px solid var(--warn);background:var(--warnbg);padding:8px 10px;border-radius:0 10px 10px 0;margin-top:8px;font-size:14.5px}
+.guard.bad{border-left-color:var(--bad);background:var(--badbg)}
+.tier{display:inline-block;font-family:var(--mono);font-size:11px;border:1px solid var(--line);border-radius:999px;padding:2px 8px;color:var(--muted);margin:6px 6px 0 0}
+details{margin-top:10px;border-top:1px solid var(--line);padding-top:8px}
+.whyline{margin:10px 0 0;font-size:14.5px;color:var(--muted)}
+.whyline b{color:var(--ink);font-weight:600}
+summary{cursor:pointer;color:var(--accent);font-weight:600;min-height:44px;line-height:44px}
+details p{margin:0 0 8px;font-size:15px}
+details li{font-size:15px}
+.empty{color:var(--muted)}
+.btn{min-height:44px;border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);border-radius:10px;padding:8px 14px;font:inherit;font-weight:600;cursor:pointer}
+.btn.ghost{background:var(--card);color:var(--accent)}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.note{font-size:14px;color:var(--muted)}
+.nums{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:10px}
+.num{background:var(--fill);border-radius:10px;padding:6px 8px}
+.num span{display:block;font-size:12px;color:var(--muted)}
+.num b{font-family:var(--mono);font-size:14px}
+.num.hot{box-shadow:inset 0 0 0 1.5px var(--warn)}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:6px 6px 6px 0;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:var(--mono);font-size:11.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);font-weight:500}
+.tw{overflow-x:auto}
+.case h2{font-size:17px}
+.ans{margin-top:10px;border-top:1px solid var(--line);padding-top:10px}
+.ans .card{border-color:var(--line);margin:10px 0 0}
+footer{margin-top:28px;font-size:13.5px;color:var(--muted)}
+footer p{margin:0 0 8px}
+@media (min-width:900px){
+  .wrap{max-width:1040px}
+  #p-pt.on{display:grid;grid-template-columns:360px minmax(0,1fr);gap:20px;align-items:start}
+  #inputs{position:sticky;top:calc(var(--bt-bar,0px) + 16px);max-height:calc(100vh - 32px - var(--bt-bar,0px));overflow-y:auto}
+  .refgrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;align-items:start}
+  #narrow,#kdigo{grid-column:1 / -1}
+  #p-learn{max-width:720px;margin:0 auto}
+  .refgrid .card{margin-bottom:0}
+  #inputs .grid{grid-template-columns:1fr 1fr}
+  #inputs .checks{grid-template-columns:1fr}
+}
+.panel{display:none}.panel.on{display:block}
+.fig{display:block;width:100%;max-width:460px;height:auto;margin:0 auto}
+.states{display:flex;gap:6px;overflow-x:auto;margin:10px -16px;padding:2px 16px 6px;scrollbar-width:none}
+.states::-webkit-scrollbar{display:none}
+.sbtn{flex:none;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--ink);font:inherit;font-size:14px;cursor:pointer;white-space:nowrap}
+.sbtn[aria-pressed="true"]{border-color:var(--accent);color:var(--accent);font-weight:600}
+.line1{font-size:15px;margin:10px 0 0}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.chip{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--fill);color:var(--ink);font:inherit;font-size:14px;cursor:pointer}
+.chip svg{flex:none;color:var(--accent)}
+.scrim{position:fixed;inset:0;background:var(--scrim);z-index:20}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:21;max-height:90vh;overflow-y:auto;background:var(--card);border:1px solid var(--line);border-bottom:0;border-radius:20px 20px 0 0;padding:8px 16px 24px;max-width:560px;margin:0 auto}
+.sheethead{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.sheethead h2{font-size:18px;margin:0}
+.xbtn{min-height:44px;min-width:44px;border:0;background:transparent;color:var(--accent);font:inherit;font-weight:600;cursor:pointer}
+.pills{position:sticky;top:var(--bt-bar,0px);z-index:5;background:var(--bg);display:flex;gap:6px;overflow-x:auto;margin:0 -16px 12px;padding:8px 16px;border-bottom:1px solid var(--line);scrollbar-width:none}
+.pills::-webkit-scrollbar{display:none}
+.pill{flex:none;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--muted);font:inherit;font-size:14px;cursor:pointer;white-space:nowrap}
+.pill[aria-current="true"]{border-color:var(--accent);color:var(--accent);font-weight:600}
+.chap{scroll-margin-top:70px}
+.cause{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:8px 0;border-top:1px solid var(--line);font-size:15px}
+.cause small{color:var(--muted);font-size:13px;text-align:right;flex:0 1 55%}
+.cause.less{opacity:.6}
+.cause.less span{color:var(--muted);text-decoration:line-through}
+.cause.fav span{font-weight:700}
+.cause.fav span:before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--accent);margin-right:8px}
+.ptr{border-top:1px solid var(--line);padding:8px 0}
+.ptr b{display:block}
+.ptr span{font-size:14px;color:var(--muted)}
+.trial{border-left:3px solid var(--accent);padding-left:12px}
+.trial p{margin:0 0 6px;font-size:15px}
+.trial .k{font-family:var(--mono);font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);display:block}
+@media (max-width:420px){.grid{grid-template-columns:1fr 1fr}.checks{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+.deeper{margin-top:14px;border-top:1px solid var(--line)}
+.deeper>summary{min-height:44px;display:flex;align-items:center;gap:8px;color:var(--accent);font-weight:600;font-size:15px;cursor:pointer;list-style:none}
+.deeper>summary::-webkit-details-marker{display:none}
+.deeper>summary::before{content:"+";font-family:var(--mono);font-size:18px;line-height:1;width:14px;text-align:center}
+.deeper[open]>summary::before{content:"\2212"}
+.deeper>summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.deeper .dpx{border:1px solid var(--line);border-radius:12px;padding:2px 12px;background:var(--card);text-align:left}
+.deeper .dpx>div{padding:10px 0;border-top:1px solid var(--line)}
+.deeper .dpx>div:first-child{border-top:0}
+.deeper .dl{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500;margin:0 0 3px}
+.deeper p{font-size:15px;line-height:1.45;color:var(--ink);margin:0 0 4px}
+.deeper p:last-child{margin-bottom:0}
+/* cause-fix: ruled-out causes stay readable; the name greys, the reason does not fade */
+.cause.out,.cause.less,.cause.unl{opacity:1}
+.cause.less>span,.cause.unl>span{color:var(--muted)}
+.plate{margin:12px 0 4px}
+.plate img{display:block;width:100%;height:auto;border-radius:10px;border:1px solid var(--line)}
+.plate figcaption{font-size:13px;color:var(--muted);margin-top:6px}
+@media (max-width:560px){.tabs{display:grid;grid-template-columns:repeat(3,1fr)}}
+.zone{display:flex;gap:3px;margin-top:10px}
+.zone span{flex:1;min-width:0;border-radius:6px;background:var(--fill);color:var(--muted);font-family:var(--mono);font-size:11px;line-height:1.25;padding:6px 4px;text-align:center}
+.zone span.on{background:var(--accent);color:var(--accent-ink);font-weight:600}
+.zone span.on.wz{background:var(--warn);color:var(--warnbg)}
+.zname{font-size:14.5px;margin:6px 0 0}
+.dp{margin-top:8px;border-top:1px solid var(--line)}
+.dp>div{padding:8px 0;border-bottom:1px solid var(--line)}
+.dp .dl{display:block;font-family:var(--mono);font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+.dp p{margin:2px 0 0;font-size:14.5px}
+.fx{font-family:var(--mono);font-size:13px;color:var(--muted);margin:6px 0 0;overflow-wrap:anywhere}
+.steps{margin:6px 0 0;padding-left:20px}
+.steps li{margin-bottom:4px}
+.seg .sbtn{flex:0 1 auto}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="/">← bedside.tools</a>
+<h1>Emergent dialysis and CRRT</h1>
+<p class="purpose">Whether to start now, which kind, how to read the prescription, and what it does to drugs.</p>
+
+<div class="tabs" role="tablist">
+  <button class="tab" role="tab" id="t-pt" aria-selected="true" aria-controls="p-pt">Patient</button>
+  <button class="tab" role="tab" id="t-rx" aria-selected="false" aria-controls="p-rx">CRRT orders</button>
+  <button class="tab" role="tab" id="t-drug" aria-selected="false" aria-controls="p-drug">Drugs</button>
+  <button class="tab" role="tab" id="t-learn" aria-selected="false" aria-controls="p-learn">Learn</button>
+  <button class="tab" role="tab" id="t-prac" aria-selected="false" aria-controls="p-prac">Practice</button>
+</div>
+
+<div class="panel on" id="p-pt" role="tabpanel" aria-labelledby="t-pt">
+  <div id="inputs">
+  <div class="card" id="indications">
+    <p class="label">Emergent indications: tick only if medical treatment is not holding</p>
+    <div class="checks" id="ticks-i"></div>
+    <p class="note" style="margin:10px 0 0">KDIGO gives no potassium, pH or bicarbonate number for starting. The question is whether the problem is life-threatening and not responding to treatment.</p>
+  </div>
+  <div class="card" id="course">
+    <p class="label">Kidney course</p>
+    <p class="q" style="margin-top:0">KDIGO AKI stage (<a href="/aki/">stage it in the AKI tool</a>)</p>
+    <div class="seg" data-seg="stage" role="group" aria-label="KDIGO stage">
+      <button class="sbtn" data-v="0" aria-pressed="true">Not sure</button>
+      <button class="sbtn" data-v="1" aria-pressed="false">1</button>
+      <button class="sbtn" data-v="2" aria-pressed="false">2</button>
+      <button class="sbtn" data-v="3" aria-pressed="false">3</button>
+    </div>
+    <div class="grid" style="margin-top:12px">
+      <div class="field"><label for="olig">Oliguric for (h)</label><input id="olig" inputmode="decimal" autocomplete="off"></div>
+      <div class="field"><label for="bun">BUN (mg/dL)</label><input id="bun" inputmode="decimal" autocomplete="off"></div>
+    </div>
+    <div class="checks" id="ticks-c"></div>
+  </div>
+  <div class="card" id="hemo">
+    <p class="label">Circulation and brain</p>
+    <div class="checks" id="ticks-h"></div>
+  </div>
+  <div class="card" id="bleed">
+    <p class="label">Clotting, bleeding and liver</p>
+    <div class="checks" id="ticks-b"></div>
+  </div>
+  </div>
+  <div id="out"><div class="card empty">Tick an indication or enter the kidney course to start. Add circulation, brain and clotting details to choose the modality and the circuit anticoagulant.</div></div>
+</div>
+
+<div class="panel" id="p-rx" role="tabpanel" aria-labelledby="t-rx">
+  <div class="refgrid">
+  <div class="card" id="rxcalc">
+    <p class="label">Read a CRRT prescription</p>
+    <p class="note" style="margin:0 0 10px">Flows as written on the order, in mL/h unless marked. Leave a field empty if it is not used: replacement only is CVVH, dialysate only is CVVHD, both is CVVHDF.</p>
+    <div class="grid">
+      <div class="field"><label for="wt">Weight (kg)</label><input id="wt" inputmode="decimal" autocomplete="off"></div>
+      <div class="field"><label for="ht">Height (cm), optional</label><input id="ht" inputmode="decimal" autocomplete="off"></div>
+      <div class="field"><label for="qb">Blood flow (mL/min)</label><input id="qb" inputmode="decimal" autocomplete="off"></div>
+      <div class="field"><label for="hct">Hematocrit (%)</label><input id="hct" inputmode="decimal" autocomplete="off"></div>
+      <div class="field"><label for="qpre">Replacement before filter</label><input id="qpre" inputmode="decimal" autocomplete="off"></div>
+      <div class="field"><label for="qpost">Replacement after filter</label><input id="qpost" inputmode="decimal" autocomplete="off"></div>
+      <div class="field"><label for="qd">Dialysate</label><input id="qd" inputmode="decimal" autocomplete="off"></div>
+      <div class="field"><label for="qnet">Net fluid removal</label><input id="qnet" inputmode="decimal" autocomplete="off"></div>
+    </div>
+    <div id="rxout" style="margin-top:12px"></div>
+  </div>
+  <div class="card" id="citrate">
+    <p class="label">Citrate: total-to-ionized calcium ratio</p>
+    <div class="grid">
+      <div class="field"><label for="tca">Total calcium</label><input id="tca" inputmode="decimal" autocomplete="off"></div>
+      <div class="field"><label for="ica">Ionized calcium</label><input id="ica" inputmode="decimal" autocomplete="off"></div>
+    </div>
+    <p class="q">Total calcium unit</p>
+    <div class="seg" data-seg="tcu" role="group" aria-label="Total calcium unit">
+      <button class="sbtn" data-v="mg" aria-pressed="true">mg/dL</button>
+      <button class="sbtn" data-v="mmol" aria-pressed="false">mmol/L</button>
+    </div>
+    <p class="q">Ionized calcium unit</p>
+    <div class="seg" data-seg="icu" role="group" aria-label="Ionized calcium unit">
+      <button class="sbtn" data-v="mmol" aria-pressed="true">mmol/L</button>
+      <button class="sbtn" data-v="mg" aria-pressed="false">mg/dL</button>
+    </div>
+    <div id="caout" style="margin-top:12px"></div>
+  </div>
+  <div class="card" id="ihd">
+    <p class="label">Intermittent or prolonged intermittent dose</p>
+    <p>Deliver a Kt/V of 3.9 per week (KDIGO 2012 5.8.3, 1A), for example 1.3 three times a week (KDIGO rationale). Prescribe the dose before each session and check what was delivered (5.8.1, 1B).</p>
+    <p class="note">Prolonged intermittent therapy (SLED, PIRRT) usually runs 6 to 10 hours a day (Jang 2020).</p>
+    <span class="tier">KDIGO 2012 1A · 1B</span><span class="tier">KDIGO 2026 draft Rec 5.3.1, 1B</span>
+  </div>
+  <div class="card" id="losses">
+    <p class="label">What CRRT takes out besides toxins</p>
+    <ul>
+      <li><b>Phosphate.</b> Low phosphate is common (54% at 25 and 65% at 40 mL/kg/h in RENAL). Phosphate-containing CRRT solutions, used by protocol, prevent most of it (Broman 2011; Pistolesi 2019); with standard fluids, check and replace phosphate. The <a href="/electrolytes/">electrolyte tool</a>'s "on dialysis" rows are for maintenance intermittent dialysis, not CRRT.</li>
+      <li><b>Magnesium.</b> Check daily on citrate: citrate binds it as well as calcium.</li>
+      <li><b>Potassium.</b> Keeps falling while the circuit runs; recheck on the unit's schedule.</li>
+      <li><b>Heat.</b> Hypothermia is common: 53% reached 35 °C or below in the first 48 hours in one single-centre series, commoner in shock and with hemodiafiltration even though that group had a warmed return line. Check the temperature, and remember the circuit can hide a fever.</li>
+      <li><b>Drugs.</b> Anything small and not protein-bound comes out. See the Drugs tab.</li>
+    </ul>
+    <p class="note">Recheck schedule and bag choice: adjust to your institution's CRRT protocol.</p>
+    <span class="tier">RENAL 2009</span><span class="tier">Broman 2011 (non-randomized)</span><span class="tier">Pistolesi 2019 (review)</span><span class="tier">Schneider 2017 (review)</span><span class="tier">Morsch 2021 (observational)</span><span class="tier">Fever masking, potassium: expert practice</span>
+  </div>
+  <div class="card" id="stop">
+    <p class="label">When to stop</p>
+    <p>Stop when the kidneys meet the patient's needs, or when dialysis no longer fits the goals of care (KDIGO 2012 5.2.1, not graded).</p>
+    <ul>
+      <li>A trial off is reasonable when urine output is over 450 mL a day without diuretics, or over 2300 mL a day with them, and a 2-hour timed creatinine clearance is 23 mL/min or more (KDIGO 2026 draft PP 5.9.3).</li>
+      <li>Urine output predicted success best without diuretics (area under the curve 0.845, against 0.671 with diuretics; BEST Kidney, Uchino 2009). It predicts success; it is not a requirement.</li>
+      <li>Diuretics do not speed recovery or shorten dialysis (KDIGO 2012 5.2.2, 2B); they can still manage fluid around stopping (draft PP 5.9.4).</li>
+    </ul>
+    <span class="tier">KDIGO 2012 not graded · 2B</span><span class="tier">KDIGO 2026 draft PP</span><span class="tier">Uchino 2009 (observational)</span>
+  </div>
+  </div>
+</div>
+
+<div class="panel" id="p-drug" role="tabpanel" aria-labelledby="t-drug">
+  <div class="refgrid">
+  <div class="card" id="drug-principles">
+    <p class="label">What decides how much CRRT removes</p>
+    <ul>
+      <li><b>Protein binding.</b> Only the free drug crosses. The sieving coefficient is roughly 1 minus the bound fraction: 0 means not removed, 1 means freely removed.</li>
+      <li><b>Volume of distribution.</b> Removal matters most for drugs with a small volume, low binding and mainly renal clearance; little for lipophilic drugs cleared mainly outside the kidney (for example linezolid; levofloxacin and ciprofloxacin are exceptions because they are cleared by the kidney).</li>
+      <li><b>Effluent rate.</b> Blood flow is much higher than effluent flow, so the effluent rate sets drug clearance: more effluent, more removal.</li>
+      <li><b>Pre-filter replacement</b> dilutes the blood entering the filter and lowers clearance.</li>
+      <li><b>Low albumin</b> raises the free fraction of highly bound drugs, so more is removed.</li>
+    </ul>
+    <span class="tier">Jang 2020 (review)</span><span class="tier">Pea 2007 (review)</span>
+  </div>
+  <div class="card" id="clcalc">
+    <p class="label">Estimate drug clearance by the circuit</p>
+    <p class="note" style="margin:0 0 10px">Uses the flows on the CRRT orders tab. A teaching estimate: dose with pharmacy.</p>
+    <div class="grid">
+      <div class="field"><label for="pb">Protein bound (%)</label><input id="pb" inputmode="decimal" autocomplete="off"></div>
+    </div>
+    <div id="clout" style="margin-top:12px"></div>
+  </div>
+  <div class="card" id="drug-rules">
+    <p class="label">Rules that prevent underdosing</p>
+    <ul>
+      <li><b>Loading dose:</b> at least the standard dose. The volume of distribution is usually unchanged or larger in critical illness; CRRT changes only the doses after (Wong 2015).</li>
+      <li><b>Maintenance:</b> based on total clearance, which moves with the effluent rate. Tell pharmacy the effluent rate and when it changes.</li>
+      <li><b>Interruptions:</b> a clotted filter, a trip to CT or a bag change lowers delivered clearance; tell pharmacy when CRRT has been off.</li>
+      <li><b>Levels:</b> draw from the patient or a pre-filter port, never after the filter.</li>
+      <li>Choosing the antibiotic: <a href="/abx-empiric/">empiric antibiotics</a>. This tool gives no drug dose table of its own.</li>
+    </ul>
+    <span class="tier">Wong 2015 (review)</span><span class="tier">Jang 2020 (review)</span>
+  </div>
+  </div>
+</div>
+
+<div class="panel" id="p-learn" role="tabpanel" aria-labelledby="t-learn">
+  <div class="pills" id="pills"></div>
+  <section class="chap card" id="learn-modes" data-pill="Filter">
+    <p class="label">1 · How blood is cleaned</p>
+    <h2>Diffusion and convection</h2>
+    <figure class="plate" style="margin-left:0;margin-right:0"><img src="/media/dialysis/circuit.webp" width="900" height="514" loading="lazy" alt="A patient in an ICU bed with a dialysis catheter in the neck. Two blood lines run to a CRRT machine beside the bed with a roller blood pump and a vertical cylindrical filter; fluid bags hang above and an effluent bag collects below."><figcaption>The circuit: blood leaves the catheter, a pump drives it through the filter, and it returns. Fluid bags hang above, effluent collects below. Created with BioRender.com</figcaption></figure>
+    <p class="line1">Diffusion moves small solutes down a concentration gradient into dialysate. Convection drags solutes along with water pushed across the membrane, which carries larger molecules too.</p>
+    <div data-figure="modes"></div>
+    <figure class="plate" style="margin-left:0;margin-right:0"><img src="/media/dialysis/diffusion-convection.webp" width="850" height="465" loading="lazy" alt="Two panels of a membrane wall with blood on the left and fluid on the right. Left, diffusion: many small particles on the blood side, fewer on the fluid side, crossing through the pores; large protein shapes stay on the blood side. Right, convection: streams of water cross the pores carrying small and medium-sized particles; the large protein shapes stay behind."><figcaption>Left: diffusion, small solutes move down their gradient. Right: convection, water carries small and middle-sized solutes across. Proteins stay in the blood in both. Created with BioRender.com</figcaption></figure>
+  </section>
+  <section class="chap card" id="learn-gentle" data-pill="Continuous">
+    <p class="label">2 · Why continuous is gentler</p>
+    <h2>The same litres, spread out</h2>
+    <p class="line1">The kidney is replaced either fast for a few hours or slowly all day. Blood pressure tolerates the slow version better.</p>
+    <div data-figure="time"></div>
+  </section>
+  <section class="chap card" id="learn-citrate" data-pill="Citrate">
+    <p class="label">3 · Citrate anticoagulation</p>
+    <h2>Clotting stopped in the circuit only</h2>
+    <p class="line1">Citrate takes calcium out of the blood in the circuit; calcium is put back before the blood returns, and the body burns the citrate.</p>
+    <div data-figure="citrate"></div>
+    <div id="plate-citrate"></div>
+  </section>
+  <section class="chap card" id="learn-ff" data-pill="Clotting">
+    <p class="label">4 · Filtration fraction</p>
+    <h2>Why filters clot</h2>
+    <p class="line1">The more plasma water is pulled out of the blood in the filter, the thicker the blood that is left.</p>
+    <div data-figure="ff"></div>
+  </section>
+  <section class="chap card" id="learn-drugs" data-pill="Drugs">
+    <p class="label">5 · Drugs on CRRT</p>
+    <h2>Only free drug crosses</h2>
+    <p class="line1">A drug stuck to albumin or hidden in tissue cannot reach the filter.</p>
+    <div data-figure="sieve"></div>
+  </section>
+  <section class="chap card" id="trials" data-pill="Trials">
+    <p class="label">6 · The trials</p>
+    <h2>When to start, how much, and which anticoagulant</h2>
+    <div id="trialbox"></div>
+    <div class="row"><button class="btn ghost" id="go-prac">Try the practice cases</button></div>
+  </section>
+</div>
+
+<div class="panel" id="p-prac" role="tabpanel" aria-labelledby="t-prac">
+  <div id="practice"></div>
+</div>
+
+<div class="scrim" id="scrim" hidden></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-t" hidden>
+  <div class="sheethead"><h2 id="sheet-t"></h2><button class="xbtn" id="sheet-x">Close</button></div>
+  <div id="sheet-b"></div>
+</div>
+
+<footer>
+  <p><strong>For education only. Not a substitute for clinical judgment.</strong> Built to the KDIGO 2012 AKI guideline (Section 5, dialysis interventions), the current final edition. The KDIGO 2026 AKI and AKD guideline was a public review draft when this was reviewed; rows from it are marked "draft" and may change. Rows marked expert practice or review are not graded guideline recommendations. For acute kidney injury only: patients on maintenance dialysis follow a different pathway. CRRT solutions, citrate and calcium targets, recheck schedules and drug doses follow your institution's protocol and pharmacy.</p>
+  <p>Privacy: everything runs in your browser. Nothing you enter is sent anywhere or stored, and there are no analytics. Do not enter names, record numbers, or dates of birth.</p>
+  <p class="mono">Last reviewed: 2026-11-26</p>
+  <p><strong>Sources:</strong> KDIGO Clinical Practice Guideline for Acute Kidney Injury, Section 5, Kidney Int Suppl 2012;2:89 (graded 1–2, A–D, or not graded) · KDIGO 2026 Clinical Practice Guideline for AKI and AKD, public review draft, March 2026 (graded; draft) · Neri M et al. (ADQI), Crit Care 2016;20:318 (nomenclature) · Schneider AG et al., Crit Care 2017;21:281 (citrate) · Link A et al., Crit Care 2012;16:R97 · Karkar A, Ronco C, Ann Intensive Care 2020;10:32 (filtration fraction; authors industry-affiliated) · Jang SM et al., Pharmacy 2020;8:18 (drug dosing) · Pea F et al., Clin Pharmacokinet 2007;46:997 · Wong WT et al., Curr Opin Pharmacol 2015;24:68 · Murugan R et al., JAMA Netw Open 2019;2:e195418 (observational) · Uchino S et al., Crit Care Med 2009;37:2576 (observational) · Pistolesi V et al., J Nephrol 2019;32:895 · Broman M et al., Acta Anaesthesiol Scand 2011;55:39 (non-randomized) · Morsch CMF et al., Rev Bras Ter Intensiva 2021;33:111 (observational) · Trials: Palevsky PM et al., N Engl J Med 2008;359:7 (ATN) · Bellomo R et al., N Engl J Med 2009;361:1627 (RENAL) · Zarbock A et al., JAMA 2016;315:2190 (ELAIN) · Gaudry S et al., N Engl J Med 2016;375:122 (AKIKI) · Barbar SD et al., N Engl J Med 2018;379:1431 (IDEAL-ICU) · STARRT-AKI Investigators, N Engl J Med 2020;383:240 · Gaudry S et al., Lancet 2021;397:1293 (AKIKI 2) · Zarbock A et al., JAMA 2020;324:1629 (RICH) · Diagrams are schematic and drawn for this site.</p>
+</footer>
+</div>
+<script id="engine">
+/* Engine: pure functions. Every rule and number here is listed in the decision table with its source. */
+var ENG = (function(){
+function r1(x){ return Math.round(x * 10) / 10; }
+function r2(x){ return Math.round(x * 100) / 100; }
+function num(x){ return typeof x === 'number' && isFinite(x) ? x : null; }
+
+var IND = {k: 'hyperkalemia', acid: 'metabolic acidosis', fluid: 'fluid overload with pulmonary edema', uremia: 'a uremic complication', tox: 'a dialyzable poison'};
+
+/* ---- start, modality, anticoagulation ---- */
+function decide(i){
+  var o = {ind: [], any: false};
+  Object.keys(IND).forEach(function(k){ if (i[k]) o.ind.push(k); });
+  var stage = i.stage || 0, olig = num(i.olig), bun = num(i.bun);
+  o.any = o.ind.length > 0 || stage > 0 || olig != null || bun != null || !!(i.pressor || i.brain || i.alf || i.icu || i.onrrt);
+  o.alfHE = !!i.alf;
+  if (i.onrrt) o.start = 'running';
+  else if (o.ind.length) o.start = 'now';
+  else if (stage === 3 && i.icu && ((olig != null && olig > 72) || (bun != null && bun > 112))) o.start = 'reasonable';
+  else if (stage === 3 || o.alfHE) o.start = 'plan';
+  else if (o.any) o.start = 'defer';
+  else o.start = 'empty';
+  o.aki2 = stage === 3 && i.icu && ((olig != null && olig > 72) || (bun != null && bun > 112));
+  o.aki2Outside = !o.ind.length && !(stage === 3 && i.icu) && ((olig != null && olig > 72) || (bun != null && bun > 112));
+  /* modality */
+  var unstable = !!i.pressor, brain = !!(i.brain || i.alf);
+  if (unstable || brain) o.mode = 'crrt';
+  else if (i.k || i.tox) o.mode = 'ihd-fast';
+  else o.mode = 'either';
+  o.unstable = unstable; o.brainy = brain;
+  /* anticoagulation */
+  var liver = !!(i.liver || i.alf), perf = !!i.shockperf, cBleed = !!(i.bleedrisk || i.coag);
+  o.citRel = liver || perf;
+  if (i.hit) o.ac = 'hit';
+  else if (i.fullac) o.ac = 'onac';
+  else if (cBleed && o.citRel) o.ac = 'none';
+  else if (cBleed) o.ac = 'bleed';
+  else if (o.citRel) o.ac = 'citrel';
+  else o.ac = 'standard';
+  o.liver = liver; o.cBleed = cBleed;
+  return o;
+}
+
+/* ---- CRRT prescription ---- */
+var DOSEZ = [[20, 'Below 20', 'Below the delivered target of 20 to 25'], [25, '20–25', 'At the delivered target only if nothing is lost to downtime'], [30.0001, '25–30', 'The usual prescription to deliver 20 to 25'], [35.0001, '30–35', 'Above the usual prescription'], [1e9, 'Over 35', 'High intensity: no benefit at 35 (ATN) or 40 (RENAL)']];
+var FFZ = [[20.0001, '20% or less', 'Within the usual limit'], [25.0001, '20–25%', 'At the top of the usual 20 to 25% limit'], [30.0001, '25–30%', 'Above 20 to 25%; at or under the ADQI outer limit of 30%'], [1e9, 'Over 30%', 'Above both limits: the filter is likely to clot']];
+var NUFZ = [[1.01, 'Under 1.01', 'Lowest third in the RENAL analysis'], [1.7501, '1.01–1.75', 'Middle third'], [1e9, 'Over 1.75', 'Highest third: associated with more deaths from day 7 on (observational)']];
+var CAZ = [[2.1, 'Under 2.1', 'No sign of citrate accumulation'], [2.5001, '2.1–2.5', 'Watch the trend: rising toward 2.5 suggests accumulation is starting'], [1e9, 'Over 2.5', 'Citrate accumulation likely']];
+function zoneOf(Z, v){ for (var n = 0; n < Z.length; n++) if (v < Z[n][0]) return n; return Z.length - 1; }
+
+function rx(i){
+  var wt = num(i.wt), qb = num(i.qb), hct = num(i.hct), pre = num(i.qpre) || 0, post = num(i.qpost) || 0, qd = num(i.qd) || 0, net = num(i.qnet) || 0, ht = num(i.ht);
+  var o = {};
+  o.rep = pre + post; o.eff = pre + post + qd + net;
+  if (o.eff <= 0) return null;
+  o.mode = o.rep > 0 && qd > 0 ? 'CVVHDF' : (o.rep > 0 ? 'CVVH' : (qd > 0 ? 'CVVHD' : 'SCUF (fluid removal only)'));
+  o.pre = pre; o.post = post; o.qd = qd; o.net = net;
+  if (qb != null && qb > 0){ o.qbh = qb * 60; o.dil = pre > 0 ? o.qbh / (o.qbh + pre) : 1; }
+  if (wt != null && wt > 0){
+    o.dose = o.eff / wt; o.doseZ = zoneOf(DOSEZ, o.dose);
+    if (o.dil != null && pre > 0){ o.doseC = o.dose * o.dil; o.doseZ = zoneOf(DOSEZ, o.doseC); }
+    else if (pre > 0) o.needQb = true;
+    o.nuf = net / wt; o.nufZ = zoneOf(NUFZ, o.nuf);
+    if (ht != null && ht > 0){ o.bmi = wt / Math.pow(ht / 100, 2); }
+  }
+  if (o.qbh != null && hct != null && hct > 0 && hct < 100){
+    o.qp = o.qbh * (1 - hct / 100) + pre;
+    o.quf = pre + post + net;
+    o.ff = o.quf / o.qp * 100; o.ffZ = zoneOf(FFZ, o.ff);
+  }
+  return o;
+}
+
+function caRatio(i){
+  var t = num(i.tca), c = num(i.ica);
+  if (t == null || c == null || t <= 0 || c <= 0) return null;
+  var tm = i.tcu === 'mmol' ? t : t / 4.008, cm = i.icu === 'mg' ? c / 4.008 : c;
+  var o = {tm: tm, cm: cm, ratio: tm / cm};
+  o.z = zoneOf(CAZ, o.ratio);
+  if (i.icu !== 'mg' && c > 3) o.unitWarn = 'An ionized calcium over 3 in mmol/L is not plausible: it is probably in mg/dL. Switch the unit.';
+  if (i.tcu !== 'mmol' && t < 4) o.unitWarn = 'A total calcium under 4 in mg/dL is not plausible: it is probably in mmol/L. Switch the unit.';
+  return o;
+}
+
+/* drug clearance by the circuit: effluent x sieving coefficient x predilution factor (Jang 2020, Table 1) */
+function drugCl(r, pb){
+  if (!r || pb == null || pb < 0 || pb > 100) return null;
+  var sc = 1 - pb / 100;
+  var dil = r.dil != null ? r.dil : null;
+  if (r.pre > 0 && dil == null) return {needQb: true};
+  var clh = r.eff * sc * (dil == null ? 1 : dil);
+  return {sc: sc, clh: clh, clmin: clh / 60, dil: dil};
+}
+
+return {decide: decide, rx: rx, caRatio: caRatio, drugCl: drugCl, zoneOf: zoneOf, DOSEZ: DOSEZ, FFZ: FFZ, NUFZ: NUFZ, CAZ: CAZ, IND: IND, r1: r1, r2: r2};
+})();
+</script>
+<script>
+(function(){
+var $ = function(id){ return document.getElementById(id); };
+function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+var r1 = ENG.r1;
+var TICKS = {
+  'ticks-i': [['k','Hyperkalemia not controlled by medical treatment'],['acid','Severe metabolic acidosis not correctable with bicarbonate (or bicarbonate would overload)'],['fluid','Fluid overload with pulmonary edema or rising oxygen need, not responding to diuretics'],['uremia','Uremic complication: pericarditis, encephalopathy or bleeding'],['tox','Dialyzable poison (for example salicylate, methanol, ethylene glycol, metformin)']],
+  'ticks-c': [['icu','Critically ill (ICU)'],['onrrt','Dialysis or CRRT already running for this AKI'],['chronic','Already on maintenance dialysis before this illness']],
+  'ticks-h': [['pressor','On a vasopressor, or MAP below 65 despite resuscitation'],['brain','Acute brain injury, raised intracranial pressure or brain edema'],['alf','Acute liver failure with grade 2 or higher encephalopathy']],
+  'ticks-b': [['fullac','Already on full-dose systemic anticoagulation'],['bleedrisk','High bleeding risk: bleeding in the last 7 days, recent trauma, surgery or stroke, aneurysm, epidural catheter'],['coag','Impaired coagulation: high INR or low platelets'],['liver','Severe liver failure'],['shockperf','Shock with poor tissue perfusion (rising lactate, mottling)'],['hit','Heparin-induced thrombocytopenia, suspected or confirmed'],['goc','Unsure dialysis fits the goals of care']]
+};
+var ticked = {}, seg = {stage: '0', tcu: 'mg', icu: 'mmol'};
+var NUMS = ['olig','bun'], RXN = ['wt','ht','qb','hct','qpre','qpost','qd','qnet'], CAN = ['tca','ica'];
+Object.keys(TICKS).forEach(function(h){
+  $(h).innerHTML = TICKS[h].map(function(t){ return '<label class="chk"><input type="checkbox" data-k="' + t[0] + '">' + esc(t[1]) + '</label>'; }).join('');
+  $(h).addEventListener('change', function(e){ var k = e.target.getAttribute('data-k'); if (k){ ticked[k] = e.target.checked; render(); } });
+});
+document.querySelectorAll('[data-seg]').forEach(function(g){
+  g.addEventListener('click', function(e){ var v = e.target.getAttribute('data-v'); if (!v) return; seg[g.getAttribute('data-seg')] = v; [].forEach.call(g.children, function(b){ b.setAttribute('aria-pressed', String(b.getAttribute('data-v') === v)); }); render(); renderRx(); });
+});
+NUMS.forEach(function(k){ $(k).addEventListener('input', render); });
+RXN.concat(CAN, ['pb']).forEach(function(k){ $(k).addEventListener('input', renderRx); });
+function val(k){ var v = parseFloat($(k).value); return isFinite(v) && v >= 0 ? v : null; }
+function read(){
+  var i = {stage: parseInt(seg.stage, 10) || 0};
+  NUMS.forEach(function(k){ i[k] = val(k); });
+  Object.keys(ticked).forEach(function(k){ if (ticked[k]) i[k] = true; });
+  return i;
+}
+
+/* ---------- figures ---------- */
+var FS = 'font-family:var(--sans)', FM = 'font-family:var(--mono)';
+function svgOpen(vb, label){ return '<svg viewBox="' + vb + '" role="img" aria-label="' + esc(label) + '" class="fig">'; }
+function mk(p){ return '<defs><marker id="' + p + 'a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--ink)"/></marker><marker id="' + p + 'b" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--accent)"/></marker></defs>'; }
+function tx(x, y, t, size, fill, anchor, w){ return '<text x="' + x + '" y="' + y + '" text-anchor="' + (anchor || 'middle') + '" style="' + FM + ';font-size:' + (size || 11) + 'px;fill:' + (fill || 'var(--ink)') + (w ? ';font-weight:600' : '') + '">' + esc(t) + '</text>'; }
+function ln(x1, y1, x2, y2, p, col, dash, wdt){ return '<line x1="' + x1 + '" y1="' + y1 + '" x2="' + x2 + '" y2="' + y2 + '" stroke="' + (col || 'var(--ink)') + '" stroke-width="' + (wdt || 1.6) + '"' + (dash ? ' stroke-dasharray="4 3"' : '') + (p ? ' marker-end="url(#' + p + ')"' : '') + '/>'; }
+function dots(x, y, w, h, n, r, fill, seed){ var s = '', k = seed || 7; for (var j = 0; j < n; j++){ k = (k * 37 + 11) % 101; var px = x + (k % 23) / 23 * w, py = y + ((k * 7) % 19) / 19 * h; s += '<circle cx="' + r1(px) + '" cy="' + r1(py) + '" r="' + r + '" fill="' + fill + '"/>'; } return s; }
+
+var FIGS = {
+  modes: {t: 'How solutes cross the filter', states: ['cvvh','cvvhd','cvvhdf','ihd'], data: {
+    cvvh: {n: 'CVVH', line: 'Hemofiltration: pressure pushes plasma water across the membrane and solutes are dragged along (convection). Replacement fluid goes back in before or after the filter. Removes small and middle-sized molecules.'},
+    cvvhd: {n: 'CVVHD', line: 'Hemodialysis, continuous: dialysate runs the other way outside the fibres and small solutes diffuse down their gradient. No replacement fluid. Mainly small solutes.'},
+    cvvhdf: {n: 'CVVHDF', line: 'Hemodiafiltration: both at once, replacement fluid and dialysate. Effluent is everything that comes out.'},
+    ihd: {n: 'Intermittent', line: 'Intermittent hemodialysis: the same diffusion, with much faster blood and dialysate flows, usually for 3 to 5 hours. Fastest at clearing potassium and small toxins; removes fluid faster too.'}},
+    svg: function(k, p){
+      var conv = k === 'cvvh' || k === 'cvvhdf', diff = k !== 'cvvh';
+      var s = svgOpen('0 0 340 230', FIGS.modes.data[k].line) + mk(p);
+      s += '<rect x="90" y="70" width="160" height="70" rx="12" fill="var(--fill)" stroke="var(--line)" stroke-width="1.5"/>';
+      s += '<rect x="90" y="96" width="160" height="18" fill="var(--hrt-art)" opacity=".85"/>';
+      s += ln(14, 105, 86, 105, p + 'a', 'var(--hrt-art)', 0, 3) + ln(254, 105, 326, 105, p + 'a', 'var(--hrt-art)', 0, 3);
+      s += tx(12, 126, 'from patient', 10.5, 'var(--muted)', 'start') + tx(328, 126, 'to patient', 10.5, 'var(--muted)', 'end');
+      s += tx(170, 62, 'filter', 11, 'var(--muted)');
+      if (diff){ s += ln(240, 128, 100, 128, p + 'b', 'var(--accent)', 0, 2); s += tx(170, 156, k === 'ihd' ? 'dialysate, fast flow' : 'dialysate (counter-current)', 10.5, 'var(--accent)'); s += dots(110, 116, 120, 8, 6, 2.2, 'var(--ink)', 3); }
+      if (conv){ s += ln(135, 115, 135, 125, p + 'a', 'var(--ink)') + ln(205, 115, 205, 125, p + 'a', 'var(--ink)'); s += tx(96, 88, 'water pushed across', 10.5, 'var(--ink)', 'start'); }
+      s += ln(170, 140, 170, 190, p + 'a', 'var(--muted)', 0, 2) + tx(170, 206, 'effluent', 11, 'var(--ink)', 'middle', 1);
+      if (conv){ s += ln(50, 40, 50, 100, p + 'a', 'var(--ok)', 1, 2) + tx(10, 32, 'replacement pre', 10.5, 'var(--ok)', 'start'); s += ln(290, 40, 290, 100, p + 'a', 'var(--ok)', 1, 2) + tx(330, 32, 'or post', 10.5, 'var(--ok)', 'end'); }
+      s += tx(170, 226, conv && diff ? 'convection + diffusion' : (conv ? 'convection' : 'diffusion'), 11, 'var(--muted)');
+      return s + '</svg>';
+    }},
+  time: {t: 'Removing 2 litres: 4 hours or 24 hours', states: ['ihd','crrt'], data: {
+    ihd: {n: 'Intermittent, 4 h', line: '2 litres over 4 hours is 500 mL an hour. The blood volume has to refill from the tissues that fast, or pressure falls. Illustrative numbers.'},
+    crrt: {n: 'Continuous, 24 h', line: '2 litres over 24 hours is about 83 mL an hour: slow enough for the tissues to refill the blood as it goes. Illustrative numbers.'}},
+    svg: function(k){
+      var rate = k === 'ihd' ? 500 : 2000 / 24, h = rate / 500 * 130;
+      var s = svgOpen('0 0 340 200', FIGS.time.data[k].line);
+      s += ln(50, 170, 320, 170, '', 'var(--line)', 0, 1.5) + ln(50, 30, 50, 170, '', 'var(--line)', 0, 1.5);
+      s += tx(44, 44, '500', 10.5, 'var(--muted)', 'end') + tx(44, 174, '0', 10.5, 'var(--muted)', 'end') + tx(14, 110, 'mL/h', 10.5, 'var(--muted)', 'start');
+      var w = k === 'ihd' ? 40 : 240;
+      s += '<rect x="60" y="' + r1(170 - h) + '" width="' + w + '" height="' + r1(h) + '" rx="4" fill="' + (k === 'ihd' ? 'var(--warn)' : 'var(--accent)') + '"/>';
+      s += tx(60 + w / 2, r1(170 - h - 8), r1(rate) + ' mL/h', 11, 'var(--ink)', 'middle', 1);
+      s += tx(185, 192, k === 'ihd' ? 'hours 0–4, then off' : 'hours 0–24', 10.5, 'var(--muted)');
+      return s + '</svg>';
+    }},
+  citrate: {t: 'Citrate in the circuit', states: ['normal','accum'], data: {
+    normal: {n: 'Working', line: 'Citrate goes in before the filter and binds calcium, so blood in the filter cannot clot. Calcium goes back in after the filter. Citrate that reaches the patient is turned into bicarbonate by liver, muscle and kidney.'},
+    accum: {n: 'Accumulating', line: 'If liver or muscle cannot clear citrate, citrate-calcium complexes build up: total calcium rises, ionized calcium falls, the ratio climbs and an anion gap acidosis appears.'}},
+    svg: function(k, p){
+      var acc = k === 'accum';
+      var s = svgOpen('0 0 340 230', FIGS.citrate.data[k].line) + mk(p);
+      s += '<rect x="14" y="150" width="110" height="70" rx="12" fill="var(--fill)" stroke="var(--line)"/>' + tx(69, 166, 'patient', 11, 'var(--muted)');
+      s += '<ellipse cx="69" cy="182" rx="26" ry="8" fill="' + (acc ? 'var(--line)' : 'var(--hrt-muscle)') + '" opacity=".9"/>' + tx(69, 210, acc ? 'clears slowly' : 'liver, muscle', 10.5, acc ? 'var(--warn)' : 'var(--ink)');
+      s += ln(40, 150, 40, 60, '', 'var(--hrt-art)', 0, 3) + ln(40, 60, 150, 60, p + 'a', 'var(--hrt-art)', 0, 3);
+      s += '<rect x="150" y="40" width="40" height="80" rx="10" fill="var(--fill)" stroke="var(--line)" stroke-width="1.5"/>' + tx(170, 134, 'filter', 10.5, 'var(--muted)');
+      s += ln(190, 60, 300, 60, '', 'var(--hrt-art)', 0, 3) + ln(300, 60, 300, 182, '', 'var(--hrt-art)', 0, 3) + ln(300, 182, 128, 182, p + 'a', 'var(--hrt-art)', 0, 3);
+      s += ln(95, 20, 95, 56, p + 'b', 'var(--accent)', 0, 2) + tx(95, 14, 'citrate', 11, 'var(--accent)', 'middle', 1);
+      s += ln(245, 20, 245, 56, p + 'b', 'var(--ok)', 0, 2) + tx(245, 14, 'calcium', 11, 'var(--ok)', 'middle', 1);
+      s += tx(170, 86, 'low', 10.5, 'var(--ink)') + tx(170, 100, 'iCa', 10.5, 'var(--ink)');
+      s += tx(222, 110, 'iCa back', 10.5, 'var(--ink)') + tx(222, 124, 'to normal', 10.5, 'var(--ink)') ;
+      s += tx(220, 204, acc ? 'citrate builds up; anion gap acidosis' : 'citrate → bicarbonate', 11, acc ? 'var(--warn)' : 'var(--ink)', 'middle', 1) + (acc ? tx(220, 220, 'total Ca up, iCa down', 10.5, 'var(--warn)') : '');
+      return s + '</svg>';
+    }},
+  ff: {t: 'Filtration fraction', states: ['low','high'], data: {
+    low: {n: 'Under 20%', line: 'A small share of the plasma water is pulled off: the blood leaving the filter is only a little thicker.'},
+    high: {n: 'Over 25%', line: 'A large share is pulled off: cells and proteins pack together at the end of the fibre and the filter clots. Lower it with more blood flow or by moving replacement before the filter.'}},
+    svg: function(k, p){
+      var hi = k === 'high';
+      var s = svgOpen('0 0 340 200', FIGS.ff.data[k].line) + mk(p);
+      s += '<rect x="30" y="60" width="280" height="50" rx="25" fill="var(--fill)" stroke="var(--line)" stroke-width="1.5"/>';
+      s += dots(50, 72, 90, 26, 14, 4, 'var(--hrt-art)', 5) + dots(200, 72, 90, 26, hi ? 34 : 18, 4, 'var(--hrt-art)', 13);
+      s += tx(70, 52, 'blood in', 11, 'var(--muted)') + tx(270, 52, hi ? 'thick blood out' : 'blood out', 11, hi ? 'var(--warn)' : 'var(--muted)', 'middle', hi);
+      s += ln(170, 112, 170, hi ? 170 : 145, p + 'b', 'var(--accent)', 0, hi ? 5 : 2) + tx(170, 190, hi ? 'much plasma water removed' : 'some plasma water removed', 11, 'var(--accent)');
+      return s + '</svg>';
+    }},
+  sieve: {t: 'Which drugs the filter removes', states: ['free','bound','tissue'], data: {
+    free: {n: 'Low binding', line: 'Small, mostly free in plasma, small volume: crosses freely (sieving coefficient near 1). CRRT clearance matters; dose by effluent rate.'},
+    bound: {n: 'Highly bound', line: 'Stuck to albumin, which cannot cross: little removed (sieving coefficient near 0). Low albumin frees more of it.'},
+    tissue: {n: 'Large volume', line: 'Mostly in tissues, little in the blood at any time: the filter sees only a small fraction, so CRRT changes little.'}},
+    svg: function(k){
+      var s = svgOpen('0 0 340 200', FIGS.sieve.data[k].line);
+      s += '<rect x="20" y="30" width="140" height="140" rx="12" fill="var(--fill)" stroke="var(--line)"/>' + tx(90, 22, 'blood', 11, 'var(--muted)');
+      s += '<rect x="200" y="30" width="120" height="140" rx="12" fill="var(--card)" stroke="var(--line)"/>' + tx(260, 22, 'effluent', 11, 'var(--muted)');
+      for (var y = 36; y < 168; y += 14) s += '<rect x="176" y="' + y + '" width="8" height="8" fill="var(--line)"/>';
+      if (k === 'bound'){
+        [[60,70],[110,100],[70,140],[120,150]].forEach(function(c){ s += '<circle cx="' + c[0] + '" cy="' + c[1] + '" r="14" fill="var(--hrt-vein)" opacity=".8"/>' + dots(c[0] - 6, c[1] - 6, 12, 12, 3, 2.6, 'var(--accent)', c[0]); });
+        s += dots(220, 90, 60, 40, 2, 2.6, 'var(--accent)', 4) + tx(90, 188, 'albumin holds the drug', 10.5, 'var(--ink)');
+      } else if (k === 'tissue'){
+        s += dots(40, 50, 100, 100, 4, 2.6, 'var(--accent)', 8) + dots(220, 80, 70, 60, 2, 2.6, 'var(--accent)', 2) + tx(90, 188, 'most drug is in tissue', 10.5, 'var(--ink)');
+      } else {
+        s += dots(40, 50, 100, 100, 12, 2.6, 'var(--accent)', 6) + dots(215, 50, 90, 100, 11, 2.6, 'var(--accent)', 12) + tx(170, 188, 'free drug crosses', 10.5, 'var(--ink)');
+      }
+      return s + '</svg>';
+    }}
+};
+var figN = 0;
+var ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M7 15l3-4 3 3 2-2 2 3"/></svg>';
+function mountFig(host, id, state){
+  var F = FIGS[id], pre = 'f' + (++figN) + '-';
+  function draw(k){
+    host.innerHTML = '<div class="states" role="group" aria-label="' + esc(F.t) + '">' + F.states.map(function(x){ return '<button class="sbtn" data-k="' + x + '" aria-pressed="' + (x === k) + '">' + esc(F.data[x].n) + '</button>'; }).join('') + '</div>' + F.svg(k, pre) + '<p class="line1">' + esc(F.data[k].line) + '</p>';
+  }
+  host.onclick = function(e){ var k = e.target.getAttribute && e.target.getAttribute('data-k'); if (k && F.data[k]) draw(k); };
+  draw(state && F.data[state] ? state : F.states[0]);
+}
+function chip(fig, state, label){ return '<button class="chip" data-fig="' + fig + '" data-state="' + (state || '') + '">' + ICON + esc(label || FIGS[fig].t) + '</button>'; }
+var lastFocus = null;
+function openSheet(fig, state){
+  lastFocus = document.activeElement;
+  $('sheet-t').textContent = FIGS[fig].t;
+  mountFig($('sheet-b'), fig, state);
+  $('scrim').hidden = false; $('sheet').hidden = false; $('sheet').scrollTop = 0; $('sheet-x').focus();
+}
+function closeSheet(){ if ($('sheet').hidden) return; $('scrim').hidden = true; $('sheet').hidden = true; if (lastFocus && lastFocus.focus) lastFocus.focus(); }
+$('sheet-x').addEventListener('click', closeSheet); $('scrim').addEventListener('click', closeSheet);
+document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeSheet(); });
+document.addEventListener('click', function(e){ var c = e.target.closest && e.target.closest('[data-fig]'); if (c) openSheet(c.getAttribute('data-fig'), c.getAttribute('data-state')); });
+
+/* ---------- card helpers ---------- */
+function more(list, tiers){
+  if ((!list || !list.length) && (!tiers || !tiers.length)) return '';
+  return '<details><summary>More</summary>' + (list || []).map(function(x){ return '<p>' + x + '</p>'; }).join('') + (tiers || []).map(function(t){ return '<span class="tier">' + esc(t) + '</span>'; }).join('') + '</details>';
+}
+function why(w){ return w ? '<p class="whyline"><b>Why:</b> ' + esc(w) + '</p>' : ''; }
+function ul(a){ return '<ul>' + a.map(function(x){ return '<li>' + x + '</li>'; }).join('') + '</ul>'; }
+function card(id, label, inner){ return '<div class="card" id="' + id + '"><p class="label">' + esc(label) + '</p>' + inner + '</div>'; }
+function guard(t, bad){ return '<div class="guard' + (bad ? ' bad' : '') + '">' + t + '</div>'; }
+function head(t, cls){ return '<p class="head' + (cls ? ' ' + cls : '') + '">' + esc(t) + '</p>'; }
+function zoneHtml(Z, n, warnFrom){ return '<div class="zone" aria-hidden="true">' + Z.map(function(z, j){ return '<span class="' + (j === n ? 'on' + (warnFrom != null && j >= warnFrom ? ' wz' : '') : '') + '">' + esc(z[1]) + '</span>'; }).join('') + '</div><p class="zname"><b>' + esc(Z[n][2]) + '.</b></p>'; }
+function dpHtml(rows){ return '<div class="dp">' + rows.map(function(r){ return '<div><span class="dl">' + esc(r[0]) + '</span><p>' + r[1] + '</p></div>'; }).join('') + '</div>'; }
+
+/* ---------- Patient tab: read-down cards ---------- */
+var INDTXT = {
+  k: 'Hyperkalemia: keep the medical treatment going (calcium, insulin with glucose, beta-agonist) while dialysis is arranged. See the <a href="/hyperkalemia/">hyperkalemia tool</a> and the <a href="/rrt/">severe hyperkalemia code card</a>.',
+  acid: 'Metabolic acidosis: KDIGO notes it can usually be corrected with bicarbonate and rarely needs urgent dialysis on its own, unless volume overload or uremia stop that. See the <a href="/acid-base/">acid–base tool</a>.',
+  fluid: 'Fluid overload with pulmonary edema: dialysis removes the fluid when diuretics cannot; support oxygenation meanwhile (<a href="/oxygen-niv/">oxygen and NIV</a>).',
+  uremia: 'Uremic complication (pericarditis, encephalopathy, bleeding): in current practice dialysis is rarely delayed until these appear; once present, they are a reason to start.',
+  tox: 'Dialyzable poison: call poison control. Agent-specific criteria for dialysis come from the EXTRIP workgroup and are not reproduced here.'
+};
+function build(i){
+  var o = ENG.decide(i), h = '';
+  if (!o.any && !i.fullac && !i.bleedrisk && !i.coag && !i.liver && !i.shockperf && !i.hit && !i.goc && !i.chronic) return {html: '<div class="card empty">Tick an indication or enter the kidney course to start. Add circulation, brain and clotting details to choose the modality and the circuit anticoagulant.</div>', o: o};
+  if (i.chronic) h += guard('<b>On maintenance dialysis?</b> This tool is built for acute kidney injury. The emergent indications still apply, but timing, access and prescription follow the patient\'s usual dialysis unit and nephrology.', false);
+  /* 1. Start */
+  var sh, scls = '', sw, sl = [];
+  if (o.start === 'now'){
+    sh = 'Start now: emergent indication'; scls = 'bad';
+    sw = 'These can kill within hours and dialysis corrects them within hours; when medical treatment is not holding, dialysis is the bridge.';
+    o.ind.forEach(function(k){ sl.push(INDTXT[k]); });
+    sl.push('Call nephrology now and place access (below). KDIGO 2012 5.1.1: start emergently for life-threatening fluid, electrolyte or acid–base change (not graded); the 2026 draft adds "if consistent with the patient\'s preferences and goals of care".');
+  } else if (o.start === 'running'){
+    sh = 'Already running: ask every day whether it is still needed';
+    sw = 'Kidneys often recover while dialysis runs; the only way to find out is to look for it each day.';
+    sl.push('See <a href="#stop">when to stop</a> on the CRRT orders tab. The cards below still apply to modality, access and the circuit anticoagulant.');
+  } else if (o.start === 'reasonable'){
+    sh = 'No emergent indication, but reasonable to start: discuss with nephrology now'; scls = 'wn';
+    sw = 'In AKIKI 2, waiting longer past this point bought nothing, and in a secondary analysis was associated with more deaths.';
+    sl.push('AKIKI 2 enrolled critically ill adults with stage 3 AKI once oliguria passed 72 hours or BUN passed 112 mg/dL. Starting then was compared with waiting further, until a mandatory indication or BUN 140 mg/dL: dialysis-free days 12 vs 10 (no difference); 60-day death hazard ratio 1.65 (1.09 to 2.50) with the longer wait, in a multivariable analysis.');
+  } else if (o.start === 'plan'){
+    sh = 'No emergent indication: defer, and plan ahead'; scls = 'wn';
+    sw = 'Three large multicentre trials found no survival gain from starting before an indication, and waiting meant 38 to 49% never needed dialysis; one small single-centre trial (ELAIN) disagreed.';
+    sl.push('Deferred start preferred over early start (KDIGO 2026 draft Rec 5.1.1, 1C). Decide on context and trends rather than single BUN or creatinine values (KDIGO 2012 5.1.2).');
+    sl.push('When dialysis looks likely, plan before an indication arrives (draft PP 5.1.2): involve nephrology, check platelets and coagulation, decide where access would go.');
+    sl.push('Reassess at least daily: potassium, acid–base, fluid and oxygen, urine output, BUN.');
+  } else {
+    sh = 'No emergent indication: watch and treat the cause';
+    sw = 'Three large multicentre trials found no survival gain from starting before an indication, and waiting meant 38 to 49% never needed dialysis; one small single-centre trial (ELAIN) disagreed.';
+    sl.push('Deferred start preferred over early start (KDIGO 2026 draft Rec 5.1.1, 1C). Work up and treat the AKI in the <a href="/aki/">AKI tool</a>.');
+  }
+  if (o.alfHE) sl.push('Acute or acute-on-chronic liver failure with grade 2 or higher encephalopathy: CRRT to lower ammonia may be considered even without a usual indication (KDIGO 2026 draft PP 5.1.4). Discuss with hepatology and nephrology.');
+  if (o.aki2Outside) sl.push('Oliguria over 72 hours or BUN over 112 mg/dL: AKIKI 2 studied these triggers only in critically ill adults with stage 3 AKI. Set stage 3 and ICU if that fits.');
+  if (i.goc) sl.push('Goals of care: decide together with the patient or family (draft PP 5.1.1). A time-limited trial has a defined place in the draft when uremia or metabolic problems may be confounding a neurological assessment (PP 5.1.5). See <a href="/goals-of-care/">goals of care</a>.');
+  if (o.start !== 'empty') h += card('r-start', 'Start dialysis?', head(sh, scls) + ul(sl) + why(sw) + more([
+    'Why there is no number: KDIGO 2012 gives no potassium, pH or bicarbonate threshold, and states that no standard criteria exist for starting dialysis for acidosis. Severe hyperkalemia, severe acidosis, pulmonary edema and uremic complications are dialysed emergently when they threaten life.',
+    'Timing trials: AKIKI (620 ventilated or on catecholamines, stage 3): 60-day death 48.5% early vs 49.7% delayed; 49% of the delayed group never received dialysis. IDEAL-ICU (488 septic shock): 90-day death 58% vs 54%; 38% of the delayed group never needed it. STARRT-AKI (3019): 90-day death 43.9% vs 43.7%, more dialysis dependence (10.4% vs 6.0%) and adverse events with the accelerated start. ELAIN (231, single centre, stage 2): early start lowered 90-day death (39.3% vs 54.7%). Details on the Learn tab.'
+  ], ['KDIGO 2012 5.1.1–5.1.2, not graded', 'KDIGO 2026 draft Rec 5.1.1, 1C', 'Trials: AKIKI, IDEAL-ICU, STARRT-AKI, AKIKI 2, ELAIN']));
+
+  /* 2. Modality */
+  var mh, ml = [], mw = '';
+  if (o.mode === 'crrt'){
+    mh = 'Continuous therapy (CRRT)';
+    if (o.unstable){ ml.push('Hemodynamically unstable: CRRT rather than standard intermittent dialysis (KDIGO 2012 5.6.2, 2B). Prolonged intermittent therapy (SLED, PIRRT) is an acceptable alternative (draft PP 5.2.4). Look for and treat a fixable cause of the instability as dialysis starts.'); mw = 'Removing the same fluid over 24 hours instead of 4 asks less of a failing circulation.'; }
+    if (o.brainy){ ml.push('Acute brain injury, raised intracranial pressure or brain edema (including acute liver failure with encephalopathy): CRRT rather than intermittent dialysis (KDIGO 2012 5.6.3, 2B).'); mw = 'Fast solute removal can pull water into the brain, and a fall in blood pressure lowers its perfusion; continuous therapy avoids both.'; }
+    ml.push('Switch to intermittent dialysis once the patient tolerates it (draft PP 5.2.5).');
+  } else if (o.mode === 'ihd-fast'){
+    mh = 'Intermittent hemodialysis clears it fastest';
+    ml.push('Stable patient with life-threatening hyperkalemia or a dialyzable poison: intermittent hemodialysis removes small solutes fastest; CRRT if the pressure will not allow it (expert practice).');
+    if (i.k) ml.push('After intermittent dialysis for hyperkalemia, potassium rebounds: recheck within hours and keep treating the cause (KDIGO 2012 rationale).');
+    mw = 'Intermittent dialysis runs blood and dialysate much faster, so it clears potassium and small toxins in hours.';
+  } else {
+    mh = 'Either works: intermittent if stable';
+    ml.push('Continuous and intermittent therapy are complementary (KDIGO 2012 5.6.1, not graded). A stable patient without brain injury can have intermittent hemodialysis.');
+  }
+  ml.push('Bicarbonate, not lactate, as the buffer (KDIGO 2012 5.7.1, 2C; 1B with shock; 2B with liver failure or lactic acidosis).');
+  h += card('r-mode', 'Which kind', head(mh) + ul(ml) + why(mw) + '<div class="chips">' + chip('modes', o.mode === 'crrt' ? 'cvvhdf' : 'ihd') + (o.unstable ? chip('time', 'ihd') : '') + '</div>' + more([
+    'CVVH removes solutes by convection, CVVHD by diffusion, CVVHDF by both. Convection removes larger (middle) molecules better; diffusion mainly small solutes. Prolonged intermittent therapy usually runs 6 to 10 hours a day (Jang 2020).',
+    'Do not use high-volume hemofiltration for sepsis or septic shock (KDIGO 2026 draft Rec 5.3.2, 1B).'
+  ], ['KDIGO 2012 5.6.1 not graded · 5.6.2–5.6.3, 2B', 'KDIGO 2026 draft Rec 5.2.1, 2C (CRRT or acute PD when unstable)']));
+
+  /* 3. Access */
+  h += card('r-access', 'Access', head('Right internal jugular first') + '<ol class="steps"><li>Right internal jugular</li><li>Femoral</li><li>Left internal jugular</li><li>Subclavian last, dominant side</li></ol>' + ul([
+    'Uncuffed, non-tunnelled dialysis catheter to start (KDIGO 2012 5.4.1, 2D); a tunnelled cuffed catheter if weeks of temporary access are expected.',
+    'Ultrasound guidance (5.4.3, 1A). Chest film after a jugular or subclavian line, before first use (5.4.4, 1B).',
+    'No topical antibiotic at the site, no antibiotic lock (5.4.5, 5.4.6, 2C); no routine scheduled catheter changes (draft PP 5.4.6).'
+  ]) + why('A subclavian line can narrow the central vein and spoil the arm for a future fistula if the kidneys do not recover, so it goes last.') + more([
+    'Catheter length (KDIGO rationale): right internal jugular 12–15 cm, left internal jugular 15–20 cm, femoral 19–24 cm.',
+    'Tip position: the 2012 text places the tip at the junction of the superior vena cava and right atrium, not in the heart; the 2026 draft lists a right atrial position among ways to extend filter life. Follow your institution.',
+    'Placement steps and tip confirmation for central lines: expert practice; see your procedure service.'
+  ], ['KDIGO 2012 5.4.1 2D · 5.4.2 not graded · 5.4.3 1A · 5.4.4 1B · 5.4.5–6 2C']));
+
+  /* 4. Circuit anticoagulation */
+  var ah, al = [], aw = '', acls = '';
+  if (o.ac === 'hit'){
+    ah = 'HIT: no heparin at all, including flushes and locks'; acls = 'bad';
+    al.push('Use a direct thrombin inhibitor such as argatroban (or a factor Xa inhibitor) during dialysis rather than other or no anticoagulation (KDIGO 2012 5.3.4, 1A); argatroban preferred when there is no severe liver failure (5.3.4.1, 2C).');
+    if (o.liver) al.push('Severe liver failure: argatroban is cleared by the liver, so it is not the preferred choice here; the 2026 draft also lists bivalirudin (PP 5.5.4). Decide with hematology and pharmacy.');
+    al.push('In the US danaparoid is not available and fondaparinux is cleared by the kidney (expert practice note). Citrate is an option for subacute or remote HIT (draft PP 5.5.5). See the <a href="/hit/">HIT tool</a>.');
+    aw = 'Any heparin, even in flushes and catheter locks, keeps HIT going.';
+  } else if (o.ac === 'onac'){
+    ah = 'Already anticoagulated: no extra circuit anticoagulant';
+    al.push('KDIGO 2012 recommends circuit anticoagulation when the patient is not already on systemic anticoagulation and has no increased bleeding risk or impaired coagulation (5.3.1.1, 1B); a patient already on effective systemic anticoagulation usually needs nothing added (decide case by case).');
+  } else if (o.ac === 'none'){
+    ah = 'Start without anticoagulation'; acls = 'wn';
+    al.push('Bleeding risk or impaired coagulation plus severe liver failure or shock with poor perfusion: such patients may not benefit from added anticoagulation (KDIGO 2012 5.3.1), and citrate needs caution (below). Experienced centres sometimes use citrate here with intensified monitoring of the calcium ratio and lactate (Schneider 2017).');
+    al.push('Help the filter last without drugs: pre-filter replacement and a diffusive mode (CVVHD or CVVHDF rather than CVVH; draft PP 5.6.2), and a higher blood flow (KDIGO 2012 rationale).');
+    aw = 'A failing liver or shocked tissues may not clear citrate fast enough, and heparin adds bleeding to a patient who already cannot clot.';
+  } else if (o.ac === 'bleed'){
+    ah = 'CRRT: regional citrate. Intermittent: none';
+    al.push('CRRT with increased bleeding risk: regional citrate rather than no anticoagulation, if no contraindication (KDIGO 2012 5.3.3.1, 2C); avoid regional heparinization (5.3.3.2, 2C).');
+    al.push('Intermittent dialysis with increased bleeding risk: run without anticoagulation (KDIGO 2012 rationale).');
+    aw = 'Citrate anticoagulates only the circuit: calcium is given back before the blood returns, so the patient\'s own clotting is left alone.';
+  } else if (o.ac === 'citrel'){
+    ah = 'Citrate needs caution here: heparin or citrate with close monitoring'; acls = 'wn';
+    al.push('KDIGO 2012 treats severe liver failure and shock with poor muscle perfusion as major contraindications to citrate because it can accumulate, and limits citrate to centres with an established protocol. Later experience suggests these patients clear citrate more slowly, not never; experienced centres use it with intensified monitoring (Schneider 2017). Decide with nephrology.');
+    al.push('If citrate is not used: unfractionated heparin (KDIGO 2012 5.3.2.3, 2C, also allows low-molecular-weight heparin; the 2026 draft lists unfractionated heparin, epoprostenol or nafamostat, PP 5.5.1).');
+    aw = 'A failing liver or shocked tissues may not clear citrate fast enough; it builds up, with low ionized calcium and often an anion gap acidosis.';
+  } else {
+    ah = o.mode === 'crrt' ? 'Regional citrate' : (o.mode === 'either' ? 'CRRT: regional citrate. Intermittent: heparin' : 'Intermittent: heparin');
+    if (o.mode !== 'ihd-fast') al.push('CRRT: regional citrate rather than heparin when there is no contraindication (KDIGO 2012 5.3.2.2, 2B; 2026 draft Rec 5.5.1, 1B, "where available"). Only in a centre with an established citrate protocol.');
+    if (o.unstable) al.push('On a vasopressor: KDIGO 2012 limited citrate to patients without shock. Later experience suggests citrate can be used, in an experienced centre with a protocol, with close monitoring of the calcium ratio and lactate when perfusion is adequate (Schneider 2017, review); if perfusion is poor, tick shock with poor tissue perfusion above.');
+    if (o.mode !== 'crrt') al.push('Intermittent dialysis: unfractionated or low-molecular-weight heparin (KDIGO 2012 5.3.2.1, 1C).');
+    al.push('No citrate protocol, or citrate contraindicated: unfractionated heparin (2012 also allows low-molecular-weight heparin, 2C; draft alternatives: unfractionated heparin, epoprostenol, nafamostat).');
+    aw = 'Citrate binds calcium in the circuit so it clots less; once it reaches the patient, liver, muscle and kidney turn it into bicarbonate.';
+  }
+  h += card('r-anticoag', 'Keeping the circuit open', head(ah, acls) + ul(al) + why(aw) + '<div class="chips">' + chip('citrate', o.citRel ? 'accum' : 'normal') + '</div>' + more([
+    'RICH (2020, 638 randomized, stopped early): regional citrate vs systemic heparin for CRRT. Filter life 47 vs 26 hours; bleeding 5.1% vs 16.9%; new infections 68.0% vs 55.4%; 90-day death 51.2% vs 53.6% (adjusted hazard ratio 0.79, 0.63 to 1.004), underpowered for mortality.',
+    'Repeated early filter clotting on heparin is a reason to think of HIT (KDIGO 2012 rationale).',
+    'High bleeding risk in KDIGO 2012: bleeding in the last 7 days, recent trauma or surgery, recent stroke, an intracranial arteriovenous malformation or aneurysm, retinal hemorrhage, uncontrolled hypertension, an epidural catheter.',
+    'Citrate monitoring: check the ratio on the CRRT orders tab. Circuit and patient ionized calcium targets come from your institution\'s protocol.'
+  ], ['KDIGO 2012 5.3.1.1 1B · 5.3.2.1 1C · 5.3.2.2 2B · 5.3.2.3 2C · 5.3.3 2C · 5.3.4 1A', 'KDIGO 2026 draft Rec 5.5.1, 1B', 'RICH 2020 (trial)']));
+
+  /* 5. Once it is running */
+  h += card('r-watch', 'Once it is running', ul([
+    'Phosphate, magnesium, potassium and calcium on the unit\'s schedule; replace phosphate early (see <a href="#losses">losses</a>).',
+    'Temperature: CRRT cools the blood.',
+    'Drug doses change: tell pharmacy the effluent rate (see the Drugs tab).',
+    'Set an hourly net fluid goal and recheck it as pressure and oxygen change.',
+    'Ask daily whether it is still needed (see <a href="#stop">when to stop</a>).'
+  ]) + '<div class="row"><button class="btn ghost" data-go="t-rx">Read the CRRT orders</button></div>');
+
+  /* 6. Calling nephrology */
+  var say = [];
+  say.push('Who and why: age, reason for admission, and that you are asking about dialysis.');
+  say.push('Kidney course: baseline and current creatinine, urine output over the last 24 hours' + (i.stage ? ', KDIGO stage ' + i.stage : '') + (i.olig != null ? ', oliguric ' + i.olig + ' h' : '') + (i.bun != null ? ', BUN ' + i.bun : '') + '.');
+  say.push('The indication: ' + (o.ind.length ? o.ind.map(function(k){ return ENG.IND[k]; }).join(', ') + ' not responding to treatment, and what has been given' : 'none yet; ask whether to plan') + '.');
+  say.push('Potassium, pH and bicarbonate, fluid balance and oxygen need.');
+  say.push('Hemodynamics' + (o.unstable ? ': on a vasopressor (dose)' : '') + '; any brain injury.');
+  say.push('Access: platelets, INR, ' + (i.hit ? 'HIT, ' : '') + (i.fullac ? 'current anticoagulant, ' : '') + 'and where a line could go.');
+  say.push('Goals of care, and the question: start now, and which modality?');
+  h += card('r-call', 'Calling nephrology', '<ol class="steps">' + say.map(function(x){ return '<li>' + esc(x) + '</li>'; }).join('') + '</ol>' + '<span class="tier">expert practice</span>');
+  return {html: h, o: o};
+}
+function render(){ $('out').innerHTML = build(read()).html; }
+$('out').addEventListener('click', function(e){ var g = e.target.getAttribute && e.target.getAttribute('data-go'); if (g){ show(g); window.scrollTo(0, 0); } });
+
+/* ---------- CRRT orders tab ---------- */
+function readRx(){ var i = {tcu: seg.tcu, icu: seg.icu}; RXN.concat(CAN, ['pb']).forEach(function(k){ i[k] = val(k); }); return i; }
+function rxHtml(r){
+  if (!r) return '<p class="empty">Enter the weight and the flows from the order.</p>';
+  var h = '<p class="head">' + esc(r.mode) + ': effluent ' + Math.round(r.eff) + ' mL/h</p>';
+  h += '<p class="fx">effluent = pre ' + r.pre + ' + post ' + r.post + ' + dialysate ' + r.qd + ' + net removal ' + r.net + ' mL/h</p>';
+  if (r.dose != null){
+    var d = r.doseC != null ? r.doseC : r.dose;
+    h += '<p class="head' + (r.doseZ === 0 || r.doseZ === 4 ? ' wn' : '') + '">Dose ' + r1(d) + ' mL/kg/h' + (r.doseC != null ? ' (approximate correction for pre-filter dilution; ' + r1(r.dose) + ' uncorrected)' : '') + '</p>';
+    h += zoneHtml(ENG.DOSEZ, r.doseZ, 4);
+    var wh = r.doseZ === 0 ? 'Below what KDIGO asks to be delivered.' : (r.doseZ === 1 ? 'Meets the target on paper, but the delivered dose usually falls short of the prescription.' : (r.doseZ === 2 ? 'Enough margin for downtime to deliver 20 to 25.' : (r.doseZ === 3 ? 'More than needed; more drug and phosphate removal.' : 'In ATN and RENAL, higher intensity did not lower mortality; in RENAL it caused more low phosphate.')));
+    h += dpHtml([
+      ['What is happening', wh],
+      ['Why the rule', 'KDIGO 2012 5.8.4 (1A): deliver 20 to 25 mL/kg/h. Downtime for bags, clotted filters and scans means the delivered dose falls short of the prescription, so 25 to 30 is usually written.'],
+      ['At the bedside', 'Check the delivered dose each day (5.8.1, 1B), and fix the cause of interruptions before raising the rate.']
+    ]);
+    if (r.needQb) h += guard('Pre-filter replacement dilutes the blood and lowers the real dose: enter the blood flow to correct for it.');
+    if (r.bmi != null && r.bmi >= 30) h += guard('BMI ' + r1(r.bmi) + ': the 2026 draft (PP 5.3.1) bases the dose on ideal or adjusted body weight when BMI is 30 or more. This dose uses the weight entered.');
+    h += '<p class="head' + (r.nufZ === 2 ? ' wn' : '') + '" style="margin-top:14px">Net fluid removal ' + ENG.r2(r.nuf) + ' mL/kg/h</p>' + zoneHtml(ENG.NUFZ, r.nufZ, 2);
+    h += '<p class="note">From a secondary analysis of RENAL (observational): net removal over 1.75 mL/kg/h was associated with higher mortality from day 7 on (adjusted hazard ratios 1.5 to 1.7) compared with under 1.01. Not tested in an outcome trial. Set the goal from blood pressure and oxygen, and revisit it.</p>';
+  }
+  if (r.ff != null){
+    h += '<p class="head' + (r.ffZ >= 2 ? ' wn' : '') + '" style="margin-top:14px">Filtration fraction ' + r1(r.ff) + '%</p>';
+    h += '<p class="fx">FF = (pre + post + net) ÷ (blood flow × 60 × (1 − Hct) + pre) = ' + Math.round(r.quf) + ' ÷ ' + Math.round(r.qp) + '</p>';
+    h += zoneHtml(ENG.FFZ, r.ffZ, 2);
+    h += dpHtml([
+      ['What is happening', r.ffZ <= 1 ? 'The blood leaving the filter is only modestly concentrated.' : 'So much plasma water is pulled off that cells and proteins pack together at the end of the fibres.'],
+      ['Why the rule', 'A high fraction concentrates the blood in the filter, which clots and loses performance. A review gives 20 to 25% as the limit (Karkar 2020, industry-affiliated authors); ADQI keeps the filtration fraction ideally under 30% and puts its 20 to 25% limit on the blood-based concentration ratio (Neri 2016). Dialysate does not count.'],
+      ['At the bedside', r.ffZ >= 2 ? 'Raise the blood flow, move some replacement before the filter, or shift dose to dialysate.' : 'Recheck when the blood flow or replacement changes.']
+    ]) + '<div class="chips">' + chip('ff', r.ffZ >= 2 ? 'high' : 'low') + '</div>';
+  } else h += '<p class="note">Add blood flow and hematocrit for the filtration fraction.</p>';
+  h += '<p class="note" style="margin-top:12px">Typical CRRT blood flow is 150 to 250 mL/min; citrate protocols with diffusive modes often use 80 to 150 (Jang 2020; Schneider 2017). Your protocol decides.</p>';
+  h += more(['Effluent is everything leaving the filter: replacement (pre and post), dialysate and net removal (ADQI). The dose is effluent per kilogram per hour; pre-filter replacement is corrected approximately by blood flow ÷ (blood flow + pre-filter rate); a correction based on plasma flow is a little larger.', 'In one academic centre, the prescribed clearance overestimated what was delivered by 24% (Jang 2020).'], ['KDIGO 2012 5.8.4, 1A', 'KDIGO 2026 draft Rec 5.3.1, 1B', 'Neri 2016 · Karkar 2020 (review)', 'Murugan 2019 (observational)']);
+  return h;
+}
+function caHtml(c){
+  if (!c) return '<p class="empty">Enter total and ionized calcium from the same blood sample (patient, not post-filter).</p>';
+  var h = '';
+  if (c.unitWarn) h += guard(esc(c.unitWarn));
+  h += '<p class="head' + (c.z === 2 ? ' bad' : (c.z === 1 ? ' wn' : '')) + '">Ratio ' + ENG.r2(c.ratio) + '</p>';
+  h += '<p class="fx">' + ENG.r2(c.tm) + ' ÷ ' + ENG.r2(c.cm) + ' mmol/L (mg/dL ÷ 4.008)</p>';
+  h += zoneHtml(ENG.CAZ, c.z, 2);
+  h += dpHtml([
+    ['What is happening', c.z === 2 ? 'Citrate-calcium complexes are building up: they count in total calcium but not ionized, so the gap widens.' : (c.z === 1 ? 'Possibly early accumulation; one value means less than its trend.' : 'Citrate is being cleared as fast as it arrives.')],
+    ['Why the rule', 'KDIGO 2012 calls the ratio the best marker and cites 2.1 as the optimal cutoff; a 2017 review treats over 2.5 as significant accumulation, and a trend toward it as ongoing accumulation (Schneider 2017). The zones are this tool\'s synthesis of the two.'],
+    ['At the bedside', c.z === 2 ? 'Warning signs alongside: anion gap acidosis, rising lactate, a rising calcium infusion with falling ionized calcium. First cut citrate delivery (lower blood flow, or more dialysate or replacement, or a lower citrate target per protocol); if it does not improve quickly, switch to another circuit anticoagulant and keep CRRT running to clear the citrate-calcium complexes (Schneider 2017). Call nephrology.' : 'Recheck on protocol (often every 6 hours). Alkalosis with a normal ratio is citrate overload, which is common and benign: lower citrate delivery per protocol.']
+  ]);
+  h += '<div class="chips">' + chip('citrate', c.z === 2 ? 'accum' : 'normal') + '</div>';
+  h += more(['Link 2012 (observational, 208 patients): a ratio of 2.4 or more predicted higher 28-day mortality; that is a mortality marker, not an accumulation cutoff.', 'Metabolic alkalosis is the commonest metabolic problem on citrate, in up to half of patients in observational studies (KDIGO 2012).'], ['KDIGO 2012 rationale', 'Schneider 2017 (review)', 'Link 2012 (observational)']);
+  return h;
+}
+function clHtml(r, pb){
+  if (pb == null) return '<p class="empty">Enter the protein binding from the drug label or pharmacy reference.</p>';
+  if (pb > 100) return '<p class="empty">Protein binding is a percentage from 0 to 100.</p>';
+  if (!r) return '<p class="empty">Enter the flows on the CRRT orders tab first.</p>';
+  var d = ENG.drugCl(r, pb);
+  if (d.needQb) return '<p class="empty">Pre-filter replacement is set: enter the blood flow on the CRRT orders tab.</p>';
+  var h = '<p class="head">About ' + r1(d.clmin) + ' mL/min removed by the circuit</p>';
+  h += '<p class="fx">effluent ' + Math.round(r.eff) + ' mL/h × sieving ' + ENG.r2(d.sc) + (d.dil != null && d.dil < 1 ? ' × dilution ' + ENG.r2(d.dil) : '') + ' ÷ 60</p>';
+  h += dpHtml([
+    ['What is happening', pb >= 80 ? 'Most of the drug is held by albumin and cannot cross; the circuit adds little.' : 'Most of the drug is free and crosses with the effluent: the circuit acts as a kidney for it.'],
+    ['Why the rule', 'Sieving coefficient ≈ 1 − bound fraction; circuit clearance ≈ effluent rate × sieving coefficient, reduced by pre-filter dilution (Jang 2020). The patient\'s own kidney and liver clearance add to this.'],
+    ['At the bedside', 'Give the usual loading dose, then let pharmacy set maintenance from the effluent rate. A drug with a large volume of distribution is little affected even when this number is high.']
+  ]);
+  return h;
+}
+function renderRx(){ var i = readRx(), r = ENG.rx(i); $('rxout').innerHTML = rxHtml(r); $('caout').innerHTML = caHtml(ENG.caRatio(i)); $('clout').innerHTML = clHtml(r, i.pb); }
+
+/* ---------- tabs ---------- */
+var tabs = [['t-pt','p-pt'],['t-rx','p-rx'],['t-drug','p-drug'],['t-learn','p-learn'],['t-prac','p-prac']];
+function show(t){ tabs.forEach(function(p){ var on = p[0] === t; $(p[0]).setAttribute('aria-selected', String(on)); $(p[1]).classList.toggle('on', on); }); }
+tabs.forEach(function(p){ $(p[0]).addEventListener('click', function(){ show(p[0]); }); });
+function fromHash(){ var id = location.hash.slice(1); if (!id) return; var el = $(id); if (!el) return; var pan = el.closest('.panel'); if (pan) tabs.forEach(function(p){ if (p[1] === pan.id) show(p[0]); }); el.scrollIntoView(); }
+window.addEventListener('hashchange', fromHash);
+
+/* ---------- Learn ---------- */
+var TRIALS = [
+  {q: 'ATN (2008): does more dialysis help?', d: 'Randomized, 1124 critically ill adults with AKI plus another organ failure or sepsis. Intensive (intermittent or SLED six times a week, CVVHDF 35 mL/kg/h) vs less intensive (three times a week, 20 mL/kg/h).', r: '60-day death 53.6% vs 51.5% (odds ratio 1.09, 0.86 to 1.40). No difference in kidney recovery.', c: 'Set the dose: 20 to 25 mL/kg/h delivered for CRRT, Kt/V 3.9 a week for intermittent.', cite: 'Palevsky PM et al. N Engl J Med 2008;359:7', doi: '10.1056/NEJMoa0802639'},
+  {q: 'RENAL (2009): 40 or 25 mL/kg/h of CVVHDF?', d: 'Randomized, 1508 critically ill adults in Australia and New Zealand (1464 analysed).', r: '90-day death 44.7% in both groups. Low phosphate 65% vs 54% with the higher dose.', c: 'Confirmed ATN\'s null result; the higher dose added only low phosphate.', cite: 'RENAL Investigators. N Engl J Med 2009;361:1627', doi: '10.1056/NEJMoa0902413'},
+  {q: 'ELAIN (2016): start at stage 2?', d: 'Single-centre randomized trial, 231 critically ill adults with stage 2 AKI and NGAL over 150 ng/mL: start within 8 hours vs within 12 hours of stage 3.', r: '90-day death 39.3% vs 54.7% (hazard ratio 0.66, 0.45 to 0.97); more kidney recovery by day 90 (53.6% vs 38.7%). Small and single centre; 91% of the delayed group were dialysed.', c: 'The one positive early-start trial; larger trials did not reproduce it.', cite: 'Zarbock A et al. JAMA 2016;315:2190', doi: '10.1001/jama.2016.5828'},
+  {q: 'AKIKI (2016): start early or wait for an indication?', d: 'Multicentre randomized, 620 adults with stage 3 AKI on a ventilator or catecholamines, no life-threatening complication.', r: '60-day death 48.5% vs 49.7%. 49% of the delayed group never received dialysis. Catheter-related bloodstream infection 10% vs 5% with the early start.', c: 'Waiting for an indication is safe and spares many patients dialysis.', cite: 'Gaudry S et al. N Engl J Med 2016;375:122', doi: '10.1056/NEJMoa1603017'},
+  {q: 'IDEAL-ICU (2018): early dialysis in septic shock?', d: 'Multicentre randomized, 488 adults with early septic shock and severe AKI: within 12 hours vs after 48 hours if no recovery. Stopped for futility.', r: '90-day death 58% vs 54% (477 analysed). 38% of the delayed group never needed dialysis; 17% met emergency criteria.', c: 'Same answer in sepsis.', cite: 'Barbar SD et al. N Engl J Med 2018;379:1431', doi: '10.1056/NEJMoa1803213'},
+  {q: 'STARRT-AKI (2020): accelerated or standard start?', d: 'Multinational randomized, 3019 critically ill adults with severe AKI: start within 12 hours vs wait for a conventional indication or AKI over 72 hours.', r: '90-day death 43.9% vs 43.7% (relative risk 1.00). Dialysis dependence among survivors 10.4% vs 6.0%; adverse events 23.0% vs 16.5%. 61.8% of the standard group were dialysed.', c: 'The strongest evidence against an early start: no survival benefit, more dialysis dependence.', cite: 'STARRT-AKI Investigators. N Engl J Med 2020;383:240', doi: '10.1056/NEJMoa2000741'},
+  {q: 'AKIKI 2 (2021): how long can you wait?', d: 'Multicentre randomized, 278 adults with stage 3 AKI and oliguria over 72 hours or BUN over 112 mg/dL: start then vs wait for a mandatory indication or BUN 140 mg/dL.', r: 'Dialysis-free days 12 vs 10 (no difference). 60-day death hazard ratio 1.65 (1.09 to 2.50) with the longer wait, in a multivariable analysis.', c: 'Deferring has a limit: waiting past these triggers bought nothing.', cite: 'Gaudry S et al. Lancet 2021;397:1293', doi: '10.1016/S0140-6736(21)00350-0'},
+  {q: 'RICH (2020): citrate or heparin for CRRT?', d: 'Multicentre randomized, Germany, 638 randomized (596 analysed), stopped early.', r: 'Filter life 47 vs 26 hours; bleeding 5.1% vs 16.9%; new infections 68.0% vs 55.4%; 90-day death 51.2% vs 53.6% (adjusted hazard ratio 0.79, 0.63 to 1.004). Underpowered for mortality.', c: 'Supports citrate as the first choice for CRRT where a protocol exists.', cite: 'Zarbock A et al. JAMA 2020;324:1629', doi: '10.1001/jama.2020.18618'}
+];
+document.querySelectorAll('[data-figure]').forEach(function(hst){ mountFig(hst, hst.getAttribute('data-figure'), hst.getAttribute('data-state')); });
+(function(){
+  var chaps = [].slice.call(document.querySelectorAll('.chap'));
+  $('pills').innerHTML = chaps.map(function(c, n){ return '<button class="pill" data-go="' + c.id + '" aria-current="' + (n === 0) + '">' + (n + 1) + ' ' + esc(c.getAttribute('data-pill')) + '</button>'; }).join('');
+  $('pills').addEventListener('click', function(e){ var g = e.target.getAttribute('data-go'); if (g) $(g).scrollIntoView(); });
+  function mark(id){ [].forEach.call($('pills').children, function(b){ var on = b.getAttribute('data-go') === id; b.setAttribute('aria-current', String(on)); if (on) $('pills').scrollLeft = Math.max(0, b.offsetLeft - 60); }); }
+  if ('IntersectionObserver' in window){
+    var io = new IntersectionObserver(function(es){ es.forEach(function(en){ if (en.isIntersecting) mark(en.target.id); }); }, {rootMargin: '-30% 0px -60% 0px'});
+    chaps.forEach(function(c){ io.observe(c); });
+  }
+  $('trialbox').innerHTML = TRIALS.map(function(t){ return '<div class="trial" style="margin-top:14px"><p><b>' + esc(t.q) + '</b></p><p><span class="k">Design</span>' + esc(t.d) + '</p><p><span class="k">Result</span>' + esc(t.r) + '</p><p><span class="k">What it changed</span>' + esc(t.c) + '</p><p class="mono" style="font-size:13px">' + esc(t.cite) + ' · <a href="https://doi.org/' + t.doi + '" rel="noopener">doi:' + esc(t.doi) + '</a></p></div>'; }).join('');
+  $('go-prac').addEventListener('click', function(){ show('t-prac'); window.scrollTo(0, 0); });
+})();
+
+/* ---------- Practice: cases run through the same engine ---------- */
+var CASES = [
+  {t: 'Septic shock, creatinine climbing', s: 'Age 64, ICU, norepinephrine running, lactate 1.8 and falling. Stage 3 AKI, oliguric 20 hours. Potassium 5.2, pH 7.28, no pulmonary edema. No bleeding.', q: 'Start now? If it is started, which kind and which anticoagulant?', i: {stage: 3, icu: true, olig: 20, pressor: true}, p: 'No emergent indication: defer and plan (STARRT-AKI, AKIKI, IDEAL-ICU). If it comes to it, CRRT because of the vasopressor, with regional citrate where there is a protocol. KDIGO 2012 excluded shock from citrate; with perfusion adequate (lactate falling), later experience suggests it can be used in an experienced centre with close monitoring of the calcium ratio and lactate.'},
+  {t: 'Drowning on the ward', s: 'Age 71, anuric for a day after contrast and sepsis. Pulmonary edema on 6 L/min oxygen despite high-dose furosemide. MAP 78 without pressors.', q: 'Start now, and which kind?', i: {fluid: true, stage: 3}, p: 'Start now: fluid overload with pulmonary edema not responding to diuretics. Stable pressure: intermittent or continuous both work; anticoagulate the circuit with heparin for intermittent dialysis, or citrate for CRRT.'},
+  {t: 'Potassium 7.1, stable', s: 'Age 58, rhabdomyolysis. Potassium 7.1 with peaked T waves, still 6.9 after calcium, insulin with glucose and albuterol. MAP 85. No bleeding risk.', q: 'Start now, and what kind?', i: {k: true, stage: 2}, p: 'Start now. Stable, so intermittent hemodialysis clears potassium fastest. Keep the shifting treatment going, and recheck potassium within hours after the session because it rebounds.'},
+  {t: 'Acute liver failure', s: 'Age 33, acetaminophen. Grade 3 encephalopathy, INR 4.2, lactate 6 and rising, on norepinephrine. Creatinine doubling.', q: 'Which kind, and what anticoagulation?', i: {alf: true, pressor: true, coag: true, shockperf: true, stage: 2, icu: true}, p: 'CRRT (brain edema risk and instability; CRRT may also lower ammonia, draft PP 5.1.4). Impaired coagulation with liver failure and shock: start without anticoagulation, help the filter with pre-filter replacement and a diffusive mode. Citrate only in an experienced centre with close ratio monitoring.'},
+  {t: 'Day 4 in the ICU', s: 'Age 69, stage 3 AKI after cardiac surgery, oliguric for 80 hours. BUN 118. Potassium 5.0, pH 7.31, mild edema, stable pressure.', q: 'Keep waiting?', i: {stage: 3, icu: true, olig: 80, bun: 118}, p: 'Reasonable to start now: this is the AKIKI 2 population, where waiting longer (to BUN 140 or a mandatory indication) bought no dialysis-free days and in a secondary analysis was associated with more deaths.'},
+  {t: 'Platelets falling on CRRT', s: 'Age 60 on CRRT with heparin for 6 days. Platelets 210 to 70, a new leg DVT, filters clotting early. Liver function normal.', q: 'What happens to the circuit anticoagulant?', i: {hit: true, pressor: true, icu: true, stage: 3, onrrt: true}, p: 'Suspected HIT: stop all heparin, including flushes and catheter locks. Argatroban during dialysis (KDIGO 2012 5.3.4, 1A; argatroban preferred with a normal liver, 2C). See the HIT tool.'}
+];
+var RXCASE = {t: 'Read this CRRT order', s: '80 kg. CVVHDF: blood flow 150 mL/min, hematocrit 30%, replacement 1000 mL/h after the filter, dialysate 1000 mL/h, net removal 100 mL/h.', q: 'What dose is delivered, and is the filtration fraction safe?', rx: {wt: 80, qb: 150, hct: 30, qpost: 1000, qd: 1000, qnet: 100}, p: 'Effluent 2100 mL/h, so 26.3 mL/kg/h prescribed: enough margin to deliver 20 to 25. Filtration fraction 1100 ÷ 6300 = 17.5%, within the usual limit. Net removal 1.25 mL/kg/h.'};
+$('practice').innerHTML = CASES.concat([RXCASE]).map(function(c, n){
+  return '<div class="card case"><p class="label">Case ' + (n + 1) + '</p><h2>' + esc(c.t) + '</h2><p>' + esc(c.s) + '</p><p><b>' + esc(c.q) + '</b></p><div class="row"><button class="btn" data-ans="' + n + '">Show the answer</button><button class="btn ghost" data-load="' + n + '">Open in the tool</button></div><div class="ans" id="ans' + n + '" hidden></div></div>';
+}).join('');
+$('practice').addEventListener('click', function(e){
+  var a = e.target.getAttribute('data-ans'), l = e.target.getAttribute('data-load');
+  if (a != null){ var c = a < CASES.length ? CASES[a] : RXCASE; var box = $('ans' + a); var body = c.rx ? '<div class="card">' + rxHtml(ENG.rx(c.rx)) + '</div>' : build(c.i).html; box.innerHTML = '<p>' + esc(c.p) + '</p>' + body.replace(/ id="[^"]*"/g, ''); box.hidden = false; e.target.hidden = true; }
+  var g = e.target.getAttribute('data-go'); if (g && /^t-/.test(g)){ show(g); window.scrollTo(0, 0); }
+  if (l != null){ if (l < CASES.length) load(CASES[l].i); else loadRx(RXCASE.rx); }
+});
+function load(i){
+  NUMS.forEach(function(k){ $(k).value = i[k] != null ? i[k] : ''; });
+  ticked = {}; Object.keys(TICKS).forEach(function(h){ TICKS[h].forEach(function(t){ if (i[t[0]]) ticked[t[0]] = true; }); });
+  document.querySelectorAll('#inputs .checks input').forEach(function(x){ x.checked = !!ticked[x.getAttribute('data-k')]; });
+  seg.stage = String(i.stage || 0);
+  var g = document.querySelector('[data-seg="stage"]'); [].forEach.call(g.children, function(b){ b.setAttribute('aria-pressed', String(b.getAttribute('data-v') === seg.stage)); });
+  render(); show('t-pt'); window.scrollTo(0, 0);
+}
+function loadRx(x){ RXN.forEach(function(k){ $(k).value = x[k] != null ? x[k] : ''; }); renderRx(); show('t-rx'); window.scrollTo(0, 0); }
+render(); renderRx();
+fromHash();
+})();
+</script>
+<script id="deeper-data">
+/* Go deeper: mechanism, rationale and the common trap for each Learn chapter. Text only; no doses or thresholds beyond the tool's own. */
+(function(){ var D = {
+"learn-modes": [["Mechanism", "In diffusion, solutes move from blood to dialysate down their concentration gradient; small molecules such as urea and potassium move fastest. In convection, a pressure gradient pushes plasma water through the membrane and solutes small enough to pass the pores are carried with it, so larger (middle) molecules leave too. Replacement fluid gives back the volume that convection removes."], ["Why it matters", "For potassium, acid and urea, both work: what matters most is how much effluent flows. Convection removes larger molecules better, but no mode has been shown to change survival, so the choice usually follows the machine, the protocol and filter life."], ["Common trap", "Thinking intermittent and continuous therapy are different treatments. They use the same membrane physics; they differ in speed. Speed decides tolerance: hypotension with fast fluid removal, and solute shifts in an injured brain."]],
+"learn-gentle": [["Mechanism", "Fluid is removed from the blood, and the blood volume is refilled from the tissues. If removal outruns refill, the blood volume falls and pressure drops. Spreading the same removal over 24 hours keeps the hourly rate low."], ["Why it matters", "This is why KDIGO suggests continuous therapy for hemodynamically unstable patients (2B), and why prolonged intermittent therapy is an acceptable middle ground."], ["Common trap", "Assuming continuous means safe at any rate. A high hourly net removal on CRRT can still drop the pressure, and in an observational analysis of RENAL the highest net removal rates were associated with more deaths."]],
+"learn-citrate": [["Mechanism", "Clotting needs ionized calcium. Citrate infused before the filter binds it, so blood in the circuit cannot clot; calcium is replaced after the filter so the patient's own clotting is untouched. Citrate that reaches the patient is metabolised in liver, muscle and kidney, producing bicarbonate."], ["Why it matters", "That is why citrate makes filters last longer and causes less bleeding than heparin (RICH), and why its commonest problem is metabolic alkalosis: every citrate molecule metabolised adds bicarbonate."], ["Common trap", "Reading a low ionized calcium as a reason to give more calcium and nothing else. When citrate is accumulating, total calcium rises while ionized calcium falls; the ratio, not the ionized value alone, shows it."]],
+"learn-ff": [["Mechanism", "Only plasma water can be pulled across the membrane; red cells and proteins stay in the fibre. The higher the share of plasma water removed, the more concentrated the blood becomes by the end of the fibre, and concentrated blood clots and coats the membrane."], ["Why it matters", "Pre-filter replacement dilutes the blood before water is removed, and a higher blood flow brings more plasma per minute, so both lower the fraction. That is the trade: pre-filter replacement protects the filter but lowers the effective dose."], ["Common trap", "Blaming every clotted filter on too little anticoagulant. A high filtration fraction, a kinked or poorly flowing catheter, and frequent alarm stops clot filters too; check them before adding anticoagulant."]],
+"learn-drugs": [["Mechanism", "The membrane lets through free drug, not drug bound to albumin. Drug clearance by the circuit is roughly the effluent rate times the free fraction. How much that matters depends on where the drug lives: a drug mostly in tissue is barely touched by what happens in the blood."], ["Why it matters", "The circuit acts as a kidney for small, free drugs. Dosing as if the kidneys had simply failed, without counting the circuit, risks underdosing an antibiotic in septic shock."], ["Common trap", "Cutting the loading dose because the patient has kidney failure. The loading dose depends on the volume of distribution, which is unchanged or larger; only the maintenance dose depends on clearance."]]
+};
+  function add(){ Object.keys(D).forEach(function(id){ var c = document.getElementById(id); if (!c || c.querySelector(":scope > .deeper")) return; var d = document.createElement("details"); d.className = "deeper"; d.innerHTML = "<summary>Go deeper: mechanism and rationale</summary><div class=\"dpx\">" + D[id].map(function(r){ return "<div><span class=\"dl\">" + r[0] + "</span><p>" + r[1] + "</p></div>"; }).join("") + "</div>"; c.appendChild(d); }); }
+  add();
+})();
+</script>
+</body>
+</html>
