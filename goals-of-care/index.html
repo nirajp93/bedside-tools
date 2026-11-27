@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Goals of care in the ICU · bedside.tools</title>
+<meta name="description" content="The ICU family meeting step by step, code status, time-limited trials, the move to comfort care and compassionate extubation, and what to do after a death, with the evidence.">
+<script src="/theme.js"></script>
+<style>
+:root{--bg:#FBFBFA;--card:#FFFFFF;--ink:#111113;--muted:#55555D;--line:#ECECEE;--accent:#2B4BDB;--warn:#9A3B00;--warnbg:#FFF6EC}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5}
+.mono{font-family:var(--mono)}
+.wrap{max-width:720px;margin:0 auto;padding:20px 16px 48px}
+a{color:var(--accent)}
+.back{font-size:14px;text-decoration:none;display:inline-block;min-height:44px;line-height:44px}
+h1{font-size:26px;margin:4px 0 4px;letter-spacing:-.01em}
+.purpose{color:var(--muted);margin:0 0 20px}
+.tabs{display:flex;gap:6px;margin:0 -16px 16px;padding:0 16px 2px;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:1 0 auto;min-width:0;min-height:44px;border:1px solid var(--line);background:var(--card);border-radius:14px;padding:0 12px;font:inherit;font-size:15px;font-weight:600;color:var(--muted);cursor:pointer}
+.tab[aria-selected="true"]{border-color:var(--accent);color:var(--accent)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
+.label{font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+.grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.grid2{grid-template-columns:1fr 1fr}
+.field{display:flex;flex-direction:column;justify-content:flex-end}
+.field label{display:block;font-size:13px;color:var(--muted);margin-bottom:4px}
+.field input,.field select{width:100%;min-height:44px;border:1px solid var(--line);border-radius:10px;padding:8px 10px;font:inherit;font-family:var(--mono);background:var(--card);color:var(--ink)}
+.field input:focus,.field select:focus,.tab:focus-visible,.chk:focus-within,button:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.checks{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.chk{display:flex;align-items:center;gap:10px;min-height:44px;border:1px solid var(--line);border-radius:10px;padding:6px 10px;font-size:14px;cursor:pointer}
+.chk input{width:20px;height:20px;accent-color:var(--accent);flex:none}
+.card h2{font-size:18px;margin:0 0 2px}
+.head{font-family:var(--mono);font-size:17px;font-weight:600;margin:6px 0 4px;overflow-wrap:anywhere}
+.head.bad{color:var(--bad)}.head.okc{color:var(--ok)}
+.sub{font-size:14px;color:var(--muted);margin:0}
+.card ul{margin:6px 0 0;padding-left:20px}
+.card li{margin-bottom:4px}
+.guard{border-left:3px solid var(--warn);background:var(--warnbg);padding:8px 10px;border-radius:0 10px 10px 0;margin-top:8px;font-size:14.5px}
+.tier{display:inline-block;font-family:var(--mono);font-size:11px;border:1px solid var(--line);border-radius:999px;padding:2px 8px;color:var(--muted);margin:6px 6px 0 0}
+details{margin-top:10px;border-top:1px solid var(--line);padding-top:8px}
+.whyline{margin:10px 0 0;font-size:14.5px;color:var(--muted)}
+.whyline b{color:var(--ink);font-weight:600}
+summary{cursor:pointer;color:var(--accent);font-weight:600;min-height:44px;line-height:44px}
+details p{margin:0 0 8px;font-size:15px}
+.empty{color:var(--muted)}
+.btn{min-height:44px;border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);border-radius:10px;padding:8px 14px;font:inherit;font-weight:600;cursor:pointer}
+.btn.ghost{background:var(--card);color:var(--accent)}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.note{font-size:14px;color:var(--muted)}
+.tl{position:relative;padding-left:26px}
+.tl:before{content:"";position:absolute;left:8px;top:8px;bottom:8px;width:2px;background:var(--line)}
+.st{position:relative;padding:6px 0 10px}
+.st:before{content:"";position:absolute;left:-24px;top:11px;width:12px;height:12px;border-radius:50%;background:var(--card);border:2px solid var(--muted)}
+.st.now:before{background:var(--accent);border-color:var(--accent)}
+.st .when{font-family:var(--mono);font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+.st b{display:block}
+.st .dose{font-family:var(--mono);font-size:14.5px;display:block;overflow-wrap:anywhere}
+.st small{color:var(--muted);font-size:13.5px;display:block}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:6px 6px 6px 0;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:var(--mono);font-size:11.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);font-weight:500}
+td.mono{font-size:13px}
+.tw{overflow-x:auto}
+.case h2{font-size:17px}
+.ans{margin-top:10px;border-top:1px solid var(--line);padding-top:10px}
+footer{margin-top:28px;font-size:13.5px;color:var(--muted)}
+footer p{margin:0 0 8px}
+.panel{display:none}.panel.on{display:block}
+.fig{display:block;width:100%;max-width:460px;height:auto;margin:0 auto}
+.states{display:flex;gap:6px;overflow-x:auto;margin:10px -16px;padding:2px 16px 6px;scrollbar-width:none}
+.states::-webkit-scrollbar{display:none}
+.states.wrapit{flex-wrap:wrap;overflow:visible;margin:10px 0;padding:0}
+.sbtn{flex:none;min-height:44px;min-width:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--ink);font:inherit;font-size:14px;cursor:pointer;white-space:nowrap}
+.sbtn[aria-pressed="true"]{border-color:var(--accent);color:var(--accent);font-weight:600}
+.line1{font-size:15px;margin:10px 0 0}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.chip{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--fill);color:var(--ink);font:inherit;font-size:14px;cursor:pointer}
+.chip svg{flex:none;color:var(--accent)}
+.scrim{position:fixed;inset:0;background:var(--scrim);z-index:20}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:21;max-height:90vh;overflow-y:auto;background:var(--card);border:1px solid var(--line);border-bottom:0;border-radius:20px 20px 0 0;padding:8px 16px 24px;max-width:560px;margin:0 auto}
+.sheethead{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.sheethead h2{font-size:18px;margin:0}
+.xbtn{min-height:44px;min-width:44px;border:0;background:transparent;color:var(--accent);font:inherit;font-weight:600;cursor:pointer}
+.pills{position:sticky;top:var(--bt-bar,0px);z-index:5;background:var(--bg);display:flex;gap:6px;overflow-x:auto;margin:0 -16px 12px;padding:8px 16px;border-bottom:1px solid var(--line);scrollbar-width:none}
+.pills::-webkit-scrollbar{display:none}
+.pill{flex:none;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--muted);font:inherit;font-size:14px;cursor:pointer;white-space:nowrap}
+.pill[aria-current="true"]{border-color:var(--accent);color:var(--accent);font-weight:600}
+.chap{scroll-margin-top:70px}
+.cause{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:8px 0;border-top:1px solid var(--line);font-size:15px}
+.cause small{color:var(--muted);font-size:13px;text-align:right;flex:0 1 58%}
+.cause.out span{color:var(--muted);text-decoration:line-through}
+.cause.out,.cause.less{opacity:.6}
+.cause.fav span{font-weight:700}
+.cause.fav span:before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--accent);margin-right:8px}
+.trial{border-left:3px solid var(--accent);padding-left:12px}
+.trial p{margin:0 0 6px;font-size:15px}
+.trial .k{font-family:var(--mono);font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);display:block}
+tr.mark td{font-weight:700;color:var(--accent)}
+@media (min-width:900px){
+  .wrap{max-width:1040px}
+  .panel.two.on{display:grid;grid-template-columns:380px minmax(0,1fr);gap:20px;align-items:start}
+  #p-fix{max-width:720px;margin:0 auto}
+  .refgrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;align-items:start}
+  .refgrid .card{margin-bottom:0}
+  #p-learn{max-width:720px;margin:0 auto}
+}
+@media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+.deeper{margin-top:14px;border-top:1px solid var(--line)}
+.deeper>summary{min-height:44px;display:flex;align-items:center;gap:8px;color:var(--accent);font-weight:600;font-size:15px;cursor:pointer;list-style:none}
+.deeper>summary::-webkit-details-marker{display:none}
+.deeper>summary::before{content:"+";font-family:var(--mono);font-size:18px;line-height:1;width:14px;text-align:center}
+.deeper[open]>summary::before{content:"\2212"}
+.deeper>summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.deeper .dpx{border:1px solid var(--line);border-radius:12px;padding:2px 12px;background:var(--card);text-align:left}
+.deeper .dpx>div{padding:10px 0;border-top:1px solid var(--line)}
+.deeper .dpx>div:first-child{border-top:0}
+.deeper .dl{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500;margin:0 0 3px}
+.deeper p{font-size:15px;line-height:1.45;color:var(--ink);margin:0 0 4px}
+.deeper p:last-child{margin-bottom:0}
+/* cause-fix: ruled-out causes stay readable; the name greys, the reason does not fade */
+.cause.out,.cause.less,.cause.unl{opacity:1}
+.cause.less>span,.cause.unl>span{color:var(--muted)}
+.plate{margin:12px 0 4px}
+.plate img{display:block;width:100%;height:auto;border-radius:10px;border:1px solid var(--line)}
+.plate figcaption{font-size:13px;color:var(--muted);margin-top:6px}
+/* goals-of-care additions */
+.quote{border-left:3px solid var(--accent);background:var(--fill);border-radius:0 10px 10px 0;padding:8px 12px;margin:10px 0 0;font-size:15px}
+.quote::before{content:"Say: ";font-family:var(--mono);font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+.trap{font-size:14.5px;margin:8px 0 0}
+.trap b{font-family:var(--mono);font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--warn);font-weight:600;margin-right:6px}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.two-col h3{font-size:14px;font-family:var(--mono);letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin:6px 0 2px;font-weight:500}
+@media (max-width:520px){.two-col{grid-template-columns:1fr}}
+.stepno{font-family:var(--mono);font-size:12px;color:var(--muted);margin:10px 0 0}
+.opt{display:block;width:100%;text-align:left;min-height:44px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);font:inherit;font-size:15px;padding:10px 12px;margin-top:8px;cursor:pointer}
+.opt[aria-pressed="true"].good{border-color:var(--ok);background:var(--okbg)}
+.opt[aria-pressed="true"].bad{border-color:var(--bad);background:var(--badbg)}
+.inst{border:1px dashed var(--line);border-radius:10px;padding:8px 10px;margin-top:10px;font-size:14px;color:var(--muted)}
+.inst b{color:var(--ink)}
+.cert td.ln{font-family:var(--mono);width:28px;color:var(--muted)}
+.cert tr.badrow td{color:var(--bad)}
+@media (min-width:900px){#p-learn,#p-prac{max-width:720px;margin:0 auto}.panel.cols.on{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;align-items:start}.panel.cols.on>div>.card:last-child{margin-bottom:0}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="/">← bedside.tools</a>
+<h1>Goals of care in the ICU</h1>
+<p class="purpose">Run the family meeting, talk about code status and time-limited trials, move to comfort care, and do what follows a death.</p>
+
+<div class="tabs" role="tablist">
+  <button class="tab" role="tab" id="t-meet" aria-selected="true" aria-controls="p-meet">Meeting</button>
+  <button class="tab" role="tab" id="t-code" aria-selected="false" aria-controls="p-code">Code status</button>
+  <button class="tab" role="tab" id="t-tlt" aria-selected="false" aria-controls="p-tlt">Time-limited trial</button>
+  <button class="tab" role="tab" id="t-comfort" aria-selected="false" aria-controls="p-comfort">Comfort</button>
+  <button class="tab" role="tab" id="t-after" aria-selected="false" aria-controls="p-after">After death</button>
+  <button class="tab" role="tab" id="t-learn" aria-selected="false" aria-controls="p-learn">Learn</button>
+  <button class="tab" role="tab" id="t-prac" aria-selected="false" aria-controls="p-prac">Practice</button>
+</div>
+
+<div class="panel cols on" id="p-meet" role="tabpanel" aria-labelledby="t-meet">
+  <div><div id="meet-a"></div></div>
+  <div><div id="meet-b"></div></div>
+</div>
+<div class="panel cols" id="p-code" role="tabpanel" aria-labelledby="t-code">
+  <div><div id="code-a"></div></div>
+  <div><div id="code-b"></div></div>
+</div>
+<div class="panel cols" id="p-tlt" role="tabpanel" aria-labelledby="t-tlt">
+  <div><div id="tlt-a"></div></div>
+  <div><div id="tlt-b"></div></div>
+</div>
+<div class="panel cols" id="p-comfort" role="tabpanel" aria-labelledby="t-comfort">
+  <div><div id="comfort-a"></div></div>
+  <div><div id="comfort-b"></div></div>
+</div>
+<div class="panel cols" id="p-after" role="tabpanel" aria-labelledby="t-after">
+  <div><div id="after-a"></div></div>
+  <div><div id="after-b"></div></div>
+</div>
+
+<div class="panel" id="p-learn" role="tabpanel" aria-labelledby="t-learn">
+  <div class="pills" id="pills"></div>
+  <div class="card chap" id="learn-optimism" data-pill="Optimism"><p class="label">1 · What families hear</p><h2>A grim number is heard as a hopeful one</h2><p>Surrogates were read prognostic statements and asked what they meant. Tap a statement.</p><div data-figure="optimism" data-state="five"></div></div>
+  <div class="card chap" id="learn-spectrum" data-pill="Who decides"><p class="label">2 · Who decides</p><h2>From a menu to a recommendation</h2><p>Shared decision making is a range, not one method. Tap a point on it.</p><div data-figure="spectrum" data-state="shared"></div></div>
+  <div class="card chap" id="learn-standard" data-pill="Standard"><p class="label">3 · Deciding for someone else</p><h2>What would the patient say?</h2><p>Tap a path.</p><div data-figure="standard" data-state="sj"></div></div>
+  <div class="card chap" id="learn-distress" data-pill="Family distress"><p class="label">4 · The cost to families</p><h2>Deciding is a burden families carry home</h2><p>Families were screened for post-traumatic stress symptoms 90 days after the ICU. Tap a group.</p><div data-figure="distress" data-state="all"></div></div>
+  <div class="card chap" id="learn-uncertainty" data-pill="Uncertainty"><p class="label">5 · Saying what you do not know</p><h2>Hope and worry in the same breath</h2><p>Tap a situation to see a way to say it.</p><div class="states wrapit" id="hwseg" role="group" aria-label="Situation"></div><p class="quote" id="hwout"></p><p class="note" id="hwnote" style="margin-top:8px"></p></div>
+  <div class="card chap" id="trials" data-pill="Trials"><p class="label">6 · Trials</p><h2>What has been tested, and what helped</h2><div id="trialbox"></div><div class="row"><button class="btn" id="go-prac">Try the practice cases</button></div></div>
+</div>
+
+<div class="panel" id="p-prac" role="tabpanel" aria-labelledby="t-prac">
+  <div id="practice"></div>
+</div>
+
+<div class="scrim" id="scrim" hidden></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-t" hidden>
+  <div class="sheethead"><h2 id="sheet-t"></h2><button class="xbtn" id="sheet-x">Close</button></div>
+  <div id="sheet-b"></div>
+</div>
+
+<footer>
+  <p><strong>For education only. Not a substitute for clinical judgment.</strong> A primer with no patient data entered. Example wording is expert practice, offered as a starting point to put in your own words. Who may act as surrogate, out-of-hospital orders, organ donation referral, medical examiner cases, brain death accommodation, and disputes over potentially inappropriate treatment are set by state law and hospital policy: adjust to your state and institution, and involve palliative care, ethics, chaplaincy and social work. No symptom dose appears here: doses live on the Opioids and Sedation tools. Evidence tiers are shown as each source grades them (strong or conditional with certainty for SCCM); policy statements, consensus statements and regulations are labelled as such.</p>
+  <p>Privacy: everything runs in your browser. Nothing you enter is sent anywhere or stored, and there are no analytics. Do not enter names, record numbers, or dates of birth.</p>
+  <p class="mono">Last reviewed: 2026-11-26</p>
+  <p><strong>Sources:</strong> Hwang DY et al., SCCM guidelines on family-centered care for adult ICUs: 2024, Crit Care Med 2025;53:e465 · Marshall MF et al., SCCM clinical practice guidelines on adult end-of-life care in the ICU, Crit Care Med 2025;53:e2734 · Kon AA et al., ACCM/ATS policy statement on shared decision making in ICUs, Crit Care Med 2016;44:188 · Bosslet GT et al., ATS/AACN/ACCP/ESICM/SCCM policy statement on responding to requests for potentially inappropriate treatments, Am J Respir Crit Care Med 2015;191:1318 · Downar J et al., Guidelines for the withdrawal of life-sustaining measures, Intensive Care Med 2016;42:1003 · Lampert R et al., HRS expert consensus statement on CIEDs at the end of life, Heart Rhythm 2010;7:1008 (reaffirmed 2023) · Greer DM et al., Pediatric and adult brain death/death by neurologic criteria determination (AAN/AAP/CNS/SCCM), Neurology 2023;101:1112 · 42 CFR 482.45, Condition of participation: organ, tissue, and eye procurement · CDC/NCHS Physicians' handbook on medical certification of death, 2023 revision · VHA Directive 1004.03, Advance care planning, 2023 (institution note) · Baile WF et al., SPIKES, Oncologist 2000;5:302 · Back AL et al., Approaching difficult communication tasks in oncology, CA Cancer J Clin 2005;55:164 · Taylor LJ et al., Best Case/Worst Case, JAMA Surg 2017;152:531 · Andersen LW et al., In-hospital cardiac arrest: a review, JAMA 2019;321:1200 · Perman SM et al., Location of in-hospital cardiac arrest, J Am Heart Assoc 2016;5:e003638 · Ehlenbach WJ et al., In-hospital CPR in the elderly, N Engl J Med 2009;361:22 · Chan PS et al., Long-term outcomes in elderly survivors of in-hospital cardiac arrest, N Engl J Med 2013;368:1019 · Zier LS et al., Ann Intern Med 2012;156:360 · White DB et al., JAMA 2016;315:2086 · Azoulay E et al., Am J Respir Crit Care Med 2005;171:987 · Trials: Lautrette A et al., N Engl J Med 2007;356:469 · Curtis JR et al., Am J Respir Crit Care Med 2016;193:154 · Carson SS et al., JAMA 2016;316:51 · White DB et al. (PARTNER), N Engl J Med 2018;378:2365 · Chang DW et al., JAMA Intern Med 2021;181:786.</p>
+</footer>
+</div>
+
+<script id="engine">
+/* Content and the practice engine. No page access here, so the audits can run it. Every number has its source in the decision table. */
+var EP = 'Expert practice';
+var N = {
+  ihcaAll: 25, ihcaGood: 85, ihcaIcu: 14, ihcaOld: 18.3, oldYear1: 58.5,      /* Andersen 2019 (GWTG-R 2017); Perman 2016 (adjusted, 2003-2010); Ehlenbach 2009 (Medicare, 65+, 1992-2005); Chan 2013 */
+  share: '75 to 85', alone: 10, defer: '5 to 20',                              /* Kon 2016 */
+  zier5: 15, zier90: 90, white: 53,                                            /* Zier 2012; White 2016 (discordance of 20 points or more) */
+  azAll: 33.1, azShare: 47.8, azEol: 81.8                                      /* Azoulay 2005 */
+};
+
+var STEPS = [
+  {n: 'Open', do: 'Introduce everyone, including the nurse, and say why you are meeting.', say: 'Thank you for coming. We want to share where things stand with your father and, just as much, hear from you about him.', trap: 'Starting with the data before anyone knows why they are in the room.'},
+  {n: 'Ask first', do: 'Ask what they understand and how much detail they want (Ask-Tell-Ask).', say: 'Before I share what we see, can you tell me what you have heard from the team so far?', trap: 'Repeating what they already know, or missing that they have heard something quite different.'},
+  {n: 'Headline', do: 'Give the main message in one or two plain sentences, then stop talking.', say: 'I am worried. Despite everything we are doing, his lungs and kidneys are getting worse, and I am afraid he may die in this hospital.', trap: 'Burying the headline in numbers, or filling the silence that follows it.'},
+  {n: 'Emotion', do: 'Respond to the emotion before giving more information (NURSE).', say: 'This is not what you were hoping to hear. I can only imagine how hard this is.', trap: 'Answering an emotional question ("Is he going to die?") with more data.'},
+  {n: 'The person', do: 'Ask about the patient as a person: what matters to him, what he has said, what he would not want.', say: 'Tell me about your father. If he could join us and hear what I just said, what would he tell us?', trap: 'Asking the family what "they want done", which puts the weight of the decision on them.'},
+  {n: 'Recommend', do: 'Offer a recommendation that joins the medical facts to what you heard about him. Say which part is medical and which is your judgment.', say: 'From what you have told me, being kept alive on machines without getting back to his garden is not what he would choose. Given that, I recommend we focus on his comfort.', trap: 'Laying out a menu of procedures and asking the family to pick.'},
+  {n: 'Close', do: 'Summarise, agree next steps and when you will meet again, invite questions.', say: 'Let me make sure I have this right. What questions do you have? We will meet again tomorrow at 4.', trap: 'Leaving without a plan for the next conversation or who will be the contact.'}
+];
+
+var NURSE = [
+  ['Naming', 'It sounds like you are frightened.'],
+  ['Understanding', 'I can see why this is so hard after how well he was doing last month.'],
+  ['Respecting', 'You have been here every day. He is lucky to have you.'],
+  ['Supporting', 'Whatever is decided, we will be with you and we will take good care of him.'],
+  ['Exploring', 'Tell me more about what is worrying you most.']
+];
+
+var FRAMES = [
+  ['VALUE', 'For the family meeting: Value what the family says; Acknowledge emotions; Listen; Understand the patient as a person; Elicit questions.', 'Lautrette 2007 (used in the trial with a bereavement brochure)'],
+  ['SPIKES', 'For breaking bad news: Setting; Perception; Invitation; Knowledge; Emotions with empathic responses; Strategy and summary.', 'Baile 2000'],
+  ['NURSE', 'For responding to emotion: Naming, Understanding, Respecting, Supporting, Exploring.', 'Back 2005'],
+  ['Ask-Tell-Ask', 'Ask what they know, tell a small amount, ask what they understood. No more than three pieces of information at a time.', 'Back 2005'],
+  ['Best case / worst case', 'For a high-risk decision: draw each option as a range from best to worst case, including function, so the family sees the choice.', 'Taylor 2017 (surgical patients, before-after study)']
+];
+
+var TLT = {
+  ards: {n: 'Severe pneumonia, on the ventilator', what: 'Continue full support: antibiotics, the ventilator, proning if needed.', how: 'Until next Friday, enough time for the antibiotics to work and the lungs to begin to recover.', better: 'Less oxygen and less ventilator support, awake and following commands, off the blood pressure drip.', worse: 'More oxygen or pressure needed, kidneys failing, new infections, not waking.'},
+  aki: {n: 'Septic shock, kidneys failing', what: 'Dialysis by machine, with antibiotics and blood pressure support.', how: 'Four or five dialysis sessions, then we meet.', better: 'Off the blood pressure drip, urine output returning, more awake.', worse: 'Still needing high-dose pressors, unable to tolerate dialysis, new organ failure.'},
+  stroke: {n: 'Large stroke, intubated', what: 'Continue the ventilator and feeding while the brain swelling settles.', how: 'Through the weekend, until the swelling has peaked and we can judge the exam.', better: 'Opening eyes, moving the good side, breathing well enough to try off the ventilator.', worse: 'Exam worse, signs of herniation, or no improvement after the swelling settles.'}
+};
+
+var IHCA = [
+  ['All adults, US registry (2017)', N.ihcaAll],
+  ['Arrests in the ICU (adjusted, 2003 to 2010)', N.ihcaIcu],
+  ['Age 65 or more, Medicare (1992 to 2005)', N.ihcaOld]
+];
+
+var CERT = {
+  right: {n: 'Correct chain', rows: [['a', 'Septic shock', 'days'], ['b', 'Pneumococcal pneumonia', '1 week']], part2: 'Chronic obstructive pulmonary disease; type 2 diabetes', line: 'Line a is the immediate cause; the lowest line used is the underlying cause, the condition that started the chain. Each line has an interval from onset; do not leave it blank. Other conditions that contributed go in Part II.'},
+  wrong: {n: 'Common error', rows: [['a', 'Cardiopulmonary arrest', 'minutes'], ['b', 'Septic shock', 'days']], part2: '', bad: [0], line: 'Cardiac or respiratory arrest is how everyone dies, not why. A terminal event on line a, or as the only cause, makes the cause of death uninformative for public health data. Start from the disease.'}
+};
+
+var CARDS = {
+  'meet-a': [
+    {id: 'before', label: 'Before the meeting', head: 'Agree the message, then gather the right people',
+      list: ['Does the patient have capacity for this decision? If so, the conversation is with the patient.', 'Who is the legal surrogate: a named health care agent first, otherwise the person your state\'s law names. Record it.', 'Agree one medical message among the teams involved, including the range of likely outcomes.', 'Invite the bedside nurse; add palliative care, social work or chaplaincy when they would help.', 'Book a professional interpreter if needed; a family member should not interpret.', 'A quiet room, enough chairs, phones silenced, time protected.'],
+      inst: 'Adjust to your state and institution: the surrogate order, and what to do for a patient with no surrogate, are set by state law and hospital policy.',
+      why: 'Families hear mixed messages as hope; one agreed message from every team keeps the decision anchored in the same facts.',
+      more: ['SCCM 2025 adds a good practice statement: ICUs should have a standardized way to identify and document the legal surrogate, including for patients who have none.'],
+      tiers: ['Standardized family conferences: SCCM 2024 conditional, low', 'Liberal family presence as the default: SCCM 2024 strong, low', 'Proactive palliative care or ethics consultation when available: SCCM 2025 conditional, low', 'Preparation list: ' + EP]},
+    {id: 'steps', label: 'During the meeting', head: 'Seven steps, one at a time', stepper: true,
+      why: 'In a trial of a structured end-of-life meeting, with a bereavement brochure, in which families did more of the talking, they had fewer stress, anxiety and depression symptoms 90 days later.',
+      more: ['The steps combine SPIKES, Ask-Tell-Ask, NURSE and VALUE. The wording is an example to adapt, not a script.'],
+      tiers: ['Frameworks: Baile 2000; Back 2005; Lautrette 2007', 'Example wording: ' + EP]}
+  ],
+  'meet-b': [
+    {id: 'emotion', label: 'Responding to emotion', head: 'Name it, then pause', grid: 'nurse',
+      why: 'Strong emotion blocks the processing of facts; acknowledging it first is what lets the information land.',
+      tiers: ['NURSE: Back 2005', 'Example wording: ' + EP]},
+    {id: 'after', label: 'After the meeting', head: 'Write it down and tell the team',
+      list: ['Note who attended, the prognosis given, what you learned about the patient\'s values, the decision, and when you will meet again.', 'Update the orders the same day so the plan is not undone overnight.', 'Tell the bedside nurse and the covering team what was said, in the words used.', 'Name one contact person for the family.', 'Check in with the team after a hard meeting.'],
+      why: 'Families lose trust fastest when the next clinician says something different; the note is how the next team stays consistent.',
+      tiers: [EP]},
+    {id: 'frameworks', label: 'Named frameworks', head: 'Which tool for which moment', grid: 'frames',
+      tiers: ['Sources as listed on each row']}
+  ],
+  'code-a': [
+    {id: 'package', label: 'Explaining CPR', head: 'Recommend, do not offer a menu',
+      list: ['Explain what CPR involves at this point in this illness: compressions, shocks, a breathing tube and a ventilator, usually in the ICU afterwards.', 'Connect it to what you have heard about the patient\'s goals.', 'Make a recommendation, and say which part rests on medical facts and which on your own judgment.', 'Check that the family can accept it, or wants to talk more. Many families prefer to share the decision or to decide after hearing a recommendation; a few want to defer it entirely.'],
+      quote: 'Given how sick she is and what she told you about not wanting to live on machines, I recommend that if her heart stops we allow a natural death, and that we keep giving the treatments that fit what she wants. How does that sound to you?',
+      why: 'A menu of procedures makes the family choose each intervention and carry that weight; a recommendation shares it, while they keep the right to disagree.',
+      more: ['Kon 2016: about ' + N.share + '% of surrogates prefer to share responsibility or decide after hearing the clinician\'s recommendation, about ' + N.alone + '% prefer to decide on their own, and ' + N.defer + '% wish to defer to clinicians. Informed non-dissent (the clinician decides, the family may object) is ethically acceptable for families who want it.', 'Avoid pressure: a recommendation is offered, not imposed.'],
+      tiers: ['ACCM/ATS policy statement 2016', 'Example wording: ' + EP]},
+    {id: 'partial', label: 'Partial codes and what DNR means', head: 'Each part must make sense with the others',
+      list: ['Do not resuscitate is not do not treat: antibiotics, dialysis and the ICU can continue.', 'Some partial orders do not make clinical sense, such as intubation without compressions for an arrest. Explain each part and recommend a plan that holds together.', 'Write the order in your hospital\'s terms and check it matches what was agreed.', 'Out-of-hospital forms (POLST and similar) differ by state.'],
+      inst: 'Adjust to your state and institution: order names, partial-code options, and whether a physician may write a DNR order without agreement.',
+      why: 'An incoherent order fails the patient at the worst moment, when nobody has time to interpret it.',
+      tiers: [EP]}
+  ],
+  'code-b': [
+    {id: 'outcomes', label: 'What CPR achieves in hospital', head: 'About 1 in 4 adults survive to discharge', chart: 'ihca',
+      sub: 'Most survivors leave with a good neurologic outcome. These are registry averages; the person in front of you may differ.',
+      list: ['Survival is lower with a non-shockable rhythm, more chronic illness, older age, and admission from a nursing facility.', 'Among survivors aged 65 or more who left hospital, about ' + Math.round(N.oldYear1) + '% were alive a year later.'],
+      why: 'Families often expect CPR to work as it does on television; real numbers, given gently and in context, let them weigh it.',
+      more: ['Andersen 2019 (Get With The Guidelines-Resuscitation, 2017): survival to discharge ' + N.ihcaAll + '%; ' + N.ihcaGood + '% of survivors had a good neurologic outcome. Perman 2016: adjusted survival to discharge ' + N.ihcaIcu + '% for arrests in the ICU (2003 to 2010). Ehlenbach 2009: ' + N.ihcaOld + '% for Medicare patients aged 65 or more (1992 to 2005; older data). Chan 2013: ' + N.oldYear1 + '% of survivors aged 65 or more alive at one year.'],
+      tiers: ['Registry and cohort data', 'How to use them: ' + EP]},
+    {id: 'presence', label: 'Family during a code', head: 'Offer families the chance to be present',
+      sub: 'With a staff member assigned to support them.', why: 'Seeing that everything was tried can help families, and they need someone with them to explain.',
+      tiers: ['Family presence during resuscitation: SCCM 2024 conditional, low']},
+    {id: 'inappropriate', label: 'When the family asks for treatment you think is wrong', head: 'Potentially inappropriate, rarely futile',
+      list: ['Futile means a treatment cannot achieve its physiologic goal; do not provide it.', 'Potentially inappropriate means it has some chance of the effect sought but clinicians believe other considerations argue against it. Resolve these through a process, not a unilateral decision.', 'Steps: expert consultation (palliative care, ethics); written notice to the surrogate; a second medical opinion; review by an institutional committee; the option of transfer to a willing provider; a chance of outside review; then provide or withdraw, with good palliative care.', 'Under real time pressure, seek whatever procedural oversight is possible.'],
+      inst: 'Adjust to your state and institution: some states set a legal dispute process and timelines.',
+      why: 'Conflict often reflects grief or mistrust as much as disagreement about facts; a fair process protects the patient, the family and the team.',
+      tiers: ['Multisociety policy statement (Bosslet 2015)', 'Institutional conflict policies: SCCM 2025 conditional, low']}
+  ],
+  'tlt-a': [
+    {id: 'tlt', label: 'Time-limited trial', head: 'Full treatment, for a set time, with agreed markers', tlt: true,
+      list: ['What we will do: the treatments included.', 'For how long: a date, long enough for the treatment to have a fair chance.', 'What better and worse look like: markers you agree on now, in plain words.', 'When we will meet to decide, and who will be there.'],
+      why: 'Agreeing the markers in advance turns the later decision into reading a result together, rather than the family having to give up.',
+      tiers: ['Time-limited trial structure: ' + EP + ' (described in the Chang 2021 programme)']}
+  ],
+  'tlt-b': [
+    {id: 'tlt-when', label: 'When to offer one', head: 'When the outcome is uncertain and the family wants to try',
+      list: ['Prognosis truly uncertain, or the family is not ready to stop.', 'The treatment could plausibly help in the time allowed.', 'Not when the treatment cannot work: then recommend against it.'],
+      quote: 'We do not know yet whether he can get through this. What I suggest is that we give full treatment until Friday, and then meet to look at whether he is getting better.',
+      tiers: [EP]},
+    {id: 'tlt-doc', label: 'Writing it down', head: 'Record the three parts and the review date',
+      list: ['Note the treatments, the time frame, the markers and the meeting date in the chart.', 'Tell the covering teams so the plan survives handover.', 'At the review meeting, look at the markers together, then recommend.'],
+      why: 'Without a written plan, the date passes and the trial quietly becomes open-ended treatment.',
+      more: ['Chang 2021 (before-after, 3 hospitals, ' + '209 patients): training clinicians to use time-limited trials raised formal family meetings from 60.2% to 95.8%, values elicited from 46.5% to 98.3%, cut median ICU stay from 8.7 to 7.4 days and ventilation from 85.8% to 72.9%, with hospital mortality unchanged (58.4% against 58.3%). Not randomized.'],
+      tiers: ['Before-after study: weak evidence']}
+  ],
+  'comfort-a': [
+    {id: 'transition', label: 'Moving to comfort care', head: 'Stop what does not help comfort, start what does', twocol: {h1: 'Stop', l1: ['Blood tests and imaging', 'Monitors and alarms in the room', 'Vasopressors and inotropes', 'Dialysis, transfusion, antibiotics not given for comfort', 'Defibrillator shocks (deactivate the ICD)', 'Paralytics, early, so distress can be seen'], h2: 'Start', l2: ['Opioid for breathlessness or pain, titrated to what you see', 'Sedative if distress remains once the opioid has worked', 'Mouth care, positioning, a quiet room', 'Open visiting; chaplain if wanted', 'A plan for secretions', 'A named nurse and physician for the family']},
+      links: [['/opioids/', 'Opioid doses and conversions'], ['/sedation/', 'Sedatives']],
+      why: 'Comfort care is active care: every order should either relieve a symptom or support the family.',
+      tiers: ['Protocolized withdrawal and symptom management: SCCM 2025 conditional, moderate', 'Lists: ' + EP + ', drawing on Downar 2016']},
+    {id: 'symptoms', label: 'Symptom medicines', head: 'No fixed maximum: increase in steps to the distress you see',
+      list: ['Opioids first for breathlessness and pain; add a sedative only once those are treated.', 'Assess before and after each dose: breathing rate and effort, grimacing, restlessness.', 'Give enough to relieve distress; the intent is always comfort, never to shorten life.', 'Record the symptom and the response with each dose.'],
+      links: [['/opioids/', 'Doses on Opioids'], ['/sedation/', 'Doses on Sedation']],
+      why: 'Treating observed distress, not a fixed number, is what keeps the intent and the dose aligned and documented.',
+      tiers: ['Titrate to symptoms with no set dose limit; opioids before sedatives: Downar 2016 (Canadian consensus guideline)']}
+  ],
+  'comfort-b': [
+    {id: 'extubation', label: 'Compassionate extubation', head: 'Step by step', stepper2: true,
+      why: 'Families often remember this hour for years; preparation is what makes it calm.',
+      more: ['Downar 2016 favours extubation to room air, rather than leaving the tube in on minimal support, in most cases. No method of withdrawing the ventilator has been shown better than another; use your unit\'s protocol.'],
+      tiers: ['Downar 2016 (Canadian consensus guideline)', 'Sequence and wording: ' + EP]},
+    {id: 'devices', label: 'Defibrillators and pacemakers', head: 'Turn off the shocks',
+      list: ['A patient with capacity, or the surrogate, may ask for an ICD to be deactivated; it is neither assisted suicide nor euthanasia.', 'A DNR order does not switch off the ICD; it needs its own order.', 'Involve electrophysiology or the device clinic; a magnet over most ICDs suspends shocks while it stays in place.', 'Stopping pacing in a pacemaker-dependent patient is a separate decision; discuss it explicitly.', 'A clinician who objects should hand over care, not abandon the patient.'],
+      why: 'Shocks in a dying patient are painful and frightening for patient and family.',
+      tiers: ['HRS 2010 expert consensus (reaffirmed 2023)']},
+    {id: 'family-care', label: 'Caring for the family', head: 'Presence, meaning and what comes after',
+      list: ['Let the family stay at the bedside.', 'Ask about spiritual or cultural needs and rituals.', 'Offer bereavement support and say how to reach the team afterwards.'],
+      tiers: ['Family presence at the bedside: Downar 2016', 'Spiritual needs and bereavement support: SCCM 2024 conditional, low']}
+  ],
+  'after-a': [
+    {id: 'pronounce', label: 'Pronouncing death', head: 'Confirm, record the time, then sit with the family',
+      list: ['Identify the patient.', 'No response to voice or touch.', 'No pulse, no heart sounds and no breath sounds over at least a minute.', 'Pupils fixed.', 'Record the time and who was present.'],
+      why: 'A calm, unhurried pronouncement is a moment families remember; the exam is simple, the presence matters.',
+      tiers: [EP + '; adjust to your institution\'s policy']},
+    {id: 'call', label: 'The call to the family', head: 'Warn, then tell, then pause',
+      quote: 'I am calling from the ICU about your mother. I am afraid I have very sad news. She died a few minutes ago. I am so sorry.',
+      list: ['Check you have the right person; ask if they can talk.', 'Say "died", not "passed" or "we lost her".', 'Let them ask; offer to stay on the line; tell them what happens next and how to come in.'],
+      tiers: [EP]},
+    {id: 'note', label: 'The death note', head: 'What the note records',
+      list: ['Time of death and the findings.', 'Who was notified, and when: family, attending, primary physician.', 'Whether the organ procurement organization and the medical examiner were contacted, and their reference numbers.'],
+      tiers: [EP]},
+    {id: 'certificate', label: 'Death certificate', head: 'From the immediate cause down to the one that started it', cert: true,
+      list: ['Part I: line a is the immediate cause; the lowest line used is the underlying cause. Probable is allowed when uncertain.', 'Part II: other conditions that contributed but did not cause the chain.', 'Never a terminal event (cardiac or respiratory arrest) as a cause.'],
+      tiers: ['CDC/NCHS physicians\' handbook, 2023 revision']}
+  ],
+  'after-b': [
+    {id: 'donation', label: 'Organ and tissue donation', head: 'Call the organ procurement organization; do not start the conversation',
+      list: ['The hospital must notify the organ procurement organization in a timely manner of every patient whose death is imminent or who has died. Follow your hospital\'s triggers, which usually include before life support is withdrawn.', 'The organization decides who is medically suitable; the family is approached only by its staff or a trained designated requestor.', 'If the family raises donation, acknowledge it and connect them with the organization.', 'Keep the decision to withdraw treatment separate from any request to donate.'],
+      inst: 'Adjust to your institution: referral triggers, how to call, and donation after circulatory death protocols are set by your hospital\'s agreement with its organ procurement organization.',
+      why: 'Separating the two decisions protects the family\'s trust that care was never shaped by donation.',
+      tiers: ['Federal regulation: 42 CFR 482.45']},
+    {id: 'examiner', label: 'Medical examiner', head: 'Know which deaths you must report',
+      list: ['Deaths from injury, accident, suicide or homicide are reportable in every state; the exact list is set by state law.', 'Many states add unexpected deaths, deaths soon after admission or surgery, and deaths whose cause is unknown.', 'The examiner decides whether to take the case; until then, usually leave lines and tubes in place, following your examiner\'s and hospital\'s rules.'],
+      inst: 'Adjust to your state: the list of reportable deaths and the time limits are set by state law.',
+      tiers: [EP + '; state law']},
+    {id: 'dnc', label: 'Brain death', head: 'Death by neurologic criteria: an overview',
+      list: ['Performed by credentialed, trained attending clinicians under hospital policy, not by residents alone.', 'Before the exam: a known, irreversible cause; at least 24 hours after a hypoxic-ischemic injury; core temperature 36 °C or more; systolic pressure 100 or more and mean pressure 75 or more; sedatives cleared (at least 5 half-lives) and paralysis excluded.', 'In adults one full examination is enough, plus an apnea test: positive when the PaCO2 reaches 60 or more and at least 20 above baseline with pH under 7.30.', 'An ancillary test only when the exam or apnea test cannot be completed or interpreted, when a metabolic problem cannot be corrected, or when state or hospital rules require one.', 'Families are informed; consent is not required unless state law or policy says so.'],
+      inst: 'Adjust to your state and institution: some states require accommodation of religious or moral objections, and hospitals set who may perform the exam.',
+      why: 'Brain death is death; using the same careful process every time is what makes the determination trustworthy.',
+      more: ['This is an overview for understanding, not a protocol. Use your hospital\'s checklist and the 2023 guideline. Children need two exams by two examiners.'],
+      tiers: ['AAN/AAP/CNS/SCCM guideline 2023']},
+    {id: 'va-note', label: 'Institution note (VA)', head: 'In VA hospitals: the life-sustaining treatment note',
+      sub: 'VHA Directive 1004.03 (2023) requires a goals-of-care conversation recorded in the standardized life-sustaining treatment note, with matching orders, before a DNR or limiting order is written.',
+      inst: 'Institution note, not a rule of this tool. Follow your facility\'s current template.',
+      tiers: ['VHA Directive 1004.03, Advance care planning (2023)']}
+  ]
+};
+
+var EXTUB = [
+  ['Prepare the family', 'Explain what they may see: changes in breathing, pauses, noisy secretions, colour changes. The time to death varies from minutes to days.'],
+  ['Stop paralytics first', 'Let any neuromuscular blocker wear off so distress can be seen and treated.'],
+  ['Turn off monitors and alarms', 'Remove monitoring that does not serve comfort; keep the room quiet.'],
+  ['Treat symptoms in advance', 'Give an opioid (and a sedative if needed) before the tube comes out, and have more drawn up. Doses on Opioids and Sedation.'],
+  ['Stop other support', 'Stop vasopressors and other machines in the order the team and family agree.'],
+  ['Remove the tube', 'Suction gently, deflate the cuff, remove the tube, then oxygen by nasal cannula only if it helps comfort.'],
+  ['Stay', 'Treat breathlessness and secretions as they come; reposition; stay or check in often. Tell the family it is all right to talk to and touch the patient.']
+];
+
+var HW = [
+  ['unk', 'Prognosis unclear', 'I hope he will get stronger over the next few days, and I worry that he may not.', 'Holds both outcomes open without false certainty.'],
+  ['ask', 'Family asks "will he make it?"', 'I wish I could tell you. Here is what I am seeing, and here is what would make me more or less hopeful.', 'Acknowledges the wish, then gives markers instead of a number.'],
+  ['bad', 'Things are going badly', 'I am worried he is dying. We will keep doing what helps, and we will make sure he is comfortable.', 'Says the hard word clearly, then pairs it with what you will do.'],
+  ['arrest', 'Early after cardiac arrest', 'It is too early to know how much his brain will recover. We will look again over the next days and tell you what we learn.', 'Avoids an early prediction before the evidence is in.']
+];
+
+var TRIALS = [
+  {q: 'Does a structured end-of-life meeting help families? (Lautrette)', d: 'Randomized, 22 French ICUs, families of 126 dying patients; proactive conference with a bereavement brochure against the usual conference.', r: 'At 90 days: post-traumatic stress symptoms 45% against 69%; anxiety 45% against 67%; depression 29% against 56%. Families talked longer (median 14 against 5 minutes).', c: 'Made a structured, listening-heavy meeting the model for end-of-life conferences.', cite: 'Lautrette A et al. N Engl J Med 2007;356:469', doi: '10.1056/NEJMoa063446'},
+  {q: 'Does a communication facilitator help? (Curtis)', d: 'Randomized, 2 hospitals, 168 high-risk patients; a facilitator supporting clinician and family communication against usual care. Family follow-up under half.', r: 'Family depressive symptoms lower at 6 months, not at 3; no difference in anxiety or PTSD symptoms. Among patients who died: ICU stay 7.7 against 28.5 days, ICU costs lower.', c: 'Shows that support for communication can reduce prolonged dying in the ICU without worsening family distress.', cite: 'Curtis JR et al. Am J Respir Crit Care Med 2016;193:154', doi: '10.1164/rccm.201505-0900OC'},
+  {q: 'Do palliative-led meetings help in chronic critical illness? (Carson)', d: 'Randomized, 4 ICUs, 365 surrogates of patients ventilated 7 days or more; at least 2 meetings led by palliative care against usual ICU meetings.', r: 'Anxiety and depression no different (12.2 against 11.4); post-traumatic stress symptoms higher with the intervention (25.9 against 21.3).', c: 'A caution: routine, mandatory palliative-led meetings did not help and may have added distress.', cite: 'Carson SS et al. JAMA 2016;316:51', doi: '10.1001/jama.2016.8474'},
+  {q: 'Does nurse-led family support help? (PARTNER)', d: 'Stepped-wedge cluster randomized, 5 ICUs, 1,420 high-risk patients; a family-support programme delivered by the ICU team and led by trained ICU nurses.', r: 'Anxiety and depression no different (11.7 against 12.0); better ratings of communication (69.1 against 62.7); shorter ICU stay (6.7 against 7.4 days), mostly among patients who died.', c: 'Better communication and shorter dying, without a change in family symptoms.', cite: 'White DB et al. N Engl J Med 2018;378:2365', doi: '10.1056/NEJMoa1802637'},
+  {q: 'Does training in time-limited trials change care? (Chang)', d: 'Before-after quality improvement, 3 hospitals, 209 patients with advanced illness. Not randomized.', r: 'Formal meetings 60.2% to 95.8%; median ICU stay 8.7 to 7.4 days; ventilation 85.8% to 72.9%; hospital mortality unchanged.', c: 'Supports time-limited trials as a default approach; weak design.', cite: 'Chang DW et al. JAMA Intern Med 2021;181:786', doi: '10.1001/jamainternmed.2021.1000'}
+];
+
+/* Practice: choose the next sentence. Each option: text, good (true for the best), why. */
+var CASES = [
+  {t: 'The opening question', s: 'Family meeting for a man on day 6 of septic shock with multiorgan failure. His wife and son sit down.', q: 'What do you say first, after introductions?', o: [
+    ['What do you want us to do for him?', false, 'Puts the decision on the family before they know the situation.'],
+    ['Can you tell me what you have heard from the team so far?', true, 'Ask first: you learn what they know and how they talk about it.'],
+    ['His SOFA score has risen from 9 to 14 since admission.', false, 'Data before understanding; the number means nothing to them yet.']]},
+  {t: 'After the headline', s: 'You have just said: "I am worried he is dying." His wife starts to cry and says, "He was fine last week."', q: 'What next?', o: [
+    ['Let me explain why the kidneys failed.', false, 'More facts while she is flooded with emotion will not be heard.'],
+    ['This came so fast. It is a shock.', true, 'Naming and understanding the emotion lets her take in what follows.'],
+    ['We have done everything we can.', false, 'Sounds like abandonment, and is rarely true: you will still do a great deal.']]},
+  {t: 'Code status', s: 'A woman with metastatic cancer is in the ICU with worsening respiratory failure and is now too drowsy to take part. She has told her family she never wants "to be kept alive on machines".', q: 'How do you raise CPR with her daughter?', o: [
+    ['Do you want us to do everything?', false, 'A menu with no recommendation; "everything" implies the alternative is nothing.'],
+    ['If her heart stops, would you like compressions, shocks, intubation, or some of them?', false, 'A menu of parts asks the daughter to choose each intervention.'],
+    ['Given what she told you, I recommend that if her heart stops we allow a natural death, and that we keep giving the treatments that fit what she wants. How does that sound?', true, 'A recommendation built on her own words, with room to disagree.']]},
+  {t: 'The family is not ready', s: 'A man with a large stroke is intubated. His children say it is too soon to stop and they want to give him a chance.', q: 'What do you offer?', o: [
+    ['A time-limited trial: full support until Monday, with agreed signs of better and worse, then we meet again.', true, 'Gives treatment a fair chance with a decision point agreed in advance.'],
+    ['Continue everything and see how it goes.', false, 'No end point: the decision is postponed rather than shared.'],
+    ['Nothing more will help, so we will stop on Monday.', false, 'Imposes a decision while the prognosis is still uncertain.']]},
+  {t: 'Donation comes up', s: 'The team has agreed with the family to withdraw life support this afternoon. A resident asks whether to mention organ donation.', q: 'What is right?', o: [
+    ['Ask the family about donation before the extubation.', false, 'The team does not start the donation conversation.'],
+    ['Call the organ procurement organization now, before withdrawal; they decide suitability and who approaches the family.', true, 'Required referral, kept separate from the decision to withdraw.'],
+    ['Only call if the family brings it up.', false, 'Referral is required for imminent death, whether or not the family asks.']]},
+  {t: 'The certificate', s: 'A man with COPD died of septic shock from pneumococcal pneumonia. He also had type 2 diabetes. Both made him more vulnerable but did not cause the pneumonia.', q: 'What goes on line a of Part I?', o: [
+    ['Cardiopulmonary arrest', false, 'A terminal event, not a cause.'],
+    ['Septic shock, with pneumococcal pneumonia on line b; COPD and diabetes in Part II', true, 'Immediate cause on line a, the underlying cause (the pneumonia) on the lowest line, contributors in Part II.'],
+    ['Type 2 diabetes', false, 'It contributed but did not start the chain that led to death.']]}
+];
+function score(caseIdx, optIdx){ var o = CASES[caseIdx].o[optIdx]; return {good: o[1], why: o[2]}; }
+</script>
+
+<script id="figures">
+var FS = 'font-family:var(--sans)', FM = 'font-family:var(--mono)';
+function svgOpen(vb, label){ return '<svg viewBox="' + vb + '" role="img" aria-label="' + label + '" class="fig">'; }
+function tx(x, y, t, o){ o = o || {}; return '<text x="' + x + '" y="' + y + '" text-anchor="' + (o.a || 'middle') + '" style="' + (o.sans ? FS : FM) + ';font-size:' + (o.s || 11) + 'px;font-weight:' + (o.w || 400) + ';fill:' + (o.c || 'var(--ink)') + '">' + t + '</text>'; }
+function hbars(rows, max, hot){
+  var s = '', y = 20;
+  rows.forEach(function(r, n){
+    var w = Math.round(r[1] / max * 220), on = hot == null || hot === n;
+    s += tx(20, y, r[0], {a: 'start', s: 10.5, c: on ? 'var(--ink)' : 'var(--muted)'});
+    s += '<rect x="20" y="' + (y + 6) + '" width="220" height="14" rx="7" fill="var(--fill)"/><rect x="20" y="' + (y + 6) + '" width="' + w + '" height="14" rx="7" fill="' + (on ? 'var(--accent)' : 'var(--line)') + '"/>';
+    s += tx(250, y + 18, r[1] + '%', {a: 'start', s: 12, w: 600, c: on ? 'var(--ink)' : 'var(--muted)'});
+    y += 48;
+  });
+  return s;
+}
+function ihcaSVG(){ return svgOpen('0 0 360 160', 'Survival to discharge after in-hospital cardiac arrest') + hbars(IHCA, 50) + tx(20, 156, 'survival to hospital discharge, scale to 50%', {a: 'start', s: 10.5, c: 'var(--muted)'}) + '</svg>'; }
+
+var OPT = {
+  five: {n: '"5% chance of surviving"', said: 5, heard: N.zier5, line: 'Told "a 5% chance", the median surrogate heard about ' + N.zier5 + '%, and some heard much more. Surrogates described needing to stay hopeful and believing the patient had strengths the doctors could not see. In another study, surrogate and physician estimates differed by 20 points or more ' + N.white + '% of the time.'},
+  ninety: {n: '"90% chance of surviving"', said: 90, heard: N.zier90, line: 'Good news was heard as said. The optimism applies to bad news, which is why a grim prognosis needs saying clearly, more than once, and checking.'}
+};
+function optimismSVG(k){
+  var d = OPT[k], s = svgOpen('0 0 360 150', 'What was said and what was heard: ' + d.n);
+  s += hbars([['What the doctor said', d.said], ['What the median surrogate heard', d.heard]], 100);
+  s += tx(20, 140, 'Zier 2012, 80 surrogates', {a: 'start', s: 10.5, c: 'var(--muted)'});
+  return s + '</svg>';
+}
+
+var SPEC = {
+  surr: {n: 'Family decides', x: 75, line: 'Surrogate-directed: the clinician informs, the family chooses. About ' + N.alone + '% of surrogates prefer this for value-laden decisions.'},
+  shared: {n: 'Shared', x: 180, line: 'Shared: information and values are exchanged and the decision is made together, often after a recommendation. ' + N.share + '% of surrogates prefer this.'},
+  clin: {n: 'Clinician decides', x: 285, line: 'Clinician-directed, such as informed non-dissent: the clinician decides and the family may object. ' + N.defer + '% of surrogates prefer to defer. Ethically acceptable when the family wants it.'}
+};
+function spectrumSVG(k){
+  var d = SPEC[k], s = svgOpen('0 0 360 130', 'Range of decision-making approaches: ' + d.n);
+  s += '<line x1="75" y1="60" x2="285" y2="60" stroke="var(--line)" stroke-width="6" stroke-linecap="round"/>';
+  ['surr','shared','clin'].forEach(function(q){ var on = q === k; s += '<circle cx="' + SPEC[q].x + '" cy="60" r="' + (on ? 11 : 7) + '" fill="' + (on ? 'var(--accent)' : 'var(--card)') + '" stroke="' + (on ? 'var(--accent)' : 'var(--muted)') + '" stroke-width="2"/>' + tx(SPEC[q].x, 96, SPEC[q].n, {s: 10.5, w: on ? 600 : 400, c: on ? 'var(--ink)' : 'var(--muted)'}); });
+  s += tx(20, 32, 'family holds it', {a: 'start', s: 10.5, c: 'var(--muted)'}) + tx(340, 32, 'clinician holds it', {a: 'end', s: 10.5, c: 'var(--muted)'});
+  s += tx(180, 122, 'all are ethically supportable (Kon 2016)', {s: 10.5, c: 'var(--muted)'});
+  return s + '</svg>';
+}
+
+var STD = {
+  sj: {n: 'Substituted judgment', line: 'If the patient\'s values or wishes are known, the surrogate decides as the patient would have, even if the surrogate would choose differently for themselves.'},
+  bi: {n: 'Best interest', line: 'If the patient never had capacity or never made their values known, the decision is what best serves the patient\'s interests, weighing benefits and burdens.'}
+};
+function box(x, y, w, h, t1, t2, on){ return '<g' + (on === false ? ' opacity=".74"' : '') + '><rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="10" fill="' + (on ? 'var(--card)' : 'var(--fill)') + '" stroke="' + (on ? 'var(--accent)' : 'var(--line)') + '" stroke-width="' + (on ? 2 : 1) + '"/>' + tx(x + w / 2, y + (t2 ? h / 2 - 3 : h / 2 + 4), t1, {sans: 1, s: 12, w: 600}) + (t2 ? tx(x + w / 2, y + h / 2 + 13, t2, {s: 10.5, c: 'var(--muted)'}) : '') + '</g>'; }
+function standardSVG(k){
+  var sj = k === 'sj', s = svgOpen('0 0 360 210', 'Choosing a decision standard: ' + STD[k].n);
+  s += box(60, 10, 240, 52, 'Do we know what the', 'patient valued or wanted?', null);
+  s += '<path d="M130 62V110M230 62V110" stroke="var(--muted)" stroke-width="1.5"/>';
+  s += tx(122, 92, 'yes', {a: 'end', s: 10.5, c: 'var(--muted)'}) + tx(238, 92, 'no', {a: 'start', s: 10.5, c: 'var(--muted)'});
+  s += box(20, 110, 150, 60, 'Substituted', 'judgment', sj) + box(190, 110, 150, 60, 'Best', 'interest', !sj);
+  s += tx(95, 192, 'what would they say?', {s: 10.5, c: sj ? 'var(--accent)' : 'var(--muted)'}) + tx(265, 192, 'what serves them best?', {s: 10.5, c: !sj ? 'var(--accent)' : 'var(--muted)'});
+  return s + '</svg>';
+}
+
+var DIS = {
+  all: {n: 'All families', hot: 0, line: 'One in three main family decision-makers had symptoms consistent with a moderate to major risk of post-traumatic stress at 90 days.'},
+  shared: {n: 'Shared in decisions', hot: 1, line: 'Nearly half of those who shared in decisions about treatment had these symptoms.'},
+  eol: {n: 'Shared in end-of-life decisions', hot: 2, line: 'Most of the small group who shared in end-of-life decisions had these symptoms. The answer is support, not keeping families out of decisions: meetings that listen more, clear recommendations, and follow-up after the ICU (expert practice).'}
+};
+function distressSVG(k){
+  var d = DIS[k], s = svgOpen('0 0 360 170', 'Post-traumatic stress symptoms in families: ' + d.n);
+  s += hbars([['All family decision-makers', N.azAll], ['Shared in decisions', N.azShare], ['Shared in end-of-life decisions', N.azEol]], 100, d.hot);
+  s += tx(20, 164, 'Azoulay 2005, 284 families, 21 ICUs', {a: 'start', s: 10.5, c: 'var(--muted)'});
+  return s + '</svg>';
+}
+
+var FIGS = {
+  optimism: {t: 'What families hear', states: ['five','ninety'], data: OPT, svg: optimismSVG},
+  spectrum: {t: 'Who decides', states: ['surr','shared','clin'], data: SPEC, svg: spectrumSVG},
+  standard: {t: 'Decision standards', states: ['sj','bi'], data: STD, svg: standardSVG},
+  distress: {t: 'Family distress after the ICU', states: ['all','shared','eol'], data: DIS, svg: distressSVG}
+};
+</script>
+
+<script id="deeper-data" type="application/json">
+{"learn-optimism": [["Mechanism", "Surrogates hold two jobs at once: weighing the facts and keeping hope alive for someone they love. Many believe their hope or presence can change the outcome, or that the patient has strengths the doctors cannot see."], ["Why it matters", "A grim prognosis said once, in numbers, is often not heard as grim. Saying it plainly, in words as well as numbers, and checking what was understood closes the gap."], ["Common trap", "Treating the family's optimism as a failure to understand. Often they understood and still need to hope; respond to the hope before repeating the facts."]],
+"learn-spectrum": [["Mechanism", "Shared decision making is a range of approaches, from the family deciding after being informed to the clinician deciding with the family's agreement. The right point depends on what the family wants and how value-laden the choice is."], ["Why it matters", "Most families want to share the decision or hear a recommendation. Offering one, while making clear the family can disagree, lightens a burden many find unbearable."], ["Common trap", "Assuming autonomy means presenting every option neutrally. A menu without a recommendation can feel like abandonment."]],
+"learn-standard": [["Mechanism", "A surrogate is asked to speak for the patient. When the patient's values are known, the standard is substituted judgment: what would the patient choose. When they are not, the standard is the patient's best interest."], ["Why it matters", "Asking what the patient would say shifts the question from what the family wants to what the patient valued, which is the standard most state laws use and is easier for families to carry."], ["Common trap", "Asking the family what they want done. It invites them to answer for themselves rather than for the patient."]],
+"learn-distress": [["Mechanism", "Family members face sudden illness, uncertainty and decisions about life and death while sleeping little and often alone. Many carry symptoms of anxiety, depression and post-traumatic stress for months."], ["Why it matters", "How the team communicates is one of the few things that changes this: listening more, giving a clear message, offering a recommendation, and support afterwards."], ["Common trap", "Reading the higher distress among families who shared end-of-life decisions as a reason to keep families out. The answer is better support, not exclusion; one trial of a structured meeting (Lautrette) lowered distress; others showed little or no effect on family symptoms."]],
+"learn-uncertainty": [["Mechanism", "Prognosis in critical illness is uncertain, and both families and clinicians find uncertainty hard to hold. Stating hope and worry together acknowledges both possible futures."], ["Why it matters", "Families can plan, and say what matters, only if they know the bad outcome is possible. Pairing it with hope keeps them from feeling that the team has given up."], ["Common trap", "Waiting for certainty before raising the possibility of dying. By then there is often no time left for the conversation."]]}
+</script>
+
+<script>
+(function(){
+var $ = function(id){ return document.getElementById(id); };
+function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+var ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M7 15l3-4 3 3 2-2 2 3"/></svg>';
+function chip(fig, state, label){ return '<button class="chip" data-fig="' + fig + '" data-state="' + (state || '') + '">' + ICON + esc(label || FIGS[fig].t) + '</button>'; }
+var CHIPS = {before: [['standard', 'sj', 'Decision standards']], steps: [['optimism', 'five', 'What families hear']], package: [['spectrum', 'shared', 'Who decides']], 'family-care': [['distress', 'all', 'Family distress after the ICU']]};
+var stepSel = {steps: 0, extub: 0}, tltSel = 'ards', certSel = 'right', gridSel = {nurse: 0, frames: 0};
+function ul(a){ return '<ul>' + a.map(function(s){ return '<li>' + esc(s) + '</li>'; }).join('') + '</ul>'; }
+function stepper(key, list, i){
+  var h = '<div class="states wrapit" role="group" aria-label="Step" data-step="' + key + '">' + list.map(function(s, n){ return '<button class="sbtn" data-sn="' + n + '" aria-pressed="' + (n === i) + '">' + (n + 1) + ' ' + esc(key === 'steps' ? s.n : s[0]) + '</button>'; }).join('') + '</div>';
+  if (key === 'steps'){ var s = list[i]; h += '<p class="stepno">Step ' + (i + 1) + ' of ' + list.length + '</p><p class="line1">' + esc(s.do) + '</p><p class="quote">' + esc(s.say) + '</p><p class="trap"><b>Trap</b>' + esc(s.trap) + '</p>'; }
+  else { var e = list[i]; h += '<p class="stepno">Step ' + (i + 1) + ' of ' + list.length + '</p><p class="line1"><b>' + esc(e[0]) + '.</b> ' + esc(e[1]) + '</p>'; }
+  return h;
+}
+function grid(key, i){
+  var rows = key === 'nurse' ? NURSE : FRAMES;
+  var h = '<div class="states wrapit" role="group" aria-label="Choose" data-grid="' + key + '">' + rows.map(function(r, n){ return '<button class="sbtn" data-gn="' + n + '" aria-pressed="' + (n === i) + '">' + esc(r[0]) + '</button>'; }).join('') + '</div>';
+  var r = rows[i];
+  return h + (key === 'nurse' ? '<p class="quote">' + esc(r[1]) + '</p>' : '<p class="line1">' + esc(r[1]) + '</p><p class="note">' + esc(r[2]) + '</p>');
+}
+function tltHTML(){
+  var d = TLT[tltSel];
+  return '<div class="states wrapit" role="group" aria-label="Example" data-tlt="1">' + Object.keys(TLT).map(function(k){ return '<button class="sbtn" data-tk="' + k + '" aria-pressed="' + (k === tltSel) + '">' + esc(TLT[k].n) + '</button>'; }).join('') + '</div>' +
+    '<div class="tw"><table><tbody><tr><th>We will</th><td>' + esc(d.what) + '</td></tr><tr><th>For</th><td>' + esc(d.how) + '</td></tr><tr><th>Better looks like</th><td>' + esc(d.better) + '</td></tr><tr><th>Worse looks like</th><td>' + esc(d.worse) + '</td></tr></tbody></table></div><p class="note">An illustration, not a prognosis for any patient.</p>';
+}
+function certHTML(){
+  var d = CERT[certSel];
+  return '<div class="states wrapit" role="group" aria-label="Example" data-cert="1">' + Object.keys(CERT).map(function(k){ return '<button class="sbtn" data-ck="' + k + '" aria-pressed="' + (k === certSel) + '">' + esc(CERT[k].n) + '</button>'; }).join('') + '</div>' +
+    '<div class="tw"><table class="cert"><thead><tr><th></th><th>Part I</th><th>Onset to death</th></tr></thead><tbody>' + d.rows.map(function(r, n){ return '<tr' + (d.bad && d.bad.indexOf(n) >= 0 ? ' class="badrow"' : '') + '><td class="ln">' + r[0] + '</td><td>' + esc(r[1]) + '</td><td class="mono">' + esc(r[2]) + '</td></tr>'; }).join('') + '<tr><td class="ln">II</td><td colspan="2">' + esc(d.part2 || '(none)') + '</td></tr></tbody></table></div><p class="line1">' + esc(d.line) + '</p>';
+}
+function cardHTML(c){
+  var h = '<div class="card" id="' + c.id + '"><p class="label">' + esc(c.label) + '</p><h2>' + esc(c.head) + '</h2>';
+  if (c.sub) h += '<p class="sub">' + esc(c.sub) + '</p>';
+  if (c.chart === 'ihca') h += ihcaSVG();
+  if (c.stepper) h += '<div data-host="steps">' + stepper('steps', STEPS, stepSel.steps) + '</div>';
+  if (c.stepper2) h += '<div data-host="extub">' + stepper('extub', EXTUB, stepSel.extub) + '</div>';
+  if (c.grid) h += '<div data-host="g-' + c.grid + '">' + grid(c.grid, gridSel[c.grid]) + '</div>';
+  if (c.tlt) h += '<div data-host="tlt">' + tltHTML() + '</div>';
+  if (c.cert) h += '<div data-host="cert">' + certHTML() + '</div>';
+  if (c.list) h += ul(c.list);
+  if (c.twocol) h += '<div class="two-col"><div><h3>' + esc(c.twocol.h1) + '</h3>' + ul(c.twocol.l1) + '</div><div><h3>' + esc(c.twocol.h2) + '</h3>' + ul(c.twocol.l2) + '</div></div>';
+  if (c.quote) h += '<p class="quote">' + esc(c.quote) + '</p>';
+  if (c.inst) h += '<p class="inst"><b>Adjust:</b> ' + esc(c.inst.replace(/^Adjust to your [^:]*: /, '')) + '</p>';
+  if (c.links) h += '<p class="linkrow">' + c.links.map(function(l){ return '<a href="' + l[0] + '">' + esc(l[1]) + '</a>'; }).join(' · ') + '</p>';
+  if (c.why) h += '<p class="whyline"><b>Why:</b> ' + esc(c.why) + '</p>';
+  var ch = CHIPS[c.id]; if (ch) h += '<div class="chips">' + ch.map(function(x){ return chip(x[0], x[1], x[2]); }).join('') + '</div>';
+  if ((c.more && c.more.length) || (c.tiers && c.tiers.length)) h += '<details><summary>More</summary>' + (c.more || []).map(function(m){ return '<p>' + esc(m) + '</p>'; }).join('') + (c.tiers || []).map(function(t){ return '<span class="tier">' + esc(t) + '</span>'; }).join('') + '</details>';
+  return h + '</div>';
+}
+Object.keys(CARDS).forEach(function(host){ $(host).innerHTML = CARDS[host].map(cardHTML).join(''); });
+
+document.addEventListener('click', function(e){
+  var t = e.target.closest ? e.target.closest('button') : null; if (!t) return;
+  var host;
+  if (t.hasAttribute('data-sn')){ var k = t.parentNode.getAttribute('data-step'); stepSel[k] = +t.getAttribute('data-sn'); host = document.querySelector('[data-host="' + k + '"]'); host.innerHTML = stepper(k, k === 'steps' ? STEPS : EXTUB, stepSel[k]); }
+  else if (t.hasAttribute('data-gn')){ var g = t.parentNode.getAttribute('data-grid'); gridSel[g] = +t.getAttribute('data-gn'); document.querySelector('[data-host="g-' + g + '"]').innerHTML = grid(g, gridSel[g]); }
+  else if (t.hasAttribute('data-tk')){ tltSel = t.getAttribute('data-tk'); document.querySelector('[data-host="tlt"]').innerHTML = tltHTML(); }
+  else if (t.hasAttribute('data-ck')){ certSel = t.getAttribute('data-ck'); document.querySelector('[data-host="cert"]').innerHTML = certHTML(); }
+});
+
+/* Tabs */
+var tabs = [['t-meet','p-meet'],['t-code','p-code'],['t-tlt','p-tlt'],['t-comfort','p-comfort'],['t-after','p-after'],['t-learn','p-learn'],['t-prac','p-prac']];
+function show(t){ tabs.forEach(function(p){ var on = p[0] === t; $(p[0]).setAttribute('aria-selected', String(on)); $(p[1]).classList.toggle('on', on); }); }
+tabs.forEach(function(p){ $(p[0]).addEventListener('click', function(){ show(p[0]); }); });
+function fromHash(){ var id = location.hash.slice(1); if (!id) return; var el = $(id); if (!el) return; var pan = el.closest('.panel'); if (pan) tabs.forEach(function(p){ if (p[1] === pan.id) show(p[0]); }); el.scrollIntoView(); }
+window.addEventListener('hashchange', fromHash);
+
+/* Figures and the sheet */
+function mountFig(host, id, state){
+  var F = FIGS[id];
+  function draw(k){ host.innerHTML = '<div class="states" role="group" aria-label="' + esc(F.t) + '">' + F.states.map(function(x){ return '<button class="sbtn" data-k2="' + x + '" aria-pressed="' + (x === k) + '">' + esc(F.data[x].n) + '</button>'; }).join('') + '</div>' + F.svg(k) + '<p class="line1">' + esc(F.data[k].line) + '</p>'; }
+  host.onclick = function(e){ var k = e.target.getAttribute && e.target.getAttribute('data-k2'); if (k) draw(k); };
+  draw(state && F.data[state] ? state : F.states[0]);
+}
+var lastFocus = null;
+function openSheet(fig, state){ lastFocus = document.activeElement; $('sheet-t').textContent = FIGS[fig].t; mountFig($('sheet-b'), fig, state); $('scrim').hidden = false; $('sheet').hidden = false; $('sheet').scrollTop = 0; $('sheet-x').focus(); }
+function closeSheet(){ if ($('sheet').hidden) return; $('scrim').hidden = true; $('sheet').hidden = true; if (lastFocus && lastFocus.focus) lastFocus.focus(); }
+$('sheet-x').addEventListener('click', closeSheet); $('scrim').addEventListener('click', closeSheet);
+document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeSheet(); });
+document.addEventListener('click', function(e){ var c = e.target.closest && e.target.closest('[data-fig]'); if (c) openSheet(c.getAttribute('data-fig'), c.getAttribute('data-state')); });
+document.querySelectorAll('[data-figure]').forEach(function(h){ mountFig(h, h.getAttribute('data-figure'), h.getAttribute('data-state')); });
+
+/* Learn */
+var hwSel = 'unk';
+function drawHw(){ $('hwseg').innerHTML = HW.map(function(r){ return '<button class="sbtn" data-v="' + r[0] + '" aria-pressed="' + (r[0] === hwSel) + '">' + esc(r[1]) + '</button>'; }).join(''); var r = HW.filter(function(x){ return x[0] === hwSel; })[0]; $('hwout').textContent = r[2]; $('hwnote').textContent = r[3] + ' (expert practice)'; }
+$('hwseg').addEventListener('click', function(e){ var v = e.target.getAttribute('data-v'); if (v){ hwSel = v; drawHw(); } });
+drawHw();
+(function(){
+  var chaps = [].slice.call(document.querySelectorAll('.chap'));
+  $('pills').innerHTML = chaps.map(function(c, n){ return '<button class="pill" data-go="' + c.id + '" aria-current="' + (n === 0) + '">' + (n + 1) + ' ' + esc(c.getAttribute('data-pill')) + '</button>'; }).join('');
+  $('pills').addEventListener('click', function(e){ var g = e.target.getAttribute('data-go'); if (g) $(g).scrollIntoView(); });
+  function mark(id){ [].forEach.call($('pills').children, function(b){ var on = b.getAttribute('data-go') === id; b.setAttribute('aria-current', String(on)); if (on) $('pills').scrollLeft = Math.max(0, b.offsetLeft - 60); }); }
+  if ('IntersectionObserver' in window){ var io = new IntersectionObserver(function(es){ es.forEach(function(en){ if (en.isIntersecting) mark(en.target.id); }); }, {rootMargin: '-30% 0px -60% 0px'}); chaps.forEach(function(c){ io.observe(c); }); }
+  $('trialbox').innerHTML = TRIALS.map(function(t){ return '<div class="trial" style="margin-top:14px"><p><b>' + esc(t.q) + '</b></p><p><span class="k">Design</span>' + esc(t.d) + '</p><p><span class="k">Result</span>' + esc(t.r) + '</p><p><span class="k">What it changed</span>' + esc(t.c) + '</p><p class="mono" style="font-size:13px"><a href="https://doi.org/' + t.doi + '" rel="noopener">' + esc(t.cite) + '</a></p></div>'; }).join('');
+  $('go-prac').addEventListener('click', function(){ show('t-prac'); window.scrollTo(0, 0); });
+  var D = JSON.parse($('deeper-data').textContent);
+  Object.keys(D).forEach(function(id){ var host = $(id); if (!host) return; var d = document.createElement('details'); d.className = 'deeper'; d.innerHTML = '<summary>Go deeper: mechanism and rationale</summary><div class="dpx">' + D[id].map(function(r){ return '<div><span class="dl">' + esc(r[0]) + '</span><p>' + esc(r[1]) + '</p></div>'; }).join('') + '</div>'; host.appendChild(d); });
+})();
+
+/* Practice */
+$('practice').innerHTML = CASES.map(function(c, n){
+  return '<div class="card case"><p class="label">Case ' + (n + 1) + '</p><h2>' + esc(c.t) + '</h2><p>' + esc(c.s) + '</p><p><b>' + esc(c.q) + '</b></p>' + c.o.map(function(o, j){ return '<button class="opt" data-c="' + n + '" data-o="' + j + '" aria-pressed="false">' + esc(o[0]) + '</button>'; }).join('') + '<p class="line1" id="fb' + n + '" aria-live="polite"></p></div>';
+}).join('');
+$('practice').addEventListener('click', function(e){
+  var b = e.target.closest('.opt'); if (!b) return;
+  var c = +b.getAttribute('data-c'), o = +b.getAttribute('data-o'), r = score(c, o);
+  b.parentNode.querySelectorAll('.opt').forEach(function(x){ x.setAttribute('aria-pressed', 'false'); x.classList.remove('good', 'bad'); });
+  b.setAttribute('aria-pressed', 'true'); b.classList.add(r.good ? 'good' : 'bad');
+  $('fb' + c).innerHTML = '<b>' + (r.good ? 'Best choice.' : 'Not the best choice.') + '</b> ' + esc(r.why);
+});
+fromHash();
+})();
+</script>
+</body>
+</html>

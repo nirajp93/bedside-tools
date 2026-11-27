@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Transfusion thresholds · bedside.tools</title>
+<meta name="description" content="When to transfuse red cells, platelets, plasma and cryoprecipitate in adults: the threshold for each situation, the trial behind it, the dose and the expected rise, with the reasoning in diagrams.">
+<script src="/theme.js"></script>
+<style>
+:root{--bg:#FBFBFA;--card:#FFFFFF;--ink:#111113;--muted:#55555D;--line:#ECECEE;--accent:#2B4BDB;--warn:#9A3B00;--warnbg:#FFF6EC}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5}
+.mono{font-family:var(--mono)}
+.wrap{max-width:720px;margin:0 auto;padding:20px 16px 48px}
+a{color:var(--accent)}
+.back{font-size:14px;text-decoration:none;display:inline-block;min-height:44px;line-height:44px}
+h1{font-size:26px;margin:4px 0 4px;letter-spacing:-.01em}
+.purpose{color:var(--muted);margin:0 0 20px}
+.tabs{display:flex;gap:6px;margin-bottom:16px}
+.tab{flex:1;min-width:0;min-height:44px;border:1px solid var(--line);background:var(--card);border-radius:14px;padding:0 4px;font:inherit;font-size:15px;font-weight:600;color:var(--muted);cursor:pointer}
+.tab[aria-selected="true"]{border-color:var(--accent);color:var(--accent)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
+.label{font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px}
+.field{display:flex;flex-direction:column;justify-content:flex-end}
+.field label{display:block;font-size:13px;color:var(--muted);margin-bottom:4px}
+.field input,.field select{width:100%;min-height:44px;border:1px solid var(--line);border-radius:10px;padding:8px 10px;font:inherit;font-family:var(--mono);background:var(--card);color:var(--ink)}
+.field input:focus,.field select:focus,.tab:focus-visible,.chk:focus-within,button:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.checks{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.chk{display:flex;align-items:center;gap:10px;min-height:44px;border:1px solid var(--line);border-radius:10px;padding:6px 10px;font-size:14px;cursor:pointer}
+.chk input{width:20px;height:20px;accent-color:var(--accent);flex:none}
+.card h2{font-size:18px;margin:0 0 2px}
+.head{font-family:var(--mono);font-size:17px;font-weight:600;margin:6px 0 4px;overflow-wrap:anywhere}
+.head.bad{color:var(--bad)}.head.okc{color:var(--ok)}.head.wn{color:var(--warn)}
+.sub{font-size:14px;color:var(--muted);margin:0}
+.q{font-size:14px;margin:12px 0 0;font-weight:600}
+.card ul{margin:6px 0 0;padding-left:20px}
+.card li{margin-bottom:4px}
+.guard{border-left:3px solid var(--warn);background:var(--warnbg);padding:8px 10px;border-radius:0 10px 10px 0;margin-top:8px;font-size:14.5px}
+.tier{display:inline-block;font-family:var(--mono);font-size:11px;border:1px solid var(--line);border-radius:999px;padding:2px 8px;color:var(--muted);margin:6px 6px 0 0}
+details{margin-top:10px;border-top:1px solid var(--line);padding-top:8px}
+.whyline{margin:10px 0 0;font-size:14.5px;color:var(--muted)}
+.whyline b{color:var(--ink);font-weight:600}
+summary{cursor:pointer;color:var(--accent);font-weight:600;min-height:44px;line-height:44px}
+details p{margin:0 0 8px;font-size:15px}
+.empty{color:var(--muted)}
+.btn{min-height:44px;border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);border-radius:10px;padding:8px 14px;font:inherit;font-weight:600;cursor:pointer}
+.btn.ghost{background:var(--card);color:var(--accent)}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.note{font-size:14px;color:var(--muted)}
+.tl{position:relative;padding-left:26px;margin-top:6px}
+.tl:before{content:"";position:absolute;left:8px;top:8px;bottom:8px;width:2px;background:var(--line)}
+.st{position:relative;padding:6px 0 10px}
+.st:before{content:"";position:absolute;left:-24px;top:11px;width:12px;height:12px;border-radius:50%;background:var(--card);border:2px solid var(--muted)}
+.st.now:before{background:var(--accent);border-color:var(--accent)}
+.st .when{font-family:var(--mono);font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+.st b{display:block}
+.st small{color:var(--muted);font-size:13.5px;display:block}
+.st .tier{margin-top:4px}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:6px 6px 6px 0;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:var(--mono);font-size:11.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);font-weight:500}
+td.mono{font-size:13px;white-space:nowrap}
+tr.sel td{font-weight:700}
+.tw{overflow-x:auto}
+.case h2{font-size:17px}
+.ans{margin-top:10px;border-top:1px solid var(--line);padding-top:10px}
+footer{margin-top:28px;font-size:13.5px;color:var(--muted)}
+footer p{margin:0 0 8px}
+.panel{display:none}.panel.on{display:block}
+.fig{display:block;width:100%;max-width:460px;height:auto;margin:0 auto}
+.states{display:flex;gap:6px;overflow-x:auto;margin:10px -16px;padding:2px 16px 6px;scrollbar-width:none}
+.states::-webkit-scrollbar{display:none}
+.states.wrapit{flex-wrap:wrap;overflow:visible;margin:10px 0 0;padding:0}
+.sbtn{flex:none;min-height:44px;min-width:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--ink);font:inherit;font-size:14px;cursor:pointer;white-space:nowrap}
+.sbtn[aria-pressed="true"]{border-color:var(--accent);color:var(--accent);font-weight:600}
+.line1{font-size:15px;margin:10px 0 0}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.chip{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--fill);color:var(--ink);font:inherit;font-size:14px;cursor:pointer}
+.chip svg{flex:none;color:var(--accent)}
+.scrim{position:fixed;inset:0;background:var(--scrim);z-index:20}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:21;max-height:90vh;overflow-y:auto;background:var(--card);border:1px solid var(--line);border-bottom:0;border-radius:20px 20px 0 0;padding:8px 16px 24px;max-width:560px;margin:0 auto}
+.sheethead{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.sheethead h2{font-size:18px;margin:0}
+.xbtn{min-height:44px;min-width:44px;border:0;background:transparent;color:var(--accent);font:inherit;font-weight:600;cursor:pointer}
+.pills{position:sticky;top:var(--bt-bar,0px);z-index:5;background:var(--bg);display:flex;gap:6px;overflow-x:auto;margin:0 -16px 12px;padding:8px 16px;border-bottom:1px solid var(--line);scrollbar-width:none}
+.pills::-webkit-scrollbar{display:none}
+.pill{flex:none;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--muted);font:inherit;font-size:14px;cursor:pointer;white-space:nowrap}
+.pill[aria-current="true"]{border-color:var(--accent);color:var(--accent);font-weight:600}
+.chap{scroll-margin-top:70px}
+.cause{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:8px 0;border-top:1px solid var(--line);font-size:15px}
+.cause small{color:var(--muted);font-size:13px;text-align:right;flex:0 1 58%}
+.cause.out span{color:var(--muted);text-decoration:line-through}
+.cause.out,.cause.less{opacity:.6}
+.cause.fav span{font-weight:700}
+.cause.fav span:before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--accent);margin-right:8px}
+.trial{border-left:3px solid var(--accent);padding-left:12px}
+.trial p{margin:0 0 6px;font-size:15px}
+.trial .k{font-family:var(--mono);font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);display:block}
+.badge{display:inline-block;font-family:var(--mono);font-size:12px;border-radius:999px;padding:2px 10px;margin:4px 6px 0 0;border:1px solid var(--line);color:var(--muted)}
+.badge.hi{border-color:var(--warn);color:var(--warn);background:var(--warnbg)}
+.badge.lo{border-color:var(--ok);color:var(--ok);background:var(--okbg)}
+.score{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:8px 0;border-top:1px solid var(--line)}
+.score b{font-family:var(--mono);font-size:15px}
+.score small{color:var(--muted);font-size:13px;text-align:right}
+.tap{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.qn{font-size:14px;color:var(--muted);margin:12px 0 0}
+.plate{margin:12px 0 4px}
+.plate img{display:block;width:100%;height:auto;border-radius:10px;border:1px solid var(--line)}
+.plate figcaption{font-size:12px;color:var(--muted);margin-top:4px}
+@media (min-width:900px){
+  .wrap{max-width:1040px}
+  #p-tool.on{display:grid;grid-template-columns:420px minmax(0,1fr);gap:20px;align-items:start}
+  .refgrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;align-items:start}
+  .refgrid .card{margin-bottom:0}
+  #p-learn{max-width:720px;margin:0 auto}
+}
+@media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+.opts{display:grid;gap:6px;margin-top:8px}
+.opt{display:flex;justify-content:space-between;align-items:center;gap:10px;min-height:44px;padding:6px 12px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);font:inherit;font-size:14px;text-align:left;cursor:pointer}
+.opt[aria-pressed="true"]{border-color:var(--accent);color:var(--accent);font-weight:600}
+.opt .pt{font-family:var(--mono);font-size:13px;color:var(--muted);flex:none}
+.opt[aria-pressed="true"] .pt{color:var(--accent)}
+.opts.auto .opt:not([aria-pressed="true"]){opacity:.55}
+.checks.one{grid-template-columns:1fr}
+.qn b{color:var(--ink)}
+.drug{padding:10px 0;border-top:1px solid var(--line)}
+.drug:first-child{border-top:0;padding-top:0}
+.drug p{margin:0 0 4px}
+.drug .dd{font-size:14px;font-weight:600}
+.drug.sel .dn b{color:var(--accent)}
+.drug.sel{border-left:3px solid var(--accent);padding-left:10px}
+.drug.bad .dd{text-decoration:line-through;color:var(--muted)}
+.refgrid .card ul{padding-left:18px}
+.refgrid .card li{font-size:14.5px}
+input[type=range]{width:100%;min-height:44px;accent-color:var(--accent)}
+@media (min-width:900px){
+  #p-treat.on{display:grid;grid-template-columns:420px minmax(0,1fr);gap:20px;align-items:start}
+  #p-treat .refgrid{grid-column:1/-1}
+  #p-treat #tout .card{margin-bottom:0}
+}
+@media (max-width:420px){.checks{grid-template-columns:1fr}}
+[hidden]{display:none!important}
+.dp{margin-top:10px;border:1px solid var(--line);border-radius:12px;padding:2px 12px;background:var(--card);text-align:left}
+.dp:empty{display:none}
+.dp>div{padding:10px 0;border-top:1px solid var(--line)}
+.dp>div:first-child{border-top:0}
+.dp .dl{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500;margin:0 0 3px}
+.dp p{font-size:15px;line-height:1.45;color:var(--ink);margin:0 0 4px}
+.dp p:last-child{margin-bottom:0}
+.deeper{margin-top:14px;border-top:1px solid var(--line)}
+.deeper>summary{min-height:44px;display:flex;align-items:center;gap:8px;color:var(--accent);font-weight:600;font-size:15px;cursor:pointer;list-style:none}
+.deeper>summary::-webkit-details-marker{display:none}
+.deeper>summary::before{content:"+";font-family:var(--mono);font-size:18px;line-height:1;width:14px;text-align:center}
+.deeper[open]>summary::before{content:"\2212"}
+.deeper>summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.deeper .dpx{border:1px solid var(--line);border-radius:12px;padding:2px 12px;background:var(--card);text-align:left}
+.deeper .dpx>div{padding:10px 0;border-top:1px solid var(--line)}
+.deeper .dpx>div:first-child{border-top:0}
+.deeper .dl{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500;margin:0 0 3px}
+.deeper p{font-size:15px;line-height:1.45;color:var(--ink);margin:0 0 4px}
+.deeper p:last-child{margin-bottom:0}
+/* cause-fix: ruled-out causes stay readable; the name greys, the reason does not fade */
+.cause.out,.cause.less,.cause.unl{opacity:1}
+.cause.less>span,.cause.unl>span{color:var(--muted)}
+.tabs .tab{font-size:14px}
+.thr{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin:4px 0 2px}
+.thr .big{font-family:var(--mono);font-size:30px;font-weight:700;color:var(--accent);line-height:1.1}
+.thr .unit{font-family:var(--mono);font-size:13px;color:var(--muted)}
+.zone{display:flex;margin-top:10px;border-radius:10px;overflow:hidden;border:1px solid var(--line)}
+.zone span{flex:1;min-width:0;text-align:center;font-family:var(--mono);font-size:11.5px;padding:6px 2px;color:var(--muted);background:var(--card);border-left:1px solid var(--line)}
+.zone span:first-child{border-left:0}
+.zone span.on{background:var(--accent);color:var(--accent-ink);font-weight:600}
+.zname{font-size:14px;margin:6px 0 0}
+.sitlist td:first-child,#ptable td:first-child{width:62%}
+.sitlist tr.sel td .note,#ptable tr.sel td .note{font-weight:400}
+.link{font-weight:600}
+@media (min-width:900px){
+  #p-pp.on{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px;align-items:start}
+  #p-pp .refgrid{grid-column:1/-1}
+  #p-rbc.on{display:grid;grid-template-columns:420px minmax(0,1fr);gap:20px;align-items:start}
+  #p-rbc .refgrid{grid-column:1/-1}
+}
+</style>
+<script>function dpHtml(rows){ return rows.map(function(r){ return '<div><span class="dl">' + r[0] + '</span>' + r[1] + '</div>'; }).join(''); }</script>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="/">← bedside.tools</a>
+<h1>Transfusion thresholds</h1>
+<p class="purpose">When to give red cells, platelets, plasma or cryoprecipitate in adults: the threshold for the situation, the trial behind it, and what one dose does.</p>
+
+<div class="tabs" role="tablist">
+  <button class="tab" role="tab" id="t-rbc" aria-selected="true" aria-controls="p-rbc">Red cells</button>
+  <button class="tab" role="tab" id="t-pp" aria-selected="false" aria-controls="p-pp">Platelets, plasma</button>
+  <button class="tab" role="tab" id="t-learn" aria-selected="false" aria-controls="p-learn">Learn</button>
+  <button class="tab" role="tab" id="t-prac" aria-selected="false" aria-controls="p-prac">Practice</button>
+</div>
+
+<div class="panel on" id="p-rbc" role="tabpanel" aria-labelledby="t-rbc">
+  <div>
+  <div class="card" id="red">
+    <p class="label">Red cells</p>
+    <p class="qn" id="situation"><b>Situation.</b> Pick the one that fits best.</p>
+    <div class="opts" id="sitseg" role="group" aria-label="Situation"></div>
+    <div class="grid">
+      <div class="field"><label for="hb">Hemoglobin (g/dL)</label><input id="hb" inputmode="decimal" autocomplete="off" placeholder="e.g. 7.4"></div>
+      <div></div>
+    </div>
+    <div class="checks one" id="rbcticks"></div>
+  </div>
+  </div>
+  <div id="rout"></div>
+  <div class="refgrid">
+    <div class="card" id="rbc-table"><p class="label">Every situation</p><h2>Red-cell thresholds and the trial behind each</h2><div id="sittable"></div></div>
+    <div class="card" id="massive"><p class="label">Bleeding fast</p><h2>Massive transfusion</h2><div id="massbox"></div></div>
+  </div>
+</div>
+
+<div class="panel" id="p-pp" role="tabpanel" aria-labelledby="t-pp">
+  <div>
+  <div class="card" id="platelets">
+    <p class="label">Platelets</p>
+    <p class="qn" id="plt-situation"><b>Situation.</b></p>
+    <div class="opts" id="psitseg" role="group" aria-label="Platelet situation"></div>
+    <div class="grid">
+      <div class="field"><label for="plt">Platelets (×10⁹/L)</label><input id="plt" inputmode="numeric" autocomplete="off" placeholder="e.g. 18"></div>
+      <div></div>
+    </div>
+    <div class="checks one" id="pltticks"></div>
+  </div>
+  <div id="pout"></div>
+  </div>
+  <div>
+  <div class="card" id="plasma">
+    <p class="label">Plasma and cryoprecipitate</p>
+    <p class="qn" id="plasma-situation"><b>Situation.</b></p>
+    <div class="opts" id="qsitseg" role="group" aria-label="Plasma situation"></div>
+    <div class="grid">
+      <div class="field"><label for="inr">INR</label><input id="inr" inputmode="decimal" autocomplete="off" placeholder="e.g. 1.6"></div>
+      <div class="field"><label for="fib">Fibrinogen (mg/dL)</label><input id="fib" inputmode="numeric" autocomplete="off" placeholder="e.g. 120"></div>
+      <div class="field"><label for="wt">Weight (kg)</label><input id="wt" inputmode="decimal" autocomplete="off" placeholder="e.g. 70"></div>
+      <div></div>
+    </div>
+    <div class="checks one" id="qticks"></div>
+  </div>
+  <div id="qout"></div>
+  </div>
+  <div class="refgrid">
+    <div class="card" id="plt-table"><p class="label">Every situation</p><h2>Platelet thresholds</h2><div id="ptable"></div></div>
+    <div class="card" id="products"><p class="label">One dose</p><h2>What each product carries</h2><div id="prodbox"></div></div>
+    <div class="card" id="cci"><p class="label">Did the platelets work?</p><h2>Corrected count increment</h2>
+      <div class="grid">
+        <div class="field"><label for="c-pre">Count before (×10⁹/L)</label><input id="c-pre" inputmode="numeric" autocomplete="off" placeholder="e.g. 8"></div>
+        <div class="field"><label for="c-post">Count after (×10⁹/L)</label><input id="c-post" inputmode="numeric" autocomplete="off" placeholder="e.g. 30"></div>
+        <div class="field"><label for="c-ht">Height (cm)</label><input id="c-ht" inputmode="decimal" autocomplete="off" placeholder="e.g. 170"></div>
+        <div class="field"><label for="c-wt">Weight (kg)</label><input id="c-wt" inputmode="decimal" autocomplete="off" placeholder="e.g. 70"></div>
+        <div class="field"><label for="c-dose">Platelets given (×10¹¹)</label><input id="c-dose" inputmode="decimal" autocomplete="off" value="3"></div>
+        <div class="field"><label for="c-when">Count drawn</label><select id="c-when"><option value="1h">10–60 min after</option><option value="24h">About 24 h after</option></select></div>
+      </div>
+      <div id="ccibox"></div>
+    </div>
+  </div>
+</div>
+
+<div class="panel" id="p-learn" role="tabpanel" aria-labelledby="t-learn">
+  <div class="pills" id="pills"></div>
+  <div class="card chap" id="learn-o2" data-pill="Oxygen"><p class="label">1 · Oxygen</p><h2>Hemoglobin is a carrier, not a target</h2><p class="sub">Drag the hemoglobin. The oxygen each decilitre of blood carries falls in a straight line, but the body has slack: at rest it uses about a quarter of what is delivered.</p>
+    <input type="range" id="o2r" min="4" max="14" step="0.5" value="7" aria-label="Hemoglobin, g/dL">
+    <div id="o2fig"></div><div class="zone" id="o2zone"></div><p class="zname" id="o2zn"></p><div class="dp" id="o2dp"></div></div>
+  <div class="card chap" id="learn-trials" data-pill="Trials"><p class="label">2 · The trials</p><h2>Restrictive was as safe, with less blood</h2><p class="sub">Each trial compared a lower trigger (filled) with a higher one (ring). Tap a trial.</p><div data-figure="ladder"></div></div>
+  <div class="card chap" id="learn-heart" data-pill="The heart"><p class="label">3 · The exception</p><h2>The ischemic heart is different</h2><figure class="plate" style="margin-left:0;margin-right:0"><img src="/media/transfusion/coronary.webp" width="1024" height="402" loading="lazy" alt="Three panels of a coronary artery over heart muscle. Normal: a wide lumen full of red cells. Narrowed: yellow plaque narrows the lumen and fewer red cells pass. Narrowed with anemia: the same narrowing with only a few red cells, and the muscle beyond it dusky."><figcaption>Normal, narrowed, narrowed with anemia: supply falls twice over. Created with BioRender.com</figcaption></figure><p class="sub">Most tissues take more oxygen out of the blood when hemoglobin falls. The heart muscle already takes out most of it at rest, so it can only get more by more coronary flow. Tap each state.</p><div data-figure="heart"></div></div>
+  <div class="card chap" id="learn-plt" data-pill="Platelets"><p class="label">4 · Platelets</p><h2>Four numbers: 10, 20, 50, or none</h2><p class="sub">The threshold rises with the bleeding risk of what is about to happen. Tap a number.</p><div data-figure="pladder"></div></div>
+  <div class="card chap" id="learn-products" data-pill="Products"><p class="label">5 · The products</p><h2>What one dose does</h2><figure class="plate" style="margin-left:0;margin-right:0"><img src="/media/transfusion/products.webp" width="949" height="449" loading="lazy" alt="Four transfusion bags: dark red packed red cells, pale straw platelets, golden plasma, and a small volume of pale cryoprecipitate. A magnified circle under each shows red cells, platelets, dissolved proteins and fibrinogen strands."><figcaption>Red cells, platelets, plasma and cryoprecipitate. Created with BioRender.com</figcaption></figure><p class="sub">Tap a product.</p><div data-figure="bags"></div></div>
+  <div class="card chap" id="narrow" data-pill="No rise?"><p class="label">6 · Narrowing</p><h2>Platelets given, count did not rise</h2><p class="sub">Send a count 10 to 60 minutes after the next dose and another at about 24 hours, and work out the corrected count increment (CCI; calculator on the Platelets, plasma tab). Tap each result as it comes back.</p><div id="nfeat" class="tap"></div><div id="ncause"></div></div>
+  <div class="card chap" id="trials" data-pill="Evidence"><p class="label">7 · Evidence</p><h2>The trials behind the numbers</h2><div id="trialbox"></div><div class="row"><button class="btn ghost" id="go-prac">Try the practice cases</button></div></div>
+</div>
+
+<div class="panel" id="p-prac" role="tabpanel" aria-labelledby="t-prac">
+  <div id="practice"></div>
+</div>
+
+<div class="scrim" id="scrim" hidden></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-t" hidden>
+  <div class="sheethead"><h2 id="sheet-t"></h2><button class="xbtn" id="sheet-x">Close</button></div>
+  <div id="sheet-b"></div>
+</div>
+
+<footer>
+  <p><strong>For education only. Not a substitute for clinical judgment.</strong> For adults. Pregnancy is covered only where marked (obstetric bleeding, neuraxial counts). Out of scope: children, antenatal anemia, transfusion-dependent anemia (thalassemia, sickle cell disease), exchange transfusion, transfusion reactions and blood-bank product selection (irradiated, washed, HLA-matched). Product doses and expected rises are averages from the US Circular of Information; your blood bank's products and protocol come first.</p>
+  <p>Privacy: everything runs in your browser. Nothing you enter is sent anywhere or stored, and there are no analytics. Do not enter names, record numbers, or dates of birth.</p>
+  <p class="mono">Last reviewed: 2026-11-26</p>
+  <p><strong>Sources:</strong> Carson JL et al., Red blood cell transfusion: 2023 AABB international guidelines, JAMA 2023;330:1892 (doi 10.1001/jama.2023.12914; recommendation 1 strong, moderate; 2 conditional, low). Metcalf RA et al., Platelet transfusion: 2025 AABB and ICTMG international clinical practice guidelines, JAMA 2025;334:606 (doi 10.1001/jama.2025.7529; recommendation numbers and strength shown on each card). Pagano MB et al., Red cell transfusion in acute myocardial infarction: AABB 2025, Ann Intern Med 2025;178:1469 (conditional, low). Rao SV et al., 2025 ACC/AHA/ACEP/NAEMSP/SCAI guideline for acute coronary syndromes, Circulation 2025;151:e771 (transfusion to 10 g/dL: class 2b, B-R). CHEST guideline on red blood cell transfusion in critically ill adults, Chest 2025;167:477. Surviving Sepsis Campaign 2026 adult guidelines, Intensive Care Med 2026;52:863 (restrictive transfusion: strong, moderate, carried over from 2021; Evans L et al., Intensive Care Med 2021;47:1181). Laine L et al., ACG guideline: upper gastrointestinal and ulcer bleeding, Am J Gastroenterol 2021;116:899. Sengupta N et al., ACG guideline: acute lower gastrointestinal bleeding, Am J Gastroenterol 2023;118:208. de Franchis R et al., Baveno VII, J Hepatol 2022;76:959. O'Leary JG et al., AGA clinical practice update: coagulation in cirrhosis, Gastroenterology 2019;157:34 (best practice advice, ungraded). Patel IJ et al., SIR consensus on periprocedural thrombotic and bleeding risk, J Vasc Interv Radiol 2019;30:1168. Green L et al., BSH guideline on fresh frozen plasma and cryoprecipitate, Br J Haematol 2018;181:54. Shah A et al., Association of Anaesthetists guideline on major haemorrhage, Anaesthesia 2025;80:425 (UK; shown as expert practice). Bauer ME et al., SOAP consensus on neuraxial procedures in obstetric patients with thrombocytopenia, Anesth Analg 2021;132:1531. AABB, America's Blood Centers, American Red Cross and Armed Services Blood Program, Circular of Information for the Use of Human Blood and Blood Components, June 2024. Trials as cited on the Learn tab: TRICC 1999, TRISS 2014, Villanueva 2013, FOCUS 2011, TRICS III 2017, MINT 2023, REALITY 2021, TRAIN 2024, HEMOTION 2024, SAHaRA 2025, TOPPS 2013, PLADO 2010, PACER 2023, PATCH 2016, PROPPR 2015. Evidence tier on each card: guideline strength and certainty, or "expert practice".</p>
+</footer>
+</div>
+<script id="engine">
+/* Pure decision engine. No DOM access. Hemoglobin in g/dL, platelets in x10^9/L, fibrinogen in mg/dL. */
+var T = {
+  aabb1: 'AABB 2023 rec 1 · strong, moderate',
+  aabbR: 'AABB 2023 remark: clinicians may choose',
+  aabb2: 'AABB 2023 rec 2 · conditional, low',
+  aabbGP: 'AABB 2023 · good practice',
+  chest: 'CHEST 2025 rec 1 · strong, moderate',
+  ssc: 'SSC 2026 · strong, moderate',
+  acc: 'ACC/AHA 2025 · 2b, B-R',
+  aabbMI: 'AABB 2025 MI · conditional, low',
+  acg21: 'ACG 2021 · conditional, low',
+  acg23: 'ACG 2023 · conditional, low',
+  bav: 'Baveno VII 6.2 · A1',
+  ep: 'Expert practice',
+  circ: 'Circular of Information 2024'
+};
+
+/* Red-cell situations. thr = transfuse below; cvd = threshold with preexisting cardiovascular disease (AABB 2023 remark; ACG text for GI bleeding). */
+var SIT = {
+  stable: {n: 'Stable, on the ward (medical or surgical)', thr: 7, cvd: 8, t: [T.aabb1], trial: 'TRICC, and the trials pooled by AABB', why: 'restr'},
+  icu: {n: 'Critically ill, not bleeding', thr: 7, cvd: 8, t: [T.chest, T.aabb1], trial: 'TRICC', why: 'restr', more: ['CHEST 2025 gives the restrictive range as 7 to 8 g/dL and does not apply to unstable bleeding, brain injury or trauma.']},
+  sepsis: {n: 'Sepsis or septic shock', thr: 7, cvd: 8, t: [T.ssc], trial: 'TRISS', why: 'sepsis', more: ['Surviving Sepsis 2026 carries over the 2021 recommendation for a restrictive strategy. The 2021 text says the trigger is typically 7 g/dL, and that transfusion should not be guided by hemoglobin alone.', 'TRICOP (cancer patients with septic shock) leaned toward a liberal strategy: 90-day mortality 59% liberal against 70% restrictive. A single trial; the guideline did not change.']},
+  acs: {n: 'Heart attack (acute MI or ACS) with anemia', thr: 10, lib: true, t: [T.acc, T.aabbMI], trial: 'MINT', why: 'mint'},
+  card: {n: 'Cardiac surgery', thr: 7.5, t: [T.aabbR], trial: 'TRICS III', why: 'trics'},
+  ortho: {n: 'Orthopedic surgery, such as hip fracture', thr: 8, t: [T.aabbR], trial: 'FOCUS', why: 'focus'},
+  ugib: {n: 'Upper GI bleed, not variceal, stable', thr: 7, cvd: 8, t: [T.acg21], trial: 'Villanueva 2013', why: 'ugib', more: ['ACG 2021 text: a threshold of 8 g/dL is reasonable with preexisting cardiovascular disease, and hypotensive patients may be transfused at higher levels.', 'The International Consensus Group (2019) suggests 8 g/dL without cardiovascular disease and a higher number with it; it gives no figure for the higher number.']},
+  lgib: {n: 'Lower GI bleed, stable', thr: 7, cvd: 8, t: [T.acg23], trial: 'Villanueva 2013 (upper GI bleeding)', why: 'lgib', more: ['ACG 2023: the restrictive threshold is for hemodynamically stable patients; 8 g/dL can be considered with cardiovascular disease.']},
+  varix: {n: 'Variceal bleed in cirrhosis', thr: 7, top: 8, t: [T.bav], trial: 'Villanueva 2013', why: 'varix'},
+  onc: {n: 'Hematology or oncology, including transplant', thr: 7, cvd: 8, t: [T.aabb2], trial: 'Tay 2020 and other AABB trials', why: 'onc'},
+  neuro: {n: 'Brain injury: trauma, subarachnoid or intracerebral bleed', thr: null, t: [T.ep], trial: 'TRAIN, HEMOTION, SAHaRA', why: 'neuro'}
+};
+var SITK = ['stable', 'icu', 'sepsis', 'acs', 'card', 'ortho', 'ugib', 'lgib', 'varix', 'onc', 'neuro'];
+
+var WHY = {
+  restr: 'In the trials, transfusing only below 7 used about half the blood and gave the same survival as transfusing below 9 or 10 (TRICC, and the trials pooled by AABB).',
+  restrNo: 'Above the threshold, more blood added risk (volume overload, reactions) without a benefit in the trials.',
+  sepsis: 'TRISS: in septic shock, transfusing at 7 rather than 9 gave the same 90-day mortality (43.0% against 45.0%) with a median of 1 unit against 4.',
+  mint: 'MINT: in heart attack with anemia, the restrictive group (transfused at 7 or 8) had more heart attack or death at 30 days, 16.9% against 14.5% (not significant), so harm from restriction cannot be excluded.',
+  trics: 'TRICS III: in cardiac surgery, transfusing below 7.5 was noninferior to transfusing below 9.5 (8.5 on the ward), and fewer patients were transfused.',
+  focus: 'FOCUS: after hip fracture surgery in patients with cardiovascular disease or its risk factors, transfusing for symptoms or below 8 matched transfusing below 10 for death and walking at 60 days.',
+  cvd: 'With preexisting cardiovascular disease AABB allows 8, the restrictive trigger in FOCUS, which enrolled patients with cardiovascular disease or its risk factors.',
+  cvdGi: 'ACG considers 8 reasonable with preexisting cardiovascular disease: a diseased heart has less slack when oxygen delivery falls.',
+  ugib: 'Villanueva 2013: in upper GI bleeding, transfusing below 7 rather than 9 meant less rebleeding (10% against 16%) and better 6-week survival (95% against 91%).',
+  lgib: 'ACG carries the upper GI bleeding evidence over: the restrictive trigger of 7 for stable patients.',
+  varix: 'Extra blood volume raises portal pressure. In Villanueva 2013 portal pressure rose with the liberal strategy, and varices rebleed when it rises.',
+  onc: 'In stem-cell transplant, a trigger of 7 gave the same quality of life and clinical outcomes as 9 with fewer units (Tay 2020); in the hematology trials AABB pooled, bleeding was not affected by the strategy.',
+  neuro: 'No US guideline gives a number. All three recent trials leaned toward a higher trigger, significantly only in TRAIN.',
+  fast: 'In a fast bleed the hemoglobin has not yet fallen: whole blood is being lost, and the number drops only after fluid refills the vessels.'
+};
+
+function has(v){ return v !== null && v !== undefined && v !== '' && isFinite(v); }
+function r1(n){ return Math.round(n * 10) / 10; }
+
+/* Red cells. i = {sit, hb, cvd, sym, fast} */
+function rbc(i){
+  var c = {kind: 'empty', head: '', sub: '', guards: [], more: [], tiers: [], chips: [], tx: null, thr: null};
+  if (!i.sit || !SIT[i.sit]){ c.head = 'Pick a situation to see its threshold.'; return c; }
+  var s = SIT[i.sit], hb = has(i.hb) ? i.hb : null;
+  c.tiers = s.t.slice(); c.more = (s.more || []).slice();
+  if (i.fast){
+    c.kind = 'fast'; c.tx = true;
+    c.head = 'Transfuse for the bleeding, not for the number';
+    c.sub = 'Call for help and the massive transfusion protocol if the bleeding is massive. Red cells, plasma and platelets go in together; in trauma, 1:1:1 (PROPPR).';
+    c.why = WHY.fast;
+    c.more = ['Hemoglobin thresholds, and giving one unit at a time, do not apply to bleeding faster than single units can keep up with (CHEST 2025).', 'Stop the bleeding: endoscopy, surgery or interventional radiology, and reversal of any anticoagulant.'];
+    c.tiers = [T.ep];
+    c.chips = [['bags', 'rbc', 'What one unit does']];
+    return c;
+  }
+  if (i.sit === 'neuro'){
+    c.kind = 'neuro';
+    c.head = 'No guideline threshold. Decide with neurocritical care.';
+    c.sub = 'TRAIN (transfuse below 9 against 7): fewer unfavorable neurologic outcomes, 62.6% against 72.6%. HEMOTION (10 against 7, traumatic brain injury) and SAHaRA (10 against 8, subarachnoid bleed): no significant difference.';
+    c.why = WHY.neuro;
+    c.more = ['CHEST 2025 says its restrictive recommendation does not apply to neurologic injury. A 2025 Cochrane review pooled the trials and found fewer unfavorable neurologic outcomes with a liberal strategy (moderate certainty).'];
+    c.chips = [['ladder', 'train', 'The brain-injury trials']];
+    return c;
+  }
+  var thr = s.thr, cvdUsed = false;
+  if (i.cvd && s.cvd){ thr = s.cvd; cvdUsed = true; }
+  c.thr = thr;
+  if (cvdUsed) c.tiers = [i.sit === 'ugib' ? 'ACG 2021 text' : i.sit === 'lgib' ? 'ACG 2023 text' : T.aabbR];
+  if (s.lib){
+    c.kind = hb === null ? 'thr' : hb < 10 ? 'yes' : 'no';
+    c.tx = hb === null ? null : hb < 10;
+    c.head = hb === null ? 'Liberal threshold: keep hemoglobin at 10 or above' : hb < 10 ? 'Transfuse: aim for a hemoglobin of 10 or above' : 'No transfusion: hemoglobin is 10 or above';
+    c.sub = 'For anemia in a heart attack, transfusing to 10 may be reasonable (ACC/AHA 2025) and AABB 2025 suggests the liberal strategy. Give one unit, then recheck.';
+    c.guards = ['Not for uncontrolled bleeding, which MINT excluded (ACC/AHA 2025 text). Watch for volume overload: one unit at a time.'];
+    c.why = WHY.mint;
+    c.more = ['CHEST 2025 also suggests against a restrictive strategy in critically ill patients with acute coronary syndrome (conditional, low). AABB 2023 made no recommendation for heart attack; MINT was still running.', 'REALITY (transfuse at 8 against 10) found the restrictive strategy noninferior for major cardiac events at 30 days, 11.0% against 14.0%, but the confidence interval included a clinically important harm.'];
+    c.chips = [['heart', 'mi', 'Why the heart is different'], ['ladder', 'mint', 'MINT and REALITY']];
+  } else if (s.top){
+    c.kind = hb === null ? 'thr' : hb < s.thr ? 'yes' : 'no';
+    c.tx = hb === null ? null : hb < s.thr;
+    c.head = hb === null ? 'Target 7 to 8. Transfuse below 7.' : hb < s.thr ? 'Transfuse one unit: aim for 7 to 8, no higher' : hb <= s.top ? 'No transfusion: at the 7 to 8 target' : 'No transfusion: above the 7 to 8 target';
+    c.sub = 'Baveno VII: transfuse conservatively, with a target of 7 to 8 g/dL, weighing cardiovascular disease, age, blood pressure and ongoing bleeding.';
+    c.why = WHY.varix;
+    c.more = ['Baveno VII also says plasma is not recommended in acute variceal bleeding: it does not correct the coagulopathy (6.36, B1). See the plasma card.', 'The rest of the first hour (octreotide, ceftriaxone, endoscopy within 12 hours) is in the cirrhosis tool: /cirrhosis/#bleed.'];
+    if (i.cvd) c.guards.push('Cardiovascular disease: Baveno VII asks you to weigh it within the 7 to 8 target; it gives no separate number.');
+    c.chips = [['ladder', 'vill', 'Villanueva 2013']];
+  } else {
+    c.kind = hb === null ? 'thr' : hb < thr ? 'yes' : 'no';
+    c.tx = hb === null ? null : hb < thr;
+    c.head = hb === null ? 'Threshold: transfuse below ' + thr : hb < thr ? 'Transfuse one unit, then recheck' : 'No transfusion for this hemoglobin';
+    c.sub = hb === null ? 'Enter the hemoglobin.' : hb < thr ? 'Below the threshold of ' + thr + ' g/dL. Recheck the hemoglobin and the patient before a second unit.' : 'At or above the threshold of ' + thr + ' g/dL. Treat the cause of the anemia.';
+    c.why = hb !== null && hb >= thr ? WHY.restrNo : cvdUsed ? (i.sit === 'ugib' || i.sit === 'lgib' ? WHY.cvdGi : WHY.cvd) : WHY[s.why];
+    if (cvdUsed && i.sit === 'ugib') c.more.unshift('Threshold raised to 8 for preexisting cardiovascular disease.');
+    var chipK = {stable: 'tricc', icu: 'tricc', sepsis: 'triss', card: 'trics', ortho: 'focus', ugib: 'vill', lgib: 'vill', onc: 'tricc'};
+    if (i.sit === 'onc') s = {trial: 'TRICC', t: s.t};
+    c.chips = [['ladder', chipK[i.sit] || 'tricc', 'The trial: ' + s.trial.split(',')[0]], ['o2', '', 'Oxygen and hemoglobin']];
+  }
+  if (c.tx) c.sub += ' Expect about ' + r1(hb + 1) + ' g/dL after one unit if not bleeding.';
+  if (i.sym && c.tx === false) c.guards.push('Symptoms of anemia: AABB asks for symptoms, signs and the whole picture, not the number alone. In FOCUS the restrictive arm was transfused for symptoms at any hemoglobin.');
+  if (i.sym) c.tiers.push(T.aabbGP);
+  if (c.tx) c.more.push('One unit raises hemoglobin by about 1 g/dL in an average-sized adult who is not bleeding (Circular of Information); an inpatient study measured a median 1.4 g/dL per unit (REDS-III, Karafin 2017).');
+  return c;
+}
+
+/* Platelets. thr = transfuse below; no = no prophylactic platelets. Metcalf 2025 recommendation numbers. */
+var PSIT = {
+  hypo: {n: 'Not bleeding: chemotherapy or allogeneic transplant', thr: 10, t: 'AABB 2025 1.1 · strong, moderate', why: 'topps'},
+  crit: {n: 'Not bleeding: critical illness (consumption)', thr: 10, t: 'AABB 2025 2.2 · conditional, very low', why: 'crit'},
+  auto: {n: 'Not bleeding: autologous transplant or aplastic anemia', no: true, t: 'AABB 2025 2.1 · conditional, low to very low', why: 'auto'},
+  cvc: {n: 'Central line, internal jugular or femoral', thr: 10, t: 'AABB 2025 2.3 · conditional, moderate to very low', why: 'pacer'},
+  lp: {n: 'Lumbar puncture', thr: 20, t: 'AABB 2025 1.3 · strong, moderate', why: 'lp'},
+  irlo: {n: 'Radiology procedure, low bleeding risk', thr: 20, t: 'AABB 2025 2.4 · conditional, very low', why: 'ir'},
+  irhi: {n: 'Radiology procedure, high bleeding risk', thr: 50, t: 'AABB 2025 2.4 · conditional, very low', why: 'ir'},
+  surg: {n: 'Major surgery, not neuraxial', thr: 50, t: 'AABB 2025 2.5 · conditional, very low', why: 'surg'},
+  cpb: {n: 'Cardiac surgery with bypass, count not low, no major bleeding', no: true, t: 'AABB 2025 2.6 · conditional, very low', why: 'cpb'},
+  ich: {n: 'Brain bleed, no surgery, count over 100 (antiplatelets or not)', no: true, t: 'AABB 2025 2.7 · conditional, low to very low', why: 'patch'},
+  bleed: {n: 'Major bleeding', thr: 50, t: 'Expert practice (UK, Association of Anaesthetists 2025)', why: 'bleed'}
+};
+var PSITK = ['hypo', 'crit', 'auto', 'cvc', 'lp', 'irlo', 'irhi', 'surg', 'cpb', 'ich', 'bleed'];
+var PWHY = {
+  topps: 'TOPPS: with no prophylaxis, more patients bled (50% against 43%), so prophylaxis below 10 stays.',
+  crit: 'Consumption is not the same as low production, but the evidence for critical illness is very weak; the threshold follows the chemotherapy trials.',
+  auto: 'In TOPPS, patients after autologous transplant bled as often with no prophylaxis as with it.',
+  pacer: 'PACER: skipping platelets (counts 10 to 50) gave more line bleeding, 11.9% against 4.8%, so the threshold of 10 is a trade-off, not proof of safety.',
+  lp: 'A spinal or epidural bleed is rare but disabling; the 2025 panel made this a strong recommendation.',
+  ir: 'The threshold follows the procedure\'s bleeding risk, which the radiologist classifies (SIR 2019).',
+  surg: 'Very low certainty: the number is a consensus, not a trial result.',
+  cpb: 'Bypass makes platelets work less well, but routine platelets with a normal count and no bleeding are not recommended (very low certainty).',
+  patch: 'PATCH: platelets for a brain bleed on antiplatelets made death or dependence more likely (adjusted odds ratio 2.05).',
+  bleed: 'In major bleeding the target is a floor that keeps clot forming while the source is controlled.',
+  immune: 'Transfused platelets meet the same antibody or clotting process, so they are cleared quickly and in HIT or TTP may add to clotting.'
+};
+
+/* i = {psit, plt, imm} */
+function platelets(i){
+  var c = {kind: 'empty', head: '', sub: '', guards: [], more: [], tiers: [], chips: [], tx: null};
+  if (!i.psit || !PSIT[i.psit]){ c.head = 'Pick a situation to see its threshold.'; return c; }
+  var s = PSIT[i.psit], p = has(i.plt) ? i.plt : null;
+  c.tiers = [s.t];
+  if (s.no){
+    c.kind = 'no'; c.tx = false;
+    c.head = 'No prophylactic platelets';
+    c.sub = i.psit === 'ich' && p !== null && p <= 100 ? 'This recommendation covers counts over 100 only. Below 100 it does not apply: UK major-haemorrhage guidance keeps the count above 100 in intracranial bleeding (expert practice).' : i.psit === 'cpb' ? 'Give platelets for bleeding with a low count or platelet dysfunction, not routinely.' : i.psit === 'ich' ? 'With a count over 100, platelets do not help the bleed, and in PATCH they did harm in patients on antiplatelets.' : 'Transfuse for bleeding, not for the number.';
+    if (i.psit === 'ich' && p !== null && p <= 100){ c.kind = 'thr'; c.tx = null; c.head = 'Count 100 or below: outside the 2025 recommendation'; c.tiers.push(T.ep); }
+  } else {
+    c.kind = p === null ? 'thr' : p < s.thr ? 'yes' : 'no';
+    c.tx = p === null ? null : p < s.thr;
+    c.head = p === null ? 'Threshold: transfuse below ' + s.thr : p < s.thr ? 'Give one dose of platelets' : 'No platelets for this count';
+    c.sub = p === null ? 'Enter the count.' : p < s.thr ? 'Below ' + s.thr + '. One apheresis unit (or a pool of whole-blood platelets) raises the count by about 30 to 60 at 1 hour.' : 'At or above ' + s.thr + '.';
+    if (c.tx && i.psit !== 'hypo' && i.psit !== 'crit' && i.psit !== 'bleed') c.sub += ' Check the count after the dose, before the procedure.';
+  }
+  c.why = PWHY[s.why];
+  if (i.psit === 'cvc') c.more.push('Compressible sites are the internal jugular and femoral veins. The guideline notes the subclavian site may be less amenable to compression; it is not covered by this threshold.');
+  if (i.psit === 'irlo' || i.psit === 'irhi') c.more.push('The 2025 guideline does not define low and high risk. SIR 2019 classes paracentesis, thoracentesis and venous access as low risk; ask the radiologist for the procedure\'s class.');
+  if (i.psit === 'lp') c.more.push('Epidural or spinal anesthesia: the 2025 guideline makes no recommendation. For obstetric patients with gestational thrombocytopenia, ITP or preeclampsia, SOAP 2021 says a count of 70 or more is likely low risk (IIa, C-LD).');
+  if (i.psit === 'hypo') c.more.push('Dose: one apheresis unit or equivalent. PLADO: half, standard and double doses gave the same bleeding (71%, 69%, 70%); the low dose used fewer platelets but needed more transfusions.');
+  if (i.psit === 'bleed') c.more.push('Association of Anaesthetists 2025: platelets if the count is under 50 in bleeding (under 75 in obstetrics); keep it over 100 in multiple trauma, brain injury or spontaneous intracranial bleeding.');
+  if (i.imm){
+    c.guards.push('HIT, TTP or immune thrombocytopenia: platelets are not used unless the bleeding is life-threatening (Circular of Information). For HIT see /hit/.');
+    c.why = PWHY.immune;
+    if (i.psit === 'bleed' && (p === null || p < 50)){ c.kind = p === null ? 'thr' : 'yes'; c.head = 'Life-threatening bleeding: platelets may be given'; c.sub = 'With hematology, alongside the disease\'s own treatment. In immune thrombocytopenia the Circular says platelets may be indicated for active bleeding.'; }
+    else if (c.tx){ c.head = 'No prophylactic platelets: only for life-threatening bleeding'; c.sub = 'Below the usual threshold, but in these conditions platelets are kept for life-threatening bleeding. Treat the condition itself, with hematology.'; c.tx = false; c.kind = 'no'; }
+    c.tiers.push(T.circ);
+  }
+  c.chips = [['pladder', s.no ? 'none' : 't' + s.thr, 'All four platelet numbers'], ['bags', 'plt', 'What one dose does']];
+  return c;
+}
+
+/* Plasma and cryo. i = {qsit, inr, fib, wt, ob} */
+var QSIT = {
+  proc: {n: 'Before a procedure, not bleeding'},
+  cirr: {n: 'Cirrhosis, before a procedure'},
+  bleed: {n: 'Bleeding, not on warfarin'},
+  varix: {n: 'Variceal bleed'},
+  warf: {n: 'On warfarin'}
+};
+var QSITK = ['proc', 'cirr', 'bleed', 'varix', 'warf'];
+function cryoUnits(wt){ return has(wt) && wt > 0 ? [Math.ceil(wt / 10), Math.ceil(wt / 7)] : null; }
+function plasma(i){
+  var c = {kind: 'empty', head: '', sub: '', guards: [], more: [], tiers: [], chips: [], tx: null};
+  if (!i.qsit || !QSIT[i.qsit]){ c.head = 'Pick a situation.'; return c; }
+  var inr = has(i.inr) ? i.inr : null, fib = has(i.fib) ? i.fib : null, wt = has(i.wt) && i.wt > 0 ? i.wt : null;
+  var fibT = i.ob ? 200 : 150;
+  if (i.qsit === 'warf'){
+    c.kind = 'thr';
+    c.head = 'Warfarin: 4-factor PCC and vitamin K, not plasma';
+    c.sub = 'For a major bleed or an urgent procedure: PCC by INR and weight plus vitamin K 5 to 10 mg IV. Doses are in the reversal tool (/reversal/). No bleed and nothing urgent: hold warfarin, no plasma.';
+    c.more = ['Plasma 10 to 15 mL/kg is the fallback only when PCC is not available (reversal tool).', 'ACG 2023 (lower GI bleeding): 4-factor PCC is preferred to plasma because it lowers the INR faster (conditional, very low).'];
+    c.tiers = ['See the reversal tool', T.acg23.replace('low', 'very low')];
+    c.why = 'PCC concentrates the factors warfarin lowers (II, VII, IX and X) into a small volume, so it works in minutes without the litres of fluid plasma would need.';
+    return c;
+  }
+  if (i.qsit === 'varix'){
+    c.kind = 'no'; c.tx = false;
+    c.head = 'No plasma in acute variceal bleeding';
+    c.sub = 'Baveno VII: plasma is not recommended because it will not correct the coagulopathy (6.36, B1). Red cells to a hemoglobin of 7 to 8.';
+    c.more = ['AGA 2019 (best practice advice): in active bleeding in cirrhosis, aim for platelets over 50 and fibrinogen over 120 mg/dL; there is no evidence for INR-correction thresholds.'];
+    c.tiers = ['Baveno VII 6.36 · B1', 'AGA 2019 · best practice advice'];
+    c.why = 'Plasma adds volume, which raises portal pressure; the INR does not measure bleeding risk in cirrhosis.';
+    if (fib !== null && fib <= 120) c.guards.push('Fibrinogen ' + fib + ': AGA advice is to keep it over 120 mg/dL in active bleeding; cryoprecipitate is the source.');
+    return c;
+  }
+  if (i.qsit === 'cirr'){
+    c.kind = 'no'; c.tx = false;
+    c.head = 'No plasma or platelets just to correct the numbers';
+    c.sub = 'Before paracentesis, thoracentesis or variceal banding, do not routinely correct the INR or the platelet count (AGA 2019). The INR does not reflect bleeding risk in liver disease.';
+    c.more = ['BSH 2018: prophylactic plasma and cryoprecipitate are not given for low-risk procedures in liver disease (1C).', 'High-risk procedures or active bleeding (AGA 2019): platelets over 50 and fibrinogen over 120 mg/dL; INR-correction thresholds are not supported by evidence.'];
+    c.tiers = ['AGA 2019 · best practice advice', 'BSH 2018 · 1C'];
+    c.why = 'Cirrhosis lowers clotting and anticlotting proteins together, so the balance is closer to normal than the INR suggests.';
+    return c;
+  }
+  if (i.qsit === 'proc'){
+    c.kind = 'no'; c.tx = false;
+    c.head = inr !== null && inr <= 1.7 ? 'No plasma: an INR of 1.7 or less is not a reason for plasma' : 'Plasma is not the fix for a high INR before a procedure';
+    c.sub = 'There is no evidence that prophylactic plasma prevents bleeding in a patient who is not bleeding. Treat the cause: hold or reverse warfarin (vitamin K, or PCC if urgent), give vitamin K for deficiency. High-risk radiology procedures still have an INR target (More).';
+    c.more = ['Circular of Information: plasma should not be transfused to correct an INR of 1.7 or less.', 'BSH 2018: no evidence for prophylactic plasma in non-bleeding patients with abnormal coagulation tests (2C).', 'SIR 2019 suggests correcting the INR to 2.0 to 3.0 or less for low-risk and 1.5 to 1.8 or less for high-risk radiology procedures (weak).'];
+    c.tiers = [T.circ, 'BSH 2018 · 2C', 'SIR 2019 · weak'];
+    c.why = 'Plasma barely moves a mildly raised INR: in one study (Abdel-Wahab 2006, INR 1.1 to 1.85), plasma brought it to normal in under 1% of patients.';
+    return c;
+  }
+  /* bleeding, not on warfarin */
+  c.kind = 'thr';
+  var lines = [];
+  if (inr === null) lines.push('Plasma if the INR is over 1.5.');
+  else if (inr > 1.5){ c.tx = true; lines.push('INR ' + inr + ': give plasma ' + (wt ? '15 to 20 mL/kg = ' + Math.round(15 * wt) + ' to ' + Math.round(20 * wt) + ' mL.' : '15 to 20 mL/kg.')); }
+  else lines.push('INR ' + inr + ': no plasma for the INR.');
+  if (fib === null) lines.push('Cryoprecipitate if fibrinogen is under ' + fibT + ' mg/dL.');
+  else if (fib < fibT){ c.tx = true; var u = cryoUnits(wt); lines.push('Fibrinogen ' + fib + ': give cryoprecipitate, 1 unit per 7 to 10 kg' + (u ? ' = ' + u[0] + ' to ' + u[1] + ' units' : '') + ', expected to raise fibrinogen by about 50 to 75 mg/dL.'); }
+  else lines.push('Fibrinogen ' + fib + ': no cryoprecipitate.');
+  if (c.tx === null && inr !== null && fib !== null) c.tx = false;
+  c.kind = c.tx ? 'yes' : c.tx === false ? 'no' : 'thr';
+  c.head = c.tx ? 'Replace what is low while the bleeding is controlled' : c.tx === false ? 'No plasma or cryoprecipitate for these numbers' : 'Bleeding: plasma for INR over 1.5, cryo for fibrinogen under ' + fibT;
+  c.list = lines;
+  c.guards.push('On a DOAC (apixaban, rivaroxaban, edoxaban, dabigatran): plasma is not the reversal for a DOAC; see /reversal/. In cirrhosis: no plasma to correct the INR; keep platelets over 50 and fibrinogen over 120 (AGA 2019).');
+  c.sub = 'Recheck INR, fibrinogen and platelets after each round. Platelets: keep 50 or more (75 in obstetric bleeding; over 100 in brain injury, spontaneous intracerebral bleeding or multiple trauma, UK guidance).';
+  c.more = ['Thresholds from UK major-haemorrhage guidance (Association of Anaesthetists 2025): plasma if INR over 1.5, cryoprecipitate if fibrinogen under 150 mg/dL (under 200 in obstetrics), four units of plasma being about 15 to 20 mL/kg. US Circular of Information: standard plasma dose about 15 mL/kg; each cryoprecipitate unit contains at least 150 mg fibrinogen.', 'Cirrhosis with bleeding: AGA 2019 advises fibrinogen over 120 mg/dL. Variceal bleeding: no plasma.', 'In a massive bleed the protocol gives plasma with the red cells before results come back.'];
+  c.tiers = [T.ep, T.circ];
+  c.why = 'Plasma replaces every clotting factor at once but at low concentration; cryoprecipitate concentrates fibrinogen, the first factor to run short in major bleeding.';
+  c.chips = [['bags', 'ffp', 'What plasma and cryo carry']];
+  return c;
+}
+
+/* Corrected count increment (Circular of Information). Counts in x10^9/L; CCI in per-microlitre units. */
+function bsa(ht, wt){ return has(ht) && has(wt) && ht > 0 && wt > 0 ? Math.sqrt(ht * wt / 3600) : null; }
+function cci(pre, post, ht, wt, dose, when){
+  var b = bsa(ht, wt);
+  if (!has(pre) || !has(post) || b === null || !has(dose) || dose <= 0) return null;
+  var v = Math.round((post - pre) * 1000 * b / dose);
+  var ok = when === '24h' ? v > 4500 : v > 7500;
+  var poor = when === '1h' && v < 5000;
+  return {v: v, bsa: Math.round(b * 100) / 100, ok: ok, poor: poor, when: when};
+}
+
+/* Learn: oxygen content. CaO2 = 1.34 x Hb x SaO2 + 0.003 x PaO2, SaO2 0.98, PaO2 95. */
+function cao2(hb){ return Math.round((1.34 * hb * 0.98 + 0.003 * 95) * 10) / 10; }
+</script>
+<script>
+(function(){
+var $ = function(id){ return document.getElementById(id); };
+function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+var FS = 'font-family:var(--sans)', FM = 'font-family:var(--mono)';
+var st = {sit: null, psit: null, qsit: null, t: {}};
+var RT = [['cvd', 'Preexisting cardiovascular disease (coronary, heart failure, stroke)'], ['sym', 'Symptoms of anemia (chest pain, breathlessness, faintness)'], ['fast', 'Bleeding fast or unstable']];
+var PT = [['imm', 'Suspected HIT, TTP or immune thrombocytopenia (ITP)']];
+var QT = [['ob', 'Obstetric bleeding']];
+
+function num(id){ var v = parseFloat($(id).value); return isFinite(v) ? v : null; }
+function opts(host, keys, M, cur){ host.innerHTML = keys.map(function(k){ var s = M[k]; var tag = s.lib ? '≥10' : s.top ? '7–8' : s.no ? 'none' : s.thr != null ? '<' + s.thr : ''; return '<button class="opt" data-v="' + k + '" aria-pressed="' + (k === cur) + '"><span>' + esc(s.n) + '</span>' + (tag ? '<span class="pt">' + tag + '</span>' : '') + '</button>'; }).join(''); }
+function ticks(host, list){ host.innerHTML = list.map(function(t){ return '<label class="chk"><input type="checkbox" data-k="' + t[0] + '"' + (st.t[t[0]] ? ' checked' : '') + '> ' + esc(t[1]) + '</label>'; }).join(''); }
+function drawInputs(){
+  opts($('sitseg'), SITK, SIT, st.sit); opts($('psitseg'), PSITK, PSIT, st.psit); opts($('qsitseg'), QSITK, QSIT, st.qsit);
+  ticks($('rbcticks'), RT); ticks($('pltticks'), PT); ticks($('qticks'), QT);
+}
+function bindOpt(id, key){ $(id).addEventListener('click', function(e){ var b = e.target.closest('[data-v]'); if (!b) return; var v = b.getAttribute('data-v'); st[key] = st[key] === v ? null : v; drawInputs(); render(); }); }
+bindOpt('sitseg', 'sit'); bindOpt('psitseg', 'psit'); bindOpt('qsitseg', 'qsit');
+document.addEventListener('change', function(e){ var k = e.target.getAttribute && e.target.getAttribute('data-k'); if (k && e.target.type === 'checkbox'){ st.t[k] = e.target.checked; render(); } });
+['hb', 'plt', 'inr', 'fib', 'wt', 'c-pre', 'c-post', 'c-ht', 'c-wt', 'c-dose'].forEach(function(id){ $(id).addEventListener('input', render); });
+$('c-when').addEventListener('change', render);
+
+function guards(list){ return (list || []).map(function(g){ return '<div class="guard">' + linkify(esc(g)) + '</div>'; }).join(''); }
+function tiers(list){ return (list || []).map(function(t){ return '<span class="tier">' + esc(t) + '</span>'; }).join(''); }
+function linkify(h){ return h.replace(/\/(reversal|hit|cirrhosis)\/(#[a-z-]+)?/g, function(m){ return '<a class="link" href="' + m + '">' + m + '</a>'; }); }
+function paras(list){ return (list || []).map(function(m){ return '<p>' + linkify(esc(m)) + '</p>'; }).join(''); }
+var KL = {yes: 'Transfuse', no: 'Do not transfuse', thr: 'Threshold', fast: 'Active bleeding', neuro: 'No guideline number', empty: 'Start'};
+function card(id, label, o, extra){
+  var cls = o.kind === 'no' ? ' okc' : o.kind === 'yes' || o.kind === 'fast' ? ' bad' : '';
+  var h = '<div class="card" id="' + id + '"><p class="label">' + esc(label) + ' · ' + KL[o.kind] + '</p><p class="head' + cls + '">' + esc(o.head) + '</p>';
+  if (o.sub) h += '<p class="sub">' + linkify(esc(o.sub)) + '</p>';
+  if (o.list) h += '<ul>' + o.list.map(function(l){ return '<li>' + esc(l) + '</li>'; }).join('') + '</ul>';
+  h += (extra || '') + guards(o.guards);
+  if (o.why) h += '<p class="whyline"><b>Why:</b> ' + esc(o.why) + '</p>';
+  if (o.chips && o.chips.length) h += '<div class="chips">' + o.chips.map(function(c){ return chip(c[0], c[1], c[2]); }).join('') + '</div>';
+  if ((o.more && o.more.length) || (o.tiers && o.tiers.length)) h += '<details><summary>More</summary>' + paras(o.more) + tiers(o.tiers) + '</details>';
+  return h + '</div>';
+}
+function rbcIn(){ return {sit: st.sit, hb: num('hb'), cvd: !!st.t.cvd, sym: !!st.t.sym, fast: !!st.t.fast}; }
+function pltIn(){ return {psit: st.psit, plt: num('plt'), imm: !!st.t.imm}; }
+function qIn(){ return {qsit: st.qsit, inr: num('inr'), fib: num('fib'), wt: num('wt'), ob: !!st.t.ob}; }
+function render(){
+  var r = rbc(rbcIn());
+  var zr = '';
+  if (r.thr != null && !SIT[st.sit].top && !SIT[st.sit].lib) zr = '<div class="thr"><span class="big">' + r.thr + '</span><span class="unit">g/dL threshold</span></div>';
+  $('rout').innerHTML = r.kind === 'empty' ? '<div class="card" id="rbc-answer"><p class="label">Start</p><p class="empty">' + esc(r.head) + '</p></div>' : card('rbc-answer', 'Red cells', r, zr);
+  var p = platelets(pltIn());
+  $('pout').innerHTML = p.kind === 'empty' ? '<div class="card" id="plt-answer"><p class="label">Start</p><p class="empty">' + esc(p.head) + '</p></div>' : card('plt-answer', 'Platelets', p);
+  var q = plasma(qIn());
+  $('qout').innerHTML = q.kind === 'empty' ? '<div class="card" id="plasma-answer"><p class="label">Start</p><p class="empty">' + esc(q.head) + '</p></div>' : card('plasma-answer', 'Plasma and cryo', q);
+  drawTables();
+  var c = cci(num('c-pre'), num('c-post'), num('c-ht'), num('c-wt'), num('c-dose'), $('c-when').value);
+  $('ccibox').innerHTML = c ? '<p class="head ' + (c.poor ? 'bad' : c.ok ? 'okc' : 'wn') + '">CCI ' + c.v.toLocaleString('en-US') + '</p><p class="sub">Body surface area ' + c.bsa + ' m² (Mosteller). Expected: over 7,500 at 10 to 60 minutes, over 4,500 at 24 hours. ' + (c.poor ? 'Under 5,000 at 10 to 60 minutes may mean immune refractoriness: discuss HLA-selected platelets with the blood bank.' : c.ok ? 'An adequate rise.' : c.when === '24h' ? 'A poor 24-hour rise: look for consumption (fever, sepsis, DIC, bleeding) or a large spleen.' : 'Lower than expected; repeat with the next dose.') + '</p><p class="note">CCI = rise in count per µL × body surface area (m²) ÷ platelets given (×10¹¹). These expected values are for platelets that are not pathogen-reduced; pathogen-reduced platelets give lower increments. <span class="tier">' + T.circ + '</span></p><div class="chips">' + chip('narrow', '', 'Why no rise? Narrow it') + '</div>' : '<p class="note">Enter both counts, height and weight. An apheresis unit holds about 3 × 10¹¹ platelets.</p>';
+}
+function drawTables(){
+  $('sittable').innerHTML = '<div class="tw"><table class="sitlist"><thead><tr><th>Situation · trial · tier</th><th>Transfuse</th></tr></thead><tbody>' + SITK.map(function(k){ var s = SIT[k]; var t = s.lib ? 'below 10' : s.top ? 'below 7, target 7 to 8' : s.thr == null ? 'no guideline number' : 'below ' + s.thr + (s.cvd ? ' (' + s.cvd + ' with heart disease)' : ''); return '<tr' + (k === st.sit ? ' class="sel"' : '') + '><td>' + esc(s.n) + '<br><span class="note">' + esc(s.trial) + ' · ' + esc(s.t[0]) + '</span></td><td>' + esc(t) + '</td></tr>'; }).join('') + '</tbody></table></div><p class="note">Non-bleeding patients: one unit at a time, then reassess (AABB Choosing Wisely; CHEST 2025).</p>';
+  $('ptable').innerHTML = '<div class="tw"><table><thead><tr><th>Situation · tier</th><th>Transfuse</th></tr></thead><tbody>' + PSITK.map(function(k){ var s = PSIT[k]; return '<tr' + (k === st.psit ? ' class="sel"' : '') + '><td>' + esc(s.n) + '<br><span class="note">' + esc(s.t) + '</span></td><td>' + (s.no ? 'not routinely' : 'below ' + s.thr) + '</td></tr>'; }).join('') + '</tbody></table></div>';
+}
+function drawStatic(){
+  $('massbox').innerHTML = '<ul><li>Call for help and the massive transfusion protocol; the blood bank sends red cells, plasma and platelets together.</li><li>Trauma: plasma, platelets and red cells 1:1:1. In PROPPR, 1:1:1 against 1:1:2 gave 24-hour mortality 12.7% against 17.0% and 30-day mortality 22.4% against 26.1% (neither significant), more hemostasis (86% against 78%) and fewer deaths from bleeding at 24 hours (9.2% against 14.6%).</li><li>Stop the source and reverse anticoagulants (/reversal/). Recheck hemoglobin, platelets, INR and fibrinogen after each round.</li></ul><span class="tier">' + T.ep + '</span><span class="tier">PROPPR 2015 (trauma)</span>';
+  $('massbox').innerHTML = linkify($('massbox').innerHTML);
+  $('prodbox').innerHTML = '<div class="tw"><table><thead><tr><th>Product</th><th>Usual adult dose</th><th>Expected change</th></tr></thead><tbody>' +
+    '<tr><td>Red cells</td><td>1 unit, then reassess</td><td>Hemoglobin up about 1 g/dL (hematocrit about 3%)</td></tr>' +
+    '<tr><td>Platelets</td><td>1 apheresis unit (about 3 × 10¹¹), or a pool of about 6 whole-blood units</td><td>Count up about 30 to 60 at 1 hour; each whole-blood unit 5 to 10</td></tr>' +
+    '<tr><td>Plasma</td><td>About 15 mL/kg</td><td>Not for an INR of 1.7 or less</td></tr>' +
+    '<tr><td>Cryoprecipitate</td><td>1 unit per 7 to 10 kg</td><td>Fibrinogen up about 50 to 75 mg/dL; each unit at least 150 mg fibrinogen</td></tr>' +
+    '</tbody></table></div><p class="note">Average-sized adult who is not bleeding. <span class="tier">' + T.circ + '</span></p><div class="chips">' + chip('bags', 'rbc', 'Tap through the products') + '</div>';
+}
+
+/* Tabs */
+var tabs = [['t-rbc','p-rbc'],['t-pp','p-pp'],['t-learn','p-learn'],['t-prac','p-prac']];
+function show(t){ tabs.forEach(function(p){ var on = p[0] === t; $(p[0]).setAttribute('aria-selected', String(on)); $(p[1]).classList.toggle('on', on); }); }
+tabs.forEach(function(p){ $(p[0]).addEventListener('click', function(){ show(p[0]); }); });
+function fromHash(){ var id = location.hash.slice(1); if (!id) return; var el = $(id); if (!el) return; var pan = el.closest('.panel'); if (pan) tabs.forEach(function(p){ if (p[1] === pan.id) show(p[0]); }); el.scrollIntoView(); }
+window.addEventListener('hashchange', fromHash);
+
+/* SVG helpers */
+function svgOpen(vb, label){ return '<svg viewBox="' + vb + '" role="img" aria-label="' + esc(label) + '" class="fig">'; }
+function tx(x, y, t, o){ o = o || {}; return '<text x="' + x + '" y="' + y + '" text-anchor="' + (o.a || 'middle') + '" style="' + (o.sans ? FS : FM) + ';font-size:' + (o.s || 11) + 'px;font-weight:' + (o.w || 400) + ';fill:' + (o.c || 'var(--ink)') + '">' + t + '</text>'; }
+
+/* 1. Oxygen content bar (computed by cao2) */
+function o2SVG(hb){
+  var ref = cao2(14), v = cao2(hb), W = 250, x0 = 80;
+  var w = Math.max(2, W * v / ref), use = W * 0.25;
+  var h = svgOpen('0 0 350 150', 'Oxygen carried at hemoglobin ' + hb);
+  h += tx(8, 34, 'Hb 14', {a: 'start', s: 11, c: 'var(--muted)'}) + '<rect x="' + x0 + '" y="20" width="' + W + '" height="22" rx="6" fill="var(--fill)" stroke="var(--line)"/>' + tx(x0 + W - 6, 35, ref + ' mL/dL', {a: 'end', s: 11, c: 'var(--muted)'});
+  h += tx(8, 84, 'Hb ' + hb, {a: 'start', s: 11, w: 600}) + '<rect x="' + x0 + '" y="70" width="' + r1(w) + '" height="22" rx="6" fill="var(--accent)"/>' + tx(w > 200 ? x0 + w - 6 : x0 + w + 6, 85, v + ' mL/dL', {a: w > 200 ? 'end' : 'start', s: 11, w: 600, c: w > 200 ? 'var(--accent-ink)' : 'var(--ink)'});
+  h += '<line x1="' + (x0 + use) + '" y1="12" x2="' + (x0 + use) + '" y2="102" stroke="var(--warn)" stroke-dasharray="4 3"/>' + tx(x0 + use, 118, 'resting use at Hb 14', {s: 10.5, c: 'var(--warn)'});
+  h += tx(175, 140, 'Oxygen per dL of arterial blood (SaO2 98%)', {s: 10.5, c: 'var(--muted)'});
+  return h + '</svg>';
+}
+/* 2. Trial ladder */
+var TL = {
+  tricc: {n: 'TRICC', r: 7, l: 10, line: 'TRICC 1999, ICU: 30-day mortality 18.7% (trigger 7) against 23.3% (trigger 10), P=0.11.'},
+  triss: {n: 'TRISS', r: 7, l: 9, line: 'TRISS 2014, septic shock: 90-day mortality 43.0% against 45.0%; median 1 unit against 4.'},
+  vill: {n: 'Villanueva', r: 7, l: 9, line: 'Villanueva 2013, upper GI bleeding: 6-week survival 95% against 91% (hazard ratio for death 0.55); further bleeding 10% against 16%.'},
+  focus: {n: 'FOCUS', r: 8, l: 10, line: 'FOCUS 2011, hip fracture with cardiovascular disease or risk factors (restrictive: symptoms or below 8): death or unable to walk at 60 days 34.7% against 35.2%.'},
+  trics: {n: 'TRICS III', r: 7.5, l: 9.5, line: 'TRICS III 2017, cardiac surgery (liberal 8.5 on the ward): death, MI, stroke or new dialysis 11.4% against 12.5%, noninferior.'},
+  reality: {n: 'REALITY', r: 8, l: 10, line: 'REALITY 2021, MI with anemia: major cardiac events at 30 days 11.0% against 14.0%, noninferior, but the interval included a clinically important harm.'},
+  mint: {n: 'MINT', r: [7, 8], l: 10, line: 'MINT 2023, MI with anemia: MI or death at 30 days 16.9% (trigger 7 or 8) against 14.5% (trigger 10), RR 1.15 (0.99 to 1.34).', hot: 1},
+  train: {n: 'TRAIN', r: 7, l: 9, line: 'TRAIN 2024, acute brain injury: unfavorable outcome at 180 days 72.6% (trigger 7) against 62.6% (trigger 9), P=0.002.', hot: 1},
+  hemo: {n: 'HEMOTION', r: 7, l: 10, line: 'HEMOTION 2024, traumatic brain injury: unfavorable outcome at 6 months 73.5% against 68.4%; not significant.'},
+  sah: {n: 'SAHaRA', r: 8, l: 10, line: 'SAHaRA 2025, subarachnoid bleed: unfavorable outcome at 12 months 37.7% against 33.5%; not significant.'}
+};
+var TLK = ['tricc', 'triss', 'vill', 'focus', 'trics', 'reality', 'mint', 'train', 'hemo', 'sah'];
+function ladSVG(k, p){
+  var x = function(v){ return 108 + (v - 6) * 46; }, y0 = 30, rh = 25;
+  var h = svgOpen('0 0 350 ' + (y0 + rh * TLK.length + 34), 'Restrictive and liberal triggers in each trial');
+  [6, 7, 8, 9, 10, 11].forEach(function(v){ h += '<line x1="' + x(v) + '" y1="' + (y0 - 8) + '" x2="' + x(v) + '" y2="' + (y0 + rh * TLK.length - 6) + '" stroke="var(--line)"/>' + tx(x(v), y0 - 12, v, {s: 10.5, c: 'var(--muted)'}); });
+  TLK.forEach(function(t, n){
+    var d = TL[t], y = y0 + rh * n + 8, on = t === k, col = on ? (d.hot ? 'var(--warn)' : 'var(--accent)') : 'var(--muted)';
+    if (on) h += '<rect x="2" y="' + (y - 12) + '" width="346" height="23" rx="6" fill="var(--fill)"/>';
+    h += tx(8, y + 4, d.n, {a: 'start', s: 11, w: on ? 700 : 400, c: on ? 'var(--ink)' : 'var(--muted)'});
+    var rx = d.r.length ? [x(d.r[0]), x(d.r[1])] : [x(d.r), x(d.r)];
+    h += '<line x1="' + rx[1] + '" y1="' + y + '" x2="' + x(d.l) + '" y2="' + y + '" stroke="' + col + '" stroke-width="2"/>';
+    if (d.r.length) h += '<line x1="' + rx[0] + '" y1="' + y + '" x2="' + rx[1] + '" y2="' + y + '" stroke="' + col + '" stroke-width="7" stroke-linecap="round"/>';
+    else h += '<circle cx="' + rx[0] + '" cy="' + y + '" r="5.5" fill="' + col + '"/>';
+    h += '<circle cx="' + x(d.l) + '" cy="' + y + '" r="5.5" fill="var(--card)" stroke="' + col + '" stroke-width="2"/>';
+  });
+  h += tx(175, y0 + rh * TLK.length + 20, 'Trigger, g/dL: filled lower, ring higher', {s: 10.5, c: 'var(--muted)'});
+  return h + '</svg>';
+}
+/* 3. The heart (schematic, no measured values) */
+var HEART = {
+  body: {n: 'Most tissues', ext: 0.25, flow: 'up', narrow: 0, line: 'At rest most tissues take out about a quarter of the oxygen delivered. When hemoglobin falls they take out more, and the heart pumps more: two kinds of slack.'},
+  heart: {n: 'Heart muscle', ext: 0.75, flow: 'up', narrow: 0, line: 'Heart muscle already takes out most of the oxygen at rest. When hemoglobin falls its only slack is more coronary flow.'},
+  cad: {n: 'Narrowed artery', ext: 0.75, flow: 'cap', narrow: 1, line: 'A narrowed coronary artery caps that flow. Anemia then lowers supply exactly where supply is already short.'},
+  mi: {n: 'Heart attack', ext: 0.75, flow: 'cap', narrow: 1, mi: 1, line: 'In a heart attack the muscle is already short of oxygen, which is why MINT tested a higher trigger and why guidelines now suggest 10.'}
+};
+function heartSVG(k, p){
+  var d = HEART[k], h = svgOpen('0 0 350 170', d.n + ': oxygen extraction and flow');
+  h += '<defs><marker id="' + p + 'a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="var(--accent)"/></marker></defs>';
+  var fw = d.narrow ? 6 : 14;
+  h += tx(70, 22, 'Flow in', {s: 11, c: 'var(--muted)'});
+  h += '<path d="M20 70 H' + (d.narrow ? '60' : '120') + '" stroke="var(--accent)" stroke-width="' + (d.narrow ? 14 : fw) + '" stroke-linecap="round"/>';
+  if (d.narrow) h += '<path d="M60 70 H120" stroke="var(--accent)" stroke-width="5" stroke-linecap="round"/><rect x="62" y="56" width="40" height="8" rx="3" fill="var(--warn)"/><rect x="62" y="76" width="40" height="8" rx="3" fill="var(--warn)"/>' + tx(82, 104, 'narrowing', {s: 10.5, c: 'var(--warn)'});
+  h += tx(70, 44, d.flow === 'up' ? 'can rise' : 'capped', {s: 11, w: 600, c: d.flow === 'up' ? 'var(--ok)' : 'var(--warn)'});
+  h += '<rect x="140" y="30" width="190" height="80" rx="12" fill="' + (d.mi ? 'var(--warnbg)' : 'var(--fill)') + '" stroke="' + (d.mi ? 'var(--warn)' : 'var(--line)') + '"/>' + tx(235, 52, d.n, {sans: 1, s: 13, w: 600});
+  h += '<rect x="156" y="66" width="158" height="16" rx="5" fill="var(--card)" stroke="var(--line)"/><rect x="156" y="66" width="' + (158 * d.ext) + '" height="16" rx="5" fill="var(--accent)"/>';
+  h += tx(235, 100, d.ext < 0.5 ? 'oxygen taken out: about a quarter' : 'oxygen taken out: most of it', {s: 10.5, c: 'var(--muted)'});
+  h += '<path d="M120 70 H136" stroke="var(--accent)" stroke-width="2" marker-end="url(#' + p + 'a)"/>';
+  h += tx(175, 140, d.ext < 0.5 ? 'Two kinds of slack: take out more, or pump more' : 'One kind of slack: more coronary flow', {s: 11, c: 'var(--ink)'});
+  h += tx(175, 160, 'Schematic, not to scale', {s: 10.5, c: 'var(--muted)'});
+  return h + '</svg>';
+}
+/* 4. Platelet ladder (from PSIT) */
+var PL = {t10: {n: '10', v: 10}, t20: {n: '20', v: 20}, t50: {n: '50', v: 50}, none: {n: 'None', v: null}};
+PL.t10.line = 'Below 10: ' + PSITK.filter(function(k){ return PSIT[k].thr === 10; }).map(function(k){ return PSIT[k].n; }).join('; ') + '.';
+PL.t20.line = 'Below 20: ' + PSITK.filter(function(k){ return PSIT[k].thr === 20; }).map(function(k){ return PSIT[k].n; }).join('; ') + '.';
+PL.t50.line = 'Below 50: ' + PSITK.filter(function(k){ return PSIT[k].thr === 50; }).map(function(k){ return PSIT[k].n; }).join('; ') + '.';
+PL.none.line = 'No routine platelets: ' + PSITK.filter(function(k){ return PSIT[k].no; }).map(function(k){ return PSIT[k].n; }).join('; ') + '.';
+function plSVG(k, p){
+  var x = function(v){ return 30 + v * 2.9; }, h = svgOpen('0 0 350 120', 'Platelet thresholds');
+  h += '<rect x="30" y="50" width="290" height="14" rx="7" fill="var(--fill)" stroke="var(--line)"/>';
+  [0, 10, 20, 50, 100].forEach(function(v){ h += '<line x1="' + x(v) + '" y1="44" x2="' + x(v) + '" y2="70" stroke="var(--muted)"/>' + tx(x(v), 86, v, {s: 10.5, c: 'var(--muted)'}); });
+  if (PL[k].v){ h += '<rect x="30" y="50" width="' + (PL[k].v * 2.9) + '" height="14" rx="7" fill="var(--accent)"/>' + tx(Math.max(x(PL[k].v), 90), 34, 'transfuse below ' + PL[k].v, {s: 11, w: 600, c: 'var(--accent)'}); }
+  else h += tx(175, 34, 'transfuse for bleeding, not for the count', {s: 11, w: 600, c: 'var(--warn)'});
+  h += tx(175, 108, 'Platelet count, ×10⁹/L', {s: 10.5, c: 'var(--muted)'});
+  return h + '</svg>';
+}
+/* 5. Products (Circular of Information) */
+var BAGS = {
+  rbc: {n: 'Red cells', line: 'One unit: hemoglobin up about 1 g/dL (hematocrit about 3%) in an average-sized adult who is not bleeding.'},
+  plt: {n: 'Platelets', line: 'One apheresis unit, about 3 × 10¹¹ platelets (about 6 whole-blood units): count up about 30 to 60 at 1 hour.'},
+  ffp: {n: 'Plasma', line: 'Plasma: every clotting factor, at the concentration in blood. Usual dose about 15 mL/kg. Not for an INR of 1.7 or less.'},
+  cryo: {n: 'Cryo', line: 'Cryoprecipitate: each unit at least 150 mg fibrinogen and 80 units of factor VIII. One unit per 7 to 10 kg raises fibrinogen by about 50 to 75 mg/dL.'}
+};
+var BAGK = ['rbc', 'plt', 'ffp', 'cryo'];
+function bagSVG(k, p){
+  var h = svgOpen('0 0 350 130', 'Blood products');
+  BAGK.forEach(function(b, n){
+    var x = 20 + n * 82, on = b === k, fill = b === 'rbc' ? 'var(--bad)' : b === 'plt' ? 'var(--warn)' : b === 'ffp' ? 'var(--warnbg)' : 'var(--card)';
+    h += '<g' + (on ? '' : ' opacity=".74"') + '><rect x="' + (x + 22) + '" y="10" width="14" height="10" rx="2" fill="var(--fill)" stroke="var(--muted)"/><rect x="' + x + '" y="20" width="58" height="72" rx="12" fill="' + fill + '" stroke="' + (on ? 'var(--accent)' : 'var(--muted)') + '" stroke-width="' + (on ? 3 : 1) + '"/>' + tx(x + 29, 112, BAGS[b].n, {s: 11, w: on ? 700 : 400}) + '</g>';
+  });
+  return h + '</svg>';
+}
+/* 6. Oxygen states for chips */
+var O2S = {h7: {n: '7', v: 7}, h8: {n: '8', v: 8}, h10: {n: '10', v: 10}, h14: {n: '14', v: 14}};
+Object.keys(O2S).forEach(function(k){ O2S[k].line = 'At ' + O2S[k].v + ' g/dL each decilitre of arterial blood carries about ' + cao2(O2S[k].v) + ' mL of oxygen, ' + Math.round(cao2(O2S[k].v) / cao2(14) * 100) + '% of the content at 14.'; });
+
+var FIGS = {
+  ladder: {t: 'Trials: lower against higher trigger', states: TLK, data: TL, svg: ladSVG},
+  heart: {t: 'Why the heart is different', states: ['body', 'heart', 'cad', 'mi'], data: HEART, svg: heartSVG},
+  pladder: {t: 'Platelet thresholds', states: ['t10', 't20', 't50', 'none'], data: PL, svg: plSVG},
+  bags: {t: 'What one dose does', states: BAGK, data: BAGS, svg: bagSVG},
+  o2: {t: 'Oxygen and hemoglobin', states: ['h7', 'h8', 'h10', 'h14'], data: O2S, svg: function(k){ return o2SVG(O2S[k].v); }},
+  narrow: {t: 'Count did not rise', states: null}
+};
+var ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M7 15l3-4 3 3 2-2 2 3"/></svg>';
+var figN = 0;
+function mountFig(host, id, state){
+  var F = FIGS[id], pre = 'f' + (++figN) + '-';
+  function draw(k){
+    var d = F.data[k];
+    host.innerHTML = '<div class="states" role="group" aria-label="' + esc(F.t) + '">' + F.states.map(function(x){ return '<button class="sbtn" data-k="' + x + '" aria-pressed="' + (x === k) + '">' + esc(F.data[x].n) + '</button>'; }).join('') + '</div>' + F.svg(k, pre) + '<p class="line1">' + esc(d.line) + '</p>';
+  }
+  host.onclick = function(e){ var b = e.target.closest && e.target.closest('[data-k]'); if (b) draw(b.getAttribute('data-k')); };
+  draw(state && F.data[state] ? state : F.states[0]);
+}
+function chip(fig, state, label){ return '<button class="chip" data-fig="' + fig + '" data-state="' + (state || '') + '">' + ICON + esc(label || FIGS[fig].t) + '</button>'; }
+var lastFocus = null;
+function openSheet(fig, state){
+  if (fig === 'narrow'){ show('t-learn'); $('narrow').scrollIntoView(); return; }
+  lastFocus = document.activeElement;
+  $('sheet-t').textContent = FIGS[fig].t;
+  mountFig($('sheet-b'), fig, state);
+  $('scrim').hidden = false; $('sheet').hidden = false; $('sheet').scrollTop = 0; $('sheet-x').focus();
+}
+function closeSheet(){ if ($('sheet').hidden) return; $('scrim').hidden = true; $('sheet').hidden = true; if (lastFocus && lastFocus.focus) lastFocus.focus(); }
+$('sheet-x').addEventListener('click', closeSheet); $('scrim').addEventListener('click', closeSheet);
+document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeSheet(); });
+document.addEventListener('click', function(e){ var c = e.target.closest && e.target.closest('[data-fig]'); if (c) openSheet(c.getAttribute('data-fig'), c.getAttribute('data-state')); });
+
+/* Learn: oxygen slider (zones from the engine's thresholds) */
+(function(){
+  var Z = [['<7', 0, 7, 'Below 7: below the threshold for most stable patients'], ['7–8', 7, 8, '7 to under 8: transfuse in a heart attack (below 10), with cardiovascular disease or orthopedic surgery (below 8), and in cardiac surgery below 7.5; variceal bleeding is at its target'], ['8–10', 8, 10, '8 to under 10: only the heart-attack threshold applies'], ['≥10', 10, 99, '10 or above: above every threshold']];
+  function draw(){
+    var v = parseFloat($('o2r').value), zi = 0;
+    Z.forEach(function(z, n){ if (v >= z[1] && v < z[2]) zi = n; });
+    $('o2fig').innerHTML = o2SVG(v);
+    $('o2zone').innerHTML = Z.map(function(z, n){ return '<span class="' + (n === zi ? 'on' : '') + '">' + z[0] + '</span>'; }).join('');
+    $('o2zn').textContent = Z[zi][3] + '.';
+    var tx_ = SITK.filter(function(k){ var r = rbc({sit: k, hb: v}); return r.tx === true; }).map(function(k){ return SIT[k].n; });
+    var txc = SITK.filter(function(k){ var a = rbc({sit: k, hb: v}), b = rbc({sit: k, hb: v, cvd: true}); return a.tx === false && b.tx === true; }).map(function(k){ return SIT[k].n; });
+    var c = cao2(v), pct = Math.round(c / cao2(14) * 100);
+    $('o2dp').innerHTML = dpHtml([
+      ['What is happening', '<p>Each g/dL of hemoglobin carries about 1.3 mL of oxygen per decilitre. At ' + v + ' g/dL that is ' + c + ' mL/dL, ' + pct + '% of the content at 14. Cardiac output and extraction rise to make up the difference.</p>'],
+      ['Why the rule', '<p>' + (tx_.length ? 'Transfuse at this value: ' + esc(tx_.join('; ')) + '.' : 'No situation in the tool transfuses at this value.') + (txc.length ? ' Only with cardiovascular disease: ' + esc(txc.join('; ')) + '.' : '') + '</p>'],
+      ['At the bedside', '<p>' + (v < 10 ? 'One unit should bring it to about ' + r1(v + 1) + ' g/dL if the patient is not bleeding; recheck before the next.' : 'No threshold applies; look for the cause of any symptoms.') + '</p>']
+    ]);
+  }
+  $('o2r').addEventListener('input', draw); draw();
+})();
+
+/* Learn: narrowing workup for a poor platelet increment (CCI cutoffs: Circular of Information; the rest expert practice) */
+var CAUSES = [['immune', 'Antibodies (HLA or platelet-specific)'], ['consume', 'Consumption: fever, sepsis, DIC'], ['bleed', 'Ongoing bleeding'], ['spleen', 'Large spleen (pooling)']];
+var FEATS = {
+  c1: {n: '1-hour CCI under 5,000', fav: ['immune'], less: [], why: {immune: 'Antibodies clear transfused platelets within minutes.'}},
+  c24: {n: '1-hour rise fine, 24-hour poor', fav: ['consume', 'bleed'], out: ['immune'], why: {immune: 'A good early rise argues against antibodies.', consume: 'Platelets survive the first hour, then are used up.', bleed: 'Platelets are lost after they arrive.'}},
+  hla: {n: 'HLA antibodies found', fav: ['immune'], why: {immune: 'Discuss HLA-matched or crossmatched platelets with the blood bank.'}},
+  fev: {n: 'Fever, sepsis or DIC', fav: ['consume'], why: {consume: 'Common non-immune causes of a poor increment.'}},
+  spl: {n: 'Spleen enlarged', fav: ['spleen'], why: {spleen: 'A large spleen holds back a share of each dose.'}}
+};
+(function(){
+  var sel = {};
+  function draw(){
+    $('nfeat').innerHTML = Object.keys(FEATS).map(function(k){ return '<button class="sbtn" data-f="' + k + '" aria-pressed="' + !!sel[k] + '">' + esc(FEATS[k].n) + '</button>'; }).join('');
+    var stt = {}, why = {};
+    Object.keys(sel).forEach(function(k){ if (!sel[k]) return; var f = FEATS[k]; (f.fav || []).forEach(function(c){ if (stt[c] !== 'out') stt[c] = 'fav'; }); (f.out || []).forEach(function(c){ stt[c] = 'out'; }); Object.keys(f.why).forEach(function(c){ why[c] = f.why[c]; }); });
+    $('ncause').innerHTML = CAUSES.map(function(c){ var s = stt[c[0]] || ''; return '<div class="cause ' + s + '"><span>' + esc(c[1]) + '</span><small>' + esc(why[c[0]] || '') + '</small></div>'; }).join('') + '<p class="note">CCI cutoffs: Circular of Information. Reading the pattern: expert practice.</p>';
+  }
+  $('nfeat').addEventListener('click', function(e){ var b = e.target.closest('[data-f]'); if (b){ var k = b.getAttribute('data-f'); sel[k] = !sel[k]; draw(); } });
+  draw();
+})();
+
+/* Learn: pills and evidence */
+var TRIALS = [
+  {q: 'ICU: does a lower trigger harm critically ill patients? (TRICC)', d: 'Randomized, 838 euvolemic ICU patients; transfuse below 7 (keep 7 to 9) against below 10 (keep 10 to 12).', r: '30-day mortality 18.7% against 23.3% (P=0.11); hospital mortality 22.3% against 28.1% (P=0.05).', c: 'Founded the restrictive strategy.', cite: 'Hébert PC et al., N Engl J Med 1999;340:409', doi: '10.1056/NEJM199902113400601'},
+  {q: 'Septic shock: 7 or 9? (TRISS)', d: 'Randomized, 998 ICU patients with septic shock; one leukoreduced unit at 7 or below against 9 or below.', r: '90-day mortality 43.0% against 45.0% (RR 0.94, 0.78 to 1.09); median 1 unit against 4.', c: 'The basis of the restrictive recommendation in sepsis.', cite: 'Holst LB et al., N Engl J Med 2014;371:1381', doi: '10.1056/NEJMoa1406617'},
+  {q: 'Upper GI bleeding: 7 or 9? (Villanueva)', d: 'Randomized, 921 patients with acute upper GI bleeding, single centre.', r: '6-week survival 95% against 91% (HR for death 0.55, 0.33 to 0.92); further bleeding 10% against 16%. Benefit in Child-Pugh A and B cirrhosis, not C.', c: 'The restrictive trigger for GI bleeding and the 7 to 8 target in variceal bleeding.', cite: 'Villanueva C et al., N Engl J Med 2013;368:11', doi: '10.1056/NEJMoa1211801'},
+  {q: 'Hip fracture with cardiovascular disease: symptoms or 8, or 10? (FOCUS)', d: 'Randomized, 2,016 patients aged 50 or more with cardiovascular disease or risk factors, hemoglobin below 10 after surgery.', r: 'Death or unable to walk across a room at 60 days 35.2% (liberal) against 34.7% (restrictive); median 2 units against 0.', c: 'Supports 8 in cardiovascular disease and orthopedic surgery.', cite: 'Carson JL et al., N Engl J Med 2011;365:2453', doi: '10.1056/NEJMoa1012452'},
+  {q: 'Cardiac surgery: 7.5, or 9.5 (8.5 on the ward)? (TRICS III)', d: 'Randomized noninferiority, 5,243 moderate-to-high-risk cardiac surgery patients.', r: 'Death, MI, stroke or new dialysis 11.4% against 12.5% (OR 0.90), noninferior; 52.3% against 72.6% transfused.', c: 'The 7.5 threshold for cardiac surgery.', cite: 'Mazer CD et al., N Engl J Med 2017;377:2133', doi: '10.1056/NEJMoa1711818'},
+  {q: 'Heart attack with anemia: 7 or 8, or 10? (MINT)', d: 'Randomized, 3,504 patients with MI and hemoglobin below 10.', r: 'MI or death at 30 days 16.9% against 14.5% (RR 1.15, 0.99 to 1.34, P=0.07); death 9.9% against 8.3%.', c: 'Not significant, but harm from restriction could not be excluded; AABB and ACC/AHA now suggest the liberal strategy in MI.', cite: 'Carson JL et al., N Engl J Med 2023;389:2446', doi: '10.1056/NEJMoa2307983'},
+  {q: 'Heart attack with anemia: 8 or 10? (REALITY)', d: 'Randomized noninferiority, 668 patients with MI and hemoglobin 7 to 10.', r: 'Major cardiac events at 30 days 11.0% against 14.0% (RR 0.79); noninferior.', c: 'Pointed the other way from MINT; smaller, and the interval included a clinically important harm.', cite: 'Ducrocq G et al., JAMA 2021;325:552', doi: '10.1001/jama.2021.0135'},
+  {q: 'Acute brain injury: 7 or 9? (TRAIN)', d: 'Randomized, patients with traumatic brain injury, subarachnoid or intracerebral bleeding.', r: 'Unfavorable neurologic outcome at 180 days 72.6% (7) against 62.6% (9); adjusted RR 0.86 (0.79 to 0.94).', c: 'With HEMOTION (traumatic brain injury, 10 against 7: 68.4% against 73.5%, not significant) and SAHaRA (subarachnoid bleed, 10 against 8: 33.5% against 37.7%, not significant), all lean toward a higher trigger.', cite: 'Taccone FS et al., JAMA 2024;332:1623', doi: '10.1001/jama.2024.20424'},
+  {q: 'Can prophylactic platelets be dropped in blood cancers? (TOPPS)', d: 'Randomized, 600 patients having chemotherapy or stem-cell transplant; prophylaxis below 10 against none.', r: 'WHO grade 2 to 4 bleeding 50% (none) against 43% (prophylaxis); noninferiority not shown. Similar rates after autologous transplant.', c: 'Prophylaxis below 10 stays, except after autologous transplant.', cite: 'Stanworth SJ et al., N Engl J Med 2013;368:1771', doi: '10.1056/NEJMoa1212772'},
+  {q: 'Does a bigger platelet dose prevent more bleeding? (PLADO)', d: 'Randomized, three doses (1.1, 2.2 and 4.4 × 10¹¹ per m²) at counts of 10 or below.', r: 'Grade 2 or higher bleeding 71%, 69% and 70%.', c: 'Dose does not change bleeding; the low dose used fewer platelets but needed more transfusions.', cite: 'Slichter SJ et al., N Engl J Med 2010;362:600', doi: '10.1056/NEJMoa0904084'},
+  {q: 'Central line with platelets 10 to 50: skip the transfusion? (PACER)', d: 'Randomized noninferiority, 338 patients (373 ultrasound-guided lines) on hematology wards and ICUs.', r: 'Grade 2 to 4 line bleeding 11.9% without platelets against 4.8% with (RR 2.45, 90% CI 1.27 to 4.70); noninferiority not shown.', c: 'Skipping platelets causes more bleeding; the 2025 guideline still sets 10 for compressible sites, weighing that against the platelets saved.', cite: 'van Baarle FLF et al., N Engl J Med 2023;388:1956', doi: '10.1056/NEJMoa2214322'},
+  {q: 'Platelets for a brain bleed on antiplatelets? (PATCH)', d: 'Randomized, 190 patients with supratentorial bleeding within 6 hours, on antiplatelets for at least 7 days.', r: 'Death or dependence at 3 months: adjusted common odds ratio 2.05 (1.18 to 3.56) against platelets; in-hospital death 24% against 17%.', c: 'Platelets do harm here; the 2025 guideline recommends against them when the count is over 100.', cite: 'Baharoglu MI et al., Lancet 2016;387:2605', doi: '10.1016/S0140-6736(16)30392-0'},
+  {q: 'Massive transfusion in trauma: 1:1:1 or 1:1:2? (PROPPR)', d: 'Randomized, 680 severely injured patients at 12 level I trauma centres.', r: '24-hour mortality 12.7% against 17.0% and 30-day 22.4% against 26.1% (neither significant); hemostasis 86% against 78%; death from bleeding at 24 hours 9.2% against 14.6%.', c: 'Balanced 1:1:1 ratios in massive transfusion protocols.', cite: 'Holcomb JB et al., JAMA 2015;313:471', doi: '10.1001/jama.2015.12'}
+];
+(function(){
+  var chaps = [].slice.call(document.querySelectorAll('.chap'));
+  $('pills').innerHTML = chaps.map(function(c, n){ return '<button class="pill" data-go="' + c.id + '" aria-current="' + (n === 0) + '">' + (n + 1) + ' ' + esc(c.getAttribute('data-pill')) + '</button>'; }).join('');
+  $('pills').addEventListener('click', function(e){ var g = e.target.getAttribute('data-go'); if (g) $(g).scrollIntoView(); });
+  function mark(id){ [].forEach.call($('pills').children, function(b){ var on = b.getAttribute('data-go') === id; b.setAttribute('aria-current', String(on)); if (on) $('pills').scrollLeft = Math.max(0, b.offsetLeft - 60); }); }
+  if ('IntersectionObserver' in window){ var io = new IntersectionObserver(function(es){ es.forEach(function(en){ if (en.isIntersecting) mark(en.target.id); }); }, {rootMargin: '-30% 0px -60% 0px'}); chaps.forEach(function(c){ io.observe(c); }); }
+  $('trialbox').innerHTML = TRIALS.map(function(t){ return '<div class="trial" style="margin-top:14px"><p><b>' + esc(t.q) + '</b></p><p><span class="k">Design</span>' + esc(t.d) + '</p><p><span class="k">Result</span>' + esc(t.r) + '</p><p><span class="k">What it changed</span>' + esc(t.c) + '</p><p class="mono" style="font-size:13px"><a href="https://doi.org/' + t.doi + '" rel="noopener">' + esc(t.cite) + '</a></p></div>'; }).join('');
+  $('go-prac').addEventListener('click', function(){ show('t-prac'); window.scrollTo(0, 0); });
+})();
+document.querySelectorAll('[data-figure]').forEach(function(h){ mountFig(h, h.getAttribute('data-figure'), h.getAttribute('data-state')); });
+
+/* Practice: cases run through the same engines */
+var CASES = [
+  {t: 'Pneumonia, hemoglobin 7.4', s: 'Woman, 68, on the ward with pneumonia, improving. No heart disease, no bleeding, no symptoms of anemia. Hemoglobin 7.4, was 8.1.', k: 'rbc', i: {sit: 'stable', hb: 7.4}, p: 'No: above 7 in a stable patient (AABB 2023, strong). Look for the cause of the fall.'},
+  {t: 'Septic shock, hemoglobin 6.8', s: 'Man, 59, in the ICU on norepinephrine for septic shock from a urinary source. Not bleeding. Hemoglobin 6.8.', k: 'rbc', i: {sit: 'sepsis', hb: 6.8}, p: 'Yes: one unit, below 7 (TRISS; Surviving Sepsis). Recheck before another.'},
+  {t: 'NSTEMI, hemoglobin 8.6', s: 'Man, 74, with a non-ST-elevation MI and chronic anemia, not bleeding. Hemoglobin 8.6.', k: 'rbc', i: {sit: 'acs', hb: 8.6}, p: 'Yes: transfusing toward 10 may be reasonable in a heart attack with anemia (ACC/AHA 2025, 2b; AABB 2025; MINT). One unit at a time, watching volume.'},
+  {t: 'Ulcer bleed with coronary disease', s: 'Woman, 70, with a bleeding duodenal ulcer, treated at endoscopy, now stable. Prior coronary stents. Hemoglobin 7.6.', k: 'rbc', i: {sit: 'ugib', hb: 7.6, cvd: true}, p: 'Yes: with preexisting cardiovascular disease ACG considers 8 reasonable.'},
+  {t: 'Variceal bleed after banding', s: 'Man, 52, with cirrhosis; varices banded 6 hours ago, no further bleeding. Hemoglobin 7.8.', k: 'rbc', i: {sit: 'varix', hb: 7.8}, p: 'No: at the 7 to 8 target (Baveno VII). More blood raises portal pressure.'},
+  {t: 'Lumbar puncture, platelets 15', s: 'Woman, 45, with leukemia, febrile with headache; an LP is planned. Platelets 15.', k: 'plt', i: {psit: 'lp', plt: 15}, p: 'Yes: below 20 for a lumbar puncture (AABB 2025, strong). Check the count after the dose.'},
+  {t: 'Internal jugular line, platelets 24', s: 'Man, 61, in the ICU needs an ultrasound-guided internal jugular line. Platelets 24.', k: 'plt', i: {psit: 'cvc', plt: 24}, p: 'No: the threshold for a compressible site is 10 (AABB 2025, conditional). PACER showed more catheter-related bleeding, including serious bleeding, without platelets, so use ultrasound and an experienced operator.'},
+  {t: 'Brain bleed on aspirin', s: 'Woman, 77, on aspirin, with a small intracerebral bleed; no surgery planned. Platelets 190.', k: 'plt', i: {psit: 'ich', plt: 190}, p: 'No: PATCH showed harm; the 2025 guideline recommends against platelets when the count is over 100.'},
+  {t: 'Paracentesis, INR 2.1', s: 'Man, 58, with cirrhosis and tense ascites. INR 2.1, platelets 62. Large-volume paracentesis planned.', k: 'pla', i: {qsit: 'cirr', inr: 2.1}, p: 'No: do not correct the INR or platelets before a paracentesis (AGA 2019). The INR does not measure bleeding risk in cirrhosis.'}
+];
+(function(){
+  $('practice').innerHTML = CASES.map(function(c, n){
+    return '<div class="card case" id="' + (n ? 'case' + n : 'practice-cases') + '"><p class="label">Case ' + (n + 1) + '</p><h2>' + esc(c.t) + '</h2><p>' + esc(c.s) + '</p><p><b>Transfuse?</b></p><div class="row" data-case="' + n + '"><button class="btn ghost" data-z="y">Yes</button><button class="btn ghost" data-z="n">No</button></div><div class="ans" id="ans' + n + '" hidden></div></div>';
+  }).join('');
+})();
+function runCase(c){ return c.k === 'rbc' ? rbc(c.i) : c.k === 'plt' ? platelets(c.i) : plasma(c.i); }
+$('practice').addEventListener('click', function(e){
+  var b = e.target.closest('[data-z]'); if (b){ var n = +b.parentNode.getAttribute('data-case'), c = CASES[n], o = runCase(c), yes = o.tx === true, pick = b.getAttribute('data-z') === 'y';
+    $('ans' + n).innerHTML = '<p><b>' + (pick === yes ? 'Right: ' : 'The tool says: ') + (yes ? 'transfuse.' : 'do not transfuse.') + '</b> ' + esc(c.p) + '</p><p class="sub"><b>' + esc(o.head) + '.</b></p>' + (o.why ? '<p class="sub">' + esc(o.why) + '</p>' : '') + '<div class="row"><button class="btn ghost" data-load="' + n + '">Open in the tool</button></div>'; $('ans' + n).hidden = false; return; }
+  var l = e.target.closest('[data-load]'); if (l){ var c2 = CASES[+l.getAttribute('data-load')], i = c2.i;
+    if (c2.k === 'rbc'){ st.sit = i.sit; st.t.cvd = !!i.cvd; st.t.sym = !!i.sym; st.t.fast = !!i.fast; $('hb').value = i.hb; drawInputs(); render(); show('t-rbc'); }
+    else if (c2.k === 'plt'){ st.psit = i.psit; st.t.imm = !!i.imm; $('plt').value = i.plt; drawInputs(); render(); show('t-pp'); }
+    else { st.qsit = i.qsit; $('inr').value = i.inr != null ? i.inr : ''; $('fib').value = i.fib != null ? i.fib : ''; drawInputs(); render(); show('t-pp'); }
+    window.scrollTo(0, 0); }
+});
+window.__rbc = rbc; window.__platelets = platelets; window.__plasma = plasma; window.__cases = CASES; window.__runCase = runCase;
+drawStatic(); drawInputs(); render(); fromHash();
+})();
+</script>
+<script id="deeper-data">
+/* Go deeper: mechanism, rationale and the common trap for each Learn chapter. Text only; no doses or thresholds beyond the tool's own. */
+(function(){ var D = {"learn-o2": [["Mechanism", "Oxygen delivery is cardiac output times arterial oxygen content, and almost all of that content rides on hemoglobin. When hemoglobin falls, delivery falls in proportion unless the heart pumps more or the tissues take out a larger share of what arrives."], ["Why it matters", "Healthy tissues have slack on both counts, which is why the trials found that waiting until about 7 was as safe as transfusing earlier. Each unit also carries volume and the risk of a reaction, so blood given without need is not neutral."], ["Common trap", "Transfusing to a number rather than to the patient. A hemoglobin just under the threshold in a comfortable, stable patient is not an emergency, and a hemoglobin above it does not exclude symptoms from anemia."]], "learn-trials": [["Mechanism", "Each trial randomized patients to a lower or a higher hemoglobin trigger and counted deaths or complications. Restrictive arms received far fewer units, so any harm from anemia would have shown as more events."], ["Why it matters", "Across intensive care, septic shock, GI bleeding, orthopedic and cardiac surgery the lower trigger was as safe, which is why AABB recommends 7 for most stable inpatients. Heart attack and brain injury are where the trials point the other way."], ["Common trap", "Treating noninferior as identical in every subgroup. The trials enrolled specific populations; a patient with an active heart attack or a fresh brain injury is outside most of them."]], "learn-heart": [["Mechanism", "Heart muscle takes out most of the oxygen in coronary blood even at rest, so it cannot compensate for anemia by extracting more. It depends on raising coronary flow, which a narrowed or blocked artery limits."], ["Why it matters", "This is the physiological reason a heart attack was studied separately. MINT's restrictive group had more heart attack or death, a difference that did not reach significance, and guidelines now suggest a liberal trigger in this setting."], ["Common trap", "Applying the heart-attack trigger to every patient with coronary disease. For stable coronary disease without a heart attack, AABB allows clinicians to choose 8."]], "learn-plt": [["Mechanism", "Platelets form the first plug at an injured vessel. At very low counts spontaneous bleeding becomes more likely; a needle or a scalpel adds an injury, so the count needed rises with the size and site of the wound."], ["Why it matters", "Most of these thresholds rest on very low certainty evidence, which is why only the prophylaxis and lumbar puncture numbers are strong recommendations. Platelets are scarce, short-lived and carry a reaction risk, so giving fewer matters."], ["Common trap", "Giving platelets where they do harm or do nothing: a brain bleed on antiplatelet drugs with a normal count, autologous transplant without bleeding, or immune causes such as HIT, TTP and ITP."]], "learn-products": [["Mechanism", "Each product replaces one part of blood: red cells carry oxygen, platelets plug, plasma brings every clotting factor at the concentration found in blood, and cryoprecipitate concentrates fibrinogen and factor VIII."], ["Why it matters", "Knowing the expected rise lets you check whether a dose worked. A smaller rise than expected points to ongoing loss or destruction rather than a need for a bigger dose."], ["Common trap", "Using plasma to fix a mildly raised INR before a procedure. Plasma barely changes an INR of 1.7 or less, and a large volume is needed to change a higher one."]], "narrow": [["Mechanism", "Transfused platelets can be cleared within minutes by antibodies, or survive the first hour and then be used up by fever, sepsis, clotting or bleeding, or held back in a large spleen."], ["Why it matters", "The two patterns lead to different fixes: once HLA or platelet antibodies are confirmed, the blood bank can supply matched or crossmatched platelets, while consumption needs treatment of the cause."], ["Common trap", "Ordering bigger or more frequent doses without measuring the increment. Without a count soon after the dose, immune and non-immune causes cannot be told apart."]]};
+  function add(){ Object.keys(D).forEach(function(id){ var c = document.getElementById(id); if (!c || c.querySelector(":scope > .deeper")) return; var host = c.matches(".card,.lsec,section,.chap") ? c : null; if (!host){ var n = c.nextElementSibling; while (n && !n.matches(".card")) n = n.nextElementSibling; host = n; } if (!host || host.querySelector(":scope > .deeper")) return; var d = document.createElement("details"); d.className = "deeper"; d.innerHTML = "<summary>Go deeper: mechanism and rationale</summary><div class=\"dpx\">" + D[id].map(function(r){ return "<div><span class=\"dl\">" + r[0] + "</span><p>" + r[1] + "</p></div>"; }).join("") + "</div>"; var last = host.querySelector(":scope > .row"); if (last) host.insertBefore(d, last); else host.appendChild(d); }); }
+  add(); document.addEventListener("click", function(){ setTimeout(add, 0); }); document.addEventListener("input", function(){ setTimeout(add, 0); });
+})();
+</script>
+</body>
+</html>
