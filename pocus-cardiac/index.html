@@ -33,7 +33,8 @@ nav.tabs .wrap{display:flex;padding-block:0}
 nav.tabs button{flex:1;min-height:56px;color:var(--muted);font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;border-top:2px solid transparent}
 nav.tabs button[aria-selected=true]{color:var(--accent);border-top-color:var(--accent)}
 section.view{display:none;padding-block:14px 28px}
-section.view.on{display:grid;gap:14px}
+section.view.on{display:grid;grid-template-columns:minmax(0,1fr);gap:14px}
+section.view>*{min-width:0}
 .lede{font-size:15px;color:var(--muted)}
 
 .seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:4px;padding:4px;background:var(--line);border-radius:12px}
@@ -125,6 +126,24 @@ details.more ul{padding-left:18px}
 .limits li{font-size:15px;margin-bottom:8px}
 .limits ul{padding-left:18px;margin-top:8px}
 
+.clips{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x proximity;margin:12px -16px 0;padding:0 16px 2px;scrollbar-width:none}
+.clips::-webkit-scrollbar{display:none}
+.clip{flex:0 0 min(80%,290px);scroll-snap-align:start}
+.clips.one .clip{flex-basis:100%}
+.clip .scr{position:relative;aspect-ratio:4/3;background:var(--us-bg);border-radius:10px;overflow:hidden}
+.clip video,.clip img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;display:block}
+.clip .play{position:absolute;inset:0;width:100%;display:grid;place-items:end start;padding:8px}
+.clip .play i{width:44px;height:44px;border-radius:50%;background:var(--us-halo);border:1.5px solid var(--us-ink);display:grid;place-items:center}
+.clip .play i::before{content:"";border-left:13px solid var(--us-ink);border-top:8px solid transparent;border-bottom:8px solid transparent;margin-left:4px}
+.clip.playing .play i{opacity:0}
+.clip figcaption{font-size:14px;margin-top:7px}
+.clip .tag{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:1px}
+.clip .tag.w{color:var(--warn)}
+.clip .by{display:block;font-size:12px;color:var(--muted);margin-top:2px}
+#viewclips h3{font-size:16px}
+#credits li{font-size:13px;margin-bottom:8px;color:var(--muted)}
+#credits ul{padding-left:18px;margin-top:6px}
+
 footer{max-width:720px;margin:8px auto 0;padding:16px max(16px,env(safe-area-inset-right,0px)) 24px max(16px,env(safe-area-inset-left,0px));border-top:1px solid var(--line);font-size:13px;color:var(--muted)}
 footer p{margin-bottom:8px}
 
@@ -132,7 +151,7 @@ footer p{margin-bottom:8px}
   .wrap,footer{max-width:980px}
   #views.on{grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);align-items:start}
   #views.on>.views,#views.on>.lede{grid-column:1/-1}
-  #views.on>.figcard{grid-row:span 3}
+  #views.on>.figcard{grid-row:span 4}
   #read.on{grid-template-columns:1fr 1fr;align-items:start}
   #read.on>.lede{grid-column:1/-1}
 }
@@ -165,7 +184,8 @@ footer p{margin-bottom:8px}
   </div>
 
   <div class="card" id="how"></div>
-  <p class="note">Probe position and poor-view fixes are expert practice, not guideline statements. The scan side is a drawn stand-in until the licensed clips are added.</p>
+  <div class="card pad" id="viewclips"><span class="kicker">Real scans</span><h3 id="vcTitle"></h3><div class="clips" id="vcClips"></div></div>
+  <p class="note">Probe position and poor-view fixes are expert practice, not guideline statements. The figure above is a drawing of the standard view on both sides of the handle; the clips are patient scans from open-licence articles.</p>
 
   <div class="cmp" id="compare" hidden>
     <span class="kicker">Same view</span>
@@ -186,6 +206,7 @@ footer p{margin-bottom:8px}
     <h3><span class="n">1</span>How well does the LV squeeze?</h3>
     <p class="ans">Say it in broad words: hyperdynamic, normal, reduced or severely reduced. Judge it in at least two views. No ejection-fraction number.</p>
     <p class="why"><b>Why:</b> broad categories are what a focused exam supports. A number implies a precision it does not have.</p>
+    <div class="clips" data-clips="lv-reduced-plax,lv-reduced-psax,epss-wide"></div>
     <details class="more"><summary>More</summary>
       <p>What to watch: the walls thicken, the inner edge moves inward, and the front mitral leaflet opens toward the septum. <span class="tier">Expert practice.</span></p>
       <p>E-point septal separation (M-mode at the mitral tips in the long-axis view): over 7 mm was 100% sensitive (95% CI 63 to 100) and 52% specific (39 to 65) for an EF of 30% or less. Read it one way only: 7 mm or less makes a severely reduced EF unlikely. <span class="tier">Single centre, convenience sample (McKaigney 2014).</span></p>
@@ -199,6 +220,7 @@ footer p{margin-bottom:8px}
     <p class="ans">The RV should look no more than two-thirds the size of the LV, and the LV should form the apex. A septum that flattens in systole means pressure load; in diastole, volume load; in both, pressure with or without volume.</p>
     <p class="why"><b>Why:</b> the septum bows toward whichever ventricle has the lower pressure at that moment.</p>
     <div class="warnbox">A normal-looking RV does not exclude pulmonary embolism. Pooled sensitivity of right heart strain on echo was 53%, specificity 83%.</div>
+    <div class="clips" data-clips="rv-dilated-a4c,rv-dilated-still-labelled,rv-dilated-plax,rv-strain-1,tapse-normal,tapse-measure"></div>
     <details class="more"><summary>More</summary>
       <p>TAPSE (M-mode through the lateral tricuspid annulus, RV-focused apical view): over 1.7 cm normal; 1.3 to 1.7 mild; 1.0 to 1.3 moderate; 1.0 or less severe. Never read it alone: it misleads after cardiac surgery, with pacing leads or catheters, in constriction, with severe tricuspid regurgitation, or with a misaligned cursor.</p>
       <p>RV basal diameter under 4.1 cm is normal (end-diastole, RV-focused view). RV free wall under 5 mm is normal; a thick wall points to long-standing load but is not specific. RV size needs more than one view.</p>
@@ -211,6 +233,7 @@ footer p{margin-bottom:8px}
     <p class="ans">A dark band around the heart, measured at end-diastole: 10 to 20 mm is moderate, over 20 mm is large. In the long-axis view pericardial fluid lies in front of the descending aorta; pleural fluid lies behind it.</p>
     <p class="why"><b>Why:</b> size does not define tamponade. Pressure does, and a small fluid collection that arrives fast can be enough.</p>
     <div class="warnbox">Tamponade is neither a bedside nor an ultrasound diagnosis alone. An effusion on the screen is not tamponade until the patient fits.</div>
+    <div class="clips" data-clips="tamponade-bedside,tamponade-a4c,tamponade-psax,fat-sub-4c"></div>
     <details class="more"><summary>More</summary>
       <p>Signs that support tamponade: the right atrium collapses in systole (earliest); the right ventricle collapses in diastole (high specificity); the IVC is full with little change on breathing (high sensitivity); mitral and tricuspid inflow swing with breathing more than normal.</p>
       <p class="tier">Size: ESC 2025 myocarditis and pericarditis guideline. Signs: Alerhand 2019, narrative review. Aorta landmark: expert practice.</p>
@@ -234,6 +257,7 @@ footer p{margin-bottom:8px}
       <p class="ans" id="ivcans" aria-live="polite"></p>
       <div class="dp" id="ivcdp"></div>
     </div>
+    <div class="clips" data-clips="ivc-normal,ivc-plethoric-sniff,ivc-plethoric-breath"></div>
     <details class="more"><summary>More</summary>
       <p>Measure in the subcostal long-axis view, 0.5 to 3 cm from the right atrium. Use a sniff; quiet breathing if the patient cannot sniff. M-mode times the change better.</p>
       <p>A large IVC can be normal in young adults, athletes and pregnancy.</p>
@@ -245,6 +269,7 @@ footer p{margin-bottom:8px}
     <h3><span class="n">5</span>Is there an obvious valve problem?</h3>
     <p class="ans">Flag only: a leaflet that is thick, fixed or flailing, or a large colour jet. Do not grade it. Any flag means a formal echo.</p>
     <p class="why"><b>Why:</b> a focused exam finds the obvious and misses the rest.</p>
+    <div class="clips" data-clips="colour-tr"></div>
     <details class="more"><summary>More</summary>
       <p>Ten hospitalists with hand-carried ultrasound, 354 inpatients: LV function matched the cardiologist's read exactly in 59% with ultrasound against 46% by exam, and within one level in 88% against 67%. There was no gain for aortic stenosis, aortic regurgitation or mitral regurgitation.</p>
       <p class="tier">ASE 2013 (grading valve lesions is not appropriate for a focused exam); Martin 2009, single centre.</p>
@@ -259,7 +284,15 @@ footer p{margin-bottom:8px}
       <li>Do not call these at the bedside: aortic dissection, hypertrophic cardiomyopathy, regional wall motion abnormality, LV aneurysm or thrombus, masses, vegetations. A scan that looks normal does not exclude them.</li>
       <li>Pulmonary pressures, diastolic function and constriction are outside a focused exam.</li>
     </ul>
+    <div class="clips" data-clips="vegetation,lv-thrombus-1,lv-thrombus-2,takotsubo,constriction-a4c,ivc-thrombus"></div>
     <p class="tier">ASE 2013; international FoCUS recommendations 2014.</p>
+  </div>
+  <div class="card pad" id="credits">
+    <span class="kicker">Image credits</span>
+    <details class="more"><summary>Who made the scans</summary>
+      <p>Every clip and still is reused under the Creative Commons licence shown. Each was cropped to the scan, resized and re-encoded; dates and machine text were removed. Labels drawn by the original authors are noted in the caption.</p>
+      <ul id="creditList"></ul>
+    </details>
   </div>
 </section>
 </main>
@@ -273,7 +306,7 @@ footer p{margin-bottom:8px}
   <p>For education only. Not a substitute for clinical judgment.</p>
   <p>Last reviewed: draft, not yet audited.</p>
   <p>Sources: Mukherjee M, Rudski LG, et al. Guidelines for the echocardiographic assessment of the right heart in adults. J Am Soc Echocardiogr 2025;38:141-86, doi:10.1016/j.echo.2025.01.006 (guideline). Spencer KT, et al. Focused cardiac ultrasound: recommendations from the American Society of Echocardiography. J Am Soc Echocardiogr 2013;26:567-81 (expert consensus). Via G, et al. International evidence-based recommendations for focused cardiac ultrasound. J Am Soc Echocardiogr 2014;27:683.e1-33, doi:10.1016/j.echo.2014.05.001 (consensus). 2025 ESC guidelines for the management of myocarditis and pericarditis. Eur Heart J 2025;46:3952-4041, doi:10.1093/eurheartj/ehaf192 (guideline). McKaigney CJ, et al. Am J Emerg Med 2014;32:493-7, doi:10.1016/j.ajem.2014.01.045 (observational). Alerhand S, Carter JM. Am J Emerg Med 2019;37:321-6, doi:10.1016/j.ajem.2018.11.004 (review). Fields JM, et al. J Am Soc Echocardiogr 2017;30:714-23, doi:10.1016/j.echo.2017.03.004 (meta-analysis). Martin LD, et al. Am J Med 2009;122:35-41, doi:10.1016/j.amjmed.2008.07.022 (observational).</p>
-  <p>Probe positions, image fixes and structure descriptions are expert practice. The ultrasound pictures on this page are drawings, not patient images.</p>
+  <p>Probe positions, image fixes and structure descriptions are expert practice. The wipe figure is a drawing. The clips are patient scans from open-licence articles, credited under Image credits.</p>
   <p>Privacy: everything runs in your browser. Nothing you enter is sent anywhere or stored, and there are no analytics. Do not enter names, record numbers, or dates of birth.</p>
 </footer>
 
@@ -465,7 +498,7 @@ function paintView(){
   $("#how").innerHTML='<div class="row"><span class="k">Answers</span><span>'+view.answers+'</span></div><div class="row"><span class="k">Probe</span><span>'+view.probe+'</span></div><div class="row"><span class="k">Poor view</span><span>'+view.fix+'</span></div>';
   $("#compare").hidden=!view.states;
   if(view.states){$("#stateText").textContent=st().text;$$("#states button").forEach(function(b){b.setAttribute("aria-pressed",String(b.dataset.s===state))})}
-  drawScan();paintFig();
+  drawScan();paintFig();paintViewClips();
 }
 
 $("#viewpick").addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;
@@ -486,7 +519,7 @@ hd.addEventListener("keydown",function(e){var step=e.key==="ArrowLeft"?-5:e.key=
 $$("nav.tabs button").forEach(function(b){b.addEventListener("click",function(){
   $$("nav.tabs button").forEach(function(x){x.setAttribute("aria-selected",String(x===b))});
   $$("section.view").forEach(function(s){s.classList.toggle("on",s.id===b.getAttribute("aria-controls"))});
-  window.scrollTo(0,0)})});
+  stopClips();window.scrollTo(0,0)})});
 function openHash(){var id=location.hash.slice(1);if(!id)return;var el=document.getElementById(id);if(!el)return;var sec=el.closest("section.view");
   if(sec&&!sec.classList.contains("on")){var t=document.getElementById("t-"+sec.id);if(t)t.click()}
   if(el!==sec)el.scrollIntoView()}
@@ -518,6 +551,25 @@ function paintIvc(){
 $("#ivcd").addEventListener("input",paintIvc);
 $("#ivcc").addEventListener("click",function(e){var b=e.target.closest("button");if(!b||b.disabled)return;$$("#ivcc button").forEach(function(x){x.setAttribute("aria-pressed",String(x===b))});paintIvc()});
 $("#ivcv").addEventListener("click",function(){var b=$("#ivcv");b.setAttribute("aria-pressed",String(b.getAttribute("aria-pressed")!=="true"));paintIvc()});
+
+/* Real scans. Files live in /media/pocus-cardiac/; credit and licence for each are listed under Image credits. */
+var MEDIA={"plax-normal": ["v", "Normal", "Long axis, breath held out.", "G"], "plax-breathing": ["v", "Tip", "Same patient breathing normally: lung slides across and hides the heart. Ask for a breath out and hold.", "G"], "psax-normal": ["v", "Normal", "Short axis, breath held.", "G"], "psax-breathing": ["v", "Tip", "Same patient breathing: the heart drifts in and out of the cut.", "G"], "sub-normal": ["v", "Tip", "Subcostal four-chamber: the view sharpens as the patient breathes in. The trace across the picture is breathing.", "G"], "a4c-normal": ["v", "Normal", "Apical four-chamber, breath held out.", "G"], "a4c-lung": ["v", "Tip", "Same patient breathing normally: lung covers the apex.", "G"], "ivc-normal": ["v", "Normal", "IVC narrowing as the patient breathes in.", "T"], "ivc-plethoric-sniff": ["v", "Abnormal", "Wide IVC with no change on a sniff.", "G"], "ivc-plethoric-breath": ["v", "Abnormal", "Wide IVC with no change on a deep breath.", "G"], "lv-reduced-plax": ["v", "Abnormal", "Dilated LV, severely reduced squeeze, long axis.", "N"], "lv-reduced-psax": ["v", "Abnormal", "Same patient, short axis: the walls barely thicken.", "N"], "epss-wide": ["i", "Abnormal", "M-mode at the mitral tips in systolic heart failure. The red arrow is the gap between the open leaflet and the septum (authors' arrows).", "S"], "rv-strain-1": ["v", "Abnormal", "Massive pulmonary embolism: large RV, free wall still while the apex moves.", "Q"], "rv-dilated-a4c": ["v", "Abnormal", "Submassive pulmonary embolism, four-chamber: RV larger than LV.", "D"], "rv-dilated-plax": ["v", "Abnormal", "Same case, long axis: the RV at the top of the screen is wide.", "D"], "rv-dilated-still-labelled": ["i", "Labelled", "Same case with the authors' outlines of RV, LV and LA.", "D"], "tapse-normal": ["i", "Normal", "TAPSE on M-mode: 3.1 cm.", "W"], "tapse-measure": ["i", "Abnormal", "TAPSE in a patient with pulmonary emboli: reduced (authors' measurement).", "Z"], "tamponade-bedside": ["v", "Abnormal", "Large effusion with tamponade on a bedside machine, subxiphoid view.", "B"], "tamponade-a4c": ["v", "Abnormal", "Tamponade, four-chamber: right-sided chambers buckle inward.", "G"], "tamponade-psax": ["v", "Abnormal", "Tamponade, short axis at the base.", "G"], "fat-sub-4c": ["v", "Look-alike", "A dark band beside the RV that proved to be fat, not fluid.", "N"], "colour-tr": ["v", "Flag", "Colour Doppler: a large tricuspid regurgitation jet.", "E"], "vegetation": ["v", "Refer", "Tricuspid vegetation.", "E"], "lv-thrombus-1": ["v", "Refer", "Several LV thrombi in a dilated heart.", "MI"], "lv-thrombus-2": ["v", "Refer", "LV thrombus after myocardial infarction.", "L"], "takotsubo": ["v", "Refer", "Regional wall motion: the apex balloons while the base squeezes (Takotsubo).", "H"], "constriction-a4c": ["v", "Refer", "Constriction: the septum shifts with breathing.", "G"], "ivc-thrombus": ["v", "Refer", "Thrombus in the IVC.", "Z"]};
+var CREDIT={"G": ["Ginghina C, Beladan C, Iancu M, Calin A, Popescu B. Respiratory maneuvers in echocardiography. Cardiovasc Ultrasound 2009;7:42.", "CC BY 2.0"], "N": ["Nguyen T, Kumar K, Francis A, Walker J, Raabe M, Zieroth S, Jassal D. Pseudo cardiac tamponade in the setting of excess pericardial fat. Cardiovasc Ultrasound 2009;7:3.", "CC BY 2.0"], "Q": ["Shafiq Q, Assaly R, Kanjwal Y. McConnell sign in a patient with massive acute pulmonary embolism. Case Rep Cardiol 2011;201097.", "CC BY 3.0"], "MI": ["Mine T, Sato I, Miyake H. Multiple left ventricular thrombi in a patient with dilated cardiomyopathy and cerebral infarction. J Med Case Rep 2014;8:306.", "CC BY 4.0"], "L": ["Lacalzada J, Mari B, Izquierdo M, Sanchez-Grande A, de la Rosa A, Laynez I. Recurrent intraventricular thrombus after myocardial infarction. BMC Res Notes 2013;6:348.", "CC BY 2.0"], "E": ["Seif D, Meeks A, Mailhot T, Perera P. Emergency department diagnosis of infective endocarditis using bedside emergency ultrasound. Crit Ultrasound J 2013;5:1.", "CC BY 2.0"], "T": ["Tinss, Wikimedia Commons, \"Inferior vena cava ultrasound\".", "CC BY-SA 4.0"], "W": ["Wolff-BI, Wikimedia Commons, \"Echokardiographie M-Mode 4KB TAPSE\".", "CC BY-SA 3.0"], "B": ["Brinley, Alvarado, Fox. Bedside echo for malignant cardiac tamponade. JETem 2017, doi:10.21980/J82S38.", "CC BY 4.0"], "D": ["Diez, Bryczkowski. RV dilation in submassive PE. JETem 2018, doi:10.21980/J82P84.", "CC BY 4.0"], "H": ["Hourmozdi, Suszanski, Pflaum. Takotsubo (stress) cardiomyopathy. JETem 2017, doi:10.21980/J8Z309.", "CC BY 4.0"], "Z": ["Zawada, Kunstadt, Alvarado. TAPSE in a patient with pulmonary emboli. JETem 2018, doi:10.21980/J8M052.", "CC BY 4.0"], "S": ["Shafi, Drachman, Bui, Chadha. POCUS for the diagnosis of systolic heart failure. JETem 2018, doi:10.21980/J8HD1R.", "CC BY 4.0"]};
+var VCLIPS={"plax": ["plax-normal", "plax-breathing"], "psax": ["psax-normal", "psax-breathing"], "sub": ["sub-normal"], "ivc": ["ivc-normal"], "a4c": ["a4c-normal", "a4c-lung"]};
+var BASE="/media/pocus-cardiac/";
+function clipHTML(id){var m=MEDIA[id],c=CREDIT[m[3]],warn=m[1]==="Refer"||m[1]==="Abnormal"||m[1]==="Flag"||m[1]==="Look-alike";
+  var by=c[0].split(".")[0].split(",")[0];
+  return '<figure class="clip">'+'<div class="scr">'+(m[0]==="v"
+    ?'<video muted loop playsinline preload="none" poster="'+BASE+id+'.jpg" src="'+BASE+id+'.mp4" aria-label="'+m[2].replace(/"/g,"&quot;")+'"></video><button type="button" class="play" aria-label="Play or pause clip"><i></i></button>'
+    :'<img loading="lazy" src="'+BASE+id+'.jpg" alt="'+m[2].replace(/"/g,"&quot;")+'">')
+    +'</div><figcaption><span class="tag'+(warn?" w":"")+'">'+m[1]+(m[0]==="i"?" · still":"")+'</span>'+m[2]+'<span class="by">'+by+(c[0].indexOf(",")>-1&&c[0].indexOf("Wikimedia")<0?" et al.":"")+" · "+c[1]+'</span></figcaption></figure>'}
+function fillClips(el,ids){el.classList.toggle("one",ids.length===1);el.innerHTML=ids.map(clipHTML).join("")}
+function stopClips(except){$$(".clip video").forEach(function(v){if(v!==except&&!v.paused){v.pause();v.closest(".clip").classList.remove("playing")}})}
+document.addEventListener("click",function(e){var b=e.target.closest(".clip .play");if(!b)return;var f=b.closest(".clip"),v=f.querySelector("video");
+  if(v.paused){stopClips(v);var p=v.play();f.classList.add("playing");if(p&&p.catch)p.catch(function(){f.classList.remove("playing")})}else{v.pause();f.classList.remove("playing")}});
+function paintViewClips(){var ids=VCLIPS[view.id]||[];$("#viewclips").hidden=!ids.length;$("#vcTitle").textContent=view.full;fillClips($("#vcClips"),ids)}
+$$(".clips[data-clips]").forEach(function(el){fillClips(el,el.dataset.clips.split(","))});
+(function(){var seen={},h="";Object.keys(MEDIA).forEach(function(k){var c=MEDIA[k][3];if(seen[c])return;seen[c]=1;h+="<li>"+CREDIT[c][0]+" "+CREDIT[c][1]+".</li>"});$("#creditList").innerHTML=h})();
 
 window.__ivcEngine=ivcEngine;
 paintView();paintIvc();openHash();
