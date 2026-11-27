@@ -319,6 +319,10 @@ function timeCard(i, s){
   if ((s.coma || s.unknownCmd) && (!has(h) || h < 72)) c.guards = ['Too early to judge the brain. ' + (s.coma ? 'Not following commands at ' + (has(h) ? fmt(h) + ' hours' : 'this stage') + ' is expected and does not predict the outcome.' : 'If the patient does not follow commands, that is expected this early and does not predict the outcome.') + ' Guidelines put prognosis at 72 hours or later.'];
   c.links = [['#p-prog', 'Prognosis: when and how']];
   c.why = s.coma ? 'The brain injury goes on for days; the first 72 hours are for preventing more of it, not for deciding the outcome.' : null;
+  var m = [];
+  if (has(i.dt)) m.push('Time to return of circulation (' + fmt(i.dt) + ' minutes) is not a reliable predictor of the neurological outcome on its own (NCS).');
+  if (i.rhy && i.rhy !== 'unk') m.push('A ' + (i.rhy === 'shock' ? 'shockable' : 'non-shockable') + ' first rhythm changes neither the targets nor temperature control, which apply whatever the rhythm; on its own it does not predict the outcome (NCS).');
+  c.more = m;
   c.tiers = ['Layout: expert practice', 'Timing of prognosis: AHA 2a, B-NR'];
   return c;
 }
@@ -450,7 +454,7 @@ function otherCard(i, s){
 
 function afterCard(i, s){
   var c = {id: 'c-after', label: 'Before discharge', head: 'Angiography if the cause may be cardiac; rehabilitation; screen for distress'};
-  c.list = ['Coronary angiography before discharge when a cardiac cause is suspected, especially after a shockable rhythm, unexplained LV dysfunction or severe ischemia.', 'Rehabilitation assessment for thinking, physical, neurological and heart-lung problems before discharge.', 'Screen the survivor and the family for emotional distress before discharge.', 'Discharge plan with return-to-activity and work expectations; Europe adds follow-up within 3 months.'];
+  c.list = [(i.rhy === 'shock' ? 'Shockable first rhythm: ' : '') + 'Coronary angiography before discharge when a cardiac cause is suspected, especially after a shockable rhythm, unexplained LV dysfunction or severe ischemia.', 'Rehabilitation assessment for thinking, physical, neurological and heart-lung problems before discharge.', 'Screen the survivor and the family for emotional distress before discharge.', 'Discharge plan with return-to-activity and work expectations; Europe adds follow-up within 3 months.'];
   c.why = WHY.after;
   c.tiers = ['Angiography before discharge: AHA 1, B-NR', 'Rehabilitation assessment: AHA 1, C-LD', 'Distress screening: AHA 1, B-NR', 'Discharge planning: AHA 1, C-LD', 'Follow-up in 3 months: ERC'];
   c.links = [['/goals-of-care/', 'Talking with the family']];
