@@ -358,7 +358,7 @@ const HX = [['psz', 'Past withdrawal seizure'], ['pdt', 'Past delirium tremens']
 const PW = [['intox', 'Drunk in the last 30 days'], ['rehab', 'Past alcohol treatment'], ['wd', 'Past withdrawal'], ['black', 'Past blackouts'], ['wsz', 'Past withdrawal seizure'], ['wdt', 'Past delirium tremens'], ['downer', 'Alcohol with benzodiazepines or barbiturates (90 days)'], ['other', 'Alcohol with other drugs (90 days)'], ['bal', 'Blood alcohol 200 mg/dL or more on arrival'], ['auto', 'Heart rate over 120, tremor, sweating, agitation or nausea']];
 const PW_CUT = 4;
 /* CIWA-Ar (Sullivan 1989): 9 items 0-7, orientation 0-4, maximum 67 */
-const CI = [['nv', 'Nausea and vomiting', 7, '0 none · 4 nausea with dry heaves · 7 constant vomiting'], ['trem', 'Tremor', 7, '0 none · 4 moderate, arms extended · 7 severe'], ['sweat', 'Sweats', 7, '0 none · 4 beads on forehead · 7 drenching'], ['anx', 'Anxiety', 7, '0 at ease · 4 guarded · 7 panic'], ['agit', 'Agitation', 7, '0 normal · 4 fidgety · 7 pacing, thrashing'], ['tact', 'Touch disturbances', 7, '0 none · 3 moderate · 4 moderately severe hallucinations · 7 continuous'], ['aud', 'Hearing disturbances', 7, '0 none · 3 moderate · 4 moderately severe hallucinations · 7 continuous'], ['vis', 'Visual disturbances', 7, '0 none · 3 moderate · 4 moderately severe hallucinations · 7 continuous'], ['head', 'Headache', 7, '0 none · 4 moderately severe · 7 extremely severe'], ['ori', 'Orientation', 4, '0 oriented · 1 unsure of date · 2 date off by 2 days or less · 3 more than 2 days · 4 place or person']];
+const CI = [['nv', 'Nausea and vomiting', 7, '0 none · 4 nausea with dry heaves · 7 constant vomiting'], ['trem', 'Tremor', 7, '0 none · 4 moderate, arms extended · 7 severe'], ['sweat', 'Sweats', 7, '0 none · 4 beads on forehead · 7 drenching'], ['anx', 'Anxiety', 7, '0 at ease · 4 guarded · 7 panic'], ['agit', 'Agitation', 7, '0 normal · 4 fidgety · 7 pacing, thrashing'], ['tact', 'Touch disturbances', 7, '0 none · 3 moderate · 4 moderately severe hallucinations · 7 continuous'], ['aud', 'Hearing disturbances', 7, '0 none · 3 moderate · 4 moderately severe hallucinations · 7 continuous'], ['vis', 'Visual disturbances', 7, '0 none · 3 moderate · 4 moderately severe hallucinations · 7 continuous'], ['head', 'Headache', 7, '0 none · 4 moderately severe · 7 extremely severe'], ['ori', 'Orientation', 4, '0 oriented · 1 unsure of date or cannot add serially · 2 date off by 2 days or less · 3 more than 2 days · 4 place or person']];
 const CIWA_MILD = 10, CIWA_SEV = 19;
 const LABS = [['mg', 'Magnesium low'], ['k', 'Potassium low'], ['phos', 'Phosphate low'], ['glu', 'Glucose low'], ['na', 'Sodium low']];
 const WK = [['diet', 'Poor diet or malnutrition'], ['eye', 'Eye signs (nystagmus, gaze palsy)'], ['cereb', 'Unsteady gait or limbs'], ['mental', 'Confusion or memory loss']];
@@ -375,12 +375,14 @@ function assess(i) {
   const band = ciOk ? ciwaBand(ci) : null;
   const complicated = hx('sz') || hx('del');
   const bigDose = (i.dzp || 0) > RES_DZP || (i.lzp || 0) > RES_LZP;
-  const resistant = bigDose && ((i.hx || []).includes('del') || (i.ci && ciwaBand(Object.values(i.ci).reduce((a, b) => a + b, 0)) === 'severe' && i.comm !== 'no'));
+  const ci0 = i.ci ? Object.values(i.ci).reduce((a, b) => a + b, 0) : null;
+  const resistant = bigDose && ((i.hx || []).includes('del') || (i.comm !== 'no' && ci0 != null && ci0 >= CIWA_MILD));
   const highRisk = pw >= PW_CUT || hx('psz') || hx('pdt') || (i.pw || []).includes('wsz') || (i.pw || []).includes('wdt');
   const wk = (i.wk || []).length;
   let ap;
   const empty = ci == null && pw === 0 && !(i.hx || []).length && ciOk && !bigDose;
   if (empty) ap = 'start';
+  else if (bigDose && !resistant && !(ciOk && band === 'mild')) ap = 'reassess';
   else if (resistant || hx('del')) ap = 'icu';
   else if (hx('sz')) ap = 'seizure';
   else if (band === 'severe') ap = 'frontload';
@@ -392,6 +394,11 @@ function assess(i) {
 }
 
 const APPROACH = {
+  reassess: {t: 'Large dose already given: reassess before more', a: [
+    `Check sedation and breathing (RASS) before any further dose; no routine scheduled doses on top.` + tg('Expert practice'),
+    `If symptoms persist despite these doses, this is resistant withdrawal: monitored bed and senior review (escalation card).` + tg('ASAM 2020'),
+    `If the patient is now calm, long-acting drug already given will keep working as it is cleared; watch for over-sedation.` + tg('Pharmacology')],
+    why: 'Over 150 mg of diazepam or 30 mg of lorazepam in 3 to 4 hours is the range ASAM cites for resistant withdrawal; the next step depends on whether symptoms persist.'},
   start: {t: 'Score the patient first', a: [
     `Score PAWSS for risk and CIWA-Ar for severity (or note that the patient cannot answer), then the dosing approach appears here.` + tg('ASAM 2020')],
     why: 'The approach depends on risk and severity; no dose is suggested until they are known.'},
@@ -417,7 +424,8 @@ const APPROACH = {
   seizure: {t: 'Withdrawal seizure', a: [
     `A fast-acting benzodiazepine now: <span class="dose">lorazepam 2 mg IV</span> cut recurrence in a trial; diazepam is the alternative. Ongoing seizure: <a href="/rrt/#seizure">status epilepticus card</a>.` + tg('ASAM 2020; D\'Onofrio 1999'),
     `No phenytoin: it does not prevent withdrawal seizures.` + tg('ASAM 2020'),
-    `First seizure, focal, prolonged, or after a fall: look for another cause (glucose, sodium, head CT).` + tg('Expert practice')],
+    `First seizure, focal, prolonged, or after a fall: look for another cause (glucose, sodium, head CT).` + tg('Expert practice'),
+    `A withdrawal seizure makes this high-risk withdrawal: follow with front-loading or scheduled long-acting doses.` + tg('ASAM 2020')],
     why: 'Withdrawal seizures come from too little GABA tone; a benzodiazepine replaces it, whereas sodium-channel drugs act elsewhere.'},
   icu: {t: 'Complicated or resistant withdrawal', a: [
     `ICU-level care. Escalate benzodiazepine boluses; add phenobarbital only with experienced clinicians and monitoring (<a href="#phenobarb">regimens</a>).` + tg('ASAM 2020'),
@@ -562,13 +570,14 @@ function render() {
   // approach
   const A0 = APPROACH[r.ap];
   let acts = A0.a.slice();
+ if (r.ap === 'frontload' && !r.ciOk) acts[2] = `Then further doses by RASS and objective signs; a monitored bed.` + tg('ASAM 2020; expert practice');
   if (r.ap === 'frontload' && !r.ciOk) acts[0] = acts[0].replace(/until CIWA-Ar is under 10/g, 'until calm (RASS 0 to −1)') + ` CIWA-Ar is not valid here: use RASS and objective signs, in a monitored bed.` + tg('Expert practice for the RASS end point');
   if (r.ap === 'frontload' && (r.hx('liver') || (i.age || 0) > 65)) acts.splice(1, 0, `Long-acting diazepam and chlordiazepoxide accumulate with liver disease or age: smaller doses with a sedation check before each, or a shorter-acting agent per your protocol.` + tg('ASAM 2020; FDA labels'));
-  if (r.bigDose && !r.resistant) acts.push(`Large doses already given but symptoms are controlled: this is not resistant withdrawal. Watch for over-sedation as the drug accumulates.` + tg('ASAM 2020'));
+  if (r.bigDose && !r.resistant && r.ap !== 'reassess') acts.push(`Large doses already given but symptoms are controlled: this is not resistant withdrawal. Watch for over-sedation as the drug accumulates.` + tg('ASAM 2020'));
   const A = Object.assign({}, A0, {a: acts});
   h += card({id: 'approach', cls: 'answer', label: 'What to do now', head: A.t, body: `<ol class="acts">${A.a.map(x => `<li>${x}</li>`).join('')}</ol>` + (r.ap !== 'frontload' && (r.hx('liver') || (i.age || 0) > 65) ? `<p class="guard"><b>${r.hx('liver') ? 'Severe liver disease' : 'Older patient'}:</b> use a benzodiazepine with less liver metabolism (oxazepam, lorazepam: no active metabolites) and smaller doses; long-acting agents can accumulate.${tg('ASAM 2020; pharmacology')}</p>` : ''),
     why: A.why, chips: chip('gaba', r.ap === 'icu' ? 'pb' : 'benzo', 'Brake and accelerator'),
-    more: `<p>Labels advise lower doses in older or debilitated patients (diazepam injection 2–5 mg; chlordiazepoxide started low).${tg('FDA labels')}</p><p>Benzodiazepines are first line for withdrawal and for preventing seizures and delirium tremens; longer-acting agents are preferred, and diazepam or chlordiazepoxide for front-loading.${tg('ASAM 2020')}</p><p>All sample regimens are on the <a href="#doses">Reference tab</a>. No US guideline or label gives a lorazepam withdrawal dose; use your protocol.</p>`});
+    more: r.ap === 'start' ? '' : `<p>Labels advise lower doses in older or debilitated patients (diazepam injection 2–5 mg; chlordiazepoxide started low).${tg('FDA labels')}</p><p>Benzodiazepines are first line for withdrawal and for preventing seizures and delirium tremens; longer-acting agents are preferred, and diazepam or chlordiazepoxide for front-loading.${tg('ASAM 2020')}</p><p>All sample regimens are on the <a href="#doses">Reference tab</a>. No US guideline or label gives a lorazepam withdrawal dose; use your protocol.</p>`});
   // seizure card also with frontload if seizure (approach covers)
   // thiamine
   const tw = r.wernicke;
@@ -653,8 +662,8 @@ document.addEventListener('DOMContentLoaded', () => {
 const WR = [
   {x: 47, y: 44, n: 'Medial thalamus', t: 'Around the third ventricle: confusion and, later, the memory loss of Korsakoff syndrome.'},
   {x: 44, y: 56, n: 'Mammillary bodies', t: 'Part of the memory circuit; shrink in chronic thiamine deficiency.'},
-  {x: 56, y: 55, n: 'Around the aqueduct (midbrain)', t: 'Eye-movement nuclei: nystagmus and gaze palsies.'},
-  {x: 65, y: 67, n: 'Cerebellar vermis', t: 'Unsteady gait (truncal ataxia).'}
+  {x: 56, y: 55, n: 'Around the aqueduct and fourth ventricle', t: 'Oculomotor, abducens and vestibular nuclei: nystagmus and gaze palsies.'},
+  {x: 65, y: 67, n: 'Cerebellar vermis', t: 'Unsteady gait (truncal ataxia); the upper front part of the vermis is most affected.'}
 ];
 function mountWk(el) {
   el.innerHTML = `<div class="vk-plate"><div class="vk-pw"><img src="/media/alcohol-withdrawal/wernicke-regions.webp" width="680" height="572" alt="Midline section of the brain, front to the left, with four areas tinted red: the medial thalamus, the mammillary bodies, the grey matter around the cerebral aqueduct, and the cerebellar vermis."><span class="wkh">${WR.map((w, k) => `<button class="vk-hot" type="button" data-w="${k}" aria-pressed="false" style="left:${w.x}%;top:${w.y}%" aria-label="${w.n}">${k + 1}</button>`).join('')}</span></div><span class="vk-credit">Created with BioRender.com</span></div><div class="vk-list">${WR.map((w, k) => `<button type="button" data-w="${k}" aria-pressed="false">${k + 1} · ${w.n}</button>`).join('')}</div><p class="pout wkout"></p>`;
