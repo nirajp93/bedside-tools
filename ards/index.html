@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ARDS: diagnosis to rescue · bedside.tools</title>
+<meta name="description" content="ARDS at the bedside: Berlin and global definitions, mimics and the workup that narrows them, and the support ladder from lung protection through proning and paralysis to ECMO referral.">
+<script src="/theme.js"></script>
+<style>
+:root{--bg:#FBFBFA;--card:#FFFFFF;--ink:#111113;--muted:#55555D;--line:#ECECEE;--accent:#2B4BDB;--warn:#9A3B00;--warnbg:#FFF6EC}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5}
+.mono{font-family:var(--mono)}
+.wrap{max-width:720px;margin:0 auto;padding:20px 16px 48px}
+a{color:var(--accent)}
+.back{font-size:14px;text-decoration:none;display:inline-block;min-height:44px;line-height:44px}
+h1{font-size:26px;margin:4px 0 4px;letter-spacing:-.01em}
+.purpose{color:var(--muted);margin:0 0 20px}
+.tabs{display:flex;gap:6px;margin:0 -16px 16px;padding:0 16px 2px;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:1 0 auto;min-width:0;min-height:44px;border:1px solid var(--line);background:var(--card);border-radius:14px;padding:0 12px;font:inherit;font-size:15px;font-weight:600;color:var(--muted);cursor:pointer}
+.tab[aria-selected="true"]{border-color:var(--accent);color:var(--accent)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
+.label{font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+.grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.grid2{grid-template-columns:1fr 1fr}
+.field{display:flex;flex-direction:column;justify-content:flex-end}
+.field label{display:block;font-size:13px;color:var(--muted);margin-bottom:4px}
+.field input,.field select{width:100%;min-height:44px;border:1px solid var(--line);border-radius:10px;padding:8px 10px;font:inherit;font-family:var(--mono);background:var(--card);color:var(--ink)}
+.field input:focus,.field select:focus,.tab:focus-visible,.chk:focus-within,button:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.checks{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.chk{display:flex;align-items:center;gap:10px;min-height:44px;border:1px solid var(--line);border-radius:10px;padding:6px 10px;font-size:14px;cursor:pointer}
+.chk input{width:20px;height:20px;accent-color:var(--accent);flex:none}
+.card h2{font-size:18px;margin:0 0 2px}
+.head{font-family:var(--mono);font-size:17px;font-weight:600;margin:6px 0 4px;overflow-wrap:anywhere}
+.head.bad{color:var(--bad)}.head.okc{color:var(--ok)}
+.sub{font-size:14px;color:var(--muted);margin:0}
+.card ul{margin:6px 0 0;padding-left:20px}
+.card li{margin-bottom:4px}
+.guard{border-left:3px solid var(--warn);background:var(--warnbg);padding:8px 10px;border-radius:0 10px 10px 0;margin-top:8px;font-size:14.5px}
+.tier{display:inline-block;font-family:var(--mono);font-size:11px;border:1px solid var(--line);border-radius:999px;padding:2px 8px;color:var(--muted);margin:6px 6px 0 0}
+details{margin-top:10px;border-top:1px solid var(--line);padding-top:8px}
+.whyline{margin:10px 0 0;font-size:14.5px;color:var(--muted)}
+.whyline b{color:var(--ink);font-weight:600}
+summary{cursor:pointer;color:var(--accent);font-weight:600;min-height:44px;line-height:44px}
+details p{margin:0 0 8px;font-size:15px}
+.empty{color:var(--muted)}
+.btn{min-height:44px;border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);border-radius:10px;padding:8px 14px;font:inherit;font-weight:600;cursor:pointer}
+.btn.ghost{background:var(--card);color:var(--accent)}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.note{font-size:14px;color:var(--muted)}
+.tl{position:relative;padding-left:26px}
+.tl:before{content:"";position:absolute;left:8px;top:8px;bottom:8px;width:2px;background:var(--line)}
+.st{position:relative;padding:6px 0 10px}
+.st:before{content:"";position:absolute;left:-24px;top:11px;width:12px;height:12px;border-radius:50%;background:var(--card);border:2px solid var(--muted)}
+.st.now:before{background:var(--accent);border-color:var(--accent)}
+.st .when{font-family:var(--mono);font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+.st b{display:block}
+.st .dose{font-family:var(--mono);font-size:14.5px;display:block;overflow-wrap:anywhere}
+.st small{color:var(--muted);font-size:13.5px;display:block}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:6px 6px 6px 0;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:var(--mono);font-size:11.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);font-weight:500}
+td.mono{font-size:13px}
+.tw{overflow-x:auto}
+.case h2{font-size:17px}
+.ans{margin-top:10px;border-top:1px solid var(--line);padding-top:10px}
+footer{margin-top:28px;font-size:13.5px;color:var(--muted)}
+footer p{margin:0 0 8px}
+.panel{display:none}.panel.on{display:block}
+.fig{display:block;width:100%;max-width:460px;height:auto;margin:0 auto}
+.states{display:flex;gap:6px;overflow-x:auto;margin:10px -16px;padding:2px 16px 6px;scrollbar-width:none}
+.states::-webkit-scrollbar{display:none}
+.states.wrapit{flex-wrap:wrap;overflow:visible;margin:10px 0;padding:0}
+.sbtn{flex:none;min-height:44px;min-width:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--ink);font:inherit;font-size:14px;cursor:pointer;white-space:nowrap}
+.sbtn[aria-pressed="true"]{border-color:var(--accent);color:var(--accent);font-weight:600}
+.line1{font-size:15px;margin:10px 0 0}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.chip{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--fill);color:var(--ink);font:inherit;font-size:14px;cursor:pointer}
+.chip svg{flex:none;color:var(--accent)}
+.scrim{position:fixed;inset:0;background:var(--scrim);z-index:20}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:21;max-height:90vh;overflow-y:auto;background:var(--card);border:1px solid var(--line);border-bottom:0;border-radius:20px 20px 0 0;padding:8px 16px 24px;max-width:560px;margin:0 auto}
+.sheethead{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.sheethead h2{font-size:18px;margin:0}
+.xbtn{min-height:44px;min-width:44px;border:0;background:transparent;color:var(--accent);font:inherit;font-weight:600;cursor:pointer}
+.pills{position:sticky;top:0;z-index:5;background:var(--bg);display:flex;gap:6px;overflow-x:auto;margin:0 -16px 12px;padding:8px 16px;border-bottom:1px solid var(--line);scrollbar-width:none}
+.pills::-webkit-scrollbar{display:none}
+.pill{flex:none;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--muted);font:inherit;font-size:14px;cursor:pointer;white-space:nowrap}
+.pill[aria-current="true"]{border-color:var(--accent);color:var(--accent);font-weight:600}
+.chap{scroll-margin-top:70px}
+.cause{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:8px 0;border-top:1px solid var(--line);font-size:15px}
+.cause small{color:var(--muted);font-size:13px;text-align:right;flex:0 1 58%}
+.cause.out span{color:var(--muted);text-decoration:line-through}
+.cause.out,.cause.less{opacity:.6}
+.cause.fav span{font-weight:700}
+.cause.fav span:before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--accent);margin-right:8px}
+.trial{border-left:3px solid var(--accent);padding-left:12px}
+.trial p{margin:0 0 6px;font-size:15px}
+.trial .k{font-family:var(--mono);font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);display:block}
+tr.mark td{font-weight:700;color:var(--accent)}
+@media (min-width:900px){
+  .wrap{max-width:1040px}
+  .panel.two.on{display:grid;grid-template-columns:380px minmax(0,1fr);gap:20px;align-items:start}
+  #p-fix{max-width:720px;margin:0 auto}
+  .refgrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;align-items:start}
+  .refgrid .card{margin-bottom:0}
+  #p-learn{max-width:720px;margin:0 auto}
+}
+@media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+.deeper{margin-top:14px;border-top:1px solid var(--line)}
+.deeper>summary{min-height:44px;display:flex;align-items:center;gap:8px;color:var(--accent);font-weight:600;font-size:15px;cursor:pointer;list-style:none}
+.deeper>summary::-webkit-details-marker{display:none}
+.deeper>summary::before{content:"+";font-family:var(--mono);font-size:18px;line-height:1;width:14px;text-align:center}
+.deeper[open]>summary::before{content:"\2212"}
+.deeper>summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.deeper .dpx{border:1px solid var(--line);border-radius:12px;padding:2px 12px;background:var(--card);text-align:left}
+.deeper .dpx>div{padding:10px 0;border-top:1px solid var(--line)}
+.deeper .dpx>div:first-child{border-top:0}
+.deeper .dl{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500;margin:0 0 3px}
+.deeper p{font-size:15px;line-height:1.45;color:var(--ink);margin:0 0 4px}
+.deeper p:last-child{margin-bottom:0}
+/* cause-fix: ruled-out causes stay readable; the name greys, the reason does not fade */
+.cause.out,.cause.less,.cause.unl{opacity:1}
+.cause.less>span,.cause.unl>span{color:var(--muted)}
+.plate{margin:12px 0 4px}
+.plate img{display:block;width:100%;height:auto;border-radius:10px;border:1px solid var(--line)}
+.plate figcaption{font-size:13px;color:var(--muted);margin-top:6px}
+/* ards: ladder rungs */
+.rungs{display:grid;gap:4px;margin-top:4px}
+.rung{display:grid;grid-template-columns:28px minmax(0,1fr) auto;align-items:center;gap:8px;min-height:44px;width:100%;border:1px solid var(--line);border-radius:10px;padding:4px 10px;font:inherit;font-size:14.5px;color:var(--ink);background:var(--card);cursor:pointer;text-align:left}
+.rung b{font-family:var(--mono);font-weight:600;color:var(--muted)}
+.rung .tag{font-family:var(--mono);font-size:11.5px;letter-spacing:.04em;text-transform:uppercase;border-radius:999px;padding:2px 8px;border:1px solid var(--line);color:var(--muted);white-space:nowrap}
+.rung.now{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.rung.now b,.rung.now .tag{color:var(--accent);border-color:var(--accent)}
+.rung.base .tag{color:var(--ok);border-color:var(--ok)}
+.rung.hold{border-color:var(--warn)}
+.rung.hold .tag{color:var(--warn);border-color:var(--warn);background:var(--warnbg)}
+.rung.not span:not(.tag){color:var(--muted)}
+.card.rc.not h2,.card.rc.wait h2{color:var(--muted);font-size:16px}
+.card.rc.now{border-color:var(--accent)}
+.card.rc.hold{border-color:var(--warn)}
+.st-tag{float:right;font-family:var(--mono);font-size:11px;letter-spacing:.04em;text-transform:uppercase;border:1px solid var(--line);border-radius:999px;padding:2px 8px;color:var(--muted);margin-left:8px}
+.card.rc.now .st-tag{color:var(--accent);border-color:var(--accent)}
+.card.rc.hold .st-tag{color:var(--warn);border-color:var(--warn)}
+.card.rc.base .st-tag{color:var(--ok);border-color:var(--ok)}
+.cmp td:first-child{font-weight:600}
+.cmp td.met{color:var(--ok)}
+.cmp td.no{color:var(--bad)}
+.cmp td.unk{color:var(--muted)}
+.linkrow{margin:8px 0 0;font-size:14.5px}
+.linkrow a{display:inline-block;min-height:44px;line-height:44px}
+.tg td{vertical-align:top}
+.tg tr.on td{color:var(--accent)}
+.tg button{min-height:44px;width:100%;text-align:left;border:0;background:transparent;font:inherit;font-weight:600;color:inherit;cursor:pointer;padding:0}
+@media (min-width:900px){#p-learn,#p-prac{max-width:720px;margin:0 auto}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="/">← bedside.tools</a>
+<h1>ARDS: diagnosis to rescue</h1>
+<p class="purpose">Check the definition, rule out the mimics, and climb the support ladder one step at a time, from lung protection to ECMO.</p>
+
+<div class="tabs" role="tablist">
+  <button class="tab" role="tab" id="t-dx" aria-selected="true" aria-controls="p-dx">Diagnose</button>
+  <button class="tab" role="tab" id="t-lad" aria-selected="false" aria-controls="p-lad">Ladder</button>
+  <button class="tab" role="tab" id="t-learn" aria-selected="false" aria-controls="p-learn">Learn</button>
+  <button class="tab" role="tab" id="t-prac" aria-selected="false" aria-controls="p-prac">Practice</button>
+</div>
+
+<div class="panel two on" id="p-dx" role="tabpanel" aria-labelledby="t-dx">
+  <div id="dx-in">
+  <div class="card" id="criteria">
+    <p class="label">Onset, imaging, cause</p>
+    <p class="note" style="margin:0 0 4px">Onset or worsening within a week of the trigger or of new breathing symptoms?</p>
+    <div class="states wrapit" id="onsetseg" role="group" aria-label="Timing" style="margin-top:0"></div>
+    <p class="note" style="margin:6px 0 4px">Imaging</p>
+    <div class="states wrapit" id="imgseg" role="group" aria-label="Imaging" style="margin-top:0"></div>
+    <p class="note" style="margin:6px 0 4px">Is heart failure or fluid overload the main cause of the edema?</p>
+    <div class="states wrapit" id="cardseg" role="group" aria-label="Cardiac cause" style="margin-top:0"></div>
+  </div>
+  <div class="card" id="risk">
+    <p class="label">Trigger (risk factor)</p>
+    <div class="checks" id="riskticks" style="margin-top:0"></div>
+  </div>
+  <div class="card" id="support">
+    <p class="label">Support and oxygen</p>
+    <div class="states wrapit" id="supseg" role="group" aria-label="Respiratory support" style="margin-top:0"></div>
+    <div class="grid grid2">
+      <div class="field"><label for="peep">PEEP or CPAP (cm H2O)</label><input id="peep" data-k="peep" inputmode="decimal" autocomplete="off"></div>
+      <div class="field"><label for="fio2">FiO2 (0.21 to 1, or %)</label><input id="fio2" data-k="fio2" inputmode="decimal" autocomplete="off"></div>
+      <div class="field"><label for="pao2">PaO2 (mm Hg)</label><input id="pao2" data-k="pao2" inputmode="decimal" autocomplete="off"></div>
+      <div class="field"><label for="spo2">SpO2 (%) if no PaO2</label><input id="spo2" data-k="spo2" inputmode="decimal" autocomplete="off"></div>
+    </div>
+    <p class="note" style="margin:10px 0 0">Measure at rest, at least 30 minutes after a change in position, FiO2 or flow.</p>
+  </div>
+  </div>
+  <div id="dx-out">
+    <div id="defout"></div>
+    <div class="card" id="mimics">
+      <p class="label">Mimics · workup that narrows</p>
+      <h2 id="mimhead">When the story does not fit, look for a mimic</h2>
+      <p class="sub" id="mimsub"></p>
+      <p class="note" style="margin:10px 0 4px"><b>Send first:</b> echo and BNP; CT chest; blood count (hemoglobin drop, eosinophils); a full medication history; cultures and respiratory pathogen tests; ANCA, anti-GBM and ANA when no cause is found.</p>
+      <p class="note" style="margin:0 0 4px"><b>Send after:</b> bronchoscopy with lavage in sequential aliquots, cell count and differential, cultures including Pneumocystis, and cytology, when the CT and first tests do not explain it.</p>
+      <p class="note" style="margin:8px 0 0">Tap a result. Causes that no longer fit fade.</p>
+      <div class="states wrapit" id="mimseg" role="group" aria-label="Result"></div>
+      <p class="line1" id="mimsays"></p>
+      <div id="mimout"></div>
+      <p class="whyline"><b>Why:</b> In one series 7.5% of patients meeting ARDS criteria had no common trigger; many had immune, drug or malignant disease, and the steroid-responsive ones did better.</p>
+      <details><summary>More</summary>
+        <p>Gibelin 2016 (two French centers, intubated patients, retrospective): of 50 patients with no common risk factor, 36% had immune disease, 26% drug-induced lung injury, 14% malignancy and 24% no cause found. ICU mortality was 66%; lesions that respond to steroids were linked to survival.</p>
+        <p>Diffuse alveolar hemorrhage: lavage returns get bloodier with each aliquot, or 20% or more of macrophages carry hemosiderin. The second sign is not specific: 7 of 21 patients with biopsy-proven diffuse alveolar damage also met it. Acute eosinophilic pneumonia: more than 25% eosinophils in the lavage, after infection and drugs are excluded.</p>
+        <p>Heart failure and ARDS can coexist: under the global definition ARDS can still be diagnosed with cardiogenic edema if a trigger is present and the edema is not mainly cardiac.</p>
+        <span class="tier">Mimic categories: Gibelin 2016 (observational)</span><span class="tier">Lavage criteria: reviews and case series</span><span class="tier">Test order: expert practice</span>
+      </details>
+    </div>
+  </div>
+</div>
+
+<div class="panel two" id="p-lad" role="tabpanel" aria-labelledby="t-lad">
+  <div id="lad-in">
+  <div class="card" id="numbers">
+    <p class="label">Oxygen and mechanics</p>
+    <p class="note" style="margin:0 0 8px">FiO2, PaO2 and PEEP carry over from Diagnose. Compute tidal volume, plateau and driving pressure on <a href="/vent/#pressures">Ventilator basics</a>.</p>
+    <div class="grid grid2">
+      <div class="field"><label for="fio2b">FiO2</label><input id="fio2b" data-k="fio2" inputmode="decimal" autocomplete="off"></div>
+      <div class="field"><label for="pao2b">PaO2 (mm Hg)</label><input id="pao2b" data-k="pao2" inputmode="decimal" autocomplete="off"></div>
+      <div class="field"><label for="peepb">PEEP (cm H2O)</label><input id="peepb" data-k="peep" inputmode="decimal" autocomplete="off"></div>
+      <div class="field"><label for="plat">Plateau (cm H2O)</label><input id="plat" data-k="plat" inputmode="decimal" autocomplete="off"></div>
+      <div class="field"><label for="ph">pH</label><input id="ph" data-k="ph" inputmode="decimal" autocomplete="off"></div>
+      <div class="field"><label for="paco2">PaCO2 (mm Hg)</label><input id="paco2" data-k="paco2" inputmode="decimal" autocomplete="off"></div>
+    </div>
+  </div>
+  <div class="card" id="course">
+    <p class="label">Course</p>
+    <div class="grid grid2">
+      <div class="field"><label for="dsince">Days since ARDS onset</label><input id="dsince" data-k="dsince" inputmode="decimal" autocomplete="off"></div>
+      <div class="field"><label for="dvent">Days on the ventilator</label><input id="dvent" data-k="dvent" inputmode="decimal" autocomplete="off"></div>
+    </div>
+    <div class="field" style="margin-top:12px"><label for="cause">Cause, for steroid choice</label><select id="cause" data-k="cause"><option value="">Other or not known</option><option value="covid">COVID-19</option><option value="cap">Severe community-acquired pneumonia</option><option value="pjp">Pneumocystis pneumonia with HIV</option></select></div>
+    <div class="checks" id="ladticks" style="grid-template-columns:1fr"></div>
+  </div>
+  </div>
+  <div id="lad-out">
+    <div class="card" id="ladder">
+      <p class="label">The ladder</p>
+      <h2 id="ladhead">Add a step only when the last is not enough</h2>
+      <p class="sub" id="ladsub"></p>
+      <div class="rungs" id="rungs"></div>
+    </div>
+    <div id="rungcards"></div>
+    <div id="extras"></div>
+  </div>
+</div>
+
+<div class="panel" id="p-learn" role="tabpanel" aria-labelledby="t-learn">
+  <div class="pills" id="pills"></div>
+  <div class="card chap" id="learn-edema" data-pill="Leaky lung"><p class="label">1 · Two kinds of edema</p><h2>ARDS is a leak, not a flood</h2><figure class="plate" style="margin-left:0;margin-right:0"><img src="/media/ards/alveoli-ards.webp" width="942" height="572" loading="lazy" alt="Two clusters of alveoli. On the left they are round, open and air-filled with thin walls and capillaries. On the right most are flooded with pink fluid containing white cells, lined by a pink membrane, or collapsed, and only one or two still hold much air."><figcaption>Left: healthy alveoli. Right: ARDS, with flooded and collapsed units. Created with BioRender.com</figcaption></figure><p>Fluid can reach the air spaces because the pressure pushing it is too high, or because the wall holding it back is broken. Tap each.</p><div data-figure="edema" data-state="perm"></div></div>
+  <div class="card chap" id="learn-baby" data-pill="Baby lung"><p class="label">2 · The baby lung</p><h2>The open lung is small</h2><p>In ARDS the breath goes only to the part that is still open, often a fraction of the lung. Tap a breath size.</p><div data-figure="baby" data-state="six"></div><p class="linkrow"><a href="/vent/#learn-size">Size the breath on Ventilator basics</a></p></div>
+  <div class="card chap" id="learn-prone" data-pill="Prone"><p class="label">3 · Prone positioning</p><h2>Turn the patient, move the collapse</h2><figure class="plate" style="margin-left:0;margin-right:0"><img src="/media/ards/prone-ct.webp" width="972" height="406" loading="lazy" alt="Two chest cross-sections like CT slices. Left, labelled supine: the patient lies on the back, spine at the bottom, and the back of both lungs is dense and collapsed in red while the front is dark and full of air. Right, labelled prone: the patient lies face down, spine at the top, the heart rests toward the sternum at the bottom, and only a thin red strip of collapse remains along the front of the lungs."><figcaption>Supine (left): the back of both lungs is collapsed. Prone (right): the back reopens and only a thin strip of the front collapses. Schematic. Created with BioRender.com</figcaption></figure><p>The weight of the heart and the wet lung squeezes the back of the lung when the patient lies on the back. Tap a position.</p><div data-figure="prone" data-state="sup"></div></div>
+  <div class="card chap" id="learn-shunt" data-pill="Vasodilators"><p class="label">4 · Shunt and inhaled vasodilators</p><h2>Send the blood to where the air is</h2><p>Low oxygen in ARDS is mostly shunt: blood passing alveoli that hold no air. Tap a treatment.</p><div data-figure="shunt" data-state="shunt"></div></div>
+  <div class="card chap" id="learn-rv" data-pill="Right ventricle"><p class="label">5 · The right ventricle</p><h2>The thin-walled pump that ARDS loads</h2><p>Collapse, a high CO2 and high airway pressure all raise the resistance the right ventricle pumps against. Tap a state.</p><div data-figure="rv" data-state="norm"></div></div>
+  <div class="card chap" id="learn-def" data-pill="Definitions"><p class="label">6 · Two definitions</p><h2>Berlin 2012 and the global definition</h2><p>Tap a row to see what changed and why.</p><div id="defgrid"></div><p class="line1" id="defsays"></p></div>
+  <div class="card chap" id="trials" data-pill="Trials"><p class="label">7 · Trials</p><h2>The trials behind the ladder</h2><div id="trialbox"></div><div class="row"><button class="btn" id="go-prac">Try the practice cases</button></div></div>
+</div>
+
+<div class="panel" id="p-prac" role="tabpanel" aria-labelledby="t-prac">
+  <div id="practice"></div>
+</div>
+
+<div class="scrim" id="scrim" hidden></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-t" hidden>
+  <div class="sheethead"><h2 id="sheet-t"></h2><button class="xbtn" id="sheet-x">Close</button></div>
+  <div id="sheet-b"></div>
+</div>
+
+<footer>
+  <p><strong>For education only. Not a substitute for clinical judgment.</strong> Built to national and international guidelines. Ventilator numbers (tidal volume, plateau, PEEP tables, oxygen and pH goals) live on Ventilator basics and are linked here, not restated; the prone, paralysis, higher-PEEP and ECMO triggers are the same as on that tool. Protocols for proning, paralysis, inhaled vasodilators and ECMO referral vary, so adjust to your institution and your regional ECMO center. Where the American (ATS 2024) and European (ESICM 2023) guidelines differ, both are shown. Rows marked expert practice come from reviews or trial protocols, not graded guidelines. Evidence tiers are shown as strength and certainty (ATS, ESICM, SCCM) or the source's own grading.</p>
+  <p>Privacy: everything runs in your browser. Nothing you enter is sent anywhere or stored, and there are no analytics. Do not enter names, record numbers, or dates of birth.</p>
+  <p class="mono">Last reviewed: 2026-11-26</p>
+  <p><strong>Sources:</strong> Matthay MA et al., A new global definition of ARDS, Am J Respir Crit Care Med 2024;209:37 · ARDS Definition Task Force (Berlin definition), JAMA 2012;307:2526 · Qadir N et al., ATS clinical practice guideline update on ARDS, Am J Respir Crit Care Med 2024;209:24 · Grasselli G et al., ESICM guidelines on ARDS, Intensive Care Med 2023;49:727 · Fan E et al., ATS/ESICM/SCCM guideline on mechanical ventilation in ARDS, Am J Respir Crit Care Med 2017;195:1253 · Erstad BL et al., SCCM guideline on neuromuscular blockade in ARDS, Crit Care Med 2026;54:634 · Tonna JE et al., ELSO guideline for adult respiratory failure, ASAIO J 2021;67:601 · Gibelin A et al., ARDS mimickers, Intensive Care Med 2016;42:164 · Afessa B, Peters SG, Curr Opin Oncol 2008;20:227 · Maldonado F et al., Eur Respir J 2009;33:1361 · Giovannini-Chami L et al., Orphanet J Rare Dis 2014;9:28 · Mekontso Dessap A et al., acute cor pulmonale in ARDS, Intensive Care Med 2016;42:862 · Gebistorf F et al., inhaled nitric oxide in ARDS, Cochrane Database Syst Rev 2016;CD002787 · Wiedemann HP, Cleve Clin J Med 2008;75:42 · Lim J, Litton E, Crit Care Med 2019;47:1794 · Trials: ARDS Network, N Engl J Med 2000;342:1301 · Brower RG et al., N Engl J Med 2004;351:327 · Wiedemann HP et al. (FACTT), N Engl J Med 2006;354:2564 · Steinberg KP et al., N Engl J Med 2006;354:1671 · Meduri GU et al., Chest 2007;131:954 · Peek GJ et al. (CESAR), Lancet 2009;374:1351 · Papazian L et al. (ACURASYS), N Engl J Med 2010;363:1107 · Guérin C et al. (PROSEVA), N Engl J Med 2013;368:2159 · Ferguson ND et al. (OSCILLATE), N Engl J Med 2013;368:795 · Young D et al. (OSCAR), N Engl J Med 2013;368:806 · Amato MBP et al., N Engl J Med 2015;372:747 · Cavalcanti AB et al. (ART), JAMA 2017;318:1335 · Zhou Y et al., Intensive Care Med 2017;43:1648 · Combes A et al. (EOLIA), N Engl J Med 2018;378:1965 · Moss M et al. (ROSE), N Engl J Med 2019;380:1997 · Villar J et al. (DEXA-ARDS), Lancet Respir Med 2020;8:267 · Barrot L et al. (LOCO2), N Engl J Med 2020;382:999 · Horby P et al. (RECOVERY), N Engl J Med 2021;384:693 · McNamee JJ et al. (REST), JAMA 2021;326:1013 · Dequin PF et al. (CAPE COD), N Engl J Med 2023;388:1931.</p>
+</footer>
+</div>
+
+<script id="engine">
+/* Data and decision engine: no page access here, so the practice cases and the audits run the same code. */
+function r0(n){ return Math.round(n); }
+function r1(n){ return Math.round(n * 10) / 10; }
+function has(v){ return v != null && v !== ''; }
+
+/* Thresholds, each with its source in the decision table. Prone, ECMO, higher-PEEP and plateau marks are identical to /vent/. */
+var T = {
+  pfMild: 300, pfMod: 200, pfSev: 100,          /* Berlin 2012; global definition 2024 */
+  sfMild: 315, sfMod: 235, sfSev: 148, sfMaxSat: 97, /* global definition 2024 */
+  peepMin: 5, hfnoMin: 30,                      /* global definition 2024 */
+  platMax: 30, dpMark: 15,                      /* /vent/: ARDS Network card; driving pressure mark is expert practice */
+  pfProne: 150, fio2Prone: 0.6,                 /* PROSEVA entry; /vent/ */
+  pfEcmo: 80, phEcmo: 7.25, co2Ecmo: 60,        /* ATS 2024 selection text; EOLIA; /vent/ */
+  steroidDays: 14,                              /* ATS 2024; Steinberg 2006 */
+  ventDays: 7,                                  /* ATS 2024 (early, under 7 days); ELSO 2021 relative contraindication */
+  rvDp: 18, rvPf: 150, rvCo2: 48                /* Mekontso Dessap 2016 risk score */
+};
+function fio2Of(v){ if (!has(v)) return null; if (v >= 0.21 && v <= 1) return v; if (v >= 21 && v <= 100) return v / 100; return NaN; }
+function oxy(i){
+  var f = fio2Of(i.fio2);
+  if (f !== null && isNaN(f)) return {bad: 'fio2'};
+  if (has(f) && has(i.pao2) && i.pao2 > 0) return {f: f, pf: r0(i.pao2 / f), by: 'pf'}; /* rounded before comparing, as on /vent/, so the two tools agree at every cut-off */
+  if (has(f) && has(i.spo2)){ if (i.spo2 > T.sfMaxSat) return {f: f, bad: 'sat'}; return {f: f, sf: r0(i.spo2 / f), by: 'sf'}; }
+  return {f: f};
+}
+function bandPf(pf){ return pf <= T.pfSev ? 'severe' : pf <= T.pfMod ? 'moderate' : pf <= T.pfMild ? 'mild' : null; }
+function bandSf(sf){ return sf <= T.sfSev ? 'severe' : sf <= T.sfMod ? 'moderate' : sf <= T.sfMild ? 'mild' : null; }
+
+var ONSET = [['yes','Within a week'],['no','Longer'],['unk','Not sure']];
+var IMG = [['film','Both sides on film or CT'],['us','Both sides on ultrasound'],['no','Not both sides'],['unk','Not done']];
+var CARD = [['no','No'],['part','Contributes, not the main cause'],['main','Yes, the main cause'],['unk','Not assessed']];
+var SUP = [['o2','Oxygen, or high flow under 30 L/min'],['hfno','High flow 30 L/min or more'],['niv','NIV (bilevel)'],['cpap','CPAP'],['inv','Intubated']];
+var RISK = [['pneu','Pneumonia'],['sep','Infection outside the lung, or sepsis'],['asp','Aspiration'],['trauma','Trauma or burn'],['trans','Transfusion'],['shock','Shock'],['panc','Pancreatitis'],['other','Other (inhalation, drowning)'],['none','No trigger found']];
+
+var WHY = {
+  met: 'The definition names a syndrome, not a disease: it finds leaky-lung edema early so lung protection starts, and it sends you looking for the cause.',
+  hfno: 'The global definition counts high flow at 30 L/min or more because it gives a little PEEP; Berlin was written before high flow was common.',
+  none: 'In one series 7.5% of patients meeting ARDS criteria had no common trigger, and many of them had a cause that needs its own treatment.',
+  cardio: 'Edema from high pressure clears with diuresis and treating the heart; calling it ARDS would delay that.',
+  protect: 'Small breaths and a capped plateau protect the small part of the lung that is still open; every other rung sits on top of this one.',
+  noninv: 'High flow reduced intubation compared with ordinary oxygen; none of the noninvasive options has been shown to change survival.',
+  peep: 'PEEP holds open alveoli that collapse at the end of each breath; in moderate to severe ARDS there is more lung to recruit, but too much overstretches open lung and lowers venous return.',
+  fluid: 'Leaky capillaries let fluid into the lung at lower pressures; once the shock was over, a drier strategy gave better oxygenation and fewer days on the ventilator in FACTT.',
+  steroid: 'Steroids damp the inflammation that drives the leak; pooled trials showed fewer deaths and about 4 fewer days on the ventilator.',
+  steroidLate: 'In the one trial of late steroids, the patients started two weeks or more after onset had more deaths.',
+  prone: 'Turning prone reopens the back of the lung, where most of the collapse is, and spreads each breath more evenly.',
+  nmb: 'Paralysis stops strong efforts that add to lung stretch; it helped against deep sedation in earlier trials (mainly ACURASYS) but not against light sedation in the larger ROSE trial.',
+  ivd: 'An inhaled vasodilator reaches only vessels beside alveoli that take air, so blood moves toward the air; the oxygen rises but survival does not.',
+  ecmo: 'When the lung cannot be ventilated safely, the circuit takes over gas exchange so the ventilator can rest the lung.',
+  rv: 'Collapse, a high CO2 and high airway pressure all raise the load on the thin-walled right ventricle, and severe strain went with more deaths.'
+};
+
+function diagnose(i){
+  var o = oxy(i), inv = i.sup === 'inv', niv = i.sup === 'niv' || i.sup === 'cpap', peepOk = has(i.peep) && i.peep >= T.peepMin;
+  var risk = (i.risk || []).filter(function(k){ return k !== 'none'; }), noRisk = (i.risk || []).indexOf('none') >= 0 && !risk.length;
+  function tri(v){ return v === true ? 'met' : v === false ? 'no' : 'unk'; }
+  var g = {}, b = {};
+  g.time = b.time = i.onset === 'yes' ? 'met' : i.onset === 'no' ? 'no' : 'unk';
+  g.img = i.img === 'film' || i.img === 'us' ? 'met' : i.img === 'no' ? 'no' : 'unk';
+  b.img = i.img === 'film' ? 'met' : i.img === 'us' ? 'no' : g.img;
+  g.trig = risk.length ? 'met' : noRisk ? 'no' : 'unk';
+  b.trig = 'na';
+  g.orig = i.card === 'no' ? 'met' : i.card === 'part' ? (risk.length ? 'met' : noRisk ? 'no' : 'unk') : i.card === 'main' ? 'no' : 'unk';
+  b.orig = i.card === 'no' || i.card === 'part' ? 'met' : i.card === 'main' ? 'no' : 'unk';
+  if (i.sup === 'hfno') g.sup = 'met';
+  else if (inv || niv) g.sup = has(i.peep) ? tri(peepOk) : 'unk';
+  else g.sup = i.sup === 'o2' ? 'no' : 'unk';
+  var band = null;
+  if (o.by === 'pf'){ g.ox = b.ox = tri(o.pf <= T.pfMild); band = bandPf(o.pf); }
+  else if (o.by === 'sf'){ g.ox = tri(o.sf <= T.sfMild); b.ox = 'unk'; band = bandSf(o.sf); }
+  else { g.ox = b.ox = 'unk'; }
+  b.sup = inv || niv ? (has(i.peep) ? tri(peepOk) : 'unk') : i.sup ? 'no' : 'unk';
+  if (i.sup === 'cpap' && b.sup === 'met' && o.by === 'pf' && band && band !== 'mild') b.sup = 'no'; /* Berlin: CPAP counts only for mild */
+  var KEYS = ['time','img','orig','trig','sup','ox'];
+  var NAME = {time: 'Timing', img: 'Imaging', orig: 'Origin of edema', trig: 'Trigger', sup: 'Support', ox: 'Oxygen'};
+  var gNo = KEYS.filter(function(k){ return g[k] === 'no'; }), gUnk = KEYS.filter(function(k){ return g[k] === 'unk'; });
+  var bAll = KEYS.every(function(k){ return b[k] === 'met' || b[k] === 'na'; }), bNo = KEYS.filter(function(k){ return b[k] === 'no'; });
+  var gMet = !gNo.length && !gUnk.length;
+  var c = {id: 'def', label: 'Definition', list: [], guards: [], tiers: ['Global definition 2024 and Berlin 2012: consensus definitions, not graded'], chips: [['edema', i.card === 'main' ? 'hydro' : 'perm', 'Two kinds of edema']]};
+  if (o.bad === 'fio2') c.guards.push('Check the FiO2: enter it as a fraction (0.21 to 1.0) or a percent (21 to 100).');
+  if (o.bad === 'sat') c.guards.push('SpO2 is above 97%: the SpO2/FiO2 ratio is not valid there. Lower the FiO2 or send a blood gas.');
+  var sevTxt = inv && band ? ': ' + band : '';
+  if (gMet){ c.head = 'Meets the global definition' + (inv ? (band ? sevTxt : '') : ' (not intubated, so no severity grade)'); c.why = !bAll && bNo.indexOf('sup') >= 0 && i.sup === 'hfno' ? WHY.hfno : WHY.met; }
+  else if (gNo.length === 1 && gNo[0] === 'trig' && !gUnk.length){ c.head = 'Fits ARDS except for a trigger: look for a mimic'; c.why = WHY.none; }
+  else if (gNo.length){ c.head = 'Does not meet the global definition'; c.sub = 'Not met: ' + gNo.map(function(k){ return NAME[k].toLowerCase(); }).join(', ') + '.'; c.why = gNo.indexOf('orig') >= 0 ? WHY.cardio : null; }
+  else { c.head = 'Not enough to decide yet'; c.sub = 'Still needed: ' + gUnk.map(function(k){ return NAME[k].toLowerCase(); }).join(', ') + '.'; c.empty = true; }
+  var bTxt = bAll ? 'Meets Berlin' + (band && o.by === 'pf' ? ': ' + band : '') + '.' : bNo.length ? 'Does not meet Berlin (' + bNo.map(function(k){ return NAME[k].toLowerCase(); }).join(', ') + ').' : 'Berlin: not enough to decide' + (o.by === 'sf' ? '; it needs a PaO2.' : '.');
+  c.sub = (c.sub ? c.sub + ' ' : '') + bTxt + (o.pf ? ' P/F ' + r0(o.pf) + '.' : o.sf ? ' SpO2/FiO2 ' + r0(o.sf) + '.' : '');
+  c.cmp = KEYS.map(function(k){ return [NAME[k], g[k], b[k]]; });
+  if (gMet && inv) c.list.push('Next: the Ladder tab, starting with lung protection on Ventilator basics.');
+  if (gMet && !inv) c.list.push('Not intubated: see the Ladder for support choices, and Oxygen, high flow and NIV for settings.');
+  if (o.by === 'sf' && (gMet || g.ox === 'met')) c.list.push('Send a blood gas: the ladder steps are set by P/F, and pulse oximetry can read falsely high, missing hypoxemia, in darker skin and in shock.');
+  if (i.card === 'part') c.list.push('Heart failure contributing: ARDS can still be diagnosed when a trigger is present and the edema is not mainly cardiac. Treat both.');
+  if (noRisk) c.guards.push('No trigger found: work through the mimics below before treating this as ARDS alone.');
+  c.more = ['Global definition 2024. Not intubated: P/F 300 or less, or SpO2/FiO2 315 or less (SpO2 97% or less), on high flow of 30 L/min or more or NIV/CPAP of at least 5. Intubated: mild over 200 to 300 (SpO2/FiO2 over 235 to 315), moderate over 100 to 200 (over 148 to 235), severe 100 or less (148 or less), on PEEP of at least 5. Imaging may be ultrasound in trained hands. Edema not mainly cardiac and hypoxemia not mainly atelectasis.',
+    'Berlin 2012: film or CT only; P/F only; PEEP of at least 5 on invasive or noninvasive ventilation, with CPAP of at least 5 allowed only for mild; high flow does not count.',
+    'Where blood gases, high flow and ventilators are not routinely available, the global definition accepts SpO2/FiO2 315 or less (SpO2 97% or less) with no PEEP or flow minimum; FiO2 is estimated as 0.21 + 0.03 × oxygen L/min. Above 1,000 m, multiply the ratio by barometric pressure/760.',
+    'Do not use SpO2/FiO2 with suspected methemoglobin or carbon monoxide. If ARDS is likely but the oximeter ratio misses the cut-off, send a blood gas.'];
+  if (!c.guards.length) delete c.guards; if (!c.list.length) delete c.list;
+  return {cards: [c], g: g, b: b, met: gMet, band: band, ox: o, noRisk: noRisk, inv: inv};
+}
+
+/* Mimics: tap a result and the causes that no longer fit fade */
+var MIMICS = [
+  ['cardio','Cardiogenic edema','Echo and BNP; can coexist with ARDS'],
+  ['dah','Diffuse alveolar hemorrhage','Falling hemoglobin; lavage bloodier with each aliquot'],
+  ['aep','Acute eosinophilic pneumonia','Lavage eosinophils over 25%; responds to steroids'],
+  ['drug','Drug-induced lung injury','A new drug with known lung toxicity'],
+  ['immune','Immune lung disease','Vasculitis, connective tissue disease, organizing pneumonia'],
+  ['malig','Malignant infiltration','Lymphangitic or leukemic spread; cytology'],
+  ['infx','Infection not yet found','Pneumocystis, viruses, fungi in the immunocompromised']
+];
+var RESULTS = {
+  echo: {n: 'Echo: poor LV or high filling pressure', says: 'Points to hydrostatic edema. ARDS can still coexist if a trigger is present.', fit: {cardio: 1}},
+  blood: {n: 'Lavage bloodier with each aliquot', says: 'Diffuse alveolar hemorrhage. Send ANCA and anti-GBM to look for vasculitis.', fit: {dah: 1, immune: 1}},
+  eos: {n: 'Lavage eosinophils over 25%', says: 'Acute eosinophilic pneumonia once infection and drugs are excluded; a drug can cause the same picture.', fit: {aep: 1, drug: 1}},
+  sero: {n: 'ANCA or anti-GBM positive', says: 'Immune disease, often with alveolar hemorrhage.', fit: {dah: 1, immune: 1}},
+  cyto: {n: 'Malignant cells on cytology', says: 'Malignant infiltration.', fit: {malig: 1}},
+  bug: {n: 'Pathogen found', says: 'Then this is ARDS with a trigger, not a mimic: treat the infection and climb the ladder.', fit: {infx: 1}},
+  rx: {n: 'New lung-toxic drug', says: 'Stop the drug; drug injury was a quarter of the no-trigger cases in one series.', fit: {drug: 1, aep: 1}}
+};
+function mimicRows(k){
+  var R = RESULTS[k];
+  return MIMICS.map(function(m){ return {name: m[1], why: m[2], st: R ? (R.fit[m[0]] ? 'fav' : 'less') : ''}; });
+}
+
+/* The ladder */
+var TICKS = [['press','On vasopressors'],['persist','Still hypoxemic or fighting the ventilator after optimising settings'],['deep','Deeply sedated (RASS −4 to −5)'],['rvd','Right ventricle dilated on echo'],['contra','A prone caution applies (see the prone step)']];
+var RUNGS = [['protect','Protect the lung'],['peep','PEEP'],['fluids','Conservative fluids'],['steroids','Corticosteroids'],['prone','Prone positioning'],['nmb','Paralysis'],['ivd','Inhaled vasodilator'],['ecmo','ECMO referral']];
+var TAG = {now: 'Now', base: 'Every patient', cons: 'Consider', hold: 'Caution', not: 'Not yet', wait: 'Needs a number'};
+var PRONE_CHECK = ['Enough trained staff, one at the head to hold the tube.', 'Tube secured and its depth noted; suction ready; feeds paused.', 'Lines and drains checked and long enough; ECG leads moved to the back.', 'Eyes protected and face, knees, chest and pelvis padded.', 'A plan for cardiac arrest while prone.'];
+var PRONE_CAUTION = 'Prone cautions (the trial excluded these patients): raised intracranial pressure; unstable spine, pelvis or femur fracture; recent sternotomy, facial or tracheal surgery or facial trauma; massive hemoptysis; an anterior chest tube with an air leak; a mean pressure that cannot be held; pregnancy.';
+
+function ladder(i){
+  var o = oxy(i), sup = i.sup || 'inv', intub = sup === 'inv', pf = o.by === 'pf' ? o.pf : null, f = o.f;
+  var dp = has(i.plat) && has(i.peep) && i.plat > i.peep ? i.plat - i.peep : null;
+  var hyperc = has(i.ph) && has(i.paco2) && i.ph < T.phEcmo && i.paco2 >= T.co2Ecmo;
+  var R = {}, cards = {}, dd = diagnose(i), doubt = dd.g.orig === 'no' || dd.g.trig === 'no';
+  function card(id, st, head, x){ x = x || {}; x.id = 'r-' + id; x.rung = st; x.label = 'Step ' + (RUNGS.map(function(r){ return r[0]; }).indexOf(id) + 1) + ' · ' + RUNGS.filter(function(r){ return r[0] === id; })[0][1]; x.head = head; R[id] = st; cards[id] = x; }
+  var noPf = o.by === 'sf' ? 'Send a blood gas: this step is set by P/F.' : 'Enter FiO2 and PaO2 to place this step.';
+
+  /* 1 */
+  if (!intub) card('protect', 'base', 'Not intubated: high flow over ordinary oxygen', {sub: 'High flow is recommended over conventional oxygen to lower the chance of intubation. No recommendation either way for NIV or CPAP over high flow, except in COVID-19.', links: [['/oxygen-niv/', 'Settings on Oxygen, high flow and NIV']], why: WHY.noninv,
+    list: ['Watch closely for failure and do not delay intubation.', 'Awake proning is suggested only in COVID-19.'],
+    more: ['The remaining steps assume invasive ventilation, except fluids and steroids.'], tiers: ['High flow over conventional oxygen: strong, moderate (ESICM 2023)', 'NIV or CPAP against high flow: no recommendation (ESICM 2023)', 'Awake proning in COVID-19: weak, low (ESICM 2023)']});
+  else {
+    var g1 = [];
+    if (has(i.plat) && i.plat > T.platMax) g1.push('Plateau ' + i.plat + ' is over 30: fix the breath on Ventilator basics before climbing further.');
+    if (dp !== null && dp > T.dpMark) g1.push('Driving pressure ' + r1(dp) + ' is over 15 (an expert-practice mark from observational data): look for a smaller breath or a better PEEP.');
+    card('protect', g1.length ? 'hold' : 'base', g1.length ? 'Fix the breath first' : 'Lung-protective ventilation', {sub: 'Tidal volume by predicted weight, a capped plateau, and the oxygen and pH goals all live on Ventilator basics.' + (dp !== null ? ' Driving pressure now ' + r1(dp) + ' cm H2O.' : ''), guards: g1.length ? g1 : null,
+      links: [['/vent/#size', 'Tidal volume'], ['/vent/#pressures', 'Plateau and driving pressure'], ['/vent/#situation', 'Oxygen and pH goals']], why: WHY.protect, chips: [['baby', 'six', 'The baby lung']],
+      more: ['Do not push the oxygen below the goal on Ventilator basics: in LOCO2 a lower target (PaO2 55 to 70, SpO2 88 to 92%) went with more deaths at 90 days than a liberal one, and five cases of mesenteric ischemia.'],
+      tiers: ['Tidal volume 4 to 8 mL/kg and plateau under 30: strong, moderate (ATS 2017, kept in 2024); strong (ESICM 2023)', 'Driving pressure 15: expert practice']});
+  }
+  /* 2 */
+  var rmList = ['No prolonged high-pressure recruitment maneuvers (35 cm H2O or more held for over a minute).', 'Brief high-pressure maneuvers: the European guideline suggests against routine use; the American panel reached no consensus.'];
+  var rmTiers = ['Against prolonged recruitment maneuvers: strong, moderate (ATS 2024; ESICM 2023)', 'Against routine brief maneuvers: weak (ESICM 2023)'];
+  var peepMore = ['ATS 2024 suggests higher PEEP without recruitment maneuvers in moderate to severe ARDS. ESICM 2023 could not recommend for or against a higher PEEP strategy or PEEP set by mechanics. In mild ARDS there is no recommendation and a possible trend to harm.', 'ART (1,010 patients): recruitment plus PEEP titrated to compliance raised 28-day deaths, 55.3% against 49.3% (hazard ratio 1.20).', 'No consensus on PEEP set by esophageal pressure.'];
+  if (!intub) card('peep', 'not', 'Applies once intubated', {empty: true});
+  else if (pf === null) card('peep', 'wait', 'Higher PEEP for moderate to severe ARDS', {sub: noPf, list: rmList, more: peepMore, tiers: rmTiers});
+  else if (pf <= T.pfMod) card('peep', 'now', 'Higher PEEP, without recruitment maneuvers', {sub: 'P/F ' + r0(pf) + ' is 200 or less: a higher-PEEP strategy is suggested, such as the higher-PEEP table.', links: [['/vent/#situation', 'PEEP/FiO2 tables on Ventilator basics']], list: rmList, why: WHY.peep, more: peepMore, tiers: ['Higher PEEP in moderate to severe ARDS: conditional, low to moderate (ATS 2024); no recommendation (ESICM 2023)'].concat(rmTiers)});
+  else card('peep', 'not', 'Mild ARDS: no recommendation for higher PEEP', {sub: 'P/F ' + r0(pf) + ' is over 200.', list: rmList, more: peepMore, tiers: rmTiers});
+  /* 3 */
+  var flMore = ['FACTT (1,000 patients): conservative against liberal fluids for 7 days. Balance −136 mL against +6,992 mL; ventilator-free days 14.6 against 12.1; deaths at 60 days 25.5% against 28.4% (no difference). Shock was treated as clinicians judged; diuretics were held within 12 hours of a vasopressor or of coming out of shock.', 'One reanalysis suggested the hyperinflammatory subtype did better with more fluid. That is research, not practice yet.'];
+  var flTiers = ['Conservative fluids after shock: trial-based (FACTT); no current graded recommendation (ATS 2024 did not address it; outside ESICM 2023 scope)'];
+  if (i.press) card('fluids', 'hold', 'Treat the shock first', {sub: 'Conservative fluids begin once the patient is off vasopressors.', links: [['/sepsis/', 'Sepsis'], ['/pressors/', 'Pressors']], more: flMore, tiers: flTiers});
+  else card('fluids', 'now', 'Conservative fluids once out of shock', {sub: 'Aim for an even or negative balance with diuretics, watching kidney function and perfusion.', links: [['/fluids/#removal', 'Fluid removal on Fluids']], why: WHY.fluid, more: flMore, tiers: flTiers});
+  /* 4 */
+  var REG = {
+    other: ['Regimens tested in trials (the guideline did not pick one):', 'Dexamethasone 20 mg IV daily on days 1 to 5, then 10 mg daily on days 6 to 10 (DEXA-ARDS: P/F 200 or less on PEEP 10 or more and FiO2 0.5 or more).', 'Methylprednisolone 1 mg/kg/day as an infusion, started within 72 hours, for up to 28 days with a taper (Meduri 2007).'],
+    covid: ['COVID-19: dexamethasone 6 mg daily for up to 10 days (RECOVERY).'],
+    cap: ['Severe community-acquired pneumonia: hydrocortisone 200 mg daily for 4 or 7 days, then tapered to a total of 8 or 14 days (CAPE COD).'],
+    pjp: ['Pneumocystis pneumonia with HIV: use the adjunctive steroid regimen from the HIV opportunistic infection guideline.']
+  };
+  var cause = i.cause || 'other', stMore = ['ATS 2024: 19 trials, 2,790 patients; deaths relative risk 0.84 (0.73 to 0.96), about 4 fewer days on the ventilator; serious hyperglycemia relative risk 1.11. Many trials stopped the steroid at extubation.', 'ESICM 2023 did not cover drugs other than paralytics.', 'Watch glucose; screen for strongyloides and tuberculosis where exposure is likely, and take more care in the immunocompromised.'];
+  var stTiers = ['Corticosteroids in ARDS: conditional, moderate (ATS 2024)'];
+  if (!intub){
+    if (cause !== 'other') card('steroids', 'now', 'Steroid for a cause with proven benefit', {sub: 'Not intubated: ATS 2024 limits steroids to causes known to benefit (COVID-19, severe community-acquired pneumonia); Pneumocystis with HIV follows its own guideline.', list: REG[cause], why: WHY.steroid, more: stMore, tiers: stTiers});
+    else card('steroids', 'not', 'Not intubated: only for causes with proven benefit', {sub: 'COVID-19 or severe community-acquired pneumonia (ATS 2024); Pneumocystis with HIV follows its own guideline. Set the cause above.', more: stMore, tiers: stTiers});
+  } else if (has(i.dsince) && i.dsince >= T.steroidDays) card('steroids', 'hold', 'Day ' + i.dsince + ': starting now may do harm', {sub: 'Starting steroids 2 weeks or more after onset may be associated with harm.', guards: ['A steroid-responsive mimic (eosinophilic or organizing pneumonia) is a different question: treat the mimic.'], why: WHY.steroidLate, more: ['LaSRS (180 patients, ARDS of 7 days or more): no overall benefit; started 14 days or more after onset, methylprednisolone increased deaths at 60 and 180 days.'].concat(stMore), tiers: stTiers});
+  else card('steroids', 'now', 'Corticosteroids are suggested', {sub: (has(i.dsince) ? 'Day ' + i.dsince + ' of ARDS. ' : '') + 'No single agent or dose is recommended; use the regimen that fits the cause.', list: REG[cause], guards: has(i.dsince) ? null : ['Enter the day of illness: starting at 2 weeks or later may do harm.'], why: WHY.steroid, more: stMore, tiers: stTiers});
+  /* 5 */
+  var prMore = ['PROSEVA (466 patients; P/F under 150 on FiO2 0.6 or more and PEEP 5 or more, after 12 to 24 hours of stabilisation; sessions of at least 16 hours): deaths at 28 days 16.0% against 32.8%, at 90 days 23.6% against 41.0%.', 'Stop proning when, at least 4 hours after turning back, P/F stays 150 or more with PEEP 10 or less and FiO2 0.6 or less; or if P/F falls by more than 20% against supine in two sessions in a row; or for a complication such as unplanned extubation or cardiac arrest.', 'The FiO2 0.6 gate is the trial\'s entry rule, as on Ventilator basics. The European guideline asks only for P/F under 150 on PEEP 5 or more after optimising settings.', PRONE_CAUTION];
+  var prTiers = ['Prone 16 hours or more at P/F under 150: strong, high (ESICM 2023)', 'Prone over 12 hours a day in severe ARDS: strong, moderate (ATS 2017, kept in 2024)', 'Checklist and cautions: expert practice'];
+  if (!intub) card('prone', 'not', 'Applies once intubated', {empty: true});
+  else if (pf === null) card('prone', 'wait', 'Prone when P/F stays under 150', {sub: noPf, more: prMore, tiers: prTiers, chips: [['prone', 'sup', 'Supine and prone']]});
+  else if (pf < T.pfProne && has(i.peep) && i.peep < T.peepMin) card('prone', 'cons', 'Optimise first: PEEP is under 5', {sub: 'P/F ' + r0(pf) + ' on PEEP ' + i.peep + ': the trial and the European guideline both required PEEP of at least 5. Optimise and recheck.', why: WHY.prone, more: prMore, tiers: prTiers});
+  else if (pf < T.pfProne && has(f) && f >= T.fio2Prone) card('prone', i.contra ? 'hold' : 'now', i.contra ? 'Prone: weigh the caution first' : 'Turn prone for 16 hours or more a day', {sub: 'P/F ' + r0(pf) + ' on FiO2 ' + r1(f * 100) / 100 + ': prone early, once settings are optimised, in sessions of at least 16 hours.', list: PRONE_CHECK, guards: i.contra ? ['A caution is ticked. The trial excluded these patients: decide with the team whether the benefit outweighs the risk.'] : null, why: WHY.prone, chips: [['prone', 'pro', 'Supine and prone']], more: prMore, tiers: prTiers});
+  else if (pf < T.pfProne) card('prone', 'cons', 'Optimise, then prone if P/F stays under 150', {sub: 'P/F ' + r0(pf) + ' but FiO2 under 0.6: the trial enrolled patients on 0.6 or more after stabilisation. Optimise PEEP and recheck.', why: WHY.prone, chips: [['prone', 'sup', 'Supine and prone']], more: prMore, tiers: prTiers});
+  else card('prone', 'not', 'Not yet: P/F is 150 or more', {sub: 'P/F ' + r0(pf) + '.', more: prMore, tiers: prTiers});
+  /* 6 */
+  var nmMore = ['Guidelines differ. SCCM 2026 suggests it at P/F under 150 with persistent hypoxemia. ATS 2024 suggests it in early (within 48 hours) severe ARDS (P/F 100 or less), for 48 hours at most where possible. ESICM 2023 recommends against routine continuous infusions.', 'ACURASYS (340 patients, against deep sedation): adjusted 90-day hazard ratio 0.68; crude deaths 31.6% against 40.7%. ROSE (1,006 patients, against light sedation): 42.5% against 42.8%.'];
+  var nmTiers = ['P/F under 150 with persistent hypoxemia: conditional (SCCM 2026)', 'Early severe ARDS: conditional, low (ATS 2024)', 'Against routine continuous infusion: strong, moderate (ESICM 2023)'];
+  var nmGuard = 'Never paralyse without deep sedation and analgesia: a paralytic does nothing for awareness or pain.';
+  if (!intub) card('nmb', 'not', 'Applies once intubated', {empty: true});
+  else if (pf === null) card('nmb', 'wait', 'Paralysis for persistent hypoxemia at P/F under 150', {sub: noPf, guards: [nmGuard], more: nmMore, tiers: nmTiers});
+  else if (pf < T.pfProne && i.persist && !i.deep) card('nmb', 'hold', 'Sedate deeply before any paralytic', {sub: 'P/F ' + r0(pf) + ' and still failing, but not yet deeply sedated.', guards: [nmGuard], links: [['/sedation/#paralysis', 'Sedation and paralysis']], why: WHY.nmb, more: nmMore, tiers: nmTiers});
+  else if (pf < T.pfProne && i.persist) card('nmb', 'cons', 'Consider a paralytic, 48 hours at most where possible', {sub: 'P/F ' + r0(pf) + ', still hypoxemic or fighting the ventilator despite deep sedation.', guards: [nmGuard], links: [['/sedation/#paralysis', 'Drug and dose on Sedation']], why: WHY.nmb, more: nmMore, tiers: nmTiers});
+  else card('nmb', 'not', pf < T.pfProne ? 'Only if failing despite optimised settings' : 'Not yet: P/F is 150 or more', {sub: 'P/F ' + r0(pf) + '.' + (pf < T.pfProne ? ' Tick "still hypoxemic or fighting the ventilator" if that is the case.' : ''), guards: [nmGuard], more: nmMore, tiers: nmTiers});
+  /* 7 */
+  var ivMore = ['Cochrane review of inhaled nitric oxide (adults and children): deaths relative risk 1.04 (0.9 to 1.19); P/F up by about 16 at 24 hours; kidney failure relative risk 1.59 (1.17 to 2.16). Inhaled epoprostenol has less trial evidence.', 'ATS 2024 did not address them and notes more data are needed; drugs other than paralytics were outside the European guideline.'];
+  var ivTiers = ['No guideline recommendation; use as a bridge is expert practice'];
+  if (!intub) card('ivd', 'not', 'Applies once intubated', {empty: true});
+  else if (pf !== null && pf < T.pfEcmo) card('ivd', 'cons', 'A bridge only, while proning or ECMO is arranged', {sub: 'May raise the oxygen for hours. It does not change survival and is not a substitute for the steps above.', why: WHY.ivd, chips: [['shunt', 'inh', 'Shunt and vasodilators']], more: ivMore, tiers: ivTiers});
+  else card('ivd', pf === null ? 'wait' : 'not', 'Rescue for oxygenation only', {sub: pf === null ? noPf : 'Not needed at P/F ' + pf + '.', more: ivMore, tiers: ivTiers});
+  /* 8 */
+  var ecList = ['Trial criteria (EOLIA), despite rate up to 35 and plateau 32 or less: P/F under 50 for over 3 hours, under 80 for over 6 hours, or pH under 7.25 with PaCO2 60 or more for over 6 hours.', 'Prone first, unless it cannot be done.', 'Call early enough that the patient can still be moved safely.'];
+  var ecMore = ['What the ECMO center will ask (expert practice): age, days on the ventilator, mode and settings (tidal volume, PEEP, FiO2, plateau, rate), the latest gas and the P/F trend, prone and paralysis and the response, the cause of ARDS, pressors and other organ failure, bleeding risk and any reason anticoagulation is unsafe, comorbidities and baseline function, and goals of care.', 'ELSO: the only absolute contraindication is expected non-recovery with no plan to come off. Relative: brain hemorrhage or major brain injury, bleeding or a reason heparin cannot be given, immunosuppression, older age, and over 7 days of ventilation with plateau over 30 and FiO2 over 0.9.', 'EOLIA (249 patients): deaths at 60 days 35% against 46% (relative risk 0.76, 0.55 to 1.04); 28% of controls crossed over. CESAR (180 patients, referral to an ECMO center): death or severe disability at 6 months 37% against 53%.'];
+  var ecTiers = ['VV-ECMO in selected severe ARDS: conditional, low (ATS 2024)', 'ECMO for patients meeting EOLIA criteria, in an ECMO center: strong, moderate (ESICM 2023)', 'ELSO 2021: consensus'];
+  if (!intub) card('ecmo', 'not', 'Applies once intubated', {empty: true});
+  else if ((pf !== null && pf < T.pfEcmo) || hyperc){
+    var eg = [];
+    if (has(i.dvent) && i.dvent > T.ventDays) eg.push('Over 7 days on the ventilator: at high settings this becomes a relative contraindication. Call now and let the center decide.');
+    card('ecmo', 'now', 'Call an ECMO center', {sub: (pf !== null && pf < T.pfEcmo ? 'P/F ' + r0(pf) + ' is under 80: if it stays there despite the steps above (the trial required more than 6 hours), call an ECMO center.' : 'pH ' + i.ph + ' with PaCO2 ' + i.paco2 + ': if it persists despite best ventilation, call an ECMO center.') + ' Referral is for selected patients early in the illness (within about 7 days).', list: ecList, guards: eg.length ? eg : null, why: WHY.ecmo, more: ecMore, tiers: ecTiers});
+  } else card('ecmo', pf === null ? 'wait' : 'not', 'ECMO criteria not met', {sub: pf === null ? noPf : 'P/F ' + r0(pf) + (hyperc ? '' : '; no severe hypercapnia entered') + '.', list: ecList.slice(0, 1), more: ecMore, tiers: ecTiers});
+
+  /* Nothing to place yet, or the diagnosis is in doubt: do not light treatment rungs */
+  function setSt(k, st){ R[k] = st; cards[k].rung = st; }
+  if (pf === null && o.by !== 'sf'){ ['fluids','steroids'].forEach(function(k){ if (R[k] === 'now' || (k === 'fluids' && R[k] === 'hold')) setSt(k, 'wait'); }); }
+  if (doubt && R.steroids === 'now'){ setSt('steroids', 'wait'); cards.steroids.guards = (cards.steroids.guards || []).concat(['Diagnose flags cardiac edema or no trigger: settle whether this is ARDS first. Some mimics need steroids, others need something else.']); }
+  /* Extras */
+  var ex = [];
+  var rvf = [];
+  if ((i.risk || []).indexOf('pneu') >= 0) rvf.push('pneumonia as the cause');
+  if (dp !== null && dp >= T.rvDp) rvf.push('driving pressure ' + r1(dp) + ' (18 or more)');
+  if (pf !== null && pf < T.rvPf) rvf.push('P/F ' + r0(pf) + ' (under 150)');
+  if (has(i.paco2) && i.paco2 >= T.rvCo2) rvf.push('PaCO2 ' + i.paco2 + ' (48 or more)');
+  var rvOn = i.rvd || rvf.length >= 2;
+  ex.push({id: 'r-rv', label: 'Protect the right ventricle', rung: rvOn ? (i.rvd ? 'hold' : 'cons') : 'not', head: i.rvd ? 'Acute cor pulmonale: unload the right ventricle' : rvOn ? rvf.length + ' of 4 risk factors for right ventricular strain' : 'Right ventricle: no flags entered',
+    sub: rvf.length ? 'Present: ' + rvf.join('; ') + '.' : 'Risk factors: pneumonia, driving pressure 18 or more, P/F under 150, PaCO2 48 or more.',
+    list: rvOn ? ['Keep driving pressure and plateau as low as the lung allows.', 'Avoid a high CO2 where you can; do not raise PEEP beyond what recruits lung.', 'Prone: it often unloads the right ventricle.', 'Echo to recheck; avoid fluid boluses that dilate the RV further.'] : null,
+    why: rvOn ? WHY.rv : null, chips: [['rv', i.rvd ? 'acp' : 'norm', 'The right ventricle']],
+    more: ['Mekontso Dessap 2016 (752 patients, moderate to severe ARDS, transesophageal echo): acute cor pulmonale in 22%. Each risk factor counts one point. Severe cor pulmonale (RV/LV area ratio 1 or more with septal dyskinesia) independently predicted death; prone position was protective.'],
+    tiers: ['Risk factors: observational (Mekontso Dessap 2016)', 'Actions: expert practice']});
+  ex.push({id: 'avoid', label: 'Not recommended', head: 'Three things that did harm or nothing', rung: 'none',
+    list: ['High-frequency oscillation: OSCILLATE stopped early with more deaths, 47% against 35% in hospital (relative risk 1.33); OSCAR found no difference at 30 days (41.7% against 41.1%).', 'Extracorporeal CO2 removal outside a trial: REST (acute hypoxemic respiratory failure) found no benefit, 41.5% against 39.5% at 90 days, with serious adverse events in 31% against 9%.', 'Prolonged recruitment maneuvers: ART, 55.3% against 49.3% at 28 days.'],
+    tiers: ['Against routine HFOV: strong, high (ATS 2017)', 'Against ECCO2R outside trials: strong (ESICM 2023)', 'Against prolonged recruitment maneuvers: strong, moderate (ATS 2024; ESICM 2023)']});
+  ex.push({id: 'aprv', label: 'APRV', head: 'Airway pressure release ventilation: unproven', rung: 'none', sub: 'A long high-pressure phase with brief releases. Settings are not given here: use it only where the team knows the mode.',
+    list: ['One single-center trial (138 patients): more ventilator-free days (median 19 against 2); ICU deaths 19.7% against 34.3% (not significant).', 'A meta-analysis of 7 small trials (412 patients, acute hypoxemic respiratory failure): deaths relative risk 0.67 (0.48 to 0.94); the authors call for larger trials.'],
+    tiers: ['No recommendation in ATS 2024 or ESICM 2023']});
+  ex.push({id: 'recheck', label: 'After each step', head: 'Recheck before the next rung', rung: 'none',
+    list: ['Blood gas at rest, at least 30 minutes after a change in position or FiO2.', 'Plateau after every change in tidal volume or PEEP, on Ventilator basics.', 'Name what would make you climb, and what would make you step down, at each review.'], tiers: ['30-minute rule: global definition 2024', 'Review plan: expert practice']});
+
+  var order = RUNGS.map(function(r){ return r[0]; }), top = null;
+  order.forEach(function(k){ if (R[k] === 'now' || R[k] === 'hold' || R[k] === 'cons') top = k; });
+  var head = !intub ? 'Not intubated: support, fluids and cause' : top ? 'Highest step now: ' + RUNGS[order.indexOf(top)][1] : 'Start with lung protection';
+  var sub = (!i.sup ? 'Assuming invasive ventilation; set the support on Diagnose. ' : '') + (doubt ? 'Diagnose flags cardiac edema or no trigger. ' : '') + (pf !== null ? 'P/F ' + r0(pf) + (intub && bandPf(pf) ? ', ' + bandPf(pf) : '') + '.' : o.by === 'sf' ? 'SpO2/FiO2 ' + r0(o.sf) + ': send a blood gas to place the steps.' : 'Enter FiO2 and PaO2 to light the steps.');
+  return {rungs: order.map(function(k){ return {id: k, n: RUNGS[order.indexOf(k)][1], st: R[k]}; }), cards: order.map(function(k){ return cards[k]; }), extras: ex, head: head, sub: sub, top: top, pf: pf, dp: dp};
+}
+
+var TRIALS = [
+  {q: 'Do smaller breaths save lives? (ARMA)', d: 'Randomized, 861 patients; 6 mL/kg predicted weight with plateau 30 or less against 12 mL/kg.', r: 'Deaths 31.0% against 39.8%.', c: 'Made 6 mL/kg predicted weight the standard.', cite: 'ARDS Network. N Engl J Med 2000;342:1301', doi: '10.1056/NEJM200005043421801'},
+  {q: 'Higher or lower PEEP? (ALVEOLI)', d: 'Randomized, 549 patients, the two PEEP/FiO2 tables.', r: 'Deaths 24.9% with lower PEEP against 27.5% with higher (no difference).', c: 'Neither table clearly better; higher PEEP is suggested only in moderate to severe disease.', cite: 'Brower RG et al. N Engl J Med 2004;351:327', doi: '10.1056/NEJMoa032193'},
+  {q: 'Dry or wet? (FACTT)', d: 'Randomized, 1,000 patients; conservative against liberal fluid protocol for 7 days, not applied during shock.', r: '7-day balance −136 against +6,992 mL; ventilator-free days 14.6 against 12.1; deaths at 60 days 25.5% against 28.4% (no difference).', c: 'Conservative fluids once shock has resolved.', cite: 'Wiedemann HP et al. N Engl J Med 2006;354:2564', doi: '10.1056/NEJMoa062200'},
+  {q: 'Early paralysis? (ACURASYS and ROSE)', d: 'ACURASYS: 340 patients, P/F under 150, cisatracurium for 48 hours against deep sedation. ROSE: 1,006 patients, against light sedation.', r: 'ACURASYS: adjusted 90-day hazard ratio 0.68 (0.48 to 0.98); crude deaths 31.6% against 40.7%. ROSE: 42.5% against 42.8%.', c: 'Paralysis moved from routine to selective, which is why guidelines differ.', cite: 'Papazian L et al. N Engl J Med 2010;363:1107', doi: '10.1056/NEJMoa1005372'},
+  {q: 'Does proning save lives? (PROSEVA)', d: 'Randomized, 466 patients with P/F under 150 on FiO2 0.6 or more; sessions of at least 16 hours.', r: 'Deaths at 28 days 16.0% against 32.8% (hazard ratio 0.39, 0.25 to 0.63).', c: 'Proning became standard at P/F under 150. One trial, in experienced centers.', cite: 'Guérin C et al. N Engl J Med 2013;368:2159', doi: '10.1056/NEJMoa1214103'},
+  {q: 'Oscillation? (OSCILLATE and OSCAR)', d: 'OSCILLATE: 548 patients, stopped early. OSCAR: 795 patients.', r: 'OSCILLATE: in-hospital deaths 47% against 35% (relative risk 1.33, 1.09 to 1.64). OSCAR: 30-day deaths 41.7% against 41.1%.', c: 'High-frequency oscillation is no longer used routinely in adults.', cite: 'Ferguson ND et al. N Engl J Med 2013;368:795', doi: '10.1056/NEJMoa1215554'},
+  {q: 'Does driving pressure predict death? (secondary analysis)', d: 'Pooled data from 3,562 patients in 9 trials.', r: 'Each 7 cm H2O more: relative risk of death 1.41 (1.31 to 1.51).', c: 'An association, not proof that lowering it saves lives.', cite: 'Amato MBP et al. N Engl J Med 2015;372:747', doi: '10.1056/NEJMsa1410639'},
+  {q: 'Open the lung by force? (ART)', d: 'Randomized, 1,010 patients; recruitment maneuver plus PEEP titrated to compliance against low PEEP.', r: 'Deaths at 28 days 55.3% against 49.3% (hazard ratio 1.20, 1.01 to 1.42); more barotrauma.', c: 'Prolonged recruitment maneuvers are recommended against.', cite: 'Cavalcanti AB et al. JAMA 2017;318:1335', doi: '10.1001/jama.2017.14171'},
+  {q: 'ECMO for the most severe? (CESAR and EOLIA)', d: 'CESAR: 180 patients referred to an ECMO center. EOLIA: 249 patients meeting strict criteria.', r: 'CESAR: death or severe disability at 6 months 37% against 53%. EOLIA: deaths at 60 days 35% against 46% (relative risk 0.76, 0.55 to 1.04), 28% of controls crossed over.', c: 'Together, the basis for early referral of selected patients.', cite: 'Combes A et al. N Engl J Med 2018;378:1965', doi: '10.1056/NEJMoa1800385'},
+  {q: 'Dexamethasone in ARDS? (DEXA-ARDS)', d: 'Randomized, open label, 277 patients with P/F 200 or less on PEEP 10 or more and FiO2 0.5 or more; dexamethasone 20 mg for 5 days then 10 mg for 5 days. Stopped early for slow enrollment.', r: 'Deaths at 60 days 21% against 36%; 4.8 more ventilator-free days.', c: 'One of the regimens behind the 2024 steroid recommendation.', cite: 'Villar J et al. Lancet Respir Med 2020;8:267', doi: '10.1016/S2213-2600(19)30417-5'},
+  {q: 'How low should the oxygen go? (LOCO2)', d: 'Randomized, 205 patients; PaO2 55 to 70 (SpO2 88 to 92%) against 90 to 105 (SpO2 96% or more). Stopped early.', r: 'Deaths at 28 days 34.3% against 26.5% (not significant); at 90 days 44.4% against 30.4%; five mesenteric ischemia events, all with the lower target.', c: 'No reason to go below the usual ARDS oxygen goal.', cite: 'Barrot L et al. N Engl J Med 2020;382:999', doi: '10.1056/NEJMoa1916431'},
+  {q: 'Remove CO2 to ventilate less? (REST)', d: 'Randomized, 412 patients with acute hypoxemic respiratory failure; stopped early.', r: 'Deaths at 90 days 41.5% against 39.5%; serious adverse events 31% against 9%, including brain hemorrhage.', c: 'Extracorporeal CO2 removal is kept to trials.', cite: 'McNamee JJ et al. JAMA 2021;326:1013', doi: '10.1001/jama.2021.13374'}
+];
+
+/* Practice cases: each runs through diagnose() and ladder(). */
+var CASES = [
+  {t: 'Pneumonia on high flow', s: 'Woman, 58, two days of pneumonia. High flow at 50 L/min, FiO2 0.6, SpO2 92%. Opacities on both sides of the film. Echo normal.', q: 'Is this ARDS, and by which definition?', i: {onset:'yes', img:'film', card:'no', risk:['pneu'], sup:'hfno', fio2:0.6, spo2:92}, p: 'SpO2/FiO2 153 on high flow of 30 L/min or more: ARDS by the global definition, not by Berlin. Not intubated, so there is no severity grade. High flow over ordinary oxygen; send a blood gas.'},
+  {t: 'Day 1 after intubation', s: 'Man, 64, sepsis from a urinary source, intubated overnight. FiO2 0.7, PEEP 12, PaO2 84. Plateau 26. Off pressors this morning.', q: 'Which steps apply today?', i: {onset:'yes', img:'film', card:'no', risk:['sep'], sup:'inv', fio2:0.7, peep:12, pao2:84, plat:26, dsince:1, dvent:1}, p: 'P/F 120: moderate. Higher PEEP, a steroid, conservative fluids now that he is off pressors, and prone for 16 hours or more on FiO2 0.6 or more. Paralysis only if he keeps failing despite deep sedation.'},
+  {t: 'After two prone sessions', s: 'Day 3. Prone twice, paralysed and deeply sedated. FiO2 1.0, PaO2 70 for 8 hours. Rate 35, plateau 30, PEEP 16.', q: 'What next?', i: {onset:'yes', img:'film', card:'no', risk:['pneu'], sup:'inv', fio2:1.0, peep:16, pao2:70, plat:30, dsince:3, dvent:3, persist:true, deep:true}, p: 'P/F 70 for more than 6 hours despite the steps above: call an ECMO center now, while he is in the first week. An inhaled vasodilator can bridge the transfer; it will not change survival.'},
+  {t: 'New smoker, no trigger', s: 'Man, 24, started smoking three weeks ago. Fever, hypoxemia, opacities on both sides. Intubated, FiO2 0.6, PEEP 10, PaO2 90. No infection found; echo normal.', q: 'What test settles it?', i: {onset:'yes', img:'film', card:'no', risk:['none'], sup:'inv', fio2:0.6, peep:10, pao2:90}, res: 'eos', p: 'No trigger, so look for a mimic. Bronchoscopy: lavage eosinophils over 25% point to acute eosinophilic pneumonia, which responds to steroids.'},
+  {t: 'Still on the ventilator at day 16', s: 'ARDS from aspiration, now day 16. FiO2 0.5, PEEP 10, PaO2 90. The team asks about starting steroids.', q: 'Start them?', i: {onset:'yes', img:'film', card:'no', risk:['asp'], sup:'inv', fio2:0.5, peep:10, pao2:90, dsince:16, dvent:16}, p: 'Starting more than 2 weeks after onset may do harm. The exception is a steroid-responsive mimic, which would need its own workup.'},
+  {t: 'High CO2 and a big right ventricle', s: 'Pneumonia ARDS, day 2. FiO2 0.8, PEEP 14, PaO2 88, plateau 33, pH 7.22, PaCO2 62. Echo: dilated RV, flattened septum.', q: 'What does the right ventricle change?', i: {onset:'yes', img:'film', card:'no', risk:['pneu'], sup:'inv', fio2:0.8, peep:14, pao2:88, plat:33, ph:7.22, paco2:62, dsince:2, dvent:2, rvd:true}, p: 'All four risk factors and a dilated RV. Fix the plateau first on Ventilator basics, prone (it unloads the RV), and avoid fluid boluses. pH under 7.25 with PaCO2 60 or more: if it persists despite best ventilation, call an ECMO center.'}
+];
+</script>
+
+<script id="figures">
+/* Figures: plain SVG strings in the shared colour names. Every label is in the decision table. */
+var FS = 'font-family:var(--sans)', FM = 'font-family:var(--mono)';
+function svgOpen(vb, label){ return '<svg viewBox="' + vb + '" role="img" aria-label="' + label + '" class="fig">'; }
+function tx(x, y, t, o){ o = o || {}; return '<text x="' + x + '" y="' + y + '" text-anchor="' + (o.a || 'middle') + '" style="' + (o.sans ? FS : FM) + ';font-size:' + (o.s || 11) + 'px;font-weight:' + (o.w || 400) + ';fill:' + (o.c || 'var(--ink)') + '">' + t + '</text>'; }
+function arrow(x1, y1, x2, y2, c){ var a = Math.atan2(y2 - y1, x2 - x1), h = 6; return '<line x1="' + x1 + '" y1="' + y1 + '" x2="' + x2 + '" y2="' + y2 + '" stroke="' + c + '" stroke-width="2"/><path d="M' + x2 + ' ' + y2 + 'L' + r1(x2 - h * Math.cos(a - 0.5)) + ' ' + r1(y2 - h * Math.sin(a - 0.5)) + 'L' + r1(x2 - h * Math.cos(a + 0.5)) + ' ' + r1(y2 - h * Math.sin(a + 0.5)) + 'Z" fill="' + c + '"/>'; }
+
+var EDEMA = {
+  norm: {n: 'Normal', line: 'A thin, intact wall keeps fluid in the capillary. The air space is dry.'},
+  hydro: {n: 'High pressure', line: 'Hydrostatic edema: high capillary pressure (heart failure, overload) pushes watery, protein-poor fluid through an intact wall. It clears quickly once the pressure falls.'},
+  perm: {n: 'Leaky wall (ARDS)', line: 'Permeability edema: inflammation breaks the wall, so protein-rich fluid and white cells pour in at normal pressure, and a hyaline membrane lines the air space.'}
+};
+function edemaSVG(k){
+  var s = svgOpen('0 0 360 230', 'Alveolus over a capillary: ' + EDEMA[k].n), wet = k !== 'norm';
+  s += '<rect x="40" y="26" width="280" height="104" rx="34" fill="var(--card)" stroke="var(--ink)" stroke-width="1.5"/>';
+  s += tx(180, 18, 'air space (alveolus)', {s: 11, c: 'var(--muted)'});
+  if (wet) s += '<path d="M41 ' + (k === 'perm' ? 78 : 98) + 'H319V96Q319 130 285 130H75Q41 130 41 96Z" fill="var(--hrt-vein)" opacity=".75"/>';
+  if (k === 'perm'){
+    s += '<path d="M56 60Q60 40 90 34H270Q300 40 304 60" fill="none" stroke="var(--warn)" stroke-width="4"/>' + tx(180, 50, 'hyaline membrane', {s: 10.5, c: 'var(--warn)', w: 600});
+    [[80,104],[130,112],[200,100],[250,114],[290,104],[160,92]].forEach(function(p){ s += '<circle cx="' + p[0] + '" cy="' + p[1] + '" r="3" fill="var(--warn)"/>'; });
+    [[110,96],[230,100]].forEach(function(p){ s += '<circle cx="' + p[0] + '" cy="' + p[1] + '" r="7" fill="var(--card)" stroke="var(--accent)" stroke-width="2"/>'; });
+    s += tx(180, 124, 'protein and white cells', {s: 10.5, w: 600});
+  } else if (k === 'hydro') s += tx(180, 120, 'watery, little protein', {s: 10.5, w: 600});
+  else s += tx(180, 84, 'dry', {s: 11, c: 'var(--muted)'});
+  s += k === 'perm' ? '<path d="M40 138H110M130 138H220M240 138H320" stroke="var(--ink)" stroke-width="3"/>' : '<line x1="40" y1="138" x2="320" y2="138" stroke="var(--ink)" stroke-width="3"/>';
+  s += tx(334, 142, 'wall', {a: 'start', s: 10.5, c: 'var(--muted)'});
+  s += '<rect x="40" y="150" width="280" height="40" rx="20" fill="var(--badbg)" stroke="var(--bad)" stroke-width="1.5"/>';
+  s += tx(180, 175, 'capillary · ' + (k === 'hydro' ? 'pressure high' : 'pressure normal'), {s: 11, w: 600, c: 'var(--bad)'});
+  if (k === 'hydro') [90, 180, 270].forEach(function(x){ s += arrow(x, 160, x, 112, 'var(--accent)'); });
+  if (k === 'perm') [120, 230].forEach(function(x){ s += arrow(x, 160, x, 128, 'var(--accent)'); });
+  s += tx(180, 214, k === 'hydro' ? 'fluid pushed through an intact wall' : k === 'perm' ? 'fluid leaks through gaps in the wall' : 'no fluid crosses', {s: 10.5, c: 'var(--muted)'});
+  return s + '</svg>';
+}
+
+var BABY = {
+  healthy: {n: 'Healthy lung', line: 'The whole lung takes the breath, so each part stretches a little.'},
+  six: {n: 'ARDS, 6 mL/kg', line: 'Most of the back of the lung is flooded or collapsed. A breath sized to predicted weight still lands on the small open part, but the stretch stays moderate.'},
+  twelve: {n: 'ARDS, 12 mL/kg', line: 'The same small open lung now takes twice the volume: it overstretches, and the stretch itself inflames it. This is what ARMA showed to cost lives.'}
+};
+function babySVG(k){
+  var s = svgOpen('0 0 360 230', 'Lung cross-section: ' + BABY[k].n), sick = k !== 'healthy';
+  s += tx(180, 16, 'front of the chest', {s: 10.5, c: 'var(--muted)'});
+  s += '<ellipse cx="180" cy="98" rx="150" ry="74" fill="' + (sick ? 'var(--hrt-surface)' : 'var(--card)') + '" stroke="var(--ink)" stroke-width="1.5"/>';
+  if (sick){
+    var rx = k === 'twelve' ? 120 : 104, ry = k === 'twelve' ? 34 : 28;
+    s += '<ellipse cx="180" cy="62" rx="' + rx + '" ry="' + ry + '" fill="var(--card)" stroke="' + (k === 'twelve' ? 'var(--warn)' : 'var(--accent)') + '" stroke-width="' + (k === 'twelve' ? 3 : 2) + '"/>';
+    s += tx(180, 66, k === 'twelve' ? 'open lung, overstretched' : 'open lung (the baby lung)', {s: 11, w: 600, c: k === 'twelve' ? 'var(--warn)' : 'var(--accent)'});
+    s += tx(180, 132, 'flooded or collapsed', {s: 11, w: 600});
+  } else s += tx(180, 102, 'all of the lung takes air', {s: 11, w: 600});
+  s += tx(180, 186, 'back of the chest', {s: 10.5, c: 'var(--muted)'});
+  var w = k === 'healthy' ? 60 : k === 'six' ? 130 : 250;
+  s += tx(40, 208, 'stretch on open lung', {a: 'start', s: 10.5, c: 'var(--muted)'});
+  s += '<rect x="40" y="214" width="280" height="10" rx="5" fill="var(--fill)"/><rect x="40" y="214" width="' + w + '" height="10" rx="5" fill="' + (k === 'twelve' ? 'var(--warn)' : 'var(--accent)') + '"/>';
+  s += tx(320, 208, 'illustrative', {a: 'end', s: 10.5, c: 'var(--muted)'});
+  return s + '</svg>';
+}
+
+var PRONE = {
+  sup: {n: 'On the back', line: 'Supine, the weight of the heart and the wet lung presses on the back of the lung, the largest part, so it collapses; the breath goes to the smaller front.'},
+  pro: {n: 'Prone', line: 'Prone, the heart rests on the sternum and the large back of the lung reopens. Less lung collapses, the breath spreads more evenly, and the right ventricle is often unloaded.'}
+};
+function proneSVG(k){
+  var s = svgOpen('0 0 360 230', 'Chest cross-section: ' + PRONE[k].n), sup = k === 'sup';
+  s += tx(180, 16, sup ? 'front (up)' : 'back (up)', {s: 10.5, c: 'var(--muted)'});
+  s += '<ellipse cx="180" cy="106" rx="150" ry="78" fill="var(--card)" stroke="var(--ink)" stroke-width="1.5"/>';
+  s += sup ? '<path d="M32 112Q180 134 328 112Q322 168 180 184Q38 168 32 112Z" fill="var(--hrt-surface)"/>'
+           : '<path d="M66 158Q180 172 294 158Q256 180 180 184Q104 180 66 158Z" fill="var(--hrt-surface)"/>';
+  s += '<ellipse cx="' + (sup ? 196 : 196) + '" cy="' + (sup ? 92 : 128) + '" rx="34" ry="24" fill="var(--hrt-muscle)"/>' + tx(196, sup ? 96 : 132, 'heart', {s: 10.5, w: 600, c: 'var(--card)'});
+  s += tx(110, sup ? 60 : 78, sup ? 'open' : 'open, reopened', {s: 11, w: 600, c: 'var(--accent)'});
+  s += tx(180, sup ? 160 : 176, sup ? 'back: collapsed' : 'front: less collapse', {s: 11, w: 600});
+  s += tx(180, 202, sup ? 'back (down)' : 'front (down)', {s: 10.5, c: 'var(--muted)'});
+  s += arrow(340, 60, 340, 150, 'var(--muted)') + tx(346, 52, 'gravity', {a: 'end', s: 10.5, c: 'var(--muted)'});
+  s += tx(180, 224, 'schematic, not to scale', {s: 10.5, c: 'var(--muted)'});
+  return s + '</svg>';
+}
+
+var SHUNT = {
+  shunt: {n: 'Shunt', vo: 16, vf: 12, out: 'low', line: 'Blood passing the flooded alveolus meets no air and leaves without oxygen. Hypoxic vasoconstriction narrows that vessel a little, which limits the damage.'},
+  iv: {n: 'Vasodilator by vein', vo: 16, vf: 22, out: 'lower', line: 'Given by vein, a vasodilator opens vessels everywhere, including the ones squeezed beside flooded alveoli: more blood skips the air, and the blood pressure can fall.'},
+  inh: {n: 'Inhaled vasodilator', vo: 24, vf: 10, out: 'higher', line: 'Inhaled, the drug reaches only alveoli that take air. Their vessels open, blood moves toward the air, and the oxygen rises. In trials, survival did not change.'}
+};
+function shuntSVG(k){
+  var d = SHUNT[k], s = svgOpen('0 0 360 230', 'Two alveoli and their blood flow: ' + d.n);
+  s += '<circle cx="100" cy="66" r="48" fill="var(--card)" stroke="var(--ink)" stroke-width="1.5"/>' + tx(100, 62, 'takes air', {s: 11, w: 600}) + (k === 'inh' ? tx(100, 78, 'drug arrives', {s: 10.5, c: 'var(--accent)'}) : '');
+  s += '<circle cx="260" cy="66" r="48" fill="var(--hrt-vein)" stroke="var(--ink)" stroke-width="1.5"/>' + tx(260, 70, 'flooded', {s: 11, w: 600});
+  s += '<rect x="56" y="' + (130 - d.vo / 2) + '" width="88" height="' + d.vo + '" rx="' + d.vo / 2 + '" fill="var(--hrt-art)"/>';
+  s += '<rect x="216" y="' + (130 - d.vf / 2) + '" width="88" height="' + d.vf + '" rx="' + d.vf / 2 + '" fill="var(--hrt-vein)" stroke="var(--hrt-line)"/>';
+  s += tx(100, 160, d.vo > 18 ? 'more flow' : 'flow', {s: 10.5, c: 'var(--muted)'}) + tx(260, 160, d.vf > 18 ? 'more flow' : d.vf < 12 ? 'less flow' : 'flow, narrowed', {s: 10.5, c: 'var(--muted)'});
+  s += tx(100, 176, 'leaves with oxygen', {s: 10.5, c: 'var(--muted)'}) + tx(260, 176, 'leaves without', {s: 10.5, c: 'var(--muted)'});
+  var w = d.out === 'low' ? 140 : d.out === 'lower' ? 100 : 200;
+  s += tx(40, 202, 'oxygen in the mixed blood', {a: 'start', s: 10.5, c: 'var(--muted)'});
+  s += '<rect x="40" y="210" width="280" height="10" rx="5" fill="var(--fill)"/><rect x="40" y="210" width="' + w + '" height="10" rx="5" fill="' + (d.out === 'lower' ? 'var(--warn)' : 'var(--accent)') + '"/>';
+  s += tx(320, 202, 'illustrative', {a: 'end', s: 10.5, c: 'var(--muted)'});
+  return s + '</svg>';
+}
+
+var RVS = {
+  norm: {n: 'Normal', line: 'The right ventricle is a thin crescent wrapped around a round left ventricle.'},
+  acp: {n: 'Acute cor pulmonale', line: 'Against high resistance the right ventricle dilates and pushes the septum toward the left: the left ventricle becomes D-shaped and fills less. Defined in the study as septal dyskinesia with an RV/LV area ratio over 0.6; 1 or more is severe.'}
+};
+function rvSVG(k){
+  var s = svgOpen('0 0 360 230', 'Short-axis view of the ventricles: ' + RVS[k].n), a = k === 'acp';
+  s += a ? '<path d="M202 40C120 30 40 70 40 120C40 170 120 206 202 196Z" fill="var(--hrt-cavity)" stroke="var(--hrt-line)" stroke-width="2"/>'
+         : '<path d="M170 52C120 52 80 84 80 116C80 150 120 178 170 178C150 150 148 84 170 52Z" fill="var(--hrt-cavity)" stroke="var(--hrt-line)" stroke-width="2"/>';
+  s += a ? '<path d="M204 44C264 48 302 80 302 118C302 158 264 192 204 192Z" fill="var(--hrt-muscle)" stroke="var(--hrt-line)" stroke-width="2"/><path d="M218 74C250 78 274 96 274 118C274 142 250 162 218 164Z" fill="var(--hrt-cavity)"/>'
+         : '<circle cx="222" cy="116" r="70" fill="var(--hrt-muscle)" stroke="var(--hrt-line)" stroke-width="2"/><circle cx="222" cy="116" r="44" fill="var(--hrt-cavity)"/>';
+  s += tx(a ? 110 : 120, a ? 124 : 120, 'RV', {s: 12, w: 600}) + tx(a ? 240 : 222, a ? 122 : 120, 'LV', {s: 12, w: 600});
+  s += tx(a ? 196 : 162, a ? 222 : 200, a ? 'septum flattened toward the LV' : 'septum curves into the RV', {s: 10.5, c: 'var(--muted)'});
+  s += tx(180, 18, a ? 'RV dilated · LV D-shaped' : 'normal shapes', {s: 11, w: 600, c: a ? 'var(--warn)' : 'var(--ink)'});
+  return s + '</svg>';
+}
+
+var FIGS = {
+  edema: {t: 'Two kinds of edema', states: ['norm','hydro','perm'], data: EDEMA, svg: edemaSVG},
+  baby: {t: 'The baby lung', states: ['healthy','six','twelve'], data: BABY, svg: babySVG},
+  prone: {t: 'Supine and prone', states: ['sup','pro'], data: PRONE, svg: proneSVG},
+  shunt: {t: 'Shunt and vasodilators', states: ['shunt','iv','inh'], data: SHUNT, svg: shuntSVG},
+  rv: {t: 'The right ventricle', states: ['norm','acp'], data: RVS, svg: rvSVG}
+};
+
+var DEFROWS = [
+  ['Timing', 'Within 1 week of a known insult or new symptoms', 'Within 1 week of the risk factor or new symptoms', 'Unchanged.'],
+  ['Imaging', 'Film or CT', 'Film, CT, or ultrasound (bilateral B lines or consolidation) in trained hands', 'Ultrasound lets the diagnosis be made where CT and films are hard to get.'],
+  ['Support', 'PEEP of at least 5 (CPAP of at least 5 only for mild)', 'Adds high flow of 30 L/min or more, for patients not intubated', 'High flow became common for hypoxemic failure after Berlin was written; 30 L/min gives a little PEEP.'],
+  ['Oxygen measure', 'P/F only', 'P/F or SpO2/FiO2 (SpO2 97% or less)', 'Lets the diagnosis be made without a blood gas; less accurate with poor traces, shock and darker skin.'],
+  ['Severity', 'Mild, moderate, severe on PEEP (CPAP only for mild)', 'Mild, moderate, severe only once intubated; none for patients not intubated', 'A grade on high flow does not mean the same thing as a grade on a ventilator.'],
+  ['Origin', 'Not fully explained by heart failure or fluid overload', 'Not mainly cardiac or overload, not mainly atelectasis; can coexist with them if a trigger is present', 'Many patients have both; the trigger is what makes it ARDS.'],
+  ['Low-resource settings', 'Not covered', 'SpO2/FiO2 315 or less with no PEEP or flow minimum', 'Formally adopts the Kigali modification for places without gases or ventilators.']
+];
+</script>
+
+<script id="deeper-data" type="application/json">
+{"learn-edema": [["Mechanism", "A trigger such as pneumonia or sepsis injures the alveolar wall and the capillary lining. Protein-rich fluid, white cells and debris fill the air spaces, surfactant fails, and alveoli flood or collapse. Hydrostatic edema is different: the wall is intact and high capillary pressure pushes watery fluid across."], ["Why it matters", "The two look alike on a film but are treated differently. Hydrostatic edema clears when the pressure is lowered; permeability edema clears only as the injury heals, so the job is to support the lung without adding injury while the cause is treated."], ["Common trap", "Assuming a normal echo rules out heart failure, or that any heart disease rules out ARDS. Both can be present: the question is which explains most of the edema."]],
+"learn-baby": [["Mechanism", "In ARDS much of the lung is flooded or collapsed, so the part still taking air is small, like a child's lung. A breath sized for a whole adult lung lands entirely on that small part and overstretches it, and the stretch itself releases inflammation."], ["Why it matters", "This is why the breath is scaled to predicted weight and capped by plateau pressure, and why driving pressure, which reflects how much lung is open, adds information beyond the tidal volume."], ["Common trap", "Thinking the problem is a stiff lung. The open lung often has near-normal stiffness; it is simply small."]],
+"learn-prone": [["Mechanism", "Lying on the back, the weight of the heart and the heavy wet lung compresses the back of the lung, which holds most of the lung tissue. Turning prone lifts that weight, lets the back reopen, and makes the stretch more even across the lung, while blood flow stays largely toward the back."], ["Why it matters", "Proning is the rung with the strongest survival evidence, and its benefit is thought to come mainly from less lung injury, not just better oxygen, so it is used early and for long sessions, not as a last resort."], ["Common trap", "Judging it by the first hour's oxygen, or turning back as soon as the number improves. Some patients improve slowly, and the trial sessions lasted at least 16 hours."]],
+"learn-shunt": [["Mechanism", "Blood that passes flooded or collapsed alveoli never meets air, so it leaves without oxygen and mixes with oxygenated blood. Adding oxygen does little for it. Hypoxic pulmonary vasoconstriction narrows vessels beside poorly aerated alveoli and diverts some of that blood toward air."], ["Why it matters", "An inhaled vasodilator reaches only ventilated alveoli and widens their vessels, so it improves matching and raises the oxygen. A vasodilator by vein undoes the vasoconstriction everywhere and can make the shunt worse."], ["Common trap", "Reading a better oxygen number as a better outcome. In trials, inhaled nitric oxide improved oxygen briefly and did not reduce deaths, with more kidney injury."]],
+"learn-rv": [["Mechanism", "Collapsed lung, hypoxic and hypercapnic vasoconstriction, small-vessel clots and high airway pressure all raise pulmonary vascular resistance. The thin right ventricle dilates rather than generating more pressure, the septum shifts toward the left, and the left ventricle fills less."], ["Why it matters", "Right ventricular failure can cause the shock in ARDS. Keeping driving pressure low, avoiding high CO2 and proning all unload it; more fluid usually does not help."], ["Common trap", "Giving fluid for low blood pressure without looking at the right ventricle, or raising PEEP further when the lung does not recruit, which only adds load."]],
+"learn-def": [["Mechanism", "ARDS is a syndrome defined by timing, imaging, oxygenation and the absence of a better explanation, not by a test. Each definition draws a line through a continuum of lung injury."], ["Why it matters", "The global definition widens the net to patients on high flow and to places without blood gases, so lung-protective care and trials can reach them earlier. Severity grades still guide the ladder once the patient is intubated."], ["Common trap", "Treating the label as the diagnosis. Meeting the definition starts the search for the cause; it does not end it."]]}
+</script>
+
+<script>
+(function(){
+var $ = function(id){ return document.getElementById(id); };
+function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+var ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M7 15l3-4 3 3 2-2 2 3"/></svg>';
+function chip(fig, state, label){ return '<button class="chip" data-fig="' + fig + '" data-state="' + (state || '') + '">' + ICON + esc(label || FIGS[fig].t) + '</button>'; }
+var WORD = {met: 'met', no: 'not met', unk: 'missing', na: 'not a criterion'};
+function cardHTML(c, noId){
+  var rc = c.rung && c.rung !== 'none';
+  var h = '<div class="card' + (rc ? ' rc ' + c.rung : '') + '"' + (noId ? '' : ' id="' + c.id + '"') + '><p class="label">' + (rc ? '<span class="st-tag">' + esc(TAG[c.rung]) + '</span>' : '') + esc(c.label) + '</p>';
+  h += c.empty ? '<p class="head">' + esc(c.head) + '</p>' : '<h2>' + esc(c.head) + '</h2>';
+  if (c.sub) h += '<p class="sub">' + esc(c.sub) + '</p>';
+  if (c.cmp) h += '<div class="tw" style="margin-top:8px"><table class="cmp"><thead><tr><th>Criterion</th><th>Global 2024</th><th>Berlin 2012</th></tr></thead><tbody>' + c.cmp.map(function(r){ return '<tr><td>' + esc(r[0]) + '</td><td class="' + r[1] + '">' + WORD[r[1]] + '</td><td class="' + r[2] + '">' + WORD[r[2]] + '</td></tr>'; }).join('') + '</tbody></table></div>';
+  if (c.list) h += '<ul>' + c.list.map(function(s){ return '<li>' + esc(s) + '</li>'; }).join('') + '</ul>';
+  h += (c.guards || []).map(function(g){ return '<div class="guard">' + esc(g) + '</div>'; }).join('');
+  if (c.links) h += '<p class="linkrow">' + c.links.map(function(l){ return '<a href="' + l[0] + '">' + esc(l[1]) + '</a>'; }).join(' · ') + '</p>';
+  if (c.why) h += '<p class="whyline"><b>Why:</b> ' + esc(c.why) + '</p>';
+  if (c.chips && c.chips.length) h += '<div class="chips">' + c.chips.map(function(x){ return chip(x[0], x[1], x[2]); }).join('') + '</div>';
+  if ((c.more && c.more.length) || (c.tiers && c.tiers.length)) h += '<details><summary>More</summary>' + (c.more || []).map(function(m){ return '<p>' + esc(m) + '</p>'; }).join('') + (c.tiers || []).map(function(t){ return '<span class="tier">' + esc(t) + '</span>'; }).join('') + '</details>';
+  return h + '</div>';
+}
+function seg(host, list, cur){ host.innerHTML = list.map(function(c){ return '<button class="sbtn" data-v="' + c[0] + '" aria-pressed="' + (c[0] === cur) + '">' + esc(c[1]) + '</button>'; }).join(''); }
+
+/* State shared by both tabs */
+var S = {risk: []}, NUMK = ['peep','fio2','pao2','spo2','plat','ph','paco2','dsince','dvent'];
+function input(){ var i = {}; Object.keys(S).forEach(function(k){ i[k] = S[k]; }); return i; }
+document.querySelectorAll('[data-k]').forEach(function(el){
+  el.addEventListener(el.tagName === 'SELECT' ? 'change' : 'input', function(){
+    var k = el.getAttribute('data-k'), v = el.tagName === 'SELECT' ? el.value : parseFloat(el.value);
+    S[k] = el.tagName === 'SELECT' ? v : (isFinite(v) && v >= 0 ? v : null);
+    document.querySelectorAll('[data-k="' + k + '"]').forEach(function(o){ if (o !== el) o.value = el.value; });
+    render();
+  });
+});
+function fill(){ document.querySelectorAll('[data-k]').forEach(function(el){ var k = el.getAttribute('data-k'); el.value = S[k] != null ? S[k] : ''; }); }
+
+function drawSegs(){
+  seg($('onsetseg'), ONSET, S.onset); seg($('imgseg'), IMG, S.img); seg($('cardseg'), CARD, S.card); seg($('supseg'), SUP, S.sup);
+  $('riskticks').innerHTML = RISK.map(function(r){ return '<label class="chk"><input type="checkbox" data-r="' + r[0] + '"' + (S.risk.indexOf(r[0]) >= 0 ? ' checked' : '') + '>' + esc(r[1]) + '</label>'; }).join('');
+  $('ladticks').innerHTML = TICKS.map(function(t){ return '<label class="chk"><input type="checkbox" data-t="' + t[0] + '"' + (S[t[0]] ? ' checked' : '') + '>' + esc(t[1]) + '</label>'; }).join('');
+}
+[['onsetseg','onset'],['imgseg','img'],['cardseg','card'],['supseg','sup']].forEach(function(p){
+  $(p[0]).addEventListener('click', function(e){ var v = e.target.getAttribute('data-v'); if (v){ S[p[1]] = S[p[1]] === v ? null : v; drawSegs(); render(); } });
+});
+$('riskticks').addEventListener('change', function(e){ var r = e.target.getAttribute('data-r'); if (!r) return;
+  if (e.target.checked){ if (r === 'none') S.risk = ['none']; else S.risk = S.risk.filter(function(x){ return x !== 'none'; }).concat([r]); }
+  else S.risk = S.risk.filter(function(x){ return x !== r; });
+  drawSegs(); render(); });
+$('ladticks').addEventListener('change', function(e){ var t = e.target.getAttribute('data-t'); if (t){ S[t] = e.target.checked; render(); } });
+
+var mimSel = null;
+function drawMimics(d){
+  var focus = d.noRisk || S.card === 'part' || S.card === 'main';
+  $('mimhead').textContent = d.noRisk ? 'No trigger found: work up the mimics' : S.card === 'main' ? 'Edema looks cardiac: confirm, and look for a mimic if it does not clear' : S.card === 'part' ? 'Heart and lung both: sort out how much is each' : 'When the story does not fit, look for a mimic';
+  $('mimsub').textContent = focus ? 'Send the first tests now.' : 'Use this when there is no clear trigger, the course is atypical, or the patient does not improve.';
+  $('mimseg').innerHTML = Object.keys(RESULTS).map(function(k){ return '<button class="sbtn" data-v="' + k + '" aria-pressed="' + (k === mimSel) + '">' + esc(RESULTS[k].n) + '</button>'; }).join('');
+  $('mimsays').textContent = mimSel ? RESULTS[mimSel].says : '';
+  $('mimout').innerHTML = mimicRows(mimSel).map(function(r){ return '<div class="cause' + (r.st ? ' ' + r.st : '') + '"><span>' + esc(r.name) + '</span><small>' + esc(r.why) + '</small></div>'; }).join('');
+}
+$('mimseg').addEventListener('click', function(e){ var v = e.target.getAttribute('data-v'); if (v){ mimSel = mimSel === v ? null : v; render(); } });
+
+function render(){
+  var i = input(), d = diagnose(i), L = ladder(i);
+  $('defout').innerHTML = d.cards.map(function(c){ return cardHTML(c); }).join('');
+  drawMimics(d);
+  $('ladhead').textContent = L.head; $('ladsub').textContent = L.sub;
+  $('rungs').innerHTML = L.rungs.map(function(r, n){ return '<button class="rung ' + r.st + '" data-go="r-' + r.id + '"><b>' + (n + 1) + '</b><span>' + esc(r.n) + '</span><span class="tag">' + esc(TAG[r.st]) + '</span></button>'; }).join('');
+  $('rungcards').innerHTML = L.cards.map(function(c){ return cardHTML(c); }).join('');
+  $('extras').innerHTML = L.extras.map(function(c){ return cardHTML(c); }).join('');
+}
+$('rungs').addEventListener('click', function(e){ var b = e.target.closest('[data-go]'); if (b) $(b.getAttribute('data-go')).scrollIntoView(); });
+
+/* Tabs */
+var tabs = [['t-dx','p-dx'],['t-lad','p-lad'],['t-learn','p-learn'],['t-prac','p-prac']];
+function show(t){ tabs.forEach(function(p){ var on = p[0] === t; $(p[0]).setAttribute('aria-selected', String(on)); $(p[1]).classList.toggle('on', on); }); }
+tabs.forEach(function(p){ $(p[0]).addEventListener('click', function(){ show(p[0]); }); });
+function fromHash(){ var id = location.hash.slice(1); if (!id) return; var el = $(id); if (!el) return; var pan = el.closest('.panel'); if (pan) tabs.forEach(function(p){ if (p[1] === pan.id) show(p[0]); }); el.scrollIntoView(); }
+window.addEventListener('hashchange', fromHash);
+
+/* Figures and the sheet */
+function mountFig(host, id, state){
+  var F = FIGS[id];
+  function draw(k){
+    var d = F.data[k];
+    host.innerHTML = '<div class="states" role="group" aria-label="' + esc(F.t) + '">' + F.states.map(function(x){ return '<button class="sbtn" data-k2="' + x + '" aria-pressed="' + (x === k) + '">' + esc(F.data[x].n) + '</button>'; }).join('') + '</div>' + F.svg(k) + '<p class="line1">' + esc(d.line) + '</p>';
+  }
+  host.onclick = function(e){ var k = e.target.getAttribute && e.target.getAttribute('data-k2'); if (k) draw(k); };
+  draw(state && F.data[state] ? state : F.states[0]);
+}
+var lastFocus = null;
+function openSheet(fig, state){
+  lastFocus = document.activeElement;
+  $('sheet-t').textContent = FIGS[fig].t;
+  mountFig($('sheet-b'), fig, state);
+  $('scrim').hidden = false; $('sheet').hidden = false; $('sheet').scrollTop = 0; $('sheet-x').focus();
+}
+function closeSheet(){ if ($('sheet').hidden) return; $('scrim').hidden = true; $('sheet').hidden = true; if (lastFocus && lastFocus.focus) lastFocus.focus(); }
+$('sheet-x').addEventListener('click', closeSheet); $('scrim').addEventListener('click', closeSheet);
+document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeSheet(); });
+document.addEventListener('click', function(e){ var c = e.target.closest && e.target.closest('[data-fig]'); if (c) openSheet(c.getAttribute('data-fig'), c.getAttribute('data-state')); });
+document.querySelectorAll('[data-figure]').forEach(function(h){ mountFig(h, h.getAttribute('data-figure'), h.getAttribute('data-state')); });
+
+/* Learn tab */
+var defSel = 1;
+function drawDef(){
+  $('defgrid').innerHTML = '<div class="tw"><table class="tg"><thead><tr><th>Item</th><th>Berlin 2012</th><th>Global 2024</th></tr></thead><tbody>' + DEFROWS.map(function(r, n){ return '<tr' + (n === defSel ? ' class="on"' : '') + '><td><button data-row="' + n + '" aria-pressed="' + (n === defSel) + '">' + esc(r[0]) + '</button></td><td>' + esc(r[1]) + '</td><td>' + esc(r[2]) + '</td></tr>'; }).join('') + '</tbody></table></div>';
+  $('defsays').textContent = DEFROWS[defSel][3];
+}
+$('defgrid').addEventListener('click', function(e){ var b = e.target.closest('[data-row]'); if (b){ defSel = +b.getAttribute('data-row'); drawDef(); } });
+drawDef();
+(function(){
+  var chaps = [].slice.call(document.querySelectorAll('.chap'));
+  $('pills').innerHTML = chaps.map(function(c, n){ return '<button class="pill" data-go="' + c.id + '" aria-current="' + (n === 0) + '">' + (n + 1) + ' ' + esc(c.getAttribute('data-pill')) + '</button>'; }).join('');
+  $('pills').addEventListener('click', function(e){ var g = e.target.getAttribute('data-go'); if (g) $(g).scrollIntoView(); });
+  function mark(id){ [].forEach.call($('pills').children, function(b){ var on = b.getAttribute('data-go') === id; b.setAttribute('aria-current', String(on)); if (on) $('pills').scrollLeft = Math.max(0, b.offsetLeft - 60); }); }
+  if ('IntersectionObserver' in window){
+    var io = new IntersectionObserver(function(es){ es.forEach(function(en){ if (en.isIntersecting) mark(en.target.id); }); }, {rootMargin: '-30% 0px -60% 0px'});
+    chaps.forEach(function(c){ io.observe(c); });
+  }
+  $('trialbox').innerHTML = TRIALS.map(function(t){ return '<div class="trial" style="margin-top:14px"><p><b>' + esc(t.q) + '</b></p><p><span class="k">Design</span>' + esc(t.d) + '</p><p><span class="k">Result</span>' + esc(t.r) + '</p><p><span class="k">What it changed</span>' + esc(t.c) + '</p><p class="mono" style="font-size:13px"><a href="https://doi.org/' + t.doi + '" rel="noopener">' + esc(t.cite) + '</a></p></div>'; }).join('');
+  $('go-prac').addEventListener('click', function(){ show('t-prac'); window.scrollTo(0, 0); });
+})();
+
+/* Go deeper: one disclosure at the end of each Learn chapter */
+(function(){
+  var D = JSON.parse($('deeper-data').textContent);
+  Object.keys(D).forEach(function(id){ var host = $(id); if (!host) return;
+    var d = document.createElement('details'); d.className = 'deeper';
+    d.innerHTML = '<summary>Go deeper: mechanism and rationale</summary><div class="dpx">' + D[id].map(function(r){ return '<div><span class="dl">' + esc(r[0]) + '</span><p>' + esc(r[1]) + '</p></div>'; }).join('') + '</div>';
+    host.appendChild(d); });
+})();
+
+/* Practice: cases run through the same engine */
+(function(){
+  $('practice').innerHTML = CASES.map(function(c, n){
+    return '<div class="card case"' + (n === 0 ? ' id="practice-cases"' : '') + '><p class="label">Case ' + (n + 1) + '</p><h2>' + esc(c.t) + '</h2><p>' + esc(c.s) + '</p><p><b>' + esc(c.q) + '</b></p><div class="row"><button class="btn" data-ans="' + n + '">Show the answer</button><button class="btn ghost" data-load="' + n + '">Open in the tool</button></div><div class="ans" id="ans' + n + '" hidden></div></div>';
+  }).join('');
+})();
+$('practice').addEventListener('click', function(e){
+  var a = e.target.getAttribute('data-ans'), l = e.target.getAttribute('data-load');
+  if (a != null){ var c = CASES[a], d = diagnose(c.i), L = ladder(c.i), box = $('ans' + a);
+    var lit = L.rungs.filter(function(r){ return r.st === 'now' || r.st === 'cons' || r.st === 'hold'; });
+    box.innerHTML = '<p>' + esc(c.p) + '</p><p class="note"><b>Definition:</b> ' + esc(d.cards[0].head) + '.</p><p class="note"><b>Ladder:</b> ' + esc(lit.map(function(r){ return r.n + ' (' + TAG[r.st].toLowerCase() + ')'; }).join('; ') || 'lung protection only') + '.</p>' + (c.res ? '<p class="note"><b>Workup:</b> ' + esc(RESULTS[c.res].n + ': ' + RESULTS[c.res].says) + '</p>' : '');
+    box.hidden = false; e.target.hidden = true; }
+  if (l != null){ var c2 = CASES[l]; S = {risk: []}; Object.keys(c2.i).forEach(function(k){ S[k] = Array.isArray(c2.i[k]) ? c2.i[k].slice() : c2.i[k]; }); mimSel = c2.res || null; fill(); drawSegs(); render(); show('t-dx'); window.scrollTo(0, 0); }
+});
+drawSegs(); render(); fromHash();
+})();
+</script>
+</body>
+</html>
