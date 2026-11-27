@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ultrasound Basics · bedside.tools</title>
+<meta name="description" content="What each ultrasound control does, where it is on common point-of-care machines, how the picture is made, the artefacts, and why lung ultrasound is the reading of artefacts.">
+<script src="/theme.js"></script>
+<style>
+/* Colours: shared site names only. Dark values and extras (--fill --body --us-*) live in /theme.js. */
+:root{--bg:#FBFBFA; --card:#FFFFFF; --ink:#111113; --muted:#55555D; --line:#ECECEE; --accent:#2B4BDB; --warn:#9A3B00; --warnbg:#FFF6EC}
+:root{--r:14px}
+*{box-sizing:border-box;margin:0;padding:0}
+[hidden]{display:none!important}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.45;padding-bottom:calc(76px + env(safe-area-inset-bottom))}
+a{color:var(--accent);text-decoration:none}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;-webkit-tap-highlight-color:transparent}
+button:focus-visible,a:focus-visible,summary:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+h1,h2,h3{font-weight:600;letter-spacing:-.01em;line-height:1.15;text-wrap:balance}
+h1{font-size:26px} h2{font-size:21px} h3{font-size:18px}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.kicker{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.wrap{max-width:720px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header{border-bottom:1px solid var(--line)}
+header .wrap{padding-block:8px 14px}
+.back{font-size:14px;color:var(--accent);display:inline-flex;align-items:center;min-height:44px}
+header p{font-size:15px;color:var(--muted);margin-top:4px}
+nav.tabs{position:fixed;left:0;right:0;bottom:0;background:var(--bg);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom);z-index:20}
+nav.tabs .wrap{display:flex;padding-block:0}
+nav.tabs button{flex:1;min-height:56px;color:var(--muted);font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;border-top:2px solid transparent}
+nav.tabs button[aria-selected=true]{color:var(--accent);border-top-color:var(--accent)}
+section.view{display:none;padding-block:14px 28px}
+section.view.on{display:grid;gap:14px}
+.lede{font-size:15px;color:var(--muted)}
+.seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:4px;padding:4px;background:var(--line);border-radius:12px}
+.seg button{min-height:44px;padding:0 6px;border-radius:9px;font-size:14px;font-weight:500;color:var(--muted)}
+.seg button[aria-pressed=true]{background:var(--card);color:var(--ink);font-weight:600}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r)}
+.card.pad{padding:16px}
+.card h3+p,.card .kicker+h3{margin-top:4px}
+.card p{font-size:15px}
+.card p+p{margin-top:8px}
+.tier{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.note{font-size:13px;color:var(--muted)}
+
+/* simulator */
+.sim{overflow:hidden}
+.fig{position:relative;aspect-ratio:6/5;background:var(--us-bg)}
+.fig canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.fig .pill{position:absolute;top:8px;left:8px;font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;padding:3px 7px;border-radius:6px;background:var(--us-halo);color:var(--us-ink)}
+.under{padding:12px 14px 14px;display:grid;gap:8px}
+.ctl{display:grid;grid-template-columns:92px 1fr 54px;gap:10px;align-items:center}
+.ctl label{font-size:14px}
+.ctl output{font-family:var(--mono);font-size:14px;text-align:right}
+.ctl input[type=range]{width:100%;height:44px;accent-color:var(--accent)}
+.verdict{font-size:16px;font-weight:600;margin-top:4px}
+.dp{display:grid;border-top:1px solid var(--line)}
+.dp div{display:grid;grid-template-columns:104px 1fr;gap:10px;padding:10px 0;border-bottom:1px solid var(--line);font-size:14px}
+.dp div:last-child{border-bottom:0}
+.dp div span:first-child{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding-top:2px}
+.reset{min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);font-size:14px;justify-self:start}
+
+/* machine picker and control cards */
+.machines{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin-inline:-16px;padding-inline:16px}
+.machines::-webkit-scrollbar{display:none}
+.machines button{flex:none;min-height:44px;padding:0 13px;border-radius:999px;font-size:14px;color:var(--muted);border:1px solid transparent;white-space:nowrap}
+.machines button[aria-pressed=true]{color:var(--ink);font-weight:600;border-color:var(--line);background:var(--card)}
+.row{display:grid;grid-template-columns:86px 1fr;gap:12px;padding:11px 16px;border-top:1px solid var(--line);font-size:15px}
+.row .k{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);padding-top:3px}
+.row.on{background:var(--fill);border-radius:0 0 var(--r) var(--r)}
+.cc h3{padding:14px 16px 0}
+.cc .what{padding:6px 16px 12px;font-size:15px}
+.ep{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;padding:1px 6px;border-radius:5px;background:var(--fill);color:var(--muted);margin-left:6px;vertical-align:2px;font-weight:500}
+
+/* drawings */
+svg.d{display:block;width:100%;height:auto;margin-top:12px;border-radius:10px;background:var(--fill)}
+svg.d.us{background:var(--us-bg)}
+.d .i{stroke:var(--ink);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.d .m{stroke:var(--muted);fill:none;stroke-width:1.5;stroke-linecap:round;stroke-dasharray:4 4}
+.d .a{stroke:var(--accent);fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+.d .fi{fill:var(--ink)} .d .fa{fill:var(--accent)} .d .fb{fill:var(--body)} .d .fc{fill:var(--card);stroke:var(--ink);stroke-width:2}
+.d text{font-family:var(--mono);font-size:12px;fill:var(--ink)}
+.d text.mu{fill:var(--muted)}
+.d.us .w{stroke:var(--us-ink);fill:none;stroke-linecap:round}
+.d.us .wf{fill:var(--us-ink)}
+.d.us .k{stroke:var(--us-mark);fill:none;stroke-width:1.5;stroke-dasharray:4 3}
+.d.us text{fill:var(--us-ink)}
+.d.us text.y{fill:var(--us-mark)}
+.zones{display:grid;gap:4px;margin-top:10px}
+.zones span{min-height:44px;border-radius:9px;background:var(--fill);color:var(--muted);display:grid;place-items:center;text-align:center;font-size:13px;line-height:1.15;padding:4px}
+.zones span.on{background:var(--ink);color:var(--bg);font-weight:500}
+.warnbox{background:var(--warnbg);color:var(--warn);border-radius:10px;padding:10px 12px;font-size:14px;margin-top:10px}
+footer{max-width:720px;margin:8px auto 0;padding:16px max(16px,env(safe-area-inset-right,0px)) 24px max(16px,env(safe-area-inset-left,0px));border-top:1px solid var(--line);font-size:13px;color:var(--muted)}
+footer p{margin-bottom:8px}
+@media (min-width:900px){
+  .wrap,footer{max-width:980px}
+  section.view.on{grid-template-columns:1fr 1fr;align-items:start}
+  section.view.on>.lede,section.view.on>.machines,section.view.on>.note{grid-column:1/-1}
+  #controls.on>.sim{grid-row:span 4}
+}
+
+.case .stem{font-size:16px;margin-top:6px}
+.case canvas{display:block;width:100%;height:auto;aspect-ratio:6/5;border-radius:10px;margin-top:12px;background:var(--us-bg)}
+.case h4{font-size:15px;font-weight:600;margin-top:14px}
+.opts{display:grid;gap:6px;margin-top:8px}
+.opts button{min-height:44px;padding:8px 12px;border:1px solid var(--line);border-radius:12px;background:var(--card);font-size:15px;text-align:left}
+.opts button.right{border-color:var(--ink);background:var(--ink);color:var(--bg)}
+.opts button.wrong{background:var(--warnbg);border-color:var(--warnbg);color:var(--warn)}
+.fb{font-size:15px;margin-top:8px}
+.casenav{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:14px}
+.casenav button{min-height:44px;padding:0 16px;border-radius:999px;border:1px solid var(--line);background:var(--card);font-size:14px}
+.casenav button.p{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.casenav button:disabled{opacity:.74}
+.casenav span{font-family:var(--mono);font-size:12px;color:var(--muted)}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <a class="back" href="/">← bedside.tools</a>
+  <h1>Ultrasound basics</h1>
+  <p>What each control does, how the picture is made, and why some of it is not real.</p>
+  <a class="back" href="/pocus-cardiac/">Next: Cardiac ultrasound →</a>
+</div></header>
+
+<main class="wrap">
+<section class="view on" id="controls" aria-labelledby="t-controls">
+  <div class="card sim" id="simulator">
+    <div class="fig"><canvas id="scan" width="720" height="600" aria-label="Simulated ultrasound picture of a fluid-filled circle in tissue"></canvas><span class="pill">Simulated</span></div>
+    <div class="under">
+      <div class="ctl"><label for="s-depth">Depth</label><input type="range" id="s-depth" min="4" max="20" step="1" value="12"><output id="o-depth"></output></div>
+      <div class="ctl"><label for="s-gain">Gain</label><input type="range" id="s-gain" min="0" max="100" step="2" value="50"><output id="o-gain"></output></div>
+      <div class="ctl"><label for="s-near">Near gain</label><input type="range" id="s-near" min="0" max="100" step="2" value="40"><output id="o-near"></output></div>
+      <div class="ctl"><label for="s-far">Far gain</label><input type="range" id="s-far" min="0" max="100" step="2" value="60"><output id="o-far"></output></div>
+      <p class="verdict" id="verdict" aria-live="polite"></p>
+      <div class="dp" id="simdp"></div>
+      <button type="button" class="reset" id="simreset">Reset</button>
+    </div>
+  </div>
+
+  <p class="lede">Each control, then where to find it. Pick your machine once.</p>
+  <div class="machines" role="group" aria-label="Machine" id="machines"></div>
+  <div id="cards" style="display:contents"></div>
+  <p class="note" id="machnote"></p>
+</section>
+
+<section class="view" id="physics" aria-labelledby="t-physics">
+  <p class="lede">How sound becomes a picture, one idea at a time.</p>
+  <div id="phys" style="display:contents"></div>
+</section>
+
+<section class="view" id="artefacts" aria-labelledby="t-artefacts">
+  <p class="lede">The machine assumes sound goes straight down and straight back at one speed. When that is false, it draws something that is not there.</p>
+  <div id="arts" style="display:contents"></div>
+</section>
+
+<section class="view" id="lung" aria-labelledby="t-lung">
+  <p class="lede">Below the pleural line, lung ultrasound is the reading of artefacts.</p>
+  <div id="lungs" style="display:contents"></div>
+</section>
+<section class="view" id="practice" aria-labelledby="t-practice">
+  <p class="lede">Twelve cases. Say what is wrong, or name the artefact.</p>
+  <div class="card pad case" id="case"></div>
+</section>
+</main>
+
+<nav class="tabs" role="tablist" aria-label="Sections"><div class="wrap">
+  <button type="button" role="tab" id="t-controls" aria-controls="controls" aria-selected="true">Controls</button>
+  <button type="button" role="tab" id="t-physics" aria-controls="physics" aria-selected="false">Physics</button>
+  <button type="button" role="tab" id="t-artefacts" aria-controls="artefacts" aria-selected="false">Artefacts</button>
+  <button type="button" role="tab" id="t-lung" aria-controls="lung" aria-selected="false">Lung</button>
+  <button type="button" role="tab" id="t-practice" aria-controls="practice" aria-selected="false">Practice</button>
+</div></nav>
+
+<footer>
+  <p>For education only. Not a substitute for clinical judgment.</p>
+  <p>Last reviewed: 2026-11-26</p>
+  <p>Sources: Poggi C, Palavecino M. Ultrasound principles and instrumentation. Surg Open Sci 2024, doi:10.1016/j.sopen.2024.02.005 (review). Abu-Zidan FM, Hefny AF, Corr P. Clinical ultrasound physics. J Emerg Trauma Shock 2011;4:501-3, doi:10.4103/0974-2700.86646 (review). Demi L, et al. New international guidelines and consensus on the use of lung ultrasound. J Ultrasound Med 2023;42:309-44, doi:10.1002/jum.16088 (consensus). Kameda T, Kamiyama N, Taniguchi N. The mechanisms underlying vertical artifacts in lung ultrasound. Diagnostics 2022;12:252, doi:10.3390/diagnostics12020252 (review). American Institute of Ultrasound in Medicine. As low as reasonably achievable principle, official statement, reapproved 2026. Mukherjee M, Rudski LG, et al. J Am Soc Echocardiogr 2025;38:141-86, doi:10.1016/j.echo.2025.01.006 (guideline; Doppler alignment).</p>
+  <p>Machine controls are taken from each maker's own documents: Sonosite PX quick reference guide P22231-02A; Butterfly iQ3 user manual rev I; GE Vscan Air support article "Black/White Imaging (B-mode) adjustments"; Philips Lumify user manual and operating notes; Mindray TE7/TE5 operator's manual. Software updates move controls; "not stated" means the document read did not say. Rules of thumb marked "practice" are expert practice. Every picture on this page is a drawing or a simulation, not a patient image.</p>
+  <p>Privacy: everything runs in your browser. Nothing you enter is sent anywhere or stored, and there are no analytics. Do not enter names, record numbers, or dates of birth.</p>
+</footer>
+
+<script>
+(function(){
+"use strict";
+var $=function(s){return document.querySelector(s)}, $$=function(s){return Array.prototype.slice.call(document.querySelectorAll(s))};
+var NS="Not stated in the document read";
+
+/* ── Machines: only what each maker's document says ── */
+var MACH=[["px","Sonosite PX"],["iq3","Butterfly iQ3"],["vscan","GE Vscan Air"],["lumify","Philips Lumify"],["te7","Mindray TE7"]];
+var CONTROLS=[
+ {id:"c-depth",n:"Depth",what:"Sets how far down the screen shows. The machine turns each echo's return time into a depth. It does not change brightness.",
+  wrong:"Too deep: the target is a small strip at the top. Too shallow: its far wall is cut off.",fix:"Target in the middle of the screen with its far border visible.",ep:1,
+  m:{px:"Depth buttons on the panel.",iq3:"Swipe up or down on the picture. The probe buttons can be set to depth.",vscan:"Swipe up or down on the picture.",lumify:"Depth dial on the screen.",te7:"Drag the Depth control at the right of the picture."}},
+ {id:"c-gain",n:"Gain",what:"Amplifies every returning echo, so the whole picture gets brighter or darker. Too much also amplifies noise.",
+  wrong:"Too high: fluid looks grey and edges wash out. Too low: detail is hidden in black.",fix:"Fluid black, tissue mid-grey.",ep:1,
+  m:{px:"Drag a finger round the gain wheel.",iq3:"Swipe left or right on the picture. The probe buttons can be set to gain.",vscan:"Swipe left or right, then drag.",lumify:"Gain dial on the screen.",te7:"Drag the Gain control at the right of the picture."}},
+ {id:"c-vs",n:"Gain or depth?",what:"They are independent. Depth is a ruler. Gain is a brightness dial.",
+  wrong:"Reaching for gain when the target is simply too small or off the screen.",fix:"Depth first, then gain.",ep:1,m:null},
+ {id:"c-tgc",n:"Time-gain compensation",what:"Extra gain for deeper echoes, band by band, so that equal reflectors look equally bright near and far without adding noise near the probe.",
+  wrong:"A bright near field with a dark far field, or one bright horizontal stripe.",fix:"Level the sliders.",
+  m:{px:"TGC button, then sliders on the touch panel.",iq3:"Tap the picture, then the TGC button.",vscan:"Switched on in the Menu. Sliders appear; overall gain is disabled while they are in use.",lumify:NS+" as a user control.",te7:"The icon at the bottom left opens six sliders. Double-tap to reset."}},
+ {id:"c-auto",n:"Auto gain",what:"The machine sets the gain curve from the picture.",
+  wrong:"It can be wrong when the screen is mostly fluid or mostly shadow.",fix:"Use it, then check that fluid is black.",ep:1,
+  m:{px:"AUTO button.",iq3:NS+".",vscan:NS+".",lumify:"AutoSCAN, always on.",te7:"iTouch: tap the left of the picture; long-press to exit."}},
+ {id:"c-preset",n:"Preset (exam type)",what:"A bundle chosen for the organ: frequency, gain, focus, depth, power, time-gain and greyscale.",
+  wrong:"A coarse or washed-out picture. Lung artefacts change with the preset.",fix:"Choose the preset before anything else.",
+  m:{px:"Transducer-and-exam button, then choose on the touch panel.",iq3:"Bottom toolbar. Tap the screen, then the presets filter button to move between presets in the same family.",vscan:NS+".",lumify:"Preset control during the exam.",te7:"Probe button, then pick the probe and exam mode."}},
+ {id:"c-freq",n:"Frequency",what:"Higher frequency gives finer detail and less depth. Lower gives the reverse.",
+  wrong:"Grainy deep structures, or blurry shallow ones.",fix:"Lower frequency (penetration) for a large patient or a deep target.",
+  m:{px:NS+".",iq3:NS+".",vscan:"Tap Resolution or Penetration (some presets).",lumify:NS+".",te7:"Frequency control at the left of the picture."}},
+ {id:"c-focus",n:"Focus",what:"The depth where the beam is narrowest and strongest. Some handhelds fix it for you.",
+  wrong:"A blurred target above or below the focal mark. For lung, a deep focus widens and merges B-lines.",fix:"Focus at the target; for lung, at the pleural line.",
+  m:{px:NS+".",iq3:NS+".",vscan:NS+".",lumify:NS+" as adjustable.",te7:"Drag at the right of the picture; number of focal zones in the menu."}},
+ {id:"c-freeze",n:"Freeze and cine",what:"Stops the picture and steps back through the last frames.",wrong:"",fix:"Freeze, pick the best frame, then measure or save.",
+  m:{px:"Freeze button. Drag on the touchpad or turn the gain wheel to scroll.",iq3:"Freeze icon on the bottom toolbar. The probe's centre button captures, records or unfreezes.",vscan:"Freeze button; it freezes itself when idle. Tap or scroll the buffer bar.",lumify:"Freeze control; saved loops play back with a timeline.",te7:"Freeze button on the operating panel."}},
+ {id:"c-m",n:"M-mode",what:"One scan line plotted against time. Good for timing and for anything that moves.",
+  wrong:"A slanted line over-measures.",fix:"Line perpendicular to the wall.",ep:1,
+  m:{px:"M button; place the line with the touchpad; UPDATE switches between picture and trace.",iq3:"Actions, then M-Mode; drag the line; Fast or Slow sweep.",vscan:NS+".",lumify:"Touch MMode, drag the M-line; the trace starts when you let go. Touch MMode again to leave.",te7:"M button; drag the line; M again or double-tap to start."}},
+ {id:"c-colour",n:"Colour Doppler",what:"Paints flow inside a box. By convention red is toward the probe and blue is away.",
+  wrong:"A large box slows the picture. A scale set too low makes colour wrap and bleed; too high hides slow flow.",fix:"Small box; scale matched to the flow.",ep:1,
+  m:{px:"C button; move the box on the touchpad, SELECT to resize.",iq3:"Drag the box; High or Low scale.",vscan:NS+".",lumify:"Fast Flow or Slow Flow; drag and pinch the box.",te7:"Color button; drag the box, drag its corner to resize; Scale control."}},
+ {id:"c-pw",n:"Spectral Doppler",what:"Velocity against time, at a gate (pulsed wave) or along a whole line (continuous wave). At 90 degrees to flow there is no signal.",
+  wrong:"It reads low as the angle to flow grows.",fix:"Line up with flow: 60 degrees or less for vessels, within 20 degrees for right-heart measurements.",
+  m:{px:"D button; pulsed, continuous or tissue Doppler under More Controls (the last two in cardiac exams only).",iq3:"Drag the gate, then Start Spectrum.",vscan:NS+".",lumify:NS+".",te7:"PW or CW button; drag the gate, pinch to size it; drag the baseline; Quick Angle buttons."}},
+ {id:"c-measure",n:"Measure and save",what:"Calipers give the distance between two points on a frozen frame.",wrong:"",fix:"Freeze first.",
+  m:{px:"CALIPER button, touchpad, SELECT to switch calipers. Save buttons for image and clip.",iq3:"Line or Ellipse after freezing. Capture from the bottom toolbar.",vscan:"Store an image in freeze mode. Measuring: "+NS.toLowerCase()+".",lumify:"Measure, then drag the calipers. Save Image; Save Loop.",te7:"Save Clip when frozen. Measurement steps "+NS.toLowerCase()+"."}},
+ {id:"c-marker",n:"Which side is which",what:"The mark on the screen matches the mark on the probe. Which side of the screen it sits on depends on the preset.",
+  wrong:"A mirrored picture.",fix:"Touch one edge of the probe face and see which side of the screen moves.",ep:1,m:null},
+ {id:"c-safety",n:"Output and safety",what:"Use the right preset, the lowest power that still gives a diagnostic picture, and the shortest scan. Watch the mechanical and thermal indices on the screen, and move the probe when holding still is not needed.",
+  wrong:"",fix:"Extra care over the eye, lung and bowel gas, and fetal bone. For lung, start with a mechanical index under 0.4.",m:null}
+];
+var machine="px";
+function paintCards(){
+  $("#machines").innerHTML=MACH.map(function(m){return '<button type="button" data-m="'+m[0]+'" aria-pressed="'+(m[0]===machine)+'">'+m[1]+'</button>'}).join("");
+  var name=MACH.filter(function(m){return m[0]===machine})[0][1];
+  $("#cards").innerHTML=CONTROLS.map(function(c){
+    var h='<div class="card cc" id="'+c.id+'"><h3>'+c.n+'</h3><p class="what">'+c.what+'</p>';
+    if(c.wrong)h+='<div class="row"><span class="k">Wrong</span><span>'+c.wrong+'</span></div>';
+    h+='<div class="row"><span class="k">Fix</span><span>'+c.fix+(c.ep?'<span class="ep">practice</span>':'')+'</span></div>';
+    if(c.m)h+='<div class="row on"><span class="k">'+name.split(" ").pop()+'</span><span>'+c.m[machine]+'</span></div>';
+    return h+'</div>'}).join("");
+  $("#machnote").textContent="Locations are for "+name+", from the maker's document listed under Disclaimers and sources. Software updates move controls.";
+}
+$("#machines").addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;machine=b.dataset.m;var y=window.scrollY;paintCards();window.scrollTo(0,y)});
+
+/* ── Simulator: one fluid-filled circle in tissue. Depth, gain and the time-gain slope act as the cards say. ── */
+function rng(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+var TARGET={z:6,r:1.6};           /* centre depth and radius in cm */
+function simState(){return {D:+$("#s-depth").value,g:+$("#s-gain").value,n:+$("#s-near").value,f:+$("#s-far").value}}
+function levelAt(z,s){             /* brightness multiplier at depth z: gain x time-gain x attenuation */
+  var t=Math.min(1,z/s.D), tg=Math.pow(2,((s.n+(s.f-s.n)*t)-50)/25), att=Math.pow(2,-0.8*t), G=Math.pow(2,(s.g-50)/25);
+  return G*tg*att*1.32;
+}
+function simEngine(s){
+  var far=TARGET.z+TARGET.r, tissue=92*levelAt(TARGET.z,s), fluid=7*levelAt(TARGET.z,s);
+  var top=92*levelAt(0.1*s.D,s), bottom=92*levelAt(0.9*s.D,s), ratio=top/bottom;
+  var depth=s.D<far+0.3?"shallow":s.D>15?"deep":"ok";
+  var gain=(tissue>185||fluid>30)?"high":tissue<42?"low":"ok";
+  var tgc=ratio>1.9?"neartop":ratio<0.52?"fartop":"ok";
+  return {depth:depth,gain:gain,tgc:tgc,tissue:tissue,fluid:fluid,ratio:ratio};
+}
+function paintScan(c,s){
+  var x=c.getContext("2d");
+  x.setTransform(1,0,0,1,0,0);x.fillStyle="rgb(5,5,6)";x.fillRect(0,0,720,600);
+  x.setTransform(2,0,0,2,0,0);
+  var sector=new Path2D("M180 8 L4.5 232.6 A285 285 0 0 0 355.5 232.6 Z");
+  x.save();x.clip(sector);
+  var sc=285/s.D;                 /* px per cm */
+  x.fillStyle="rgb(92,92,92)";x.fillRect(0,0,360,300);
+  x.fillStyle="rgb(150,150,150)";x.fillRect(0,8,360,0.35*sc);                       /* skin line */
+  x.strokeStyle="rgb(215,215,215)";x.lineWidth=Math.max(2,0.22*sc);x.beginPath();   /* a bright deep interface at 10 cm */
+  x.moveTo(-10,8+10.6*sc);x.quadraticCurveTo(180,8+9.2*sc,370,8+10.6*sc);x.stroke();
+  x.fillStyle="rgb(118,118,118)";x.fillRect(180-TARGET.r*sc*0.8,8+(TARGET.z+TARGET.r)*sc,TARGET.r*sc*1.6,300); /* enhancement behind fluid */
+  x.fillStyle="rgb(7,7,7)";x.beginPath();x.arc(180,8+TARGET.z*sc,TARGET.r*sc,0,6.3);x.fill();
+  x.strokeStyle="rgb(150,150,150)";x.lineWidth=1.5;x.stroke();
+  x.restore();
+  var im=x.getImageData(0,0,720,600),d=im.data,r=rng(11);
+  for(var yy=0;yy<600;yy+=2){
+    var z=Math.max(0,(yy/2-8)/sc), L=levelAt(z,s);
+    for(var xx=0;xx<720;xx+=2){
+      var a=r(),b=r(),m=0.5+0.95*a*Math.sqrt(b+0.2);
+      for(var dy=0;dy<2;dy++)for(var dx=0;dx<2;dx++){
+        var i=((yy+dy)*720+(xx+dx))*4,v=d[i];
+        if(v>6){v=Math.min(255,v*L*m);d[i]=d[i+1]=d[i+2]=v}
+      }}}
+  x.putImageData(im,0,0);
+  x.fillStyle="rgb(170,170,170)";x.font="10px monospace";x.textAlign="right";
+  var step=s.D<=8?2:s.D<=14?4:5;
+  for(var cm=step;cm<s.D;cm+=step){x.fillRect(350,8+cm*sc,6,1);x.fillText(cm,347,8+cm*sc+3)}
+}
+function drawSim(){
+  var s=simState();paintScan($("#scan"),s);
+  /* readouts and verdict */
+  $("#o-depth").textContent=s.D+" cm";$("#o-gain").textContent=s.g+"%";$("#o-near").textContent=s.n+"%";$("#o-far").textContent=s.f+"%";
+  var e=simEngine(s),v,rows;
+  if(e.depth==="shallow"){v="Too shallow: the far side of the target is cut off.";rows=[["What changed","Depth only. Brightness is the same; you are seeing less of the patient."],["Why","The screen ends before the echoes from the back of the target arrive."],["Fix","Add depth until the far wall and what lies behind it are on screen."]]}
+  else if(e.depth==="deep"){v="Too deep: the target is a small shape near the top.";rows=[["What changed","Depth only. Half the screen shows nothing you need."],["Why","More depth spreads the same screen over more centimetres, so everything shrinks."],["Fix","Take depth off until the target sits in the middle."]]}
+  else if(e.tgc==="neartop"){v="Bright near the probe, dark deeper down.";rows=[["What changed","The balance between near and far gain."],["Why","Deep echoes travel further and return weaker. Without extra gain for them the bottom of the picture fades."],["Fix","Raise the far gain, or lower the near gain, until tissue is the same grey top to bottom."]]}
+  else if(e.tgc==="fartop"){v="Dark near the probe, bright deeper down.";rows=[["What changed","The balance between near and far gain."],["Why","The deep bands are being amplified more than their weakness needs."],["Fix","Lower the far gain or raise the near gain."]]}
+  else if(e.gain==="high"){v="Too much gain: tissue is washed out and the fluid is starting to fill in.";rows=[["What changed","Every echo, and the noise, amplified together."],["Why","Gain adds brightness, not information. Noise fills the spaces that should be black."],["Fix","Turn gain down until the fluid is black again."]]}
+  else if(e.gain==="low"){v="Too little gain: tissue detail is lost in black.";rows=[["What changed","Every echo turned down together."],["Why","Weak echoes fall below what the screen can show."],["Fix","Turn gain up until tissue is mid-grey and the fluid is still black."]]}
+  else{v="Good picture.";rows=[["What you see","Fluid black, tissue an even mid-grey, the target centred with its far wall and the brighter tissue behind it in view."],["Try","Move one control at a time. Depth changes size and position; gain changes brightness; the near and far gains change the balance."]]}
+  $("#verdict").textContent=v;
+  $("#simdp").innerHTML=rows.map(function(q){return "<div><span>"+q[0]+"</span><span>"+q[1]+"</span></div>"}).join("");
+}
+["s-depth","s-gain","s-near","s-far"].forEach(function(id){$("#"+id).addEventListener("input",drawSim)});
+$("#simreset").addEventListener("click",function(){$("#s-depth").value=12;$("#s-gain").value=50;$("#s-near").value=40;$("#s-far").value=60;drawSim()});
+
+/* ── Drawings ── */
+function svg(cls,vb,inner,label){return '<svg class="d'+(cls?" "+cls:"")+'" viewBox="0 0 '+vb+'" role="img" aria-label="'+label+'">'+inner+'</svg>'}
+var PROBE='<rect class="fi" x="150" y="8" width="60" height="16" rx="4"/>';
+var SEC="M180 10 L40 150 A198 198 0 0 0 320 150 Z";
+function us(inner,label){var texts=inner.match(/<text[^>]*>[^<]*<\/text>/g)||[],shapes=inner.replace(/<text[^>]*>[^<]*<\/text>/g,"");
+  return svg("us","360 170",'<clipPath id="k'+(us.n=(us.n||0)+1)+'"><path d="'+SEC+'"/></clipPath><path d="'+SEC+'" class="w" stroke-width="1" stroke-opacity=".35"/><g clip-path="url(#k'+us.n+')">'+shapes+'</g>'+texts.join(""),label)}
+
+var PHYS=[
+ {id:"p-echo",t:"Pulse and echo",b:"Crystals in the probe turn electricity into a short pulse of sound, then listen, and turn the returning echoes back into a signal. How long an echo takes to return sets how deep it is drawn, assuming sound travels at 1540 m/s in soft tissue.",
+  f:svg("","360 150",PROBE+'<path class="a" d="M165 30 V120 M159 112 L165 122 L171 112"/><path class="i" d="M195 122 V32 M189 40 L195 30 L201 40"/><path class="m" d="M40 70 H320 M40 122 H320"/><text x="48" y="64" class="mu">boundary</text><text x="48" y="116" class="mu">boundary</text><text x="214" y="60">early = shallow</text><text x="214" y="112">late = deep</text>',"A pulse travels down from the probe and echoes return from two boundaries; the later echo is drawn deeper")},
+ {id:"p-bright",t:"Why some things are bright",b:"Echoes come from boundaries where acoustic impedance changes. A large change, such as muscle to bone, sends a large share of the sound back. A small one, such as liver to kidney, sends back very little. Fluid has almost nothing inside it to reflect, so it is black.",
+  f:svg("","360 130",'<text x="16" y="30">liver to kidney</text><rect class="fb" x="150" y="18" width="190" height="14" rx="3"/><rect class="fa" x="150" y="18" width="22" height="14" rx="3"/><text x="16" y="66">muscle to bone</text><rect class="fb" x="150" y="54" width="190" height="14" rx="3"/><rect class="fa" x="150" y="54" width="150" height="14" rx="3"/><text x="16" y="102">tissue to air</text><rect class="fb" x="150" y="90" width="190" height="14" rx="3"/><rect class="fa" x="150" y="90" width="184" height="14" rx="3"/><text x="150" y="124" class="mu">sound sent back (schematic)</text>',"Bars comparing how much sound returns from three kinds of boundary")},
+ {id:"p-air",t:"Why air ends the picture",b:"Air blocks the transmission of sound. Gel is there to remove the air between the probe and the skin; lung and bowel gas do the same thing inside the body."},
+ {id:"p-atten",t:"Sound fades with depth, faster at high frequency",b:"Sound loses energy on the way down and again on the way back, by absorption, scattering and bending. Higher frequencies fade faster. That is the whole trade-off between detail and depth.",custom:"freq"},
+ {id:"p-focus",t:"The beam has a waist",b:"The beam narrows to a focal zone and spreads again beyond it. Side-to-side detail is best in the zone.",
+  f:svg("","360 130",PROBE+'<path class="i" d="M152 26 C170 60 176 70 176 80 C176 92 160 110 140 126 M208 26 C190 60 184 70 184 80 C184 92 200 110 220 126"/><path class="a" d="M150 80 H210"/><text x="218" y="84">focus: narrowest, sharpest</text><text x="228" y="122" class="mu">beyond: wider, blurrier</text>',"A beam narrowing to a focal zone and widening beyond it")},
+ {id:"p-tgc",t:"Gain and time-gain",b:"Drawn from raw echoes, the picture would be bright at the top and dark at the bottom. The machine amplifies late echoes more to cancel that. The time-gain sliders shape the curve; the gain control shifts all of it.",
+  f:svg("","360 130",'<path class="m" d="M30 110 H330 M30 110 V16"/><path class="i" d="M30 30 C120 60 220 86 330 100"/><path class="a" d="M30 100 C120 80 220 52 330 30"/><text x="40" y="24">echo strength</text><text x="236" y="24" style="fill:var(--accent)">gain applied</text><text x="262" y="126" class="mu">depth</text>',"Echo strength falling with depth and the gain applied rising to cancel it")},
+ {id:"p-doppler",t:"Doppler",b:"A reflector moving toward the probe raises the echo's frequency; moving away lowers it. Perpendicular to the flow there is no shift at all, so alignment is everything.",custom:"dopp"},
+ {id:"p-modes",t:"The modes",b:"B-mode turns echo strength into brightness and gives the moving picture. M-mode plots one line of that picture against time. Colour and spectral Doppler show flow."},
+ {id:"p-safe",t:"Safety",b:"There is no ionising radiation. Sound can heat tissue and has mechanical effects, so machines display a thermal and a mechanical index, and the rule is to keep power and scan time as low as reasonably achievable."}
+];
+var ARTS=[
+ {id:"r-reverb",t:"Reverberation",b:"Sound bounces between two strong reflectors, or between the probe and one. Each late echo is drawn deeper: evenly spaced lines that fade. Only the first is real.",h:"A-lines over air-filled lung.",x:"False lines inside a fluid-filled space (practice).",
+  f:us('<path class="w" stroke-width="4" d="M40 50 H320"/><path class="w" stroke-width="3" stroke-opacity=".6" d="M40 90 H320"/><path class="w" stroke-width="2" stroke-opacity=".35" d="M40 130 H320"/><path class="k" d="M300 50 V130"/><text class="y" x="150" y="74">same gap</text><text class="y" x="150" y="114">same gap</text>',"Evenly spaced horizontal lines fading with depth")},
+ {id:"r-comet",t:"Comet tail and ring-down",b:"Reverberation between interfaces too close to tell apart draws a tapering bright cone. Between gas bubbles it draws a long bright streak.",h:"Shows gas, or a small very reflective object.",x:"",
+  f:us('<circle class="wf" cx="130" cy="60" r="5"/><path class="wf" fill-opacity=".7" d="M124 62 L136 62 L131 120Z"/><circle class="wf" cx="230" cy="60" r="5"/><rect class="wf" fill-opacity=".6" x="227" y="62" width="6" height="110"/><text x="96" y="46">comet tail</text><text x="204" y="46">ring-down</text>',"A tapering bright cone and a long bright streak below two small reflectors")},
+ {id:"r-mirror",t:"Mirror image",b:"A strong reflector sends sound on a detour. The machine assumes a straight path and draws a copy deeper, on the far side of the reflector. The copy is dimmer and blurrier.",h:"",x:"A lesion beside the diaphragm drawn a second time above it.",
+  f:us('<path class="w" stroke-width="4" d="M40 96 Q180 76 320 96"/><circle class="wf" cx="150" cy="62" r="11"/><circle class="wf" fill-opacity=".35" cx="150" cy="120" r="12"/><text x="170" y="60">real</text><text class="y" x="170" y="126">copy</text><text x="246" y="80">reflector</text>',"A real object above a curved reflector and a dimmer copy below it")},
+ {id:"r-shadow",t:"Shadowing",b:"Nothing is drawn behind a structure that returns or absorbs nearly all the sound.",h:"Stones, calcification and bone announce themselves.",x:"It hides whatever lies behind.",
+  f:us('<rect class="wf" fill-opacity=".28" x="0" y="0" width="360" height="170"/><path d="M152 66 L208 66 L236 170 L124 170Z" style="fill:var(--us-bg)"/><path class="w" stroke-width="5" d="M152 62 Q180 50 208 62"/><text x="216" y="50">stone</text><text class="y" x="150" y="130">shadow</text>',"A bright curved surface with a dark band beneath it")},
+ {id:"r-enh",t:"Enhancement",b:"Fluid weakens sound very little, so the tissue behind it looks brighter than its neighbours.",h:"Tells fluid from solid.",x:"A little fluid behind the bladder can be hidden unless gain is lowered.",
+  f:us('<rect class="wf" fill-opacity=".28" x="0" y="0" width="360" height="170"/><path class="wf" fill-opacity=".42" d="M156 92 L204 92 L226 170 L134 170Z"/><circle cx="180" cy="64" r="28" style="fill:var(--us-bg)" class="w" stroke-width="1.5"/><text x="216" y="62">fluid</text><text class="y" x="146" y="140">brighter</text>',"A black circle with a brighter band of tissue beneath it")},
+ {id:"r-edge",t:"Edge shadow",b:"The beam bends at the curved edge of a round structure and can leave a shadow below each edge. Changing the angle of the probe can make it vanish.",h:"",x:"Can be mistaken for the shadow of a stone (practice).",
+  f:us('<rect class="wf" fill-opacity=".28" x="0" y="0" width="360" height="170"/><circle cx="180" cy="64" r="28" style="fill:var(--us-bg)" class="w" stroke-width="1.5"/><path d="M150 76 L156 76 L146 170 L136 170Z M204 76 L210 76 L224 170 L214 170Z" style="fill:var(--us-bg)"/><text class="y" x="92" y="140">edge</text><text class="y" x="232" y="140">edge</text>',"A round structure with a thin dark line descending from each edge")}
+];
+var LUNG=[
+ {id:"l-mirror",t:"Normal lung cannot be seen",b:"Air hinders sound, and the surface of air-filled lung behaves like a mirror. What appears below the pleural line does not map point for point onto lung structure.",
+  f:svg("","360 140",PROBE+'<rect class="fb" x="40" y="30" width="280" height="34"/><text x="48" y="52">chest wall</text><path class="i" d="M40 66 H320" stroke-width="3"/><text x="226" y="84">pleural line</text><path class="a" d="M150 30 V60 M210 60 V32 M204 40 L210 30 L216 40"/><text x="48" y="118" class="mu">air: almost nothing passes</text>',"Sound from the probe crossing the chest wall and turning back at the pleural line")},
+ {id:"l-pleura",t:"The pleural line",b:"A landmark for the boundary between chest wall and lung. It is a landmark, not an artefact, though it is not an exact picture of the pleura."},
+ {id:"l-a",t:"A-lines",b:"Horizontal reverberations between the pleural line and the probe, evenly spaced at multiples of the distance from probe to pleural line. They appear over normal lung and over a pneumothorax alike: both are air.",custom:"aline"},
+ {id:"l-b",t:"B-lines (vertical artefacts)",b:"Bright vertical lines that start at the pleural line. The leading explanation is an acoustic trap: where a little air has been replaced by fluid or tissue, a small pocket traps sound that entered through a narrow opening (the channel), which scatters inside and leaks back to the probe over time. The machine draws that late sound as a long streak. The consensus adds that their origin is not fully understood.",custom:"bline"},
+ {id:"l-set",t:"Settings change what you see",b:"Whether a vertical artefact appears depends on the frequency and on the machine's processing. There is no agreed standard, so say what you used.",custom:"settings"},
+ {id:"l-cons",t:"When lung becomes visible",b:"Once air is replaced, real anatomy appears. A consolidation is seen only where it reaches the pleural surface; one that is surrounded by air-filled lung stays hidden."},
+ {id:"l-slide",t:"Sliding and the lung point",b:"Absent pleural sliding together with a lung point supports pneumothorax."},
+ {id:"l-safe",t:"Safety in lung",b:"In animal studies diagnostic ultrasound can cause bleeding from lung capillaries. Start with a mechanical index under 0.4 and raise it only if the picture needs it. Some societies give limits of 0.4 to 0.7 depending on how long the lung is exposed."}
+];
+
+function card(c){
+  var h='<div class="card pad" id="'+c.id+'"><h3>'+c.t+'</h3><p>'+c.b+'</p>';
+  if(c.h)h+='<p><b>Helps:</b> '+c.h+'</p>';
+  if(c.x)h+='<p><b>Fools you:</b> '+c.x+'</p>';
+  if(c.f)h+=c.f;
+  if(c.custom)h+='<div id="x-'+c.custom+'"></div>';
+  return h+'</div>';
+}
+$("#phys").innerHTML=PHYS.map(card).join("");
+$("#arts").innerHTML=ARTS.map(card).join("");
+$("#lungs").innerHTML=LUNG.map(card).join("");
+
+/* frequency trade-off */
+function freqEngine(f){return f<=5?{z:0,reach:1-(f-2)/3*0.25}:f<7.5?{z:1,reach:0.7-(f-5)/2.5*0.25}:{z:2,reach:0.42-(f-7.5)/7.5*0.24}}
+$("#x-freq").innerHTML='<div class="ctl" style="margin-top:12px"><label for="s-freq">Frequency</label><input type="range" id="s-freq" min="2" max="15" step="0.5" value="3.5"><output id="o-freq"></output></div><div id="freqfig"></div><div class="zones" id="freqz" style="grid-template-columns:repeat(3,1fr)"><span>Low<br>deep, coarser</span><span>Middle</span><span>High<br>shallow, finer</span></div><div class="dp" id="freqdp" style="margin-top:10px"></div>';
+function paintFreq(){
+  var f=+$("#s-freq").value,e=freqEngine(f),len=20+e.reach*100,gap=3+ (15-f)*0.9;
+  $("#o-freq").textContent=f.toFixed(1)+" MHz";
+  var dots="";for(var i=0;i<4;i++)dots+='<circle class="fi" cx="'+(250+i*gap)+'" cy="60" r="2.5"/>';
+  $("#freqfig").innerHTML=svg("","360 140",PROBE+'<path class="a" d="M180 28 V'+(28+len).toFixed(0)+'"/><path class="m" d="M150 '+(30+len).toFixed(0)+' H210"/><text x="60" y="'+Math.min(132,(34+len)).toFixed(0)+'" class="mu">useful reach</text>'+dots+'<text x="222" y="86" class="mu">smallest gap seen</text>',"Beam reach and resolvable gap at this frequency");
+  $$("#freqz span").forEach(function(s,i){s.classList.toggle("on",i===e.z)});
+  var rows=e.z===0?[["What is happening","Long waves lose little energy on the way, so echoes still return from deep structures."],["Why the rule","Low frequency is chosen for deep structures and large patients."],["At the bedside","Curvilinear probes work here, at about 3.5 to 5 MHz."]]
+   :e.z===2?[["What is happening","Short waves separate fine detail but do not reach deep structures."],["Why the rule","High frequency is chosen for shallow structures such as vessels, thyroid and muscle."],["At the bedside","Linear probes work here, from about 7.5 MHz upward."]]
+   :[["What is happening","A compromise: moderate reach, moderate detail."],["Why the rule","Some machines let you tip a preset toward resolution or penetration."],["At the bedside","If the deep part of the picture is grainy, switch toward penetration."]];
+  $("#freqdp").innerHTML=rows.map(function(q){return "<div><span>"+q[0]+"</span><span>"+q[1]+"</span></div>"}).join("");
+}
+$("#s-freq").addEventListener("input",paintFreq);
+
+/* Doppler alignment */
+function doppEngine(a){return a<=20?0:a<=60?1:a<90?2:3}
+$("#x-dopp").innerHTML='<div class="ctl" style="margin-top:12px"><label for="s-ang">Angle to flow</label><input type="range" id="s-ang" min="0" max="90" step="5" value="15"><output id="o-ang"></output></div><div id="doppfig"></div><div class="zones" id="doppz" style="grid-template-columns:repeat(4,1fr)"><span>0 to 20<br>aligned</span><span>to 60<br>vessels only</span><span>over 60<br>unreliable</span><span>90<br>no signal</span></div><div class="dp" id="doppdp" style="margin-top:10px"></div>';
+function paintDopp(){
+  var a=+$("#s-ang").value,z=doppEngine(a),rad=a*Math.PI/180,frac=Math.cos(rad);
+  $("#o-ang").textContent=a+"°";
+  var bx=180-Math.sin(rad)*70,by=92-Math.cos(rad)*70;
+  $("#doppfig").innerHTML=svg("","360 140",'<path class="i" d="M40 92 H300 M290 86 L302 92 L290 98" /><text x="44" y="116" class="mu">flow</text><path class="a" d="M'+bx.toFixed(1)+' '+by.toFixed(1)+' L180 92"/><circle class="fa" cx="'+bx.toFixed(1)+'" cy="'+by.toFixed(1)+'" r="6"/><rect class="fb" x="236" y="20" width="14" height="60" rx="3"/><rect class="fa" x="236" y="'+(80-60*frac).toFixed(1)+'" width="14" height="'+(60*frac).toFixed(1)+'" rx="3"/><text x="256" y="32" class="mu">shift</text><text x="256" y="46" class="mu">detected</text>',"A Doppler beam meeting flow at "+a+" degrees, with a bar showing how much of the shift is detected");
+  $$("#doppz span").forEach(function(s,i){s.classList.toggle("on",i===z)});
+  var rows=[
+   [["What is happening","The beam runs nearly along the flow, so nearly all of the frequency shift is detected."],["Why the rule","Right-heart velocities are measured within 20 degrees of the jet."],["At the bedside","Move the probe, not the cursor, until the line lies along the flow."]],
+   [["What is happening","Part of the shift is lost, and more with every degree."],["Why the rule","60 degrees or less is the usual advice for vessels; it is too loose for cardiac jets."],["At the bedside","Without angle correction velocities read low; with it, the error grows as the angle nears 60. Find a better window if the number matters."]],
+   [["What is happening","Most of the shift is lost, and small errors in angle change the answer a great deal."],["Why the rule","Beyond 60 degrees the measurement is not dependable."],["At the bedside","Do not record a velocity from here."]],
+   [["What is happening","The flow crosses the beam without moving toward or away from the probe."],["Why the rule","Perpendicular to flow the Doppler effect does not occur."],["At the bedside","A vessel with no colour may simply be square to the beam. Tilt the probe."]]][z];
+  $("#doppdp").innerHTML=rows.map(function(q){return "<div><span>"+q[0]+"</span><span>"+q[1]+"</span></div>"}).join("");
+}
+$("#s-ang").addEventListener("input",paintDopp);
+
+/* A-lines: spacing is a multiple of the probe-to-pleura distance */
+$("#x-aline").innerHTML='<div class="ctl" style="margin-top:12px"><label for="s-wall">Chest wall</label><input type="range" id="s-wall" min="1" max="4" step="0.5" value="2"><output id="o-wall"></output></div><div id="alinefig"></div><div class="dp" id="alinedp" style="margin-top:10px"></div>';
+function alineEngine(w,depth){var out=[];for(var k=2;k*w<=depth;k++)out.push(k*w);return out}
+function paintAline(){
+  var w=+$("#s-wall").value,depth=10,sc=15,lines=alineEngine(w,depth);
+  $("#o-wall").textContent=w.toFixed(1)+" cm";
+  var h='<path class="w" stroke-width="4" d="M40 '+(10+w*sc)+' H320"/><text x="236" y="'+(6+w*sc)+'">pleural line</text>';
+  lines.forEach(function(z,i){h+='<path class="w" stroke-width="2.5" stroke-opacity="'+Math.max(.25,.75-i*.18)+'" d="M40 '+(10+z*sc)+' H320"/><text class="y" x="56" y="'+(6+z*sc)+'">'+(i+2)+' × '+w.toFixed(1)+' = '+z.toFixed(1)+' cm</text>'});
+  $("#alinefig").innerHTML=us(h,"A-lines repeating below the pleural line at multiples of its depth");
+  $("#alinedp").innerHTML=[["What is happening","Sound bounces between the pleural line and the probe. Every extra round trip is drawn one more chest-wall thickness down."],["Why it matters","A line at exactly twice the depth of the pleural line is an artefact, not a second structure."],["At the bedside","A-lines mean air below the pleura. They do not tell normal lung from pneumothorax. Sliding at that spot argues against pneumothorax there; absent sliding alone does not prove it."]].map(function(q){return "<div><span>"+q[0]+"</span><span>"+q[1]+"</span></div>"}).join("");
+}
+$("#s-wall").addEventListener("input",paintAline);
+
+/* B-line trap */
+$("#x-bline").innerHTML='<div class="seg" role="group" aria-label="Size of the channel" id="trap" style="margin-top:12px"><button type="button" data-t="small" aria-pressed="true">Narrow channel</button><button type="button" data-t="large" aria-pressed="false">Wider channel</button></div><div id="blinefig"></div><p class="note" id="blinenote" style="margin-top:8px"></p>';
+function paintBline(){
+  var small=$('#trap button[aria-pressed=true]').dataset.t==="small",len=small?120:44;
+  $("#blinefig").innerHTML=us('<path class="w" stroke-width="4" d="M40 40 H320"/><rect class="wf" fill-opacity=".8" x="176" y="42" width="8" height="'+len+'"/><circle class="k" cx="180" cy="40" r="'+(small?6:12)+'"/><text class="y" x="198" y="34">'+(small?"small trap":"larger trap")+'</text>',"A vertical bright line below the pleural line, "+(small?"long":"short"));
+  $("#blinenote").textContent=small?"In bench models, a narrow channel holds the sound for longer, so it keeps leaking back and the streak is long.":"In bench models, a wider channel lets the energy escape sooner, so the streak is short.";
+}
+$("#trap").addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;$$("#trap button").forEach(function(x){x.setAttribute("aria-pressed",String(x===b))});paintBline()});
+
+/* settings and B-lines */
+var SETS={base:["Lung preset, single focus at the pleural line","One narrow line. This is the setting to count on.",'<rect class="wf" fill-opacity=".8" x="176" y="42" width="8" height="126"/>'],
+ freq:["Frequency raised from 2 to 6 MHz","The line may shorten or disappear, more often in fibrosis than in cardiogenic edema. This is a change to know about, not an error.",'<rect class="wf" fill-opacity=".7" x="176" y="42" width="8" height="34"/>'],
+ comp:["Spatial compounding on","One line splits into several fanning from the pleural line, which spoils a count.",'<path class="wf" fill-opacity=".6" d="M177 42 L183 42 L150 168 L138 168Z M177 42 L183 42 L186 168 L174 168Z M177 42 L183 42 L222 168 L210 168Z"/>'],
+ focus:["Focus set deep","The line widens and neighbours merge.",'<path class="wf" fill-opacity=".65" d="M176 42 L184 42 L214 168 L146 168Z"/>']};
+$("#x-settings").innerHTML='<div class="seg" role="group" aria-label="Setting" id="setpick" style="margin-top:12px"><button type="button" data-k="base" aria-pressed="true">Lung preset</button><button type="button" data-k="freq" aria-pressed="false">Higher MHz</button><button type="button" data-k="comp" aria-pressed="false">Compound</button><button type="button" data-k="focus" aria-pressed="false">Deep focus</button></div><div id="setfig"></div><p id="settext" style="margin-top:8px"></p><div class="warnbox">For lung: use the lung preset or turn compounding off, keep a single focus at the pleural line, and do not use harmonic imaging when judging cardiogenic edema.</div>';
+function paintSet(){var k=$('#setpick button[aria-pressed=true]').dataset.k,s=SETS[k];
+  $("#setfig").innerHTML=us('<path class="w" stroke-width="4" d="M40 40 H320"/>'+s[2],"The same lung under this setting");
+  $("#settext").innerHTML="<b>"+s[0]+".</b> "+s[1]}
+$("#setpick").addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;$$("#setpick button").forEach(function(x){x.setAttribute("aria-pressed",String(x===b))});paintSet()});
+
+/* tabs */
+$$("nav.tabs button").forEach(function(b){b.addEventListener("click",function(){
+  $$("nav.tabs button").forEach(function(x){x.setAttribute("aria-selected",String(x===b))});
+  $$("section.view").forEach(function(s){s.classList.toggle("on",s.id===b.getAttribute("aria-controls"))});
+  window.scrollTo(0,0)})});
+function openHash(){var id=location.hash.slice(1);if(!id)return;var el=document.getElementById(id);if(!el)return;var sec=el.closest("section.view");
+  if(sec&&!sec.classList.contains("on")){var t=document.getElementById("t-"+sec.id);if(t)t.click()}
+  if(el!==sec)el.scrollIntoView()}
+window.addEventListener("hashchange",openHash);
+
+/* ── Practice: the same engines and drawings as the other tabs ── */
+var CTRL=["Depth","Gain","Near and far gain (time-gain)","Preset"];
+function simCase(s,stem){var e=simEngine(s),ans=e.depth!=="ok"?0:e.tgc!=="ok"?2:e.gain!=="ok"?1:3;
+  var why=e.depth==="shallow"?"Too shallow: the far side of the target is cut off. Add depth; brightness is not the problem.":e.depth==="deep"?"Too deep: the target is a small shape near the top. Take depth off until it sits in the middle.":e.tgc==="neartop"?"Bright near the probe and dark deeper down. Raise the far gain or lower the near gain until tissue is the same grey top to bottom.":e.tgc==="fartop"?"Dark near the probe and bright deeper down. Lower the far gain or raise the near gain.":e.gain==="high"?"Too much gain: tissue is washed out and the fluid is starting to fill in. Turn gain down until tissue is mid-grey and the fluid is black.":"Too little gain: tissue detail is lost in black. Turn gain up until tissue is mid-grey and the fluid is still black.";
+  return {stem:stem,sim:s,q:"Which control fixes it?",o:CTRL,a:ans,why:why}}
+function artCase(id,opts){var r=ARTS.filter(function(x){return x.id===id})[0];return {stem:"Name the artefact.",fig:r.f.replace(/<text[^>]*>[^<]*<\/text>/g,""),q:"What is this?",o:opts,a:opts.indexOf(r.t),why:r.b}}
+function setCase(k,stem,opts,a){return {stem:stem,fig:us('<path class="w" stroke-width="4" d="M40 40 H320"/>'+SETS[k][2],"Lung picture"),q:"What is the most likely cause?",o:opts,a:a,why:SETS[k][0]+". "+SETS[k][1]+" Use the lung preset or turn compounding off, with a single focus at the pleural line."}}
+var PCASES=[
+ simCase({D:12,g:88,n:40,f:60},"The tissue is washed out to white and edges are hard to see."),
+ simCase({D:20,g:50,n:40,f:60},"You are looking for a 3 cm structure about 6 cm down."),
+ simCase({D:7,g:50,n:40,f:60},"The bottom of the target is missing."),
+ simCase({D:12,g:14,n:40,f:60},"You can hardly see the tissue."),
+ simCase({D:12,g:50,n:85,f:15},"The top of the picture is bright and the bottom fades out."),
+ simCase({D:12,g:50,n:8,f:96},"The top of the picture is dark and the bottom glares."),
+ setCase("comp","Over the lung, one vertical line seems to fan into several.",["Spatial compounding is on","Gain is too low","Depth is too shallow"],0),
+ setCase("focus","Over the lung, the vertical lines look wide and run together.",["Focus is set deep","The probe marker is reversed","Gain is too low"],0),
+ {stem:"Spectral Doppler over a vessel shows almost no signal. The beam crosses the vessel at a right angle.",q:"Which fix?",o:["Turn the gain up","Angle the beam along the flow","Add depth"],a:1,why:doppEngine(90)===3?"At 90 degrees to flow there is no Doppler shift, so there is nothing to amplify. Line up with flow: 60 degrees or less for vessels, within 20 degrees for right-heart measurements.":""},
+ {stem:"In an apical view the larger ventricle is on the side where you expected the smaller one. Before calling it disease:",q:"What do you check first?",o:["Touch one edge of the probe face and see which side of the screen moves","Turn the gain down","Switch to M-mode"],a:0,why:"The mark on the screen matches the mark on the probe, and which side it sits on depends on the preset. A mirrored picture swaps left and right."},
+ artCase("r-reverb",["Reverberation","Mirror image","Enhancement"]),
+ artCase("r-enh",["Shadowing","Enhancement","Edge shadow"])
+];
+var pi=0,ppick={};
+function paintCase(){var c=PCASES[pi],p=ppick[pi],h='<span class="kicker">Case '+(pi+1)+' of '+PCASES.length+'</span><p class="stem">'+c.stem+'</p>'+(c.sim?'<canvas id="pscan" width="720" height="600" role="img" aria-label="Drawn ultrasound picture"></canvas>':(c.fig||""));
+  h+='<h4>'+c.q+'</h4><div class="opts">'+c.o.map(function(o,i){var cls=p===undefined?"":(i===c.a?"right":(i===p?"wrong":""));return '<button type="button" data-o="'+i+'" class="'+cls+'"'+(p!==undefined?" disabled":"")+'>'+o+'</button>'}).join("")+'</div>'+(p!==undefined?'<p class="fb"><b>'+(p===c.a?"Right.":"Not quite.")+'</b> '+c.why+'</p>':"");
+  var done=0,ok=0;PCASES.forEach(function(x,i){if(ppick[i]!==undefined){done++;if(ppick[i]===x.a)ok++}});
+  h+='<div class="casenav"><button type="button" id="prevc"'+(pi===0?" disabled":"")+'>Back</button><span>'+ok+' right of '+done+' answered</span><button type="button" class="p" id="nextc"'+(pi===PCASES.length-1?" disabled":"")+'>Next</button></div>';
+  $("#case").innerHTML=h;if(c.sim)paintScan($("#pscan"),c.sim)}
+$("#case").addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;
+  if(b.id==="nextc"){pi++;paintCase();return}if(b.id==="prevc"){pi--;paintCase();return}
+  if(b.dataset.o!==undefined&&ppick[pi]===undefined){ppick[pi]=+b.dataset.o;paintCase()}});
+
+window.__pcases=PCASES;
+window.__engines={sim:simEngine,freq:freqEngine,dopp:doppEngine,aline:alineEngine};
+paintCards();drawSim();paintFreq();paintDopp();paintAline();paintBline();paintSet();paintCase();openHash();
+})();
+</script>
+</body>
+</html>
