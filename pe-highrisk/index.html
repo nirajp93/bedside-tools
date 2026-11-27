@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>High-risk pulmonary embolism · bedside.tools</title>
+<meta name="description" content="High-risk pulmonary embolism in adults (AHA/ACC 2026 categories C3, D and E): confirm the PE is causing the shock, support the right ventricle, anticoagulate, choose systemic lysis, catheter therapy, surgery or ECMO by category and bleeding risk, and the plan after lysis.">
+<script src="/theme.js"></script>
+<style>
+:root{--bg:#FBFBFA;--card:#FFFFFF;--ink:#111113;--muted:#55555D;--line:#ECECEE;--accent:#2B4BDB;--warn:#9A3B00;--warnbg:#FFF6EC}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5}
+.mono{font-family:var(--mono)}
+.wrap{max-width:720px;margin:0 auto;padding:20px 16px 48px}
+a{color:var(--accent)}
+.back{font-size:14px;text-decoration:none;display:inline-block;min-height:44px;line-height:44px}
+h1{font-size:26px;margin:4px 0 4px;letter-spacing:-.01em}
+.purpose{color:var(--muted);margin:0 0 20px}
+.tabs{display:flex;gap:6px;margin-bottom:16px}
+.tab{flex:1;min-width:0;min-height:44px;border:1px solid var(--line);background:var(--card);border-radius:14px;padding:0 4px;font:inherit;font-size:15px;font-weight:600;color:var(--muted);cursor:pointer}
+.tab[aria-selected="true"]{border-color:var(--accent);color:var(--accent)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
+.label{font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.field{display:flex;flex-direction:column;justify-content:flex-end}
+.field label{display:block;font-size:13px;color:var(--muted);margin-bottom:4px}
+.field input,.field select{width:100%;min-height:44px;border:1px solid var(--line);border-radius:10px;padding:8px 10px;font:inherit;font-family:var(--mono);background:var(--card);color:var(--ink)}
+.field input:focus,.field select:focus,.tab:focus-visible,.chk:focus-within,button:focus-visible,summary:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.checks{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.chk{display:flex;align-items:center;gap:10px;min-height:44px;border:1px solid var(--line);border-radius:10px;padding:6px 10px;font-size:14px;cursor:pointer}
+.chk input{width:20px;height:20px;accent-color:var(--accent);flex:none}
+.card h2{font-size:18px;margin:0 0 2px}
+.sub{font-size:14px;color:var(--muted);margin:0}
+.card ul{margin:6px 0 0;padding-left:20px}
+.card li{margin-bottom:4px}
+.guard{border-left:3px solid var(--warn);background:var(--warnbg);padding:8px 10px;border-radius:0 10px 10px 0;margin-top:8px;font-size:14.5px}
+.tier{display:inline-block;font-family:var(--mono);font-size:11px;border:1px solid var(--line);border-radius:999px;padding:2px 8px;color:var(--muted);margin:6px 6px 0 0}
+details{margin-top:10px;border-top:1px solid var(--line);padding-top:8px}
+.whyline{margin:10px 0 0;font-size:14.5px;color:var(--muted)}
+.whyline b{color:var(--ink);font-weight:600}
+summary{cursor:pointer;color:var(--accent);font-weight:600;min-height:44px;line-height:44px}
+details p{margin:0 0 8px;font-size:15px}
+.btn{min-height:44px;border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);border-radius:10px;padding:8px 14px;font:inherit;font-weight:600;cursor:pointer}
+.btn.ghost{background:var(--card);color:var(--accent)}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.note{font-size:14px;color:var(--muted)}
+.links{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:8px;font-size:14.5px}
+.links a{display:inline-flex;align-items:center;min-height:44px}
+.tl{position:relative;padding-left:26px;margin-top:6px}
+.tl:before{content:"";position:absolute;left:8px;top:10px;bottom:10px;width:2px;background:var(--line)}
+.st{position:relative;padding:6px 0 10px}
+.st:before{content:"";position:absolute;left:-24px;top:11px;width:12px;height:12px;border-radius:50%;background:var(--card);border:2px solid var(--muted)}
+.st.now:before{background:var(--accent);border-color:var(--accent)}
+.st.done:before{background:var(--ok);border-color:var(--ok)}
+.st .when{font-family:var(--mono);font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+.st b{display:block}
+.st small{color:var(--muted);font-size:13.5px;display:block}
+.st.done b{color:var(--muted)}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:6px 6px 6px 0;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:var(--mono);font-size:11.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);font-weight:500}
+.case h2{font-size:17px}
+.ans{margin-top:10px;border-top:1px solid var(--line);padding-top:10px}
+footer{margin-top:28px;font-size:13.5px;color:var(--muted)}
+footer p{margin:0 0 8px}
+.panel{display:none}.panel.on{display:block}
+.fig{display:block;width:100%;max-width:460px;height:auto;margin:0 auto}
+.states{display:flex;gap:6px;overflow-x:auto;margin:10px -16px;padding:2px 16px 6px;scrollbar-width:none}
+.states::-webkit-scrollbar{display:none}
+.states.wrapit{flex-wrap:wrap;overflow:visible;margin:10px 0;padding:0}
+.sbtn{flex:none;min-height:44px;min-width:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--ink);font:inherit;font-size:14px;cursor:pointer;white-space:nowrap}
+.sbtn[aria-pressed="true"]{border-color:var(--accent);color:var(--accent);font-weight:600}
+.line1{font-size:15px;margin:10px 0 0}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.chip{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--fill);color:var(--ink);font:inherit;font-size:14px;cursor:pointer;text-align:left}
+.chip svg{flex:none;color:var(--accent)}
+.scrim{position:fixed;inset:0;background:var(--scrim);z-index:20}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:21;max-height:90vh;overflow-y:auto;background:var(--card);border:1px solid var(--line);border-bottom:0;border-radius:20px 20px 0 0;padding:8px 16px 24px;max-width:560px;margin:0 auto}
+.sheethead{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.sheethead h2{font-size:18px;margin:0}
+.xbtn{min-height:44px;min-width:44px;border:0;background:transparent;color:var(--accent);font:inherit;font-weight:600;cursor:pointer}
+.pills{position:sticky;top:var(--bt-bar,0px);z-index:5;background:var(--bg);display:flex;gap:6px;overflow-x:auto;margin:0 -16px 12px;padding:8px 16px;border-bottom:1px solid var(--line);scrollbar-width:none}
+.pills::-webkit-scrollbar{display:none}
+.pill{flex:none;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--muted);font:inherit;font-size:14px;cursor:pointer;white-space:nowrap}
+.pill[aria-current="true"]{border-color:var(--accent);color:var(--accent);font-weight:600}
+.chap{scroll-margin-top:70px}
+.cause{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:8px 0;border-top:1px solid var(--line);font-size:15px}
+.cause small{color:var(--muted);font-size:13px;text-align:right;flex:0 1 58%}
+.cause.less>span{color:var(--muted)}
+.cause.fav span{font-weight:700}
+.cause.fav span:before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--accent);margin-right:8px}
+.trial{border-left:3px solid var(--accent);padding-left:12px}
+.trial p{margin:0 0 6px;font-size:15px}
+.trial .k{font-family:var(--mono);font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);display:block}
+.sl input[type=range]{width:100%;min-height:44px;accent-color:var(--accent)}
+.sl label{display:flex;justify-content:space-between;font-size:13px;color:var(--muted);margin-top:8px}
+.sl label b{font-family:var(--mono);color:var(--ink)}
+.zs{display:flex;gap:2px;height:8px;margin-top:4px}
+.zs i{display:block;border-radius:99px;background:var(--line)}
+.zs i.on{background:var(--accent)}
+.zt{font-family:var(--mono);font-size:12.5px;color:var(--ink);margin:6px 0 0}
+.dp{margin-top:10px;border:1px solid var(--line);border-radius:12px;padding:2px 12px;background:var(--card)}
+.dp>div{padding:10px 0;border-top:1px solid var(--line)}
+.dp>div:first-child{border-top:0}
+.dp .label{margin:0 0 3px}
+.dp p{font-size:15px;margin:0}
+.clock{font-family:var(--mono);font-size:14px;margin:8px 0 0}
+.deeper{margin-top:14px;border-top:1px solid var(--line)}
+.deeper>summary{min-height:44px;display:flex;align-items:center;gap:8px;color:var(--accent);font-weight:600;font-size:15px;cursor:pointer;list-style:none;line-height:1.3}
+.deeper>summary::-webkit-details-marker{display:none}
+.deeper>summary::before{content:"+";font-family:var(--mono);font-size:18px;line-height:1;width:14px;text-align:center}
+.deeper[open]>summary::before{content:"\2212"}
+.deeper .dpx{border:1px solid var(--line);border-radius:12px;padding:2px 12px;background:var(--card);text-align:left}
+.deeper .dpx>div{padding:10px 0;border-top:1px solid var(--line)}
+.deeper .dpx>div:first-child{border-top:0}
+.deeper .dl{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500;margin:0 0 3px}
+.deeper p{font-size:15px;line-height:1.45;color:var(--ink);margin:0 0 4px}
+.plate{margin-top:10px;border:1px solid var(--line);border-radius:12px;padding:6px;background:var(--card)}
+.plate img{display:block;width:100%;height:auto;border-radius:8px}
+.credit{display:block;font-family:var(--mono);font-size:11px;color:var(--muted);text-align:right;margin:4px 2px 0}
+@media (min-width:900px){
+  .wrap{max-width:1040px}
+  #p-tool.on{display:grid;grid-template-columns:380px minmax(0,1fr);gap:20px;align-items:start}
+
+  .scoregrid{grid-template-columns:1fr 1fr 1fr}
+  #p-learn{max-width:720px;margin:0 auto}
+}
+@media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+.opt{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 10px;padding:9px 0;border-top:1px solid var(--line);font-size:15px;align-items:baseline}
+.opt .g{font-family:var(--mono);font-size:12px;color:var(--muted);text-align:right}
+.opt small{grid-column:1/-1;color:var(--muted);font-size:13.5px;line-height:1.4}
+.opt.lead>b:before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--accent);margin-right:8px}
+.opt.out>b{text-decoration:line-through;color:var(--muted)}
+.opt.dim>b{color:var(--muted)}
+.tag{display:inline-block;font-family:var(--mono);font-size:11px;font-weight:500;border-radius:999px;padding:1px 7px;border:1px solid var(--line);margin-left:6px;color:var(--muted)}
+.tag.here{color:var(--ok);border-color:var(--ok)}
+.tag.warn{color:var(--warn);border-color:var(--warn)}
+.sec{font-size:13px;color:var(--muted);margin:14px 0 0}
+.hint{font-size:13.5px;color:var(--muted);margin:8px 0 0}
+.checks.one{grid-template-columns:1fr}
+@media (max-width:420px){.checks{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="/">← bedside.tools</a>
+<h1>High-risk pulmonary embolism</h1>
+<p class="purpose">PE with a failing right ventricle (AHA/ACC categories C3, D and E): is the PE causing the shock, how to support the right ventricle, which anticoagulant, and lysis, catheter, surgery or ECMO by category and bleeding risk.</p>
+
+<div class="tabs" role="tablist">
+  <button class="tab" role="tab" id="t-tool" aria-selected="true" aria-controls="p-tool">Treat</button>
+  <button class="tab" role="tab" id="t-learn" aria-selected="false" aria-controls="p-learn">Learn</button>
+  <button class="tab" role="tab" id="t-prac" aria-selected="false" aria-controls="p-prac">Practice</button>
+</div>
+
+<div class="panel on" id="p-tool" role="tabpanel" aria-labelledby="t-tool">
+  <div id="inputs">
+  <div class="card" id="category">
+    <p class="label">Category</p>
+    <p class="sub">Already classed in <a href="/vte-treatment/#severity">VTE treatment</a>? Pick it. Otherwise leave it on "work it out" and enter what you see.</p>
+    <div class="states wrapit" id="pickseg" role="group" aria-label="Category if known"></div>
+  </div>
+  <div class="card" id="hemo">
+    <p class="label">Blood pressure and perfusion</p>
+    <div class="states wrapit" id="hemoseg" role="group" aria-label="Blood pressure"></div>
+    <div class="grid">
+      <div class="field"><label for="sbp">Systolic BP (mmHg)</label><input id="sbp" inputmode="decimal" autocomplete="off"></div>
+      <div class="field"><label for="map">MAP (mmHg)</label><input id="map" inputmode="decimal" autocomplete="off"></div>
+      <div class="field"><label for="lac">Lactate (mmol/L)</label><input id="lac" inputmode="decimal" autocomplete="off"></div>
+      <div class="field"><label for="wt">Weight (kg)</label><input id="wt" inputmode="decimal" autocomplete="off"></div>
+    </div>
+    <div class="checks one" id="ticks-h"></div>
+  </div>
+  <div class="card" id="heart">
+    <p class="label">Right ventricle, oxygen and imaging</p>
+    <div class="checks" id="ticks-r"></div>
+    <p class="sec">Oxygen and breathing support</p>
+    <div class="states wrapit" id="respseg" role="group" aria-label="Breathing support"></div>
+    <div class="checks" id="ticks-i"></div>
+  </div>
+  <div class="card" id="contra">
+    <p class="label">Contraindications to thrombolysis</p>
+    <p class="sub">Tick any that apply. ESC 2019 list; check the full label list too.</p>
+    <p class="sec">Absolute</p>
+    <div class="checks" id="ticks-a"></div>
+    <p class="sec">Relative</p>
+    <div class="checks" id="ticks-l"></div>
+  </div>
+  <div class="card" id="patient">
+    <p class="label">Anticoagulant</p>
+    <div class="checks" id="ticks-p"></div>
+  </div>
+  <div class="card" id="hospital">
+    <p class="label">Available at this hospital now</p>
+    <p class="sub">Leave blank if unsure; options then read "where available".</p>
+    <div class="checks one" id="ticks-x"></div>
+  </div>
+  </div>
+  <div id="out"></div>
+</div>
+
+<div class="panel" id="p-learn" role="tabpanel" aria-labelledby="t-learn">
+  <div class="pills" id="pills"></div>
+  <div class="card chap" id="learn-spiral" data-pill="Spiral"><p class="label">1 · The spiral</p><h2>How a clot kills through the right ventricle, and where each treatment acts</h2><p class="sub">Tap a state.</p><div data-figure="spiral"></div></div>
+  <div class="card chap" id="learn-septum" data-pill="Fluid"><p class="label">2 · Two ventricles, one sac</p><h2>Why more fluid can lower the blood pressure</h2><div id="plate-rv"></div><p class="sub" style="margin-top:12px">Tap a state.</p><div data-figure="septum"></div></div>
+  <div class="card chap" id="learn-tube" data-pill="Intubation"><p class="label">3 · The tube</p><h2>Why intubation can cause arrest</h2><div data-figure="tube"></div></div>
+  <div class="card chap" id="learn-echo" data-pill="Echo"><p class="label">4 · Echo</p><h2>What the right ventricle looks like on bedside echo</h2><p class="sub">Tap a state. Schematic, not to scale.</p><div data-figure="echo"></div></div>
+  <div class="card chap" id="learn-options" data-pill="Options"><p class="label">5 · Reperfusion</p><h2>Which option the guideline grades, by category</h2><p class="sub">Tap a category. Same table as the Treat tab.</p><div data-figure="options"></div><div id="plate-cdl" style="margin-top:12px"></div></div>
+  <div class="card chap" id="trials" data-pill="Trials"><p class="label">6 · Trials</p><h2>The trials behind the practice</h2><p class="sub">Almost no randomized trial enrolled patients in shock. Most catheter evidence uses surrogate endpoints or no control group, and most trials were industry funded.</p><div id="trialbox"></div><div class="row"><button class="btn" id="go-prac">Try the practice cases</button></div></div>
+</div>
+
+<div class="panel" id="p-prac" role="tabpanel" aria-labelledby="t-prac">
+  <div id="practice"></div>
+</div>
+
+<div class="scrim" id="scrim" hidden></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-t" hidden>
+  <div class="sheethead"><h2 id="sheet-t"></h2><button class="xbtn" id="sheet-x">Close</button></div>
+  <div id="sheet-b"></div>
+</div>
+
+<footer>
+  <p><strong>For education only. Not a substitute for clinical judgment.</strong> This tool starts where VTE treatment stops: categories C3, D and E of the 2026 AHA/ACC classification. Categories, reperfusion grades and doses match the VTE treatment and code cards tools. Evidence tiers are the AHA/ACC class and level (1, 2a, 2b, 3: No Benefit, 3: Harm; A, B-R, B-NR, C-LD, C-EO) or the ESC 2019 class and level (I to III; A to C); rows marked expert practice are not from a graded guideline. The bleeding plan after lysis is adapted from the 2026 AHA/ASA stroke guideline, which was written for stroke, not PE. Who has a catheter team, cardiac surgery or ECMO, and the heparin protocol, vary: adjust to your institution.</p>
+  <p>Privacy: everything runs in your browser. Nothing you enter is sent anywhere or stored, and there are no analytics. Do not enter names, record numbers, or dates of birth.</p>
+  <p id="credit-line">Learn figures marked so were created with BioRender.com.</p>
+  <p class="mono">Last reviewed: 2026-11-27</p>
+  <p><strong>Sources:</strong> Creager MA et al., 2026 AHA/ACC/ACCP/ACEP/CHEST/SCAI/SHM/SIR/SVM/SVN Guideline for the Evaluation and Management of Acute Pulmonary Embolism in Adults, Circulation 2026;153:e977 (a correction, Circulation 2026;154:e24, was not reviewed) · Konstantinides SV et al., 2019 ESC Guidelines for the diagnosis and management of acute pulmonary embolism, Eur Heart J 2020;41:543 · 2025 American Heart Association Guidelines for CPR and Emergency Cardiovascular Care, Part 10: Adult and Pediatric Special Circumstances of Resuscitation, Circulation 2025 · Prabhakaran S et al., 2026 Guideline for the Early Management of Patients With Acute Ischemic Stroke, Stroke 2026 (Table 5) · Raschke RA et al., Ann Intern Med 1993;119:874 · US prescribing information: Activase (alteplase, 2022), TNKase (tenecteplase, 2025), enoxaparin, heparin sodium · Trials: Meyer G et al., N Engl J Med 2014;370:1402 · Rosenfield K et al., N Engl J Med 2026;394:1979 · Kucher N et al., Circulation 2014;129:479 · Jaber WA et al., Circulation 2025;151:260 · Lookstein RA et al., Circulation 2026;153:21 · Wang C et al., Chest 2010;137:254 · Sharifi M et al., Am J Cardiol 2013;111:273 · Chatterjee S et al., JAMA 2014;311:2414 · Jerjes-Sanchez C et al., J Thromb Thrombolysis 1995;2:227 · Karami M et al., J Crit Care 2021;64:245.</p>
+</footer>
+</div>
+<script id="engine">
+/* Data and decision engine: no page access here, so the practice cases and the audits run the same code. */
+function has(v){ return v != null; }
+function r0(n){ return Math.round(n); }
+function fmt(n){ return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
+
+var PICK = [['','Not sure: work it out'],['C3','C3'],['D1','D1'],['D2','D2'],['E1','E1'],['E2','E2']];
+var HEMO = [['held','Pressure has held'],['brief','Brief drop: under 15 min, or came up with fluid'],['pers','Low for over 15 min, or needs a vasopressor'],['refr','Low despite vasopressors'],['arrest','Cardiac arrest now']];
+var RESP = [['air','Room air'],['low','Nasal oxygen up to 6 L/min'],['hi','Over 6 L/min or non-rebreather'],['ppv','NIV or ventilator']];
+var TICKS_H = [['perf','Poor perfusion: lactate above 2, AKI, urine below 0.5 mL/kg/h, new confusion, cardiac index below 2.2 or MAP below 60'],['rosc','Arrested earlier, now has a pulse']];
+var TICKS_R = [['rv','Right ventricle dilated or failing (echo or CT)'],['bio','Troponin or BNP raised'],['cit','Clot in transit in the right heart']];
+var TICKS_I = [['ctno','Too unstable to go to CT'],['ctyes','PE confirmed on CT']];
+var ABS = [['a_hs','Hemorrhagic stroke, or stroke of unknown origin, ever'],['a_is','Ischemic stroke in the past 6 months'],['a_cns','Tumor of the brain or spinal cord'],['a_tr','Major trauma, surgery or head injury in the past 3 weeks'],['a_bd','Bleeding disorder'],['a_ab','Active bleeding']];
+var REL = [['r_tia','TIA in the past 6 months'],['r_oac','On an oral anticoagulant'],['r_preg','Pregnant, or within a week of delivery'],['r_punc','Puncture site that cannot be compressed'],['r_cpr','Traumatic CPR'],['r_htn','Systolic above 180 despite treatment'],['r_liv','Advanced liver disease'],['r_ie','Infective endocarditis'],['r_pu','Active peptic ulcer']];
+var TICKS_P = [['crcl','CrCl below 30'],['soon','Lysis or surgery likely within hours'],['lmwh','LMWH already given'],['noac','Cannot take any anticoagulant']];
+var TICKS_X = [['x_cath','Catheter thrombectomy or catheter-directed lysis'],['x_surg','Surgical embolectomy'],['x_ecmo','VA-ECMO'],['x_none','None of these']];
+var ALLT = TICKS_H.concat(TICKS_R, TICKS_I, ABS, REL, TICKS_P, TICKS_X);
+var CATORDER = ['C2','C3','D1','D2','E1','E2'];
+
+/* Category definitions: AHA/ACC 2026 section 3.2 and Figure 2, same wording as the VTE treatment tool. */
+var CATS = {
+  C3: {t: 'Raised score, RV and a biomarker abnormal', def: 'A raised severity score (sPESI 1 or more, PESI above 85, or Hestia 1 or more) with both an abnormal right ventricle and a raised troponin or BNP, blood pressure normal.'},
+  D1: {t: 'Transient hypotension', def: 'Systolic below 90, or a fall of more than 40, lasting under 15 minutes or responding to fluid, with no sign of poor perfusion.'},
+  D2: {t: 'Poor perfusion without sustained hypotension', def: 'A marker of poor perfusion (lactate above 2 mmol/L, acute kidney injury, urine below 0.5 mL/kg/h, mental status change, cardiac index below 2.2, MAP below 60) while blood pressure holds or dips only briefly.'},
+  E1: {t: 'Persistent hypotension, cardiogenic shock', def: 'Recurrent or persistent hypotension with cardiogenic shock (SCAI stage C).'},
+  E2: {t: 'Refractory shock or cardiac arrest', def: 'Refractory cardiogenic shock (SCAI stage D to E), or cardiac arrest. The guideline defines the arrest part of E2 as no return of circulation after 30 minutes of resuscitation.'}
+};
+
+var WHY = {
+  E: 'The right ventricle has failed against the clot and blood pressure is gone with it. Only removing the obstruction breaks the cycle.',
+  D2: 'Blood pressure can hold while cardiac output is already too low; lactate, urine output and mentation show it first.',
+  D1: 'A brief drop in pressure means the right ventricle is near its limit, even if it has recovered for now.',
+  C3: 'A strained right ventricle with a troponin leak can still decompensate. Lysis up front prevents that but causes more major bleeding than it saves, so watch closely and escalate on decline.',
+  arrest: 'Arrest from PE is the right ventricle failing completely. A thrombolytic given during CPR needs time to work, which is why CPR continues longer after it.',
+  ctno: 'In shock the right ventricle either is or is not the problem: a normal one makes PE an unlikely cause of the shock, and a dilated one makes the trip to CT the bigger risk.',
+  confirm: 'Echo signs of right ventricular strain are not specific: tamponade, right ventricular infarction and long-standing pulmonary hypertension can look the same.',
+  fluid: 'A dilated right ventricle pushes the septum into the left ventricle; more volume makes that worse and lowers output. Norepinephrine raises aortic pressure, which feeds the right ventricle its own coronary flow.',
+  ufh: 'A heparin infusion can be stopped and wears off within hours, which matters when lysis, surgery or ECMO may follow.',
+  lmwh: 'The 2026 guideline prefers LMWH over a heparin infusion up to category E1, including when a catheter procedure is likely.',
+  abs: 'An absolute contraindication makes a major or brain bleed from full-dose lysis too likely; removing the clot mechanically avoids the drug.',
+  rE2: 'In refractory shock there is no time for a slow strategy: lysis is the fastest option at the bedside, and ECMO holds the circulation when nothing else does.',
+  rE1: 'Reperfusion removes the afterload that is killing the right ventricle. Every option is graded the same here, so speed and local skill decide.',
+  rD: 'The right ventricle is near its limit but holding. Lysis prevents collapse at a cost in bleeding, so the options that bleed less are weighed first.',
+  cit: 'A clot caught in the right heart can embolize at any moment and add to the obstruction.',
+  lysis: 'Alteplase turns plasminogen into plasmin on the clot and lowers the afterload within hours; the price is bleeding, worst inside the skull.',
+  bleed: 'Alteplase also breaks down circulating fibrinogen, so bleeding after lysis is treated by replacing fibrinogen and blocking plasmin, not only by stopping heparin.',
+  filter: 'A filter only catches the next clot from the legs; it does nothing for the clot already in the lungs.',
+  pert: 'A response team decides faster and better when the first call holds every fact that changes the choice.'
+};
+
+function readFlags(i){
+  var f = {abs: ABS.filter(function(t){ return i[t[0]]; }).map(function(t){ return t[1]; }), rel: REL.filter(function(t){ return i[t[0]]; }).map(function(t){ return t[1]; })};
+  f.xAny = !!(i.x_cath || i.x_surg || i.x_ecmo || i.x_none);
+  return f;
+}
+
+function classify(i){
+  var o = {guards: [], cat: null};
+  var perf = !!i.perf || (has(i.lac) && i.lac > 2) || (has(i.map) && i.map < 60);
+  var raw = null;
+  if (i.hemo === 'arrest' || i.hemo === 'refr') raw = 'E2';
+  else if (i.hemo === 'pers') raw = 'E1';
+  else if (perf){ raw = 'D2'; if (i.hemo === 'held' && has(i.sbp) && i.sbp < 90) o.guards.push('Systolic ' + i.sbp + ' is below 90: if it lasts over 15 minutes or needs a vasopressor, this is E1. Tap the matching blood pressure button.'); }
+  else if (i.hemo === 'held' && has(i.sbp) && i.sbp < 90){ o.ask = true; raw = 'D1'; }
+  else if (i.hemo === 'brief') raw = 'D1';
+  else if (i.rv && i.bio) raw = 'C3';
+  else if (i.rv || i.bio) raw = 'C2';
+  if (o.ask && !i.pick){ o.raw = raw; return o; }
+  if (o.ask && CATORDER.indexOf(i.pick) < CATORDER.indexOf('D1')) o.guards.push('Systolic ' + i.sbp + ' is below 90: at least D1, or E1 if it lasts. Tap the matching blood pressure button.');
+  o.raw = raw;
+  o.cat = (i.pick && (!raw || CATORDER.indexOf(raw) <= CATORDER.indexOf(i.pick))) ? i.pick : (raw || i.pick);
+  if (!o.cat) return o;
+  if (i.pick && raw && CATORDER.indexOf(raw) > CATORDER.indexOf(i.pick)) o.guards.push('What you entered reads as ' + raw + ', higher than the ' + i.pick + ' you picked. The tool uses ' + raw + ': the most severe finding sets the category.');
+  o.arrest = i.hemo === 'arrest';
+  o.letter = o.cat.charAt(0);
+  o.r = o.letter === 'E' ? i.resp === 'ppv' : o.letter === 'D' ? (i.resp === 'hi' || i.resp === 'ppv') : o.cat === 'C3' ? (!!i.resp && i.resp !== 'air') : false;
+  o.label = o.cat + (o.r ? 'R' : '');
+  o.key = o.letter === 'D' ? 'D' : o.cat;
+  if (has(i.map) && i.map < 60 && o.cat === 'C3') o.guards.push('MAP below 60 is a marker of poor perfusion: this is at least D2.');
+  return o;
+}
+
+/* Advanced therapy grades: AHA/ACC 2026 Table 7 and section 4.4 (class, level). */
+var OPT = ['sys','cdl','mt','surg','ecmo'];
+var OPTN = {sys: 'Systemic thrombolysis', cdl: 'Catheter-directed thrombolysis', mt: 'Mechanical thrombectomy', surg: 'Surgical embolectomy', ecmo: 'VA-ECMO'};
+var GR = {
+  C3: {sys: ['2b','C-LD'], cdl: ['2b','C-LD'], mt: ['2b','C-LD'], surg: ['3: No Benefit','C-EO'], ecmo: null},
+  D: {sys: ['2b','C-LD'], cdl: ['2b','B-NR'], mt: ['2b','B-NR'], surg: ['2b','C-LD'], ecmo: null},
+  E1: {sys: ['2a','C-LD'], cdl: ['2a','C-LD'], mt: ['2a','B-NR'], surg: ['2a','B-NR'], ecmo: null},
+  E2: {sys: ['2a','C-LD'], cdl: null, mt: null, surg: ['3: No Benefit','B-NR'], ecmo: ['2a','B-NR']}
+};
+var GWORD = {'2a': 'reasonable', '2b': 'may be considered', '3: No Benefit': 'not recommended'};
+var NEEDS = {cdl: 'x_cath', mt: 'x_cath', surg: 'x_surg', ecmo: 'x_ecmo'};
+
+function reperf(i, o, f){
+  var key = o.key, G = GR[key], abs = f.abs.length > 0, rel = !abs && f.rel.length > 0;
+  var rows = OPT.map(function(k){
+    var g = G[k], r = {k: k, name: OPTN[k], g: g ? g[0] + ', ' + g[1] : 'not graded here', word: g ? GWORD[g[0]] : '', st: 'ok', note: ''};
+    if (!g){ r.st = 'dim'; r.note = k === 'ecmo' ? 'Graded only for refractory shock (E2).' : 'No grade in E2; on VA-ECMO, the value of adding a catheter or surgical procedure is uncertain (2b, C-LD).'; }
+    if (g && g[0].indexOf('3') === 0){ r.st = 'dim'; r.word = ''; r.note = key === 'E2' ? 'Not recommended unless already on circulatory support such as VA-ECMO.' : 'Not recommended over anticoagulation alone in this category.'; }
+    if (NEEDS[k] && f.xAny) r.here = !!i[NEEDS[k]];
+    return r;
+  });
+  var by = {}; rows.forEach(function(r){ by[r.k] = r; });
+  if (abs){
+    by.sys.st = 'out'; by.sys.note = 'Absolute contraindication: ' + f.abs.join('; ') + '.';
+    if (by.cdl.st !== 'dim'){ by.cdl.st = 'weigh'; by.cdl.note = 'Still gives alteplase into the artery; weigh it against the contraindication.'; }
+    if (by.mt.st !== 'dim') by.mt.note = 'Removes clot without a thrombolytic. ESC 2019: catheter treatment when lysis is contraindicated (IIa, C).';
+    if (by.surg.st !== 'dim') by.surg.note = 'ESC 2019: surgery when lysis is contraindicated or has failed (I, C).';
+  } else if (rel){
+    by.sys.st = 'weigh'; by.sys.note = 'Relative contraindication: ' + f.rel.join('; ') + '. Weigh the bleeding risk; a lower dose may be considered (2b, C-LD).';
+  }
+  if (!abs && (key === 'D' || key === 'E1')){
+    if (by.cdl.st === 'ok') by.cdl.note = 'May be considered over systemic lysis to reduce bleeding (2b, C-LD).';
+    if (by.mt.st === 'ok') by.mt.note = 'May be considered over systemic lysis to reduce bleeding (2b, B-NR).';
+    if (by.surg.st === 'ok') by.surg.note = 'For surgical candidates, may be considered over systemic lysis to reduce brain bleeding (2b, B-NR).';
+  }
+  if (key === 'C3') ['sys','cdl','mt'].forEach(function(k){ if (by[k].st === 'ok' || by[k].st === 'weigh') by[k].note = (by[k].note ? by[k].note + ' ' : '') + (i.cit ? 'Clot in transit: advanced therapy is reasonable (2a, C-LD).' : 'Benefit uncertain; for decline on anticoagulation.'); });
+  if (key === 'E2' && !by.ecmo.note) by.ecmo.note = 'Reasonable for refractory shock where available (2a, B-NR). Parenteral anticoagulation continues on ECMO (1, B-NR).';
+  if (key === 'E2' && by.sys.st === 'ok') by.sys.note = 'The fastest option at the bedside.';
+  if (key === 'E2' && abs){ by.ecmo.note = 'With lysis ruled out, ECMO holds the circulation. ESC 2019: ECMO with surgery or catheter treatment in refractory collapse or arrest (IIb, C).'; by.surg.note = 'Not recommended in E2 unless on circulatory support; once on ECMO it becomes an option (ESC IIb, C).'; }
+  if (o.arrest){
+    ['mt','surg'].forEach(function(k){ if (by[k].st === 'dim'){ by[k].word = ''; if (i.ctyes){ by[k].st = 'ok'; by[k].g = '2a, B-NR (arrest, confirmed PE)'; by[k].note = 'Cardiac arrest with confirmed PE: surgical or percutaneous mechanical embolectomy is reasonable (AHA 2025 Part 10, 2a, B-NR).'; } else { by[k].g = 'graded once PE is confirmed'; by[k].note = 'AHA 2025 grades embolectomy in arrest only for confirmed PE (2a, B-NR); for suspected PE, thrombolysis (2b) or ECMO (2a).'; } } });
+    if (i.ctyes && by.sys.st !== 'out'){ by.sys.g = '2a, B-NR (arrest)'; by.sys.word = ''; by.sys.note = 'Confirmed PE in arrest: thrombolysis is reasonable (AHA 2025 Part 10, 2a, B-NR).'; }
+    if (!i.ctyes && by.sys.st !== 'out'){ by.sys.g = '2b, B-NR (arrest)'; by.sys.word = ''; by.sys.note = 'Suspected PE in arrest: thrombolysis may be considered (AHA 2025 Part 10, 2b, B-NR); reasonable once PE is confirmed (2a, B-NR).'; }
+    if (by.ecmo.st !== 'out') by.ecmo.note = 'ECMO is reasonable for confirmed or suspected PE in arrest where available (AHA 2025 Part 10, 2a, B-NR).';
+  }
+  if (i.noac && by.sys.st !== 'out'){ by.sys.st = 'weigh'; by.sys.note = 'Cannot anticoagulate: the same bleeding risk usually rules out systemic lysis.'; }
+  /* Lead: the first eligible option in this order that is not ruled out and not missing here. */
+  var order = key === 'E2' ? (abs ? ['ecmo','mt','surg'] : ['sys','ecmo'])
+    : key === 'E1' ? (abs ? ['mt','surg','cdl'] : ['sys','mt','cdl','surg'])
+    : key === 'D' ? (abs ? ['mt','surg','cdl'] : ['cdl','mt','sys','surg'])
+    : [];
+  var lead = null;
+  if (key !== 'C3' && (f.xAny || key === 'E2' || abs)){
+    for (var n = 0; n < order.length; n++){ var r = by[order[n]]; if ((r.st === 'ok' || r.st === 'weigh') && r.here !== false && !(r.st === 'weigh' && order[n] === 'cdl' && abs)){ lead = r; break; } }
+    if (!lead && key === 'E1' && !abs) lead = by.sys;
+  }
+  if (lead) lead.st = lead.st === 'weigh' ? 'weigh lead' : 'lead';
+  var out = {rows: rows, lead: lead, abs: abs, rel: rel, guards: [], key: key};
+  var teamHere = f.xAny && (i.x_cath || i.x_surg || i.x_ecmo);
+  if (o.letter === 'E' && abs && f.xAny && !lead) out.guards.push('Nothing here can remove the clot without a thrombolytic. Call a PE center now for advice; do not transfer an unstable patient before stabilizing (3: Harm, C-EO).');
+  if ((key === 'C3' || key === 'D') && f.xAny && !i.x_cath && !i.x_surg) out.guards.push('No catheter or surgical team here. While stable, transfer to a center with advanced therapy may be considered (2b, C-LD).');
+  if (o.letter === 'E' && f.xAny && !i.x_cath && !i.x_surg && !i.x_ecmo && !abs) out.guards.push('No catheter, surgical or ECMO team here: systemic lysis is the option you have. Do not transfer before stabilizing (3: Harm, C-EO).');
+  if (i.cit && key !== 'C3') out.guards.push('Clot in transit: advanced therapy is reasonable over anticoagulation alone (2a, C-LD).');
+  out.teamHere = teamHere;
+  out.why = abs ? WHY.abs : key === 'E2' ? WHY.rE2 : key === 'E1' ? WHY.rE1 : key === 'D' ? WHY.rD : i.cit ? WHY.cit : WHY.C3;
+  out.head = key === 'C3' ? (i.cit ? 'Clot in transit: advanced therapy is reasonable' : 'Anticoagulation first; reperfusion only on decline')
+    : key === 'D' ? 'Advanced therapy may be considered: decide with the response team'
+    : key === 'E1' ? (abs ? 'No systemic lysis: remove the clot mechanically' : 'Reperfuse now, by the fastest safe route here')
+    : (abs ? 'No systemic lysis: VA-ECMO, then remove the clot' : 'Systemic lysis now, or VA-ECMO where available');
+  out.sys = by.sys.st.indexOf('out') < 0;
+  out.cdlRisk = by.cdl.st !== 'dim' && by.cdl.st !== 'out';
+  return out;
+}
+
+function anti(i, o){
+  var w = has(i.wt) && i.wt > 0 ? i.wt : null;
+  var ufh = o.cat === 'E2' || !!i.crcl || !!i.soon;
+  var c = {id: 'c-anti', label: 'Anticoagulant now'};
+  if (i.noac){ c.head = 'No anticoagulant can be given'; c.sub = 'See the filter card below. Reperfusion choices still apply; systemic lysis is usually ruled out by the same bleeding.'; c.tiers = ['AHA/ACC 2026 4.3']; return c; }
+  if (ufh){
+    c.head = 'Heparin infusion: 80 units/kg bolus, then 18 units/kg/h' + (w ? ' = ' + fmt(r0(80 * w)) + ' units, then ' + fmt(r0(18 * w)) + ' units/h' : '');
+    c.sub = (o.cat === 'E2' ? 'Refractory shock or arrest' : i.soon ? 'Lysis or surgery likely within hours' : 'CrCl below 30') + ': a heparin infusion leads (expert practice; ESC 2019 recommends heparin with a weight-adjusted bolus in high-risk PE, I, C). Titrate to your hospital\'s aPTT or anti-Xa nomogram.';
+    c.why = WHY.ufh;
+  } else {
+    c.head = 'Enoxaparin 1 mg/kg SC every 12 hours' + (w ? ' = ' + r0(w) + ' mg every 12 hours' : '');
+    c.sub = 'LMWH is recommended over a heparin infusion in categories C1 to E1 (1, B-R) and is reasonable when a catheter procedure is likely (2a, C-LD).';
+    c.why = WHY.lmwh;
+  }
+  c.guards = ['Start now. Do not wait for the reperfusion decision.'];
+  if (i.lmwh && o.letter !== 'C') c.guards.push('LMWH already given: the sources reviewed here give no interval between LMWH and lysis. Tell the response team the dose and time.');
+  c.list = [];
+  if (ufh) c.list.push('Alternative: enoxaparin 1 mg/kg SC every 12 hours' + (i.crcl ? ', or once daily with CrCl below 30 (label)' : '') + '.');
+  else c.list.push('Alternative: heparin infusion, 80 units/kg bolus then 18 units/kg/h, when lysis or surgery is imminent or the kidneys fail.');
+  if (o.cat === 'E2') c.list.push('On VA-ECMO, continue parenteral anticoagulation unless bleeding (1, B-NR).');
+  c.more = ['After systemic lysis or a catheter procedure, LMWH is preferred over a heparin infusion as the first parenteral drug (1, B-NR). During a catheter-directed lysis, therapeutic LMWH or heparin, or low-dose heparin, is recommended over none (1, C-LD).', 'The LMWH preference is graded for categories C1 to E1 only. Leading with heparin in E2, with CrCl below 30, or when lysis or surgery is imminent is expert practice; the heparin label gives a fixed 5,000-unit bolus and 20,000 to 40,000 units a day, and the weight-based start is from Raschke 1993.'];
+  c.links = [['/vte-treatment/#agent', 'The long-term drug: VTE treatment']];
+  c.tiers = ['AHA/ACC 2026 4.2.1', 'ESC 2019 6.6 (I, C)', 'Raschke 1993', 'Enoxaparin label'];
+  return c;
+}
+
+function decide(i){
+  var o = classify(i), f = readFlags(i), cards = [];
+  if (o.ask && !i.pick){
+    cards.push({id: 'c-cat', label: 'Category', head: 'Systolic ' + i.sbp + ': brief or lasting?', sub: 'A pressure below 90 that lasted under 15 minutes or came up with fluid is D1. One that lasted longer, keeps coming back or needs a vasopressor is E1. Tap the matching blood pressure button above.', guards: ['Do not read a low pressure as transient until you know it is.']});
+    return {o: o, cards: cards};
+  }
+  if (!o.cat){
+    cards.push({id: 'c-cat', label: 'Start here', head: 'Enter the blood pressure, perfusion and right ventricle findings', sub: 'Or pick the category if VTE treatment has already classed the PE. Low-risk and C1 to C2 PE are managed in VTE treatment.', links: [['/vte-treatment/', 'VTE treatment'], ['/rrt/#pe', 'Massive PE in arrest: code card']]});
+    return {o: o, cards: cards};
+  }
+  if (o.cat === 'C2'){
+    cards.push({id: 'c-cat', label: 'Category', head: 'C2: not high-risk', sub: 'One of right ventricle or biomarker abnormal, blood pressure and perfusion normal. Anticoagulation alone for most; systemic lysis is harmful here (3: Harm, B-R).', links: [['/vte-treatment/', 'Manage in VTE treatment']], tiers: ['AHA/ACC 2026 4.4.1']});
+    return {o: o, cards: cards};
+  }
+  var R = reperf(i, o, f);
+
+  if (o.arrest){
+    var t = has(i.wt) && i.wt > 0 ? Math.floor(Math.min(0.6 * i.wt, 50)) : null;
+    cards.push({id: 'c-arrest', label: 'Cardiac arrest', head: 'Run the arrest; decide on lysis early', list: [
+      'Confirmed PE: systemic thrombolysis, or surgical or catheter embolectomy, is reasonable (2a, B-NR).',
+      'Suspected PE: thrombolysis may be considered (2b, B-NR). ECMO is reasonable for confirmed or suspected PE where available (2a, B-NR).',
+      'Alteplase 100 mg IV over 2 hours is the labelled dose. ESC 2019 also lists an accelerated regimen, ' + (t ? t + ' mg' + (0.6 * i.wt >= 50 ? ' (maximum)' : '') + ' over 15 minutes at ' + i.wt + ' kg' : '0.6 mg/kg over 15 minutes, maximum 50 mg') + ', not FDA-approved but sometimes used in cardiac arrest.',
+      'After a thrombolytic, continue CPR for at least 60 to 90 minutes before stopping (ESC 2019); AHA 2025 says the best duration is unclear (2b, C-EO).'],
+      guards: abs1(f) ? ['Absolute contraindication ticked: systemic lysis is ruled out on the reperfusion card. ECMO or embolectomy avoid the drug where available; if neither is, decide as a team and say the contraindication out loud.'] : [],
+      why: WHY.arrest, links: [['/rrt/#pe', 'Massive PE code card'], ['/rrt/#arrest', 'Cardiac arrest card']],
+      more: ['A dilated right ventricle on ultrasound is common in arrest from any cause, so it does not prove PE. The 2026 AHA/ACC guideline defines the arrest part of category E2 as no return of circulation after 30 minutes; this tool reads any arrest in progress as E2.'],
+      tiers: ['AHA 2025 Part 10', 'ESC 2019 6.1.4, Table 10', 'Activase label 2.3']});
+  }
+
+  var cat = {id: 'c-cat', label: 'Category', head: o.label + ': ' + CATS[o.cat].t, sub: CATS[o.cat].def, guards: o.guards.slice()};
+  cat.list = ['Call the PE response team now (1, B-NR). Check lactate (1, B-NR).'];
+  if (o.letter === 'E') cat.list.push('Stabilize here; an unstable patient should not be transferred before stabilizing (3: Harm, C-EO).');
+  if (i.rosc && !o.arrest) cat.list.push('Circulation is back: here the category follows the current blood pressure and perfusion (expert practice; ESC 2019 counts cardiac arrest as high-risk PE).');
+  if (o.r) cat.list.push('R added: ' + (o.letter === 'E' ? 'on positive-pressure support' : o.letter === 'D' ? 'needs more than 6 L/min or a non-rebreather' : 'needs oxygen') + '.');
+  cat.why = o.letter === 'E' ? WHY.E : WHY[o.cat];
+  cat.chips = [['spiral', o.letter === 'E' ? 'pe' : 'pe', 'The right ventricle spiral']];
+  cat.more = ['R suffix (respiratory modifier): in C, hypoxemia, tachypnea or any oxygen; in D, more than 6 L/min by nasal cannula or a non-rebreather; in E, non-invasive or invasive positive pressure.', 'Categories C to E mean admission with monitoring; the guideline uses lactate to stratify short-term risk.'];
+  cat.tiers = ['AHA/ACC 2026 3.2, 4.1.4'];
+  cards.push(cat);
+
+  if (o.cat === 'C3'){
+    var w = {id: 'c-watch', label: 'Watch for the turn', head: 'Anticoagulate and watch: escalate on decline', list: [
+      'Systolic below 90 or a fall of more than 40: now D1, or E1 if it lasts.',
+      'Lactate above 2, falling urine output or new confusion: now D2.',
+      'A MAP below 80 may help identify who needs escalation (2a, B-NR).',
+      'Deterioration on anticoagulation: rescue thrombolysis is recommended (ESC I, B); surgery or catheter treatment are alternatives (ESC IIa, C).'],
+      guards: ['Avoid intubation and deep sedation unless clearly needed (3: Harm, C-LD).'], why: WHY.C3,
+      more: ['Systemic thrombolysis up front in C3: benefit uncertain (2b, C-LD). In PEITHO it prevented collapse but caused more major and brain bleeding.', 'Transfer to a center with advanced therapy may be considered while stable (2b, C-LD).'],
+      tiers: ['AHA/ACC 2026 3.2.2, 4.4', 'ESC 2019 6.7']};
+    if (has(i.map) && i.map < 80 && i.map >= 60) w.guards.unshift('MAP ' + i.map + ': below 80. Tell the response team; this may flag the need to escalate (2a, B-NR).');
+    cards.push(w);
+  }
+
+  if (o.letter !== 'C' || i.ctno){
+    var cf = {id: 'c-confirm', label: 'Is it the PE?'};
+    if (i.ctyes){ cf.head = 'PE confirmed on CT'; cf.sub = 'Check that the clot burden fits the shock; if it does not, look for a second cause.'; cf.why = WHY.confirm; }
+    else if (i.ctno){
+      cf.head = 'Too unstable for CT: bedside echo decides';
+      cf.sub = 'ESC 2019: in a patient too unstable for CT, a dilated, failing right ventricle (mainly RV/LV above 1.0) is enough to treat as high-risk PE. A normal right ventricle points to another cause of the shock. Get CT once stable.';
+      cf.guards = i.rv ? [] : ['Right ventricle not marked as dilated: look for another cause of shock before giving a thrombolytic.'];
+      if (o.arrest) cf.sub += ' In arrest, a dilated right ventricle is common from any cause; it supports but does not prove PE.';
+      cf.why = WHY.ctno;
+    } else { cf.head = 'Confirm with CT angiography if the patient can travel'; cf.sub = 'If not, bedside echo (ESC pathway): tick "Too unstable to go to CT".'; cf.why = WHY.confirm; }
+    cf.list = ['Echo signs: RV/LV above 0.9 (AHA) or 1.0 (ESC); TAPSE below 1.6 cm; flattened septum; McConnell sign; 60/60 sign (ESC); distended IVC; clot in the right heart.', 'Look-alikes: tamponade, right ventricular infarction, tension pneumothorax, long-standing pulmonary hypertension (thick right ventricular wall), and sepsis or bleeding in a patient whose right ventricle was already large.'];
+    cf.more = ['The 2026 AHA/ACC guideline does not recommend echo to confirm or refute PE in general (3: No Benefit, B-R); ESC notes a negative echo cannot exclude PE. Leg compression ultrasound or transesophageal echo can add support at the bedside (ESC).', 'Other AHA/ACC echo thresholds: tricuspid regurgitation velocity above 2.6 m/s, pulmonary acceleration time below 90 ms, basal RV diameter above 42 mm. On CT, RV/LV 1.0 or more.'];
+    cf.chips = [['echo', 'pe', 'What a strained right ventricle looks like']];
+    cf.tiers = ['ESC 2019 Figure 4', 'AHA/ACC 2026 3.1.2, Table 4', 'Look-alikes: expert practice'];
+    cards.push(cf);
+  }
+
+  if (o.letter !== 'C' && !o.arrest){
+    var sp = {id: 'c-support', label: 'Support the right ventricle', head: i.rv ? 'No more fluid; norepinephrine first' : 'Small fluid bolus at most; norepinephrine first', list: [
+      'Fluid: only if preload looks low, one bolus of 500 mL or less, then reassess (D1 to D2: 2b, C-LD; ESC Table 9).',
+      'Vasopressors or inotropes for shock (D2 to E2: 1, C-LD). Norepinephrine is the usual first choice; above about 15 mcg/min, add a second vasopressor such as vasopressin. Dobutamine (up to 10 mcg/kg/min) when output stays low with pressure supported.',
+      'An inhaled pulmonary vasodilator, such as nitric oxide, may be considered (2b, B-R).',
+      'Oxygen for SpO2 below 90% (ESC). High-flow nasal oxygen over a standard cannula when hypoxia is moderate to severe (2a, C-LD).',
+      'Avoid intubation and deep sedation unless necessary (3: Harm, C-LD). If unavoidable: vasopressors, inotropes or ECMO ready first (1, C-LD), an induction drug less likely to drop pressure, cautious PEEP, tidal volume about 6 mL/kg (ESC).'],
+      guards: [], why: WHY.fluid,
+      links: [['/pressors/', 'Pressor doses'], ['/airway/', 'Airway: the physiologically difficult airway'], ['/oxygen-niv/', 'High-flow oxygen']],
+      chips: [['septum', i.rv ? 'fluid' : 'pe', 'Why fluid can lower the pressure'], ['plate:rv', '', 'Normal heart and acute PE'], ['tube', '', 'Why intubation is dangerous']],
+      more: ['ESC 2019 Table 9 gives cautious volume of 500 mL or less over 15 to 30 minutes, norepinephrine 0.2 to 1.0 mcg/kg/min and dobutamine 2 to 20 mcg/kg/min; the AHA/ACC text caps dobutamine at about 10 mcg/kg/min.', 'The AHA/ACC guideline counts a "trial" of 500 to 1,000 mL when it defines D1; that is for classification, not a target.'],
+      tiers: ['AHA/ACC 2026 4.2.2, 4.2.3', 'ESC 2019 Table 9, 6.1.1']};
+    if (i.rv) sp.guards.push('Do not give more fluid: the right ventricle is already dilated.');
+    if (i.resp === 'ppv') sp.guards.push('Already on positive pressure: keep PEEP low and pressors running; the failing right ventricle is sensitive to it (expert practice).');
+    cards.push(sp);
+  }
+
+  cards.push(anti(i, o));
+
+  var rc = {id: 'c-reperf', label: 'Reperfusion', head: R.head, guards: R.guards, why: R.why, opts: R.rows,
+    sub: R.lead ? 'First choice here: ' + R.lead.name.toLowerCase() + '.' : (o.letter === 'C' ? '' : f.xAny ? '' : 'Tick what this hospital has to rank the options.'),
+    more: ['ESC 2019: systemic thrombolysis is recommended in high-risk PE (I, B); surgery when lysis is contraindicated or has failed (I, C); catheter treatment then (IIa, C); ECMO with surgery or catheter treatment in refractory collapse or arrest (IIb, C).', 'Whether catheter-directed lysis or mechanical thrombectomy is better is uncertain (2b, B-R). Systemic lysis is harmful in categories A to C2 (3: Harm).'],
+    chips: [['options', R.key, 'All options by category'], ['plate:cdl', '', 'How catheter-directed lysis reaches the clot']],
+    tiers: ['AHA/ACC 2026 Table 7, 4.4', 'ESC 2019 6.6, 6.7']};
+  cards.push(rc);
+
+  var lysisOK = R.sys && (o.letter !== 'C' || i.cit);
+  if (lysisOK){
+    var lc = {id: 'c-lysis', label: 'If systemic lysis is chosen', head: o.arrest ? 'If lysis is given during CPR' : 'Alteplase 100 mg IV over 2 hours', sub: 'Anticoagulation: the label says to start parenteral anticoagulation near the end of the infusion or straight after it, once the aPTT or thrombin time is twice normal or less. ESC 2019 allows heparin to continue during alteplase. Follow your hospital protocol.', list: [
+      'A lower dose may be considered to reduce bleeding (2b, C-LD). 50 mg over 2 hours was compared with 100 mg in one trial (Wang 2010): similar imaging, less bleeding, too small to show a difference in death. The AHA/ACC guideline names no dose.',
+      'Before starting: fibrinogen, platelets, aPTT, and type and screen (expert practice).'], guards: [], why: WHY.lysis,
+      more: ['Tenecteplase and reteplase are not FDA-approved for PE. PEITHO used weight-based tenecteplase in C-type patients.', 'Catheter-directed lysis uses 5 to 10 mg of alteplase per pulmonary artery; less than 5 mg per artery is not recommended over that (3: No Benefit, B-NR).', 'Label contraindications (alteplase, PE): active internal bleeding; recent stroke; intracranial or intraspinal surgery or serious head trauma in the past 3 months; intracranial conditions that raise bleeding risk (some tumors, arteriovenous malformations, aneurysms); bleeding diathesis; severe uncontrolled hypertension.'],
+      tiers: ['Activase label 2.3, 4.2', 'Lower dose: AHA/ACC 2b, C-LD', 'ESC 2019 Table 10']};
+    if (o.arrest){ lc.sub = 'ESC 2019 lists an accelerated regimen, 0.6 mg/kg over 15 minutes (maximum 50 mg), not FDA-approved but sometimes used in arrest; the labelled dose is 100 mg over 2 hours. See the arrest card for the dose at this weight.'; lc.list = [lc.list[0]]; }
+    if (i.noac) lc.guards.push('Cannot take any anticoagulant: the same bleeding risk usually rules out systemic lysis. Decide with the response team.');
+    if (R.rel) lc.guards.push('Relative contraindication ticked: ' + f.rel.join('; ') + '. Decide with the response team; a catheter option or a lower dose bleeds less.');
+    if (has(i.wt) && i.wt > 0 && i.wt < 65) lc.guards.push('Weight under 65 kg: in Wang 2010, bleeding with 100 mg was 41% against 15% with 50 mg in this group.');
+    cards.push(lc);
+  }
+  if (lysisOK || (R.cdlRisk && o.letter !== 'C')){
+    cards.push({id: 'c-bleed', label: 'After lysis', head: 'Watch for bleeding, and know the plan', list: [
+      'No intramuscular injections. Avoid internal jugular and subclavian punctures; if an artery must be punctured, use an arm vessel and press for at least 30 minutes (label).',
+      'Neurological checks, access sites and hemoglobin through the infusion and after (expert practice).',
+      'Serious bleeding: stop the infusion (label). Stop heparin and give protamine if needed.',
+      'Send CBC, PT/INR, aPTT, fibrinogen, type and cross-match. Cryoprecipitate 10 units over 10 to 30 minutes to keep fibrinogen at 150 mg/dL or more.',
+      'Tranexamic acid 1,000 mg IV over 10 minutes, or aminocaproic acid 4 to 5 g over 1 hour then 1 g IV until bleeding is controlled.',
+      'New headache, confusion or a neurological sign: CT head now.'], why: WHY.bleed,
+      links: [['/reversal/', 'Reversing heparin: protamine'], ['/transfusion/', 'Transfusion']],
+      more: ['The cryoprecipitate, tranexamic acid and aminocaproic acid steps come from the 2026 AHA/ASA stroke guideline table for brain bleeding after thrombolysis. No PE guideline gives a bleeding protocol; using it after PE lysis is an extrapolation.', 'As a rule of thumb, 10 units of cryoprecipitate raise fibrinogen by about 50 mg/dL (AHA/ASA).'],
+      tiers: ['Activase label 5.1', 'AHA/ASA 2026 stroke Table 5 (extrapolated)', 'Monitoring: expert practice']});
+  }
+
+  if (i.noac || i.a_ab){
+    cards.push({id: 'c-filter', label: 'IVC filter', head: 'Cannot anticoagulate: a filter can be useful', list: ['A filter can be useful when anticoagulation cannot be tolerated (2a, B-R); retrievable over permanent (1, B-R); retrieve as soon as possible (1, C-LD).', 'As an add-on to advanced therapy, benefit is uncertain (2b, C-LD).', 'Not routinely on top of therapeutic anticoagulation (3: Harm, A).'], why: WHY.filter, tiers: ['AHA/ACC 2026 4.3']});
+  }
+
+  var p = ['Category ' + o.label + (o.arrest ? ', in arrest' : '') + '.'];
+  var bp = []; if (has(i.sbp)) bp.push('systolic ' + i.sbp); if (has(i.map)) bp.push('MAP ' + i.map); if (has(i.lac)) bp.push('lactate ' + i.lac);
+  p.push((bp.length ? bp.join(', ') : 'Blood pressure, MAP and lactate') + '; vasopressor and dose.');
+  p.push('Right ventricle ' + (i.rv ? 'dilated' : 'not reported') + '; troponin or BNP ' + (i.bio ? 'raised' : 'not reported') + (i.cit ? '; clot in transit' : '') + '; oxygen: ' + ({air: 'room air', low: 'up to 6 L/min', hi: 'over 6 L/min or non-rebreather', ppv: 'positive pressure'}[i.resp] || 'not stated') + '.');
+  p.push('PE ' + (i.ctyes ? 'confirmed on CT' : i.ctno ? 'suspected on echo; too unstable for CT' : 'confirmation pending') + '; where the clot is.');
+  p.push('Bleeding: ' + (f.abs.length ? 'absolute: ' + f.abs.join('; ') : 'no absolute contraindication ticked') + (f.rel.length ? '; relative: ' + f.rel.join('; ') : '') + '.');
+  p.push((has(i.wt) ? 'Weight ' + i.wt + ' kg. ' : 'Weight. ') + 'Anticoagulant given, dose and time' + (i.lmwh ? ' (LMWH given)' : '') + '.');
+  p.push('What this hospital can do now: ' + (f.xAny ? TICKS_X.filter(function(t){ return i[t[0]] && t[0] !== 'x_none'; }).map(function(t){ return t[1].toLowerCase(); }).join(', ') || 'none of catheter, surgery or ECMO' : 'not stated') + '.');
+  cards.push({id: 'c-pert', label: 'Calling the response team', head: 'What to say on the first call', list: p, why: WHY.pert, tiers: ['PERT: AHA/ACC 1, B-NR', 'Script: expert practice']});
+
+  return {o: o, R: R, cards: cards};
+}
+function abs1(f){ return f.abs.length > 0; }
+</script>
+<script id="figs">
+/* Figures: site-drawn SVG, shared colour names only. Schematic, not to scale. */
+var FM = 'font-family:var(--mono)';
+function svgOpen(vb, label){ return '<svg viewBox="' + vb + '" role="img" aria-label="' + label + '" class="fig">'; }
+function tx(x, y, t, o){ o = o || {}; return '<text x="' + x + '" y="' + y + '" text-anchor="' + (o.a || 'middle') + '" style="' + FM + ';font-size:' + (o.s || 11.5) + 'px;font-weight:' + (o.w || 400) + ';fill:' + (o.c || 'var(--ink)') + '">' + t + '</text>'; }
+function rect(x, y, w, h, st){ var s = st === 'hot' ? 'fill:var(--card);stroke:var(--accent);stroke-width:2.5' : st === 'dim' ? 'fill:var(--fill);stroke:var(--line);stroke-width:1.5' : st === 'ok' ? 'fill:var(--okbg);stroke:var(--ok);stroke-width:2' : 'fill:var(--card);stroke:var(--muted);stroke-width:1.5'; return '<rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="10" style="' + s + '"/>'; }
+function arrow(x1, y1, x2, y2, hot){ var c = hot ? 'var(--accent)' : 'var(--muted)'; var a = Math.atan2(y2 - y1, x2 - x1), l = 7; return '<line x1="' + x1 + '" y1="' + y1 + '" x2="' + x2 + '" y2="' + y2 + '" style="stroke:' + c + ';stroke-width:' + (hot ? 2.5 : 1.5) + '"/><path d="M' + x2 + ' ' + y2 + ' L' + (x2 - l * Math.cos(a - 0.45)) + ' ' + (y2 - l * Math.sin(a - 0.45)) + ' L' + (x2 - l * Math.cos(a + 0.45)) + ' ' + (y2 - l * Math.sin(a + 0.45)) + ' Z" style="fill:' + c + '"/>'; }
+
+/* The right ventricle spiral: five boxes, the loop closes from coronary flow back to the dilated ventricle. */
+var SPB = [['Clot raises pulmonary pressure', 'right ventricular afterload rises'], ['Right ventricle dilates', 'wall stress and oxygen need rise'], ['Septum bows into the left', 'left ventricle underfills'], ['Output and blood pressure fall', 'less flow to every organ'], ['Right coronary flow falls', 'ischemia: the RV pumps less']];
+var SPS = {
+  pe: {n: 'The spiral', st: ['hot','hot','hot','hot','hot'], tag: {}, line: 'Each step feeds the next, and falling coronary flow to the right ventricle closes the loop. Patients can look stable until the loop tips, then collapse fast.'},
+  fluid: {n: 'Give fluid', st: ['', 'hot', 'hot', 'hot', ''], tag: {1: 'fluid stretches it further', 2: 'the septum bows more'}, line: 'In a dilated right ventricle, extra volume does not raise output; it pushes the septum further into the left ventricle and output can fall. A small bolus only helps when preload is truly low.'},
+  tube: {n: 'Intubate', st: ['hot', '', '', 'hot', 'hot'], tag: {0: 'positive pressure: afterload up', 3: 'induction drug: tone falls'}, line: 'Positive pressure squeezes the lung vessels and cuts venous return; induction drugs drop vascular tone. Both hit a ventricle with no reserve, which is why arrest at intubation is a known risk.'},
+  ne: {n: 'Norepinephrine', st: ['', '', '', 'ok', 'ok'], tag: {3: 'norepinephrine: pressure up', 4: 'coronary flow restored'}, line: 'Raising aortic pressure restores flow down the right coronary artery and breaks the ischemia loop. It buys time; it does not remove the clot.'},
+  reperf: {n: 'Reperfusion', st: ['ok', 'ok', 'ok', 'ok', 'ok'], tag: {0: 'lysis or removal: afterload falls'}, line: 'Dissolving or removing the clot lowers the afterload at the first step, and every step after it can recover. This is the only treatment that acts on the cause.'}
+};
+function spiralSVG(k){
+  var S = SPS[k], h = svgOpen('0 0 360 330', 'The right ventricle spiral in pulmonary embolism');
+  for (var n = 0; n < 5; n++){
+    var y = 14 + n * 62, st = S.st[n] === 'hot' ? 'hot' : S.st[n] === 'ok' ? 'ok' : S.st[n] === '' && k !== 'pe' ? 'dim' : '';
+    h += rect(20, y, 290, 46, st);
+    h += tx(165, y + 19, SPB[n][0], {w: 600, c: st === 'dim' ? 'var(--muted)' : 'var(--ink)'});
+    h += S.tag[n] ? tx(165, y + 36, S.tag[n], {s: 10.5, w: 600, c: S.st[n] === 'ok' ? 'var(--ok)' : 'var(--accent)'}) : tx(165, y + 36, SPB[n][1], {s: 10.5, c: 'var(--muted)'});
+    if (n < 4) h += arrow(165, y + 46, 165, y + 61, S.st[n] === 'hot' && S.st[n + 1] === 'hot');
+  }
+  var y1 = 14 + 62 + 23, y4 = 14 + 4 * 62 + 23, hot = S.st[4] === 'hot';
+  h += '<path d="M310 ' + y4 + ' L340 ' + y4 + ' L340 ' + y1 + '" style="fill:none;stroke:' + (hot ? 'var(--accent)' : 'var(--muted)') + ';stroke-width:' + (hot ? 2.5 : 1.5) + '"/>' + arrow(340, y1, 312, y1, hot);
+  return h + '</svg>';
+}
+
+/* Short-axis view: right ventricle (left of screen) and left ventricle. The flat side of the LV is the septum. */
+var SEP = {norm: {n: 'Normal', lv: [62, 62], rv: [150, 58, 52], line: 'The left ventricle is round and the right ventricle wraps around it as a thin crescent.'},
+  pe: {n: 'Pressure overload', lv: [56, 22], rv: [130, 88, 78], line: 'The right ventricle dilates against the clot. Both ventricles share one pericardium, so the septum flattens and the left ventricle becomes a D shape and underfills.'},
+  fluid: {n: 'After more fluid', lv: [50, 10], rv: [122, 100, 88], line: 'More volume goes to the right ventricle, which grows further; the septum bows into the left ventricle, which fills even less, and output falls.'}};
+function septumSVG(k){
+  var S = SEP[k], cx = 215, cy = 112, r = S.lv[0], f = S.lv[1], h = svgOpen('0 0 360 230', 'Short-axis view of the two ventricles');
+  h += '<ellipse cx="' + S.rv[0] + '" cy="' + cy + '" rx="' + S.rv[1] + '" ry="' + S.rv[2] + '" style="fill:var(--hrt-cavity);stroke:var(--hrt-muscle);stroke-width:4"/>';
+  if (f >= r) h += '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" style="fill:var(--hrt-cavity);stroke:var(--hrt-muscle);stroke-width:11"/>';
+  else { var x1 = cx - f, dy = Math.sqrt(r * r - f * f); h += '<path d="M' + x1 + ' ' + (cy - dy) + ' A' + r + ' ' + r + ' 0 1 1 ' + x1 + ' ' + (cy + dy) + ' Z" style="fill:var(--hrt-cavity);stroke:var(--hrt-muscle);stroke-width:11;stroke-linejoin:round"/>'; }
+  h += tx(cx + 8, cy + 5, 'LV', {w: 700, s: 13, c: 'var(--hrt-line)'}) + tx(S.rv[0] - S.rv[1] * 0.5, cy + 5, 'RV', {w: 700, s: 13, c: 'var(--hrt-line)'});
+  var sx = f >= r ? cx - r : cx - f;
+  h += '<line x1="' + sx + '" y1="' + (cy - 34) + '" x2="' + (sx + 30) + '" y2="' + 24 + '" style="stroke:var(--muted);stroke-width:1.2"/>' + tx(sx + 34, 20, 'septum', {a: 'start', s: 11, c: 'var(--muted)'});
+  return h + '</svg>';
+}
+
+/* Intubation: three hits, one per state. */
+var TUB = [['Induction drug', 'vascular tone and pressure fall'], ['Positive pressure', 'venous return falls, afterload rises'], ['Apnea while intubating', 'rising CO2 and low oxygen tighten lung vessels']];
+var TUBS = {ind: {n: 'Induction', hot: 0, line: 'Most induction drugs lower vascular tone. Aortic pressure falls, and with it the coronary flow the right ventricle depends on.'},
+  ppv: {n: 'Positive pressure', hot: 1, line: 'Positive pressure raises the pressure around the heart and in the lung vessels: less blood returns to the right ventricle, and it must push harder to empty.'},
+  apnea: {n: 'Apnea', hot: 2, line: 'During the attempt, carbon dioxide rises and oxygen falls; both constrict lung vessels and raise the afterload further. This is why the guideline grades deep sedation and ventilation as harmful unless needed.'}};
+function tubeSVG(k){
+  var S = TUBS[k], h = svgOpen('0 0 360 220', 'Three ways intubation harms a failing right ventricle');
+  for (var n = 0; n < 3; n++){ var y = 12 + n * 68; h += rect(20, y, 320, 52, n === S.hot ? 'hot' : 'dim'); h += tx(180, y + 22, TUB[n][0], {w: 600, c: n === S.hot ? 'var(--ink)' : 'var(--muted)'}) + tx(180, y + 40, TUB[n][1], {s: 10.5, c: n === S.hot ? 'var(--accent)' : 'var(--muted)'}); }
+  return h + '</svg>';
+}
+
+/* Apical four-chamber schematic on an ultrasound frame. */
+var ECHOS = {norm: {n: 'Normal', rv: [128, 40, 66], lv: [222, 50, 84], line: 'The right ventricle is narrower and shorter than the left, and the septum is straight.'},
+  pe: {n: 'Acute PE', rv: [120, 64, 86], lv: [228, 40, 78], line: 'The right ventricle is wider than the left at the base (RV/LV above 1.0 by ESC, above 0.9 by AHA/ACC). The free wall can move little while the apex still moves (McConnell sign). The septum bows toward the left ventricle.'}};
+function echoSVG(k){
+  var S = ECHOS[k], h = svgOpen('0 0 360 250', 'Apical four-chamber view, schematic');
+  h += '<rect x="8" y="4" width="344" height="242" rx="12" style="fill:var(--us-bg)"/>';
+  h += '<ellipse cx="' + S.rv[0] + '" cy="' + (186 - S.rv[2]) + '" rx="' + S.rv[1] + '" ry="' + S.rv[2] + '" style="fill:none;stroke:var(--us-ink);stroke-width:3' + (k === 'pe' ? ';stroke-dasharray:none' : '') + '"/>';
+  h += '<ellipse cx="' + S.lv[0] + '" cy="' + (186 - S.lv[2]) + '" rx="' + S.lv[1] + '" ry="' + S.lv[2] + '" style="fill:none;stroke:var(--us-ink);stroke-width:3"/>';
+  var yb = 168;
+  h += '<line x1="' + (S.rv[0] - S.rv[1]) + '" y1="' + yb + '" x2="' + (S.rv[0] + S.rv[1]) + '" y2="' + yb + '" style="stroke:var(--us-mark);stroke-width:2"/>';
+  h += '<line x1="' + (S.lv[0] - S.lv[1]) + '" y1="' + yb + '" x2="' + (S.lv[0] + S.lv[1]) + '" y2="' + yb + '" style="stroke:var(--us-mark);stroke-width:2"/>';
+  h += tx(S.rv[0], 120, 'RV', {w: 700, s: 13, c: 'var(--us-ink)'}) + tx(S.lv[0], 120, 'LV', {w: 700, s: 13, c: 'var(--us-ink)'});
+  h += tx(180, 208, k === 'pe' ? 'RV wider than LV at the base' : 'RV narrower than LV at the base', {s: 11, w: 600, c: 'var(--us-mark)'});
+  if (k === 'pe') h += tx(180, 230, 'free wall moves little, apex still moves', {s: 10.5, c: 'var(--us-mark)'});
+  return h + '</svg>';
+}
+
+/* Options by category: drawn from the same grade table as the engine (GR). */
+var OPTKEYS = ['C3', 'D', 'E1', 'E2'];
+function optionsSVG(k){
+  var G = GR[k], h = svgOpen('0 0 360 250', 'Advanced therapy grades for category ' + k);
+  OPT.forEach(function(o, n){
+    var g = G[o], y = 10 + n * 48, code = g ? (g[0].indexOf('3') === 0 ? '3' : g[0]) : 'none', st = !g || code === '3' ? 'dim' : code === '2a' ? 'hot' : '';
+    h += tx(16, y + 18, OPTN[o], {a: 'start', w: 600, s: 11.5, c: st === 'dim' ? 'var(--muted)' : 'var(--ink)'});
+    h += tx(16, y + 34, g ? GWORD[g[0]] + ' (' + g[1] + ')' : 'not graded in this category', {a: 'start', s: 10.5, c: 'var(--muted)'});
+    h += rect(290, y + 6, 56, 30, st) + tx(318, y + 26, code, {w: 700, s: 12, c: st === 'hot' ? 'var(--accent)' : 'var(--muted)'});
+  });
+  return h + '</svg>';
+}
+
+var FIGS = {
+  spiral: {t: 'The right ventricle spiral', states: ['pe', 'fluid', 'tube', 'ne', 'reperf'], data: SPS, svg: spiralSVG},
+  septum: {t: 'Two ventricles, one sac', states: ['norm', 'pe', 'fluid'], data: SEP, svg: septumSVG},
+  tube: {t: 'Why intubation is dangerous', states: ['ind', 'ppv', 'apnea'], data: TUBS, svg: tubeSVG},
+  echo: {t: 'The right ventricle on echo', states: ['norm', 'pe'], data: ECHOS, svg: echoSVG},
+  options: {t: 'Reperfusion options by category', states: OPTKEYS, data: {C3: {n: 'C3', line: 'C3: anticoagulation first. Systemic lysis, catheter-directed lysis and thrombectomy may be considered; surgery is not recommended.'}, D: {n: 'D1 and D2', line: 'D: every option may be considered (2b). Catheter options may be considered over systemic lysis to reduce bleeding.'}, E1: {n: 'E1', line: 'E1: every option is reasonable (2a). Choose the fastest and safest where you are.'}, E2: {n: 'E2', line: 'E2: systemic lysis and VA-ECMO are reasonable. Surgery is not recommended unless already on circulatory support; catheter therapy is not graded.'}}, svg: optionsSVG}
+};
+var PLATES = {
+  rv: {t: 'Normal heart and acute PE', src: '/media/pe-highrisk/rv-overload.webp', w: 888, h: 525, alt: 'Two panels. Left: an open pulmonary artery above a short-axis view of a normal heart, with a round left ventricle and a thin crescent-shaped right ventricle. Right: a clot filling the pulmonary artery above a heart whose right ventricle is greatly dilated, with the septum flattened and a small D-shaped left ventricle.', cap: 'Left: normal. Right: a clot in the pulmonary artery, a dilated right ventricle, a flattened septum and a small, underfilled left ventricle.'},
+  cdl: {t: 'Catheter-directed lysis', src: '/media/pe-highrisk/catheter-lysis.webp', w: 381, h: 536, alt: 'Frontal cutaway of the heart. A thin catheter enters from the inferior vena cava, loops through the right atrium and right ventricle, passes the pulmonary valve and ends inside a clot in the left pulmonary artery.', cap: 'The catheter runs from a leg vein through the right atrium and ventricle into the pulmonary artery, and its tip sits in the clot so a small dose of alteplase goes straight into it.'}
+};
+function plateHTML(id){ var P = PLATES[id]; return '<div class="plate"><img src="' + P.src + '" alt="' + P.alt + '" width="' + P.w + '" height="' + P.h + '" loading="lazy"><span class="credit">Created with BioRender.com</span></div><p class="line1">' + P.cap + '</p>'; }
+
+var TRIALS = [
+  {q: 'Should a strained right ventricle be thrombolysed before it fails? (PEITHO)', d: 'Double-blind, 1006 normotensive patients with RV dysfunction and a positive troponin; tenecteplase plus heparin against heparin alone.', r: 'Death or hemodynamic decompensation by day 7: 2.6% vs 5.6% (OR 0.44, 0.23–0.87). Death by day 7: 1.2% vs 1.8%, and by day 30: 2.4% vs 3.2%, not different. Extracranial major bleeding 6.3% vs 1.2%; stroke 2.4% vs 0.2%.', c: 'Why systemic lysis is not given up front in category C3: it prevents collapse, which can be rescued, at the price of bleeding into the brain.', cite: 'Meyer G et al. N Engl J Med 2014;370:1402', doi: '10.1056/NEJMoa1302097'},
+  {q: 'Does catheter-directed lysis do better in the same patients? (HI-PEITHO)', d: '544 patients with RV/LV 1.0 or more, a raised troponin and at least two of systolic 110 or less, heart rate 100 or more, respiratory rate above 20; ultrasound-facilitated catheter-directed alteplase plus anticoagulation against anticoagulation alone. Outcomes adjudicated blind.', r: 'PE-related death, cardiorespiratory decompensation or collapse, or recurrent PE within 7 days: 4.0% vs 10.3% (RR 0.39, 0.20–0.77), driven by fewer decompensations. Major bleeding at 7 days 4.1% vs 2.2% (P = 0.32); no intracranial bleeding.', c: 'Published after the 2026 guideline, which still rates catheter therapy as uncertain (2b) in C3. Fewer collapses, not fewer deaths; industry funded.', cite: 'Rosenfield K et al. N Engl J Med 2026;394:1979', doi: '10.1056/NEJMoa2516567'},
+  {q: 'Does catheter-directed lysis unload the right ventricle faster? (ULTIMA)', d: 'Randomized, 59 patients with intermediate-risk PE; ultrasound-assisted catheter lysis (10 to 20 mg alteplase over 15 hours) plus heparin against heparin alone.', r: 'RV/LV ratio fell by 0.30 against 0.03 at 24 hours. No major bleeding by 90 days; one death, in the heparin group.', c: 'Showed the right ventricle recovers faster with a low catheter dose. Small, with a surrogate endpoint.', cite: 'Kucher N et al. Circulation 2014;129:479', doi: '10.1161/CIRCULATIONAHA.113.005544'},
+  {q: 'Thrombectomy or catheter lysis? (PEERLESS)', d: 'Randomized, open label, 550 patients with intermediate-risk PE; large-bore mechanical thrombectomy against catheter-directed lysis.', r: 'Win ratio 5.01 (3.68–6.97) on a ranked composite, driven by less clinical deterioration (1.8% vs 5.4%) and fewer ICU admissions (41.6% vs 98.6%). No difference in death, intracranial bleeding or major bleeding; 30-day death 0.4% vs 0.8%.', c: 'Thrombectomy used fewer ICU beds; neither catheter method has been shown to save more lives. Device-maker sponsored.', cite: 'Jaber WA et al. Circulation 2025;151:260', doi: '10.1161/CIRCULATIONAHA.124.072364'},
+  {q: 'Does thrombectomy beat anticoagulation alone? (STORM-PE)', d: 'Randomized, open label, 100 patients with intermediate-high-risk PE and RV/LV 1.0 or more; computer-assisted vacuum thrombectomy plus anticoagulation against anticoagulation alone.', r: 'RV/LV fell by 0.52 against 0.24 at 48 hours (difference 0.27, 0.12–0.43). Major adverse events by day 7: 4.3% vs 7.5% (not significant); two PE-related deaths in the thrombectomy arm.', c: 'A surrogate endpoint in a small trial; device-maker funded. Outcome trials are still running.', cite: 'Lookstein RA et al. Circulation 2026;153:21', doi: '10.1161/CIRCULATIONAHA.125.077232'},
+  {q: 'Is half-dose alteplase enough? (Wang)', d: 'Randomized, open label, 118 patients in China with unstable or anatomically massive PE; alteplase 50 mg against 100 mg, both over 2 hours.', r: 'Similar improvement on imaging. Bleeding 3% vs 10%; under 65 kg, any bleeding 14.8% vs 41.2%. Deaths 1 vs 3.', c: 'The basis for "a lower dose may be considered" (2b). Too small to show a difference in death, and it included anatomically massive PE without shock.', cite: 'Wang C et al. Chest 2010;137:254', doi: '10.1378/chest.09-0765'},
+  {q: 'Low-dose lysis in moderate PE? (MOPETT)', d: 'Randomized, open label, 121 patients with "moderate" PE; a reduced ("safe") alteplase dose plus anticoagulation against anticoagulation alone.', r: 'Pulmonary hypertension on echo at 28 months: 16% vs 57%. No bleeding in either group. Death or recurrent PE 1.6% vs 10%.', c: 'Often quoted for reduced-dose lysis, but small, open, with a surrogate primary endpoint and a definition of moderate PE of its own.', cite: 'Sharifi M et al. Am J Cardiol 2013;111:273', doi: '10.1016/j.amjcard.2012.09.027'},
+  {q: 'Does thrombolysis lower mortality across trials? (Chatterjee meta-analysis)', d: '16 randomized trials, 2115 patients, mostly intermediate risk; thrombolysis against anticoagulation.', r: 'Death 2.17% vs 3.89% (OR 0.53, 0.32–0.88; number needed to treat 59). Major bleeding 9.24% vs 3.42% (number needed to harm 18). Intracranial bleeding 1.46% vs 0.19%.', c: 'Benefit and harm in one picture: a death saved for roughly every three major bleeds.', cite: 'Chatterjee S et al. JAMA 2014;311:2414', doi: '10.1001/jama.2014.5990'},
+  {q: 'Is there a trial in PE with shock? (Jerjes-Sanchez)', d: 'Randomized, 8 patients with massive PE and shock; streptokinase plus heparin against heparin alone.', r: 'All 4 given streptokinase survived; all 4 given heparin alone died within 1 to 3 hours.', c: 'The only randomized trial in PE with shock. Tiny; the recommendation for lysis in shock rests largely on physiology and observational data.', cite: 'Jerjes-Sanchez C et al. J Thromb Thrombolysis 1995;2:227', doi: '10.1007/BF01062714'},
+  {q: 'Does ECMO save patients with PE shock? (Karami meta-analysis)', d: '29 observational studies, 1947 patients with high-risk PE, 1138 on VA-ECMO.', r: 'Short-term survival not different from patients without ECMO (RR 0.91, 0.71–1.16). Survival lower above age 60; higher with surgical embolectomy (RR 1.96).', c: 'Observational and confounded: patients put on ECMO were sicker. ECMO is a bridge to clot removal, not a treatment on its own.', cite: 'Karami M et al. J Crit Care 2021;64:245', doi: '10.1016/j.jcrc.2021.03.006'}
+];
+
+var CASES = [
+  {t: 'Day 2 after a hip replacement', s: 'Age 68, 82 kg. Systolic 84 for 40 minutes, now on norepinephrine. Lactate 4.1. CT: saddle PE, RV/LV 1.5, troponin raised. The hospital has a catheter team and cardiac surgery.', q: 'Systemic lysis?', i: {hemo: 'pers', sbp: 84, lac: 4.1, wt: 82, rv: true, bio: true, ctyes: true, a_tr: true, x_cath: true, x_surg: true}, p: 'E1. Surgery 2 days ago is an absolute contraindication (major surgery in the past 3 weeks), so no systemic lysis. Mechanical thrombectomy or surgical embolectomy, both reasonable (2a). Norepinephrine, no more fluid, avoid intubation.'},
+  {t: 'Normal pressure, rising lactate', s: 'Age 55, 95 kg. BP 108/70, heart rate 124, lactate 3.2, new confusion. RV dilated, troponin raised, PE on CT. No contraindications. Catheter team on site.', q: 'Is this high-risk, and what next?', i: {hemo: 'held', sbp: 108, lac: 3.2, perf: true, rv: true, bio: true, ctyes: true, wt: 95, x_cath: true}, p: 'D2: shock with a normal pressure. Advanced therapy may be considered (2b); with a catheter team here, catheter-directed therapy is weighed first because it bleeds less than systemic lysis (2b). Enoxaparin 95 mg every 12 hours. Norepinephrine or an inotrope for the poor perfusion (1, C-LD); no more fluid.'},
+  {t: 'PEA on the ward', s: 'Age 61, 80 kg, day 5 of a pneumonia admission, collapses with PEA. Bedside echo at the pulse check shows a very dilated RV. No CT.', q: 'Lysis during CPR? What dose?', i: {hemo: 'arrest', wt: 80, rv: true, ctno: true}, p: 'Suspected PE in arrest: thrombolysis may be considered (2b; 2a if PE is confirmed). Alteplase 100 mg over 2 hours is the labelled dose; the ESC accelerated regimen is 48 mg over 15 minutes at 80 kg. Continue CPR for at least 60 to 90 minutes after it. A dilated RV is common in arrest from any cause.'},
+  {t: 'Holding, but MAP 76', s: 'Age 74, 70 kg. BP 104/62 (MAP 76), heart rate 112, lactate 1.6, on 4 L nasal oxygen. CT: RV/LV 1.2; troponin raised.', q: 'Lyse now?', i: {hemo: 'held', sbp: 104, map: 76, lac: 1.6, rv: true, bio: true, ctyes: true, resp: 'low', wt: 70}, p: 'C3R (assuming sPESI 1 or more). Enoxaparin 70 mg every 12 hours and close watch: MAP below 80 may flag the need to escalate (2a). Systemic lysis up front is of uncertain benefit and bleeds; rescue lysis if the pressure falls (ESC I, B).'},
+  {t: 'Small hospital, persistent hypotension', s: 'Age 50, 100 kg. No catheter team, cardiac surgery or ECMO. Systolic 80 for 30 minutes on norepinephrine, lactate 5. CT confirms PE; RV dilated. No contraindications. The team plans to give alteplase.', q: 'Transfer or treat here?', i: {hemo: 'pers', sbp: 80, lac: 5, wt: 100, rv: true, bio: true, ctyes: true, x_none: true, soon: true}, p: 'E1. Systemic alteplase 100 mg over 2 hours is reasonable (2a) and is the option this hospital has. Stabilize here; do not transfer while unstable (3: Harm). Heparin infusion (8,000 units, then 1,800 units/h) because lysis is imminent; restart it after alteplase once the aPTT is twice normal or less.'},
+  {t: 'Refractory shock after a brain hemorrhage', s: 'Age 66, 75 kg, brain hemorrhage two years ago. On norepinephrine and vasopressin, systolic still 70, lactate 9. Echo: huge RV; too unstable for CT. ECMO and cardiac surgery on site.', q: 'What breaks the spiral here?', i: {hemo: 'refr', sbp: 70, lac: 9, wt: 75, rv: true, ctno: true, a_hs: true, x_ecmo: true, x_surg: true, resp: 'hi'}, p: 'E2 with an absolute contraindication: no systemic lysis. VA-ECMO (2a) to hold the circulation, then surgical embolectomy on support (ESC IIb, C). Heparin infusion. A dilated RV on echo in shock is enough to act on when CT is impossible (ESC).'}
+];
+</script>
+<script>
+(function(){
+var $ = function(id){ return document.getElementById(id); };
+function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+var ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M7 15l3-4 3 3 2-2 2 3"/></svg>';
+function chip(fig, state, label){ if (fig.indexOf('plate:') === 0) return '<button class="chip" type="button" data-plate="' + fig.slice(6) + '">' + ICON + esc(label) + '</button>'; return '<button class="chip" type="button" data-fig="' + fig + '" data-state="' + (state || '') + '">' + ICON + esc(label || FIGS[fig].t) + '</button>'; }
+function optHTML(r){
+  var tag = r.here === true ? '<span class="tag here">here</span>' : r.here === false ? '<span class="tag">not here</span>' : '';
+  var st = r.st.indexOf('weigh') >= 0 ? ' <span class="tag warn">weigh</span>' : r.st === 'out' ? ' <span class="tag warn">ruled out</span>' : '';
+  return '<div class="opt ' + r.st + '"><b>' + esc(r.name) + tag + st + '</b><span class="g">' + esc(r.g) + '</span>' + ((r.word && r.st !== 'out') || r.note ? '<small>' + esc((r.word && r.st !== 'out' ? r.word.charAt(0).toUpperCase() + r.word.slice(1) + '. ' : '') + r.note) + '</small>' : '') + '</div>';
+}
+function cardHTML(c){
+  var h = '<div class="card" id="' + c.id + '"><p class="label">' + esc(c.label) + '</p><h2>' + esc(c.head) + '</h2>';
+  if (c.sub) h += '<p class="sub">' + esc(c.sub) + '</p>';
+  h += (c.guards || []).map(function(g){ return '<div class="guard">' + esc(g) + '</div>'; }).join('');
+  if (c.opts) h += '<div style="margin-top:8px">' + c.opts.map(optHTML).join('') + '</div>';
+  if (c.list && c.list.length) h += '<ul>' + c.list.map(function(s){ return '<li>' + esc(s) + '</li>'; }).join('') + '</ul>';
+  if (c.why) h += '<p class="whyline"><b>Why:</b> ' + esc(c.why) + '</p>';
+  if (c.links) h += '<div class="links">' + c.links.map(function(l){ return '<a href="' + l[0] + '">' + esc(l[1]) + ' →</a>'; }).join('') + '</div>';
+  if (c.chips && c.chips.length) h += '<div class="chips">' + c.chips.map(function(x){ return chip(x[0], x[1], x[2]); }).join('') + '</div>';
+  if ((c.more && c.more.length) || (c.tiers && c.tiers.length)) h += '<details><summary>More</summary>' + (c.more || []).map(function(m){ return '<p>' + esc(m) + '</p>'; }).join('') + (c.tiers || []).map(function(t){ return '<span class="tier">' + esc(t) + '</span>'; }).join('') + '</details>';
+  return h + '</div>';
+}
+
+/* Inputs */
+var st = {pick: '', hemo: 'held', resp: 'air', t: {}};
+var NUMS = ['sbp','map','lac','wt'];
+function read(){
+  var i = {pick: st.pick, hemo: st.hemo, resp: st.resp};
+  NUMS.forEach(function(k){ var v = parseFloat($(k).value); i[k] = isFinite(v) && v > 0 ? v : null; });
+  ALLT.forEach(function(t){ if (st.t[t[0]]) i[t[0]] = true; });
+  return i;
+}
+function seg(host, list, sel){ $(host).innerHTML = list.map(function(x){ return '<button class="sbtn" type="button" data-v="' + x[0] + '" aria-pressed="' + (x[0] === sel) + '">' + esc(x[1]) + '</button>'; }).join(''); }
+function ticks(host, list){ $(host).innerHTML = list.map(function(t){ return '<label class="chk"><input type="checkbox" data-t="' + t[0] + '"' + (st.t[t[0]] ? ' checked' : '') + '>' + esc(t[1]) + '</label>'; }).join(''); }
+function drawInputs(){ seg('pickseg', PICK, st.pick); seg('hemoseg', HEMO, st.hemo); seg('respseg', RESP, st.resp); ticks('ticks-h', TICKS_H); ticks('ticks-r', TICKS_R); ticks('ticks-i', TICKS_I); ticks('ticks-a', ABS); ticks('ticks-l', REL); ticks('ticks-p', TICKS_P); ticks('ticks-x', TICKS_X); }
+function build(i){ var o = decide(i); return {o: o, html: o.cards.map(cardHTML).join('')}; }
+function render(){ $('out').innerHTML = build(read()).html; }
+function segClick(host, key){ $(host).addEventListener('click', function(e){ var b = e.target.closest && e.target.closest('[data-v]'); if (b){ st[key] = b.getAttribute('data-v'); drawInputs(); render(); } }); }
+segClick('pickseg', 'pick'); segClick('hemoseg', 'hemo'); segClick('respseg', 'resp');
+$('inputs').addEventListener('change', function(e){ var t = e.target.getAttribute && e.target.getAttribute('data-t'); if (t){ st.t[t] = e.target.checked; if (t === 'x_none' && e.target.checked){ st.t.x_cath = st.t.x_surg = st.t.x_ecmo = false; drawInputs(); } else if (t.indexOf('x_') === 0 && t !== 'x_none' && e.target.checked && st.t.x_none){ st.t.x_none = false; drawInputs(); } } render(); });
+$('inputs').addEventListener('input', render);
+
+/* Tabs */
+var tabs = [['t-tool','p-tool'],['t-learn','p-learn'],['t-prac','p-prac']];
+function show(t){ tabs.forEach(function(p){ var on = p[0] === t; $(p[0]).setAttribute('aria-selected', String(on)); $(p[1]).classList.toggle('on', on); }); }
+tabs.forEach(function(p){ $(p[0]).addEventListener('click', function(){ show(p[0]); }); });
+function fromHash(){ var id = location.hash.slice(1); if (!id) return; var el = $(id); if (!el) return; var pan = el.closest('.panel'); if (pan) tabs.forEach(function(p){ if (p[1] === pan.id) show(p[0]); }); el.scrollIntoView(); }
+window.addEventListener('hashchange', fromHash);
+
+/* Figures and the sheet */
+function mountFig(host, id, state){
+  var F = FIGS[id];
+  function draw(k){
+    var d = F.data[k];
+    host.innerHTML = '<div class="states" role="group" aria-label="' + esc(F.t) + '">' + F.states.map(function(x){ return '<button class="sbtn" type="button" data-k="' + x + '" aria-pressed="' + (x === k) + '">' + esc(F.data[x].n) + '</button>'; }).join('') + '</div>' + F.svg(k) + '<p class="line1">' + esc(d.line) + '</p>';
+  }
+  host.onclick = function(e){ var b = e.target.closest && e.target.closest('[data-k]'); if (b) draw(b.getAttribute('data-k')); };
+  draw(state && F.data[state] ? state : F.states[0]);
+}
+var lastFocus = null;
+function openSheet(fig, state){
+  lastFocus = document.activeElement;
+  $('sheet-t').textContent = FIGS[fig].t;
+  mountFig($('sheet-b'), fig, state);
+  $('scrim').hidden = false; $('sheet').hidden = false; $('sheet').scrollTop = 0; $('sheet-x').focus();
+}
+function closeSheet(){ if ($('sheet').hidden) return; $('scrim').hidden = true; $('sheet').hidden = true; if (lastFocus && lastFocus.focus) lastFocus.focus(); }
+$('sheet-x').addEventListener('click', closeSheet); $('scrim').addEventListener('click', closeSheet);
+document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeSheet(); });
+document.addEventListener('click', function(e){ var c = e.target.closest && e.target.closest('[data-fig]'); if (c) openSheet(c.getAttribute('data-fig'), c.getAttribute('data-state')); var q = e.target.closest && e.target.closest('[data-plate]'); if (q){ lastFocus = document.activeElement; var id = q.getAttribute('data-plate'); $('sheet-t').textContent = PLATES[id].t; $('sheet-b').onclick = null; $('sheet-b').innerHTML = plateHTML(id); $('scrim').hidden = false; $('sheet').hidden = false; $('sheet').scrollTop = 0; $('sheet-x').focus(); } });
+Object.keys(PLATES).forEach(function(id){ var host = $('plate-' + id); if (host) host.innerHTML = plateHTML(id); });
+if (!Object.keys(PLATES).length) $('credit-line').hidden = true;
+document.querySelectorAll('[data-figure]').forEach(function(h){ mountFig(h, h.getAttribute('data-figure'), h.getAttribute('data-state')); });
+document.addEventListener('click', function(e){ var a = e.target.closest && e.target.closest('a[href^="#"]'); if (a){ var id = a.getAttribute('href').slice(1), el = $(id); if (el){ e.preventDefault(); var pan = el.closest('.panel'); if (pan) tabs.forEach(function(p){ if (p[1] === pan.id) show(p[0]); }); el.scrollIntoView(); } } });
+
+/* Learn tab */
+(function(){
+  var chaps = [].slice.call(document.querySelectorAll('.chap'));
+  $('pills').innerHTML = chaps.map(function(c, n){ return '<button class="pill" type="button" data-go="' + c.id + '" aria-current="' + (n === 0) + '">' + (n + 1) + ' ' + esc(c.getAttribute('data-pill')) + '</button>'; }).join('');
+  $('pills').addEventListener('click', function(e){ var g = e.target.getAttribute('data-go'); if (g) $(g).scrollIntoView(); });
+  function mark(id){ [].forEach.call($('pills').children, function(b){ var on = b.getAttribute('data-go') === id; b.setAttribute('aria-current', String(on)); if (on) $('pills').scrollLeft = Math.max(0, b.offsetLeft - 60); }); }
+  if ('IntersectionObserver' in window){
+    var io = new IntersectionObserver(function(es){ es.forEach(function(en){ if (en.isIntersecting) mark(en.target.id); }); }, {rootMargin: '-30% 0px -60% 0px'});
+    chaps.forEach(function(c){ io.observe(c); });
+  }
+  $('trialbox').innerHTML = TRIALS.map(function(t){ return '<div class="trial" style="margin-top:14px"><p><b>' + esc(t.q) + '</b></p><p><span class="k">Design</span>' + esc(t.d) + '</p><p><span class="k">Result</span>' + esc(t.r) + '</p><p><span class="k">What it changed</span>' + esc(t.c) + '</p><p class="mono" style="font-size:13px"><a href="https://doi.org/' + t.doi + '" rel="noopener">' + esc(t.cite) + '</a></p></div>'; }).join('');
+  $('go-prac').addEventListener('click', function(){ show('t-prac'); window.scrollTo(0, 0); });
+})();
+
+/* Practice: cases run through the same engine */
+$('practice').innerHTML = CASES.map(function(c, n){
+  return '<div class="card case"><p class="label">Case ' + (n + 1) + '</p><h2>' + esc(c.t) + '</h2><p>' + esc(c.s) + '</p><p><b>' + esc(c.q) + '</b></p><div class="row"><button class="btn" type="button" data-ans="' + n + '">Show the answer</button><button class="btn ghost" type="button" data-load="' + n + '">Open in the tool</button></div><div class="ans" id="ans' + n + '" hidden></div></div>';
+}).join('');
+function caseInput(c){ var inp = {pick: '', hemo: 'held', resp: 'air'}; Object.keys(c.i).forEach(function(k){ inp[k] = c.i[k]; }); NUMS.forEach(function(k){ if (inp[k] === undefined) inp[k] = null; }); return inp; }
+$('practice').addEventListener('click', function(e){
+  var a = e.target.getAttribute('data-ans'), l = e.target.getAttribute('data-load');
+  if (a != null){ var c = CASES[a], box = $('ans' + a), b = build(caseInput(c)); box.innerHTML = '<p>' + esc(c.p) + '</p>' + b.html.replace(/ id="[^"]*"/g, ''); box.hidden = false; e.target.hidden = true; }
+  if (l != null){ var c2 = CASES[l]; st = {pick: c2.i.pick || '', hemo: c2.i.hemo || 'held', resp: c2.i.resp || 'air', t: {}}; ALLT.forEach(function(t){ if (c2.i[t[0]]) st.t[t[0]] = true; }); drawInputs(); NUMS.forEach(function(k){ $(k).value = c2.i[k] != null ? c2.i[k] : ''; }); render(); show('t-tool'); window.scrollTo(0, 0); }
+});
+drawInputs(); render(); fromHash();
+})();
+</script>
+<script id="deeper-data">
+/* Go deeper: mechanism, rationale and the common trap for each Learn chapter. Text only; no doses or thresholds beyond the tool's own. */
+(function(){ var D = {
+"learn-spiral": [["Mechanism", "The right ventricle is a thin-walled chamber built to pump into a low-pressure circuit. A sudden clot raises the pressure it must pump against; it dilates, its wall stress and oxygen need rise, and its output falls. The left ventricle then fills less, systemic pressure falls, and the right coronary artery, which is perfused by aortic pressure, delivers less oxygen to a ventricle that needs more."], ["Why it matters", "The loop explains why patients can look stable and then collapse within minutes, why a vasopressor helps even though the problem is in the lungs, and why only reperfusion treats the cause."], ["Common trap", "Reading a normal blood pressure as safety. Category D2 can be shock with a normal or only briefly low pressure: lactate, urine output and mentation show it before the pressure does."]],
+"learn-septum": [["Mechanism", "Both ventricles sit inside one pericardium and share the septum. When the right ventricle dilates, the septum flattens toward the left, so the left ventricle fills less at the same filling pressure. This is ventricular interdependence."], ["Why it matters", "A fluid bolus that would help a dry patient can lower output here: the extra volume goes into the right ventricle, the septum bows further, and the left ventricle fills even less. That is why the guideline limits fluid to small boluses and only when preload looks low."], ["Common trap", "Treating a low blood pressure in PE like hypovolemia, with repeated litre boluses, while the neck veins and the right ventricle are already full."]],
+"learn-tube": [["Mechanism", "Induction drugs lower vascular tone, positive pressure raises intrathoracic pressure and the resistance of lung vessels, and the pause in breathing lets carbon dioxide rise and oxygen fall, which tightens lung vessels further. Each lowers right ventricular output; together they can stop it."], ["Why it matters", "The 2026 guideline grades deep sedation and mechanical ventilation as harmful in categories C to E unless needed, and asks for vasopressors, inotropes or ECMO to be ready before sedation. High-flow nasal oxygen is reasonable over a standard cannula for moderate to severe hypoxia (2a)."], ["Common trap", "Intubating to fix the oxygen saturation. Hypoxemia in PE comes mostly from the clot and often improves only partly with oxygen, and the tube can cause the arrest it was meant to prevent."]],
+"learn-echo": [["Mechanism", "Sudden pressure overload makes the right ventricle dilate before it can thicken, so in acute PE it is large but thin-walled. The free wall can stop moving while the apex, tethered to the left ventricle, still contracts."], ["Why it matters", "In a patient too unstable for CT, ESC 2019 accepts a dilated, failing right ventricle as enough to treat as high-risk PE, and a normal right ventricle points to another cause of the shock."], ["Common trap", "Taking a large right ventricle as proof of PE. Tamponade, right ventricular infarction, long-standing pulmonary hypertension and cardiac arrest from any cause can all enlarge it; a thick right ventricular wall suggests a chronic cause."]],
+"learn-options": [["Mechanism", "Systemic lysis dissolves clot throughout the lungs within hours but also breaks down circulating fibrinogen everywhere. Catheter-directed lysis puts a small dose into the clot. Mechanical thrombectomy pulls clot out without a drug. Surgery removes it under direct vision. VA-ECMO bypasses the right heart and lungs while the clot is dealt with."], ["Why it matters", "The grades rise with severity: may be considered in D, reasonable in E1. In E2, lysis and ECMO are reasonable; surgery is not recommended unless the patient is on circulatory support, and catheter therapy is not graded. In cardiac arrest with confirmed PE, AHA 2025 rates surgical or percutaneous embolectomy as reasonable (2a). The bleeding risk and what the hospital can do decide between options of the same grade."], ["Common trap", "Treating catheter-directed lysis as drug-free. It still gives alteplase, so with an absolute contraindication a mechanical option or surgery comes first."]],
+"trials": [["Mechanism", "Most reperfusion trials enrolled patients with normal blood pressure, because shock is rare and too urgent to randomize. Their endpoints are often the RV/LV ratio or a composite driven by decompensation rather than death."], ["Why it matters", "Recommendations for categories D and E rest largely on physiology, small trials and observational data, which is why most are graded 2a or 2b and why the response team's judgment matters."], ["Common trap", "Reading a fall in the RV/LV ratio as proof of fewer deaths. No catheter trial has yet shown lower mortality."]]
+};
+  function add(){ Object.keys(D).forEach(function(id){ var c = document.getElementById(id); if (!c || c.querySelector(":scope > .deeper")) return; var d = document.createElement("details"); d.className = "deeper"; d.innerHTML = "<summary>Go deeper: mechanism and rationale</summary><div class=\"dpx\">" + D[id].map(function(r){ return "<div><span class=\"dl\">" + r[0] + "</span><p>" + r[1] + "</p></div>"; }).join("") + "</div>"; c.appendChild(d); }); }
+  add();
+})();
+</script>
+</body>
+</html>
