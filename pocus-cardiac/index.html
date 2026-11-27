@@ -50,7 +50,8 @@ section.view>*{min-width:0}
 .card.pad{padding:16px}
 .figcard{overflow:hidden}
 .fig{position:relative;aspect-ratio:6/5;background:var(--us-bg);touch-action:pan-y;user-select:none;-webkit-user-select:none}
-.fig canvas,.fig svg{position:absolute;inset:0;width:100%;height:100%;display:block}
+.figmode{margin:10px 10px 10px;}
+.fig canvas,.fig svg,.fig img{position:absolute;inset:0;width:100%;height:100%;display:block}
 .fig .pill{position:absolute;top:8px;font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;padding:3px 7px;border-radius:6px;pointer-events:none}
 .fig .pill.l{left:8px;background:var(--us-halo);color:var(--us-ink)}
 .fig .pill.r{right:8px;background:var(--card);color:var(--ink);border:1px solid var(--line)}
@@ -169,8 +170,13 @@ footer p{margin-bottom:8px}
   <div class="views" role="group" aria-label="View" id="viewpick"></div>
 
   <div class="card figcard" id="figure">
+    <div class="seg figmode" role="group" aria-label="Figure" id="figmode" hidden>
+      <button type="button" data-m="real" aria-pressed="true">Real scan</button>
+      <button type="button" data-m="dg" aria-pressed="false">Diagram</button>
+    </div>
     <div class="fig" id="fig">
       <canvas id="scan" width="720" height="600"></canvas>
+      <img id="frame" alt="" hidden>
       <svg class="dg" id="diagram" viewBox="0 0 360 300" role="img"></svg>
       <svg class="hl" id="hl" viewBox="0 0 360 300"></svg>
       <span class="pill l" id="pillL">Scan</span>
@@ -185,7 +191,7 @@ footer p{margin-bottom:8px}
 
   <div class="card" id="how"></div>
   <div class="card pad" id="viewclips"><span class="kicker">Real scans</span><h3 id="vcTitle"></h3><div class="clips" id="vcClips"></div></div>
-  <p class="note">Probe position and poor-view fixes are expert practice, not guideline statements. The figure above is a drawing of the standard view on both sides of the handle; the clips are patient scans from open-licence articles.</p>
+  <p class="note">Probe position and poor-view fixes are expert practice, not guideline statements. <span id="fignote"></span> The clips are patient scans from open-licence articles.</p>
 
   <div class="cmp" id="compare" hidden>
     <span class="kicker">Same view</span>
@@ -405,31 +411,37 @@ var VIEWS=[
  ]}
 ];
 
-var view=VIEWS[0], state="normal", sel=null, pos=50;
+var REAL=/*REAL*/{};
+var view=VIEWS[0], state="normal", sel=null, pos=50, mode=REAL[VIEWS[0].id]?"real":"dg";
 function tfAttr(v){return "matrix("+v.tf[0]+" 0 0 "+v.tf[0]+" "+v.tf[1]+" "+v.tf[2]+")"}
-function st(){return view.states?view.states[state]:null}
+function st(){return (view.states&&mode!=="real")?view.states[state]:null}
 function dOf(s){var x=st();return (s.peri&&x&&x.peri)?x.peri:s.d}
-function find(id){return view.S.filter(function(x){return x.id===id})[0]}
+/* Real mode: outlines traced on one real frame of the view. Diagram mode: the drawn standard view. */
+function real(){return mode==="real"?REAL[view.id]:null}
+function cs(){var r=real();return r?r.S:view.S}
+function cdec(){return real()?[]:view.decor}
+function ctf(){return real()?"matrix(1 0 0 1 0 0)":tfAttr(view)}
+function find(id){return cs().filter(function(x){return x.id===id})[0]}
 
 function diagram(){
-  var x=st(),h='<rect class="bgr" width="360" height="300"/><path class="sector" d="'+SECTOR+'"/>';
-  h+='<clipPath id="sc"><path d="'+SECTOR+'"/></clipPath><g clip-path="url(#sc)"><g transform="'+tfAttr(view)+'">';
+  var x=st(),real=mode==="real",clip=real?"M0 0H360V300H0Z":SECTOR,h='<rect class="bgr" width="360" height="300"/>'+(real?'':'<path class="sector" d="'+SECTOR+'"/>');
+  h+='<clipPath id="sc"><path d="'+clip+'"/></clipPath><g clip-path="url(#sc)"><g transform="'+ctf()+'">';
   if(x&&x.fluid&&x.behind)h+='<path class="fluid" d="'+x.fluid+'"/>';
-  view.decor.forEach(function(d){h+=d.k==="ln"?'<path class="leaf" d="'+d.d+'"/>':'<path class="mus" d="'+d.d+'"/>'});
-  view.S.forEach(function(s){
+  cdec().forEach(function(d){h+=d.k==="ln"?'<path class="leaf" d="'+d.d+'"/>':'<path class="mus" d="'+d.d+'"/>'});
+  cs().forEach(function(s){
     var cls=s.kind==="ln"?(s.id==="peri"?"peri":"leaf"):s.kind;
     if(s.peri&&x&&x.fluid&&!x.behind)h+='<path class="fluid" d="'+x.fluid+'"/>';
     h+='<path class="'+cls+'" d="'+dOf(s)+'"/>';
   });
-  h+='</g></g><g transform="'+tfAttr(view)+'">';
-  view.S.forEach(function(s){if(s.lab)h+='<text x="'+s.lx+'" y="'+(s.ly+4)+'">'+s.lab+'</text>'});
+  h+='</g></g><g transform="'+ctf()+'">';
+  cs().forEach(function(s){if(s.lab)h+='<text x="'+s.lx+'" y="'+(s.ly+4)+'">'+s.lab+'</text>'});
   if(x&&x.label)h+='<text class="fl" x="'+x.label[1]+'" y="'+x.label[2]+'">'+x.label[0]+'</text>';
   return h+'</g>';
 }
 function highlight(){
-  var h='<g transform="'+tfAttr(view)+'">';
+  var h='<g transform="'+ctf()+'">';
   if(sel){var s=find(sel);if(s){h+='<path class="halo" d="'+dOf(s)+'"/><path class="mark'+(s.kind==="ln"?" ln":"")+'" d="'+dOf(s)+'"/>'}}
-  var big=view.S.filter(function(x){return x.kind!=="ln"}),thin=view.S.filter(function(x){return x.kind==="ln"});
+  var big=cs().filter(function(x){return x.kind!=="ln"}),thin=cs().filter(function(x){return x.kind==="ln"});
   /* largest first so that small structures stay tappable on top */
   big.concat(thin).forEach(function(x){h+='<path class="hit" data-id="'+x.id+'" d="'+dOf(x)+'"/>'});
   return h+'</g>';
@@ -486,24 +498,29 @@ function paintFig(){
   $("#diagram").innerHTML=diagram();
   $("#diagram").setAttribute("aria-label","Labelled anatomy: "+view.full);
   $("#scan").setAttribute("aria-label","Ultrasound stand-in drawing: "+view.full);
+  var r=real(),fr=$("#frame");fr.hidden=!r;if(r){fr.src=BASE+view.id+"-frame.jpg";fr.alt="Ultrasound frame: "+view.full}
+  $("#pillL").textContent=r?"Real scan":"Drawn scan";
+  $("#figmode").hidden=!REAL[view.id];$$("#figmode button").forEach(function(b){b.setAttribute("aria-pressed",String(b.dataset.m===mode))});
+  $("#fignote").textContent=r?"Outlines are approximate, traced on one frame of the clip below. Only structures that could be placed with confidence are outlined.":"A drawing of the standard view on both sides of the handle.";
   $("#hl").innerHTML=highlight();
   setPos(pos);
   var info=$("#info"),s=sel&&find(sel);
   if(s){info.className="info";info.innerHTML="<b>"+s.n+".</b> "+s.tip}
   else{info.className="info idle";info.textContent=view.full+". Drag the handle; tap any structure to name it."}
-  $("#chips").innerHTML=view.S.map(function(s){return '<button type="button" data-id="'+s.id+'" aria-pressed="'+(sel===s.id)+'">'+s.n+'</button>'}).join("");
+  $("#chips").innerHTML=cs().map(function(s){return '<button type="button" data-id="'+s.id+'" aria-pressed="'+(sel===s.id)+'">'+s.n+'</button>'}).join("");
 }
 function paintView(){
   $("#viewpick").innerHTML=VIEWS.map(function(v){return '<button type="button" data-v="'+v.id+'" aria-pressed="'+(v===view)+'">'+v.name+'</button>'}).join("");
   $("#how").innerHTML='<div class="row"><span class="k">Answers</span><span>'+view.answers+'</span></div><div class="row"><span class="k">Probe</span><span>'+view.probe+'</span></div><div class="row"><span class="k">Poor view</span><span>'+view.fix+'</span></div>';
   $("#compare").hidden=!view.states;
-  if(view.states){$("#stateText").textContent=st().text;$$("#states button").forEach(function(b){b.setAttribute("aria-pressed",String(b.dataset.s===state))})}
+  if(view.states){$("#stateText").textContent=view.states[state].text;$$("#states button").forEach(function(b){b.setAttribute("aria-pressed",String(b.dataset.s===state))})}
   drawScan();paintFig();paintViewClips();
 }
 
 $("#viewpick").addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;
-  view=VIEWS.filter(function(v){return v.id===b.dataset.v})[0];state="normal";sel=null;pos=50;paintView()});
-$("#states").addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;state=b.dataset.s;sel=st().sel||null;paintView()});
+  view=VIEWS.filter(function(v){return v.id===b.dataset.v})[0];state="normal";sel=null;pos=50;mode=REAL[view.id]?"real":"dg";paintView()});
+$("#figmode").addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;mode=b.dataset.m;sel=null;state="normal";paintView()});
+$("#states").addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;state=b.dataset.s;mode="dg";sel=st().sel||null;paintView()});
 $("#chips").addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;sel=sel===b.dataset.id?null:b.dataset.id;paintFig()});
 $("#hl").addEventListener("click",function(e){var t=e.target.closest("[data-id]");if(!t)return;var id=t.getAttribute("data-id");sel=sel===id?null:id;paintFig();
   var c=document.querySelector('#chips button[data-id="'+id+'"]');if(c&&c.scrollIntoView)c.scrollIntoView({block:"nearest",inline:"center"})});
