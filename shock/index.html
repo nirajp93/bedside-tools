@@ -302,7 +302,7 @@ footer strong{color:var(--ink)}
 
 <section class="view" id="v-learn">
   <div class="lpills" id="lpills"></div>
-  <div class="card chap" id="learn-map" data-pill="Four types"><p class="label">Start here</p><h2>Four ways the circulation fails</h2><div class="vk-plate"><img src="/media/shock/four-types.webp" width="1008" height="420" alt="Four panels of the heart and great vessels: hypovolemic with thin, under-filled vessels; distributive with wide, dilated vessels; cardiogenic with a dilated, weak left ventricle; obstructive with fluid compressing the heart (tamponade)."><span class="vk-credit">Created with BioRender.com</span></div><p class="line1">An empty tank, dilated pipes, a weak pump, or a blocked pump. The obstructive panel shows tamponade; massive PE and tension pneumothorax block flow too. More than one can coexist.</p></div>
+  <div class="card chap" id="learn-map" data-pill="Four types"><p class="label">Start here</p><h2>Four ways the circulation fails</h2><div class="vk-plate"><img src="/media/shock/four-types.webp" width="1008" height="420" alt="Four panels of the heart and great vessels: hypovolemic with thin, under-filled vessels; distributive with wide, dilated vessels; cardiogenic with a dilated, weak left ventricle; obstructive with fluid compressing the heart (tamponade)."><span class="vk-credit">Created with BioRender.com</span></div><p class="line1">An empty tank, dilated pipes, a weak pump, or a squeezed or blocked heart. The obstructive panel shows tamponade; massive PE and tension pneumothorax block flow too. More than one can coexist.</p></div>
   <div class="card chap" id="learn-do2" data-pill="Oxygen delivery"><p class="label">1 · The common end point</p><h2>Oxygen delivery falls, or cells cannot use it</h2><p class="lead">Each state shows which part of delivery fails in that type.</p><div data-figure="do2"></div></div>
   <div class="card chap" id="learn-lactate" data-pill="Lactate"><p class="label">2 · Lactate</p><h2>Why lactate rises</h2><p class="lead">Three sources; not every rise is oxygen debt.</p><div data-figure="lac"></div></div>
   <div class="card chap" id="learn-pp" data-pill="Pulse pressure"><p class="label">3 · Pulse pressure</p><h2>The pulse hints at the stroke volume</h2><p class="lead">The gap between systolic and diastolic tracks how much blood each beat ejects.</p><div data-figure="pp"></div></div>
@@ -398,12 +398,12 @@ const F = {
     r: {O: 'A leg clot with shock and a strained right ventricle points to PE.'}},
   inf: {n: 'Infection likely', g: 'ctx', w: {D: 3}, spec: ['D'], sub: 'sepsis', r: {D: 'Suspected infection with shock is septic shock until shown otherwise.'}},
   ana: {n: 'Allergen exposure, hives, wheeze', g: 'ctx', w: {D: 3}, spec: ['D'], sub: 'ana', r: {D: 'Exposure with skin or airway signs points to anaphylaxis.'}},
-  adr: {n: 'Long-term steroids or adrenal disease', g: 'ctx', w: {D: 2}, spec: ['D'], sub: 'adr', r: {D: 'Steroid exposure or adrenal disease raises the chance of adrenal crisis.'}},
+  adr: {n: 'Long-term steroids or adrenal disease', g: 'ctx', w: {D: 3}, spec: ['D'], sub: 'adr', r: {D: 'Steroid exposure or adrenal disease raises the chance of adrenal crisis.'}},
   spin: {n: 'Spinal cord injury', g: 'ctx', w: {D: 2}, spec: ['D'], sub: 'neuro', r: {D: 'Spinal cord injury can cause neurogenic shock, but only after bleeding is excluded.'}},
   bleed: {n: 'Bleeding seen or suspected', g: 'ctx', w: {H: 4}, spec: ['H'], sub: 'bleed', r: {H: 'Bleeding is the commonest cause of hypovolemic shock.'}},
   loss: {n: 'Vomiting, diarrhea, poor intake', g: 'ctx', w: {H: 2}, spec: ['H'], sub: 'loss', r: {H: 'Ongoing losses empty the tank.'}},
   isch: {n: 'Chest pain or ischemic ECG', g: 'ctx', w: {C: 3}, spec: ['C'], sub: 'mi', r: {C: 'Ischemia with shock points to infarction and pump failure.'}},
-  perisk: {n: 'PE risk or leg swelling', g: 'ctx', w: {O: 2}, spec: ['O'], sub: 'pe', r: {O: 'Risk factors for clot raise the chance of massive PE.'}},
+  perisk: {n: 'PE risk or leg swelling', g: 'ctx', w: {O: 2}, sub: 'pe', r: {O: 'Risk factors for clot raise the chance of massive PE.'}},
   effrisk: {n: 'Cancer, uremia, recent cardiac procedure', g: 'ctx', w: {O: 1}, sub: 'tamp', r: {O: 'These raise the chance of a pericardial effusion.'}},
   vent: {n: 'On a ventilator, sudden drop', g: 'ctx', w: {O: 2}, spec: ['O'], sub: 'tension', r: {O: 'A sudden fall on positive pressure suggests tension pneumothorax (also think auto-PEEP).'}},
   diss: {n: 'Tearing pain or pulse deficit', g: 'ctx', w: {H: 1, O: 1}, flag: 'diss', r: {H: 'Aortic dissection can rupture and bleed.', O: 'Dissection can cause tamponade, which needs emergency surgery.'}}
@@ -446,12 +446,15 @@ function score(i) {
   const f = findings(i);
   const s = {D: 0, H: 0, C: 0, O: 0}, why = {D: [], H: [], C: [], O: []}, spec = {D: false, H: false, C: false, O: false}, subs = {};
   const bled = f.includes('bleed') || f.includes('free');
+  // a treatable distributive cause (infection, anaphylaxis, adrenal, spinal) is not argued away by non-specific signs
+  const dSpec = f.some(k => (F[k].spec || []).includes('D') && !(k === 'spin' && bled));
   f.forEach(k => {
     const d = F[k];
     if (k === 'spin' && bled) { why.D.push({k, w: 0, t: 'Neurogenic shock is not counted while bleeding is possible: bleeding first.'}); return; }
     const rvi = k === 'rvdil' && f.includes('isch') && !f.includes('dvt') && !f.includes('perisk');
     T.forEach(t => {
-      const w = rvi && t === 'O' ? 1 : d.w[t] || 0;
+      let w = rvi && t === 'O' ? 1 : d.w[t] || 0;
+      if (t === 'D' && w < 0 && dSpec) w = 0;
       s[t] += w;
       if (d.r[t]) why[t].push({k, w, t: d.r[t]});
     });
@@ -497,7 +500,7 @@ const ACT = {
     `Airway check early; lie the patient flat with legs raised; fluid bolus.` + tg('Expert practice'),
     `Refractory: epinephrine infusion, and the steps on the code card.` + tg('AHA 2025')]},
   adr: {t: 'Adrenal crisis', a: [
-    `Hydrocortisone now; do not wait for a cortisol result: ${L('/steroids/#crisis', 'steroids tool')}.` + tg('Endocrine Society 2016'),
+    `Draw cortisol (and ACTH) with the first bloods, then hydrocortisone now; never wait for the result: ${L('/steroids/#crisis', 'steroids tool')}.` + tg('Endocrine Society 2016'),
     `Fluid resuscitation and glucose check.` + tg('Endocrine Society 2016'),
     `Look for the trigger (infection is common).` + tg('Expert practice')]},
   neuro: {t: 'Neurogenic shock', a: [
@@ -516,9 +519,9 @@ const ACT = {
     `ECG now; ST elevation or ongoing ischemia means emergency angiography: ${L('/ekg-cath/', 'EKG emergencies')}.` + tg('ACC/AHA'),
     `SCAI stage and the first pressor or inotrope: ${L('/hf/#shock', 'heart failure tool, Advanced')}.` + tg('SCAI 2026; ACC 2025'),
     `No routine fluid boluses with wet lungs; echo for a mechanical cause (valve, septal rupture).` + tg('Expert practice')]},
-  pump: {t: 'Pump failure without infarct', a: [
+  pump: {t: 'Pump failure (no ischemia entered)', a: [
     `ECG and troponin to look for ischemia anyway; echo for a valve or mechanical cause.` + tg('Expert practice'),
-    `SCAI stage and the first pressor or inotrope: ${L('/hf/#shock', 'heart failure tool, Advanced')}. With infection, a weak ventricle is septic cardiomyopathy: treat the sepsis and see the inotrope step in ${L('/pressors/#shock', 'pressors')}.` + tg('SCAI 2026; SSC 2026'),
+    `SCAI stage and the first pressor or inotrope: ${L('/hf/#shock', 'heart failure tool, Advanced')}. With infection, a weak ventricle may be septic cardiomyopathy (still exclude a coronary cause): treat the sepsis and see the inotrope step in ${L('/pressors/#shock', 'pressors')}.` + tg('SCAI 2026; SSC 2026'),
     `No routine fluid boluses with wet lungs.` + tg('Expert practice')]},
   tension: {t: 'Tension pneumothorax', a: [
     `Decompress now (needle or finger thoracostomy), then a chest tube; do not wait for a film. On a ventilator, first check tube depth: a mainstem tube also stops sliding on one side.` + tg('Expert practice'),
@@ -761,7 +764,7 @@ function typeCard(t, sc) {
   const pk = t !== 'O' ? t : subs[0] === 'tamp' ? 'Ot' : subs[0] === 'tension' ? 'Ox' : 'Op';
   const head = sc && sc.mixed ? `${TYPE[t].n} (part of mixed shock)` : `${TYPE[t].n} shock`;
   return `<div class="card answer" id="ans-${t}"><p class="label">${TYPE[t].n}</p><p class="big">${head}</p>` +
-    subs.map(x => `<div><h3>${ACT[x].t}: first three</h3><ol class="acts">${ACT[x].a.map(a => `<li>${a}</li>`).join('')}</ol></div>`).join('') +
+    subs.map(x => { const a = x === 'tamp' && sc && sc.flags.diss ? [ACT[x].a[2], ACT[x].a[1], ACT[x].a[0]] : ACT[x].a; return `<div><h3>${ACT[x].t}: first three</h3><ol class="acts">${a.map(y => `<li>${y}</li>`).join('')}</ol></div>`; }).join('') +
     `<p class="why"><b>Why:</b> ${why}</p><div class="fchips">${chip('do2', st, 'Oxygen delivery')}${chip('prof', pk, 'Hemodynamic profile')}</div>` +
     `<details class="more"><summary>More</summary>${sc ? `<p><b>For:</b> ${r.map(x => x.t).join(' ') || 'none entered.'}</p><p><b>Against:</b> ${sc.why[t].filter(x => x.w < 0).map(x => x.t).join(' ') || 'nothing entered argues against it.'}</p>` : ''}<p>${PROF[pk].why}</p><p>Each step lists its evidence tier; doses are in the linked tools.</p></details></div>`;
 }
@@ -791,7 +794,7 @@ const WIN = [
   {x: 41, y: 37, n: 'Right upper chest', t: 'Lung sliding (both sides): sliding present excludes pneumothorax under the probe; absent sliding with low pressure suggests tension. B-lines suggest a wet lung.', f: ['nosl', 'wet']},
   {x: 64, y: 23, n: 'Left upper chest', t: 'The same lung check on the other side; compare both.', f: ['nosl']},
   {x: 56, y: 41, n: 'Left parasternal', t: 'Heart: how well the left ventricle squeezes, right ventricle size and septal shape, pericardial effusion.', f: ['lvhyper', 'lvpoor', 'rvdil', 'eff']},
-  {x: 35, y: 65, n: 'Right upper quadrant', t: 'Free fluid between liver and kidney, and the right pleural space.', f: ['free']},
+  {x: 35, y: 65, n: 'Right upper quadrant', t: 'Free fluid between liver and kidney, and the right pleural space. Check the left upper quadrant and pelvis too; one negative view does not exclude bleeding.', f: ['free']},
   {x: 50, y: 64, n: 'Below the xiphoid', t: 'Subxiphoid heart view and effusion; then the IVC (size, variation) and the abdominal aorta (over 3 cm is an aneurysm).', f: ['eff', 'ivcs', 'ivcw', 'aaa']}
 ];
 function windowsHtml() {
