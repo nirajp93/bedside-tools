@@ -171,6 +171,12 @@ footer strong{color:var(--ink)}
 .rowb{display:flex;gap:8px;flex-wrap:wrap}
 .vk-plate{border:1px solid var(--line);border-radius:12px;padding:6px;background:var(--card)}
 .vk-plate img{display:block;width:100%;height:auto;border-radius:8px}
+.vk-pw{position:relative}
+.vk-hot{position:absolute;transform:translate(-50%,-50%);width:26px;height:26px;border-radius:50%;border:2px solid var(--card);background:var(--accent);color:var(--accent-ink);font-family:var(--mono);font-size:12px;font-weight:700;padding:0;cursor:pointer}
+.vk-hot[aria-pressed=true]{background:var(--card);color:var(--accent);box-shadow:0 0 0 2px var(--accent)}
+.vk-list{display:grid;gap:6px;margin-top:10px}
+.vk-list button{min-height:44px;text-align:left;border:1px solid var(--line);border-radius:10px;background:var(--card);font-size:14px;padding:6px 10px;cursor:pointer}
+.vk-list button[aria-pressed=true]{border-color:var(--accent);color:var(--accent);font-weight:600}
 .vk-credit{display:block;font-family:var(--mono);font-size:11px;color:var(--muted);text-align:right;margin:4px 2px 0}
 @media (min-width:1000px){
   .wrap{max-width:1040px}
@@ -225,6 +231,7 @@ footer strong{color:var(--ink)}
         </div>
         <div class="step" id="pocus">
           <p class="hd"><i>4</i>Bedside ultrasound (tap what you saw)</p>
+          <div class="fchips"><button class="fchip" type="button" data-fig="windows" data-st="">Where to put the probe</button></div>
           <div class="ctx" data-multi="us"></div>
         </div>
         <div class="step" id="context">
@@ -295,6 +302,7 @@ footer strong{color:var(--ink)}
 
 <section class="view" id="v-learn">
   <div class="lpills" id="lpills"></div>
+  <div class="card chap" id="learn-map" data-pill="Four types"><p class="label">Start here</p><h2>Four ways the circulation fails</h2><div class="vk-plate"><img src="/media/shock/four-types.webp" width="1008" height="420" alt="Four panels of the heart and great vessels: hypovolemic with thin, under-filled vessels; distributive with wide, dilated vessels; cardiogenic with a dilated, weak left ventricle; obstructive with fluid compressing the heart (tamponade)."><span class="vk-credit">Created with BioRender.com</span></div><p class="line1">An empty tank, dilated pipes, a weak pump, or a blocked pump. The obstructive panel shows tamponade; massive PE and tension pneumothorax block flow too. More than one can coexist.</p></div>
   <div class="card chap" id="learn-do2" data-pill="Oxygen delivery"><p class="label">1 · The common end point</p><h2>Oxygen delivery falls, or cells cannot use it</h2><p class="lead">Each state shows which part of delivery fails in that type.</p><div data-figure="do2"></div></div>
   <div class="card chap" id="learn-lactate" data-pill="Lactate"><p class="label">2 · Lactate</p><h2>Why lactate rises</h2><p class="lead">Three sources; not every rise is oxygen debt.</p><div data-figure="lac"></div></div>
   <div class="card chap" id="learn-pp" data-pill="Pulse pressure"><p class="label">3 · Pulse pressure</p><h2>The pulse hints at the stroke volume</h2><p class="lead">The gap between systolic and diastolic tracks how much blood each beat ejects.</p><div data-figure="pp"></div></div>
@@ -323,6 +331,7 @@ footer strong{color:var(--ink)}
 <footer>
   <p><strong>For education only. Not a substitute for clinical judgment.</strong> This tool sorts and hands off: it shows no drug, fluid or steroid doses; each action links to the tool that holds them. Built to US practice and international critical care guidance; adjust to your institution's protocols.</p>
   <p>Privacy: everything runs in your browser. Nothing you enter is sent anywhere or stored, and there are no analytics. Do not enter names, record numbers, or dates of birth.</p>
+  <p>Anatomical figures created with BioRender.com.</p>
   <p class="mono">Last reviewed: 2026-11-26</p>
   <p><strong>Sources:</strong> Monnet X et al., ESICM guidelines on circulatory shock and hemodynamic monitoring 2025, Intensive Care Med 2025;51:1971 (graded statements and ungraded good practice statements; read from the abstract and visual abstract) · Cecconi M et al., Consensus on circulatory shock and hemodynamic monitoring, Task force of the ESICM, Intensive Care Med 2014;40:1795 (definitions, thresholds; level and grade shown) · Prescott HC et al., Surviving Sepsis Campaign 2026, Crit Care Med 2026;54:725 · Singer M et al., Sepsis-3, JAMA 2016;315:801 · Vincent JL, De Backer D, Circulatory shock, N Engl J Med 2013;369:1726 (profiles; physiology) · Arabi YM et al., ESICM fluid therapy guideline part 1, Intensive Care Med 2024;50:813 · Bornstein SR et al., Endocrine Society primary adrenal insufficiency guideline, J Clin Endocrinol Metab 2016;101:364 · Stevenson LW, Perloff JK, JAMA 1989;261:884 (proportional pulse pressure) · Perera P et al., The RUSH exam, Emerg Med Clin North Am 2010;28:29 · Isselbacher EM et al., 2022 ACC/AHA aortic disease guideline, Circulation 2022;146:e334 · Schulz-Menger J et al., 2025 ESC guidelines for myocarditis and pericarditis, Eur Heart J 2025;46:3952 · Hernández G et al., ANDROMEDA-SHOCK protocol, Ann Intensive Care 2018;8:52 · Trials: De Backer D et al. (SOAP II), N Engl J Med 2010;362:779 · Hernández G et al. (ANDROMEDA-SHOCK), JAMA 2019;321:654 · Hernández G et al. (ANDROMEDA-SHOCK-2), JAMA 2025;334:1988 · Stickles SP et al., CJEM 2019;21:406 · Atkinson PR et al. (SHoC-ED), Ann Emerg Med 2018;72:478. Evidence tiers are shown beside each recommendation; "expert practice" means no graded recommendation was found.</p>
 </footer>
@@ -772,9 +781,31 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('fsheet
 document.addEventListener('click', e => {
   const c = e.target.closest('.fchip'); if (!c) return;
   const f = c.dataset.fig, s = c.dataset.st;
-  if (f === 'prof') openSheet('Hemodynamic profile', '<div class="pgrid" id="pg2"></div><div class="pout" id="po2"></div>', el => mountProf(el.querySelector('#pg2'), el.querySelector('#po2'), s));
+  if (f === 'windows') openSheet('Where to put the probe', windowsHtml(), mountWindows);
+  else if (f === 'prof') openSheet('Hemodynamic profile', '<div class="pgrid" id="pg2"></div><div class="pout" id="po2"></div>', el => mountProf(el.querySelector('#pg2'), el.querySelector('#po2'), s));
   else openSheet(FIGS[f].t, '<div id="sf"></div>', el => mountFig(el.querySelector('#sf'), f, s));
 });
+
+/* ---------- ultrasound windows plate with hotspots ---------- */
+const WIN = [
+  {x: 41, y: 37, n: 'Right upper chest', t: 'Lung sliding (both sides): sliding present excludes pneumothorax under the probe; absent sliding with low pressure suggests tension. B-lines suggest a wet lung.', f: ['nosl', 'wet']},
+  {x: 64, y: 23, n: 'Left upper chest', t: 'The same lung check on the other side; compare both.', f: ['nosl']},
+  {x: 56, y: 41, n: 'Left parasternal', t: 'Heart: how well the left ventricle squeezes, right ventricle size and septal shape, pericardial effusion.', f: ['lvhyper', 'lvpoor', 'rvdil', 'eff']},
+  {x: 35, y: 65, n: 'Right upper quadrant', t: 'Free fluid between liver and kidney, and the right pleural space.', f: ['free']},
+  {x: 50, y: 64, n: 'Below the xiphoid', t: 'Subxiphoid heart view and effusion; then the IVC (size, variation) and the abdominal aorta (over 3 cm is an aneurysm).', f: ['eff', 'ivcs', 'ivcw', 'aaa']}
+];
+function windowsHtml() {
+  return `<div class="vk-plate"><div class="vk-pw"><img src="/media/shock/ultrasound-windows.webp" width="724" height="572" alt="Front of a supine torso with five ultrasound probes: right and left upper chest, left parasternal, right lower ribs over the liver, and just below the xiphoid."><span id="hots"></span></div><span class="vk-credit">Created with BioRender.com</span></div><div class="vk-list" id="winlist"></div><p class="pout" id="winout"></p><p class="muted">Add a leg compression check for DVT. A shock protocol strings these views together; positive findings rule in better than a normal scan rules out.${tg('Perera 2010 (RUSH); Stickles 2019')}</p>`;
+}
+function mountWindows(el) {
+  const sel = k => {
+    el.querySelectorAll('[data-w]').forEach(b => b.setAttribute('aria-pressed', String(+b.dataset.w === k)));
+    el.querySelector('#winout').innerHTML = k == null ? '' : `<b>${WIN[k].n}.</b> ${WIN[k].t} <span class="muted">Findings here: ${WIN[k].f.map(x => F[x].n).join(', ')}.</span>`;
+  };
+  el.querySelector('#hots').innerHTML = WIN.map((w, k) => `<button class="vk-hot" type="button" data-w="${k}" aria-pressed="false" style="left:${w.x}%;top:${w.y}%" aria-label="${w.n}">${k + 1}</button>`).join('');
+  el.querySelector('#winlist').innerHTML = WIN.map((w, k) => `<button type="button" data-w="${k}" aria-pressed="false">${k + 1} · ${w.n}</button>`).join('');
+  el.addEventListener('click', e => { const b = e.target.closest('[data-w]'); if (b) sel(+b.dataset.w); });
+}
 
 /* ---------- profile tap-grid (Reference and sheet) ---------- */
 function mountProf(grid, out, open) {
@@ -891,6 +922,7 @@ hashTab();
 
 <script id="deeper-data" type="application/json">
 {
+  "learn-map": {"m": "Hypovolemic shock lowers the volume returning to the heart; distributive shock dilates vessels so the same volume fills a larger space; cardiogenic shock is a pump that cannot eject; obstructive shock blocks filling or outflow from outside the pump.", "w": "Each mechanism has its own first fix, so naming the type early decides whether to give volume, a pressor, an inotrope or a procedure.", "t": "Stopping at one type: septic patients are often also volume-depleted, and sepsis can depress the heart."},
   "learn-do2": {"m": "Oxygen delivery is cardiac output times arterial oxygen content. Hypovolemic, cardiogenic and obstructive shock all lower output; distributive shock lowers vascular tone and disturbs how cells use oxygen, so delivery can look adequate while tissues are starved.", "w": "The type tells you which lever to pull: volume for an empty tank, the pump for cardiogenic shock, a procedure for obstruction, tone and source control for distributive shock.", "t": "Assuming one patient has one type. Sepsis can depress the heart, and bleeding can coexist with sepsis; reassess after each step."},
   "learn-lactate": {"m": "Lactate comes from pyruvate when mitochondria cannot take it up (no oxygen), when glycolysis outruns them (adrenergic drive), or when the liver clears it slowly.", "w": "A raised lactate is a warning and its trend guides resuscitation, but not every lactate is oxygen debt, so it does not name the type.", "t": "Chasing a lactate that epinephrine or liver failure is raising with more fluid."},
   "learn-pp": {"m": "Pulse pressure depends on stroke volume and arterial stiffness. A small stroke volume narrows it; low vascular tone lowers the diastolic pressure and widens it.", "w": "It is free at the bedside and gives a first hint of low output before an echo is available.", "t": "Reading it in isolation: stiff arteries in older patients widen pulse pressure even when stroke volume is small."},
