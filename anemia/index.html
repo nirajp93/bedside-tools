@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Anemia workup · bedside.tools</title>
+<meta name="description" content="Work up anemia in a hospitalized adult: is the marrow answering, where the patient sits on the MCV map, iron with and without inflammation, hemolysis, a hemoglobin that fell in hospital, and first treatment steps.">
+<script src="/theme.js"></script>
+<style>
+:root{--bg:#FBFBFA;--card:#FFFFFF;--ink:#111113;--muted:#55555D;--line:#ECECEE;--accent:#2B4BDB;--warn:#9A3B00;--warnbg:#FFF6EC}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5}
+.wrap{max-width:720px;margin:0 auto;padding:20px 16px 48px}
+a{color:var(--accent)}
+.back{font-size:14px;text-decoration:none;display:inline-block;min-height:44px;line-height:44px}
+h1{font-size:26px;margin:4px 0 4px;letter-spacing:-.01em}
+.purpose{color:var(--muted);margin:0 0 20px}
+.tabs{display:flex;gap:6px;margin-bottom:14px;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:1 0 auto;min-height:44px;border:1px solid var(--line);background:var(--card);border-radius:14px;padding:0 12px;font:inherit;font-size:14px;font-weight:600;color:var(--muted);cursor:pointer}
+.tab[aria-selected="true"]{border-color:var(--accent);color:var(--accent)}
+.panel{display:none}.panel.on{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
+.label{font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+.grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.field{display:flex;flex-direction:column;justify-content:flex-end;min-width:0}
+.field label{display:block;font-size:13px;color:var(--muted);margin-bottom:4px}
+.field input,.field select{width:100%;min-height:44px;border:1px solid var(--line);border-radius:10px;padding:8px 10px;font:inherit;font-family:var(--mono);background:var(--card);color:var(--ink);font-variant-numeric:tabular-nums}
+.field select{font-family:var(--sans);font-size:15px}
+.rng{font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:3px}
+.unitrow{display:flex;gap:6px}.unitrow input{flex:1;min-width:0}.unitrow select{flex:0 0 66px;padding:8px 6px}
+input:focus-visible,select:focus-visible,.tab:focus-visible,.chk:focus-within,button:focus-visible,summary:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.checks{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.chk{display:flex;align-items:center;gap:10px;min-height:44px;border:1px solid var(--line);border-radius:10px;padding:6px 10px;font-size:14px;cursor:pointer}
+.chk input{width:20px;height:20px;accent-color:var(--accent);flex:none}
+.sub{font-size:14px;color:var(--muted);margin:0}
+.subh{font-size:13px;color:var(--muted);margin:14px 0 0}
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.sbx{flex:1 1 auto;min-height:44px;padding:4px 10px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);font:inherit;font-size:14px;cursor:pointer}
+.sbx[aria-pressed="true"]{border-color:var(--accent);color:var(--accent);font-weight:600}
+.head{font-size:18px;font-weight:700;margin:4px 0 4px;line-height:1.3}
+.ctx{font-family:var(--mono);font-size:11.5px;color:var(--muted);margin:0 0 6px}
+.whyline{margin:10px 0 0;font-size:14.5px;color:var(--muted)}
+.whyline b{color:var(--ink);font-weight:600}
+.steps{margin:10px 0 0;padding-left:20px}.steps li{margin-bottom:5px;font-size:15px}
+details{margin-top:10px;border-top:1px solid var(--line);padding-top:4px}
+summary{cursor:pointer;color:var(--accent);font-weight:600;min-height:44px;line-height:44px}
+details p{margin:0 0 8px;font-size:15px}
+.card ul{margin:6px 0 0;padding-left:20px}.card li{margin-bottom:4px;font-size:15px}
+.tier{display:inline-block;font-family:var(--mono);font-size:11px;border:1px solid var(--line);border-radius:999px;padding:2px 8px;color:var(--muted);margin:6px 6px 0 0}
+.guard{border-left:3px solid var(--warn);background:var(--warnbg);padding:10px 12px;border-radius:0 10px 10px 0;margin:10px 0 0;font-size:15px}
+.guard b{display:block;color:var(--warn)}
+.note{font-size:14px;color:var(--muted)}
+.empty{color:var(--muted);font-size:15px;margin:0}
+.tp{display:inline-block;font-family:var(--mono);font-size:11px;letter-spacing:.04em;border-radius:999px;padding:3px 9px;border:1px solid var(--line);color:var(--muted);margin-right:4px}
+.tp.hi{color:var(--bad);border-color:var(--bad);background:var(--badbg)}
+.tp.lo{color:var(--accent);border-color:var(--accent)}
+.tp.ok{color:var(--ok);border-color:var(--ok);background:var(--okbg)}
+.big{font-family:var(--mono);font-size:30px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.1}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:7px 8px 7px 0;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:var(--mono);font-size:11.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);font-weight:500}
+.tw{overflow-x:auto}
+footer{margin-top:28px;font-size:13.5px;color:var(--muted)}
+footer p{margin:0 0 8px}
+/* TSH x free T4 map */
+.map{display:grid;grid-template-columns:30px repeat(3,minmax(0,1fr));grid-template-rows:repeat(3,64px) 26px;gap:4px;position:relative}
+.cell{border:1px solid var(--line);border-radius:10px;padding:5px 7px;font-size:12px;line-height:1.25;color:var(--muted);background:var(--card);text-align:left;font-family:var(--sans);cursor:pointer;min-width:0}
+.cell.here{border-color:var(--accent);color:var(--ink);background:var(--fill);font-weight:600}
+.ax{font-family:var(--mono);font-size:11px;color:var(--muted);display:flex;align-items:center;justify-content:center;text-align:center}
+.ax.y{writing-mode:vertical-rl;transform:rotate(180deg)}
+.dot{position:absolute;width:14px;height:14px;border-radius:50%;background:var(--accent);border:2px solid var(--card);transform:translate(-50%,-50%);pointer-events:none}
+.mapnote{margin:8px 0 0;font-size:14px;color:var(--muted)}
+/* figures */
+.figchips{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.fchip{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--fill);color:var(--ink);font:inherit;font-size:14px;cursor:pointer;text-align:left}
+.fchip svg{flex:none;color:var(--accent)}
+.fig svg{display:block;width:100%;max-width:520px;height:auto;margin:6px auto 0}
+.fig svg text{font-family:var(--mono)}
+.figcap{font-size:14.5px;margin:8px 0 0}
+.figsrc{font-family:var(--mono);font-size:11px;color:var(--muted);margin:6px 0 0}
+.sl input[type=range]{width:100%;min-height:44px;accent-color:var(--accent)}
+.sll{display:flex;justify-content:space-between;font-size:13px;color:var(--muted)}
+/* workup */
+.cause{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:8px 0;border-top:1px solid var(--line);font-size:15px}
+.cause small{color:var(--muted);font-size:13px;text-align:right;flex:0 1 55%}
+.cause.out{opacity:.55}.cause.less{opacity:.75}.cause.out span{text-decoration:line-through;color:var(--muted)}
+.cause.fav span{font-weight:700}
+.cause.fav span:before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--accent);margin-right:8px}
+.rchips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 10px}
+.rchip{min-height:44px;padding:0 12px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--ink);font:inherit;font-size:14px;cursor:pointer}
+.rchip[aria-pressed="true"]{border-color:var(--accent);color:var(--accent);font-weight:600}
+/* score rows */
+.score{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
+.band{font-family:var(--mono);font-size:13px;border-radius:999px;padding:4px 10px;border:1px solid var(--line)}
+.band.hi{color:var(--bad);border-color:var(--bad);background:var(--badbg)}
+.band.mid{color:var(--warn);border-color:var(--warn);background:var(--warnbg)}
+.band.lo{color:var(--ok);border-color:var(--ok);background:var(--okbg)}
+.order{counter-reset:o;list-style:none;padding:0;margin:10px 0 0}
+.order li{counter-increment:o;position:relative;padding:8px 0 8px 40px;border-top:1px solid var(--line);font-size:15px}
+.order li:before{content:counter(o);position:absolute;left:0;top:8px;width:28px;height:28px;border-radius:50%;background:var(--fill);color:var(--accent);font-family:var(--mono);font-weight:700;display:grid;place-items:center;font-size:13px}
+.order li b{display:block}
+.order .when{display:block;font-family:var(--mono);font-size:12px;color:var(--muted);margin-top:2px}
+/* TI-RADS */
+.tr-row{margin-top:12px}
+.tr-row .sub{margin-bottom:6px}
+.trlev{display:grid;grid-template-columns:repeat(5,1fr);gap:3px;margin-top:12px}
+.trlev span{font-family:var(--mono);font-size:12px;text-align:center;padding:8px 2px;border-radius:8px;background:var(--fill);color:var(--muted)}
+.trlev span.on{background:var(--accent);color:var(--accent-ink);font-weight:600}
+/* learn */
+.pills{position:sticky;top:0;z-index:5;background:var(--bg);display:flex;gap:6px;overflow-x:auto;margin:0 -16px 12px;padding:8px 16px;border-bottom:1px solid var(--line);scrollbar-width:none}
+.pills::-webkit-scrollbar{display:none}
+.pill{flex:none;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--muted);font:inherit;font-size:14px;cursor:pointer;white-space:nowrap;text-decoration:none;display:inline-flex;align-items:center}
+.lh{font-size:19px;margin:22px 0 4px;scroll-margin-top:70px}
+.lead{color:var(--muted);margin:0 0 12px;font-size:15px}
+.trial{border-left:3px solid var(--accent);padding-left:12px;margin:6px 0 14px}
+.trial p{margin:0 0 6px;font-size:15px}
+.trial .k{font-family:var(--mono);font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);display:block}
+.flag{display:inline-block;font-family:var(--mono);font-size:11px;border-radius:999px;padding:2px 8px;background:var(--warnbg);color:var(--warn);margin-left:6px}
+/* practice */
+.fdots{display:flex;gap:4px;margin:4px 0 12px}
+.fd{flex:1;height:4px;border-radius:99px;background:var(--line)}.fd.on{background:var(--accent)}
+.case h2{font-size:17px;margin:0 0 6px}
+.popts{display:grid;gap:8px;margin-top:10px}
+.popt{min-height:44px;text-align:left;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);font:inherit;font-size:15px;padding:8px 12px;cursor:pointer}
+.popt.right{border-color:var(--ok);color:var(--ok);font-weight:600}
+.popt.wrong{border-color:var(--bad);color:var(--bad);text-decoration:line-through}
+.ansb{margin-top:12px;border-top:1px solid var(--line);padding-top:12px}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.btn{min-height:44px;border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);border-radius:10px;padding:8px 14px;font:inherit;font-weight:600;cursor:pointer}
+.btn.ghost{background:var(--card);color:var(--accent)}
+/* sheet */
+.scrim{position:fixed;inset:0;background:var(--scrim);z-index:20}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:21;max-height:90vh;overflow-y:auto;background:var(--card);border:1px solid var(--line);border-bottom:0;border-radius:20px 20px 0 0;padding:8px 16px 24px;max-width:640px;margin:0 auto}
+.sheethead{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.sheethead h2{font-size:18px;margin:0}
+.xbtn{min-height:44px;min-width:44px;border:0;background:transparent;color:var(--accent);font:inherit;font-weight:600;cursor:pointer}
+.linkrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.linkrow a,.linkrow button{display:inline-flex;align-items:center;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--accent);font:inherit;font-size:14px;font-weight:600;text-decoration:none;cursor:pointer}
+@media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}.dot{transition:left .25s,top .25s}}
+@media (max-width:420px){.grid{grid-template-columns:1fr 1fr}.field.wide{grid-column:1/-1}.chk{font-size:13.5px;padding:6px 8px;gap:8px}}
+@media (min-width:900px){
+  .wrap{max-width:1040px}
+  .two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;align-items:start}
+  .two>.col{min-width:0}
+  .map{grid-template-rows:repeat(3,76px) 26px}
+  #p-learn,#p-practice{max-width:780px;margin:0 auto}
+}
+.dp{margin-top:10px;border:1px solid var(--line);border-radius:12px;padding:2px 12px;background:var(--card);text-align:left}
+.dp:empty{display:none}
+.dp>div{padding:10px 0;border-top:1px solid var(--line)}
+.dp>div:first-child{border-top:0}
+.dp .dl{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500;margin:0 0 3px}
+.dp p{font-size:15px;line-height:1.45;color:var(--ink);margin:0 0 4px}
+.dp p:last-child{margin-bottom:0}
+/* cause-fix: ruled-out causes stay readable; the name greys, the reason does not fade */
+.cause.out,.cause.less,.cause.unl{opacity:1}
+.cause.less>span,.cause.unl>span{color:var(--muted)}
+.deeper{margin-top:14px;border-top:1px solid var(--line)}
+.deeper>summary{min-height:44px;display:flex;align-items:center;gap:8px;color:var(--accent);font-weight:600;font-size:15px;cursor:pointer;list-style:none}
+.deeper>summary::-webkit-details-marker{display:none}
+.deeper>summary::before{content:"+";font-family:var(--mono);font-size:18px;line-height:1;width:14px;text-align:center}
+.deeper[open]>summary::before{content:"\2212"}
+.deeper>summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.deeper .dpx{border:1px solid var(--line);border-radius:12px;padding:2px 12px;background:var(--card);text-align:left}
+.deeper .dpx>div{padding:10px 0;border-top:1px solid var(--line)}
+.deeper .dpx>div:first-child{border-top:0}
+.deeper .dl{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500;margin:0 0 3px}
+.deeper p{font-size:15px;line-height:1.45;color:var(--ink);margin:0 0 4px}
+.deeper p:last-child{margin-bottom:0}
+/* anemia */
+.amap{display:grid;grid-template-columns:34px repeat(3,minmax(0,1fr));grid-template-rows:26px repeat(2,minmax(84px,auto));gap:4px}
+.amap .cell{font-size:12.5px;min-height:84px}
+.amap .cell b{display:block;font-family:var(--mono);font-size:11px;font-weight:500;color:var(--muted);margin-bottom:2px}
+.amap .cell.here b{color:var(--accent)}
+.amap .cell.here::after{content:"";display:block;width:12px;height:12px;border-radius:50%;background:var(--accent);margin-top:6px}
+.fig svg .fa{fill:var(--accent)}.fig svg .fb{fill:var(--bad)}.fig svg .ff{fill:var(--fill)}.fig svg .fc{fill:var(--card)}.fig svg .fm{fill:var(--muted)}.fig svg .fw{fill:var(--warn)}.fig svg .fo{fill:var(--ok)}.fig svg .fn{fill:none}.fig svg .fl{fill:var(--line)}
+.fig svg .sa{stroke:var(--accent)}.fig svg .sm{stroke:var(--muted)}.fig svg .sl2{stroke:var(--line)}.fig svg .si{stroke:var(--ink)}.fig svg .sb{stroke:var(--bad)}.fig svg .sw{stroke:var(--warn)}
+.fig svg text{fill:var(--ink);font-size:11px}.fig svg text.tm{fill:var(--muted)}.fig svg text.ta{fill:var(--accent)}.fig svg text.tb{fill:var(--bad)}.fig svg text.tk{fill:var(--accent-ink)}
+.fig svg .dim{opacity:.3}
+.smg{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin-top:8px}
+.smb{min-height:84px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);font:inherit;font-size:12px;line-height:1.2;padding:6px 2px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px}
+.smb[aria-pressed="true"]{border-color:var(--accent);color:var(--accent);font-weight:600}
+.smb svg{width:44px;height:44px;margin:0}
+.kv{display:flex;justify-content:space-between;gap:12px;padding:7px 0;border-top:1px solid var(--line);font-size:15px}
+.kv:first-child{border-top:0}.kv span:last-child{font-family:var(--mono);text-align:right}
+.bars{display:grid;gap:8px;margin-top:10px}
+.bar{display:grid;grid-template-columns:96px 1fr 44px;gap:8px;align-items:center;font-size:13.5px}
+.bar i{display:block;height:14px;border-radius:99px;background:var(--fill);position:relative;overflow:hidden}
+.bar i u{position:absolute;inset:0 auto 0 0;background:var(--accent);border-radius:99px}
+.bar span:last-child{font-family:var(--mono);text-align:right}
+@media (max-width:420px){.smg{grid-template-columns:repeat(4,minmax(0,1fr))}.amap .cell{font-size:12px;padding:5px}}
+</style>
+<script>function dpHtml(rows){ return rows.map(function(r){ return '<div><span class="dl">' + r[0] + '</span>' + r[1] + '</div>'; }).join(''); }</script>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="/">← bedside.tools</a>
+<h1>Anemia workup</h1>
+<p class="purpose">For the adult inpatient: is the marrow answering, what fits, what to send next, and the first treatment steps.</p>
+
+<div class="tabs" role="tablist" aria-label="Sections">
+<button class="tab" role="tab" id="t-workup" aria-controls="p-workup" aria-selected="true">Workup</button>
+<button class="tab" role="tab" id="t-replace" aria-controls="p-replace" aria-selected="false">Replace</button>
+<button class="tab" role="tab" id="t-hemolysis" aria-controls="p-hemolysis" aria-selected="false">Hemolysis</button>
+<button class="tab" role="tab" id="t-learn" aria-controls="p-learn" aria-selected="false">Learn</button>
+<button class="tab" role="tab" id="t-practice" aria-controls="p-practice" aria-selected="false">Practice</button>
+</div>
+
+<section class="panel on" id="p-workup" role="tabpanel" aria-labelledby="t-workup">
+<div class="two">
+<div class="col">
+<div class="card" id="cbc">
+<p class="label">Blood count</p>
+<div class="grid">
+<div class="field"><label for="hb">Hemoglobin g/dL</label><input id="hb" inputmode="decimal"></div>
+<div class="field"><label for="hct">Hematocrit %</label><input id="hct" inputmode="decimal"></div>
+<div class="field"><label for="mcv">MCV fL</label><input id="mcv" inputmode="decimal"></div>
+<div class="field"><label for="retic">Reticulocytes %</label><input id="retic" inputmode="decimal"></div>
+<div class="field"><label for="rbc">RBC ×10¹²/L</label><input id="rbc" inputmode="decimal"></div>
+<div class="field"><label for="plt">Platelets ×10⁹/L</label><input id="plt" inputmode="decimal"></div>
+<div class="field"><label for="sex">Sex</label><select id="sex"><option value="m">Male</option><option value="f">Female</option></select></div>
+<div class="field"><label for="egfr">eGFR</label><input id="egfr" inputmode="decimal"></div>
+</div>
+</div>
+<div class="card" id="ironin">
+<p class="label">Iron and vitamins</p>
+<div class="grid">
+<div class="field"><label for="ferr">Ferritin ng/mL</label><input id="ferr" inputmode="decimal"></div>
+<div class="field"><label for="iron">Iron µg/dL</label><input id="iron" inputmode="decimal"></div>
+<div class="field"><label for="tibc">TIBC µg/dL</label><input id="tibc" inputmode="decimal"></div>
+<div class="field"><label for="tsat">or TSAT %</label><input id="tsat" inputmode="decimal"></div>
+<div class="field"><label for="b12">B12 pg/mL</label><input id="b12" inputmode="decimal"></div>
+<div class="field"><label for="mma">MMA</label><select id="mma"><option value="">Not sent</option><option value="n">Normal</option><option value="h">High</option></select></div>
+<div class="field"><label for="fol">Folate</label><select id="fol"><option value="">Not sent</option><option value="n">Normal</option><option value="l">Low</option></select></div>
+</div>
+<p class="rng">Iron with TIBC gives TSAT. B12 in pg/mL is the same number as ng/L.</p>
+</div>
+<div class="card" id="context">
+<p class="label">Context</p>
+<div class="checks">
+<label class="chk"><input type="checkbox" id="infl">Infection or inflammation</label>
+<label class="chk"><input type="checkbox" id="ckd">CKD</label>
+<label class="chk"><input type="checkbox" id="hd">On hemodialysis</label>
+<label class="chk"><input type="checkbox" id="hfx">Heart failure</label>
+<label class="chk"><input type="checkbox" id="preg">Pregnant</label>
+<label class="chk"><input type="checkbox" id="tx">Transfused this admission</label>
+<label class="chk"><input type="checkbox" id="bleed">Bleeding or unstable</label>
+<label class="chk"><input type="checkbox" id="neuro">Numbness, ataxia or confusion</label>
+<label class="chk"><input type="checkbox" id="cyto">Two other cell lines low</label>
+<label class="chk"><input type="checkbox" id="n2o">Nitrous oxide use</label>
+</div>
+</div>
+<div class="card" id="smear">
+<p class="label">Smear: tap what was seen</p>
+<div class="smg" id="smg"></div>
+<p class="mapnote" id="smnote">Ask for a smear early. It is the only test here that can find microangiopathy or blasts.</p>
+</div>
+<div class="card" id="drop">
+<p class="label">Hemoglobin fell in hospital?</p>
+<div class="grid">
+<div class="field"><label for="hb0">Earlier Hb g/dL</label><input id="hb0" inputmode="decimal"></div>
+<div class="field"><label for="ml">Blood drawn mL</label><input id="ml" inputmode="decimal"></div>
+</div>
+<p class="rng">A standard tube holds about 4 to 10 mL; leave blank if unknown.</p>
+</div>
+</div>
+<div class="col">
+<div id="guards"></div>
+<div class="card" id="map-card">
+<p class="label">Where the patient sits</p>
+<div class="amap" id="map" aria-label="MCV by reticulocyte index map"></div>
+<p class="mapnote" id="mapnote">Enter hemoglobin, MCV and reticulocytes. Tap any square to read what belongs there.</p>
+</div>
+<div id="work-out"></div>
+<div class="card" id="narrow">
+<p class="label">What is still on the list</p>
+<div id="causes"></div>
+<details><summary>What to send, and when</summary>
+<p><b>First:</b> CBC with indices, reticulocytes, smear, ferritin with iron and TIBC, creatinine. Draw iron, B12, folate and hemolysis labs before a transfusion when that does not delay care.</p>
+<p><b>After a result:</b> B12 and folate when macrocytic, or normocytic and unexplained. MMA when B12 is 180 to 350. LDH, haptoglobin and bilirubin when the index is 2 or more without bleeding, or with jaundice or dark urine. DAT when that panel is positive. TSH, protein electrophoresis and free light chains when normocytic and unexplained. Hemoglobin electrophoresis when the Mentzer index is under 13 and iron is replete.</p>
+<span class="tier">KDIGO 2026 base set in CKD: CBC, reticulocytes, ferritin, TSAT</span><span class="tier">order of tests: expert practice</span>
+</details>
+</div>
+</div>
+</div>
+</section>
+
+<section class="panel" id="p-replace" role="tabpanel" aria-labelledby="t-replace">
+<div class="two">
+<div class="col">
+<div class="card" id="rep-in">
+<p class="label">For iron dosing</p>
+<div class="grid">
+<div class="field"><label for="wt">Weight kg</label><input id="wt" inputmode="decimal"></div>
+<div class="field wide" style="grid-column:span 2"><label for="prod">IV product on your formulary</label><select id="prod"><option value="fcm">Ferric carboxymaltose</option><option value="fdi">Ferric derisomaltose</option><option value="fmx">Ferumoxytol</option><option value="is">Iron sucrose</option><option value="dex">Iron dextran (low molecular weight)</option><option value="fg">Ferric gluconate</option></select></div>
+</div>
+<div class="checks">
+<label class="chk"><input type="checkbox" id="intol">Oral iron failed or not tolerated</label>
+<label class="chk"><input type="checkbox" id="malabs">Bariatric surgery, active IBD or celiac</label>
+<label class="chk"><input type="checkbox" id="loss">Ongoing blood loss</label>
+<label class="chk"><input type="checkbox" id="mens">Menstruating</label>
+</div>
+<p class="rng">Iron status comes from the Workup tab.</p>
+</div>
+<div id="rep-out-a"></div>
+</div>
+<div class="col"><div id="rep-out-b"></div></div>
+</div>
+</section>
+
+<section class="panel" id="p-hemolysis" role="tabpanel" aria-labelledby="t-hemolysis">
+<div class="two">
+<div class="col">
+<div class="card" id="hem-in">
+<p class="label">Hemolysis labs</p>
+<div class="grid">
+<div class="field"><label for="hapto">Haptoglobin mg/dL</label><input id="hapto" inputmode="decimal"></div>
+<div class="field"><label for="ldh">LDH</label><select id="ldh"><option value="">Not sent</option><option value="n">Normal</option><option value="h">High</option></select></div>
+<div class="field"><label for="bili">Indirect bilirubin</label><select id="bili"><option value="">Not sent</option><option value="n">Normal</option><option value="h">High</option></select></div>
+<div class="field wide" style="grid-column:span 2"><label for="dat">Direct antiglobulin test (DAT)</label><select id="dat"><option value="">Not sent</option><option value="neg">Negative</option><option value="igg">IgG (with or without C3)</option><option value="c3">C3 only</option></select></div>
+</div>
+<div class="checks">
+<label class="chk"><input type="checkbox" id="urine">Dark urine</label>
+<label class="chk"><input type="checkbox" id="newdrug">New drug in the last weeks</label>
+<label class="chk"><input type="checkbox" id="valve">Mechanical valve or device</label>
+<label class="chk"><input type="checkbox" id="liver">Liver disease</label>
+</div>
+<p class="rng">LDH and bilirubin are read against your lab's range. Smear findings and transfusion come from the Workup tab.</p>
+</div>
+</div>
+<div class="col"><div id="hem-out"></div></div>
+</div>
+</section>
+
+<section class="panel" id="p-learn" role="tabpanel" aria-labelledby="t-learn">
+<nav class="pills" aria-label="Learn topics">
+<a class="pill" href="#l-ways">Three ways</a><a class="pill" href="#l-retic">The marrow's answer</a><a class="pill" href="#l-iron">Iron and hepcidin</a><a class="pill" href="#l-b12">Big cells</a><a class="pill" href="#l-lysis">Destruction</a><a class="pill" href="#l-smear">The smear</a><a class="pill" href="#l-lag">Made in hospital</a><a class="pill" href="#l-trials">Studies</a>
+</nav>
+<div id="learn"></div>
+</section>
+
+<section class="panel" id="p-practice" role="tabpanel" aria-labelledby="t-practice">
+<div id="practice"></div>
+</section>
+
+<footer>
+<p>For education only. Not a substitute for clinical judgment.</p>
+<p>Privacy: everything runs in your browser. Nothing you enter is sent anywhere or stored, and there are no analytics. Do not enter names, record numbers, or dates of birth.</p>
+<p>Last reviewed: 26 November 2026.</p>
+<p>Sources: American Society of Hematology 2026 guidelines for diagnosis of iron deficiency (Powers et al, Blood Adv 2026;10:7353). KDIGO 2026 Clinical Practice Guideline for Anemia in CKD (Kidney Int 2026;109(1S):S1), read with the European Renal Best Practice commentary (Nephrol Dial Transplant 2026). AGA Clinical Practice Guidelines on the Gastrointestinal Evaluation of Iron Deficiency Anemia (Ko et al, Gastroenterology 2020). AGA Clinical Practice Update on Management of Iron Deficiency Anemia (DeLoughery et al, Clin Gastroenterol Hepatol 2024), an expert review without evidence grades. NICE guideline NG239, Vitamin B12 deficiency in over 16s (2024); no US society guideline exists. Diagnosis and treatment of autoimmune hemolytic anemia in adults: First International Consensus Meeting (Jäger et al, Blood Rev 2020), consensus with percent agreement. FDA prescribing information for Injectafer (08/2026), Monoferric, Feraheme (05/2026), Venofer (02/2026), INFeD, Ferrlecit and cyanocobalamin injection. Transfusion thresholds are in the transfusion tool. Studies as cited on each card. Rows marked expert practice or standard teaching are not from a guideline.</p>
+</footer>
+</div>
+
+<div class="scrim" id="scrim" hidden></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-t" hidden>
+<div class="sheethead"><h2 id="sheet-t"></h2><button class="xbtn" id="sheet-x" type="button">Close</button></div>
+<div id="sheet-b"></div>
+</div>
+
+<script id="deeper-data">
+/* Go deeper: mechanism, rationale and the common trap for each Learn chapter. Text only; no doses or thresholds beyond the tool's own. */
+window.DEEPER={
+"l-ways":[["Mechanism","A red cell lives about 120 days, so roughly 1% are replaced each day. Anemia appears when production falls behind removal: the marrow makes too few, blood leaves the body, or cells are destroyed early. Erythropoietin from the kidney rises as oxygen delivery falls and tells the marrow to make more."],["Why it matters","The reticulocyte count is the marrow's reply to that signal. Reading it first halves the differential before any other test returns."],["Common trap","More than one mechanism is common in hospital: a patient who is bleeding can also be iron deficient and inflamed, so the marrow cannot answer the loss. An index under 2 does not exclude bleeding or hemolysis."]],
+"l-retic":[["Mechanism","The count is reported as a percentage of red cells. When red cells are scarce the same number of reticulocytes is a larger percentage. In anemia, reticulocytes also leave the marrow early and spend longer in blood before maturing, so each is counted on more days."],["Why it matters","Both effects inflate the raw percentage. Scaling to a hematocrit of 45 and dividing by the maturation factor gives an index that can be compared with the roughly 2 or more expected when the marrow is responding."],["Common trap","Calling 5 or 6% a good response in a patient with a hematocrit near 20. After correction it is often inadequate, and hemolysis with an inadequate response needs urgent attention."]],
+"l-iron":[["Mechanism","Almost all iron for new red cells is recycled from old ones through macrophages; the gut adds only a little each day. Hepcidin, made by the liver, closes the channel that lets iron out of macrophages and gut cells. Inflammation raises hepcidin; iron deficiency lowers it."],["Why it matters","Ferritin measures the store but is also an acute-phase protein, so inflammation raises it whether or not iron is there. Transferrin saturation measures what is reaching the marrow. Reading them together separates an empty store from a locked one, which is why ASH 2026 asks for both when inflammation is present."],["Common trap","Excluding iron deficiency in a septic or CKD patient because ferritin is 150. The opposite trap is also real: a low saturation during acute illness may reflect hepcidin alone, so the tool says possible and asks for a recheck."]],
+"l-b12":[["Mechanism","B12 and folate are needed to make DNA. When either is short the nucleus matures slowly while the cytoplasm keeps growing, giving large cells and hypersegmented neutrophils. B12 is also the cofactor that clears methylmalonic acid, and it maintains myelin."],["Why it matters","Because only B12 deficiency raises MMA, it settles an indeterminate B12 level. Because only B12 deficiency injures nerves, B12 must be known or covered before folate is given alone, and neurologic signs mean treating before results return."],["Common trap","Treating the blood count. Folate can correct the anemia of B12 deficiency while the neuropathy progresses. And a normal count does not exclude B12 deficiency."]],
+"l-lysis":[["Mechanism","When cells break in the circulation, free hemoglobin binds haptoglobin and the complex is cleared, so haptoglobin falls; LDH spills from the cells; heme becomes unconjugated bilirubin. In the DAT, a reagent that recognises human IgG or C3 clumps the patient's cells if either is already on them."],["Why it matters","A low haptoglobin with a high LDH is specific for hemolysis, and the DAT then separates immune from non-immune causes. The pattern guides first treatment: steroids for warm IgG disease, warmth and no steroids for cold C3-only disease."],["Common trap","Trusting one test. Haptoglobin is low in liver disease and after transfusion and can be normal in inflammation; a positive DAT occurs without hemolysis after IVIG or transfusion; and the DAT is negative in a minority of autoimmune cases."]],
+"l-smear":[["Mechanism","Shape records what happened to the cell: sheared by fibrin strands (schistocytes), trimmed by splenic macrophages (spherocytes, bite cells), built with too little hemoglobin for its membrane (target cells), or squeezed from a scarred marrow (teardrops)."],["Why it matters","The smear is the only routine test that shows microangiopathy or blasts, both of which change the plan within hours. It also confirms what indices suggest, such as hypersegmented neutrophils with a high MCV."],["Common trap","Waiting for the automated differential to flag it. Ask for a manual review whenever anemia is unexplained, platelets are low, or hemolysis is suspected."]],
+"l-lag":[["Mechanism","Hemoglobin is a concentration. Acute bleeding removes cells and plasma together, so the value is unchanged until IV fluid or the body's own fluid shift restores the plasma. Separately, each blood draw removes red cells that an inflamed marrow is slow to replace."],["Why it matters","A normal first hemoglobin does not exclude a serious bleed; vital signs and the trend do the work. On the wards, the volume drawn predicts a measurable share of the fall, which can be reduced."],["Common trap","Chasing a slow one-gram drift with endoscopy while missing that 100 to 200 mL of blood has been drawn, or the reverse: blaming draws for a fall of 2 g/dL in a patient on anticoagulation."]]
+};
+</script>
+<script>
+// anemia engine. Sources: ASH 2026 iron deficiency diagnosis (A26), KDIGO 2026 anemia in CKD (K26), AGA 2020 (G20), AGA 2024 (G24),
+// NICE NG239 (N24), Jaeger 2020 AIHA consensus (J20), FDA labels (L), Marchand 1980, Thavendiranathan 2005.
+(function(){
+'use strict';
+function $(id){return document.getElementById(id)}
+function num(id){var e=$(id);if(!e||e.value==='')return null;var v=parseFloat(e.value);return isFinite(v)&&v>=0?v:null}
+function on(id){var e=$(id);return !!(e&&e.checked)}
+function val(id){var e=$(id);return e?e.value:''}
+function r1(v){return Math.round(v*10)/10}
+function tier(t){return t?'<span class="tier">'+t+'</span>':''}
+function tiers(a){return (a||[]).map(tier).join('')}
+function list(a){return a&&a.length?'<ul class="steps">'+a.map(function(s){return '<li>'+s+'</li>'}).join('')+'</ul>':''}
+function guard(t,b){return '<div class="guard"><b>'+t+'</b>'+b+'</div>'}
+var CHIP_ICON='<svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><rect x="1.5" y="2.5" width="13" height="11" rx="2" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M4 11l3-3 2 2 3-4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+function chips(ids){return ids&&ids.length?'<div class="figchips">'+ids.map(function(f){return '<button type="button" class="fchip" data-open="'+f+'">'+CHIP_ICON+FIG[f].title+'</button>'}).join('')+'</div>':''}
+function card(o){
+  return '<div class="card"'+(o.id?' id="'+o.id+'"':'')+'>'+(o.label?'<p class="label">'+o.label+'</p>':'')+(o.ctx?'<p class="ctx">'+o.ctx+'</p>':'')+
+   (o.head?'<p class="head">'+o.head+'</p>':'')+(o.guard||'')+(o.why?'<p class="whyline"><b>Why:</b> '+o.why+'</p>':'')+
+   (o.body||'')+list(o.steps)+chips(o.chips)+(o.links?'<div class="linkrow">'+o.links+'</div>':'')+
+   (o.more?'<details><summary>More</summary>'+o.more+tiers(o.tiers)+'</details>':tiers(o.tiers))+'</div>';
+}
+var SMEAR=[['schisto','Schistocytes'],['sphero','Spherocytes'],['target','Target cells'],['tear','Teardrops'],['bite','Bite cells'],['hyperseg','Hyper-segmented neutrophils'],['rouleaux','Rouleaux'],['agglut','Clumping'],['blasts','Blasts']];
+var SMEARWHY={schisto:'Sheared red cells: a microangiopathy or a mechanical valve. With low platelets, treat as TTP until shown otherwise.',sphero:'Cells that lost membrane to the spleen: warm autoimmune hemolysis or hereditary spherocytosis.',target:'Extra membrane for the hemoglobin inside: thalassemia, liver disease, hemoglobin C, after splenectomy.',tear:'Cells squeezed out of a crowded or scarred marrow: fibrosis or infiltration.',bite:'Oxidized hemoglobin removed by the spleen: G6PD deficiency or an oxidant drug.',hyperseg:'Nuclei that cannot finish dividing: B12 or folate deficiency.',rouleaux:'Stacked cells from excess protein: think myeloma or marked inflammation.',agglut:'Cells clumped by a cold-reacting IgM: cold agglutinin disease. It can falsely raise the MCV.',blasts:'Immature cells in blood: marrow disease until shown otherwise. Hematology today.'};
+var sm={};
+
+/* ---------- state and engine ---------- */
+function state(){
+  var s={hb:num('hb'),hct:num('hct'),mcv:num('mcv'),retic:num('retic'),rbc:num('rbc'),plt:num('plt'),sex:val('sex'),egfr:num('egfr'),
+   ferr:num('ferr'),iron:num('iron'),tibc:num('tibc'),tsat:num('tsat'),b12:num('b12'),mma:val('mma'),fol:val('fol'),
+   infl:on('infl'),ckd:on('ckd'),hd:on('hd'),hf:on('hfx'),preg:on('preg'),tx:on('tx'),bleed:on('bleed'),neuro:on('neuro'),cyto:on('cyto'),n2o:on('n2o'),
+   hb0:num('hb0'),ml:num('ml'),wt:num('wt'),prod:val('prod'),intol:on('intol'),malabs:on('malabs'),loss:on('loss'),mens:on('mens'),
+   hapto:num('hapto'),ldh:val('ldh'),bili:val('bili'),dat:val('dat'),urine:on('urine'),newdrug:on('newdrug'),valve:on('valve'),liver:on('liver'),sm:{}};
+  for(var k in sm)s.sm[k]=!!sm[k];
+  return s;
+}
+function compute(s){
+  var R={};
+  if(s.hd)s.ckd=true;
+  R.ckd=s.ckd||(s.egfr!=null&&s.egfr<60);
+  R.cut=s.preg?11:(s.sex==='f'?12:13);
+  R.anemic=s.hb!=null?s.hb<R.cut:null;
+  R.hct=s.hct!=null?s.hct:(s.hb!=null?s.hb*3:null);R.hctEst=s.hct==null&&s.hb!=null;
+  if(s.retic!=null&&R.hct!=null){R.corr=s.retic*R.hct/45;R.mf=R.hct>=40?1:R.hct>=30?1.5:R.hct>=20?2:2.5;R.rpi=R.corr/R.mf}
+  R.row=R.rpi==null?null:(R.rpi<2?0:1);
+  R.col=s.mcv==null?null:(s.mcv<80?0:s.mcv<=100?1:2);
+  R.tsat=s.tsat!=null?s.tsat:(s.iron!=null&&s.tibc?s.iron/s.tibc*100:null);
+  R.mentzer=(s.mcv!=null&&s.mcv<80&&s.rbc)?s.mcv/s.rbc:null;
+  R.inflAny=s.infl||R.ckd||s.hf;
+  // iron (A26 recs 2-5, K26 2.1-2.3, hf)
+  var f=s.ferr,t=R.tsat,I=null;
+  if(f!=null){
+    R.fcut=(R.anemic||s.mens&&s.loss)?50:30;
+    if(f<=30)I={k:'def',head:'Iron deficiency',src:'ASH 2026 rec 2 to 4 · conditional, low certainty'};
+    else if(!R.inflAny){
+      if(f<=R.fcut)I={k:'def',head:'Iron deficiency',src:'ASH 2026 remark: 50 or below with signs, symptoms or a risk factor'};
+      else if(f<100)I={k:'no',head:'Not iron deficient by ferritin',note:'If infection, CKD, heart failure, cancer or another inflammatory state is present, tick it: the reading changes.',src:'ASH 2026 rec 2'};
+      else I={k:'no',head:'Iron deficiency unlikely',src:'ASH 2026 rec 2'};
+    } else {
+      if(f<100)I={k:'likely',head:'Iron deficiency likely',src:'ASH 2026 rec 5 remark · conditional, very low certainty'};
+      else if(t==null)I={k:'send',head:'Send a transferrin saturation',src:'ASH 2026 rec 5: ferritin and TSAT together'};
+      else if(t<20)I={k:'restricted',head:'Iron-restricted. Deficiency possible',note:'Recheck ferritin and TSAT after the acute illness.',src:'ASH 2026 rec 5 remark, worded cautiously: specificity 0.70 in 2 studies of 67 patients'};
+      else I={k:'no',head:'Iron deficiency unlikely',src:'ASH 2026 rec 5 remark'};
+    }
+    // disease-specific lines
+    I.extra=[];
+    if(s.hf&&(f<100||(f<300&&t!=null&&t<20)))I.extra.push('Meets the heart-failure iron criteria (ferritin under 100, or 100 to 299 with TSAT under 20%): see the heart failure tool for IV iron.');
+    if(s.hd){if(t!=null&&(f>=700||t>=40))I.extra.push('Hemodialysis: KDIGO suggests withholding routine iron at ferritin 700 or more, or TSAT 40% or more.');else if(t!=null&&f<=500&&t<=30)I.extra.push('Hemodialysis: KDIGO suggests IV iron at ferritin 500 or below with TSAT 30% or below (2D).')}
+    else if(R.ckd){if(t!=null&&(f>=700||t>=40))I.extra.push('CKD: KDIGO suggests withholding routine iron at ferritin 700 or more, or TSAT 40% or more.');else if(t!=null&&((f<100&&t<40)||(f<300&&f>=100&&t<25)))I.extra.push('CKD not on hemodialysis: KDIGO suggests iron at this ferritin and TSAT (under 100 with TSAT under 40%, or 100 to 299 with TSAT under 25%; 2D).')}
+    I.give=I.k==='def'||I.k==='likely'||(!s.infl&&I.extra.length>0&&!/withholding/.test(I.extra.join(' ')));
+  }
+  R.iron=I;
+  // B12 (N24 table 1)
+  R.b12=s.b12==null?null:(s.b12<180?'low':s.b12<=350?'ind':'ok');
+  R.b12def=R.b12==='low'||(R.b12==='ind'&&s.mma==='h')||(s.n2o&&s.mma==='h');
+  // hemolysis (J20, Marchand)
+  R.lysis=null;
+  if(s.hapto!=null&&s.ldh){R.lysis=(s.hapto<25&&s.ldh==='h')?'likely':(s.hapto>25&&s.ldh==='n')?'unlikely':'ind'}
+  else if(s.hapto!=null||s.ldh||s.bili)R.lysis='part';
+  // drop (Thavendiranathan)
+  if(s.hb!=null&&s.hb0!=null&&s.hb0>s.hb){R.drop=s.hb0-s.hb;R.exp=s.ml!=null?0.7*s.ml/100:null;R.dropFlag=R.drop>=2||(R.exp!=null&&R.drop-R.exp>=1)}
+  // guards
+  R.ttp=s.sm.schisto&&s.plt!=null&&s.plt<150;
+  R.marrow=s.sm.blasts||s.cyto;
+  R.bleed=s.bleed||(R.drop!=null&&R.drop>=2);
+  return R;
+}
+var CAUSES=[['iron','Iron deficiency'],['infl','Inflammation'],['ckd','Kidney disease'],['thal','Thalassemia trait'],['b12','B12 deficiency'],['fol','Folate deficiency'],['etoh','Alcohol or liver disease'],['drug','Drugs'],['marrow','Marrow disease'],['aiha','Immune hemolysis'],['tma','Microangiopathy'],['hemo','Other hemolysis'],['bleed','Bleeding'],['dil','Blood draws or dilution']];
+function narrow(s,R){
+  var N={};CAUSES.forEach(function(c){N[c[0]]={st:'',why:''}});
+  function out(k,w){N[k]={st:'out',why:w}}
+  function less(k,w){if(N[k].st!=='out')N[k]={st:'less',why:w}}
+  function fav(k,w){if(N[k].st!=='out')N[k]={st:'fav',why:w}}
+  if(R.rpi!=null){
+    if(R.rpi>=2){['iron','b12','fol','ckd','infl','marrow','etoh','drug'].forEach(function(k){out(k,'the marrow is answering (index '+r1(R.rpi)+')')});fav('bleed','index 2 or more: cells are being lost');fav('hemo','index 2 or more: or destroyed')}
+    else ['aiha','tma','hemo','bleed'].forEach(function(k){less(k,'index under 2: not the whole story')});
+  }
+  if(s.mcv!=null){
+    if(s.mcv<80){['b12','fol','etoh'].forEach(function(k){out(k,'MCV is low')});fav('iron','small cells');fav('thal','small cells')}
+    else if(s.mcv>100){out('thal','MCV is high');less('iron','does not raise the MCV by itself');['b12','fol','etoh','drug','marrow'].forEach(function(k){fav(k,'large cells')})}
+  }
+  if(R.iron){
+    if(R.iron.k==='def'){fav('iron','ferritin '+s.ferr);if(s.ferr<=30)less('infl','cannot explain a ferritin this low alone')}
+    else if(R.iron.k==='likely')fav('iron','ferritin under 100 with inflammation');
+    else if(R.iron.k==='restricted')fav('infl','ferritin up, TSAT down');
+    else if(R.iron.k==='no'&&s.ferr>=100)out('iron','ferritin '+s.ferr+(R.tsat!=null?', TSAT '+Math.round(R.tsat)+'%':''));
+    else if(R.iron.k==='no')N.iron={st:'less',why:'ferritin '+s.ferr+' without inflammation'};
+  }
+  if(R.b12==='ok'&&!s.n2o)out('b12','B12 over 350');
+  if(R.b12def)fav('b12',R.b12==='low'?'B12 under 180':'MMA high');
+  if(s.fol==='n')out('fol','folate normal');if(s.fol==='l')fav('fol','folate low');
+  if(R.lysis==='unlikely')['aiha','tma','hemo'].forEach(function(k){out(k,'haptoglobin over 25 and LDH normal')});
+  if(R.lysis==='likely')['aiha','tma','hemo'].forEach(function(k){fav(k,'haptoglobin low, LDH high')});
+  if(R.lysis==='likely')['b12','fol','etoh','drug','marrow'].forEach(function(k){if(N[k].st==='fav'&&N[k].why==='large cells')N[k]={st:'',why:'young cells are large; still check folate'}});
+  if(s.dat==='igg'||s.dat==='c3'){fav('aiha','DAT positive');out('tma','DAT positive: immune');out('hemo','DAT positive: immune')}
+  if(s.dat==='neg')less('aiha','DAT negative (5 to 10% of autoimmune cases are)');
+  if(s.sm.schisto){fav('tma','schistocytes');less('aiha','schistocytes point elsewhere')}
+  if(s.sm.sphero)fav('aiha','spherocytes');
+  if(s.sm.agglut)fav('aiha','clumping: cold agglutinin');
+  if(s.sm.bite)fav('hemo','bite cells: G6PD');
+  if(s.sm.hyperseg){fav('b12','hypersegmented neutrophils');if(s.fol!=='n')fav('fol','hypersegmented neutrophils')}
+  if(s.sm.target&&N.thal.st!=='out')fav('thal','target cells');
+  if(s.sm.tear||s.sm.blasts||s.sm.rouleaux||s.cyto)N.marrow={st:'fav',why:s.sm.blasts?'blasts':s.cyto?'other cell lines low':s.sm.rouleaux?'rouleaux: check for myeloma':'teardrops'};
+  if(s.egfr!=null&&s.egfr>=60&&!s.ckd)out('ckd','eGFR 60 or more');
+  else if(R.ckd&&N.ckd.st!=='out')fav('ckd',s.egfr!=null?'eGFR '+s.egfr:'CKD ticked');
+  if(s.infl&&N.infl.st!=='out'&&N.infl.st!=='less')fav('infl','ticked');
+  if(R.mentzer!=null){if(R.mentzer<13)fav('thal','Mentzer '+r1(R.mentzer));else less('thal','Mentzer '+r1(R.mentzer))}
+  if(s.bleed)N.bleed={st:'fav',why:'ticked'};
+  if(R.drop!=null){if(R.dropFlag)N.bleed={st:'fav',why:'fell '+r1(R.drop)+' g/dL'};else if(R.exp!=null)fav('dil','draws explain about '+r1(R.exp)+' g/dL')}
+  return N;
+}
+function sendNext(s,R){
+  var a=[];
+  if(s.retic==null)a.push('Reticulocyte count');
+  if(s.ferr==null)a.push('Ferritin with iron and TIBC');
+  else if(R.inflAny&&R.tsat==null)a.push('Iron and TIBC for a transferrin saturation');
+  if((R.col===2||(R.col===1&&R.row===0&&R.iron&&R.iron.k==='no'))&&s.b12==null)a.push('B12 and folate');
+  if(R.b12==='ind'&&!s.mma)a.push('Methylmalonic acid');
+  if(s.n2o&&!s.mma)a.push('Methylmalonic acid (the B12 level misleads after nitrous oxide)');
+  if(R.row===1&&!s.bleed&&R.lysis==null)a.push('LDH, haptoglobin, indirect bilirubin');
+  if(R.lysis==='likely'&&!s.dat)a.push('Direct antiglobulin test');
+  if(R.col===1&&R.row===0&&R.iron&&R.iron.k==='no')a.push('TSH; protein electrophoresis and free light chains if creatinine or calcium is off');
+  if(R.mentzer!=null&&R.mentzer<13&&R.iron&&R.iron.k==='no')a.push('Hemoglobin electrophoresis');
+  if(!Object.keys(s.sm).some(function(k){return s.sm[k]}))a.push('Smear review');
+  return a;
+}
+
+/* ---------- map ---------- */
+var CELL=[['Iron deficiency · thalassemia trait · long-standing inflammation','Kidney disease · inflammation · early iron deficiency · marrow','B12 or folate · alcohol, liver · drugs · marrow'],['Thalassemia with blood loss or hemolysis','Bleeding · hemolysis','Brisk reticulocytosis (young cells are large)']];
+var CELLWHY=[['Small cells with a quiet marrow: hemoglobin cannot be built. Ferritin first; Mentzer index if the red cell count is high.','Normal-sized cells with a quiet marrow: the signal to build (erythropoietin, iron supply) or the marrow itself is the problem.','Large cells with a quiet marrow: DNA synthesis is slowed (B12, folate, drugs) or membranes are altered (alcohol, liver).'],['Uncommon square: a small-cell disorder with an added loss.','The marrow is answering, so cells are leaving: look for blood loss, then for hemolysis.','Reticulocytes are larger than mature cells, so a strong response can push the MCV over 100.']];
+function renderMap(R){
+  var h='<span></span><span class="ax">MCV under 80</span><span class="ax">80 to 100</span><span class="ax">over 100</span>';
+  ['Index under 2','Index 2 or more'].forEach(function(lab,i){
+    h+='<span class="ax y">'+lab+'</span>';
+    for(var j=0;j<3;j++){var here=R.row===i&&R.col===j;h+='<button type="button" class="cell'+(here?' here':'')+'" data-cell="'+i+','+j+'"'+(here?' aria-current="true"':'')+'>'+CELL[i][j]+'</button>'}
+  });
+  $('map').innerHTML=h;
+  if(R.row!=null&&R.col!=null)$('mapnote').textContent=CELLWHY[R.row][R.col];
+  else if(R.col!=null)$('mapnote').textContent='MCV places the column. Add the reticulocyte count to place the row.';
+  else $('mapnote').textContent='Enter hemoglobin, MCV and reticulocytes. Tap any square to read what belongs there.';
+}
+
+/* ---------- Workup ---------- */
+function renderGuards(s,R){
+  var h='';
+  if(R.ttp)h+=card({label:'Act first',head:'Schistocytes with low platelets: treat as TTP until shown otherwise',why:'Sheared cells plus consumed platelets mean clots are forming in small vessels; delay costs organs.',steps:['Call hematology now.','Send ADAMTS13 before any plasma is given.','No platelet transfusion unless bleeding is life-threatening.','LDH, creatinine, coagulation tests, repeat smear.'],links:'<a href="/transfusion/">Transfusion</a><a href="/onc-emergencies/">Heme/onc emergencies</a>',tiers:['platelets: as in the transfusion tool','order of steps: expert practice']});
+  if(R.marrow)h+=card({label:'Act first',head:s.sm.blasts?'Blasts on the smear: hematology today':'More than one cell line is low: think marrow',why:'One failing cell line can be a deficiency; several point to the factory itself.',steps:['Smear reviewed by a hematologist or pathologist.','B12, folate, HIV and liver tests while waiting.'],links:'<a href="/onc-emergencies/">Heme/onc emergencies</a>',tiers:['expert practice']});
+  if(R.bleed)h+=card({label:'Act first',head:'Find the bleeding before the cause of anemia',why:'Hemoglobin is a concentration: it only falls once plasma refills, so the first number understates a bleed.',steps:['Vitals, two IVs, type and screen.','Look where blood hides: gut, retroperitoneum, thigh, rectus sheath, chest or abdomen after a procedure.','Review anticoagulants and antiplatelets.'],chips:['lag'],links:'<a href="/transfusion/">Transfusion thresholds</a>',tiers:['2 g/dL flag: bleeding-definition convention, expert practice']});
+  $('guards').innerHTML=h;
+}
+function renderWork(){
+  var s=state(),R=compute(s);
+  renderGuards(s,R);renderMap(R);
+  var h='';
+  if(s.hb==null){h=card({label:'Start here',body:'<p class="empty">Enter the hemoglobin, MCV and reticulocyte count. Everything else sharpens the answer.</p>'})}
+  else{
+    if(R.anemic===false)h+=card({label:'Hemoglobin',head:'Not anemic by the usual definition',why:'The cut-off is '+R.cut+' g/dL for this patient.',tiers:['WHO definition, as kept by KDIGO 2026']});
+    // marrow answer
+    if(R.rpi!=null){
+      var low=R.rpi<2;
+      h+=card({id:'res-retic',label:'Is the marrow answering?',ctx:'retic '+s.retic+'% · Hct '+r1(R.hct)+(R.hctEst?' (estimated)':'')+' · corrected '+r1(R.corr)+'% · index '+r1(R.rpi),
+        head:low?'No. Reticulocyte index '+r1(R.rpi):'Yes. Reticulocyte index '+r1(R.rpi),
+        why:low?(s.retic>=2?'A percentage rises when there are fewer red cells to count against, and young cells linger longer; corrected for both, the response is short of the 2 expected.':'A healthy marrow multiplies its output when cells are lost; an index under 2 means the factory is the problem.'):'The marrow is answering, so cells are being lost or destroyed after they are made.',
+        chips:['retic','ways'],
+        more:'<p>Corrected % = reticulocyte % × hematocrit ÷ 45. Index = corrected % ÷ maturation factor (1.0 at hematocrit 40 or more, 1.5 at 30 to 39, 2.0 at 20 to 29, 2.5 below 20).</p><p>Hemolysis can present with a low count in up to 37% of autoimmune cases, so a low index does not exclude it.</p>',tiers:['standard teaching; cut-offs vary by source','37%: AIHA consensus 2020']});
+    } else h+=card({label:'Is the marrow answering?',body:'<p class="empty">Add the reticulocyte count'+(s.hct==null?'':'')+'. It splits every anemia into "not making enough" and "losing or destroying".</p>',chips:['ways']});
+    // iron
+    if(R.iron){
+      var I=R.iron;
+      var why=I.k==='def'?'Ferritin tracks stored iron; nothing else makes it this low.':I.k==='likely'||I.k==='restricted'||I.k==='send'?'Inflammation raises ferritin and, through hepcidin, locks iron in stores, so a normal-looking ferritin can hide an empty supply line.':'Stores are present'+(R.tsat!=null?' and iron is reaching the marrow.':'.');
+      h+=card({id:'res-iron',label:'Iron',ctx:'ferritin '+s.ferr+(R.tsat!=null?' · TSAT '+Math.round(R.tsat)+'%':'')+(R.inflAny?' · inflammation, CKD or heart failure':''),head:I.head,why:why,
+        body:(I.note?'<p class="note">'+I.note+'</p>':'')+(I.extra.length?list(I.extra):'')+(s.tx?guard('Transfused this admission','Iron studies drawn after a transfusion can read falsely reassuring.'):''),
+        chips:['iron','ferr'],links:(I.give?'<button type="button" data-go="replace">Replace iron</button>':'')+(s.hf?'<a href="/hf/">Heart failure</a>':''),
+        more:'<p>ASH 2026: ferritin 30 or below diagnoses iron deficiency in adults; 50 or below when signs, symptoms or an ongoing risk factor are present. With inflammation, send ferritin and TSAT together; deficiency may be considered at ferritin under 100 or TSAT under 20%. TSAT is best drawn fasting.</p><p>AGA 2020 uses ferritin under 45 in anemia (strong recommendation).</p>'+(I.k==='def'||I.k==='likely'?'<p><b>Find the cause.</b> Men and postmenopausal women: upper and lower endoscopy (AGA 2020, strong). Premenopausal women: suggested (conditional). Celiac serology and a non-invasive H. pylori test. A menstrual history in everyone who menstruates.</p>':''),
+        tiers:[I.src]});
+    } else if(s.hb!=null&&R.anemic)h+=card({label:'Iron',body:'<p class="empty">Add ferritin. With infection, CKD, heart failure or cancer, add iron and TIBC too.</p>',chips:['iron']});
+    // thal
+    if(R.mentzer!=null)h+=card({id:'res-thal',label:'Small cells: iron or thalassemia?',ctx:'MCV '+s.mcv+' ÷ RBC '+s.rbc+' = '+r1(R.mentzer),head:R.mentzer<13?'Mentzer index '+r1(R.mentzer)+': favours thalassemia trait':'Mentzer index '+r1(R.mentzer)+': favours iron deficiency',why:'Thalassemia trait makes many small cells; iron deficiency makes few small cells.',
+      more:'<p>A screen only. Send hemoglobin electrophoresis when ferritin is normal; iron deficiency lowers HbA2, so repeat after repletion. A normal electrophoresis does not exclude alpha trait.</p>',tiers:['Mentzer 1973, single small study','next steps: expert practice']});
+    // b12 / folate
+    if(R.b12||s.fol||s.n2o||R.col===2){
+      var bh,bw,bs=[];
+      if(s.n2o&&!s.mma){bh='After nitrous oxide the B12 level misleads: send MMA or homocysteine';bw='Nitrous oxide inactivates B12 already in the body, so the measured level can look normal.'}
+      else if(R.b12==='low'){bh='B12 deficiency confirmed';bw='Below 180 the level is low enough to stand without a second test.'}
+      else if(R.b12==='ind'){bh=s.mma==='h'?'B12 deficiency (MMA high)':s.mma==='n'?'B12 deficiency unlikely (MMA normal)':'B12 indeterminate: send methylmalonic acid';bw='B12 is needed to clear methylmalonic acid; a high level means tissues are short even when the blood level looks passable.'}
+      else if(R.b12==='ok'){bh='B12 deficiency unlikely';bw='Above 350 deficiency is unlikely.'}
+      else {bh='Large cells: send B12 and folate';bw='Slowed DNA synthesis lets the cell grow before it divides.'}
+      if(s.fol==='l')bs.push('Folate is low: replace, but only once B12 is known or covered.');
+      h+=card({id:'res-b12',label:'B12 and folate',ctx:(s.b12!=null?'B12 '+s.b12:'')+(s.mma?' · MMA '+(s.mma==='h'?'high':'normal'):'')+(s.fol?' · folate '+(s.fol==='l'?'low':'normal'):''),head:bh,why:bw,steps:bs,
+        guard:(s.neuro&&(R.b12==='low'||R.b12==='ind'||s.n2o)?guard('Neurologic signs: replace now','Do not wait for the MMA. Nerve injury can become permanent.'):'')+(s.fol==='l'&&!(R.b12==='ok')?guard('Check or cover B12 before folate alone','Folate can correct the blood count while nerve injury from B12 deficiency progresses.'):''),
+        chips:['b12'],links:(R.b12def||s.fol==='l'||s.neuro?'<button type="button" data-go="replace">Replace</button>':''),
+        more:'<p>NICE 2024: under 180 ng/L confirmed; 180 to 350 indeterminate, send MMA if there are symptoms or signs; over 350 unlikely. Use your lab\'s range if it differs. A normal blood count does not exclude B12 deficiency. Consider an anti-intrinsic factor antibody when autoimmune gastritis is suspected; a negative test does not exclude it.</p><p>Other causes of large cells: alcohol, liver disease, hypothyroidism, hydroxyurea, methotrexate, azathioprine, zidovudine, myelodysplasia, brisk reticulocytosis, cold agglutinins.</p>',tiers:['NICE NG239 (UK); no US guideline','cause list: standard teaching']});
+    }
+    // CKD pointer
+    if(R.ckd&&R.row===0)h+=card({label:'Kidney disease',head:'CKD can explain a quiet marrow, after iron is fixed',why:'Failing kidneys make less erythropoietin, so the marrow never gets the order to build.',more:'<p>KDIGO 2026: correct iron deficiency and other causes before an erythropoiesis-stimulating agent. Starting one is considered at hemoglobin 9 to 10 on dialysis and individualized off dialysis; hemoglobin is kept below 11.5. Nephrology decides. B12 and folate are not part of the first-line set in CKD; send them when the cells are large or the patient is malnourished, older or frail.</p>',tiers:['KDIGO 2026 rec 3.2.1, 3.2.2 (2D); target (1D); read via ERBP commentary']});
+    // drop
+    if(R.drop!=null){
+      var dh=R.dropFlag?'Fell '+r1(R.drop)+' g/dL: more than draws explain. Look for bleeding':(R.exp!=null?'Fell '+r1(R.drop)+' g/dL; blood draws explain about '+r1(R.exp):'Fell '+r1(R.drop)+' g/dL');
+      h+=card({id:'res-drop',label:'Hemoglobin fell in hospital',ctx:s.hb0+' → '+s.hb+(s.ml!=null?' · '+s.ml+' mL drawn':''),head:dh,why:R.dropFlag?'Hemoglobin is a concentration: it only falls once plasma refills, so the first number understates a bleed.':'Each 100 mL drawn costs about 0.7 g/dL.',
+        steps:R.dropFlag?['Repeat the CBC; examine for bleeding.','If not bleeding: LDH, haptoglobin, bilirubin, reticulocytes.']:['Large IV fluid volumes lower hemoglobin without red cell loss.','Fewer and smaller draws; bundle tests.'],chips:['lag'],links:'<a href="/transfusion/">Transfusion thresholds</a>',
+        more:'<p>On a general medicine ward the average admission had 75 mL drawn and lost 0.8 g/dL (404 admissions, one hospital). In ICUs, small-volume tubes did not reduce transfusion in the primary analysis of a 21,201-patient trial; a secondary analysis favoured them.</p>',tiers:['Thavendiranathan 2005, cohort','STRATUS 2023','2 g/dL flag: expert practice']});
+    }
+    var sn=sendNext(s,R);
+    if(sn.length)h+=card({id:'res-next',label:'Send next',steps:sn,tiers:['order of tests: expert practice']});
+  }
+  $('work-out').innerHTML=h;
+  var N=narrow(s,R),order={fav:0,'':1,less:2,out:3};
+  var rows=CAUSES.slice().sort(function(a,b){return order[N[a[0]].st]-order[N[b[0]].st]});
+  $('causes').innerHTML=rows.map(function(c){var n=N[c[0]];return '<div class="cause '+(n.st||'')+'"><span>'+c[1]+'</span><small>'+(n.why||'')+'</small></div>'}).join('');
+  renderReplace(s,R);renderHem(s,R);
+}
+
+/* ---------- Replace ---------- */
+function ivDose(p,w){
+  if(p==='fcm')return {n:'Ferric carboxymaltose',d:w==null?'750 mg, twice, at least 7 days apart (50 kg or more). Or 15 mg/kg up to 1000 mg once.':(w>=50?'750 mg now and 750 mg at least 7 days later (1500 mg). Or one dose of '+Math.min(1000,Math.round(15*w))+' mg (15 mg/kg, maximum 1000).':Math.round(15*w)+' mg (15 mg/kg), twice, at least 7 days apart.'),a:'Slow push about 100 mg a minute, or infuse over at least 15 minutes. Observe 30 minutes.',g:guard('Boxed warning: symptomatic hypophosphatemia','Correct a low phosphate first. Check phosphate before a repeat course in anyone at risk (malabsorption, IBD, vitamin D deficiency, hyperparathyroidism, malnutrition) and before any repeat within 3 months.'),chip:1};
+  if(p==='fdi')return {n:'Ferric derisomaltose',d:w==null?'1000 mg once (50 kg or more); 20 mg/kg once below 50 kg.':(w>=50?'1000 mg once.':Math.round(20*w)+' mg once (20 mg/kg).'),a:'Infuse over at least 20 minutes. Observe 30 minutes.',g:''};
+  if(p==='fmx')return {n:'Ferumoxytol',d:'510 mg, then 510 mg 3 to 8 days later.',a:'Dilute in 50 to 200 mL and infuse over at least 15 minutes. Observe 30 minutes with blood pressure and pulse. Alters MRI for up to 3 months: tell radiology.',g:guard('Boxed warning: fatal anaphylaxis','Has occurred after a tolerated earlier dose. Never give as a push.')};
+  if(p==='is')return {n:'Iron sucrose',d:'CKD not on dialysis: 200 mg on 5 occasions within 14 days (1000 mg). Hemodialysis: 100 mg at each session to 1000 mg. Peritoneal dialysis: 300 mg, 300 mg, then 400 mg, 14 days apart.',a:'200 mg undiluted over 2 to 5 minutes.',g:guard('Label covers CKD only','Use outside CKD is off-label; follow your pharmacy\'s protocol.')};
+  if(p==='dex')return {n:'Iron dextran (low molecular weight)',d:'Test dose 0.5 mL (25 mg); wait at least 1 hour. The label\'s maximum is 100 mg (2 mL) a day.',a:'Single large "total dose" infusions are off-label and are not dosed here.',g:guard('Boxed warning: anaphylaxis','Fatal reactions have followed a tolerated test dose.')};
+  return {n:'Ferric gluconate',d:'125 mg at each dialysis session, usually 8 sessions (1000 mg).',a:'Labelled for hemodialysis patients on an erythropoiesis-stimulating agent.',g:''};
+}
+function renderReplace(s,R){
+  var a='',b='',I=R.iron;
+  if(!I)a+=card({label:'Iron',body:'<p class="empty">Enter ferritin on the Workup tab to see whether iron is needed and by which route.</p>',links:'<button type="button" data-go="workup">Workup</button>'});
+  else if(!I.give)a+=card({label:'Iron',head:I.k==='restricted'?'No iron yet: recheck after the acute illness':'Iron is not indicated by these studies',why:I.k==='restricted'?'With stores present, iron cannot be released until inflammation settles; extra iron adds little now.':'Stores are adequate.',tiers:[I.src]});
+  else{
+    var needIV=s.intol||s.malabs||s.loss||s.hd||s.hf;
+    var why=needIV?(s.hd?'On hemodialysis, oral iron cannot keep up with losses and hepcidin blocks absorption.':s.hf?'In heart failure the trials that showed benefit used IV iron.':s.malabs?'Iron is absorbed in the duodenum; bypass or inflamed gut cannot take it up.':s.loss?'Ongoing loss outpaces the few milligrams a day the gut can absorb.':'Oral iron has already failed.'):'A dose of iron raises hepcidin for about a day, which blocks the next dose; spacing doses absorbs more of each.';
+    if(needIV){
+      var d=ivDose(s.prod,s.wt);
+      a+=card({id:'res-iv',label:'Iron: IV',ctx:d.n+(s.wt!=null?' · '+s.wt+' kg':''),head:d.d,why:why,guard:(s.infl?guard('Active infection: hold IV iron until it is treated','Iron feeds many pathogens; the trials stopped iron during infection.'):'')+d.g,body:'<p class="note">'+d.a+'</p>',
+        more:'<p>AGA 2024: prefer a product that replaces the deficit in one or two infusions. All products carry similar risk; true anaphylaxis is very rare and most reactions are infusion reactions.</p>'+(s.wt!=null&&s.hb!=null?'<p>Deficit estimate (Ganzoni): '+s.wt+' kg × (15 − '+s.hb+') × 2.4 + 500 = about '+Math.round(s.wt*(15-s.hb)*2.4+500)+' mg. For teaching; dose by the label.</p>':'')+(s.hf?'<p>Heart failure uses its own carboxymaltose schedule: see the heart failure tool.</p>':''),
+        links:s.hf?'<a href="/hf/">Heart failure</a>':'',tiers:['doses: FDA labels','route: AGA 2024, expert review','infection hold: KDIGO 2026 practice point 2.8 (CKD); expert practice elsewhere']});
+    } else a+=card({id:'res-oral',label:'Iron: oral',head:'Ferrous sulfate 325 mg (65 mg iron) once daily or every other day',why:why,steps:['Take with vitamin C; away from calcium, antacids, tea and coffee.','No formulation is better than another; ferrous sulfate is cheapest.','Switch to IV if not tolerated, if ferritin does not rise, or if absorption is unlikely.'],chips:['iron'],
+        more:'<p>In iron-depleted women, alternate-day dosing absorbed 21.8% of each dose against 16.3% with daily dosing, and splitting a dose twice a day raised hepcidin without absorbing more. Those were absorption studies in women who were not anemic.</p>',tiers:['AGA 2024 advice 1 to 4, expert review','Stoffel 2017']});
+    b+=card({id:'res-resp',label:'Did it work?',steps:['Reticulocytes rise in about a week.','Hemoglobin up about 1 g/dL by two weeks suggests a response.','Do not recheck ferritin within 4 weeks of IV iron: it reads falsely high.'],why:'New red cells appear first; the hemoglobin follows as they accumulate.',tiers:['expert practice']});
+    b+=card({id:'res-cause',label:'Find the cause',head:'Iron deficiency is a finding, not a diagnosis',why:'In adults the lost iron has usually left as blood, most often from the gut or the uterus.',steps:['Men and postmenopausal women: upper and lower endoscopy.','Premenopausal women: endoscopy suggested; take a menstrual history first.','Celiac serology; non-invasive H. pylori test.','No capsule study if both scopes are normal and there are no symptoms.'],tiers:['AGA 2020: strong for men and postmenopausal women; conditional otherwise','read via summaries']});
+  }
+  // B12 and folate
+  var bb='';
+  if(R.b12def||s.neuro&&(R.b12==='ind'||R.b12==='low')){
+    bb=card({id:'res-b12rx',label:'B12',head:'Cyanocobalamin 1000 mcg IM or deep subcutaneous',why:'Injection bypasses the gut, where most deficiency arises.',guard:s.neuro?guard('Neurologic signs: start today','Do not wait for confirmatory tests.'):'',
+      steps:['Daily for 6 to 7 days, then alternate days for 7 doses, then every 3 to 4 days for 2 to 3 weeks, then monthly.','Lifelong injections for autoimmune gastritis, total gastrectomy or terminal ileal resection.','Diet or unknown cause: oral 1000 mcg daily is reasonable once stable.','Severe megaloblastic anemia: watch potassium for the first 48 hours.','Not by the IV route.'],chips:['b12'],
+      more:'<p>Labels differ: some state 100 mcg per injection, others 1000 mcg; 1000 mcg is common practice. The schedule above is the label\'s. NICE 2024: symptoms may start to improve within 2 weeks and can take 3 months; do not recheck the B12 level on injections; oral replacement for malabsorption needs at least 1 mg a day.</p>',tiers:['schedule: FDA label','1000 mcg per dose: common practice, labels vary','route by cause: NICE NG239']});
+  }
+  if(s.fol==='l')bb+=card({id:'res-folrx',label:'Folate',head:'Folic acid 1 mg daily',why:'Folate stores last only months, so deficiency follows poor intake, alcohol or high cell turnover quickly.',guard:R.b12==='ok'?'':guard('Check or cover B12 first','Folate alone can let B12 nerve injury progress.'),tiers:['label dose; 1 to 5 mg used in hemolysis (AIHA consensus)']});
+  if(!bb)bb=card({label:'B12 and folate',body:'<p class="empty">Shown when B12 is low, MMA is high, or folate is low on the Workup tab.</p>'});
+  b+=bb;
+  if(R.ckd)b+=card({label:'Erythropoiesis-stimulating agents',head:'Nephrology\'s decision, after iron is replete',why:'These drugs need iron to work and carry clot and stroke risk when hemoglobin is pushed high.',more:'<p>KDIGO 2026: consider starting at hemoglobin 9 to 10 on dialysis; individualize off dialysis; keep hemoglobin below 11.5; suspend during admission for stroke or thrombosis.</p>',tiers:['KDIGO 2026 (2D; target 1D), read via ERBP commentary']});
+  $('rep-out-a').innerHTML=a;$('rep-out-b').innerHTML=b;
+}
+
+/* ---------- Hemolysis ---------- */
+function renderHem(s,R){
+  var h='';
+  if(R.ttp)h+=card({label:'Act first',head:'Schistocytes with low platelets: treat as TTP until shown otherwise',steps:['Hematology now; ADAMTS13 before plasma; no platelets unless bleeding is life-threatening.'],links:'<button type="button" data-go="workup">Workup</button>',tiers:['expert practice']});
+  if(R.lysis==null)h+=card({label:'Is it hemolysis?',body:'<p class="empty">Enter haptoglobin and LDH. Send them with indirect bilirubin, reticulocytes and a smear.</p>',chips:['lysis'],tiers:['AIHA consensus 2020, 99% agreement']});
+  else{
+    var head=R.lysis==='likely'?'Hemolysis likely':R.lysis==='unlikely'?'Hemolysis unlikely':R.lysis==='ind'?'Mixed picture: repeat and look at the smear':'Add the other test: haptoglobin and LDH are read together';
+    var why=R.lysis==='likely'?'Free hemoglobin uses up haptoglobin and broken cells spill LDH.':R.lysis==='unlikely'?'With haptoglobin over 25 and a normal LDH, hemolysis is absent in about 9 of 10.':'Either test alone has common false readings.';
+    var traps=[];
+    if(s.liver)traps.push('Liver disease lowers haptoglobin without hemolysis.');
+    if(s.tx)traps.push('Recent transfusion can lower haptoglobin and raise LDH.');
+    if(s.infl)traps.push('Inflammation raises haptoglobin and can hide hemolysis.');
+    if(R.rpi!=null&&R.rpi<2&&R.lysis==='likely')traps.push('Low reticulocytes do not exclude hemolysis: think parvovirus or marrow failure. This combination is dangerous.');
+    h+=card({id:'res-lysis',label:'Is it hemolysis?',ctx:(s.hapto!=null?'haptoglobin '+s.hapto:'')+(s.ldh?' · LDH '+(s.ldh==='h'?'high':'normal'):'')+(s.bili?' · indirect bilirubin '+(s.bili==='h'?'high':'normal'):''),head:head,why:why,steps:traps,chips:['lysis'],
+      body:s.urine?'<p class="note">Dark urine points to destruction inside the vessels: check the urine for hemoglobin.</p>':'',
+      more:'<p>Haptoglobin under 25 mg/dL with a high LDH is 95% specific. Haptoglobin over 25 with a normal LDH is 92% sensitive for the absence of hemolysis. Haptoglobin alone at 25 or below: sensitivity 83%, specificity 96% in 100 inpatients. About 1 in 1000 white people and up to 4% of African Americans have no haptoglobin.</p>',tiers:['AIHA consensus 2020','Marchand 1980, retrospective']});
+    if(R.lysis==='likely'||R.lysis==='ind'||s.dat){
+      var D;
+      if(!s.dat)D={head:'Send the direct antiglobulin test',why:'It asks whether antibody or complement is sitting on the red cells.',steps:['Ask for IgG and C3 separately.','Send before transfusion if you can.']};
+      else if(s.dat==='igg')D={head:'Warm autoimmune hemolysis',why:'Antibody is on the cells at body temperature; the spleen removes them.',steps:['Call hematology.','Prednisone 1 mg/kg daily by mouth when anemia is symptomatic.','Hemoglobin over 10 and stable: watching is reasonable.','Folic acid 1 to 5 mg daily.','VTE prophylaxis unless contraindicated.','Look for a cause: ANA, protein electrophoresis with immunofixation, flow cytometry, HIV and hepatitis B and C; CT if nodes or spleen.'],links:'<a href="/vte-ppx/">VTE prophylaxis</a><a href="/transfusion/">Transfusion</a>',
+        guard:guard('Do not withhold blood in critical anemia','A difficult crossmatch is expected. Give ABO- and Rh-matched cells slowly at first and watch for 20 minutes.'),
+        more:'<p>Life-threatening and transfusion-dependent: ICU and hematology now. IV methylprednisolone, IVIG (0.4 to 0.5 g/kg a day for 5 days; 12 of 37 responded in the only study) and plasma exchange are bridges. Check hepatitis B surface antigen and core antibody before rituximab. On more than 20 mg a day of prednisone for over a month, consider Pneumocystis prophylaxis (70% agreement).</p><p>A positive DAT without hemolysis follows IVIG, Rh immune globulin, daratumumab or a recent transfusion.</p>'};
+      else if(s.dat==='c3')D={head:'Cold agglutinin disease pattern',why:'A cold-reacting IgM fixed complement and let go; complement is the footprint left on the cell.',steps:['Send a cold agglutinin titre; 64 or higher at 4 °C is significant.','Keep the patient and the limbs warm; give blood through a warmer.','Steroids do not work here.','Treat any infection; protein electrophoresis with immunofixation.','Folic acid 1 to 5 mg daily; VTE prophylaxis unless contraindicated.','Hematology decides on rituximab-based therapy.'],more:'<p>After Mycoplasma or Epstein-Barr infection the same pattern is usually self-limited over weeks.</p>'};
+      else D={head:'DAT negative: look for non-immune causes first',why:'No antibody or complement on the cell means it is being broken by force, by an enzyme defect, by its own membrane or by an organism.',steps:['Smear for schistocytes (microangiopathy, valve), bite cells (G6PD), spherocytes, organisms.','G6PD level: can read falsely normal during the episode; repeat in about 3 months.','Flow cytometry for PNH with dark urine, clots or other low counts.','Stop oxidant drugs: dapsone, rasburicase, primaquine, nitrofurantoin.'],more:'<p>5 to 10% of autoimmune hemolysis is DAT-negative: if nothing else is found, ask hematology about more sensitive testing.</p>'};
+      var g2='';
+      if(s.tx&&s.dat&&s.dat!=='neg')g2+=guard('Recent transfusion with a new positive DAT','A delayed hemolytic transfusion reaction is possible: call the blood bank.');
+      if(s.newdrug)g2+=guard('New drug','Ceftriaxone, penicillins, fludarabine and methyldopa can cause immune hemolysis: stop the suspect drug.');
+      if(s.valve&&s.dat!=='igg'&&s.dat!=='c3')g2+=guard('Mechanical valve or device','Shear from a leak or a device can break cells: echocardiogram.');
+      h+=card({id:'res-dat',label:'What is destroying the cells?',head:D.head,why:D.why,guard:(D.guard||'')+g2,steps:D.steps,chips:['dat'],links:D.links||'',more:D.more,tiers:['AIHA consensus 2020; G6PD, PNH and drug lists: expert practice']});
+    }
+  }
+  $('hem-out').innerHTML=h;
+}
+
+/* ---------- figures ---------- */
+function segBtns(fig,opts,cur){return '<div class="seg" style="margin-top:10px">'+opts.map(function(o){return '<button type="button" class="sbx" data-fig="'+fig+'" data-st="'+o[0]+'" aria-pressed="'+(o[0]===cur)+'">'+o[1]+'</button>'}).join('')+'</div>'}
+function svg(inner,hgt){return '<div class="fig"><svg viewBox="0 0 340 '+(hgt||170)+'" role="img">'+inner+'</svg></div>'}
+function box(x,y,w,h,t,cls,sub){return '<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" rx="10" class="'+(cls||'ff')+' sl2" stroke-width="1"/><text x="'+(x+w/2)+'" y="'+(y+h/2+(sub?-2:4))+'" text-anchor="middle">'+t+'</text>'+(sub?'<text class="tm" x="'+(x+w/2)+'" y="'+(y+h/2+13)+'" text-anchor="middle">'+sub+'</text>':'')}
+function arrow(x1,y1,x2,y2,w,cls){var a=Math.atan2(y2-y1,x2-x1),hx=x2-8*Math.cos(a),hy=y2-8*Math.sin(a);return '<line x1="'+x1+'" y1="'+y1+'" x2="'+hx+'" y2="'+hy+'" class="'+(cls||'sm')+'" stroke-width="'+(w||2)+'" stroke-linecap="round"/><path d="M'+x2+' '+y2+'L'+(hx-5*Math.sin(a))+' '+(hy+5*Math.cos(a))+'L'+(hx+5*Math.sin(a))+' '+(hy-5*Math.cos(a))+'z" class="'+(cls==='sa'?'fa':cls==='sb'?'fb':'fm')+'"/>'}
+var WAYS={normal:['Made and removed at the same rate: about 1% of red cells a day.',2,2,0],make:['Not making enough: iron, B12, folate, erythropoietin or the marrow itself is short. Reticulocyte index under 2.',0.8,2,0],lose:['Losing: blood leaves the body. The marrow speeds up if it has iron. Index 2 or more after a few days.',4,2,4],destroy:['Destroying: cells are broken early, in the spleen or in the vessels. Index 2 or more, haptoglobin low.',4,5,0]};
+function figWays(st){st=st||'normal';var W=WAYS[st];
+  var g=box(10,56,84,52,'Marrow',st==='make'?'fc':'ff','makes')+box(128,56,84,52,'Blood','ff','120 days')+box(246,56,84,52,'Spleen',st==='destroy'?'fc':'ff','removes')+
+   arrow(96,82,126,82,W[1],st==='make'?'sb':'sa')+arrow(214,82,244,82,W[2],st==='destroy'?'sb':'sm')+(W[3]?arrow(170,110,170,150,W[3],'sb')+'<text class="tb" x="180" y="146">out of the body</text>':'')+
+   '<text class="tm" x="170" y="30" text-anchor="middle">'+(st==='make'?'too few made':st==='lose'?'lost':st==='destroy'?'destroyed early':'in balance')+'</text>';
+  return svg(g)+segBtns('ways',[['normal','Normal'],['make','Make too few'],['lose','Lose'],['destroy','Destroy']],st)+'<p class="figcap">'+W[0]+'</p><p class="figsrc">Physiology; schematic.</p>'}
+function figRetic(){var s=state(),R=compute(s),ex=R.rpi==null;var rt=ex?6:s.retic,hc=ex?21:R.hct,co=rt*hc/45,mf=hc>=40?1:hc>=30?1.5:hc>=20?2:2.5,ix=co/mf;
+  function b(l,v,max){return '<div class="bar"><span>'+l+'</span><i><u style="width:'+Math.min(100,v/max*100)+'%"></u></i><span>'+r1(v)+'</span></div>'}
+  var mx=Math.max(rt,3);
+  return '<div class="bars">'+b('Reported %',rt,mx)+b('Corrected %',co,mx)+b('Index',ix,mx)+'</div><div class="dp">'+dpHtml([['What is happening','<p>'+(ex?'Example: ':'')+'Reticulocytes '+rt+'% at hematocrit '+r1(hc)+'. Fewer red cells make the same number of young cells a bigger percentage, so it is scaled by '+r1(hc)+' ÷ 45.</p>'],['Why the rule','<p>In anemia, young cells leave the marrow early and circulate about '+mf+' days as reticulocytes, so each is counted for longer. Dividing by '+mf+' removes that.</p>'],['At the bedside','<p>Index '+r1(ix)+': '+(ix<2?'the marrow is not keeping up. Look for what it lacks.':'the marrow is answering. Look for loss or destruction.')+'</p>']])+'</div><p class="figsrc">Standard teaching; maturation factors vary slightly by source.</p>'}
+var IRON={normal:['Normal','Iron is absorbed, carried on transferrin to the marrow, and recycled from old cells through macrophages.','normal','20 to 45%','normal'],def:['Iron deficiency','Stores are empty, so ferritin is low. The liver makes more transferrin to catch what little there is: TIBC rises and saturation falls.','low','low','high'],infl:['Inflammation','Hepcidin rises and closes the exits: iron is locked in macrophages and gut absorption stops. Ferritin is high, but little iron reaches the marrow.','normal or high','low','low or normal'],both:['Both','Empty stores hidden behind an inflamed ferritin. A ferritin under 100 or a TSAT under 20% is the clue.','often under 100','low','variable']};
+function figIron(st){st=st||'normal';var I=IRON[st],blk=st==='infl'||st==='both',emp=st==='def'||st==='both';
+  var g=box(8,14,76,44,'Gut','ff')+box(132,14,76,44,'Transferrin','ff')+box(256,14,76,44,'Marrow','ff')+box(132,104,76,48,'Macrophage',emp?'fc':'ff',emp?'store empty':'store')+
+   '<g'+(blk?' class="dim"':'')+'>'+arrow(86,36,130,36,blk?1:2,'sa')+arrow(170,102,170,60,blk?1:2,'sa')+'</g>'+arrow(210,36,254,36,(blk||emp)?1:3,(blk||emp)?'sb':'sa')+arrow(294,60,210,124,2,'sm')+
+   (blk?'<text class="tb" x="8" y="80">hepcidin high:</text><text class="tb" x="8" y="94">exits closed</text>':'<text class="tm" x="8" y="80">hepcidin low:</text><text class="tm" x="8" y="94">exits open</text>')+'<text class="tm" x="262" y="104">old cells</text>';
+  return svg(g)+segBtns('iron',[['normal','Normal'],['def','Deficiency'],['infl','Inflammation'],['both','Both']],st)+'<div class="dp">'+dpHtml([['Ferritin','<p>'+I[2]+'</p>'],['TSAT','<p>'+I[3]+'</p>'],['TIBC','<p>'+I[4]+'</p>']])+'</div><p class="figcap">'+I[1]+'</p><p class="figsrc">ASH 2026 text; physiology. Schematic.</p>'}
+var FERR={15:[0.41,0.99,'Almost never wrong when positive, but misses 6 of 10 iron-deficient people. ASH recommends against it in pregnancy and suggests against it elsewhere.'],30:[0.67,0.96,'The ASH 2026 cut-off for adults without inflammation: finds two thirds, with few false positives.'],50:[0.89,0.86,'Finds 9 of 10. ASH uses it when signs, symptoms or a risk factor are present, where a miss costs more than an extra workup.']};
+function figFerr(st){st=st||'30';var F=FERR[st];function b(l,v){return '<div class="bar"><span>'+l+'</span><i><u style="width:'+v*100+'%"></u></i><span>'+v.toFixed(2)+'</span></div>'}
+  return '<div class="bars">'+b('Sensitivity',F[0])+b('Specificity',F[1])+'</div>'+segBtns('ferr',[['15','15 or below'],['30','30 or below'],['50','50 or below']],st)+'<p class="figcap">'+F[2]+'</p><p class="figsrc">ASH 2026 evidence review: 17 studies, 5327 people, marrow iron as the reference. With inflammation: ferritin under 100 alone 0.38 and 0.88; adding TSAT under 20% 0.91 and 0.70 (2 studies, 67 people).</p>'}
+var B12F={normal:['Both reactions run. MMA and homocysteine stay low.',0,0],b12:['B12 is the cofactor for both, so both markers rise. Only B12 deficiency raises MMA.',1,1],fol:['Folate feeds only the homocysteine step. Homocysteine rises; MMA stays normal.',0,1]};
+function figB12(st){st=st||'normal';var B=B12F[st];
+  var g=box(8,16,120,40,'Methylmalonyl-CoA',B[1]?'fc':'ff')+box(232,16,100,40,'Succinyl-CoA','ff')+arrow(130,36,230,36,B[1]?1:2,B[1]?'sb':'sa')+'<text class="'+(B[1]?'tb':'ta')+'" x="180" y="28" text-anchor="middle">B12</text>'+
+   box(8,100,120,40,'Homocysteine',B[2]?'fc':'ff')+box(232,100,100,40,'Methionine','ff')+arrow(130,120,230,120,B[2]?1:2,B[2]?'sb':'sa')+'<text class="'+(B[2]?'tb':'ta')+'" x="180" y="112" text-anchor="middle">B12 + folate</text>'+
+   (B[1]?'<text class="tb" x="68" y="72" text-anchor="middle">builds up: MMA high</text>':'')+(B[2]?'<text class="tb" x="68" y="156" text-anchor="middle">builds up</text>':'');
+  return svg(g)+segBtns('b12',[['normal','Normal'],['b12','B12 low'],['fol','Folate low']],st)+'<p class="figcap">'+B[0]+'</p><p class="figsrc">Physiology; NICE NG239 for the use of MMA.</p>'}
+var LYS={none:['No hemolysis','normal','normal','normal','clear'],extra:['In the spleen (extravascular)','low','mildly high','high','clear; urobilinogen up'],intra:['In the vessels (intravascular)','very low or absent','very high','high','dark: hemoglobin; hemosiderin if chronic']};
+function figLysis(st){st=st||'none';var L=LYS[st];
+  var g='<rect x="8" y="50" width="324" height="44" rx="22" class="ff sl2"/><text class="tm" x="20" y="42">vessel</text>'+box(250,104,82,44,'Spleen',st==='extra'?'fc':'ff');
+  [40,90,140,190].forEach(function(x,i){var broken=st==='intra'&&i>1;g+=broken?'<path d="M'+x+' 64l8 6-6 8M'+(x+14)+' 66l-4 10 8 2" class="fn sb" stroke-width="2"/>':'<ellipse cx="'+(x+8)+'" cy="72" rx="12" ry="9" class="fb"/>'});
+  if(st==='extra')g+=arrow(230,86,262,104,3,'sb');if(st==='intra')g+='<text class="tb" x="96" y="114">free hemoglobin</text>';
+  return svg(g)+segBtns('lysis',[['none','None'],['extra','In the spleen'],['intra','In the vessels']],st)+'<div class="dp">'+dpHtml([['Haptoglobin','<p>'+L[1]+'</p>'],['LDH','<p>'+L[2]+'</p>'],['Indirect bilirubin','<p>'+L[3]+'</p>'],['Urine','<p>'+L[4]+'</p>']])+'</div><p class="figcap">'+L[0]+'. Haptoglobin mops up free hemoglobin; LDH spills from broken cells; bilirubin is what heme becomes.</p><p class="figsrc">AIHA consensus 2020, section 4.2. Schematic.</p>'}
+var DATF={igg:['IgG on the cell: warm autoimmune hemolysis. The spleen takes bites and the cell rounds up into a spherocyte.',1,0],c3:['C3 only: a cold IgM bound in the cool periphery, fixed complement and fell off when warmed. Cold agglutinin disease.',0,1],both:['IgG and C3: usually warm type; with a high cold agglutinin titre, a mixed type.',1,1],neg:['Nothing on the cell: look for a non-immune cause. 5 to 10% of autoimmune cases are still negative.',0,0]};
+function figDat(st){st=st||'igg';var D=DATF[st];
+  var g='<circle cx="170" cy="86" r="44" class="fb"/><circle cx="170" cy="86" r="16" class="fc dim"/>';
+  if(D[1])[[-58,-40],[58,-40],[0,-66]].forEach(function(p){var x=170+p[0],y=86+p[1];g+='<path d="M'+x+' '+(y+18)+'v-12l-8-10M'+x+' '+(y+6)+'l8-10" class="fn sa" stroke-width="3" stroke-linecap="round"/>'});
+  if(D[2])[[-50,30],[50,30],[0,58],[-28,-52]].forEach(function(p){g+='<circle cx="'+(170+p[0])+'" cy="'+(86+p[1])+'" r="6" class="fw"/>'});
+  g+='<text class="ta" x="20" y="24">Y = IgG</text><text x="20" y="42" class="tm">dot = C3</text>';
+  return svg(g)+segBtns('dat',[['igg','IgG'],['c3','C3 only'],['both','Both'],['neg','Negative']],st)+'<p class="figcap">'+D[0]+'</p><p class="figsrc">AIHA consensus 2020, section 4.1. Schematic.</p>'}
+function cellSvg(k){var c='<circle cx="22" cy="22" r="15" class="fb"/>';
+  if(k==='schisto')c='<path d="M8 28L20 8l16 8-6 16z" class="fb"/>';
+  else if(k==='sphero')c='<circle cx="22" cy="22" r="11" class="fb"/>';
+  else if(k==='target')c+='<circle cx="22" cy="22" r="9" class="fc"/><circle cx="22" cy="22" r="4" class="fb"/>';
+  else if(k==='tear')c='<path d="M22 4c2 10 12 16 12 24a12 12 0 0 1-24 0c0-8 10-14 12-24z" class="fb"/>';
+  else if(k==='bite')c+='<circle cx="36" cy="14" r="8" class="fc"/>';
+  else if(k==='hyperseg')c='<circle cx="22" cy="22" r="17" class="ff sm" stroke-width="1"/>'+[[14,16],[24,13],[30,22],[24,31],[14,29],[20,22]].map(function(p){return '<circle cx="'+p[0]+'" cy="'+p[1]+'" r="5" class="fa"/>'}).join('');
+  else if(k==='rouleaux')c=[8,14,20,26,32].map(function(x){return '<ellipse cx="'+x+'" cy="22" rx="5" ry="13" class="fb sl2" stroke-width="1"/>'}).join('');
+  else if(k==='agglut')c=[[14,14],[26,12],[32,24],[20,26],[12,30],[26,34]].map(function(p){return '<circle cx="'+p[0]+'" cy="'+p[1]+'" r="7" class="fb sl2" stroke-width="1"/>'}).join('');
+  else if(k==='blasts')c='<circle cx="22" cy="22" r="17" class="ff sm" stroke-width="1"/><circle cx="22" cy="22" r="13" class="fa"/>';
+  else c+='<circle cx="22" cy="22" r="6" class="fc dim"/>';
+  return '<svg viewBox="0 0 44 44" aria-hidden="true">'+c+'</svg>'}
+function figSmear(st){st=st||'schisto';
+  return '<div class="fig"><div class="smg">'+SMEAR.slice(0,8).map(function(c){return '<button type="button" class="smb" data-fig="smear" data-st="'+c[0]+'" aria-pressed="'+(c[0]===st)+'">'+cellSvg(c[0])+c[1]+'</button>'}).join('')+'</div></div><p class="figcap">'+SMEARWHY[st]+'</p><p class="figsrc">Standard morphology; drawings are schematic, not photographs.</p>'}
+var LAG={t0:['At the moment of bleeding','Whole blood is lost: fewer cells and less plasma in the same proportion. The hemoglobin has not moved.',70,'unchanged'],fl:['After IV fluids','Plasma is replaced, cells are not. The hemoglobin falls for the first time.',46,'lower'],d2:['24 to 72 hours','The body refills plasma from tissue fluid until volume is restored. This is the true depth of the loss.',36,'lowest']};
+function figLag(st){st=st||'t0';var L=LAG[st],tot=st==='t0'?96:130,rc=st==='t0'?L[2]*96/130*0.62+2:42;
+  var top=160-tot,g='<rect x="130" y="'+top+'" width="80" height="'+tot+'" rx="8" class="ff sm" stroke-width="1"/><rect x="130" y="'+(160-rc)+'" width="80" height="'+rc+'" rx="8" class="fb"/><line x1="124" y1="30" x2="216" y2="30" class="sm" stroke-width="1" stroke-dasharray="4 4"/><text class="tm" x="222" y="34">normal volume</text><text x="222" y="'+(160-rc+14)+'">red cells</text><text class="tm" x="222" y="'+(top+16)+'">plasma</text><text x="20" y="100">Hb</text><text class="tb" x="20" y="116">'+L[3]+'</text>';
+  return svg(g,170)+segBtns('lag',[['t0','At the bleed'],['fl','After fluids'],['d2','24 to 72 h']],st)+'<p class="figcap"><b>'+L[0]+'.</b> '+L[1]+'</p><p class="figsrc">Physiology; illustrative proportions.</p>'}
+var FIG={ways:{title:'Three ways to be anemic',f:figWays},retic:{title:'Correcting the reticulocyte count',f:figRetic},iron:{title:'Iron traffic and hepcidin',f:figIron},ferr:{title:'What each ferritin cut-off catches',f:figFerr},b12:{title:'B12, folate and the two markers',f:figB12},lysis:{title:'Where the red cell dies',f:figLysis},dat:{title:'What the DAT sees',f:figDat},smear:{title:'Reading the smear',f:figSmear},lag:{title:'Why hemoglobin lags a bleed',f:figLag}};
+
+/* ---------- Learn ---------- */
+var LEARN=[['l-ways','Three ways to be anemic','Every anemia is one or more of these. The reticulocyte count tells you which side you are on.',['ways']],['l-retic','Is the marrow answering?','A raw percentage flatters the marrow twice. Correct it before you trust it.',['retic']],['l-iron','Iron: store, supply line and hepcidin','Ferritin reports the store. Saturation reports the supply line. Hepcidin decides whether the two are connected.',['iron','ferr']],['l-b12','Big cells: B12, folate and the rest','Two vitamins, two markers, one of them specific.',['b12']],['l-lysis','Destruction: the panel and the DAT','Three labs say that cells are breaking. The DAT says whether the immune system is doing it.',['lysis','dat']],['l-smear','Reading the smear','Eight shapes that change the differential. Tap each.',['smear']],['l-lag','Anemia made in hospital','Blood draws, fluids and bleeds that the first hemoglobin misses.',['lag']]];
+var TRIALS=[
+ {n:'ASH 2026 evidence review (diagnostic accuracy)',q:'Which ferritin cut-off best finds iron deficiency?',d:'17 cross-sectional studies, 5327 people; marrow iron stain as the reference.',r:'15 or below: sensitivity 0.41, specificity 0.99. 30 or below: 0.67, 0.96. 50 or below: 0.89, 0.86.',ch:'ASH moved the adult cut-off from 15 to 30, and to 50 when signs, symptoms or a risk factor are present. Certainty low.',c:'Powers et al. Blood Adv 2026;10:7353. doi 10.1182/bloodadvances.2025015950'},
+ {n:'Guyatt 1992',q:'Which lab test best diagnoses iron-deficiency anemia?',d:'Systematic overview of 55 studies with marrow histology.',r:'Ferritin was the most powerful test (area under the curve 0.95); it performed differently with inflammatory, liver or malignant disease.',ch:'Made ferritin the first test, read on a sliding scale, not a single cut-off.',c:'J Gen Intern Med 1992;7:145. doi 10.1007/BF02598003'},
+ {n:'Marchand 1980',f:'100 patients, retrospective',q:'Does a low haptoglobin predict hemolysis?',d:'100 inpatients with mixed conditions, one centre, retrospective.',r:'Haptoglobin 25 mg/dL or below: sensitivity 83%, specificity 96%.',ch:'The source of the 25 mg/dL cut-off still in use.',c:'JAMA 1980;243:1909.'},
+ {n:'Stoffel 2017',f:'absorption, not hemoglobin',q:'Daily or alternate-day oral iron?',d:'Two randomized isotope studies in 40 and 20 iron-depleted women who were not anemic.',r:'Alternate days absorbed 21.8% of each dose against 16.3% daily (p = 0.0013). Twice-daily split dosing raised hepcidin and absorbed no more.',ch:'Supports once daily at most, or every other day.',c:'Lancet Haematol 2017;4:e524. doi 10.1016/S2352-3026(17)30182-5'},
+ {n:'PHOSPHARE-IDA (Wolf 2020)',f:'biochemical endpoint',q:'Which IV iron causes low phosphate?',d:'Two identical open-label randomized trials, 245 patients with iron-deficiency anemia and normal kidneys.',r:'Phosphate under 2.0 mg/dL within 35 days: 75.0% and 73.7% after ferric carboxymaltose; 7.9% and 8.1% after ferric derisomaltose.',ch:'Check phosphate around repeat carboxymaltose; the label now carries a warning.',c:'JAMA 2020;323:432. doi 10.1001/jama.2019.22450'},
+ {n:'PIVOTAL 2019',q:'In hemodialysis, proactive high-dose or reactive low-dose IV iron?',d:'Open-label randomized trial, 2141 adults in their first year of hemodialysis, median 2.1 years.',r:'Death, MI, stroke or heart-failure admission: 29.3% against 32.3% (HR 0.85, 0.73 to 1.00). Less erythropoiesis-stimulating agent. Infection rates the same.',ch:'Behind KDIGO 2026: proactive iron, withheld at ferritin over 700 or TSAT 40% or more.',c:'N Engl J Med 2019;380:447. doi 10.1056/NEJMoa1810742'},
+ {n:'Thavendiranathan 2005',f:'cohort, one hospital',q:'Do blood tests cause anemia on the wards?',d:'Retrospective cohort, 404 general medicine admissions.',r:'Mean 74.6 mL drawn; hemoglobin fell a mean 0.79 g/dL. Each 100 mL drawn went with a fall of 0.7 g/dL.',ch:'A number for how much of a drop phlebotomy can explain.',c:'J Gen Intern Med 2005;20:520. doi 10.1111/j.1525-1497.2005.0094.x'},
+ {n:'STRATUS 2023',q:'Do small-volume tubes reduce transfusion in ICU?',d:'Stepped-wedge cluster trial, 25 ICUs; 21,201 patients in the primary analysis.',r:'Red cell units per patient: RR 0.91 (0.79 to 1.05), not significant. Secondary analysis of 27,411 patients: RR 0.88 (0.77 to 1.00), 9.84 fewer units per 100 patients. Too-small samples were rare.',ch:'Small tubes are safe for the lab and may save blood.',c:'JAMA 2023;330:1872. doi 10.1001/jama.2023.20820'}];
+function renderLearn(){
+  var h=LEARN.map(function(l){return '<h2 class="lh" id="'+l[0]+'">'+l[1]+'</h2><p class="lead">'+l[2]+'</p>'+l[3].map(function(f){return '<div class="card"><p class="label">'+FIG[f].title+'</p><div data-host="'+f+'">'+FIG[f].f()+'</div></div>'}).join('')+'<div data-deeper="'+l[0]+'"></div>'}).join('');
+  h+='<h2 class="lh" id="l-trials">Studies behind the numbers</h2><div class="card">'+TRIALS.map(function(t){return '<div class="trial"><p><b>'+t.n+'</b>'+(t.f?'<span class="flag">'+t.f+'</span>':'')+'</p><p><span class="k">Question</span>'+t.q+'</p><p><span class="k">Design</span>'+t.d+'</p><p><span class="k">Result</span>'+t.r+'</p><p><span class="k">What it changed</span>'+t.ch+'</p><p class="note">'+t.c+'</p></div>'}).join('')+'</div>';
+  $('learn').innerHTML=h;
+  if(window.DEEPER)document.querySelectorAll('[data-deeper]').forEach(function(d){var rows=window.DEEPER[d.dataset.deeper];if(rows)d.innerHTML='<details class="deeper"><summary>Go deeper: mechanism and rationale</summary><div class="dpx">'+rows.map(function(r){return '<div><span class="dl">'+r[0]+'</span><p>'+r[1]+'</p></div>'}).join('')+'</div></details>'});
+}
+
+/* ---------- Practice ---------- */
+var CASES=[
+ {t:'Tired at 34',s:'Woman with heavy periods. Hb 8.9, MCV 72, reticulocytes 1.0%, ferritin 9.',set:{sex:'f',hb:8.9,hct:28,mcv:72,retic:1.0,ferr:9,mens:1,loss:0},q:'First step?',o:['Hemoglobin electrophoresis','Oral iron once daily or every other day, and address the bleeding','Bone marrow biopsy','Transfuse two units'],a:1,e:'Ferritin 9 is iron deficiency without another test. Treat the iron and the source.'},
+ {t:'Pneumonia on day 3',s:'Man, 71, CKD with eGFR 38. Hb 9.4, MCV 86, reticulocytes 1.8%, hematocrit 28, ferritin 240, iron 30, TIBC 250.',set:{sex:'m',hb:9.4,hct:28,mcv:86,retic:1.8,ferr:240,iron:30,tibc:250,egfr:38,ckd:1,infl:1},q:'How do you read the iron studies?',o:['Ferritin 240 excludes iron deficiency','Iron-restricted; deficiency possible. Recheck after the infection, no IV iron now','Start an erythropoiesis-stimulating agent','Iron overload'],a:1,e:'Inflammation raises ferritin and lowers saturation. TSAT 12% keeps deficiency possible; IV iron waits for the infection to clear.'},
+ {t:'An incidental count',s:'Man, 28, well. Hb 11.8, MCV 62, RBC 5.6, ferritin 85.',set:{sex:'m',hb:11.8,mcv:62,rbc:5.6,ferr:85},q:'Next test?',o:['Oral iron trial','Hemoglobin electrophoresis','Colonoscopy','B12 level'],a:1,e:'Many small cells with normal ferritin: Mentzer index 11.1 points to thalassemia trait. Iron would not help.'},
+ {t:'Numb feet',s:'Woman, 66. Hb 7.2, MCV 118, reticulocytes 0.8%, B12 140. Unsteady, with numb feet.',set:{sex:'f',hb:7.2,hct:22,mcv:118,retic:0.8,b12:140,neuro:1},q:'What now?',o:['Send MMA and wait','Folic acid alone','B12 by injection today','Transfuse to 10'],a:2,e:'B12 under 180 is confirmed deficiency, and neurologic signs mean replacing now.'},
+ {t:'"The retics are up"',s:'Man, 58, jaundiced. Hb 6.9, hematocrit 21, MCV 104, reticulocytes 6%, haptoglobin under 10, LDH high, DAT positive for IgG.',set:{sex:'m',hb:6.9,hct:21,mcv:104,retic:6,hapto:5,ldh:'h',bili:'h',dat:'igg'},q:'Which statement is right?',o:['6% shows a brisk marrow response','The index is 1.4: the response is inadequate, and this is warm autoimmune hemolysis','DAT IgG means cold agglutinin disease','Hold transfusion until a compatible unit is found'],a:1,e:'Corrected 2.8%, index 1.4. Hemolysis with a weak marrow response is dangerous. Prednisone 1 mg/kg, hematology, and blood if critical.'},
+ {t:'Confused, platelets 22',s:'Woman, 45. Hb 8.1, platelets 22, creatinine 1.9. Smear: schistocytes.',set:{sex:'f',hb:8.1,plt:22,sm:{schisto:1}},q:'What must not wait?',o:['Platelet transfusion','Hematology, and ADAMTS13 before plasma','Iron studies','DAT result'],a:1,e:'Schistocytes with low platelets are TTP until shown otherwise. Platelets are avoided unless bleeding is life-threatening.'},
+ {t:'ICU day 9',s:'Hemoglobin 11.6 on admission, 9.8 today. Stable, no bleeding seen. About 250 mL drawn for labs.',set:{sex:'m',hb:9.8,hb0:11.6,ml:250},q:'Best reading?',o:['Occult GI bleed: scope today','Blood draws explain about 1.75 of the 1.8 g/dL','Hemolysis until proven otherwise','Marrow failure'],a:1,e:'0.7 g/dL per 100 mL drawn. Fewer and smaller draws; no bleed hunt without another clue.'},
+ {t:'Back pain after a cath',s:'Day 1 after femoral access, on heparin. Hemoglobin 13.1 to 10.4. Heart rate 112.',set:{sex:'m',hb:10.4,hb0:13.1,bleed:1},q:'What first?',o:['Iron studies and reticulocytes','Look for a retroperitoneal bleed; hold heparin; type and screen','Recheck in the morning','Folate'],a:1,e:'A fall of 2 g/dL or more with tachycardia is bleeding until shown otherwise, and the number will fall further as plasma refills.'},
+ {t:'Smear drill 1',pic:'sphero',s:'Small, dense red cells with no central pallor.',set:null,q:'What are they, and what do they suggest?',o:['Schistocytes: microangiopathy','Spherocytes: warm autoimmune hemolysis or hereditary spherocytosis','Target cells: thalassemia','Teardrops: marrow fibrosis'],a:1,e:SMEARWHY.sphero},
+ {t:'Smear drill 2',pic:'hyperseg',s:'A neutrophil with six nuclear lobes.',set:null,q:'What does it point to?',o:['Iron deficiency','B12 or folate deficiency','Sepsis','G6PD deficiency'],a:1,e:SMEARWHY.hyperseg},
+ {t:'Smear drill 3',pic:'bite',s:'Red cells with a semicircular piece missing, after starting dapsone.',set:null,q:'Likely cause?',o:['Cold agglutinin disease','G6PD deficiency with an oxidant drug','Myeloma','Thalassemia trait'],a:1,e:SMEARWHY.bite}];
+var ci=0,picked2=null;
+var IDS=['hb','hct','mcv','retic','rbc','plt','egfr','ferr','iron','tibc','tsat','b12','hb0','ml','hapto','wt'],SELS=['mma','fol','ldh','bili','dat'],CHKS=['infl','ckd','hd','hfx','preg','tx','bleed','neuro','cyto','n2o','intol','malabs','loss','mens','urine','newdrug','valve','liver'];
+function caseState(c){var s={sm:{}};IDS.forEach(function(k){s[k]=c.set[k]!=null?c.set[k]:null});SELS.forEach(function(k){s[k]=c.set[k]||''});CHKS.forEach(function(k){s[k==='hfx'?'hf':k]=!!c.set[k]});s.sex=c.set.sex||'m';s.prod='fcm';if(c.set.sm)s.sm=c.set.sm;return s}
+function caseRead(c){var s=caseState(c),R=compute(s),p=[];
+  if(R.ttp)p.push('TTP guard');if(R.bleed)p.push('bleeding guard');
+  if(R.rpi!=null)p.push('reticulocyte index '+r1(R.rpi));if(R.iron)p.push(R.iron.head.toLowerCase());if(R.mentzer!=null)p.push('Mentzer '+r1(R.mentzer));
+  if(R.b12)p.push(R.b12==='low'?'B12 deficiency confirmed':R.b12==='ind'?'B12 indeterminate':'B12 adequate');if(R.lysis)p.push('hemolysis '+R.lysis);
+  if(R.drop!=null&&R.exp!=null)p.push('draws explain '+r1(R.exp)+' of '+r1(R.drop)+' g/dL');
+  return p.join('; ')}
+function renderPractice(){
+  var c=CASES[ci];
+  var h='<div class="fdots">'+CASES.map(function(_,i){return '<span class="fd'+(i<=ci?' on':'')+'"></span>'}).join('')+'</div><div class="card case" id="practice-case"><p class="label">Case '+(ci+1)+' of '+CASES.length+'</p><h2>'+c.t+'</h2>'+(c.pic?'<div class="fig" style="max-width:120px">'+cellSvg(c.pic)+'</div>':'')+'<p>'+c.s+'</p><p class="head" style="font-size:16px">'+c.q+'</p><div class="popts">'+
+   c.o.map(function(o,i){var cls=picked2==null?'':(i===c.a?' right':i===picked2?' wrong':'');return '<button type="button" class="popt'+cls+'" data-opt="'+i+'"'+(picked2!=null?' disabled':'')+'>'+o+'</button>'}).join('')+'</div>';
+  if(picked2!=null){
+    h+='<div class="ansb"><p><b>'+(picked2===c.a?'Right.':'Not quite.')+'</b> '+c.e+'</p>'+(c.set?'<p class="note">Tool reads this as: '+caseRead(c)+'.</p>':'')+'<div class="row">'+(c.set?'<button type="button" class="btn ghost" id="pload">Load into the tool</button>':'')+(ci<CASES.length-1?'<button type="button" class="btn" id="pnext">Next case</button>':'<button type="button" class="btn" id="pagain">Start over</button>')+'</div></div>';
+  }
+  $('practice').innerHTML=h+'</div>';
+}
+function loadCase(c){
+  IDS.forEach(function(k){$(k).value=c.set[k]!=null?c.set[k]:''});SELS.forEach(function(k){$(k).value=c.set[k]||''});CHKS.forEach(function(k){$(k).checked=!!c.set[k]});
+  $('sex').value=c.set.sex||'m';sm={};if(c.set.sm)for(var k in c.set.sm)sm[k]=true;renderSmear();renderWork();showTab('workup');
+}
+
+/* ---------- smear ticks, sheet, tabs ---------- */
+function renderSmear(){$('smg').innerHTML=SMEAR.map(function(c){return '<button type="button" class="smb" data-sm="'+c[0]+'" aria-pressed="'+(!!sm[c[0]])+'">'+cellSvg(c[0])+c[1]+'</button>'}).join('')}
+var lastFocus=null;
+function openSheet(id){var F=FIG[id];lastFocus=document.activeElement;$('sheet-t').textContent=F.title;$('sheet-b').innerHTML='<div data-host="'+id+'">'+F.f()+'</div>';$('sheet').hidden=false;$('scrim').hidden=false;$('sheet-x').focus()}
+function closeSheet(){$('sheet').hidden=true;$('scrim').hidden=true;if(lastFocus)try{lastFocus.focus()}catch(e){}}
+function showTab(k){document.querySelectorAll('.tab').forEach(function(t){t.setAttribute('aria-selected',t.id==='t-'+k)});document.querySelectorAll('.panel').forEach(function(p){p.classList.toggle('on',p.id==='p-'+k)});window.scrollTo(0,0)}
+document.addEventListener('input',function(e){if(e.target.closest('.panel')&&!e.target.closest('#p-learn'))renderWork()});
+document.addEventListener('change',function(e){if(e.target.closest('.panel'))renderWork()});
+document.addEventListener('click',function(e){
+  var b=e.target.closest('button,a');if(!b)return;
+  if(b.classList.contains('tab')){showTab(b.id.slice(2));return}
+  if(b.dataset.go){showTab(b.dataset.go);return}
+  if(b.dataset.open){openSheet(b.dataset.open);return}
+  if(b.dataset.fig){var host=b.closest('[data-host]');if(host){host.innerHTML=FIG[b.dataset.fig].f(b.dataset.st);var nb=host.querySelector('[data-st="'+b.dataset.st+'"]');if(nb)nb.focus()}return}
+  if(b.dataset.cell){var ij=b.dataset.cell.split(',');$('mapnote').textContent=CELL[ij[0]][ij[1]]+'. '+CELLWHY[ij[0]][ij[1]];return}
+  if(b.dataset.sm){sm[b.dataset.sm]=!sm[b.dataset.sm];renderSmear();$('smnote').textContent=sm[b.dataset.sm]?SMEARWHY[b.dataset.sm]:'Ask for a smear early. It is the only test here that can find microangiopathy or blasts.';renderWork();var n2=document.querySelector('[data-sm="'+b.dataset.sm+'"]');if(n2)n2.focus();return}
+  if(b.dataset.opt){picked2=+b.dataset.opt;renderPractice();return}
+  if(b.id==='pnext'){ci++;picked2=null;renderPractice();$('practice-case').scrollIntoView();return}
+  if(b.id==='pagain'){ci=0;picked2=null;renderPractice();return}
+  if(b.id==='pload'){loadCase(CASES[ci]);return}
+  if(b.id==='sheet-x'){closeSheet();return}
+});
+$('scrim').addEventListener('click',closeSheet);
+document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!$('sheet').hidden)closeSheet()});
+window.__anemia={compute:compute,narrow:narrow,caseState:caseState,CASES:CASES};
+renderSmear();renderLearn();renderPractice();renderWork();
+})();
+</script>
+
+</body>
+</html>
