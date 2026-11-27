@@ -340,7 +340,7 @@ footer strong{color:var(--ink)}
 
 <section class="view" id="v-learn">
   <div class="lpills" id="lpills"></div>
-  <div class="card chap" id="learn-map" data-pill="Two diseases"><p class="label">Start here</p><h2>Two ways the small airways narrow</h2><div class="vk-plate"><img src="/media/obstructive/airways.webp" width="984" height="409" alt="Three cross-sections of a small airway. Normal: thin wall, wide open lumen. Asthma: thick inflamed wall, tight muscle and folded lining, narrow lumen with mucus. COPD: thickened wall and mucus in a narrowed lumen, with the surrounding air sacs enlarged and broken down." loading="lazy"><span class="vk-credit">Created with BioRender.com</span></div><p class="lead">Asthma: muscle spasm, swelling and mucus, largely reversible with bronchodilators and steroids. COPD: fixed narrowing and loss of the air sacs that hold small airways open, so they collapse when breathing out. Both trap air.</p></div>
+  <div class="card chap" id="learn-map" data-pill="Two diseases"><p class="label">Start here</p><h2>Two ways the small airways narrow</h2><div class="vk-plate"><img src="/media/obstructive/airways.webp" width="984" height="409" alt="Three cross-sections of a small airway. Normal: thin wall, wide open lumen. Asthma: thick inflamed wall, tight muscle and folded lining, narrow lumen with mucus. COPD: thickened wall and mucus in a narrowed lumen, with the surrounding air sacs enlarged and broken down." loading="lazy"><span class="vk-credit">Created with BioRender.com</span></div><p class="lead">Asthma: muscle spasm, swelling and mucus, largely reversible with bronchodilators and steroids. COPD: largely fixed narrowing, often with loss of the air sacs that hold small airways open, so they collapse when breathing out. Both trap air.</p></div>
   <div class="card chap" id="learn-trap" data-pill="Air trapping"><p class="label">1 · Dynamic hyperinflation</p><h2>The lung cannot empty before the next breath</h2><p class="lead">Expiratory flow over two breaths. Switch the states.</p><div data-figure="flow"></div></div>
   <div class="card chap" id="learn-co2" data-pill="Normal CO₂ warning"><p class="label">2 · The blood gas in asthma</p><h2>A normal PaCO₂ is a warning sign</h2><p class="lead">PaCO₂ over the course of a severe attack.</p><div data-figure="co2"></div></div>
   <div class="card chap" id="learn-o2" data-pill="Oxygen in COPD"><p class="label">3 · Oxygen in COPD</p><h2>Why too much oxygen raises CO₂</h2><p class="lead">Three mechanisms; tap each to see its share.</p><div data-figure="o2"></div></div>
@@ -417,7 +417,7 @@ function asthmaSev(i) {
   if (sg.includes('sent')) why.sev.push('cannot finish a sentence');
   const severeish = why.sev.length || why.life.length;
   // "normal" PaCO2 is life-threatening in a patient with severe asthma
-  if (has(i.paco2) && i.paco2 >= s.co2Lo && i.paco2 <= s.co2Hi && severeish) why.life.push(`PaCO₂ ${i.paco2}, "normal" while working this hard`);
+  if (i.where !== 'vent' && has(i.paco2) && i.paco2 >= s.co2Lo && i.paco2 <= s.co2Hi && severeish) why.life.push(`PaCO₂ ${i.paco2}, "normal" while working this hard`);
   if (has(i.pef) && i.pef > s.pefMod && i.pef <= 75) why.mod.push(`peak flow ${i.pef}%`);
   const lvl = why.near.length ? 'near' : why.life.length ? 'life' : why.sev.length ? 'sev' : why.mod.length ? 'mod' : null;
   return {lvl, why, normCo2: why.life.some(x => x.includes('"normal"'))};
@@ -451,7 +451,7 @@ function engine(i) {
 
   /* guards first */
   if (hypoVent) guards.push({id: 'disconnect', alarm: true, label: 'Low blood pressure on the ventilator', head: 'Disconnect the ventilator for 30 to 60 seconds and let the chest empty.',
-    body: 'If the pressure comes up, trapped gas was the cause: restart at a lower rate and a longer expiratory time. Give fluid. If it does not come up, look for tension pneumothorax (one side silent, no sliding) and decompress.' + tg('Reviews (Gayen 2024); expert practice'),
+    body: 'If the pressure comes up, trapped gas was the likely cause: restart at a lower rate and a longer expiratory time. Give fluid. If it does not come up, look for tension pneumothorax (one side silent, no sliding) and decompress.' + tg('Reviews (Gayen 2024); expert practice'),
     why: 'Trapped gas raises the pressure in the chest, which holds back blood returning to the heart.', chip: ['ipeep', 'trap']});
   if (sg.includes('ana')) guards.push({id: 'anaph', alarm: true, label: 'Could this be anaphylaxis?', head: 'Wheeze with an allergen, hives or swelling: intramuscular epinephrine first, then bronchodilators.',
     body: L('/rrt/#anaphylaxis', 'Anaphylaxis code card') + tg('GINA 2026; AHA 2025')});
@@ -469,7 +469,7 @@ function engine(i) {
           : sv.lvl === 'sev' ? 'Each of these means the airways are narrow enough that breathing is hard work; the next hour decides which way it goes.' : null,
         list: i.where === 'vent' ? [] : icu ? ['Call the ICU team now; give the full ladder below at once.' + tg('SIGN 158'), 'Get a blood gas if you have not.' + tg('SIGN 158')] : sv.lvl === 'sev' ? ['Full ladder below; recheck within 1 hour.' + tg('SIGN 158; expert practice')] : [],
         more: 'Grading from the SIGN 158 table: any one feature puts the patient in that level. PaO₂ under 60 mmHg (8 kPa) also counts as life-threatening. A "normal" PaCO₂ (35 to 45 mmHg) counts as life-threatening once the patient has any severe feature.',
-        tiers: ['SIGN 158'], chips: sv.normCo2 || (sv.lvl === 'near' && has(i.paco2) && i.paco2 > N.sev.co2Hi) ? [['co2', sv.lvl === 'near' ? 'fail' : 'tire', 'Why a normal CO₂ is a warning']] : []});
+        tiers: ['SIGN 158'], chips: sv.normCo2 || (sv.lvl === 'near' && has(i.paco2) && i.paco2 > N.sev.co2Hi) ? [['co2', sv.lvl === 'near' ? 'fail' : 'tire', sv.normCo2 ? 'Why a normal CO₂ is a warning' : 'Why a rising CO₂ is a warning']] : []});
     } else cards.push({id: 'sev', label: 'How bad is it', head: has(i.pef) && i.pef > 75 ? `Peak flow ${i.pef}%: above the acute grading bands` : 'Enter peak flow, rate, pulse, saturation or a gas', empty: true, sub: 'Severity is graded from the first feature that fits (SIGN 158: moderate is peak flow over 50 to 75%).'});
   } else if (i.where === 'vent') {
     cards.push({id: 'sev', label: 'Blood gas', head: has(i.ph) ? `pH ${i.ph}${has(i.paco2) ? ', PaCO₂ ' + i.paco2 : ''}: see the ventilator card` : 'Enter the gas for the ventilator card', empty: !has(i.ph), sub: 'On the ventilator a high CO₂ is accepted; the pH floor is on the ventilator card below.'});
@@ -496,14 +496,17 @@ function engine(i) {
   const [lo, hi] = o2Target(i);
   const oc = {id: 'oxygen', label: 'Oxygen', head: `Target SpO₂ ${lo} to ${hi}%`};
   const normCo2Copd = i.dx === 'copd' && has(i.paco2) && i.paco2 <= N.copd.co2;
-  if (has(i.spo2) && i.o2 === 'o2' && i.spo2 > hi && !(normCo2Copd && i.spo2 <= 98)) {
+  if (normCo2Copd && has(i.spo2) && i.o2 === 'o2' && i.spo2 > 98) {
+    oc.head = `Turn the oxygen down: SpO₂ ${i.spo2}%, to 94 to 98% at most`; oc.cls = 'bad';
+    oc.why = 'Above 98%, more oxygen adds nothing; in COPD it can still raise CO₂, so repeat the gas.';
+  } else if (has(i.spo2) && i.o2 === 'o2' && i.spo2 > hi && !normCo2Copd) {
     oc.head = `Turn the oxygen down: SpO₂ ${i.spo2}%, target ${lo} to ${hi}%`; oc.cls = 'bad';
     oc.why = i.dx === 'copd' ? 'Extra oxygen raises CO₂ in COPD, mostly by undoing the lung\'s own matching of blood flow to air.' : 'Above the target, more oxygen adds no benefit and can hide a worsening patient.';
     if (i.dx === 'copd') oc.chips = [['o2', 'vq', 'Why oxygen raises CO₂']];
     if (i.dx === 'copd') guards.push({id: 'o2down', label: 'Too much oxygen in COPD', head: `SpO₂ ${i.spo2}% on oxygen: bring it to 88 to 92% now, and repeat the gas in 30 to 60 minutes.`, body: tg('BTS 2017 A; Austin 2010')});
   } else if (has(i.spo2) && i.spo2 < lo) { oc.head = `Raise the oxygen: SpO₂ ${i.spo2}%, target ${lo} to ${hi}%`; oc.cls = 'bad'; oc.why = 'Hypoxemia is what kills first; give enough oxygen to reach the target.'; }
   oc.list = i.dx === 'copd' ? ['Nasal cannula or a Venturi mask (24 or 28%) for a predictable dose; nebulisers driven by air, not oxygen.' + tg('GOLD 2026; Austin 2010 protocol')] : ['Oxygen-driven nebulisers are fine in asthma.' + tg('SIGN 158')];
-  if (normCo2Copd) oc.sub = `PaCO₂ ${i.paco2} is not raised: BTS allows 94 to 98% unless the patient has needed NIV or ventilation for high CO₂ before; repeat the gas if oxygen is raised.`;
+  if (normCo2Copd) oc.sub = (oc.sub || '') + `PaCO₂ ${i.paco2} is not raised: BTS allows 94 to 98% unless the patient has needed NIV or ventilation for high CO₂ before; repeat the gas if oxygen is raised.`;
   oc.more = i.dx === 'copd' ? 'The 88 to 92% target is from BTS 2017 (grade A), as in the oxygen tool, which also follows BTS in allowing 94 to 98% once PaCO₂ is known to be normal. Austin 2010 found lower mortality with titrated oxygen before hospital (see Learn).' : 'GINA 2026: 92 to 95%. SIGN 158 uses 94 to 98%, NAEPP over 90% (over 95% in pregnancy or heart disease). The oxygen tool uses 92 to 96% for most adults; GINA\'s range is used here for asthma.';
   oc.tiers = [i.dx === 'copd' ? 'BTS 2017 · A' : 'GINA 2026'];
   cards.push(oc);
@@ -632,7 +635,7 @@ function figO2(k) {
 const IPS = {
   norm: {n: 'Normal', line: 'Pressure in the chest falls back to the set PEEP each breath; blood returns to the right heart freely.', p: 0},
   trap: {n: 'Trapped gas', line: 'Intrinsic PEEP keeps the pressure in the chest high all the time. The gradient that drives blood back to the heart shrinks, so filling, output and blood pressure fall.', p: 1},
-  off: {n: 'Disconnected', line: 'Off the ventilator for 30 to 60 seconds the chest empties, pressure falls and venous return recovers: if the blood pressure rises, trapped gas was the cause.', p: 0}
+  off: {n: 'Disconnected', line: 'Off the ventilator for 30 to 60 seconds the chest empties, pressure falls and venous return recovers: if the blood pressure rises, trapped gas was the likely cause.', p: 0}
 };
 function figIp(k) {
   const s = IPS[k], chestP = s.p ? 70 : 28, ret = s.p ? 1.6 : 5;
@@ -832,7 +835,7 @@ hashTab();
   "learn-trap": {"m": "Narrowed airways slow expiratory flow, so emptying takes longer. When the next breath starts before emptying is complete, gas is left behind and end-expiratory lung volume and pressure climb with each breath until a new, higher balance is reached.", "w": "Expiratory time and minute ventilation set how much gas is trapped, which is why a slow rate and small breaths come before any other ventilator change.", "t": "Raising the rate to correct a high CO2: it shortens the time to breathe out, traps more gas, and can drop the blood pressure."},
   "learn-co2": {"m": "In a severe attack the drive to breathe is high, so PaCO2 is usually low. As the respiratory muscles tire, ventilation falls and PaCO2 rises back through the normal range before it becomes high.", "w": "A normal PaCO2 in a patient working hard to breathe is treated as life-threatening because it marks the point where the patient is losing ground.", "t": "Reading a PaCO2 of 40 as reassuring in a patient who cannot finish a sentence."},
   "learn-o2": {"m": "Hypoxic pulmonary vasoconstriction normally diverts blood away from poorly ventilated alveoli. Oxygen releases it, so more blood passes alveoli that clear little CO2 and dead space rises; oxygenated hemoglobin also carries less CO2 (the Haldane effect). The fall in breathing drive explains only a small part.", "w": "This is why patients who retain CO2 are given a target of 88 to 92% rather than as much oxygen as possible, and why a blood gas is repeated after oxygen is changed.", "t": "Withholding oxygen from a hypoxemic COPD patient for fear of CO2: the answer is a target range, not less than the target."},
-  "learn-ipeep": {"m": "Blood returns to the right atrium down a pressure gradient from the veins. Trapped gas keeps pressure in the chest high throughout the breath, which raises right atrial pressure, shrinks that gradient and lowers filling and output.", "w": "Disconnecting the ventilator lets the chest empty; if the blood pressure recovers within a minute, trapped gas was the cause, and changing the settings comes before reaching for a pressor.", "t": "Starting or raising a pressor for hypotension right after intubation without first letting the chest empty."},
+  "learn-ipeep": {"m": "Blood returns to the right atrium down a pressure gradient from the veins. Trapped gas keeps pressure in the chest high throughout the breath, which raises right atrial pressure, shrinks that gradient and lowers filling and output.", "w": "Disconnecting the ventilator lets the chest empty; if the blood pressure recovers within a minute, trapped gas was the likely cause, and changing the settings comes before reaching for a pressor.", "t": "Starting or raising a pressor for hypotension right after intubation without first letting the chest empty."},
   "narrow": {"m": "Peak pressure includes the push needed to move gas through narrowed airways; plateau, measured with flow stopped, reflects the lung and chest wall. The gap between them separates airway problems from stiff lungs or pleural air.", "w": "Sorting airway from lung causes in a minute tells you whether to suction and give bronchodilators or to look for a pneumothorax, consolidation or edema.", "t": "Assuming every rise in peak pressure is bronchospasm: a plug, a bitten tube or a pneumothorax can look the same until the plateau is measured."},
   "trials": {"m": "The drug and oxygen steps rest on randomised trials; the ventilator steps in asthma rest on physiology studies and case series.", "w": "Knowing which is which tells you where the advice is firm and where it is judgment.", "t": "Treating 3Mg as proof that magnesium does not work: it excluded the sickest patients, and a meta-analysis found fewer admissions with IV magnesium."}
 }
