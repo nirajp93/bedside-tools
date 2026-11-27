@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Getting off the ventilator · bedside.tools</title>
+<meta name="description" content="Liberation from mechanical ventilation after the first breathing trial: why a trial failed and what fixes it, who is ready to extubate and to what support, when to reintubate, and tracheostomy timing, care and emergencies.">
+<script src="/theme.js"></script>
+<style>
+:root{--bg:#FBFBFA;--card:#FFFFFF;--ink:#111113;--muted:#55555D;--line:#ECECEE;--accent:#2B4BDB;--warn:#9A3B00;--warnbg:#FFF6EC}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5}
+.mono{font-family:var(--mono)}
+.wrap{max-width:720px;margin:0 auto;padding:20px 16px 48px}
+a{color:var(--accent)}
+.back{font-size:14px;text-decoration:none;display:inline-block;min-height:44px;line-height:44px}
+h1{font-size:26px;margin:4px 0 4px;letter-spacing:-.01em}
+.purpose{color:var(--muted);margin:0 0 20px}
+.tabs{display:flex;gap:6px;margin-bottom:16px}
+.tab{flex:1;min-width:0;min-height:44px;border:1px solid var(--line);background:var(--card);border-radius:14px;padding:0 4px;font:inherit;font-size:14px;line-height:1.15;font-weight:600;color:var(--muted);cursor:pointer}
+.tab[aria-selected="true"]{border-color:var(--accent);color:var(--accent)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
+.label{font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.field{display:flex;flex-direction:column;justify-content:flex-end}
+.field label{display:block;font-size:13px;color:var(--muted);margin-bottom:4px}
+.field input,.field select{width:100%;min-height:44px;border:1px solid var(--line);border-radius:10px;padding:8px 10px;font:inherit;font-family:var(--mono);background:var(--card);color:var(--ink)}
+.field input:focus,.field select:focus,.tab:focus-visible,.chk:focus-within,button:focus-visible,summary:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.checks{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.chk{display:flex;align-items:center;gap:10px;min-height:44px;border:1px solid var(--line);border-radius:10px;padding:6px 10px;font-size:14px;cursor:pointer}
+.chk input{width:20px;height:20px;accent-color:var(--accent);flex:none}
+.card h2{font-size:18px;margin:0 0 2px}
+.sub{font-size:14px;color:var(--muted);margin:0}
+.card ul{margin:6px 0 0;padding-left:20px}
+.card li{margin-bottom:4px}
+.guard{border-left:3px solid var(--warn);background:var(--warnbg);padding:8px 10px;border-radius:0 10px 10px 0;margin-top:8px;font-size:14.5px}
+.tier{display:inline-block;font-family:var(--mono);font-size:11px;border:1px solid var(--line);border-radius:999px;padding:2px 8px;color:var(--muted);margin:6px 6px 0 0}
+details{margin-top:10px;border-top:1px solid var(--line);padding-top:8px}
+.whyline{margin:10px 0 0;font-size:14.5px;color:var(--muted)}
+.whyline b{color:var(--ink);font-weight:600}
+summary{cursor:pointer;color:var(--accent);font-weight:600;min-height:44px;line-height:44px}
+details p{margin:0 0 8px;font-size:15px}
+.btn{min-height:44px;border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);border-radius:10px;padding:8px 14px;font:inherit;font-weight:600;cursor:pointer}
+.btn.ghost{background:var(--card);color:var(--accent)}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.note{font-size:14px;color:var(--muted)}
+.links{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:8px;font-size:14.5px}
+.links a{display:inline-flex;align-items:center;min-height:44px}
+.tl{position:relative;padding-left:26px;margin-top:6px}
+.tl:before{content:"";position:absolute;left:8px;top:10px;bottom:10px;width:2px;background:var(--line)}
+.st{position:relative;padding:6px 0 10px}
+.st:before{content:"";position:absolute;left:-24px;top:11px;width:12px;height:12px;border-radius:50%;background:var(--card);border:2px solid var(--muted)}
+.st.now:before{background:var(--accent);border-color:var(--accent)}
+.st.done:before{background:var(--ok);border-color:var(--ok)}
+.st .when{font-family:var(--mono);font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+.st b{display:block}
+.st small{color:var(--muted);font-size:13.5px;display:block}
+.st.done b{color:var(--muted)}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:6px 6px 6px 0;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:var(--mono);font-size:11.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);font-weight:500}
+.case h2{font-size:17px}
+.ans{margin-top:10px;border-top:1px solid var(--line);padding-top:10px}
+footer{margin-top:28px;font-size:13.5px;color:var(--muted)}
+footer p{margin:0 0 8px}
+.panel{display:none}.panel.on{display:block}
+.fig{display:block;width:100%;max-width:460px;height:auto;margin:0 auto}
+.states{display:flex;gap:6px;overflow-x:auto;margin:10px -16px;padding:2px 16px 6px;scrollbar-width:none}
+.states::-webkit-scrollbar{display:none}
+.states.wrapit{flex-wrap:wrap;overflow:visible;margin:10px 0;padding:0}
+.sbtn{flex:none;min-height:44px;min-width:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--ink);font:inherit;font-size:14px;cursor:pointer;white-space:nowrap}
+.sbtn[aria-pressed="true"]{border-color:var(--accent);color:var(--accent);font-weight:600}
+.line1{font-size:15px;margin:10px 0 0}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.chip{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--fill);color:var(--ink);font:inherit;font-size:14px;cursor:pointer;text-align:left}
+.chip svg{flex:none;color:var(--accent)}
+.scrim{position:fixed;inset:0;background:var(--scrim);z-index:20}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:21;max-height:90vh;overflow-y:auto;background:var(--card);border:1px solid var(--line);border-bottom:0;border-radius:20px 20px 0 0;padding:8px 16px 24px;max-width:560px;margin:0 auto}
+.sheethead{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.sheethead h2{font-size:18px;margin:0}
+.xbtn{min-height:44px;min-width:44px;border:0;background:transparent;color:var(--accent);font:inherit;font-weight:600;cursor:pointer}
+.pills{position:sticky;top:0;z-index:5;background:var(--bg);display:flex;gap:6px;overflow-x:auto;margin:0 -16px 12px;padding:8px 16px;border-bottom:1px solid var(--line);scrollbar-width:none}
+.pills::-webkit-scrollbar{display:none}
+.pill{flex:none;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--muted);font:inherit;font-size:14px;cursor:pointer;white-space:nowrap}
+.pill[aria-current="true"]{border-color:var(--accent);color:var(--accent);font-weight:600}
+.chap{scroll-margin-top:70px}
+.cause{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:8px 0;border-top:1px solid var(--line);font-size:15px}
+.cause small{color:var(--muted);font-size:13px;text-align:right;flex:0 1 58%}
+.cause.less>span{color:var(--muted)}
+.cause.fav span{font-weight:700}
+.cause.fav span:before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--accent);margin-right:8px}
+.trial{border-left:3px solid var(--accent);padding-left:12px}
+.trial p{margin:0 0 6px;font-size:15px}
+.trial .k{font-family:var(--mono);font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);display:block}
+.sl input[type=range]{width:100%;min-height:44px;accent-color:var(--accent)}
+.sl label{display:flex;justify-content:space-between;font-size:13px;color:var(--muted);margin-top:8px}
+.sl label b{font-family:var(--mono);color:var(--ink)}
+.zs{display:flex;gap:2px;height:8px;margin-top:4px}
+.zs i{display:block;border-radius:99px;background:var(--line)}
+.zs i.on{background:var(--accent)}
+.zt{font-family:var(--mono);font-size:12.5px;color:var(--ink);margin:6px 0 0}
+.dp{margin-top:10px;border:1px solid var(--line);border-radius:12px;padding:2px 12px;background:var(--card)}
+.dp>div{padding:10px 0;border-top:1px solid var(--line)}
+.dp>div:first-child{border-top:0}
+.dp .label{margin:0 0 3px}
+.dp p{font-size:15px;margin:0}
+.clock{font-family:var(--mono);font-size:14px;margin:8px 0 0}
+.deeper{margin-top:14px;border-top:1px solid var(--line)}
+.deeper>summary{min-height:44px;display:flex;align-items:center;gap:8px;color:var(--accent);font-weight:600;font-size:15px;cursor:pointer;list-style:none;line-height:1.3}
+.deeper>summary::-webkit-details-marker{display:none}
+.deeper>summary::before{content:"+";font-family:var(--mono);font-size:18px;line-height:1;width:14px;text-align:center}
+.deeper[open]>summary::before{content:"\2212"}
+.deeper .dpx{border:1px solid var(--line);border-radius:12px;padding:2px 12px;background:var(--card);text-align:left}
+.deeper .dpx>div{padding:10px 0;border-top:1px solid var(--line)}
+.deeper .dpx>div:first-child{border-top:0}
+.deeper .dl{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500;margin:0 0 3px}
+.deeper p{font-size:15px;line-height:1.45;color:var(--ink);margin:0 0 4px}
+.plate{margin-top:10px;border:1px solid var(--line);border-radius:12px;padding:6px;background:var(--card)}
+.plate img{display:block;width:100%;height:auto;border-radius:8px}
+.credit{display:block;font-family:var(--mono);font-size:11px;color:var(--muted);text-align:right;margin:4px 2px 0}
+@media (min-width:900px){
+  .wrap{max-width:1040px}
+  .panel.two.on{display:grid;grid-template-columns:380px minmax(0,1fr);gap:20px;align-items:start}
+  #p-learn{max-width:720px;margin:0 auto}
+}
+@media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+.phases{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;margin:4px 0 10px}
+.ph{min-height:44px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--muted);font:inherit;font-size:13px;font-weight:600;padding:4px 2px;cursor:pointer;line-height:1.2}
+.ph[aria-pressed="true"]{border-color:var(--accent);color:var(--accent);background:var(--fill)}
+.ph.inf{border-style:dashed;border-color:var(--accent);color:var(--accent)}
+.stop{border:2px solid var(--bad);background:var(--badbg)}
+.stop h2{color:var(--bad)}
+.ok{color:var(--ok);font-weight:600}
+.tg{display:grid;gap:6px;margin-top:10px}
+.tgrow{display:grid;grid-template-columns:minmax(0,1.3fr) repeat(4,minmax(0,1fr));gap:4px;align-items:stretch}
+.tgrow>*{font-size:12.5px;border:1px solid var(--line);border-radius:8px;padding:6px 4px;text-align:center;background:var(--card);min-height:44px;display:flex;align-items:center;justify-content:center}
+.tgrow>.h{font-family:var(--mono);font-size:11px;color:var(--muted);border:0;background:transparent}
+.tgrow>.rl{justify-content:flex-start;text-align:left;font-weight:600}
+.tgrow button{font:inherit;font-size:12.5px;color:var(--ink);cursor:pointer}
+.tgrow .y{border-color:var(--ok);color:var(--ok)}
+.tgrow .n{color:var(--muted)}
+.tgrow .w{border-color:var(--warn);color:var(--warn)}
+.tgrow .sel{outline:2px solid var(--accent);outline-offset:1px}
+.compo{overflow-x:auto}
+.compo td,.compo th{font-family:var(--mono);font-size:12.5px;white-space:nowrap;padding-right:10px}
+.compo tr.on td{color:var(--accent);font-weight:700}
+.compo button{min-height:44px;border:0;background:transparent;color:inherit;font:inherit;cursor:pointer;padding:0;text-align:left}
+
+.steps{margin:8px 0 0;padding-left:22px}
+.steps li{margin-bottom:6px}
+.cnt{font-family:var(--mono);font-size:12px;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="/">← bedside.tools</a>
+<h1>Getting off the ventilator</h1>
+<p class="purpose">After the first breathing trial: why a trial failed and what fixes it, who is ready to extubate and to what support, when to reintubate, and the tracheostomy.</p>
+<p class="note" style="margin:-10px 0 16px">The daily screen, the first breathing trial, the rapid shallow breathing index and the cuff leak test are in the <a href="/vent/#screen">ventilator tool</a>.</p>
+
+<div class="tabs" role="tablist">
+  <button class="tab" role="tab" id="t-wean" aria-selected="true" aria-controls="p-wean">Failed trial</button>
+  <button class="tab" role="tab" id="t-ext" aria-selected="false" aria-controls="p-ext">Extubate</button>
+  <button class="tab" role="tab" id="t-trach" aria-selected="false" aria-controls="p-trach">Trach</button>
+  <button class="tab" role="tab" id="t-learn" aria-selected="false" aria-controls="p-learn">Learn</button>
+  <button class="tab" role="tab" id="t-prac" aria-selected="false" aria-controls="p-prac">Practice</button>
+</div>
+
+<div class="panel two on" id="p-wean" role="tabpanel" aria-labelledby="t-wean">
+  <div id="wean-in">
+  <div class="card" id="wean-class">
+    <p class="label">How long, how many</p>
+    <div class="grid">
+      <div class="field"><label for="dvent">Days ventilated</label><input id="dvent" inputmode="decimal" autocomplete="off"></div>
+      <div class="field"><label for="dfirst">Days since the first breathing trial</label><input id="dfirst" inputmode="decimal" autocomplete="off"></div>
+      <div class="field"><label for="nfail">Breathing trials failed</label><input id="nfail" inputmode="decimal" autocomplete="off"></div>
+      <div class="field"></div>
+    </div>
+    <div class="checks" id="ticks-w0"></div>
+  </div>
+  <div class="card" id="wean-pattern">
+    <p class="label">How the trial failed</p>
+    <div class="checks" id="ticks-w1"></div>
+  </div>
+  <div class="card" id="wean-context">
+    <p class="label">What else is true</p>
+    <div class="checks" id="ticks-w2"></div>
+  </div>
+  </div>
+  <div id="wean-out"></div>
+</div>
+
+<div class="panel two" id="p-ext" role="tabpanel" aria-labelledby="t-ext">
+  <div id="ext-in">
+  <div class="card" id="ext-ready">
+    <p class="label">Ready to pull the tube?</p>
+    <div class="checks" id="ticks-e0"></div>
+    <div class="grid" style="margin-top:12px">
+      <div class="field"><label for="cough">Cough</label><select id="cough"><option value="">Not assessed</option><option value="strong">Strong</option><option value="weak">Weak, or peak cough flow 60 L/min or less</option></select></div>
+      <div class="field"><label for="secr">Secretions</label><select id="secr"><option value="">Not assessed</option><option value="few">Few</option><option value="heavy">Moderate to abundant</option></select></div>
+      <div class="field"><label for="cmd">Commands</label><select id="cmd"><option value="">Not assessed</option><option value="yes">Follows 4 simple commands</option><option value="no">Cannot</option></select></div>
+      <div class="field"><label for="leak">Cuff leak test</label><select id="leak"><option value="">Not done</option><option value="yes">Leak heard</option><option value="no">No leak</option></select></div>
+    </div>
+  </div>
+  <div class="card" id="ext-risk">
+    <p class="label">Risk of failing after extubation</p>
+    <div class="checks" id="ticks-e1"></div>
+  </div>
+  <div class="card" id="ext-after">
+    <p class="label">After extubation</p>
+    <div class="grid"><div class="field"><label for="hrs">Hours since extubation</label><input id="hrs" inputmode="decimal" autocomplete="off"></div><div class="field"></div></div>
+    <div class="checks" id="ticks-e2"></div>
+  </div>
+  </div>
+  <div id="ext-out"></div>
+</div>
+
+<div class="panel two" id="p-trach" role="tabpanel" aria-labelledby="t-trach">
+  <div id="trach-in">
+  <div class="card" id="trach-situation">
+    <p class="label">Tracheostomy</p>
+    <p class="sub">What do you need?</p>
+    <div class="states wrapit" id="sitseg" role="group" aria-label="Situation"></div>
+    <div class="grid" style="margin-top:8px">
+      <div class="field"><label for="ttype">Type</label><select id="ttype"><option value="">Not known</option><option value="perc">Percutaneous</option><option value="surg">Surgical</option></select></div>
+      <div class="field"><label for="tdays">Days since it was placed</label><input id="tdays" inputmode="decimal" autocomplete="off"></div>
+    </div>
+    <div class="checks" id="ticks-t0"></div>
+  </div>
+  </div>
+  <div id="trach-out"></div>
+</div>
+
+<div class="panel" id="p-learn" role="tabpanel" aria-labelledby="t-learn">
+  <div class="pills" id="pills"></div>
+  <div class="card chap" id="learn-balance" data-pill="Load and capacity"><p class="label">1 · Balance</p><h2>A trial fails when load outweighs capacity</h2><p class="sub">Tap a cause.</p><div data-figure="balance"></div></div>
+  <div class="card chap" id="learn-lv" data-pill="The heart"><p class="label">2 · Heart and lungs</p><h2>Coming off positive pressure loads the heart</h2><p class="sub">Tap a state.</p><div data-figure="lv"></div></div>
+  <div class="card chap" id="learn-diaphragm" data-pill="Diaphragm"><p class="label">3 · Muscle</p><h2>A resting diaphragm wastes fast</h2><div data-figure="diaphragm"></div></div>
+  <div class="card chap" id="learn-airway" data-pill="Passed is not out"><p class="label">4 · The airway</p><h2>A passed trial is not a passed extubation</h2><p class="sub">The trial tests breathing; it does not test the cough, the secretions, the brain or the larynx. Tap one.</p><div data-figure="airway"></div></div>
+  <div class="card chap" id="learn-wind" data-pill="Weaning classes"><p class="label">5 · Classes</p><h2>Short, difficult, prolonged</h2><div data-figure="wind"></div></div>
+  <div class="card chap" id="learn-trach" data-pill="Tracheostomy"><p class="label">6 · Tracheostomy</p><h2>Two airways, two emergencies</h2><div id="plate-trach"></div><p class="sub" style="margin-top:12px">Tap a neck.</p><div data-figure="neck"></div></div>
+  <div class="card chap" id="trials" data-pill="Trials"><p class="label">7 · Trials</p><h2>The trials behind the practice</h2><div id="trialbox"></div><div class="row"><button class="btn" id="go-prac">Try the practice cases</button></div></div>
+</div>
+
+<div class="panel" id="p-prac" role="tabpanel" aria-labelledby="t-prac">
+  <div id="practice"></div>
+</div>
+
+<div class="scrim" id="scrim" hidden></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-t" hidden>
+  <div class="sheethead"><h2 id="sheet-t"></h2><button class="xbtn" id="sheet-x">Close</button></div>
+  <div id="sheet-b"></div>
+</div>
+
+<footer>
+  <p><strong>For education only. Not a substitute for clinical judgment.</strong> Built to the ATS/CHEST 2017 liberation guideline, the AARC 2024 guideline, the ERS/ATS 2017 noninvasive ventilation guideline and the ERS 2022 high-flow guideline, with the UK National Tracheostomy Safety Project algorithm and the FICM/ICS 2020 tracheostomy care guidance for the tracheostomy steps. The daily screen, first trial and cuff leak test are in the ventilator tool; sedation in the sedation tool. Airway teams, tracheostomy equipment and protocols vary, so adjust to your institution. Evidence tiers are shown as strength and certainty (strong or conditional; high, moderate, low or very low); rows marked expert practice are not from a graded guideline. Bedside predictors are shown with the study and the population they came from.</p>
+  <p>Privacy: everything runs in your browser. Nothing you enter is sent anywhere or stored, and there are no analytics. Do not enter names, record numbers, or dates of birth.</p>
+  <p class="mono">Last reviewed: 2026-11-26</p>
+  <p><strong>Sources:</strong> Schmidt GA et al., ATS/CHEST liberation guideline executive summary, Chest 2017;151:160 · Ouellette DR et al., Chest 2017;151:166 · Girard TD et al., Am J Respir Crit Care Med 2017;195:120 · Roberts KJ et al., AARC guideline on spontaneous breathing trials, Respir Care 2024;69:891 · Rochwerg B et al., ERS/ATS noninvasive ventilation guideline, Eur Respir J 2017;50:1602426 · Oczkowski S et al., ERS high-flow guideline, Eur Respir J 2022;59:2101574 · Goel NN et al., ATS noninvasive respiratory support guideline, Am J Respir Crit Care Med 2026;212:2135 (abstract) · Quintard H et al., SFAR/SRLF extubation guideline, Ann Intensive Care 2019;9:13 · Boles JM et al., weaning task force, Eur Respir J 2007;29:1033 · Béduneau G et al. (WIND), Am J Respir Crit Care Med 2017;195:772 · McGrath BA et al., National Tracheostomy Safety Project algorithms, Anaesthesia 2012;67:1025 · Faculty of Intensive Care Medicine and Intensive Care Society, Guidance for tracheostomy care, 2020 · Intensive Care Society, Standards for the care of adult patients with a temporary tracheostomy, 2014 · Passy-Muir valve instructions for use · NCEPOD, On the right trach?, 2014 · Predictors and mechanisms: Anguel N et al., Intensive Care Med 2008;34:1231 · Lamia B et al., Crit Care Med 2009;37:1696 · Liu J et al., Crit Care 2016;20:369 · Routsi C et al., Crit Care 2010;14:R204 · DiNino E et al., Thorax 2014;69:423 · Levine S et al., N Engl J Med 2008;358:1327 · Dres M et al., Am J Respir Crit Care Med 2017;195:57 · Salam A et al., Intensive Care Med 2004;30:1334 · Smina M et al., Chest 2003;124:262 · Khamiees M et al., Chest 2001;120:1262 · Coplin WM et al., Am J Respir Crit Care Med 2000;161:1530 · Epstein SK et al., Chest 1997;112:186 · Burns KE et al., Cochrane 2013;CD004127 · Andriolo BN et al., Cochrane 2015;CD007271 · Chorath K et al., JAMA Otolaryngol Head Neck Surg 2021;147:450 · Trials: Esteban A et al., N Engl J Med 1995;332:345 · Ely EW et al., N Engl J Med 1996;335:1864 · Girard TD et al. (ABC), Lancet 2008;371:126 · Subirà C et al., JAMA 2019;321:2175 · Thille AW et al. (TIP-EX), N Engl J Med 2022;387:1843 · Mekontso Dessap A et al., Am J Respir Crit Care Med 2012;186:1256 · Thille AW et al. (HIGH-WEAN), JAMA 2019;322:1465 · Hernández G et al., JAMA 2016;315:1354 · Hernández G et al., JAMA 2016;316:1565 · Esteban A et al., N Engl J Med 2004;350:2452 · François B et al., Lancet 2007;369:1083 · Jubran A et al., JAMA 2013;309:671 · Young D et al. (TracMan), JAMA 2013;309:2121 · Terragni PP et al., JAMA 2010;303:1483.</p>
+</footer>
+</div>
+<script id="engine">
+/* Data and decision engines: no page access here, so the practice cases and the audits run the same code. */
+function has(v){ return v != null; }
+
+var TW0 = [['trach','Has a tracheostomy']];
+var TW1 = [['rsb','Fast, shallow breathing'],['hypox','SpO2 fell'],['hyperc','PaCO2 rose'],['cardio','Blood pressure or heart rate surged, or new crackles'],['agit','Agitation or delirium'],['secr','Weak cough or heavy secretions']];
+var TW2 = [['bal','Fluid balance positive'],['lvd','Heart failure or reduced LV function'],['copd','COPD or chronic hypercapnia'],['obese','BMI over 30'],['weak','Weak: cannot lift arms or head against gravity'],['paral','Neuromuscular blocker or high-dose steroid this stay'],['sed','Sedative or opioid infusion running'],['bronch','Wheeze or bronchospasm'],['dist','Abdominal distension or pleural effusion'],['lytes','Low phosphate, potassium or magnesium, or metabolic alkalosis']];
+var TE0 = [['pass','Passed the breathing trial today'],['stridor','Stridor risk: traumatic intubation, tube in over 6 days, large tube, female, or reintubated after an unplanned extubation'],['brain','Brain injury']];
+var TE1 = [['age65','Over 65'],['chronic','Chronic heart or lung disease (heart failure, COPD)'],['hyperc','Hypercapnia during the trial'],['bmi','BMI over 30'],['long','Ventilated over 7 days'],['failed','Failed at least one breathing trial'],['surg','After surgery'],['nivno','NIV not possible (contraindicated or not tolerated)']];
+var TE2 = [['work','Breathing fast and labored, accessory muscles'],['spo2','SpO2 falling despite more oxygen'],['co2','PaCO2 rising with acidosis'],['mental','Drowsy or newly agitated'],['clear','Cannot clear secretions'],['strid','Stridor']];
+var TT0 = [['lary','Laryngectomy: breathes only through the neck'],['vent','Still on the ventilator']];
+var SIT = [['emerg','Tube out or blocked'],['plan','When to place one'],['care','The first days'],['talk','Cuff down and speaking valve']];
+
+var WHY = {
+  windShort: 'Most patients come off within a day of the first attempt; mortality in that group was 6% in the WIND cohort.',
+  windDiff: 'In WIND, mortality was 17% in difficult weaning against 6% in short weaning, so each failed day calls for a cause, not just another trial.',
+  windLong: 'Mortality was 29% in prolonged weaning in WIND; the risk of death rose the longer separation took.',
+  cardiac: 'Switching from positive pressure to unassisted breathing raises venous return and the load on the left ventricle; a stiff or weak ventricle answers with edema.',
+  load: 'Narrowed airways, secretions, fluid or a tense abdomen raise the work of each breath beyond what the muscles can sustain.',
+  hyperc: 'Rising carbon dioxide on the trial means the pump cannot keep up with the load; in COPD, NIV can carry that load after the tube is out.',
+  nm: 'Days of passive ventilation, sedation and critical illness weaken the diaphragm and limbs; weakness of the diaphragm predicted failure better than limb strength.',
+  neuro: 'Sedation and delirium blunt the drive and the cooperation a trial needs; pairing a sedation pause with the trial gave more days off the ventilator.',
+  metab: 'Low phosphate, potassium or magnesium weaken muscle, and a metabolic alkalosis lowers the drive to breathe.',
+  airway: 'The trial tests the breathing pump, not the airway: a weak cough, heavy secretions or a patient who cannot follow commands predicted failure after a passed trial.',
+  stridor: 'Laryngeal edema from the tube narrows the airway once it is removed; a steroid given hours before extubation reduced it.',
+  niv: 'Preventive NIV takes over part of the work of breathing in the hours when high-risk patients most often fail.',
+  hfnc: 'High flow washes out dead space and gives a little pressure; in low-risk patients it lowered reintubation from 12.2% to 4.9%.',
+  fail: 'Waiting on NIV once failure has set in delayed reintubation and was linked with higher ICU mortality.',
+  emerg: 'Oxygenation comes first; a fresh tract can close or mislead a tube into the tissues, so the airway from above is the safer route.',
+  emergEst: 'Oxygenation comes first: a blocked or displaced tube must be cleared or removed before it is used to ventilate; the mouth or the stoma can then carry oxygen.',
+  lary: 'After a laryngectomy the mouth no longer connects to the lungs, so oxygen and any airway can go only through the stoma.',
+  hfncHigh: 'In high-risk patients high flow was non-inferior to NIV for reintubation, and was better tolerated (NIV stopped for side effects in 43%).',
+  timing: 'Early tracheostomy did not lower mortality, and many patients in the late groups never received one, so timing follows the expected course, not a fixed day.',
+  care: 'A displaced or blocked tube is the commonest serious complication; the right kit and a sign at the bed save the minutes that matter.',
+  talk: 'A one-way valve lets air in through the tube and out through the mouth; with the cuff up, the breath has nowhere to go.'
+};
+
+/* Failed trial */
+function weanClass(i){
+  if (!has(i.dfirst) && !has(i.nfail)) return null;
+  var c = {id: 'c-class', label: 'Weaning class', list: []};
+  var w = !has(i.dfirst) ? null : i.dfirst < 1 ? 'short' : i.dfirst < 7 ? 'difficult' : 'prolonged';
+  var icc = !has(i.nfail) ? null : i.nfail === 0 ? 'simple' : (i.nfail >= 3 || (has(i.dfirst) && i.dfirst > 7)) ? 'prolonged' : 'difficult';
+  var rank = {simple: 0, short: 0, difficult: 1, prolonged: 2}, head = !w ? icc : !icc ? w : (rank[icc] > rank[w] ? icc : w);
+  c.head = head === 'simple' ? 'No failed trial yet' : head.charAt(0).toUpperCase() + head.slice(1) + ' weaning' + (head !== 'prolonged' ? ' so far' : '');
+  if (w) c.list.push('WIND (days from the first separation attempt): ' + (w === 'short' ? 'under 1 day' : w === 'difficult' ? '1 to under 7 days' : '7 days or more') + '.');
+  if (icc) c.list.push('Task force classes (by failed trials): ' + (icc === 'simple' ? 'no failed trial yet' : icc === 'difficult' ? 'up to 3 failed trials or up to 7 days' : 'at least 3 failed trials or more than 7 days') + '.');
+  c.why = w === 'prolonged' || icc === 'prolonged' ? WHY.windLong : w === 'difficult' || icc === 'difficult' ? WHY.windDiff : WHY.windShort;
+  c.more = ['WIND, 2,729 ventilated patients: 57% short (mortality 6%), 10% difficult (17%), 9% prolonged (29%); 24% never had a separation attempt. Risk of death 19% after the first attempt and 37% after 10 days (observational).'];
+  c.tiers = ['WIND 2017 (observational)', 'Task force 2007 (consensus)'];
+  if ((w === 'prolonged' || icc === 'prolonged') && !i.trach) c.links = [['#trach-situation', 'Tracheostomy: timing']];
+  return c;
+}
+
+var DOMAINS = [
+  {k: 'cardiac', n: 'Heart: weaning-induced pulmonary edema', w: {cardio: 2, lvd: 2, bal: 1, copd: 1, obese: 1, hypox: 1},
+    test: ['Plasma protein (or hemoglobin) rising during the trial suggests fluid leaving the vessels: protein up over 6% had sensitivity 87%, specificity 95% (46 patients who had failed two trials).', 'Echo at the end of the trial: E/A over 0.95 with E/Ea over 8.5 together had sensitivity 82%, specificity 91% for high filling pressure (39 patients).', 'BNP or NT-proBNP before and after the trial, and a chest film, as supporting signs.'],
+    fix: ['Remove fluid: diuresis guided by BNP gave a more negative balance and a shorter time to extubation in a 304-patient trial.', 'Lower afterload when blood pressure surges on the trial (nitroglycerin helped in a small uncontrolled study of 12 patients).', 'Look for and treat ischemia and arrhythmia; retry when the balance is even or negative.'],
+    why: 'cardiac', tier: 'Diagnostic and small trials; expert practice for the bundle'},
+  {k: 'hyperc', n: 'Pump overload: rising carbon dioxide', w: {hyperc: 3, copd: 1},
+    test: ['Blood gas at the end of the trial (or when it is stopped).', 'Look for the load behind it: secretions, bronchospasm, fluid, a high carbon dioxide production (fever, overfeeding).'],
+    fix: ['COPD or chronic hypercapnia that failed the trial: extubate to NIV (NIV-assisted weaning), suggested by ERS/ATS 2017 (conditional, moderate). In COPD trials it lowered mortality (risk ratio 0.36).', 'Otherwise treat the load and retry.'],
+    why: 'hyperc', tier: 'NIV-assisted weaning: conditional, moderate'},
+  {k: 'load', n: 'Load: airways, lungs, chest and abdomen', w: {rsb: 1, bronch: 2, secr: 1, dist: 2, hypox: 1},
+    test: ['Listen for wheeze; look at the flow trace; suction and grade secretions.', 'Chest film and ultrasound for effusion, collapse or edema; check the abdomen.'],
+    fix: ['Bronchodilators; physiotherapy and suction for secretions; drain a large effusion; decompress a distended abdomen.', 'Check the tube itself: a small or partly blocked tube adds resistance.'],
+    why: 'load', tier: 'Expert practice'},
+  {k: 'nm', n: 'Muscle: diaphragm and limb weakness', w: {weak: 2, paral: 1, rsb: 1},
+    test: ['Strength: lifts arms and head against gravity; a Medical Research Council sum score under 48 defines ICU-acquired weakness.', 'Diaphragm ultrasound: a thickening fraction of 30% or more predicted extubation success (sensitivity 88%, specificity 71%, 63 patients; operator dependent).', 'Diaphragm dysfunction was found in 63% of patients at their first trial, limb weakness in 34% (76 patients, measured by phrenic stimulation).'],
+    fix: ['Keep the diaphragm working: lighter sedation, no unnecessary paralysis, assisted rather than fully controlled modes once possible.', 'Protocolized rehabilitation and early mobilization (conditional, low).', 'Correct phosphate, potassium and magnesium; feed adequately.'],
+    why: 'nm', tier: 'Rehabilitation protocol: conditional, low'},
+  {k: 'neuro', n: 'Brain: sedation and delirium', w: {agit: 2, sed: 2},
+    test: ['Sedation level (RASS) and delirium screen (CAM-ICU).'],
+    fix: ['A sedation-minimizing protocol (conditional, low); pair a daily sedation pause with the trial (ABC trial).', 'Treat pain; find and treat delirium causes.'],
+    why: 'neuro', tier: 'Sedation-minimizing protocol: conditional, low', link: ['/sedation/', 'Sedation and delirium']},
+  {k: 'metab', n: 'Metabolic: electrolytes and drive', w: {lytes: 3},
+    test: ['Phosphate, potassium, magnesium, bicarbonate and chloride.'],
+    fix: ['Replace electrolytes; correct a metabolic alkalosis (often from diuretics or gastric losses).'],
+    why: 'metab', tier: 'Expert practice'}
+];
+function domainScore(d, i){ var s = 0; Object.keys(d.w).forEach(function(k){ if (i[k]) s += d.w[k]; }); if (d.k === 'nm' && s > 0 && has(i.dvent) && i.dvent >= 7) s += 1; return s; }
+
+function weanCards(i){
+  var cards = [], c0 = weanClass(i);
+  if (c0) cards.push(c0);
+  var ranked = DOMAINS.map(function(d){ return {d: d, s: domainScore(d, i)}; }).filter(function(x){ return x.s > 0; }).sort(function(a, b){ return b.s - a.s; });
+  if (!ranked.length && !c0) return [{id: 'c-wempty', label: 'Start', head: 'Enter how the trial failed', sub: 'Tick how it failed and what else is true; the likely causes are ranked with the test that confirms each and the fix.', empty: true}];
+  ranked.forEach(function(x, n){
+    var d = x.d, c = {id: 'c-' + d.k, label: (n === 0 ? 'Most likely' : 'Also consider') + ' · cause ' + (n + 1), head: d.n, list: []};
+    c.sub = 'Confirm:'; c.list = d.test.slice(); c.fixes = d.fix; c.why = WHY[d.why]; c.tiers = [d.tier];
+    if (d.link) c.links = [d.link];
+    if (d.k === 'cardiac') c.chips = [['lv', 'trial', 'Why the heart fails on a trial']];
+    if (d.k === 'nm') c.chips = [['diaphragm', 'passive', 'How fast the diaphragm wastes']];
+    if (d.k === 'load' || d.k === 'nm' || d.k === 'cardiac') (c.chips = c.chips || []).push(['balance', d.k === 'load' ? 'airway' : d.k === 'nm' ? 'weak' : 'fluid', 'Load against capacity']);
+    cards.push(c);
+  });
+  if (ranked.length || (c0 && (i.nfail > 0 || has(i.dfirst)))){
+    var n = {id: 'c-next', label: 'Next attempt', head: i.trach ? 'Next trial: off the ventilator on a tracheostomy collar' : 'Fix the cause, then retry tomorrow', list: []};
+    if (i.trach) n.list.push('In long-term weaning on a tracheostomy, unassisted collar trials weaned faster than gradual pressure-support reduction (median 15 against 19 days, 316 patients).');
+    n.list.push('Screen daily and run the trial before noon; do not raise the FiO2 during it (AARC 2024, conditional, very low).');
+    n.list.push('Pressure support 5 to 8 cm H2O or a T-piece: ATS/CHEST 2017 suggests pressure support for the first trial (conditional, moderate); AARC 2024 accepts either (conditional, moderate). In high-risk patients a pressure-support trial got more patients extubated within 24 hours with similar reintubation (TIP-EX).');
+    var prol = (has(i.dfirst) && i.dfirst >= 7) || (has(i.nfail) && i.nfail >= 3);
+    if (prol && !i.trach) n.list.push('Prolonged weaning: weigh a tracheostomy (Trach tab).');
+    if (prol) n.list.push('If weaning is prolonged and the overall course is not improving, hold a goals-of-care conversation alongside the plan (expert practice).');
+    n.why = null; n.links = [['/vent/#screen', 'Daily screen and the trial']]; n.tiers = ['Pressure-support first trial: conditional, moderate (ATS/CHEST 2017)', 'Trial with or without pressure support: conditional, moderate (AARC 2024)'];
+    cards.push(n);
+  }
+  return cards;
+}
+
+/* Extubate */
+function extCards(i){
+  var cards = [], anyFail = i.work || i.spo2 || i.co2 || i.mental || i.clear || i.strid;
+  if (has(i.hrs) || anyFail){
+    var f = {id: 'c-fail', label: 'After extubation', list: [], guards: []};
+    if (i.strid){
+      f.head = 'Stridor: an airway emergency in waiting'; f.stop = !!(i.work || i.spo2 || i.mental || i.co2 || i.clear);
+      f.sub = 'Sit the patient up, give humidified oxygen, and call the airway team now.';
+      f.list = ['Nebulized epinephrine and an IV steroid are commonly given, and heliox can bridge; none is backed by a graded guideline (expert practice).', 'High flow and NIV do not relieve laryngeal edema.', 'Worsening, or with the other signs of failure: reintubate, with a smaller tube and difficult-airway equipment ready.'];
+      f.guards.push('Do not let NIV or nebulizers delay reintubation.');
+      f.why = WHY.stridor; f.tiers = ['Expert practice'];
+    } else if (anyFail){
+      var nsig = TE2.filter(function(t){ return i[t[0]]; }).length;
+      f.stop = true; f.head = nsig > 1 ? 'Failing after extubation: reintubate' : 'Signs of failure: reassess now and prepare to reintubate';
+      f.sub = 'Signs entered: ' + TE2.filter(function(t){ return i[t[0]]; }).map(function(t){ return t[1].toLowerCase(); }).join('; ') + '.';
+      f.list = ['Do not treat established failure with NIV: in the trial it did not prevent reintubation (48% in both arms), delayed it (12 against 2.5 hours), and ICU mortality was higher (25% against 14%).', 'A French guideline allows a careful NIV trial in COPD or clear cardiogenic edema, with weak agreement; only with intubation ready.', 'Patients who failed extubation had higher hospital mortality (43% against 12% in one cohort), partly from the failure itself and partly from what caused it.'];
+      f.why = WHY.fail; f.tiers = ['Against NIV for established failure: conditional, low (ERS/ATS 2017)'];
+    } else {
+      f.head = 'No sign of failure entered'; f.sub = 'Recheck breathing, oxygen, secretions, voice and mental status; trials watched for failure over the first 48 hours.'; f.empty = true;
+    }
+    cards.push(f);
+    return cards;
+  }
+  if (!i.pass && !cards.length) return [{id: 'c-eempty', label: 'Start', head: 'Tick a passed breathing trial', sub: 'Then the cough, secretions and commands, and the risk factors. The plan for support after extubation follows.', empty: true}];
+  if (!i.pass) return cards;
+  /* Airway readiness */
+  var r = 0, have = 0, which = [];
+  if (i.cough){ have++; if (i.cough === 'weak'){ r++; which.push('weak cough'); } }
+  if (i.secr){ have++; if (i.secr === 'heavy'){ r++; which.push('heavy secretions'); } }
+  if (i.cmd){ have++; if (i.cmd === 'no'){ r++; which.push('cannot follow commands'); } }
+  var a = {id: 'c-airway', label: 'Beyond the trial', list: [], chips: [['airway', r ? (i.cough === 'weak' ? 'cough' : i.secr === 'heavy' ? 'secr' : 'brain') : 'cough', 'What the trial does not test']]};
+  if (!have){ a.head = 'Check cough, secretions and commands'; a.sub = 'The trial does not test the airway.'; }
+  else if (r === 0){ a.head = 'Airway looks ready' + (have < 3 ? ' so far' : ''); a.sub = have < 3 ? 'Assess the rest of: cough, secretions, commands.' : 'None of the three risk factors: 3% failed extubation in the study.'; }
+  else if (r === 3){ a.head = 'All three airway risks: high chance of failure'; a.sub = 'Weak cough, heavy secretions and cannot follow commands: all such patients failed in the study (88 patients). Weigh delaying, or a tracheostomy.'; }
+  else { a.head = r === 2 ? 'Two airway risks: failure much more likely' : 'One airway risk: plan for it'; a.sub = 'Present: ' + which.join(', ') + '.'; }
+  if (r) a.list.push('Each raised the risk of failure: peak cough flow 60 L/min or less about 5 times, secretions over 2.5 mL/h about 3 times, unable to follow 4 commands about 4 times. Any two: sensitivity 71%, specificity 81%.');
+  if (i.brain && i.cmd === 'no') a.list.push('Brain injury: in one cohort, staying intubated for a low coma score alone led to more pneumonia without fewer reintubations; judge cough and secretions, not the score alone.');
+  a.list.push('Before extubation: screen swallowing and consciousness, and involve the physiotherapist (SFAR/SRLF 2019, grade 2+).');
+  a.why = r ? WHY.airway : null; a.tiers = ['Bedside predictors: cohort studies'];
+  cards.push(a);
+  /* Stridor */
+  if (i.stridor || i.leak === 'no'){
+    var s = {id: 'c-stridor', label: 'Stridor risk', head: i.leak === 'no' ? 'No cuff leak: steroid at least 4 hours before extubation' : i.leak === 'yes' ? 'Leak heard: extubate with the plan below' : 'Do a cuff leak test before extubation', list: []};
+    s.sub = i.leak === 'no' ? 'No need to repeat the leak test.' : i.leak === 'yes' ? 'Watch for stridor in the first hours.' : 'Deflate the cuff and listen for a leak around the tube.';
+    if (i.leak === 'no') s.list.push('The trial regimen: methylprednisolone 20 mg IV from 12 hours before extubation, then every 4 hours until the tube is out; laryngeal edema fell from 22% to 3%. A French guideline starts at least 6 hours before.');
+    s.why = WHY.stridor; s.tiers = ['Cuff leak test in high-risk patients: conditional, very low', 'Steroid after a failed test: conditional, moderate']; s.links = [['/vent/#after', 'Cuff leak and steroid in the ventilator tool']];
+    cards.push(s);
+  }
+  /* Support after extubation */
+  var hi = i.age65 || i.chronic || i.hyperc, other = [];
+  if (i.bmi) other.push('BMI over 30'); if (i.long) other.push('ventilated over 7 days'); if (i.failed) other.push('failed a trial'); if (i.cough === 'weak') other.push('weak cough'); if (i.secr === 'heavy') other.push('heavy secretions');
+  var p = {id: 'c-support', label: 'Support after extubation', list: [], guards: ['If failure sets in after extubation, do not let NIV delay reintubation.']};
+  if (hi && !i.nivno){
+    p.head = 'Extubate straight to NIV, with high flow between sessions';
+    p.sub = 'High risk: ' + [i.age65 ? 'over 65' : '', i.chronic ? 'chronic heart or lung disease' : '', i.hyperc ? 'hypercapnia on the trial' : ''].filter(Boolean).join(', ') + '.';
+    p.list = ['Start NIV immediately after extubation, not once the patient is struggling.', 'High flow plus NIV against high flow alone in high-risk patients: reintubation 11.8% against 18.2% (HIGH-WEAN).'];
+    p.why = WHY.niv; p.tiers = ['Preventive NIV, high risk, ventilated over 24 h: strong, moderate (ATS/CHEST 2017)', 'Conditional, low (ERS/ATS 2017)', 'NIV over high flow in high risk: conditional, moderate (ERS 2022)'];
+  } else if ((hi || other.length) && i.nivno){
+    p.head = (hi ? 'High risk' : 'Raised risk') + ', NIV not possible: high flow';
+    p.sub = 'High flow when NIV is contraindicated or not tolerated (ERS 2022).';
+    p.list = ['In high-risk patients high flow was non-inferior to NIV for reintubation (22.8% against 19.1%); NIV was stopped for side effects in 43%.'];
+    p.why = WHY.hfncHigh; p.tiers = ['ERS 2022: conditional'];
+  } else if (other.length){
+    p.head = 'NIV, or high flow if NIV is unsuitable';
+    p.sub = 'Other risk factors: ' + other.join(', ') + '. These defined the high-risk group in a trial where high flow was non-inferior to NIV.';
+    p.list = ['ERS 2022 suggests NIV over high flow at high risk unless NIV is contraindicated (conditional, moderate).', 'Reintubation 22.8% with high flow against 19.1% with NIV (non-inferior); NIV was stopped for side effects in 43%.', 'NIV does not help a problem in the upper airway, and copious secretions make it harder to use, so high flow can suit those patients better (expert practice).'];
+    p.why = WHY.hfncHigh; p.tiers = ['ERS 2022: conditional, moderate', 'Hernández 2016 (trial)'];
+  } else {
+    p.head = 'High-flow nasal oxygen';
+    p.sub = i.surg ? 'Low risk after surgery: high flow or conventional oxygen.' : 'Low or moderate risk: high flow over conventional oxygen.';
+    p.list = ['Low-risk patients: reintubation 4.9% with high flow against 12.2% with conventional oxygen (527 patients).'];
+    p.why = WHY.hfnc; p.tiers = ['Conditional, low (ERS 2022)', 'Suggested, risk-based (ATS 2026, abstract)'];
+  }
+  if (i.surg) p.list.push('After surgery: ERS 2022 suggests high flow or conventional oxygen at low risk, and high flow or NIV at high risk (conditional, low); ATS/CHEST applies to anyone ventilated over 24 hours.');
+  p.links = [['/oxygen-niv/#bycause', 'High flow and NIV settings']];
+  p.chips = [['airway', 'cough', 'What the trial does not test']];
+  cards.push(p);
+  return cards;
+}
+
+/* Tracheostomy */
+function trachCards(i){
+  var cards = [], fresh = !has(i.tdays) || (i.ttype === 'surg' ? i.tdays < 4 : i.tdays < 7);
+  var e = {id: 'c-emerg', label: 'Emergency · tube out or blocked', stop: i.sit === 'emerg', list: [], guards: []};
+  if (i.lary){
+    e.head = 'Laryngectomy: the neck is the only airway';
+    e.sub = 'Red bedhead sign. Oxygen to the stoma; do not try to oxygenate or intubate from the mouth.';
+    e.steps = ['Call the airway team (anesthesia and ENT) and the code team.', 'Look, listen and feel at the stoma. Not breathing and no pulse: CPR.', 'High-flow oxygen to the stoma; capnography.', 'Remove any stoma cover and any tube in the stoma (leave a voice prosthesis in place); pass a suction catheter.', 'Oxygenate through the stoma (pediatric face mask or laryngeal mask over it); intubate the stoma with a small tube if needed.'];
+  } else {
+    e.head = fresh ? (has(i.tdays) ? 'Fresh tracheostomy (' + i.tdays + ' days): manage from above' : 'Tube out or blocked: oxygenate, and manage from above') : 'Tube out or blocked: oxygenate first';
+    e.sub = fresh ? (has(i.tdays) ? 'The tract is not established: do not blindly reinsert, which can make a false passage. Oxygenate by mouth and nose; oral intubation by an experienced operator.' : 'Check the bedhead sign: green means the upper airway is patent. Days since placement unknown: treat the tract as fresh and do not blindly reinsert.') : (has(i.tdays) ? 'Check the bedhead sign: green means the upper airway is patent. Follow the steps in order.' : 'Check the bedhead sign: green means the upper airway is patent. Days since placement unknown: treat as fresh.');
+    e.steps = ['Call the airway team (anesthesia and ENT).', 'Look, listen and feel at the mouth and the tracheostomy. Not breathing: call the code team; CPR if no pulse.', 'Breathing: high-flow oxygen to both the face and the tracheostomy; capnography.', 'Remove a speaking valve or cap and the inner tube; pass a suction catheter.', 'Catheter will not pass: deflate the cuff. Do not bag through a tube you cannot confirm is patent.', 'Not stable or improving: remove the tracheostomy tube; recheck breathing; CPR if no pulse.', 'Oxygenate from above (bag-mask with the stoma covered, or a laryngeal mask), or over the stoma.', 'Then oral intubation with an uncut tube advanced beyond the stoma, or intubate the stoma with a small tube (for example a 6.0).'];
+    if (fresh){
+      e.steps[7] = 'Then oral intubation with an uncut tube advanced beyond the stoma. Do not reinsert or intubate through the fresh stoma unless an expert is doing it, ideally over a fiberoptic scope.';
+      e.guards.push(i.ttype === 'surg' ? (has(i.tdays) ? 'Surgical tracheostomy under 4 days: manage from above; stay sutures, if placed, can lift the stoma for an expert.' : 'Surgical tracheostomy, days not known: manage from above as if under 4 days; stay sutures, if placed, can lift the stoma for an expert.') : i.ttype === 'perc' ? 'Within 7 days of a percutaneous tracheostomy, it may be safer to manage the upper airway than to reinsert through the stoma (FICM/ICS 2020).' : 'Type not known: treat it as a percutaneous tract (under 7 days).');
+    }
+  }
+  e.why = i.lary ? WHY.lary : fresh ? WHY.emerg : WHY.emergEst; e.tiers = ['National Tracheostomy Safety Project algorithm (consensus)', 'FICM/ICS 2020'];
+  e.chips = [['neck', i.lary ? 'lary' : 'trach', 'Two airways']];
+  var plan = {id: 'c-plan', label: 'When to place one', head: 'No fixed day: when a long course is expected',
+    list: ['TracMan (909 patients): tracheostomy by day 4 against after day 10 gave the same 30-day mortality (30.8% against 31.5%); only 44.9% of the late group ever received one.', 'Day 6 to 8 against 13 to 15 (419 patients): pneumonia 14% against 21% (not significant).', 'Meta-analyses: early (by day 7 or 10) may lower pneumonia or mortality, with low certainty; one called the findings no more than suggestive.', 'For the family: it replaces the tube in the mouth, usually allows less sedation, talking later with a valve and eating once swallowing is checked; it is often temporary.'],
+    why: WHY.timing, tiers: ['Trials and meta-analyses; no graded guideline on timing']};
+  if (has(i.dvent)) plan.sub = 'Ventilated ' + i.dvent + ' days.';
+  var care = {id: 'c-care', label: 'The first days', head: 'Kit at the bed and a sign above it',
+    list: ['At the bed: a spare tube of the same size and one a size smaller, spare inner tubes, suction, a cuff-pressure gauge, a stitch cutter; the obturator if the tube has one (expert practice).', 'A bedhead sign completed by the operator: type, size, date, whether the upper airway is patent.', 'Capnography whenever the patient is ventilator dependent.', 'First tube change: after 7 to 10 days for a percutaneous tracheostomy; after a surgical one, often safe after 2 to 3 days (FICM) or 4 (ICS 2014). An experienced operator, ideally over a guide.'],
+    why: WHY.care, tiers: ['FICM/ICS 2020', 'ICS 2014', 'NCEPOD 2014']};
+  if (i.ttype && has(i.tdays)){
+    var due = i.ttype === 'perc' ? 7 : 4;
+    care.sub = (i.ttype === 'perc' ? 'Percutaneous' : 'Surgical') + ', day ' + i.tdays + ': ' + (i.tdays < due ? 'too early for a routine change.' : 'a first change can be planned.');
+  }
+  var talk = {id: 'c-talk', label: 'Cuff down and speaking valve', head: i.vent ? 'On the ventilator: cuff down slowly, then the valve' : 'Cuff fully down before the valve goes on',
+    list: ['The cuff must be completely deflated before a one-way speaking valve is placed; with the cuff up the patient cannot breathe out (manufacturer warning).', 'Start with a short, supervised cuff-deflation trial; watch for distress and aspiration.', 'Do not use a one-way valve with a foam-filled cuff.'],
+    guards: ['Cuff up plus a one-way valve blocks breathing out completely.'], why: WHY.talk, tiers: ['Manufacturer instructions', 'FICM/ICS 2020']};
+  if (i.vent) talk.list.splice(1, 0, 'On the ventilator: deflate over 2 to 5 minutes, adjust the ventilator for the leak, and involve speech therapy and respiratory therapy.');
+  var order = {emerg: [e, care, talk, plan], plan: [plan, e, care, talk], care: [care, e, talk, plan], talk: [talk, e, care, plan]}[i.sit || 'emerg'];
+  return order;
+}
+</script>
+<script id="figs">
+/* Figures: site-drawn SVG, shared colour names only. Physiology figures are teaching sketches, not patient data. */
+var FM = 'font-family:var(--mono)', FSn = 'font-family:var(--sans)';
+function svgOpen(vb, label){ return '<svg viewBox="' + vb + '" role="img" aria-label="' + label + '" class="fig">'; }
+function tx(x, y, t, o){ o = o || {}; return '<text x="' + x + '" y="' + y + '" text-anchor="' + (o.a || 'middle') + '" style="' + (o.sans ? FSn : FM) + ';font-size:' + (o.s || 11.5) + 'px;font-weight:' + (o.w || 400) + ';fill:' + (o.c || 'var(--ink)') + '">' + t + '</text>'; }
+function rect(x, y, w, h, st){ var s = st === 'hot' ? 'fill:var(--card);stroke:var(--accent);stroke-width:2.5' : st === 'dim' ? 'fill:var(--fill);stroke:var(--line);stroke-width:1.5' : st === 'bad' ? 'fill:var(--badbg);stroke:var(--bad);stroke-width:2.5' : 'fill:var(--card);stroke:var(--muted);stroke-width:1.5'; return '<rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="10" style="' + s + '"/>'; }
+function bar(x, y, w, h, hot){ return '<rect x="' + x + '" y="' + y + '" width="' + Math.max(w, 0) + '" height="' + h + '" rx="4" style="fill:' + (hot ? 'var(--accent)' : 'var(--muted)') + '"/>'; }
+function arrow(x1, y1, x2, y2, hot){ var c = hot ? 'var(--accent)' : 'var(--muted)'; var a = Math.atan2(y2 - y1, x2 - x1), l = 7; return '<line x1="' + x1 + '" y1="' + y1 + '" x2="' + x2 + '" y2="' + y2 + '" style="stroke:' + c + ';stroke-width:' + (hot ? 2.5 : 1.5) + '"/><path d="M' + x2 + ' ' + y2 + ' L' + (x2 - l * Math.cos(a - 0.45)) + ' ' + (y2 - l * Math.sin(a - 0.45)) + ' L' + (x2 - l * Math.cos(a + 0.45)) + ' ' + (y2 - l * Math.sin(a + 0.45)) + ' Z" style="fill:' + c + '"/>'; }
+
+var FIGS = {
+  balance: {t: 'Load against capacity', states: ['ok', 'fluid', 'airway', 'weak', 'sedated'], data: {
+    ok: {n: 'Balanced', line: 'Capacity (drive, nerves, diaphragm and chest muscles) comfortably exceeds the load (airway resistance, lung and chest stiffness, the work of moving carbon dioxide). The trial passes.'},
+    fluid: {n: 'Fluid and heart', line: 'Lung water and a struggling left ventricle stiffen the lungs and add load; the scale tips toward failure.'},
+    airway: {n: 'Airways', line: 'Bronchospasm, secretions or a narrow tube raise resistance: every breath costs more work.'},
+    weak: {n: 'Weak muscles', line: 'Disuse, critical illness weakness and low phosphate shrink capacity, so a normal load becomes too much.'},
+    sedated: {n: 'Low drive', line: 'Sedatives, opioids, delirium and a metabolic alkalosis turn down the drive to breathe and the cooperation a trial needs.'}},
+    svg: function(k){
+      var tilt = k === 'ok' ? -8 : 10, h = svgOpen('0 0 360 210', 'A balance with load on the left and capacity on the right');
+      var cx = 180, cy = 70, L = 130, a = tilt * Math.PI / 180, lx = cx - L * Math.cos(a), ly = cy - L * Math.sin(a) * -1, rx = cx + L * Math.cos(a), ry = cy - L * Math.sin(a);
+      ly = cy + L * Math.sin(a); ry = cy - L * Math.sin(a);
+      h += '<path d="M' + (cx - 16) + ' 190 L' + cx + ' ' + (cy + 6) + ' L' + (cx + 16) + ' 190 Z" style="fill:var(--fill);stroke:var(--muted);stroke-width:1.5"/>';
+      h += '<line x1="' + lx + '" y1="' + ly + '" x2="' + rx + '" y2="' + ry + '" style="stroke:var(--ink);stroke-width:3"/>';
+      var heavyL = k !== 'ok' && k !== 'weak' && k !== 'sedated', lightR = k === 'weak' || k === 'sedated';
+      h += rect(lx - 50, ly + 6, 100, heavyL ? 74 : 50, heavyL ? 'bad' : 'on') + tx(lx, ly + 26, 'LOAD', {w: 700});
+      h += tx(lx, ly + 44, {ok: 'usual', fluid: '+ lung water', airway: '+ resistance', weak: 'usual', sedated: 'usual'}[k], {s: 11, c: heavyL ? 'var(--bad)' : 'var(--muted)'});
+      if (heavyL) h += tx(lx, ly + 62, k === 'fluid' ? '+ LV strain' : '+ secretions', {s: 11, c: 'var(--bad)'});
+      h += rect(rx - 50, ry + 6, 100, lightR ? 40 : 60, lightR ? 'bad' : 'hot') + tx(rx, ry + 26, 'CAPACITY', {w: 700});
+      h += tx(rx, ry + 44, {ok: 'drive, muscle', fluid: 'drive, muscle', airway: 'drive, muscle', weak: '− muscle', sedated: '− drive'}[k], {s: 11, c: lightR ? 'var(--bad)' : 'var(--muted)'});
+      h += tx(cx, 206, k === 'ok' ? 'trial passes' : 'trial fails', {w: 700, c: k === 'ok' ? 'var(--ok)' : 'var(--bad)'});
+      return h + '</svg>';
+    }},
+  lv: {t: 'Why the heart fails on a trial', states: ['vent', 'trial'], data: {
+    vent: {n: 'On positive pressure', line: 'Positive pressure in the chest limits venous return and helps the left ventricle empty (it lowers the pressure the ventricle must overcome). A weak ventricle is protected.'},
+    trial: {n: 'On a trial or extubated', line: 'Negative swings in chest pressure raise venous return and the pressure the left ventricle must overcome; adrenaline from the effort raises heart rate and blood pressure. A stiff or weak ventricle backs up into the lungs: weaning-induced pulmonary edema.'}},
+    svg: function(k){
+      var t = k === 'trial', h = svgOpen('0 0 360 220', 'Chest pressure, venous return and the left ventricle');
+      h += '<rect x="110" y="50" width="140" height="110" rx="30" style="fill:var(--fill);stroke:var(--muted);stroke-width:1.5"/>';
+      h += tx(180, 36, t ? 'chest pressure swings negative' : 'chest pressure positive', {s: 11, c: t ? 'var(--bad)' : 'var(--muted)'});
+      h += rect(140, 70, 80, 60, t ? 'bad' : 'hot') + tx(180, 98, 'LEFT', {w: 700}) + tx(180, 114, 'VENTRICLE', {w: 700, s: 11});
+      h += arrow(8, 100, 136, 100, t) + tx(8, 88, t ? 'more return' : 'less return', {a: 'start', s: 11, c: t ? 'var(--bad)' : 'var(--muted)'});
+      h += arrow(224, 100, 352, 100, false) + tx(352, 88, t ? 'harder' : 'easier', {a: 'end', s: 11, c: t ? 'var(--bad)' : 'var(--muted)'}) + tx(352, 120, 'to eject', {a: 'end', s: 11, c: t ? 'var(--bad)' : 'var(--muted)'});
+      if (t){ [0, 1, 2, 3].forEach(function(n){ h += '<circle cx="' + (135 + n * 30) + '" cy="146" r="5" style="fill:var(--bad)"/>'; }); h += tx(180, 194, 'lung water rises', {s: 11.5, w: 700, c: 'var(--bad)'}); }
+      else h += tx(180, 194, 'a weak ventricle is supported', {s: 11.5, w: 700, c: 'var(--ok)'});
+      return h + '</svg>';
+    }},
+  diaphragm: {t: 'How fast the diaphragm wastes', states: ['active', 'passive'], data: {
+    active: {n: 'Working', line: 'A diaphragm that contracts with each breath keeps its fibers.'},
+    passive: {n: '18 to 69 hours passive', line: 'In brain-dead organ donors whose diaphragms did not contract for 18 to 69 hours, fiber cross-sectional area was 57% (slow-twitch) and 53% (fast-twitch) smaller than in controls (14 against 8 patients).'}},
+    svg: function(k){
+      var p = k === 'passive', h = svgOpen('0 0 360 180', 'Diaphragm fiber size, working against passive');
+      [['Slow-twitch fibers', 57], ['Fast-twitch fibers', 53]].forEach(function(r, j){ var y = 20 + j * 70; h += tx(20, y + 10, r[0], {a: 'start', s: 12, w: 700}); h += tx(20, y + 30, 'controls', {a: 'start', s: 10.5, c: 'var(--muted)'}) + bar(110, y + 20, 200, 14, false) + tx(340, y + 32, '100', {a: 'end', s: 11}); h += tx(20, y + 52, 'passive', {a: 'start', s: 10.5, c: 'var(--muted)'}) + bar(110, y + 42, p ? 200 * (100 - r[1]) / 100 : 200, 14, p) + tx(340, y + 54, p ? String(100 - r[1]) : '100', {a: 'end', s: 11, w: p ? 700 : 400}); });
+      h += tx(180, 172, 'fiber area, controls = 100', {s: 10.5, c: 'var(--muted)'});
+      return h + '</svg>';
+    }},
+  airway: {t: 'What the trial does not test', states: ['cough', 'secr', 'brain', 'larynx'], data: {
+    cough: {n: 'Cough', line: 'Peak cough flow 60 L/min or less: failure about 5 times as likely (Smina; Salam).'},
+    secr: {n: 'Secretions', line: 'Secretions over 2.5 mL/h: failure about 3 times as likely; moderate to abundant secretions about 9 times in another cohort.'},
+    brain: {n: 'Commands', line: 'Unable to follow 4 simple commands: failure about 4 times as likely. With all three risks, every patient in the study failed; with none, 3%.'},
+    larynx: {n: 'Larynx', line: 'Edema from the tube narrows the airway once it is out: stridor. A failed cuff leak test flags it; a steroid hours before extubation reduces it.'}},
+    svg: function(k){
+      var D = [['Weak cough', 4.8, 'cough'], ['Heavy secretions', 3.0, 'secr'], ['Cannot follow commands', 4.3, 'brain']], h = svgOpen('0 0 360 190', 'Relative risk of extubation failure by airway factor');
+      if (k === 'larynx'){ h += rect(60, 30, 240, 60, 'on') + tx(180, 55, 'cuff leak test', {w: 700}) + tx(180, 74, 'no leak: steroid ≥4 h before', {s: 11, c: 'var(--muted)'}); h += arrow(180, 92, 180, 116, true) + rect(60, 118, 240, 54, 'hot') + tx(180, 142, 'laryngeal edema 22% → 3%', {w: 700}) + tx(180, 160, 'methylprednisolone, François 2007', {s: 10.5, c: 'var(--muted)'}); return h + '</svg>'; }
+      D.forEach(function(d, j){ var y = 14 + j * 52, on = d[2] === k; h += tx(20, y + 12, d[0], {a: 'start', s: 12, w: on ? 700 : 400}); h += '<rect x="20" y="' + (y + 20) + '" width="280" height="16" rx="5" style="fill:var(--fill)"/>' + bar(20, y + 20, d[1] / 6 * 280, 16, on) + tx(340, y + 33, '×' + d[1], {a: 'end', s: 12, w: 700}); });
+      h += tx(180, 180, 'relative risk of failure, Salam 2004 (88 patients)', {s: 10.5, c: 'var(--muted)'});
+      return h + '</svg>';
+    }},
+  wind: {t: 'Weaning classes (WIND)', states: ['share', 'death'], data: {
+    share: {n: 'How common', line: 'Of 2,729 ventilated patients: 57% short (under a day from the first attempt), 10% difficult (1 to 7 days), 9% prolonged (7 days or more), 24% never had an attempt.'},
+    death: {n: 'Mortality', line: 'Mortality 6% short, 17% difficult, 29% prolonged. Observational: longer weaning marks sicker patients.'}},
+    svg: function(k){
+      var D = k === 'share' ? [['Short', 57], ['Difficult', 10], ['Prolonged', 9], ['No attempt', 24]] : [['Short', 6], ['Difficult', 17], ['Prolonged', 29]];
+      var h = svgOpen('0 0 360 ' + (20 + D.length * 44), 'WIND weaning classes');
+      D.forEach(function(d, j){ var y = 10 + j * 44; h += tx(20, y + 12, d[0], {a: 'start', s: 12, w: 700}); h += '<rect x="20" y="' + (y + 18) + '" width="280" height="16" rx="5" style="fill:var(--fill)"/>' + bar(20, y + 18, d[1] / 60 * 280, 16, j === 2) + tx(340, y + 31, d[1] + '%', {a: 'end', s: 12, w: 700}); });
+      return h + '</svg>';
+    }},
+  neck: {t: 'Two airways', states: ['trach', 'lary'], data: {
+    trach: {n: 'Tracheostomy', line: 'The mouth still connects to the lungs. If the tube comes out or blocks, oxygen can go to the face and the stoma, and the patient can be intubated from above. Green bedhead sign.'},
+    lary: {n: 'Laryngectomy', line: 'The trachea is brought out to the neck and the mouth no longer connects to the lungs. Oxygen and any airway go only to the stoma. Red bedhead sign.'}},
+    svg: function(k){
+      var l = k === 'lary', h = svgOpen('0 0 360 220', l ? 'Laryngectomy: airway only through the neck' : 'Tracheostomy: airway through the mouth and the neck');
+      h += rect(30, 20, 120, 40, 'on') + tx(90, 45, 'MOUTH, NOSE', {w: 700, s: 11});
+      h += rect(30, 160, 120, 40, 'hot') + tx(90, 185, 'LUNGS', {w: 700});
+      h += rect(220, 100, 110, 40, 'hot') + tx(275, 125, 'NECK STOMA', {w: 700, s: 11});
+      if (l){ h += '<line x1="90" y1="62" x2="90" y2="96" style="stroke:var(--bad);stroke-width:2.5;stroke-dasharray:5 4"/>' + tx(98, 86, 'no connection', {a: 'start', s: 11, c: 'var(--bad)'}); }
+      else h += arrow(90, 62, 90, 156, true);
+      h += arrow(218, 120, 152, 168, true);
+      h += tx(275, 160, l ? 'the only airway' : 'one of two airways', {s: 11, c: l ? 'var(--bad)' : 'var(--muted)'});
+      h += tx(275, 70, l ? 'red sign' : 'green sign', {s: 12, w: 700, c: l ? 'var(--bad)' : 'var(--ok)'});
+      return h + '</svg>';
+    }}
+};
+
+var PLATES = {
+  trach: {t: 'Cuff up, cuff down', src: '/media/liberation/speaking-valve.webp', w: 945, h: 515, alt: 'Two side views of a neck showing the mouth, larynx and trachea, with a curved tracheostomy tube entering the trachea below the larynx. Left, cuff up: an inflated balloon cuff fills the trachea around the tube, and the outer end of the tube is open. Right, cuff down with a valve: the cuff is deflated, leaving space around the tube, and a small one-way valve caps the outer end.', cap: 'With the cuff up, all air moves through the tube. With the cuff fully down and a one-way valve on, air goes in through the tube and, on breathing out, passes up around the tube and through the vocal cords, so the patient can speak. A valve on a tube with the cuff up blocks breathing out completely.'}
+};
+function plateHTML(id){ var P = PLATES[id]; if (!P) return ''; return '<div class="plate"><img src="' + P.src + '" alt="' + P.alt + '" width="' + P.w + '" height="' + P.h + '" loading="lazy"><span class="credit">Created with BioRender.com</span></div><p class="line1">' + P.cap + '</p>'; }
+
+var TRIALS = [
+  {q: 'Which way to wean? (Esteban 1995)', d: 'Randomized, 130 patients who failed a 2-hour trial; intermittent mandatory ventilation, pressure support, several daily trials, or one daily trial.', r: 'Median weaning time 5, 4, 3 and 3 days. Success with one daily trial against IMV: rate ratio 2.83; against pressure support: 2.05.', c: 'A once-daily breathing trial became the standard.', cite: 'Esteban A et al. N Engl J Med 1995;332:345', doi: '10.1056/NEJM199502093320601'},
+  {q: 'Screen everyone every day? (Ely 1996)', d: 'Randomized, 300 ventilated adults; daily screen and a 2-hour trial with the physician told of success, against usual care.', r: 'Ventilation median 4.5 against 6 days; complications 20% against 41%.', c: 'Protocolized daily screening.', cite: 'Ely EW et al. N Engl J Med 1996;335:1864', doi: '10.1056/NEJM199612193352502'},
+  {q: 'Wake up and breathe? (ABC)', d: 'Randomized, 336 patients; daily sedation interruption paired with a breathing trial, against the trial alone.', r: 'Days breathing unassisted to day 28: 14.7 against 11.6. One-year mortality hazard ratio 0.68 (0.50 to 0.92). More self-extubations (16 against 6), similar reintubation.', c: 'Pair the sedation pause with the trial.', cite: 'Girard TD et al. Lancet 2008;371:126', doi: '10.1016/S0140-6736(08)60105-1'},
+  {q: 'Pressure support or T-piece? (Subirà 2019)', d: 'Randomized, 1,153 patients; pressure support 8 for 30 minutes against a T-piece for 2 hours.', r: 'Successful extubation 82.3% against 74.0%; reintubation 11.1% against 11.9%.', c: 'A shorter, easier trial extubates more patients without more reintubation.', cite: 'Subirà C et al. JAMA 2019;321:2175', doi: '10.1001/jama.2019.7234'},
+  {q: 'And in high-risk patients? (TIP-EX)', d: 'Randomized, 969 high-risk patients (over 65, or chronic heart or lung disease); pressure support 8 with no PEEP against a T-piece.', r: 'Ventilator-free days the same (median 27 in both). Extubated within 24 hours 77.7% against 72.2%; reintubation 14.9% against 13.6%.', c: 'Either trial is acceptable in high-risk patients.', cite: 'Thille AW et al. N Engl J Med 2022;387:1843', doi: '10.1056/NEJMoa2209041'},
+  {q: 'Diurese to wean? (BNP-guided)', d: 'Randomized, 304 patients; fluid removal guided by daily BNP against usual care during weaning.', r: 'Fluid balance −2,320 against −180 mL; time to successful extubation shorter; more ventilator-free days; mortality not different. The effect was largest with left ventricular systolic dysfunction.', c: 'Supports looking for and treating fluid as a cause of failure.', cite: 'Mekontso Dessap A et al. Am J Respir Crit Care Med 2012;186:1256', doi: '10.1164/rccm.201205-0939OC'},
+  {q: 'High flow alone or with NIV? (HIGH-WEAN)', d: 'Randomized, 641 high-risk patients (over 65, or chronic heart or lung disease); NIV alternating with high flow against high flow alone after extubation.', r: 'Reintubation by day 7: 11.8% against 18.2% (difference −6.4 points).', c: 'NIV for high-risk patients after extubation.', cite: 'Thille AW et al. JAMA 2019;322:1465', doi: '10.1001/jama.2019.14901'},
+  {q: 'High flow in low-risk patients? (Hernández 2016a)', d: 'Randomized, 527 low-risk patients; high flow against conventional oxygen for 24 hours.', r: 'Reintubation at 72 hours 4.9% against 12.2%.', c: 'High flow after extubation in low-risk patients.', cite: 'Hernández G et al. JAMA 2016;315:1354', doi: '10.1001/jama.2016.2711'},
+  {q: 'High flow or NIV in high risk? (Hernández 2016b)', d: 'Non-inferiority trial, 604 high-risk patients (by a broader definition including obesity, long ventilation and a failed trial).', r: 'Reintubation 22.8% with high flow against 19.1% with NIV: non-inferior. NIV stopped for side effects in 42.9%.', c: 'High flow is an alternative when NIV is not possible.', cite: 'Hernández G et al. JAMA 2016;316:1565', doi: '10.1001/jama.2016.14194'},
+  {q: 'NIV for failure after extubation? (Esteban 2004)', d: 'Randomized, 221 patients with respiratory failure within 48 hours of extubation; NIV against standard care. Stopped early.', r: 'Reintubation 48% in both. ICU mortality 25% against 14% (relative risk 1.78). Time to reintubation 12 against 2.5 hours.', c: 'Do not use NIV to treat established post-extubation failure.', cite: 'Esteban A et al. N Engl J Med 2004;350:2452', doi: '10.1056/NEJMoa032736'},
+  {q: 'Steroids to prevent stridor? (François)', d: 'Randomized, double blind, 698 patients ventilated over 36 hours; methylprednisolone 20 mg from 12 hours before extubation, every 4 hours.', r: 'Laryngeal edema 3% against 22%; reintubation 4% against 8%.', c: 'Basis for steroids after a failed cuff leak test.', cite: 'François B et al. Lancet 2007;369:1083', doi: '10.1016/S0140-6736(07)60526-1'},
+  {q: 'Collar or pressure support for the long wean? (Jubran 2013)', d: 'Randomized, 316 patients with tracheostomies in a long-term acute care hospital, ventilated over 21 days.', r: 'Median weaning time 15 days with collar trials against 19 with pressure support reduction; mortality the same at 6 and 12 months.', c: 'Unassisted collar trials for prolonged weaning.', cite: 'Jubran A et al. JAMA 2013;309:671', doi: '10.1001/jama.2013.159'},
+  {q: 'Early tracheostomy? (TracMan)', d: 'Randomized, 909 patients in UK ICUs; tracheostomy by day 4 against after day 10.', r: '30-day mortality 30.8% against 31.5%. Only 44.9% of the late group ever received one.', c: 'No benefit from routine early tracheostomy.', cite: 'Young D et al. JAMA 2013;309:2121', doi: '10.1001/jama.2013.5154'},
+  {q: 'Day 6 to 8 or 13 to 15? (Terragni 2010)', d: 'Randomized, 419 patients in Italian ICUs.', r: 'Ventilator-associated pneumonia 14% against 21% (P = 0.07); 56.7% of the late group were tracheotomized.', c: 'Early tracheostomy did not significantly reduce pneumonia.', cite: 'Terragni PP et al. JAMA 2010;303:1483', doi: '10.1001/jama.2010.447'}
+];
+
+var CASES = [
+  {tab: 'wean', t: 'Fails at 20 minutes, every time', s: 'A 72-year-old with heart failure (EF 30%), day 6 on the ventilator after pneumonia, +6 L balance. Second failed trial in 2 days: blood pressure from 120 to 175, heart rate 120, new crackles, SpO2 down to 88%.', q: 'Why is the trial failing, and what next?', i: {dvent: 6, dfirst: 2, nfail: 2, cardio: true, hypox: true, lvd: true, bal: true}, p: 'Weaning-induced pulmonary edema is the leading cause: the surge in pressure, crackles and desaturation on a weak, fluid-loaded ventricle. Confirm with a rise in plasma protein or an echo at the end of the trial; diurese toward an even balance, control the blood pressure surge, and retry. Difficult weaning (1 to 7 days).'},
+  {tab: 'ext', t: 'Good trial, wet airway', s: 'A 58-year-old passed a 30-minute pressure-support trial easily. Cough is weak, suctioned for moderate secretions every hour, follows commands. No other risk factors.', q: 'Extubate?', i: {pass: true, cough: 'weak', secr: 'heavy', cmd: 'yes'}, p: 'Two airway risks (weak cough, heavy secretions): failure much more likely despite the passed trial. Weigh a short delay with physiotherapy and suction; if extubating, NIV or high flow (ERS 2022 prefers NIV at high risk, but heavy secretions make NIV harder and favor high flow), with a plan to reintubate early.'},
+  {tab: 'ext', t: 'COPD, passed the trial', s: 'A 70-year-old with COPD, intubated 5 days for an exacerbation. Passed the trial; PaCO2 rose to 52 by the end. Strong cough, few secretions, follows commands.', q: 'What support after extubation?', i: {pass: true, cough: 'strong', secr: 'few', cmd: 'yes', age65: true, chronic: true, hyperc: true}, p: 'High risk (over 65, COPD, hypercapnia on the trial): extubate straight to NIV, with high flow between sessions (strong, moderate for preventive NIV in high-risk patients ventilated over 24 hours).'},
+  {tab: 'ext', t: 'Stridor at one hour', s: 'A 45-year-old extubated an hour ago after 8 days intubated. Now inspiratory stridor, rate 30, using neck muscles, SpO2 93% on high flow.', q: 'What now?', i: {pass: true, stridor: true, hrs: 1, strid: true, work: true}, p: 'Post-extubation stridor with increased work of breathing: sit up, humidified oxygen, call the airway team now; nebulized epinephrine and an IV steroid are commonly given (expert practice). High flow and NIV do not treat laryngeal edema: if it is not settling, reintubate with a smaller tube and difficult-airway equipment ready.'},
+  {tab: 'wean', t: 'Day 12, third failure', s: 'A 64-year-old after septic shock, day 12 on the ventilator, three failed trials over 8 days. Weak: cannot lift the arms against gravity. Rapid shallow breathing on each trial. Received a neuromuscular blocker for 2 days early on.', q: 'What is going on, and is it time for a tracheostomy?', i: {dvent: 12, dfirst: 8, nfail: 3, rsb: true, weak: true, paral: true}, p: 'Prolonged weaning (over 7 days, three failed trials) with weakness as the leading cause: diaphragm and limb weakness after critical illness. Lighter sedation, rehabilitation, electrolytes and nutrition. A tracheostomy is reasonable now that a long course is likely; no fixed day is better (TracMan).'},
+  {tab: 'trach', t: 'Fresh tracheostomy out at day 3', s: 'A percutaneous tracheostomy placed 3 days ago. The tube is found lying on the chest; SpO2 82%, breathing.', q: 'What do you do?', i: {sit: 'emerg', ttype: 'perc', tdays: 3, vent: true}, p: 'Call the airway team. Oxygen to the face and the stoma. The tract is not established (under 7 days after a percutaneous tracheostomy): do not blindly reinsert. Oxygenate from above with the stoma covered, and oral intubation by an experienced operator with an uncut tube advanced beyond the stoma.'}
+];
+</script>
+<script>
+(function(){
+var $ = function(id){ return document.getElementById(id); };
+function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+var ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M7 15l3-4 3 3 2-2 2 3"/></svg>';
+function chip(fig, state, label){ if (fig.indexOf('plate:') === 0) return '<button class="chip" type="button" data-plate="' + fig.slice(6) + '">' + ICON + esc(label) + '</button>'; return '<button class="chip" type="button" data-fig="' + fig + '" data-state="' + (state || '') + '">' + ICON + esc(label || FIGS[fig].t) + '</button>'; }
+function cardHTML(c){
+  var h = '<div class="card' + (c.stop ? ' stop' : '') + '" id="' + c.id + '"><p class="label">' + esc(c.label) + '</p><h2>' + esc(c.head) + '</h2>';
+  if (c.sub) h += '<p class="sub">' + esc(c.sub) + '</p>';
+  if (c.steps) h += '<ol class="steps">' + c.steps.map(function(s){ return '<li>' + esc(s) + '</li>'; }).join('') + '</ol>';
+  if (c.list && c.list.length) h += '<ul>' + c.list.map(function(s){ return '<li>' + esc(s) + '</li>'; }).join('') + '</ul>';
+  if (c.fixes) h += '<p class="sub" style="margin-top:8px">Fix:</p><ul>' + c.fixes.map(function(s){ return '<li>' + esc(s) + '</li>'; }).join('') + '</ul>';
+  h += (c.guards || []).map(function(g){ return '<div class="guard">' + esc(g) + '</div>'; }).join('');
+  if (c.why) h += '<p class="whyline"><b>Why:</b> ' + esc(c.why) + '</p>';
+  if (c.links) h += '<div class="links">' + c.links.map(function(l){ return '<a href="' + l[0] + '">' + esc(l[1]) + ' →</a>'; }).join('') + '</div>';
+  if (c.chips && c.chips.length) h += '<div class="chips">' + c.chips.map(function(x){ return chip(x[0], x[1], x[2]); }).join('') + '</div>';
+  if ((c.more && c.more.length) || (c.tiers && c.tiers.length)) h += '<details><summary>More</summary>' + (c.more || []).map(function(m){ return '<p>' + esc(m) + '</p>'; }).join('') + (c.tiers || []).map(function(t){ return '<span class="tier">' + esc(t) + '</span>'; }).join('') + '</details>';
+  return h + '</div>';
+}
+
+/* Inputs */
+var st = {t: {}, sit: 'emerg'};
+var NUMS = {wean: ['dvent','dfirst','nfail'], ext: ['hrs'], trach: ['tdays']};
+var SELS = {wean: [], ext: ['cough','secr','cmd','leak'], trach: ['ttype']};
+var TK = {wean: TW0.concat(TW1, TW2), ext: TE0.concat(TE1, TE2), trach: TT0};
+function num(id){ var v = parseFloat($(id).value); return isFinite(v) && v >= 0 ? v : null; }
+function read(tab){ var i = {}; NUMS[tab].forEach(function(k){ i[k] = num(k); }); SELS[tab].forEach(function(k){ i[k] = $(k).value; }); TK[tab].forEach(function(t){ if (st.t[tab + ':' + t[0]]) i[t[0]] = true; }); if (tab === 'trach') i.sit = st.sit; return i; }
+function ticks(host, list, tab){ $(host).innerHTML = list.map(function(t){ return '<label class="chk"><input type="checkbox" data-t="' + tab + ':' + t[0] + '"' + (st.t[tab + ':' + t[0]] ? ' checked' : '') + '>' + esc(t[1]) + '</label>'; }).join(''); }
+function drawInputs(){
+  ticks('ticks-w0', TW0, 'wean'); ticks('ticks-w1', TW1, 'wean'); ticks('ticks-w2', TW2, 'wean');
+  ticks('ticks-e0', TE0, 'ext'); ticks('ticks-e1', TE1, 'ext'); ticks('ticks-e2', TE2, 'ext'); ticks('ticks-t0', TT0, 'trach');
+  $('sitseg').innerHTML = SIT.map(function(x){ return '<button class="sbtn" type="button" data-v="' + x[0] + '" aria-pressed="' + (x[0] === st.sit) + '">' + esc(x[1]) + '</button>'; }).join('');
+}
+var ENG = {wean: weanCards, ext: extCards, trach: trachCards};
+function build(tab, i){ return ENG[tab](i).map(cardHTML).join(''); }
+function render(){ $('wean-out').innerHTML = build('wean', read('wean')); $('ext-out').innerHTML = build('ext', read('ext')); $('trach-out').innerHTML = build('trach', read('trach')); }
+['wean-in','ext-in','trach-in'].forEach(function(id){
+  $(id).addEventListener('change', function(e){ var t = e.target.getAttribute && e.target.getAttribute('data-t'); if (t) st.t[t] = e.target.checked; render(); });
+  $(id).addEventListener('input', render);
+});
+$('sitseg').addEventListener('click', function(e){ var b = e.target.closest('[data-v]'); if (b){ st.sit = b.getAttribute('data-v'); drawInputs(); render(); } });
+
+/* Tabs */
+var tabs = [['t-wean','p-wean'],['t-ext','p-ext'],['t-trach','p-trach'],['t-learn','p-learn'],['t-prac','p-prac']];
+function show(t){ tabs.forEach(function(p){ var on = p[0] === t; $(p[0]).setAttribute('aria-selected', String(on)); $(p[1]).classList.toggle('on', on); }); }
+tabs.forEach(function(p){ $(p[0]).addEventListener('click', function(){ show(p[0]); }); });
+function fromHash(){ var id = location.hash.slice(1); if (!id) return; var el = $(id); if (!el) return; var pan = el.closest('.panel'); if (pan) tabs.forEach(function(p){ if (p[1] === pan.id) show(p[0]); }); el.scrollIntoView(); }
+window.addEventListener('hashchange', fromHash);
+document.addEventListener('click', function(e){ var a = e.target.closest && e.target.closest('a[href^="#"]'); if (a){ var id = a.getAttribute('href').slice(1), el = $(id); if (el){ e.preventDefault(); var pan = el.closest('.panel'); if (pan) tabs.forEach(function(p){ if (p[1] === pan.id) show(p[0]); }); el.scrollIntoView(); } } });
+
+/* Figures and the sheet */
+function mountFig(host, id, state){
+  var F = FIGS[id];
+  function draw(k){
+    var d = F.data[k];
+    host.innerHTML = '<div class="states" role="group" aria-label="' + esc(F.t) + '">' + F.states.map(function(x){ return '<button class="sbtn" type="button" data-k="' + x + '" aria-pressed="' + (x === k) + '">' + esc(F.data[x].n) + '</button>'; }).join('') + '</div>' + F.svg(k) + '<p class="line1">' + esc(d.line) + '</p>';
+  }
+  host.onclick = function(e){ var b = e.target.closest && e.target.closest('[data-k]'); if (b) draw(b.getAttribute('data-k')); };
+  draw(state && F.data[state] ? state : F.states[0]);
+}
+var lastFocus = null;
+function openSheet(title, fill){ lastFocus = document.activeElement; $('sheet-t').textContent = title; fill($('sheet-b')); $('scrim').hidden = false; $('sheet').hidden = false; $('sheet').scrollTop = 0; $('sheet-x').focus(); }
+function closeSheet(){ if ($('sheet').hidden) return; $('scrim').hidden = true; $('sheet').hidden = true; if (lastFocus && lastFocus.focus) lastFocus.focus(); }
+$('sheet-x').addEventListener('click', closeSheet); $('scrim').addEventListener('click', closeSheet);
+document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeSheet(); });
+document.addEventListener('click', function(e){
+  var c = e.target.closest && e.target.closest('[data-fig]'); if (c){ var f = c.getAttribute('data-fig'), s = c.getAttribute('data-state'); openSheet(FIGS[f].t, function(b){ mountFig(b, f, s); }); }
+  var q = e.target.closest && e.target.closest('[data-plate]'); if (q){ var id = q.getAttribute('data-plate'); openSheet(PLATES[id].t, function(b){ b.onclick = null; b.innerHTML = plateHTML(id); }); }
+});
+document.querySelectorAll('[data-figure]').forEach(function(h){ mountFig(h, h.getAttribute('data-figure'), h.getAttribute('data-state')); });
+$('plate-trach').innerHTML = plateHTML('trach');
+
+/* Learn tab */
+(function(){
+  var chaps = [].slice.call(document.querySelectorAll('.chap'));
+  $('pills').innerHTML = chaps.map(function(c, n){ return '<button class="pill" type="button" data-go="' + c.id + '" aria-current="' + (n === 0) + '">' + (n + 1) + ' ' + esc(c.getAttribute('data-pill')) + '</button>'; }).join('');
+  $('pills').addEventListener('click', function(e){ var g = e.target.getAttribute('data-go'); if (g) $(g).scrollIntoView(); });
+  function mark(id){ [].forEach.call($('pills').children, function(b){ var on = b.getAttribute('data-go') === id; b.setAttribute('aria-current', String(on)); if (on) $('pills').scrollLeft = Math.max(0, b.offsetLeft - 60); }); }
+  if ('IntersectionObserver' in window){
+    var io = new IntersectionObserver(function(es){ es.forEach(function(en){ if (en.isIntersecting) mark(en.target.id); }); }, {rootMargin: '-30% 0px -60% 0px'});
+    chaps.forEach(function(c){ io.observe(c); });
+  }
+  $('trialbox').innerHTML = TRIALS.map(function(t){ return '<div class="trial" style="margin-top:14px"><p><b>' + esc(t.q) + '</b></p><p><span class="k">Design</span>' + esc(t.d) + '</p><p><span class="k">Result</span>' + esc(t.r) + '</p><p><span class="k">What it changed</span>' + esc(t.c) + '</p><p class="mono" style="font-size:13px"><a href="https://doi.org/' + t.doi + '" rel="noopener">' + esc(t.cite) + '</a></p></div>'; }).join('');
+  $('go-prac').addEventListener('click', function(){ show('t-prac'); window.scrollTo(0, 0); });
+})();
+
+/* Practice: cases run through the same engines */
+$('practice').innerHTML = CASES.map(function(c, n){
+  return '<div class="card case"><p class="label">Case ' + (n + 1) + '</p><h2>' + esc(c.t) + '</h2><p>' + esc(c.s) + '</p><p><b>' + esc(c.q) + '</b></p><div class="row"><button class="btn" type="button" data-ans="' + n + '">Show the answer</button><button class="btn ghost" type="button" data-load="' + n + '">Open in the tool</button></div><div class="ans" id="ans' + n + '" hidden></div></div>';
+}).join('');
+function caseInput(c){ var i = {}; NUMS[c.tab].forEach(function(k){ i[k] = null; }); SELS[c.tab].forEach(function(k){ i[k] = ''; }); Object.keys(c.i).forEach(function(k){ i[k] = c.i[k]; }); if (c.tab === 'trach' && !i.sit) i.sit = 'emerg'; return i; }
+$('practice').addEventListener('click', function(e){
+  var a = e.target.getAttribute('data-ans'), l = e.target.getAttribute('data-load');
+  if (a != null){ var c = CASES[a], box = $('ans' + a); box.innerHTML = '<p>' + esc(c.p) + '</p>' + build(c.tab, caseInput(c)).replace(/ id="[^"]*"/g, ''); box.hidden = false; e.target.hidden = true; }
+  if (l != null){
+    var c2 = CASES[l], tab = c2.tab;
+    Object.keys(st.t).forEach(function(k){ if (k.indexOf(tab + ':') === 0) delete st.t[k]; });
+    TK[tab].forEach(function(t){ if (c2.i[t[0]]) st.t[tab + ':' + t[0]] = true; });
+    if (tab === 'trach') st.sit = c2.i.sit || 'emerg';
+    NUMS[tab].forEach(function(k){ $(k).value = c2.i[k] != null ? c2.i[k] : ''; });
+    SELS[tab].forEach(function(k){ $(k).value = c2.i[k] || ''; });
+    drawInputs(); render(); show({wean: 't-wean', ext: 't-ext', trach: 't-trach'}[tab]); window.scrollTo(0, 0);
+  }
+});
+drawInputs(); render(); fromHash();
+})();
+</script>
+<script id="deeper-data">
+/* Go deeper: mechanism, rationale and the common trap for each Learn chapter. Text only; no doses or thresholds beyond the tool's own. */
+(function(){ var D = {
+"learn-balance": [["Mechanism", "Breathing works when the respiratory muscles, driven by the brain, can sustain the load set by airway resistance, lung and chest wall stiffness and the amount of carbon dioxide to clear. A failed trial means load exceeded capacity for that period."], ["Why it matters", "Each cause has a different fix: removing fluid, treating bronchospasm, lightening sedation, rebuilding strength. Another trial without a fix tends to fail the same way."], ["Common trap", "Labeling the patient as weak or anxious without looking for a load that can be removed, such as lung water, secretions or a tense abdomen."]],
+"learn-lv": [["Mechanism", "Positive pressure in the chest reduces venous return and lowers the pressure the left ventricle must generate to eject. Unassisted breathing reverses both, and the effort releases catecholamines that raise heart rate and blood pressure."], ["Why it matters", "A stiff or weak left ventricle that was coping on the ventilator can fail within minutes of a trial, flooding the lungs. Removing fluid and controlling the blood pressure surge often allows the next trial to pass."], ["Common trap", "Reading the rapid breathing and low oxygen on the trial as lung or muscle failure and missing the cardiac cause, especially in COPD, obesity or known heart disease."]],
+"learn-diaphragm": [["Mechanism", "A diaphragm that does not contract loses muscle protein quickly, and critical illness, sepsis and some drugs add direct injury to muscle and nerve."], ["Why it matters", "Letting the patient trigger breaths, keeping sedation light and mobilizing early protect the muscle that must take over when the ventilator stops."], ["Common trap", "Leaving a recovering patient on fully controlled ventilation for comfort or convenience long after it is needed."]],
+"learn-airway": [["Mechanism", "A breathing trial tests whether the lungs and muscles can sustain ventilation through a tube that bypasses the larynx. After extubation the patient must also protect the airway, clear secretions by coughing and keep the larynx open."], ["Why it matters", "Patients who pass the trial can still fail extubation because of a weak cough, heavy secretions, a depressed level of consciousness or laryngeal edema, and failing extubation is linked with higher mortality."], ["Common trap", "Treating a passed trial as permission to extubate without checking the cough, the secretions and whether the patient can follow commands."]],
+"learn-wind": [["Mechanism", "Classifying weaning by the time from the first attempt to separation sorts patients by how hard liberation is proving to be."], ["Why it matters", "The longer weaning takes, the higher the mortality and the stronger the case for a systematic search for causes, a tracheostomy decision and a conversation about goals."], ["Common trap", "Reading the class as a cause. Prolonged weaning marks sicker patients; it does not mean that weaning itself caused the deaths."]],
+"learn-trach": [["Mechanism", "A tracheostomy enters the trachea below the larynx. After a laryngectomy the trachea is brought out to the neck and the mouth no longer connects to the lungs. A new tracheostomy tract takes about a week to form after a percutaneous tracheostomy (sooner after a surgical one), during which a dislodged tube can be pushed into the tissues of the neck."], ["Why it matters", "The airway emergency is handled differently in each: with a patent upper airway, oxygen and intubation can come from above; after a laryngectomy, only through the stoma."], ["Common trap", "Forcing a tube back into a fresh tract and ventilating into the tissues of the neck, or trying to oxygenate a laryngectomy patient by mouth."]]
+};
+  function add(){ Object.keys(D).forEach(function(id){ var c = document.getElementById(id); if (!c || c.querySelector(":scope > .deeper")) return; var d = document.createElement("details"); d.className = "deeper"; d.innerHTML = "<summary>Go deeper: mechanism and rationale</summary><div class=\"dpx\">" + D[id].map(function(r){ return "<div><span class=\"dl\">" + r[0] + "</span><p>" + r[1] + "</p></div>"; }).join("") + "</div>"; c.appendChild(d); }); }
+  add();
+})();
+</script>
+</body>
+</html>
