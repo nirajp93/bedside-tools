@@ -99,6 +99,20 @@ footer p{margin-bottom:8px}
   section.view.on>.lede,section.view.on>.machines,section.view.on>.note{grid-column:1/-1}
   #controls.on>.sim{grid-row:span 4}
 }
+
+.case .stem{font-size:16px;margin-top:6px}
+.case canvas{display:block;width:100%;height:auto;aspect-ratio:6/5;border-radius:10px;margin-top:12px;background:var(--us-bg)}
+.case h4{font-size:15px;font-weight:600;margin-top:14px}
+.opts{display:grid;gap:6px;margin-top:8px}
+.opts button{min-height:44px;padding:8px 12px;border:1px solid var(--line);border-radius:12px;background:var(--card);font-size:15px;text-align:left}
+.opts button.right{border-color:var(--ink);background:var(--ink);color:var(--bg)}
+.opts button.wrong{background:var(--warnbg);border-color:var(--warnbg);color:var(--warn)}
+.fb{font-size:15px;margin-top:8px}
+.casenav{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:14px}
+.casenav button{min-height:44px;padding:0 16px;border-radius:999px;border:1px solid var(--line);background:var(--card);font-size:14px}
+.casenav button.p{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.casenav button:disabled{opacity:.74}
+.casenav span{font-family:var(--mono);font-size:12px;color:var(--muted)}
 </style>
 </head>
 <body>
@@ -143,6 +157,10 @@ footer p{margin-bottom:8px}
   <p class="lede">Below the pleural line, lung ultrasound is the reading of artefacts.</p>
   <div id="lungs" style="display:contents"></div>
 </section>
+<section class="view" id="practice" aria-labelledby="t-practice">
+  <p class="lede">Twelve drawn pictures. Say what is wrong, or name the artefact.</p>
+  <div class="card pad case" id="case"></div>
+</section>
 </main>
 
 <nav class="tabs" role="tablist" aria-label="Sections"><div class="wrap">
@@ -150,6 +168,7 @@ footer p{margin-bottom:8px}
   <button type="button" role="tab" id="t-physics" aria-controls="physics" aria-selected="false">Physics</button>
   <button type="button" role="tab" id="t-artefacts" aria-controls="artefacts" aria-selected="false">Artefacts</button>
   <button type="button" role="tab" id="t-lung" aria-controls="lung" aria-selected="false">Lung</button>
+  <button type="button" role="tab" id="t-practice" aria-controls="practice" aria-selected="false">Practice</button>
 </div></nav>
 
 <footer>
@@ -240,8 +259,8 @@ function simEngine(s){
   var tgc=ratio>1.9?"neartop":ratio<0.52?"fartop":"ok";
   return {depth:depth,gain:gain,tgc:tgc,tissue:tissue,fluid:fluid,ratio:ratio};
 }
-function drawSim(){
-  var s=simState(),c=$("#scan"),x=c.getContext("2d");
+function paintScan(c,s){
+  var x=c.getContext("2d");
   x.setTransform(1,0,0,1,0,0);x.fillStyle="rgb(5,5,6)";x.fillRect(0,0,720,600);
   x.setTransform(2,0,0,2,0,0);
   var sector=new Path2D("M180 8 L4.5 232.6 A285 285 0 0 0 355.5 232.6 Z");
@@ -268,6 +287,9 @@ function drawSim(){
   x.fillStyle="rgb(170,170,170)";x.font="10px monospace";x.textAlign="right";
   var step=s.D<=8?2:s.D<=14?4:5;
   for(var cm=step;cm<s.D;cm+=step){x.fillRect(350,8+cm*sc,6,1);x.fillText(cm,347,8+cm*sc+3)}
+}
+function drawSim(){
+  var s=simState();paintScan($("#scan"),s);
   /* readouts and verdict */
   $("#o-depth").textContent=s.D+" cm";$("#o-gain").textContent=s.g+"%";$("#o-near").textContent=s.n+"%";$("#o-far").textContent=s.f+"%";
   var e=simEngine(s),v,rows;
@@ -421,8 +443,40 @@ function openHash(){var id=location.hash.slice(1);if(!id)return;var el=document.
   if(el!==sec)el.scrollIntoView()}
 window.addEventListener("hashchange",openHash);
 
+/* ── Practice: the same engines and drawings as the other tabs ── */
+var CTRL=["Depth","Gain","Near and far gain (time-gain)","Preset"];
+function simCase(s,stem){var e=simEngine(s),ans=e.depth!=="ok"?0:e.tgc!=="ok"?2:e.gain!=="ok"?1:3;
+  var why=e.depth==="shallow"?"Too shallow: the far side of the target is cut off. Add depth; brightness is not the problem.":e.depth==="deep"?"Too deep: the target is a small shape near the top. Take depth off until it sits in the middle.":e.tgc==="neartop"?"Bright near the probe and dark deeper down. Raise the far gain or lower the near gain until tissue is the same grey top to bottom.":e.tgc==="fartop"?"Dark near the probe and bright deeper down. Lower the far gain or raise the near gain.":e.gain==="high"?"Too much gain: the fluid has turned grey. Turn gain down until the fluid is black again.":"Too little gain: tissue detail is lost in black. Turn gain up until tissue is mid-grey and the fluid is still black.";
+  return {stem:stem,sim:s,q:"Which control fixes it?",o:CTRL,a:ans,why:why}}
+function artCase(id,opts){var r=ARTS.filter(function(x){return x.id===id})[0];return {stem:"Name the artefact.",fig:r.f.replace(/<text[^>]*>[^<]*<\/text>/g,""),q:"What is this?",o:opts,a:opts.indexOf(r.t),why:r.b}}
+function setCase(k,stem,opts,a){return {stem:stem,fig:us('<path class="w" stroke-width="4" d="M40 40 H320"/>'+SETS[k][2],"Lung picture"),q:"What is the most likely cause?",o:opts,a:a,why:SETS[k][0]+". "+SETS[k][1]+" Use the lung preset or turn compounding off, with a single focus at the pleural line."}}
+var PCASES=[
+ simCase({D:12,g:88,n:40,f:60},"The tissue is washed out to white and edges are hard to see."),
+ simCase({D:20,g:50,n:40,f:60},"You are looking for a 3 cm structure about 6 cm down."),
+ simCase({D:7,g:50,n:40,f:60},"The bottom of the target is missing."),
+ simCase({D:12,g:14,n:40,f:60},"You can hardly see the tissue."),
+ simCase({D:12,g:50,n:85,f:15},"The top of the picture is bright and the bottom fades out."),
+ simCase({D:12,g:50,n:8,f:96},"The top of the picture is dark and the bottom glares."),
+ setCase("comp","Over the lung, one vertical line seems to fan into several.",["Spatial compounding is on","Gain is too low","Depth is too shallow"],0),
+ setCase("focus","Over the lung, the vertical lines look wide and run together.",["Focus is set deep","The probe marker is reversed","Gain is too low"],0),
+ {stem:"Spectral Doppler over a vessel shows almost no signal. The beam crosses the vessel at a right angle.",q:"Which fix?",o:["Turn the gain up","Angle the beam along the flow","Add depth"],a:1,why:doppEngine(90)===3?"At 90 degrees to flow there is no Doppler shift, so there is nothing to amplify. Line up with flow: 60 degrees or less for vessels, within 20 degrees for right-heart measurements.":""},
+ {stem:"In an apical view the larger ventricle is on the side where you expected the smaller one.",q:"What do you check first?",o:["Touch one edge of the probe face and see which side of the screen moves","Turn the gain down","Switch to M-mode"],a:0,why:"The mark on the screen matches the mark on the probe, and which side it sits on depends on the preset. A mirrored picture swaps left and right."},
+ artCase("r-reverb",["Reverberation","Mirror image","Enhancement"]),
+ artCase("r-enh",["Shadowing","Enhancement","Edge shadow"])
+];
+var pi=0,ppick={};
+function paintCase(){var c=PCASES[pi],p=ppick[pi],h='<span class="kicker">Case '+(pi+1)+' of '+PCASES.length+'</span><p class="stem">'+c.stem+'</p>'+(c.sim?'<canvas id="pscan" width="720" height="600" role="img" aria-label="Drawn ultrasound picture"></canvas>':(c.fig||""));
+  h+='<h4>'+c.q+'</h4><div class="opts">'+c.o.map(function(o,i){var cls=p===undefined?"":(i===c.a?"right":(i===p?"wrong":""));return '<button type="button" data-o="'+i+'" class="'+cls+'"'+(p!==undefined?" disabled":"")+'>'+o+'</button>'}).join("")+'</div>'+(p!==undefined?'<p class="fb"><b>'+(p===c.a?"Right.":"Not quite.")+'</b> '+c.why+'</p>':"");
+  var done=0,ok=0;PCASES.forEach(function(x,i){if(ppick[i]!==undefined){done++;if(ppick[i]===x.a)ok++}});
+  h+='<div class="casenav"><button type="button" id="prevc"'+(pi===0?" disabled":"")+'>Back</button><span>'+ok+' right of '+done+' answered</span><button type="button" class="p" id="nextc"'+(pi===PCASES.length-1?" disabled":"")+'>Next</button></div>';
+  $("#case").innerHTML=h;if(c.sim)paintScan($("#pscan"),c.sim)}
+$("#case").addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;
+  if(b.id==="nextc"){pi++;paintCase();return}if(b.id==="prevc"){pi--;paintCase();return}
+  if(b.dataset.o!==undefined&&ppick[pi]===undefined){ppick[pi]=+b.dataset.o;paintCase()}});
+
+window.__pcases=PCASES;
 window.__engines={sim:simEngine,freq:freqEngine,dopp:doppEngine,aline:alineEngine};
-paintCards();drawSim();paintFreq();paintDopp();paintAline();paintBline();paintSet();openHash();
+paintCards();drawSim();paintFreq();paintDopp();paintAline();paintBline();paintSet();paintCase();openHash();
 })();
 </script>
 </body>
