@@ -1,14 +1,15 @@
 /* bedside.tools offline copy.
    Registered by /theme.js on every page, so tools add nothing of their own.
-   - Pages and site files: try the network first (so a pushed change shows at once), and fall back to the
-     saved copy when offline or when the connection stalls for more than a few seconds.
+   - Pages and site files: the saved copy is shown at once and a fresh copy is fetched behind it, so opening a
+     tool or going back never waits on the hospital's signal. When the fresh copy of a page differs, the page
+     is told; /theme.js reloads it if nothing has been touched yet, otherwise the change shows next time.
+     A page with no saved copy comes from the network.
    - Every page opened is saved as it is visited; the home page also saves every live tool (see index.html).
    - Fonts: the site's own two files in /fonts/, saved when this worker installs.
    Nothing a visitor types is ever saved here: only GET requests for the site's own files and its fonts. */
 var CACHE = 'bt-offline';
 var SHELL = ['/', '/theme.js', '/manifest.webmanifest', '/icons/icon-192.png', '/icons/icon-512.png', '/icons/apple-touch-icon.png', '/fonts/atkinson-hyperlegible-next.woff2', '/fonts/atkinson-hyperlegible-mono.woff2'];
 var FONT_HOSTS = ['fonts.googleapis.com', 'fonts.gstatic.com'];
-var STALL_MS = 3000;
 
 self.addEventListener('install', function (e) {
   e.waitUntil(caches.open(CACHE).then(function (c) {
@@ -42,6 +43,15 @@ function saved(req, isPage) {
     });
   });
 }
+/* Has the page changed? Compared by the server's own version stamp, never by reading the page. */
+function stamp(res) {
+  var h = res.headers;
+  return h.get('etag') || h.get('last-modified') || h.get('content-length') || '';
+}
+function tell(id, path) {
+  if (!id) return;
+  return self.clients.get(id).then(function (c) { if (c) c.postMessage({ bt: 'page-updated', path: path }); }).catch(function () {});
+}
 function notSaved() {
   var html = '<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">' +
     '<title>Offline · bedside.tools</title><script src="/theme.js"></scr' + 'ipt>' +
@@ -71,23 +81,23 @@ self.addEventListener('fetch', function (e) {
 
   var isPage = req.mode === 'navigate';
   var key = url.origin + url.pathname;
+  var stored = null; // resolves once the fresh copy is in the cache
   var net = fetch(url.href, { cache: 'no-cache', credentials: 'same-origin' }).then(function (res) {
-    if (res.ok) e.waitUntil(save(res.redirected ? res.url.split('?')[0] : key, res.clone()));
+    if (res.ok) { stored = save(res.redirected ? res.url.split('?')[0] : key, res.clone()); e.waitUntil(stored); }
     return Promise.resolve(clean(res));
   });
   var fallback = function () { return saved(req, isPage).then(function (hit) { return hit || (isPage ? notSaved() : Response.error()); }); };
 
-  e.respondWith(new Promise(function (resolve) {
-    var done = false;
-    var finish = function (r) { if (!done) { done = true; resolve(r); } };
-    // Slow connection: after a few seconds show the saved copy if there is one, and keep updating in the background.
-    var timer = setTimeout(function () { saved(req, isPage).then(function (hit) { if (hit) finish(hit); }); }, STALL_MS);
-    net.then(function (res) {
-      clearTimeout(timer);
-      if (res.ok || !isPage) return finish(res);
-      // Server error page: prefer a saved copy of the real page if one exists.
-      return saved(req, isPage).then(function (hit) { finish(res.status >= 500 && hit ? hit : res); });
-    }, function () { clearTimeout(timer); fallback().then(finish); });
-    e.waitUntil(net.catch(function () {}));
+  e.respondWith(saved(req, isPage).then(function (hit) {
+    if (hit) {
+      // Saved copy first: the page opens at once, whatever the signal. The fresh copy is fetched behind it.
+      e.waitUntil(net.then(function (res) {
+        if (!isPage || !res.ok || !stored || stamp(hit) === stamp(res)) return;
+        return stored.then(function () { return tell(e.resultingClientId || e.clientId, url.pathname); });
+      }).catch(function () {}));
+      return hit;
+    }
+    // Nothing saved yet: the network, or the "not saved" page when there is no connection.
+    return net.then(function (res) { return res; }, function () { return fallback(); });
   }));
 });
