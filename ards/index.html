@@ -260,7 +260,7 @@ tr.mark td{font-weight:700;color:var(--accent)}
   <div class="pills" id="pills"></div>
   <div class="card chap" id="learn-edema" data-pill="Leaky lung"><p class="label">1 · Two kinds of edema</p><h2>ARDS is a leak, not a flood</h2><figure class="plate" style="margin-left:0;margin-right:0"><img src="/media/ards/alveoli-ards.webp" width="942" height="572" loading="lazy" alt="Two clusters of alveoli. On the left they are round, open and air-filled with thin walls and capillaries. On the right most are flooded with pink fluid containing white cells, lined by a pink membrane, or collapsed, and only one or two still hold much air."><figcaption>Left: healthy alveoli. Right: ARDS, with flooded and collapsed units. Created with BioRender.com</figcaption></figure><p>Fluid can reach the air spaces because the pressure pushing it is too high, or because the wall holding it back is broken. Tap each.</p><div data-figure="edema" data-state="perm"></div></div>
   <div class="card chap" id="learn-baby" data-pill="Baby lung"><p class="label">2 · The baby lung</p><h2>The open lung is small</h2><p>In ARDS the breath goes only to the part that is still open, often a fraction of the lung. Tap a breath size.</p><div data-figure="baby" data-state="six"></div><p class="linkrow"><a href="/vent/#learn-size">Size the breath on Ventilator basics</a></p></div>
-  <div class="card chap" id="learn-prone" data-pill="Prone"><p class="label">3 · Prone positioning</p><h2>Turn the patient, move the collapse</h2><p>The weight of the heart and the wet lung squeezes the back of the lung when the patient lies on the back. Tap a position.</p><div data-figure="prone" data-state="sup"></div></div>
+  <div class="card chap" id="learn-prone" data-pill="Prone"><p class="label">3 · Prone positioning</p><h2>Turn the patient, move the collapse</h2><figure class="plate" style="margin-left:0;margin-right:0"><img src="/media/ards/prone-ct.webp" width="972" height="406" loading="lazy" alt="Two chest cross-sections like CT slices. Left, labelled supine: the patient lies on the back, spine at the bottom, and the back of both lungs is dense and collapsed in red while the front is dark and full of air. Right, labelled prone: the patient lies face down, spine at the top, the heart rests toward the sternum at the bottom, and only a thin red strip of collapse remains along the front of the lungs."><figcaption>Supine (left): the back of both lungs is collapsed. Prone (right): the back reopens and only a thin strip of the front collapses. Schematic. Created with BioRender.com</figcaption></figure><p>The weight of the heart and the wet lung squeezes the back of the lung when the patient lies on the back. Tap a position.</p><div data-figure="prone" data-state="sup"></div></div>
   <div class="card chap" id="learn-shunt" data-pill="Vasodilators"><p class="label">4 · Shunt and inhaled vasodilators</p><h2>Send the blood to where the air is</h2><p>Low oxygen in ARDS is mostly shunt: blood passing alveoli that hold no air. Tap a treatment.</p><div data-figure="shunt" data-state="shunt"></div></div>
   <div class="card chap" id="learn-rv" data-pill="Right ventricle"><p class="label">5 · The right ventricle</p><h2>The thin-walled pump that ARDS loads</h2><p>Collapse, a high CO2 and high airway pressure all raise the resistance the right ventricle pumps against. Tap a state.</p><div data-figure="rv" data-state="norm"></div></div>
   <div class="card chap" id="learn-def" data-pill="Definitions"><p class="label">6 · Two definitions</p><h2>Berlin 2012 and the global definition</h2><p>Tap a row to see what changed and why.</p><div id="defgrid"></div><p class="line1" id="defsays"></p></div>
@@ -307,8 +307,8 @@ function fio2Of(v){ if (!has(v)) return null; if (v >= 0.21 && v <= 1) return v;
 function oxy(i){
   var f = fio2Of(i.fio2);
   if (f !== null && isNaN(f)) return {bad: 'fio2'};
-  if (has(f) && has(i.pao2) && i.pao2 > 0) return {f: f, pf: i.pao2 / f, by: 'pf'};
-  if (has(f) && has(i.spo2)){ if (i.spo2 > T.sfMaxSat) return {f: f, bad: 'sat'}; return {f: f, sf: i.spo2 / f, by: 'sf'}; }
+  if (has(f) && has(i.pao2) && i.pao2 > 0) return {f: f, pf: r0(i.pao2 / f), by: 'pf'}; /* rounded before comparing, as on /vent/, so the two tools agree at every cut-off */
+  if (has(f) && has(i.spo2)){ if (i.spo2 > T.sfMaxSat) return {f: f, bad: 'sat'}; return {f: f, sf: r0(i.spo2 / f), by: 'sf'}; }
   return {f: f};
 }
 function bandPf(pf){ return pf <= T.pfSev ? 'severe' : pf <= T.pfMod ? 'moderate' : pf <= T.pfMild ? 'mild' : null; }
@@ -504,7 +504,7 @@ function ladder(i){
 
   /* Nothing to place yet, or the diagnosis is in doubt: do not light treatment rungs */
   function setSt(k, st){ R[k] = st; cards[k].rung = st; }
-  if (pf === null && o.by !== 'sf'){ ['fluids','steroids'].forEach(function(k){ if (R[k] === 'now') setSt(k, 'wait'); }); }
+  if (pf === null && o.by !== 'sf'){ ['fluids','steroids'].forEach(function(k){ if (R[k] === 'now' || (k === 'fluids' && R[k] === 'hold')) setSt(k, 'wait'); }); }
   if (doubt && R.steroids === 'now'){ setSt('steroids', 'wait'); cards.steroids.guards = (cards.steroids.guards || []).concat(['Diagnose flags cardiac edema or no trigger: settle whether this is ARDS first. Some mimics need steroids, others need something else.']); }
   /* Extras */
   var ex = [];
