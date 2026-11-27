@@ -9,8 +9,8 @@ by GitHub Pages at https://bedside.tools. The site is an installable, offline-ca
 |---|---|
 | `<slug>/index.html` | One tool. Self-contained: inline CSS and JS, no build step, no framework. |
 | `index.html` | Home page. Its `TOOLS` list publishes tools (`live: true`) and the `sections` search jumps to. |
-| `theme.js` | Every site-wide setting: colours (light and dark), fonts, footer dropdown, PWA links, "Continue". |
-| `sw.js` | Offline copy. Registered by `theme.js`; tools add nothing for it. |
+| `theme.js` | Every site-wide setting: colours (light and dark), fonts, navigation bar and Back steps, tap behaviour, footer dropdown, PWA links, "Continue". |
+| `sw.js` | Offline copy, shown first so pages open at once; a fresh copy is fetched behind it. Registered by `theme.js`; tools add nothing for it. |
 | `fonts/`, `icons/`, `media/<slug>/` | The site's own font files, home-screen icons, and figure plates. |
 | `docs/` | The rules: read before changing anything. Not published (see `_config.yml`). |
 | `scripts/` | The checks CI runs on every pull request. |
