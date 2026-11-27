@@ -373,7 +373,7 @@ function startPlan(i){
     r.list.push('Reassess daily; start low as soon as the reason has passed.');
     r.why = i.shock === 'unctrl' ? 'in uncontrolled shock the gut is poorly perfused, and feeding raises its oxygen demand; full early feeding in shock caused more bowel ischemia than parenteral feeding (NUTRIREA-2).' : 'these are the situations in which ESPEN suggests delaying enteral feeding until they are controlled.';
     r.tiers = i.shock === 'unctrl' ? ['ESPEN 2023 rec 11 · B', 'SCCM/ASPEN 2016 B5 · expert consensus'] : ['ESPEN 2023 rec 11 · B'];
-    if (i.gut.nogut) r.list.push('If the gut stays unusable, follow the parenteral nutrition timing (untick the delay reason to see it) once the patient is stable.');
+    if (i.gut.nogut) r.list.push(i.shock === 'unctrl' ? 'The gut cannot be used: once the patient is stable, parenteral nutrition ' + (i.gut.hirisk ? 'as soon as possible (high risk).' : 'after day 7 if low risk (ESPEN: within 3 to 7 days).') : 'Parenteral nutrition instead: ' + (i.gut.hirisk ? 'as soon as possible (high risk or severely malnourished).' : 'after day 7 if low risk (ESPEN: within 3 to 7 days).'));
     return r;
   }
   if (i.gut.nogut) {
@@ -395,13 +395,13 @@ function startPlan(i){
   r.k = 'go'; r.head = 'Start enteral feeding within 24 to 48 hours';
   r.list.push('Into the stomach first; past the pylorus only if a prokinetic has not fixed intolerance, or the aspiration risk is high.');
   r.list.push('Start low (trophic, 10 to 20 kcal an hour) and build up over the first days.');
-  r.why = 'early tube feeding keeps the gut working; in the first week, ' + NUT.kcalLo + ' to ' + NUT.kcalHi + ' kcal/kg did as well as higher intakes in trials.';
+  r.why = 'early tube feeding keeps the gut working; for the first week ' + NUT.kcalLo + ' to ' + NUT.kcalHi + ' kcal/kg is the suggested range, and in trials lower intakes did as well as higher ones.';
   r.tiers = ['SCCM/ASPEN 2016 · very low', 'ESPEN 2023 (48 h) · B'];
   return r;
 }
 function targets(i){
   if (i.wt === null) return null;
-  var b = bmi(i.wt, i.ht), ibw = pbw(i.ht, i.sex), r = { b:b, ibw:ibw, notes:[], tiers:[], needHt: i.ht === null && i.wt >= 90 };
+  var b = bmi(i.wt, i.ht), ibw = pbw(i.ht, i.sex), r = { b:b, ibw:ibw, notes:[], tiers:[], needHt: i.ht === null };
   if (b !== null && b >= OB.b1) {
     if (ibw === null) { r.need = 'Obesity: enter sex so ideal weight can be calculated.'; }
     if (b > OB.b3) { r.k = ibw ? [OB.kI[0] * ibw, OB.kI[1] * ibw] : null; r.kb = OB.kI[0] + ' to ' + OB.kI[1] + ' kcal/kg ideal weight'; }
@@ -449,12 +449,12 @@ function renderFeed(){
   if (t.obese) tm.push('ASPEN 2016 also says energy should not exceed 65 to 70% of a measured target. ESPEN 2023 differs: it uses adjusted body weight and 1.3 g/kg adjusted weight of protein.');
   if (S.gut.aki || S.gut.crrt) tm.push('EFFORT Protein: a high protein target (2.2 g/kg or more) did not help, and in a subgroup it may have worsened outcomes for patients with acute kidney injury and high organ failure scores. ESPEN 2023 gives no protein number for CRRT; the CRRT line is ASPEN 2016 (J2, very low).');
   $('targethost').innerHTML = card({ id:'targets', label:'How much · first week', head: t.needHt ? 'Enter height to check for obesity' : t.k ? fmt(t.k[0]) + ' to ' + fmt(t.k[1]) + ' kcal a day' : 'Targets', list:tl, why:tw, more:tm, tiers:t.tiers.concat(t.crrt ? ['CRRT: SCCM/ASPEN 2016 · very low'] : []), chips: chip('protein', 'Figure: protein and the phases') });
-  if (!r) { $('ratehost').innerHTML = ''; return; }
+  if (!r || t.needHt) { $('ratehost').innerHTML = ''; return; }
   var rl = [];
   if (r.cut) rl.push('<b>From infusions:</b> ' + fmt(r.other) + ' kcal a day' + (r.nn.prop ? ' (propofol ' + fmt(r.nn.prop) + ')' : '') + (r.nn.d5 ? ' (dextrose ' + fmt(r.nn.d5) + ')' : '') + ', subtracted.');
   rl.push('<b>Goal rate:</b> ' + r.lo.toFixed(0) + ' to ' + r.hi.toFixed(0) + ' mL an hour of a ' + i.dens.toFixed(1) + ' kcal/mL feed, over 24 hours.');
   rl.push('<b>Start:</b> about ' + r.trophic[0].toFixed(0) + ' to ' + r.trophic[1].toFixed(0) + ' mL an hour (10 to 20 kcal an hour) and advance as tolerated.');
-  if (r.trophic[0] > r.lo) rl.push('Infusions already supply most of the lower target: start at the low end and check the total.');
+  if (r.trophic[0] > r.lo) rl.push(r.lo === 0 ? 'Infusions already meet the lower target: feed mainly for protein, and check the total.' : 'Infusions already supply most of the lower target: start at the low end and check the total.');
   if (r.cut) rl.push('A lower feed rate also cuts protein: check the formula\'s protein against the target and add a protein supplement if short.');
   var g = null;
   if (r.nn.fat > r.fatCap) g = ['Lipid above 1.5 g/kg a day', 'Propofol alone gives ' + r.nn.fat.toFixed(0) + ' g of fat a day, above ' + r.fatCap.toFixed(0) + ' g. Check triglycerides and consider another sedative.'];
@@ -479,9 +479,9 @@ function renderRisk(){
 }
 function phos(p0, p1, h){
   if (p1 === null) return null;
-  var r = { m1: p1 / P_MGDL };   /* compared in mg/dL: 0.65 mmol/L is about 2.0 mg/dL, 0.16 mmol/L about 0.5 mg/dL */
-  r.low = p1 < DOIG.mg; r.drop = p0 !== null ? p0 - p1 : null; r.win = h !== null && h <= DOIG.h;
-  r.rhp = r.low && r.drop !== null && r.drop > DOIG.mgdrop && r.win;
+  var m0 = p0 === null ? null : p0 / P_MGDL, m1 = p1 / P_MGDL, r = { m1:m1 };   /* compared in mmol/L, as in the trial; shown in mg/dL as about 2.0 and 0.5 */
+  r.low = m1 < DOIG.mmol; r.drop = m0 !== null ? m0 - m1 : null; r.win = h !== null && h <= DOIG.h;
+  r.rhp = r.low && r.drop !== null && r.drop > DOIG.drop && r.win;
   return r;
 }
 function renderPhos(){
@@ -490,16 +490,16 @@ function renderPhos(){
   if (!r) { $('phoshost').innerHTML = '<p class="sub" style="margin-top:8px">Enter phosphate now (and before feeding, with the hours since feeds started) to check for refeeding hypophosphatemia.</p>'; return; }
   if (r.rhp) {
     $('phoshost').innerHTML = '<div class="ans"><p class="head">Refeeding hypophosphatemia: cut feeds to 20 kcal an hour</p>' +
-      li(['Phosphate ' + p1 + ' mg/dL (below ' + cut + '), down ' + (p0 - p1).toFixed(1) + ' mg/dL within ' + h + ' hours of starting feeds.', 'Restrict energy to 20 kcal an hour for at least 2 days, then return to the usual target over 2 to 3 days.', 'Replace phosphate; check electrolytes 2 to 3 times a day.']) +
+      li(['Phosphate ' + p1 + ' mg/dL (below about ' + cut + '), down ' + (p0 - p1).toFixed(1) + ' mg/dL within ' + h + ' hours of starting feeds.', 'Restrict energy to 20 kcal an hour for at least 2 days, then return to the usual target over 2 to 3 days.', 'Replace phosphate; check electrolytes 2 to 3 times a day.']) +
       why('in the trial that defined this, restricting calories did not change the primary outcome, but more patients were alive at day 60 (91% against 78%).') +
       '<div class="linkrow"><a href="/electrolytes/">Replacing phosphate</a></div>' +
       more(['Definition and regimen: Doig 2015 (phosphate below 0.65 mmol/L within 72 hours of starting nutrition, with a fall of more than 0.16 mmol/L). ESPEN 2023: restrict energy for 48 hours, then increase gradually (rec 59, B); electrolytes 2 to 3 times a day (rec 58, GPP). The trial thresholds are 0.65 and 0.16 mmol/L, shown here as about 2.0 and 0.5 mg/dL (mg/dL = mmol/L × 3.1).'], ['Doig 2015 RCT', 'ESPEN 2023 B']) + '</div>';
     return;
   }
   var reasons = [];
-  if (!r.low) reasons.push('phosphate is ' + cut + ' mg/dL or more');
+  if (!r.low) reasons.push('phosphate is about ' + cut + ' mg/dL or more');
   if (r.low && r.drop === null) reasons.push('enter the value before feeding to check the fall');
-  if (r.low && r.drop !== null && r.drop <= DOIG.mgdrop) reasons.push('it has not fallen by more than ' + dcut + ' mg/dL');
+  if (r.low && r.drop !== null && r.drop <= DOIG.drop) reasons.push('it has not fallen by more than about ' + dcut + ' mg/dL');
   if (r.low && h === null) reasons.push('enter the hours since feeds started');
   else if (r.low && !r.win) reasons.push('it is more than 72 hours since feeds started');
   $('phoshost').innerHTML = '<div class="ans"><p class="head">' + (r.low ? 'Low phosphate: replace it' : 'Not refeeding hypophosphatemia') + '</p><p class="sub">Not the trial definition: ' + esc(reasons.join('; ')) + '.</p>' + (r.low ? '<div class="linkrow"><a href="/electrolytes/">Replacing phosphate</a></div>' : '') + '</div>';
@@ -630,7 +630,7 @@ var CASES = [
   { t:'BMI 42', s:'Woman, 165 cm, 115 kg (BMI 42), ventilated for pneumonia.', i:I({ wt:115, ht:165, sex:'f' }),
     q:'Protein target?', opts:['a','b','c'], name:function(k){ return { a:'About 142 g a day (2.5 g/kg ideal weight)', b:'About 230 g a day (2.0 g/kg actual weight)', c:'About 138 g a day (1.2 g/kg actual weight)' }[k]; }, ans:function(c){ var t = targets(c.i); return Math.round(t.p[0]) === 142 ? ['a'] : []; }, w:function(c){ var t = targets(c.i); return 'BMI 40 or more: up to 2.5 g/kg of ideal weight; ideal weight ' + fmt(t.ibw) + ' kg, so about ' + fmt(t.p[0]) + ' g. Energy ' + fmt(t.k[0]) + ' to ' + fmt(t.k[1]) + ' kcal (11 to 14 kcal/kg actual).'; } },
   { t:'Phosphate after feeds', s:'Alcohol use disorder, poor intake for 2 weeks. Phosphate 3.0 mg/dL before feeds; 1.6 mg/dL 36 hours after starting.', p:[3.0, 1.6, 36],
-    q:'Next step?', opts:['cut','keep','stop'], name:function(k){ return { cut:'Cut feeds to 20 kcal/h for at least 2 days and replace phosphate', keep:'Replace phosphate and keep feeding at goal', stop:'Stop feeding until phosphate is normal' }[k]; }, ans:function(c){ return phos(c.p[0], c.p[1], c.p[2]).rhp ? ['cut'] : ['keep']; }, w:function(){ return 'Below 2.0 mg/dL, a fall of more than 0.5 mg/dL, within 72 hours of starting: refeeding hypophosphatemia as defined in the trial; restricting calories for 2 days, then returning over 2 to 3, was the tested approach.'; } },
+    q:'Next step?', opts:['cut','keep','stop'], name:function(k){ return { cut:'Cut feeds to 20 kcal/h for at least 2 days and replace phosphate', keep:'Replace phosphate and keep feeding at goal', stop:'Stop feeding until phosphate is normal' }[k]; }, ans:function(c){ return phos(c.p[0], c.p[1], c.p[2]).rhp ? ['cut'] : ['keep']; }, w:function(){ return 'Below about 2.0 mg/dL (0.65 mmol/L), a fall of more than about 0.5 mg/dL (0.16 mmol/L), within 72 hours of starting: refeeding hypophosphatemia as defined in the trial; restricting calories for 2 days, then returning over 2 to 3, was the tested approach.'; } },
   { t:'Residual 300 mL', s:'Day 4 on gastric feeds at goal. Residual 300 mL; abdomen soft, no vomiting, passing stool.', k:'grv',
     q:'Next step?', opts:['keep','hold','pyl'], name:function(k){ return { keep:'Keep feeding', hold:'Hold feeds for 4 hours', pyl:'Place a post-pyloric tube now' }[k]; }, ans:function(){ return ['keep']; }, w:function(){ return PROB.grv.list[0] + ' ' + PROB.grv.why; } }
 ];
