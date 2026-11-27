@@ -310,10 +310,10 @@ footer strong{color:var(--ink)}
 
 <section class="view" id="v-learn">
   <div class="lpills" id="lpills"></div>
-  <div class="card chap" id="learn-gaba" data-pill="Brake and pedal"><p class="label">1 · Mechanism</p><h2>The brake and the accelerator</h2><p class="lead">Alcohol boosts the brain's brake (GABA) and blocks its accelerator (glutamate). Each state shows the balance.</p><div data-figure="gaba"></div></div>
+  <div class="card chap" id="learn-gaba" data-pill="Brake and pedal"><p class="label">1 · Mechanism</p><h2>The brake and the accelerator</h2><p class="lead">Alcohol boosts the brain's brake (GABA) and blocks its accelerator (glutamate). Each state shows the balance.</p><div class="vk-plate"><img src="/media/alcohol-withdrawal/synapse.webp" width="1024" height="572" alt="Two synapses side by side. Long-term drinking: few blue GABA-A receptors and many red NMDA glutamate receptors, with alcohol molecules bound. Alcohol stopped: the same receptors with no alcohol, and the receiving neuron glowing as overexcited."><span class="vk-credit">Created with BioRender.com</span></div><p class="line1">Blue: GABA-A receptors (the brake). Red: NMDA glutamate receptors (the accelerator). Adaptation leaves fewer working brakes and more accelerators; when alcohol goes, excitation wins.</p><div data-figure="gaba"></div></div>
   <div class="card chap" id="learn-time" data-pill="Timeline"><p class="label">2 · When</p><h2>What appears, hour by hour</h2><div id="tlfig2"></div><p class="line1">Enter the hours since the last drink on Start and the marker moves.</p></div>
   <div class="card chap" id="learn-kindle" data-pill="Kindling"><p class="label">3 · Why it worsens</p><h2>Each withdrawal makes the next one worse</h2><div data-figure="kindle"></div></div>
-  <div class="card chap" id="learn-thiamine" data-pill="Thiamine first"><p class="label">4 · Thiamine</p><h2>Why thiamine comes before glucose</h2><div data-figure="thia"></div></div>
+  <div class="card chap" id="learn-thiamine" data-pill="Thiamine first"><p class="label">4 · Thiamine</p><h2>Why thiamine comes before glucose</h2><div data-figure="thia"></div><p class="label" style="margin-top:16px">Where Wernicke strikes</p><div id="wkplate"></div></div>
   <div class="card chap" id="narrow" data-pill="Is it withdrawal?"><p class="label">5 · Workup that narrows</p><h2>Is it withdrawal, or something else?</h2>
     <p class="lead"><b>Send first:</b> glucose, electrolytes with magnesium and phosphate, liver tests, blood count, blood alcohol, urine drug screen. <b>Only if the picture does not fit:</b> head CT (fall, focal signs, first or focal seizure), lumbar puncture (fever with confusion), ammonia, TSH, a toxicology consult. Tap a result.</p>
     <div class="states" id="nw-results" role="group" aria-label="Results"></div>
@@ -337,6 +337,7 @@ footer strong{color:var(--ink)}
 <footer>
   <p><strong>For education only. Not a substitute for clinical judgment.</strong> Doses are the guideline's sample regimens and US label doses; use your institution's withdrawal protocol and pharmacy.</p>
   <p>Privacy: everything runs in your browser. Nothing you enter is sent anywhere or stored, and there are no analytics. Do not enter names, record numbers, or dates of birth.</p>
+  <p>Anatomical figures created with BioRender.com.</p>
   <p class="mono">Last reviewed: 2026-11-26</p>
   <p><strong>Sources:</strong> American Society of Addiction Medicine, Clinical Practice Guideline on Alcohol Withdrawal Management, J Addict Med 2020;14(3S Suppl 1):1–72 (recommendation numbers and Appendix V sample regimens) · Maldonado JR et al., Prediction of Alcohol Withdrawal Severity Scale (PAWSS), Alcohol Alcohol 2015;50:509 · Sullivan JT et al., CIWA-Ar, Br J Addict 1989;84:1353 · Galvin R et al., EFNS guidelines for Wernicke encephalopathy, Eur J Neurol 2010;17:1408 · NICE CG100, Alcohol-use disorders: physical complications · Reus VI et al., APA practice guideline for the pharmacological treatment of alcohol use disorder, Am J Psychiatry 2018;175:86 · US prescribing information (DailyMed): chlordiazepoxide, diazepam tablets and injection, oxazepam, lorazepam, phenobarbital sodium injection, dexmedetomidine, naltrexone, acamprosate · Trials: Saitz R et al., JAMA 1994;272:519 · D'Onofrio G et al., N Engl J Med 1999;340:915 · Rosenson J et al., J Emerg Med 2013;44:592 · Gold JA et al., Crit Care Med 2007;35:724. Evidence tiers are shown beside each recommendation.</p>
 </footer>
@@ -574,7 +575,7 @@ function render() {
   h += card({id: 'thiamine', cls: tw ? 'bad' : '', label: 'Thiamine', head: tw ? 'Suspected Wernicke: high-dose IV thiamine' : 'Thiamine before glucose',
     body: tw ? `<p><span class="dose">200 mg three times daily, preferably IV</span>${tg('EFNS 2010')}; ASAM's ICU discussion gives 200–500 mg IV every 8 h${tg('ASAM 2020')}; parenteral for at least 5 days.${tg('NICE CG100')}</p>` : `<p><span class="dose">100 mg IV or IM daily for 3–5 days</span>.${tg('ASAM 2020')}</p>`,
     why: tw ? `${r.wk} of 4 Caine criteria: two are enough to suspect Wernicke, which is often missed with the classic triad.` : 'Heavy drinking depletes thiamine; glucose without it can precipitate Wernicke encephalopathy.',
-    chips: chip('thia', tw ? 'low' : 'rep', 'Thiamine first')});
+    chips: chip('thia', tw ? 'low' : 'rep', 'Thiamine first') + (tw ? chip('wk', '', 'Where Wernicke strikes') : '')});
   // electrolytes
   if (IN.lab.length) h += card({id: 'lytes', label: 'Electrolytes', head: 'Replace: ' + IN.lab.filter(x => x !== 'glu').map(x => ({mg: 'magnesium', k: 'potassium', phos: 'phosphate', na: 'sodium (slowly)'})[x]).filter(Boolean).join(', ') || 'Glucose', body: `<p>Doses and correction limits: <a href="/electrolytes/">electrolytes tool</a>${IN.lab.includes('na') ? ', <a href="/hyponatremia/">hyponatremia tool</a> (malnourished drinkers are at high risk of overcorrection)' : ''}.</p>`, why: IN.lab.includes('mg') ? 'Low magnesium is common and should be corrected, though magnesium does not treat the withdrawal itself.' : 'Drinking and poor intake deplete potassium, phosphate and magnesium, and refeeding lowers them further.'});
   // hallucinations / agitation
@@ -596,7 +597,8 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('fsheet
 document.addEventListener('click', e => {
   const c = e.target.closest('.fchip'); if (!c) return;
   const f = c.dataset.fig, s = c.dataset.st;
-  if (f === 'tl') openSheet('Timeline', figTime(readIn().hrs) + '<p class="line1">ASAM 2020: onset 6–24 h; seizures 8–48 h, peak about 24 h; hallucinosis from 12–24 h; delirium tremens typically 72–96 h.</p>');
+  if (f === 'wk') openSheet('Where Wernicke strikes', '<div id="wk2"></div>', el => mountWk(el.querySelector('#wk2')));
+  else if (f === 'tl') openSheet('Timeline', figTime(readIn().hrs) + '<p class="line1">ASAM 2020: onset 6–24 h; seizures 8–48 h, peak about 24 h; hallucinosis from 12–24 h; delirium tremens typically 72–96 h.</p>');
   else openSheet(FIGS[f].t, '<div id="sf"></div>', el => mountFig(el.querySelector('#sf'), f, s));
 });
 
@@ -646,6 +648,21 @@ document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('#v-learn .chap').forEach(c => { const d = DEEP[c.id]; if (!d) return;
     c.insertAdjacentHTML('beforeend', `<details class="deeper"><summary>Go deeper: mechanism and rationale</summary><div class="dpx"><div><span class="dl">Mechanism</span><p>${d.m}</p></div><div><span class="dl">Why it matters</span><p>${d.w}</p></div><div><span class="dl">Common trap</span><p>${d.t}</p></div></div></details>`); });
 });
+
+/* Wernicke regions plate with hotspots */
+const WR = [
+  {x: 47, y: 44, n: 'Medial thalamus', t: 'Around the third ventricle: confusion and, later, the memory loss of Korsakoff syndrome.'},
+  {x: 44, y: 56, n: 'Mammillary bodies', t: 'Part of the memory circuit; shrink in chronic thiamine deficiency.'},
+  {x: 56, y: 55, n: 'Around the aqueduct (midbrain)', t: 'Eye-movement nuclei: nystagmus and gaze palsies.'},
+  {x: 65, y: 67, n: 'Cerebellar vermis', t: 'Unsteady gait (truncal ataxia).'}
+];
+function mountWk(el) {
+  el.innerHTML = `<div class="vk-plate"><div class="vk-pw"><img src="/media/alcohol-withdrawal/wernicke-regions.webp" width="680" height="572" alt="Midline section of the brain, front to the left, with four areas tinted red: the medial thalamus, the mammillary bodies, the grey matter around the cerebral aqueduct, and the cerebellar vermis."><span class="wkh">${WR.map((w, k) => `<button class="vk-hot" type="button" data-w="${k}" aria-pressed="false" style="left:${w.x}%;top:${w.y}%" aria-label="${w.n}">${k + 1}</button>`).join('')}</span></div><span class="vk-credit">Created with BioRender.com</span></div><div class="vk-list">${WR.map((w, k) => `<button type="button" data-w="${k}" aria-pressed="false">${k + 1} · ${w.n}</button>`).join('')}</div><p class="pout wkout"></p>`;
+  el.addEventListener('click', e => { const b = e.target.closest('[data-w]'); if (!b) return; const k = +b.dataset.w;
+    el.querySelectorAll('[data-w]').forEach(x => x.setAttribute('aria-pressed', String(+x.dataset.w === k)));
+    el.querySelector(".wkout").innerHTML = `<b>${WR[k].n}.</b> ${WR[k].t}`; });
+}
+mountWk($('wkplate'));
 
 /* Practice */
 const CASES = [
