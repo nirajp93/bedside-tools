@@ -222,11 +222,11 @@ footer p{margin:0 0 8px}
 
 <div class="panel" id="p-learn" role="tabpanel" aria-labelledby="t-learn">
   <div class="pills" id="pills"></div>
-  <div class="card chap" id="learn-syndrome" data-pill="Syndrome"><p class="label">1 · Four problems at once</p><h2>The post-cardiac arrest syndrome</h2><p class="sub">Tap a part.</p><div data-figure="syndrome"></div></div>
+  <div class="card chap" id="learn-syndrome" data-pill="Syndrome"><p class="label">1 · Four problems at once</p><h2>The post-cardiac arrest syndrome</h2><div id="plate-syndrome"></div><p class="sub" style="margin-top:12px">Tap a part.</p><div data-figure="syndrome"></div></div>
   <div class="card chap" id="learn-targets" data-pill="Targets"><p class="label">2 · Targets</p><h2>Pressure, oxygen, CO2 and glucose: the safe ranges</h2><p class="sub">Tap a target. US and European ranges are shown together.</p><div data-figure="targets"></div></div>
   <div class="card chap" id="learn-temp" data-pill="Temperature"><p class="label">3 · Temperature</p><h2>From cooling to 33 °C to preventing fever</h2><p class="sub">Tap a trial.</p><div data-figure="temps"></div></div>
   <div class="card chap" id="learn-clock" data-pill="Test clock"><p class="label">4 · The prognosis clock</p><h2>When each test can be counted</h2><p class="sub">Tap a guideline.</p><div data-figure="clock"></div></div>
-  <div class="card chap" id="learn-prophecy" data-pill="Prophecy"><p class="label">5 · The self-fulfilling prophecy</p><h2>Why judging too early kills</h2><p class="sub">Tap a study.</p><div data-figure="prophecy"></div></div>
+  <div class="card chap" id="learn-prophecy" data-pill="Prophecy"><p class="label">5 · The self-fulfilling prophecy</p><h2>Why judging too early is dangerous</h2><p class="sub">Tap a study.</p><div data-figure="prophecy"></div></div>
   <div class="card chap" id="trials" data-pill="Trials"><p class="label">6 · Trials</p><h2>The trials behind the practice</h2><p class="sub">Large randomized trials exist for temperature, the cath lab call, blood pressure, oxygen and CO2. Prognosis rests on observational studies.</p><div id="trialbox"></div><div class="row"><button class="btn" id="go-prac">Try the practice cases</button></div></div>
 </div>
 
@@ -353,7 +353,7 @@ function cathCard(i, s){
     if (i.mvd && i.cs) c.guards = ['Shock with multivessel disease: open the culprit artery only at first; immediate stenting of the other lesions is not recommended (AHA 3: No Benefit, B-R).'];
   } else if (i.ecg === 'nostemi' && s.unstable){
     c.head = 'No ST elevation, but ' + [i.cs ? 'shock' : null, i.va ? 'recurrent VT or VF' : null, i.isch ? 'ongoing ischemia' : null].filter(Boolean).join(' and ') + ': emergency angiography is reasonable';
-    c.sub = 'When a cardiac cause is suspected. Discuss with cardiology now.';
+    c.sub = 'When a cardiac cause is suspected. Discuss with cardiology now.' + (i.noncard ? ' Symptoms before the arrest point away from the heart: weigh a CT first (see Find the cause).' : '');
     c.why = WHY.unstable;
     c.tiers = ['Emergency angiography without ST elevation, with shock, arrhythmia or ischemia: AHA 2a, B-NR'];
     if (i.mvd && i.cs) c.guards = ['Shock with multivessel disease: culprit artery only at first (AHA 3: No Benefit, B-R for immediate non-culprit PCI).'];
@@ -382,7 +382,7 @@ function tempCard(i, s){
     c.tiers = ['Who gets temperature control: AHA 1, B-R', 'Awake patients: expert practice'];
   } else {
     c.head = 'Hold 32 to 37.5 °C for at least 36 hours';
-    c.sub = (s.unknownCmd ? 'For adults who do not follow commands, whatever the rhythm or place of arrest. ' : 'Protocolized, whatever the rhythm or place of arrest. ') + (has(i.hrs) && i.hrs < T.tcHours ? 'At ' + fmt(i.hrs) + ' hours, at least ' + fmt(T.tcHours - i.hrs) + ' more hours to go.' : has(i.hrs) ? 'Past 36 hours: the US minimum is met; Europe prevents fever up to 72 hours.' : '');
+    c.sub = (s.unknownCmd ? 'For adults who do not follow commands, whatever the rhythm or place of arrest. ' : 'Protocolized, whatever the rhythm or place of arrest. ') + (has(i.hrs) && i.hrs < T.tcHours ? 'If control started at return of circulation, at least ' + fmt(T.tcHours - i.hrs) + ' more hours to go.' : has(i.hrs) ? 'Past 36 hours: the US minimum is met; Europe prevents fever up to 72 hours.' : '');
     c.list = ['Use a device with a temperature feedback loop (surface or intravascular).', 'Rewarm no faster than 0.5 °C an hour, after cooling or when the patient arrived cold.', 'Europe: do not actively warm a comatose patient who is mildly cold (32 to 36 °C).', 'Shivering: opioids and sedation first; a paralytic may be considered if it persists.', 'No rapid infusion of cold IV fluid to cool before hospital.'];
     var g = [];
     if (s.fever) g.push('Temperature ' + fmt(i.temp) + ' °C: above 37.5. Bring it down now with the device.');
@@ -390,7 +390,7 @@ function tempCard(i, s){
     c.guards = g;
     c.why = s.fever ? WHY.fever : s.cold ? WHY.cold : WHY.tc;
     c.more = ['Which temperature: TTM2 (2021) found no difference between 33 °C and normothermia with early fever treatment. Whether a lower target helps sicker subgroups is unclear.', 'Duration: the US minimum is 36 hours; the large trials ran 72 hours of temperature control in total. In BOX, 36 hours of device fever prevention did as well as 72.', 'Europe (ERC-ESICM 2025): ' + ERCT.temp + '.'];
-    c.tiers = ['Protocolized, not following commands: AHA 1, B-R', '32 to 37.5 °C: AHA 1, B-R', 'At least 36 hours: AHA 2a, B-R', 'Rewarm 0.5 °C/h or slower: AHA 2b, B-R', 'Specific temperature for sicker patients unclear: AHA 2b, B-NR', 'No prehospital cold fluid: AHA 3: No Benefit, B-R', 'Feedback device: ERC good practice', 'Shivering: ERC, ungraded'];
+    c.tiers = ['Protocolized, not following commands: AHA 1, B-R', '32 to 37.5 °C: AHA 1, B-R', 'At least 36 hours: AHA 2a, B-R', 'Rewarm 0.5 °C/h or slower: AHA 2b, B-R', 'Specific temperature for sicker patients unclear: AHA 2b, B-NR', 'No prehospital cold fluid: AHA 3: No Benefit, B-R', 'Feedback device: ERC good practice', 'Shivering steps: expert practice'];
     c.links = [['/sedation/', 'Sedation and paralysis']];
     c.chips = [['temps', 'ttm2', 'Why 33 °C gave way to fever prevention']];
   }
@@ -479,7 +479,7 @@ var POOR = [
 ];
 var GOOD = [['nsenorm','NSE under 17 µg/L within 72 h'],['eegcont','Continuous EEG background without discharges within 72 h'],['mrinorm','MRI without diffusion restriction, day 2 to 7']];
 var NOTALONE = [
-  {k: 'cornonly', t: 'Corneal reflexes absent, pupils present', why: 'Corneal reflex alone has a false-positive rate up to 16% (NCS) and is easily suppressed by sedation.'},
+  {k: 'cornonly', t: 'Corneal reflexes absent, pupils present', why: 'Corneal reflex alone had a false-positive rate of 16% in one study (NCS) and is easily suppressed by sedation.'},
   {k: 'myoonly', t: 'Myoclonus, not status', why: 'Myoclonus is common in patients who recover; on its own its value is uncertain (AHA) and it needs EEG (NCS).'},
   {k: 'noreact', t: 'EEG not reactive', why: 'Absent EEG reactivity should not be used to predict a poor outcome (AHA 3: No Benefit).'},
   {k: 'long', t: 'Long time to return of circulation, or non-shockable rhythm', why: 'Time to return of circulation and the first rhythm are not reliable predictors on their own (NCS).'},
@@ -498,14 +498,15 @@ var PWHY = {
 function progState(i){
   var s = {hypo: i.tc === 'hypo'};
   s.earliest = 72; s.binding = 'return of circulation';
-  s.rewUnknown = s.hypo && !has(i.rew);
+  s.rewUnknown = s.hypo && (!has(i.rew) || (has(i.phrs) && i.rew > i.phrs));
+  s.tcUnknown = !i.tc;
   if (s.hypo && has(i.rew) && has(i.phrs)){ var e2 = i.phrs - i.rew + 72; if (e2 > s.earliest){ s.earliest = e2; s.binding = 'the end of rewarming'; } }
   s.conf = [];
   if (i.sed === 'on') s.conf.push('Sedatives or opioids still running');
   if (i.sed === 'recent') s.conf.push('Sedatives stopped but may not have cleared (allow 5 half-lives of the longest-acting drug; longer with kidney or liver failure, or after midazolam)');
   if (!i.sed) s.conf.push('Sedation status not entered');
   TICKS_C.forEach(function(t){ if (i[t[0]]) s.conf.push(t[1]); });
-  s.timeOK = has(i.phrs) && i.phrs >= s.earliest && !s.rewUnknown;
+  s.timeOK = has(i.phrs) && i.phrs >= s.earliest && !s.rewUnknown && !s.tcUnknown;
   s.ready = s.timeOK && s.conf.length === 0;
   s.motor = has(i.mot) ? +i.mot : null;
   s.awake = s.motor === 6;
@@ -527,20 +528,21 @@ function whenCard(i, s){
   var rem = has(i.phrs) ? s.earliest - i.phrs : null;
   if (s.ready){
     c.head = 'Timing and confounders allow an assessment now';
-    c.sub = 'At ' + fmt(i.phrs) + ' hours, ' + (s.hypo ? 'more than 72 hours after rewarming ended' : 'more than 72 hours after return of circulation') + ', with no confounder ticked. This is a time to assess, never a deadline to decide.';
+    c.sub = 'At ' + fmt(i.phrs) + ' hours, ' + (s.hypo ? '72 hours or more after rewarming ended' : '72 hours or more after return of circulation') + ', with no confounder ticked. The US guideline also counts 72 hours from stopping sedatives: check when they stopped. This is a time to assess, never a deadline to decide.';
     c.why = PWHY.multi;
   } else {
     c.head = 'Too early to judge the prognosis';
     var why = [];
     if (!has(i.phrs)) why.push('Enter the hours since return of circulation.');
-    else if (s.rewUnknown) why.push('Cooled below 36.5 °C: the clock runs from the end of rewarming. Enter the hours since rewarming ended.');
+    else if (s.tcUnknown) why.push('Enter whether the patient was cooled below 36.5 °C: if so, the clock runs from the end of rewarming.');
+    else if (s.rewUnknown) why.push('Cooled below 36.5 °C: the clock runs from the end of rewarming. Enter the hours since rewarming ended (no more than the hours since return of circulation).');
     else if (rem > 0) why.push('The earliest point is 72 hours after ' + s.binding + ': about ' + fmt(rem) + ' more hours (at ' + fmt(s.earliest) + ' hours after return of circulation).');
     s.conf.forEach(function(x){ why.push('Confounder: ' + x + '.'); });
     c.list = why;
     c.guards = ['Do not tell the family the brain will not recover, and do not withdraw life support for a presumed poor neurological outcome, on findings from this window. Findings recorded now are kept and read at the prognosis time.'];
     c.why = PWHY.early;
   }
-  c.more = ['US (AHA 2025): consolidate the tests at a minimum of 72 hours after normothermia and stopping sedatives. Read literally, the clock can start when sedatives stop, which is later than shown here for a patient sedated for days; this tool shows that as a confounder to clear, not as a second clock.', 'NCS 2023: at least 72 hours after return of circulation if not cooled below 36.5 °C, and 72 hours after rewarming if cooled. Europe (ERC 2025): 72 hours or later after return of circulation, confounders excluded.', 'Operationally the US guideline puts prognosis at about 5 days after return of circulation for patients cooled to 32 to 34 °C.'];
+  c.more = ['US (AHA 2025): consolidate the tests at a minimum of 72 hours after normothermia and stopping sedatives. Read literally, the clock can start when sedatives stop, which is later than shown here for a patient sedated for days; this tool shows that as a confounder to clear, not as a second clock.', 'NCS 2023: at least 72 hours after return of circulation if not cooled below 36.5 °C, and 72 hours after rewarming if cooled. Europe (ERC 2025): 72 hours or later after return of circulation, confounders excluded.', 'The US guideline says prognosis is typically at least 5 days after return of circulation for patients cooled to 32 to 34 °C.'];
   c.tiers = ['Delay until confounders and early exam pass: AHA 1, B-NR', 'At least 72 h after normothermia and stopping sedatives: AHA 2a, B-NR', 'Timing and no confounders: NCS good practice (strong)'];
   c.chips = [['clock', 'aha', 'When each test counts']];
   return c;
@@ -577,7 +579,7 @@ function countCard(i, s){
 function notAloneCard(i, s){
   var c = {id: 'c-alone', label: 'Do not count these alone', head: 'Findings that mislead on their own'};
   var on = NOTALONE.filter(function(x){ return i[x.k]; });
-  if (s.motor && s.motor <= 3) on.unshift({t: 'Motor response ' + (s.motor === 1 ? 'absent' : s.motor === 2 ? 'extensor' : 'flexor'), why: 'Absent or extensor motor response alone has a false-positive rate of 15 to 30% in recent studies (NCS); Europe uses it only to decide who needs an assessment.'});
+  if (s.motor && s.motor <= 2) on.unshift({t: 'Motor response ' + (s.motor === 1 ? 'absent' : 'extensor'), why: 'Absent or extensor motor response alone has a false-positive rate of 15 to 30% in recent studies (NCS); Europe uses it only to decide who needs an assessment.'});
   c.items = (on.length ? on : NOTALONE).map(function(x){ return {html: true, t: '<b>' + esc0(x.t) + '</b>. ' + esc0(x.why)}; });
   c.sub = on.length ? 'Ticked or entered above. None of these predicts the outcome on its own.' : 'None ticked. These are the findings most often over-read.';
   c.why = PWHY.multi;
@@ -631,7 +633,7 @@ var CASES = [
   {tab: 'care', t: 'Too much oxygen, too little CO2', s: 'Two hours after return of circulation. On the ventilator: SpO2 100%, PaO2 280, PaCO2 28. MAP 68. Glucose 150.', q: 'What do you change?', i: {hrs: 2, cmd: 'no', ecg: 'nostemi', map: 68, spo2: 100, pao2: 280, paco2: 28, glu: 150}, p: 'Lower the FiO2 to bring SpO2 to 98% or below (PaO2 60 to 105). Lower the minute ventilation to bring PaCO2 to 35 to 45: low CO2 narrows brain vessels. MAP and glucose are in range.'},
   {tab: 'care', t: 'Fever on day 2', s: 'Day 2 (30 hours). Temperature control was stopped early because the device was needed elsewhere. Now 38.4 °C, not following commands.', q: 'Does the fever matter?', i: {hrs: 30, cmd: 'no', ecg: 'nostemi', temp: 38.4}, p: 'Yes: above 37.5 °C. Restart device temperature control now and continue to at least 36 hours (Europe: fever prevention 36 to 72 hours). Treat shivering with opioids and sedation.'},
   {tab: 'care', t: 'Jerks on day 1', s: 'Twelve hours after return of circulation, generalized jerks start whenever the patient is suctioned. No EEG yet.', q: 'Load an antiseizure drug for the jerks?', i: {hrs: 12, cmd: 'no', ecg: 'nostemi', neu: 'myo'}, p: 'EEG first, promptly (AHA 1, C-LD). Treat if the EEG shows seizures; do not treat myoclonus with no EEG correlate (AHA 3: No Benefit). Myoclonus on its own does not predict a poor outcome.'},
-  {tab: 'prog', t: 'Day 2, pupils absent, still on propofol', s: 'Thirty-six hours after return of circulation, cooled to 36 °C. On propofol and fentanyl. Pupils are not reactive. The family asks whether he will wake up.', q: 'What do you tell them?', i: {phrs: 36, tc: 'none', sed: 'on', mot: '1'}, p: 'Too early: under 72 hours and sedation is running. Absent pupils now are not a reliable finding. Tell the family it is too early to know, when you expect to know more, and what you are doing meanwhile.'},
+  {tab: 'prog', t: 'Day 2, pupils absent, still on propofol', s: 'Thirty-six hours after return of circulation, kept at 37 °C or below with a device (fever prevention). On propofol and fentanyl. Pupils are not reactive. The family asks whether he will wake up.', q: 'What do you tell them?', i: {phrs: 36, tc: 'none', sed: 'on', mot: '1'}, p: 'Too early: under 72 hours and sedation is running. Absent pupils now are not a reliable finding. Tell the family it is too early to know, when you expect to know more, and what you are doing meanwhile.'},
   {tab: 'prog', t: 'Day 5, off sedation, several findings', s: 'Day 5 (120 hours), cooled to 33 °C; rewarming ended 80 hours ago. Off sedation for 3 days, normal kidney and liver function, no shock. Extensor posturing. N20 absent both sides; EEG burst suppression; NSE 85 at 72 hours.', q: 'What can be said?', i: {phrs: 120, rew: 80, tc: 'hypo', sed: 'off', mot: '2', n20: true, eeg: true, nse: true}, p: 'Timing and confounders allow assessment. Three findings from the European list (N20, highly malignant EEG, NSE above 60): a poor outcome is likely. The extensor posture does not count on its own. Meet the family with the whole picture; the decision about life support is separate.'},
   {tab: 'prog', t: 'Day 4, one finding, withdraws to pain', s: 'Day 4 (96 hours), fever prevention only. Off sedation and cleared. Withdraws to pain. NSE 70 at 48 hours; EEG continuous without discharges.', q: 'Poor outcome?', i: {phrs: 96, tc: 'none', sed: 'off', mot: '4', nse: true, eegcont: true}, p: 'Indeterminate: one poor-outcome finding, and signs of recovery (withdrawal, continuous EEG). Keep observing; recovery may take days to months.'}
 ];
@@ -647,9 +649,9 @@ function line(x1, y1, x2, y2, c, w, dash){ return '<line x1="' + x1 + '" y1="' +
 
 var TGT = {
   spo: {min: 85, max: 100, unit: 'SpO2 %', ticks: [85, 90, 94, 98, 100], rows: [['US', 90, 98, 'a'], ['Europe', 94, 98, 'm']], extra: [], line: 'SpO2: US 90 to 98% (PaO2 60 to 105 mm Hg), Europe 94 to 98% (PaO2 75 to 100 mm Hg). Both start at 100% oxygen until the reading is reliable, and both call hypoxemia (PaO2 under 60) harmful.'},
-  map: {min: 50, max: 90, unit: 'MAP mm Hg', ticks: [50, 60, 65, 77, 90], rows: [['US', 65, 90, 'a'], ['Europe', 60, 90, 'm']], extra: [['BOX arms', 63, 77]], line: 'MAP: US 65 or more, Europe above 60 to 65. In BOX, aiming for 77 was no better than 63.'},
+  map: {min: 50, max: 90, unit: 'MAP mm Hg', ticks: [50, 60, 65, 77, 90], rows: [['US', 65, 90, 'a'], ['Europe', 60, 90, 'm']], extra: [['BOX arms', 63, 77]], line: 'MAP: US 65 or more, Europe above 60 to 65; neither sets an upper limit (the bars run off the scale). In BOX, aiming for 77 was no better than 63.'},
   co2: {min: 25, max: 60, unit: 'PaCO2 mm Hg', ticks: [25, 35, 45, 50, 55, 60], rows: [['US', 35, 45, 'a'], ['Europe', 35, 45, 'm']], extra: [['TAME arm', 50, 55]], line: 'PaCO2: 35 to 45 in both guidelines. In TAME, letting it run at 50 to 55 gave no benefit.'},
-  glu: {min: 40, max: 260, unit: 'Glucose mg/dL', ticks: [40, 70, 140, 180, 260], rows: [['US', 70, 180, 'a'], ['Europe', 140, 180, 'm']], extra: [], line: 'Glucose: US avoid under 70 and over 180. Europe uses standard ICU protocols and cites 140 to 180.'}
+  glu: {min: 40, max: 260, unit: 'Glucose mg/dL', ticks: [40, 70, 180, 260], rows: [['US', 70, 180, 'a'], ['Europe', null, null, 't']], extra: [], line: 'Glucose: US avoid under 70 and over 180. Europe gives no number: it says to use standard ICU glucose protocols.'}
 };
 
 var FIGS = {
@@ -678,8 +680,9 @@ var FIGS = {
       var h = svgOpen('0 0 360 ' + H, 'Target ranges for ' + D.unit);
       rows.forEach(function(r, n){ var y = 18 + n * 34;
         h += tx(72, y + 15, r[0], {a: 'end', s: 11.5, c: r[3] === 'x' ? 'var(--muted)' : 'var(--ink)'});
-        h += bar(x0, y + 4, x1 - x0, 16, 'var(--fill)');
-        if (r[3] === 'x'){ h += bar(X(r[1]) - 2, y + 4, 4, 16, 'var(--muted)') + bar(X(r[2]) - 2, y + 4, 4, 16, 'var(--muted)'); }
+        if (r[3] !== 't') h += bar(x0, y + 4, x1 - x0, 16, 'var(--fill)');
+        if (r[3] === 't'){ h += tx(x0 + 8, y + 16, 'standard ICU protocol, no number', {a: 'start', s: 10.5, c: 'var(--muted)'}); }
+        else if (r[3] === 'x'){ h += bar(X(r[1]) - 2, y + 4, 4, 16, 'var(--muted)') + bar(X(r[2]) - 2, y + 4, 4, 16, 'var(--muted)'); }
         else h += bar(X(r[1]), y + 4, X(r[2]) - X(r[1]), 16, r[3] === 'a' ? 'var(--accent)' : 'var(--muted)');
       });
       var ya = 18 + rows.length * 34 + 4;
@@ -690,10 +693,10 @@ var FIGS = {
     }},
   temps: {t: 'Temperature targets in the trials', states: ['haca', 'bernard', 'ttm', 'hyperion', 'ttm2'], data: {
     haca: {n: 'HACA 2002', a: [32, 34], b: [37, 37], al: '32 to 34 °C', bl: 'usual care', line: 'HACA: 32 to 34 °C for 24 hours against usual care, where fever was not prevented. Good outcome 55% against 39%.'},
-    bernard: {n: 'Bernard 2002', a: [33, 33], b: [37, 37], al: '33 °C', bl: '37 °C', line: 'Bernard: 33 °C for 12 hours against 37 °C in 77 patients. Good outcome 49% against 26%.'},
+    bernard: {n: 'Bernard 2002', a: [33, 33], b: [37, 37], al: '33 °C', bl: 'normothermia', line: 'Bernard: 33 °C for 12 hours against normothermia in 77 patients. Good outcome 49% against 26%.'},
     ttm: {n: 'TTM 2013', a: [33, 33], b: [36, 36], al: '33 °C', bl: '36 °C', line: 'TTM: 33 °C against 36 °C, fever avoided in both. Death 50% against 48%: no difference.'},
     hyperion: {n: 'HYPERION 2019', a: [33, 33], b: [36.5, 37.5], al: '33 °C', bl: '36.5 to 37.5', line: 'HYPERION (PEA or asystole): 33 °C against 37 °C. Good outcome 10.2% against 5.7%, a fragile result.'},
-    ttm2: {n: 'TTM2 2021', a: [33, 33], b: [36, 37.5], al: '33 °C', bl: '37.5 or below', line: 'TTM2: 33 °C against 37.5 °C or below, with a device from 37.8 °C. Death 50% against 48%: no difference. Hence fever prevention.'}},
+    ttm2: {n: 'TTM2 2021', a: [33, 33], b: [37.5, 37.5], al: '33 °C', bl: '37.5 or below', line: 'TTM2: 33 °C against 37.5 °C or below, with a device from 37.8 °C. Death 50% against 48%: no difference. Hence fever prevention.'}},
     svg: function(k){
       var D = this.data[k], h = svgOpen('0 0 360 230', 'Temperature targets in ' + D.n);
       function Y(v){ return 200 - (v - 31) / 8 * 170; }
@@ -733,7 +736,11 @@ var FIGS = {
       return h + '</svg>';
     }}
 };
-var PLATES = {};
+var PLATES = {
+  syndrome: {w: 1004, h: 562, t: 'The post-cardiac arrest syndrome', src: '/media/post-arrest/syndrome.webp',
+    alt: 'Four panels. Top left: a brain from the side with pale patchy areas of injury. Top right: a heart with a pale area in the left ventricle wall. Bottom left: a small blood vessel seen lengthwise with fluid leaking through its wall, white cells inside and small clots on the wall. Bottom right: a heart with a dark clot blocking a coronary artery.',
+    cap: 'Brain injury (top left), a stunned heart (top right), whole-body ischemia and reperfusion with leaky vessels and clotting (bottom left), and the cause that is still there, here a blocked coronary artery (bottom right).'}
+};
 function plateHTML(id){ var P = PLATES[id]; return '<div class="plate"><img src="' + P.src + '" alt="' + P.alt + '" width="' + P.w + '" height="' + P.h + '" loading="lazy"><span class="credit">Created with BioRender.com</span></div><p class="line1">' + P.cap + '</p>'; }
 </script>
 <script>
