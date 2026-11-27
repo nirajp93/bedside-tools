@@ -204,7 +204,7 @@ tr.mark td{font-weight:700;color:var(--accent)}
 </div>
 
 <footer>
-  <p><strong>For education only. Not a substitute for clinical judgment.</strong> A primer with no patient data entered. Example wording is expert practice, offered as a starting point to put in your own words. Who may act as surrogate, out-of-hospital orders, organ donation referral, medical examiner cases, brain death accommodation, and disputes over potentially inappropriate treatment are set by state law and hospital policy: adjust to your state and institution, and involve palliative care, ethics, chaplaincy and social work. No symptom dose appears here: doses live on the Opioids and Sedation tools. Evidence tiers are shown as each source grades them (strong or conditional with certainty for SCCM; Level A to C for the brain death guideline); policy statements, consensus statements and regulations are labelled as such.</p>
+  <p><strong>For education only. Not a substitute for clinical judgment.</strong> A primer with no patient data entered. Example wording is expert practice, offered as a starting point to put in your own words. Who may act as surrogate, out-of-hospital orders, organ donation referral, medical examiner cases, brain death accommodation, and disputes over potentially inappropriate treatment are set by state law and hospital policy: adjust to your state and institution, and involve palliative care, ethics, chaplaincy and social work. No symptom dose appears here: doses live on the Opioids and Sedation tools. Evidence tiers are shown as each source grades them (strong or conditional with certainty for SCCM); policy statements, consensus statements and regulations are labelled as such.</p>
   <p>Privacy: everything runs in your browser. Nothing you enter is sent anywhere or stored, and there are no analytics. Do not enter names, record numbers, or dates of birth.</p>
   <p class="mono">Last reviewed: 2026-11-26</p>
   <p><strong>Sources:</strong> Hwang DY et al., SCCM guidelines on family-centered care for adult ICUs: 2024, Crit Care Med 2025;53:e465 · Marshall MF et al., SCCM clinical practice guidelines on adult end-of-life care in the ICU, Crit Care Med 2025;53:e2734 · Kon AA et al., ACCM/ATS policy statement on shared decision making in ICUs, Crit Care Med 2016;44:188 · Bosslet GT et al., ATS/AACN/ACCP/ESICM/SCCM policy statement on responding to requests for potentially inappropriate treatments, Am J Respir Crit Care Med 2015;191:1318 · Downar J et al., Guidelines for the withdrawal of life-sustaining measures, Intensive Care Med 2016;42:1003 · Lampert R et al., HRS expert consensus statement on CIEDs at the end of life, Heart Rhythm 2010;7:1008 (reaffirmed 2023) · Greer DM et al., Pediatric and adult brain death/death by neurologic criteria determination (AAN/AAP/CNS/SCCM), Neurology 2023;101:1112 · 42 CFR 482.45, Condition of participation: organ, tissue, and eye procurement · CDC/NCHS Physicians' handbook on medical certification of death, 2023 revision · VHA Directive 1004.03, Advance care planning, 2023 (institution note) · Baile WF et al., SPIKES, Oncologist 2000;5:302 · Back AL et al., Approaching difficult communication tasks in oncology, CA Cancer J Clin 2005;55:164 · Taylor LJ et al., Best Case/Worst Case, JAMA Surg 2017;152:531 · Andersen LW et al., In-hospital cardiac arrest: a review, JAMA 2019;321:1200 · Perman SM et al., Location of in-hospital cardiac arrest, J Am Heart Assoc 2016;5:e003638 · Ehlenbach WJ et al., In-hospital CPR in the elderly, N Engl J Med 2009;361:22 · Chan PS et al., Long-term outcomes in elderly survivors of in-hospital cardiac arrest, N Engl J Med 2013;368:1019 · Zier LS et al., Ann Intern Med 2012;156:360 · White DB et al., JAMA 2016;315:2086 · Azoulay E et al., Am J Respir Crit Care Med 2005;171:987 · Trials: Lautrette A et al., N Engl J Med 2007;356:469 · Curtis JR et al., Am J Respir Crit Care Med 2016;193:154 · Carson SS et al., JAMA 2016;316:51 · White DB et al. (PARTNER), N Engl J Med 2018;378:2365 · Chang DW et al., JAMA Intern Med 2021;181:786.</p>
@@ -217,9 +217,8 @@ var EP = 'Expert practice';
 var N = {
   ihcaAll: 25, ihcaGood: 85, ihcaIcu: 14, ihcaOld: 18.3, oldYear1: 58.5,      /* Andersen 2019 (GWTG-R 2017); Perman 2016 (adjusted, 2003-2010); Ehlenbach 2009 (Medicare, 65+, 1992-2005); Chan 2013 */
   share: '75 to 85', alone: 10, defer: '5 to 20',                              /* Kon 2016 */
-  zier5: 15, zier90: 90, white: 53,                                            /* Zier 2012; White 2016 */
-  azAll: 33.1, azShare: 47.8, azEol: 81.8,                                     /* Azoulay 2005 */
-  gibelin: null
+  zier5: 15, zier90: 90, white: 53,                                            /* Zier 2012; White 2016 (discordance of 20 points or more) */
+  azAll: 33.1, azShare: 47.8, azEol: 81.8                                      /* Azoulay 2005 */
 };
 
 var STEPS = [
@@ -261,8 +260,8 @@ var IHCA = [
 ];
 
 var CERT = {
-  right: {n: 'Correct chain', rows: [['a', 'Septic shock', 'days'], ['b', 'Pneumococcal pneumonia', '1 week'], ['c', 'Chronic obstructive pulmonary disease', 'years']], part2: 'Type 2 diabetes', line: 'Line a is the immediate cause; the lowest line used is the underlying cause, the condition that started the chain. Each line has an interval from onset; do not leave it blank. Other conditions that contributed go in Part II.'},
-  wrong: {n: 'Common error', rows: [['a', 'Cardiopulmonary arrest', 'minutes'], ['b', 'Septic shock', 'days']], part2: '', bad: [0], line: 'Cardiac or respiratory arrest is how everyone dies, not why. A terminal event on line a, or as the only cause, makes the certificate useless for public health data. Start from the disease.'}
+  right: {n: 'Correct chain', rows: [['a', 'Septic shock', 'days'], ['b', 'Pneumococcal pneumonia', '1 week']], part2: 'Chronic obstructive pulmonary disease; type 2 diabetes', line: 'Line a is the immediate cause; the lowest line used is the underlying cause, the condition that started the chain. Each line has an interval from onset; do not leave it blank. Other conditions that contributed go in Part II.'},
+  wrong: {n: 'Common error', rows: [['a', 'Cardiopulmonary arrest', 'minutes'], ['b', 'Septic shock', 'days']], part2: '', bad: [0], line: 'Cardiac or respiratory arrest is how everyone dies, not why. A terminal event on line a, or as the only cause, makes the cause of death uninformative for public health data. Start from the disease.'}
 };
 
 var CARDS = {
@@ -274,7 +273,7 @@ var CARDS = {
       more: ['SCCM 2025 adds a good practice statement: ICUs should have a standardized way to identify and document the legal surrogate, including for patients who have none.'],
       tiers: ['Standardized family conferences: SCCM 2024 conditional, low', 'Liberal family presence as the default: SCCM 2024 strong, low', 'Proactive palliative care or ethics consultation when available: SCCM 2025 conditional, low', 'Preparation list: ' + EP]},
     {id: 'steps', label: 'During the meeting', head: 'Seven steps, one at a time', stepper: true,
-      why: 'In a trial of a structured end-of-life meeting in which families did more of the talking, they had fewer stress, anxiety and depression symptoms 90 days later.',
+      why: 'In a trial of a structured end-of-life meeting, with a bereavement brochure, in which families did more of the talking, they had fewer stress, anxiety and depression symptoms 90 days later.',
       more: ['The steps combine SPIKES, Ask-Tell-Ask, NURSE and VALUE. The wording is an example to adapt, not a script.'],
       tiers: ['Frameworks: Baile 2000; Back 2005; Lautrette 2007', 'Example wording: ' + EP]}
   ],
@@ -292,7 +291,7 @@ var CARDS = {
   'code-a': [
     {id: 'package', label: 'Explaining CPR', head: 'Recommend, do not offer a menu',
       list: ['Explain what CPR involves at this point in this illness: compressions, shocks, a breathing tube and a ventilator, usually in the ICU afterwards.', 'Connect it to what you have heard about the patient\'s goals.', 'Make a recommendation, and say which part rests on medical facts and which on your own judgment.', 'Check that the family can accept it, or wants to talk more. Many families prefer to share the decision or to decide after hearing a recommendation; a few want to defer it entirely.'],
-      quote: 'Given how sick she is and what she told you about not wanting to live on machines, I recommend that if her heart stops we allow a natural death, and keep treating everything else. How does that sound to you?',
+      quote: 'Given how sick she is and what she told you about not wanting to live on machines, I recommend that if her heart stops we allow a natural death, and that we keep giving the treatments that fit what she wants. How does that sound to you?',
       why: 'A menu of procedures makes the family choose each intervention and carry that weight; a recommendation shares it, while they keep the right to disagree.',
       more: ['Kon 2016: about ' + N.share + '% of surrogates prefer to share responsibility or decide after hearing the clinician\'s recommendation, about ' + N.alone + '% prefer to decide on their own, and ' + N.defer + '% wish to defer to clinicians. Informed non-dissent (the clinician decides, the family may object) is ethically acceptable for families who want it.', 'Avoid pressure: a recommendation is offered, not imposed.'],
       tiers: ['ACCM/ATS policy statement 2016', 'Example wording: ' + EP]},
@@ -336,28 +335,28 @@ var CARDS = {
       tiers: ['Before-after study: weak evidence']}
   ],
   'comfort-a': [
-    {id: 'transition', label: 'Moving to comfort care', head: 'Stop what does not help comfort, start what does', twocol: {h1: 'Stop', l1: ['Blood tests and imaging', 'Monitors and alarms in the room', 'Vasopressors and inotropes', 'Dialysis, transfusion, antibiotics not given for comfort', 'Defibrillator shocks (deactivate the ICD)', 'Paralytics, before anything else'], h2: 'Start', l2: ['Opioid for breathlessness or pain, titrated to what you see', 'Sedative if distress remains once the opioid has worked', 'Mouth care, positioning, a quiet room', 'Open visiting; chaplain if wanted', 'A plan for secretions', 'A named nurse and physician for the family']},
+    {id: 'transition', label: 'Moving to comfort care', head: 'Stop what does not help comfort, start what does', twocol: {h1: 'Stop', l1: ['Blood tests and imaging', 'Monitors and alarms in the room', 'Vasopressors and inotropes', 'Dialysis, transfusion, antibiotics not given for comfort', 'Defibrillator shocks (deactivate the ICD)', 'Paralytics, early, so distress can be seen'], h2: 'Start', l2: ['Opioid for breathlessness or pain, titrated to what you see', 'Sedative if distress remains once the opioid has worked', 'Mouth care, positioning, a quiet room', 'Open visiting; chaplain if wanted', 'A plan for secretions', 'A named nurse and physician for the family']},
       links: [['/opioids/', 'Opioid doses and conversions'], ['/sedation/', 'Sedatives']],
       why: 'Comfort care is active care: every order should either relieve a symptom or support the family.',
-      tiers: ['Protocolized withdrawal and symptom management: SCCM 2025 conditional, moderate', 'Lists: ' + EP + ' and Downar 2016']},
-    {id: 'symptoms', label: 'Symptom medicines', head: 'Titrate to the distress you see, with no fixed ceiling',
+      tiers: ['Protocolized withdrawal and symptom management: SCCM 2025 conditional, moderate', 'Lists: ' + EP + ', drawing on Downar 2016']},
+    {id: 'symptoms', label: 'Symptom medicines', head: 'No fixed maximum: increase in steps to the distress you see',
       list: ['Opioids first for breathlessness and pain; add a sedative only once those are treated.', 'Assess before and after each dose: breathing rate and effort, grimacing, restlessness.', 'Give enough to relieve distress; the intent is always comfort, never to shorten life.', 'Record the symptom and the response with each dose.'],
       links: [['/opioids/', 'Doses on Opioids'], ['/sedation/', 'Doses on Sedation']],
       why: 'Treating observed distress, not a fixed number, is what keeps the intent and the dose aligned and documented.',
-      tiers: ['Titrate to symptoms with no set dose limit; opioids before sedatives: Downar 2016 (recommend)']}
+      tiers: ['Titrate to symptoms with no set dose limit; opioids before sedatives: Downar 2016 (Canadian consensus guideline)']}
   ],
   'comfort-b': [
     {id: 'extubation', label: 'Compassionate extubation', head: 'Step by step', stepper2: true,
-      why: 'Most of the family\'s memory of the death comes from this hour; preparation is what makes it calm.',
-      more: ['Downar 2016 suggests that in most cases the goal is to extubate to room air rather than leave the tube in on minimal support, while either is acceptable; no method has been shown better. It makes no recommendation on routine anticholinergics before extubation.'],
-      tiers: ['Downar 2016 (modified Delphi; recommend or suggest as stated)', 'Sequence and wording: ' + EP]},
+      why: 'Families often remember this hour for years; preparation is what makes it calm.',
+      more: ['Downar 2016 favours extubation to room air, rather than leaving the tube in on minimal support, in most cases. No method of withdrawing the ventilator has been shown better than another; use your unit\'s protocol.'],
+      tiers: ['Downar 2016 (Canadian consensus guideline)', 'Sequence and wording: ' + EP]},
     {id: 'devices', label: 'Defibrillators and pacemakers', head: 'Turn off the shocks',
       list: ['A patient with capacity, or the surrogate, may ask for an ICD to be deactivated; it is neither assisted suicide nor euthanasia.', 'A DNR order does not switch off the ICD; it needs its own order.', 'Involve electrophysiology or the device clinic; a magnet over most ICDs suspends shocks while it stays in place.', 'Stopping pacing in a pacemaker-dependent patient is a separate decision; discuss it explicitly.', 'A clinician who objects should hand over care, not abandon the patient.'],
       why: 'Shocks in a dying patient are painful and frightening for patient and family.',
       tiers: ['HRS 2010 expert consensus (reaffirmed 2023)']},
     {id: 'family-care', label: 'Caring for the family', head: 'Presence, meaning and what comes after',
       list: ['Let the family stay at the bedside.', 'Ask about spiritual or cultural needs and rituals.', 'Offer bereavement support and say how to reach the team afterwards.'],
-      tiers: ['Family presence at the bedside: Downar 2016 (recommend)', 'Spiritual needs and bereavement support: SCCM 2024 conditional, low']}
+      tiers: ['Family presence at the bedside: Downar 2016', 'Spiritual needs and bereavement support: SCCM 2024 conditional, low']}
   ],
   'after-a': [
     {id: 'pronounce', label: 'Pronouncing death', head: 'Confirm, record the time, then sit with the family',
@@ -382,11 +381,11 @@ var CARDS = {
       why: 'Separating the two decisions protects the family\'s trust that care was never shaped by donation.',
       tiers: ['Federal regulation: 42 CFR 482.45']},
     {id: 'examiner', label: 'Medical examiner', head: 'Know which deaths you must report',
-      list: ['Deaths from injury, accident, suicide, homicide or in custody are always reported.', 'Many states add unexpected deaths, deaths soon after admission or surgery, and deaths whose cause is unknown.', 'The examiner decides whether to take the case; until then, leave lines and tubes in place.'],
+      list: ['Deaths from injury, accident, suicide or homicide are reportable in every state; the exact list is set by state law.', 'Many states add unexpected deaths, deaths soon after admission or surgery, and deaths whose cause is unknown.', 'The examiner decides whether to take the case; until then, usually leave lines and tubes in place, following your examiner\'s and hospital\'s rules.'],
       inst: 'Adjust to your state: the list of reportable deaths and the time limits are set by state law.',
       tiers: [EP + '; state law']},
     {id: 'dnc', label: 'Brain death', head: 'Death by neurologic criteria: an overview',
-      list: ['Performed by credentialed, trained attending clinicians under hospital policy, not by residents alone.', 'Before the exam: a known, irreversible cause; at least 24 hours after a hypoxic-ischemic injury; core temperature 36 °C or more; systolic pressure 100 or more and mean pressure 75 or more; sedatives cleared (at least 5 half-lives) and paralysis excluded.', 'In adults one full examination is enough, plus an apnea test: positive when the PaCO2 reaches 60 or more and at least 20 above baseline with pH under 7.30.', 'An ancillary test only when the exam or apnea test cannot be completed or interpreted.', 'Families are informed; consent is not required unless state law or policy says so.'],
+      list: ['Performed by credentialed, trained attending clinicians under hospital policy, not by residents alone.', 'Before the exam: a known, irreversible cause; at least 24 hours after a hypoxic-ischemic injury; core temperature 36 °C or more; systolic pressure 100 or more and mean pressure 75 or more; sedatives cleared (at least 5 half-lives) and paralysis excluded.', 'In adults one full examination is enough, plus an apnea test: positive when the PaCO2 reaches 60 or more and at least 20 above baseline with pH under 7.30.', 'An ancillary test only when the exam or apnea test cannot be completed or interpreted, when a metabolic problem cannot be corrected, or when state or hospital rules require one.', 'Families are informed; consent is not required unless state law or policy says so.'],
       inst: 'Adjust to your state and institution: some states require accommodation of religious or moral objections, and hospitals set who may perform the exam.',
       why: 'Brain death is death; using the same careful process every time is what makes the determination trustworthy.',
       more: ['This is an overview for understanding, not a protocol. Use your hospital\'s checklist and the 2023 guideline. Children need two exams by two examiners.'],
@@ -419,7 +418,7 @@ var TRIALS = [
   {q: 'Does a structured end-of-life meeting help families? (Lautrette)', d: 'Randomized, 22 French ICUs, families of 126 dying patients; proactive conference with a bereavement brochure against the usual conference.', r: 'At 90 days: post-traumatic stress symptoms 45% against 69%; anxiety 45% against 67%; depression 29% against 56%. Families talked longer (median 14 against 5 minutes).', c: 'Made a structured, listening-heavy meeting the model for end-of-life conferences.', cite: 'Lautrette A et al. N Engl J Med 2007;356:469', doi: '10.1056/NEJMoa063446'},
   {q: 'Does a communication facilitator help? (Curtis)', d: 'Randomized, 2 hospitals, 168 high-risk patients; a facilitator supporting clinician and family communication against usual care. Family follow-up under half.', r: 'Family depressive symptoms lower at 6 months, not at 3; no difference in anxiety or PTSD symptoms. Among patients who died: ICU stay 7.7 against 28.5 days, ICU costs lower.', c: 'Shows that support for communication can reduce prolonged dying in the ICU without worsening family distress.', cite: 'Curtis JR et al. Am J Respir Crit Care Med 2016;193:154', doi: '10.1164/rccm.201505-0900OC'},
   {q: 'Do palliative-led meetings help in chronic critical illness? (Carson)', d: 'Randomized, 4 ICUs, 365 surrogates of patients ventilated 7 days or more; at least 2 meetings led by palliative care against usual ICU meetings.', r: 'Anxiety and depression no different (12.2 against 11.4); post-traumatic stress symptoms higher with the intervention (25.9 against 21.3).', c: 'A caution: routine, mandatory palliative-led meetings did not help and may have added distress.', cite: 'Carson SS et al. JAMA 2016;316:51', doi: '10.1001/jama.2016.8474'},
-  {q: 'Does nurse-led family support help? (PARTNER)', d: 'Stepped-wedge cluster randomized, 5 ICUs, 1,420 high-risk patients; a family-support programme led by ICU nurses.', r: 'Anxiety and depression no different (11.7 against 12.0); better ratings of communication (69.1 against 62.7); shorter ICU stay (6.7 against 7.4 days), mostly among patients who died.', c: 'Better communication and shorter dying, without a change in family symptoms.', cite: 'White DB et al. N Engl J Med 2018;378:2365', doi: '10.1056/NEJMoa1802637'},
+  {q: 'Does nurse-led family support help? (PARTNER)', d: 'Stepped-wedge cluster randomized, 5 ICUs, 1,420 high-risk patients; a family-support programme delivered by the ICU team and led by trained ICU nurses.', r: 'Anxiety and depression no different (11.7 against 12.0); better ratings of communication (69.1 against 62.7); shorter ICU stay (6.7 against 7.4 days), mostly among patients who died.', c: 'Better communication and shorter dying, without a change in family symptoms.', cite: 'White DB et al. N Engl J Med 2018;378:2365', doi: '10.1056/NEJMoa1802637'},
   {q: 'Does training in time-limited trials change care? (Chang)', d: 'Before-after quality improvement, 3 hospitals, 209 patients with advanced illness. Not randomized.', r: 'Formal meetings 60.2% to 95.8%; median ICU stay 8.7 to 7.4 days; ventilation 85.8% to 72.9%; hospital mortality unchanged.', c: 'Supports time-limited trials as a default approach; weak design.', cite: 'Chang DW et al. JAMA Intern Med 2021;181:786', doi: '10.1001/jamainternmed.2021.1000'}
 ];
 
@@ -433,10 +432,10 @@ var CASES = [
     ['Let me explain why the kidneys failed.', false, 'More facts while she is flooded with emotion will not be heard.'],
     ['This came so fast. It is a shock.', true, 'Naming and understanding the emotion lets her take in what follows.'],
     ['We have done everything we can.', false, 'Sounds like abandonment, and is rarely true: you will still do a great deal.']]},
-  {t: 'Code status', s: 'A woman with metastatic cancer is in the ICU with worsening respiratory failure. She has said she never wants "to be kept alive on machines".', q: 'How do you raise CPR with her daughter?', o: [
+  {t: 'Code status', s: 'A woman with metastatic cancer is in the ICU with worsening respiratory failure and is now too drowsy to take part. She has told her family she never wants "to be kept alive on machines".', q: 'How do you raise CPR with her daughter?', o: [
     ['Do you want us to do everything?', false, 'A menu with no recommendation; "everything" implies the alternative is nothing.'],
     ['If her heart stops, would you like compressions, shocks, intubation, or some of them?', false, 'A menu of parts asks the daughter to choose each intervention.'],
-    ['Given what she told you, I recommend that if her heart stops we allow a natural death and keep treating everything else. How does that sound?', true, 'A recommendation built on her own words, with room to disagree.']]},
+    ['Given what she told you, I recommend that if her heart stops we allow a natural death, and that we keep giving the treatments that fit what she wants. How does that sound?', true, 'A recommendation built on her own words, with room to disagree.']]},
   {t: 'The family is not ready', s: 'A man with a large stroke is intubated. His children say it is too soon to stop and they want to give him a chance.', q: 'What do you offer?', o: [
     ['A time-limited trial: full support until Monday, with agreed signs of better and worse, then we meet again.', true, 'Gives treatment a fair chance with a decision point agreed in advance.'],
     ['Continue everything and see how it goes.', false, 'No end point: the decision is postponed rather than shared.'],
@@ -445,9 +444,9 @@ var CASES = [
     ['Ask the family about donation before the extubation.', false, 'The team does not start the donation conversation.'],
     ['Call the organ procurement organization now, before withdrawal; they decide suitability and who approaches the family.', true, 'Required referral, kept separate from the decision to withdraw.'],
     ['Only call if the family brings it up.', false, 'Referral is required for imminent death, whether or not the family asks.']]},
-  {t: 'The certificate', s: 'A man with COPD died of septic shock from pneumococcal pneumonia. He also had type 2 diabetes.', q: 'What goes on line a of Part I?', o: [
+  {t: 'The certificate', s: 'A man with COPD died of septic shock from pneumococcal pneumonia. He also had type 2 diabetes. Both made him more vulnerable but did not cause the pneumonia.', q: 'What goes on line a of Part I?', o: [
     ['Cardiopulmonary arrest', false, 'A terminal event, not a cause.'],
-    ['Septic shock, with pneumonia on line b and COPD on line c; diabetes in Part II', true, 'Immediate cause on line a, the underlying cause on the lowest line, contributors in Part II.'],
+    ['Septic shock, with pneumococcal pneumonia on line b; COPD and diabetes in Part II', true, 'Immediate cause on line a, the underlying cause (the pneumonia) on the lowest line, contributors in Part II.'],
     ['Type 2 diabetes', false, 'It contributed but did not start the chain that led to death.']]}
 ];
 function score(caseIdx, optIdx){ var o = CASES[caseIdx].o[optIdx]; return {good: o[1], why: o[2]}; }
@@ -471,7 +470,7 @@ function hbars(rows, max, hot){
 function ihcaSVG(){ return svgOpen('0 0 360 160', 'Survival to discharge after in-hospital cardiac arrest') + hbars(IHCA, 50) + tx(20, 156, 'survival to hospital discharge, scale to 50%', {a: 'start', s: 10.5, c: 'var(--muted)'}) + '</svg>'; }
 
 var OPT = {
-  five: {n: '"5% chance of surviving"', said: 5, heard: N.zier5, line: 'Told "a 5% chance", the median surrogate heard about ' + N.zier5 + '%, and some heard much more. Surrogates described needing to stay hopeful and believing the patient had strengths the doctors could not see.'},
+  five: {n: '"5% chance of surviving"', said: 5, heard: N.zier5, line: 'Told "a 5% chance", the median surrogate heard about ' + N.zier5 + '%, and some heard much more. Surrogates described needing to stay hopeful and believing the patient had strengths the doctors could not see. In another study, surrogate and physician estimates differed by 20 points or more ' + N.white + '% of the time.'},
   ninety: {n: '"90% chance of surviving"', said: 90, heard: N.zier90, line: 'Good news was heard as said. The optimism applies to bad news, which is why a grim prognosis needs saying clearly, more than once, and checking.'}
 };
 function optimismSVG(k){
@@ -513,7 +512,7 @@ function standardSVG(k){
 var DIS = {
   all: {n: 'All families', hot: 0, line: 'One in three main family decision-makers had symptoms consistent with a moderate to major risk of post-traumatic stress at 90 days.'},
   shared: {n: 'Shared in decisions', hot: 1, line: 'Nearly half of those who shared in decisions about treatment had these symptoms.'},
-  eol: {n: 'Shared in end-of-life decisions', hot: 2, line: 'Most of the small group who shared in end-of-life decisions had these symptoms. The answer is support, not keeping families out of decisions: meetings that listen more, clear recommendations, and follow-up after the ICU.'}
+  eol: {n: 'Shared in end-of-life decisions', hot: 2, line: 'Most of the small group who shared in end-of-life decisions had these symptoms. The answer is support, not keeping families out of decisions: meetings that listen more, clear recommendations, and follow-up after the ICU (expert practice).'}
 };
 function distressSVG(k){
   var d = DIS[k], s = svgOpen('0 0 360 170', 'Post-traumatic stress symptoms in families: ' + d.n);
@@ -533,8 +532,8 @@ var FIGS = {
 <script id="deeper-data" type="application/json">
 {"learn-optimism": [["Mechanism", "Surrogates hold two jobs at once: weighing the facts and keeping hope alive for someone they love. Many believe their hope or presence can change the outcome, or that the patient has strengths the doctors cannot see."], ["Why it matters", "A grim prognosis said once, in numbers, is often not heard as grim. Saying it plainly, in words as well as numbers, and checking what was understood closes the gap."], ["Common trap", "Treating the family's optimism as a failure to understand. Often they understood and still need to hope; respond to the hope before repeating the facts."]],
 "learn-spectrum": [["Mechanism", "Shared decision making is a range of approaches, from the family deciding after being informed to the clinician deciding with the family's agreement. The right point depends on what the family wants and how value-laden the choice is."], ["Why it matters", "Most families want to share the decision or hear a recommendation. Offering one, while making clear the family can disagree, lightens a burden many find unbearable."], ["Common trap", "Assuming autonomy means presenting every option neutrally. A menu without a recommendation can feel like abandonment."]],
-"learn-standard": [["Mechanism", "A surrogate is asked to speak for the patient. When the patient's values are known, the standard is substituted judgment: what would the patient choose. When they are not, the standard is the patient's best interest."], ["Why it matters", "Asking what the patient would say shifts the question from what the family wants to what the patient valued, which is both the legal standard and easier for families to carry."], ["Common trap", "Asking the family what they want done. It invites them to answer for themselves rather than for the patient."]],
-"learn-distress": [["Mechanism", "Family members face sudden illness, uncertainty and decisions about life and death while sleeping little and often alone. Many carry symptoms of anxiety, depression and post-traumatic stress for months."], ["Why it matters", "How the team communicates is one of the few things that changes this: listening more, giving a clear message, offering a recommendation, and support afterwards."], ["Common trap", "Reading the higher distress among families who shared end-of-life decisions as a reason to keep families out. The trials point to better support, not exclusion."]],
+"learn-standard": [["Mechanism", "A surrogate is asked to speak for the patient. When the patient's values are known, the standard is substituted judgment: what would the patient choose. When they are not, the standard is the patient's best interest."], ["Why it matters", "Asking what the patient would say shifts the question from what the family wants to what the patient valued, which is the standard most state laws use and is easier for families to carry."], ["Common trap", "Asking the family what they want done. It invites them to answer for themselves rather than for the patient."]],
+"learn-distress": [["Mechanism", "Family members face sudden illness, uncertainty and decisions about life and death while sleeping little and often alone. Many carry symptoms of anxiety, depression and post-traumatic stress for months."], ["Why it matters", "How the team communicates is one of the few things that changes this: listening more, giving a clear message, offering a recommendation, and support afterwards."], ["Common trap", "Reading the higher distress among families who shared end-of-life decisions as a reason to keep families out. The answer is better support, not exclusion; one trial of a structured meeting (Lautrette) lowered distress, while others did not."]],
 "learn-uncertainty": [["Mechanism", "Prognosis in critical illness is uncertain, and both families and clinicians find uncertainty hard to hold. Stating hope and worry together acknowledges both possible futures."], ["Why it matters", "Families can plan, and say what matters, only if they know the bad outcome is possible. Pairing it with hope keeps them from feeling that the team has given up."], ["Common trap", "Waiting for certainty before raising the possibility of dying. By then there is often no time left for the conversation."]]}
 </script>
 
