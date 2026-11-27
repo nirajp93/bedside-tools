@@ -212,7 +212,7 @@ tr.mark td{font-weight:700;color:var(--accent)}
       <p class="whyline"><b>Why:</b> In one series 7.5% of patients meeting ARDS criteria had no common trigger; many had immune, drug or malignant disease, and the steroid-responsive ones did better.</p>
       <details><summary>More</summary>
         <p>Gibelin 2016 (two French centers, intubated patients, retrospective): of 50 patients with no common risk factor, 36% had immune disease, 26% drug-induced lung injury, 14% malignancy and 24% no cause found. ICU mortality was 66%; lesions that respond to steroids were linked to survival.</p>
-        <p>Diffuse alveolar hemorrhage: lavage returns get bloodier with each aliquot, or 20% or more of macrophages carry hemosiderin. The second sign is not specific: 7 of 21 patients with biopsy-proven diffuse alveolar damage also met it. Acute eosinophilic pneumonia: more than 25% eosinophils in the lavage, after infection and drugs are excluded; blood eosinophils are often normal at first.</p>
+        <p>Diffuse alveolar hemorrhage: lavage returns get bloodier with each aliquot, or 20% or more of macrophages carry hemosiderin. The second sign is not specific: 7 of 21 patients with biopsy-proven diffuse alveolar damage also met it. Acute eosinophilic pneumonia: more than 25% eosinophils in the lavage, after infection and drugs are excluded.</p>
         <p>Heart failure and ARDS can coexist: under the global definition ARDS can still be diagnosed with cardiogenic edema if a trigger is present and the edema is not mainly cardiac.</p>
         <span class="tier">Mimic categories: Gibelin 2016 (observational)</span><span class="tier">Lavage criteria: reviews and case series</span><span class="tier">Test order: expert practice</span>
       </details>
@@ -307,8 +307,8 @@ function fio2Of(v){ if (!has(v)) return null; if (v >= 0.21 && v <= 1) return v;
 function oxy(i){
   var f = fio2Of(i.fio2);
   if (f !== null && isNaN(f)) return {bad: 'fio2'};
-  if (has(f) && has(i.pao2) && i.pao2 > 0) return {f: f, pf: r0(i.pao2 / f), by: 'pf'};
-  if (has(f) && has(i.spo2)){ if (i.spo2 > T.sfMaxSat) return {f: f, bad: 'sat'}; return {f: f, sf: r0(i.spo2 / f), by: 'sf'}; }
+  if (has(f) && has(i.pao2) && i.pao2 > 0) return {f: f, pf: i.pao2 / f, by: 'pf'};
+  if (has(f) && has(i.spo2)){ if (i.spo2 > T.sfMaxSat) return {f: f, bad: 'sat'}; return {f: f, sf: i.spo2 / f, by: 'sf'}; }
   return {f: f};
 }
 function bandPf(pf){ return pf <= T.pfSev ? 'severe' : pf <= T.pfMod ? 'moderate' : pf <= T.pfMild ? 'mild' : null; }
@@ -317,7 +317,7 @@ function bandSf(sf){ return sf <= T.sfSev ? 'severe' : sf <= T.sfMod ? 'moderate
 var ONSET = [['yes','Within a week'],['no','Longer'],['unk','Not sure']];
 var IMG = [['film','Both sides on film or CT'],['us','Both sides on ultrasound'],['no','Not both sides'],['unk','Not done']];
 var CARD = [['no','No'],['part','Contributes, not the main cause'],['main','Yes, the main cause'],['unk','Not assessed']];
-var SUP = [['o2','Oxygen, or high flow under 30 L/min'],['hfno','High flow 30 L/min or more'],['niv','NIV or CPAP'],['inv','Intubated']];
+var SUP = [['o2','Oxygen, or high flow under 30 L/min'],['hfno','High flow 30 L/min or more'],['niv','NIV (bilevel)'],['cpap','CPAP'],['inv','Intubated']];
 var RISK = [['pneu','Pneumonia'],['sep','Infection outside the lung, or sepsis'],['asp','Aspiration'],['trauma','Trauma or burn'],['trans','Transfusion'],['shock','Shock'],['panc','Pancreatitis'],['other','Other (inhalation, drowning)'],['none','No trigger found']];
 
 var WHY = {
@@ -328,18 +328,18 @@ var WHY = {
   protect: 'Small breaths and a capped plateau protect the small part of the lung that is still open; every other rung sits on top of this one.',
   noninv: 'High flow reduced intubation compared with ordinary oxygen; none of the noninvasive options has been shown to change survival.',
   peep: 'PEEP holds open alveoli that collapse at the end of each breath; in moderate to severe ARDS there is more lung to recruit, but too much overstretches open lung and lowers venous return.',
-  fluid: 'Leaky capillaries let fluid into the lung at lower pressures, so once the shock is over a drier patient means drier lungs and fewer days on the ventilator.',
+  fluid: 'Leaky capillaries let fluid into the lung at lower pressures; once the shock was over, a drier strategy gave better oxygenation and fewer days on the ventilator in FACTT.',
   steroid: 'Steroids damp the inflammation that drives the leak; pooled trials showed fewer deaths and about 4 fewer days on the ventilator.',
-  steroidLate: 'In the one trial of late steroids, starting two weeks or more after onset went with more deaths.',
+  steroidLate: 'In the one trial of late steroids, the patients started two weeks or more after onset had more deaths.',
   prone: 'Turning prone reopens the back of the lung, where most of the collapse is, and spreads each breath more evenly.',
-  nmb: 'Paralysis stops strong efforts that add to lung stretch; it helped against deep sedation in one trial but not against light sedation in a larger one.',
+  nmb: 'Paralysis stops strong efforts that add to lung stretch; it helped against deep sedation in earlier trials (mainly ACURASYS) but not against light sedation in the larger ROSE trial.',
   ivd: 'An inhaled vasodilator reaches only vessels beside alveoli that take air, so blood moves toward the air; the oxygen rises but survival does not.',
   ecmo: 'When the lung cannot be ventilated safely, the circuit takes over gas exchange so the ventilator can rest the lung.',
   rv: 'Collapse, a high CO2 and high airway pressure all raise the load on the thin-walled right ventricle, and severe strain went with more deaths.'
 };
 
 function diagnose(i){
-  var o = oxy(i), inv = i.sup === 'inv', niv = i.sup === 'niv', peepOk = has(i.peep) && i.peep >= T.peepMin;
+  var o = oxy(i), inv = i.sup === 'inv', niv = i.sup === 'niv' || i.sup === 'cpap', peepOk = has(i.peep) && i.peep >= T.peepMin;
   var risk = (i.risk || []).filter(function(k){ return k !== 'none'; }), noRisk = (i.risk || []).indexOf('none') >= 0 && !risk.length;
   function tri(v){ return v === true ? 'met' : v === false ? 'no' : 'unk'; }
   var g = {}, b = {};
@@ -353,11 +353,12 @@ function diagnose(i){
   if (i.sup === 'hfno') g.sup = 'met';
   else if (inv || niv) g.sup = has(i.peep) ? tri(peepOk) : 'unk';
   else g.sup = i.sup === 'o2' ? 'no' : 'unk';
-  b.sup = inv || niv ? (has(i.peep) ? tri(peepOk) : 'unk') : i.sup ? 'no' : 'unk';
   var band = null;
   if (o.by === 'pf'){ g.ox = b.ox = tri(o.pf <= T.pfMild); band = bandPf(o.pf); }
   else if (o.by === 'sf'){ g.ox = tri(o.sf <= T.sfMild); b.ox = 'unk'; band = bandSf(o.sf); }
   else { g.ox = b.ox = 'unk'; }
+  b.sup = inv || niv ? (has(i.peep) ? tri(peepOk) : 'unk') : i.sup ? 'no' : 'unk';
+  if (i.sup === 'cpap' && b.sup === 'met' && o.by === 'pf' && band && band !== 'mild') b.sup = 'no'; /* Berlin: CPAP counts only for mild */
   var KEYS = ['time','img','orig','trig','sup','ox'];
   var NAME = {time: 'Timing', img: 'Imaging', orig: 'Origin of edema', trig: 'Trigger', sup: 'Support', ox: 'Oxygen'};
   var gNo = KEYS.filter(function(k){ return g[k] === 'no'; }), gUnk = KEYS.filter(function(k){ return g[k] === 'unk'; });
@@ -372,15 +373,15 @@ function diagnose(i){
   else if (gNo.length){ c.head = 'Does not meet the global definition'; c.sub = 'Not met: ' + gNo.map(function(k){ return NAME[k].toLowerCase(); }).join(', ') + '.'; c.why = gNo.indexOf('orig') >= 0 ? WHY.cardio : null; }
   else { c.head = 'Not enough to decide yet'; c.sub = 'Still needed: ' + gUnk.map(function(k){ return NAME[k].toLowerCase(); }).join(', ') + '.'; c.empty = true; }
   var bTxt = bAll ? 'Meets Berlin' + (band && o.by === 'pf' ? ': ' + band : '') + '.' : bNo.length ? 'Does not meet Berlin (' + bNo.map(function(k){ return NAME[k].toLowerCase(); }).join(', ') + ').' : 'Berlin: not enough to decide' + (o.by === 'sf' ? '; it needs a PaO2.' : '.');
-  c.sub = (c.sub ? c.sub + ' ' : '') + bTxt + (o.pf ? ' P/F ' + o.pf + '.' : o.sf ? ' SpO2/FiO2 ' + o.sf + '.' : '');
+  c.sub = (c.sub ? c.sub + ' ' : '') + bTxt + (o.pf ? ' P/F ' + r0(o.pf) + '.' : o.sf ? ' SpO2/FiO2 ' + r0(o.sf) + '.' : '');
   c.cmp = KEYS.map(function(k){ return [NAME[k], g[k], b[k]]; });
   if (gMet && inv) c.list.push('Next: the Ladder tab, starting with lung protection on Ventilator basics.');
   if (gMet && !inv) c.list.push('Not intubated: see the Ladder for support choices, and Oxygen, high flow and NIV for settings.');
-  if (o.by === 'sf' && (gMet || g.ox === 'met')) c.list.push('Send a blood gas: the ladder steps are set by P/F, and pulse oximetry reads high in darker skin and in shock.');
+  if (o.by === 'sf' && (gMet || g.ox === 'met')) c.list.push('Send a blood gas: the ladder steps are set by P/F, and pulse oximetry can read falsely high, missing hypoxemia, in darker skin and in shock.');
   if (i.card === 'part') c.list.push('Heart failure contributing: ARDS can still be diagnosed when a trigger is present and the edema is not mainly cardiac. Treat both.');
   if (noRisk) c.guards.push('No trigger found: work through the mimics below before treating this as ARDS alone.');
   c.more = ['Global definition 2024. Not intubated: P/F 300 or less, or SpO2/FiO2 315 or less (SpO2 97% or less), on high flow of 30 L/min or more or NIV/CPAP of at least 5. Intubated: mild over 200 to 300 (SpO2/FiO2 over 235 to 315), moderate over 100 to 200 (over 148 to 235), severe 100 or less (148 or less), on PEEP of at least 5. Imaging may be ultrasound in trained hands. Edema not mainly cardiac and hypoxemia not mainly atelectasis.',
-    'Berlin 2012: film or CT only; P/F only; PEEP of at least 5 on invasive or noninvasive ventilation (mild may be CPAP of at least 5); high flow does not count.',
+    'Berlin 2012: film or CT only; P/F only; PEEP of at least 5 on invasive or noninvasive ventilation, with CPAP of at least 5 allowed only for mild; high flow does not count.',
     'Where blood gases, high flow and ventilators are not routinely available, the global definition accepts SpO2/FiO2 315 or less (SpO2 97% or less) with no PEEP or flow minimum; FiO2 is estimated as 0.21 + 0.03 × oxygen L/min. Above 1,000 m, multiply the ratio by barometric pressure/760.',
     'Do not use SpO2/FiO2 with suspected methemoglobin or carbon monoxide. If ARDS is likely but the oximeter ratio misses the cut-off, send a blood gas.'];
   if (!c.guards.length) delete c.guards; if (!c.list.length) delete c.list;
@@ -422,7 +423,7 @@ function ladder(i){
   var o = oxy(i), sup = i.sup || 'inv', intub = sup === 'inv', pf = o.by === 'pf' ? o.pf : null, f = o.f;
   var dp = has(i.plat) && has(i.peep) && i.plat > i.peep ? i.plat - i.peep : null;
   var hyperc = has(i.ph) && has(i.paco2) && i.ph < T.phEcmo && i.paco2 >= T.co2Ecmo;
-  var R = {}, cards = {};
+  var R = {}, cards = {}, dd = diagnose(i), doubt = dd.g.orig === 'no' || dd.g.trig === 'no';
   function card(id, st, head, x){ x = x || {}; x.id = 'r-' + id; x.rung = st; x.label = 'Step ' + (RUNGS.map(function(r){ return r[0]; }).indexOf(id) + 1) + ' · ' + RUNGS.filter(function(r){ return r[0] === id; })[0][1]; x.head = head; R[id] = st; cards[id] = x; }
   var noPf = o.by === 'sf' ? 'Send a blood gas: this step is set by P/F.' : 'Enter FiO2 and PaO2 to place this step.';
 
@@ -445,13 +446,13 @@ function ladder(i){
   var peepMore = ['ATS 2024 suggests higher PEEP without recruitment maneuvers in moderate to severe ARDS. ESICM 2023 could not recommend for or against a higher PEEP strategy or PEEP set by mechanics. In mild ARDS there is no recommendation and a possible trend to harm.', 'ART (1,010 patients): recruitment plus PEEP titrated to compliance raised 28-day deaths, 55.3% against 49.3% (hazard ratio 1.20).', 'No consensus on PEEP set by esophageal pressure.'];
   if (!intub) card('peep', 'not', 'Applies once intubated', {empty: true});
   else if (pf === null) card('peep', 'wait', 'Higher PEEP for moderate to severe ARDS', {sub: noPf, list: rmList, more: peepMore, tiers: rmTiers});
-  else if (pf <= T.pfMod) card('peep', 'now', 'Higher PEEP, without recruitment maneuvers', {sub: 'P/F ' + pf + ' is 200 or less: a higher-PEEP strategy is suggested, such as the higher-PEEP table.', links: [['/vent/#situation', 'PEEP/FiO2 tables on Ventilator basics']], list: rmList, why: WHY.peep, more: peepMore, tiers: ['Higher PEEP in moderate to severe ARDS: conditional, low to moderate (ATS 2024); no recommendation (ESICM 2023)'].concat(rmTiers)});
-  else card('peep', 'not', 'Mild ARDS: no recommendation for higher PEEP', {sub: 'P/F ' + pf + ' is over 200.', list: rmList, more: peepMore, tiers: rmTiers});
+  else if (pf <= T.pfMod) card('peep', 'now', 'Higher PEEP, without recruitment maneuvers', {sub: 'P/F ' + r0(pf) + ' is 200 or less: a higher-PEEP strategy is suggested, such as the higher-PEEP table.', links: [['/vent/#situation', 'PEEP/FiO2 tables on Ventilator basics']], list: rmList, why: WHY.peep, more: peepMore, tiers: ['Higher PEEP in moderate to severe ARDS: conditional, low to moderate (ATS 2024); no recommendation (ESICM 2023)'].concat(rmTiers)});
+  else card('peep', 'not', 'Mild ARDS: no recommendation for higher PEEP', {sub: 'P/F ' + r0(pf) + ' is over 200.', list: rmList, more: peepMore, tiers: rmTiers});
   /* 3 */
   var flMore = ['FACTT (1,000 patients): conservative against liberal fluids for 7 days. Balance −136 mL against +6,992 mL; ventilator-free days 14.6 against 12.1; deaths at 60 days 25.5% against 28.4% (no difference). Shock was treated as clinicians judged; diuretics were held within 12 hours of a vasopressor or of coming out of shock.', 'One reanalysis suggested the hyperinflammatory subtype did better with more fluid. That is research, not practice yet.'];
   var flTiers = ['Conservative fluids after shock: trial-based (FACTT); no current graded recommendation (ATS 2024 did not address it; outside ESICM 2023 scope)'];
   if (i.press) card('fluids', 'hold', 'Treat the shock first', {sub: 'Conservative fluids begin once the patient is off vasopressors.', links: [['/sepsis/', 'Sepsis'], ['/pressors/', 'Pressors']], more: flMore, tiers: flTiers});
-  else card('fluids', 'now', 'Conservative fluids once out of shock', {sub: 'Aim for an even or negative balance with diuretics, watching kidney function and perfusion.', links: [['/fluids/', 'Fluid choice and removal']], why: WHY.fluid, more: flMore, tiers: flTiers});
+  else card('fluids', 'now', 'Conservative fluids once out of shock', {sub: 'Aim for an even or negative balance with diuretics, watching kidney function and perfusion.', links: [['/sepsis/', 'Fluids in sepsis']], why: WHY.fluid, more: flMore, tiers: flTiers});
   /* 4 */
   var REG = {
     other: ['Regimens tested in trials (the guideline did not pick one):', 'Dexamethasone 20 mg IV daily on days 1 to 5, then 10 mg daily on days 6 to 10 (DEXA-ARDS: P/F 200 or less on PEEP 10 or more and FiO2 0.5 or more).', 'Methylprednisolone 1 mg/kg/day as an infusion, started within 72 hours, for up to 28 days with a taper (Meduri 2007).'],
@@ -462,29 +463,30 @@ function ladder(i){
   var cause = i.cause || 'other', stMore = ['ATS 2024: 19 trials, 2,790 patients; deaths relative risk 0.84 (0.73 to 0.96), about 4 fewer days on the ventilator; serious hyperglycemia relative risk 1.11. Many trials stopped the steroid at extubation.', 'ESICM 2023 did not cover drugs other than paralytics.', 'Watch glucose; screen for strongyloides and tuberculosis where exposure is likely, and take more care in the immunocompromised.'];
   var stTiers = ['Corticosteroids in ARDS: conditional, moderate (ATS 2024)'];
   if (!intub){
-    if (cause !== 'other') card('steroids', 'now', 'Steroid for a cause with proven benefit', {sub: 'Not intubated: steroids are for causes known to benefit (COVID-19, severe community-acquired pneumonia, Pneumocystis with HIV).', list: REG[cause], why: WHY.steroid, more: stMore, tiers: stTiers});
-    else card('steroids', 'not', 'Not intubated: only for causes with proven benefit', {sub: 'COVID-19, severe community-acquired pneumonia, or Pneumocystis with HIV. Set the cause above.', more: stMore, tiers: stTiers});
-  } else if (has(i.dsince) && i.dsince > T.steroidDays) card('steroids', 'hold', 'Day ' + i.dsince + ': starting now may do harm', {sub: 'Starting steroids more than 2 weeks after onset may be associated with harm.', guards: ['A steroid-responsive mimic (eosinophilic or organizing pneumonia) is a different question: treat the mimic.'], why: WHY.steroidLate, more: ['LaSRS (180 patients, ARDS of 7 days or more): no overall benefit; started 14 days or more after onset, methylprednisolone increased deaths at 60 and 180 days.'].concat(stMore), tiers: stTiers});
-  else card('steroids', 'now', 'Corticosteroids are suggested', {sub: (has(i.dsince) ? 'Day ' + i.dsince + ' of ARDS. ' : '') + 'No single agent or dose is recommended; use the regimen that fits the cause.', list: REG[cause], guards: has(i.dsince) ? null : ['Enter the day of illness: starting after 2 weeks may do harm.'], why: WHY.steroid, more: stMore, tiers: stTiers});
+    if (cause !== 'other') card('steroids', 'now', 'Steroid for a cause with proven benefit', {sub: 'Not intubated: ATS 2024 limits steroids to causes known to benefit (COVID-19, severe community-acquired pneumonia); Pneumocystis with HIV follows its own guideline.', list: REG[cause], why: WHY.steroid, more: stMore, tiers: stTiers});
+    else card('steroids', 'not', 'Not intubated: only for causes with proven benefit', {sub: 'COVID-19 or severe community-acquired pneumonia (ATS 2024); Pneumocystis with HIV follows its own guideline. Set the cause above.', more: stMore, tiers: stTiers});
+  } else if (has(i.dsince) && i.dsince >= T.steroidDays) card('steroids', 'hold', 'Day ' + i.dsince + ': starting now may do harm', {sub: 'Starting steroids 2 weeks or more after onset may be associated with harm.', guards: ['A steroid-responsive mimic (eosinophilic or organizing pneumonia) is a different question: treat the mimic.'], why: WHY.steroidLate, more: ['LaSRS (180 patients, ARDS of 7 days or more): no overall benefit; started 14 days or more after onset, methylprednisolone increased deaths at 60 and 180 days.'].concat(stMore), tiers: stTiers});
+  else card('steroids', 'now', 'Corticosteroids are suggested', {sub: (has(i.dsince) ? 'Day ' + i.dsince + ' of ARDS. ' : '') + 'No single agent or dose is recommended; use the regimen that fits the cause.', list: REG[cause], guards: has(i.dsince) ? null : ['Enter the day of illness: starting at 2 weeks or later may do harm.'], why: WHY.steroid, more: stMore, tiers: stTiers});
   /* 5 */
   var prMore = ['PROSEVA (466 patients; P/F under 150 on FiO2 0.6 or more and PEEP 5 or more, after 12 to 24 hours of stabilisation; sessions of at least 16 hours): deaths at 28 days 16.0% against 32.8%, at 90 days 23.6% against 41.0%.', 'Stop proning when, at least 4 hours after turning back, P/F stays 150 or more with PEEP 10 or less and FiO2 0.6 or less; or if P/F falls by more than 20% against supine in two sessions in a row; or for a complication such as unplanned extubation or cardiac arrest.', 'The FiO2 0.6 gate is the trial\'s entry rule, as on Ventilator basics. The European guideline asks only for P/F under 150 on PEEP 5 or more after optimising settings.', PRONE_CAUTION];
   var prTiers = ['Prone 16 hours or more at P/F under 150: strong, high (ESICM 2023)', 'Prone over 12 hours a day in severe ARDS: strong, moderate (ATS 2017, kept in 2024)', 'Checklist and cautions: expert practice'];
   if (!intub) card('prone', 'not', 'Applies once intubated', {empty: true});
   else if (pf === null) card('prone', 'wait', 'Prone when P/F stays under 150', {sub: noPf, more: prMore, tiers: prTiers, chips: [['prone', 'sup', 'Supine and prone']]});
-  else if (pf < T.pfProne && has(f) && f >= T.fio2Prone) card('prone', i.contra ? 'hold' : 'now', i.contra ? 'Prone: weigh the caution first' : 'Turn prone for 16 hours or more a day', {sub: 'P/F ' + pf + ' on FiO2 ' + r1(f * 100) / 100 + ': prone early, once settings are optimised, in sessions of at least 16 hours.', list: PRONE_CHECK, guards: i.contra ? ['A caution is ticked. The trial excluded these patients: decide with the team whether the benefit outweighs the risk.'] : null, why: WHY.prone, chips: [['prone', 'pro', 'Supine and prone']], more: prMore, tiers: prTiers});
-  else if (pf < T.pfProne) card('prone', 'cons', 'Optimise, then prone if P/F stays under 150', {sub: 'P/F ' + pf + ' but FiO2 under 0.6: the trial enrolled patients on 0.6 or more after stabilisation. Optimise PEEP and recheck.', why: WHY.prone, chips: [['prone', 'sup', 'Supine and prone']], more: prMore, tiers: prTiers});
-  else card('prone', 'not', 'Not yet: P/F is 150 or more', {sub: 'P/F ' + pf + '.', more: prMore, tiers: prTiers});
+  else if (pf < T.pfProne && has(i.peep) && i.peep < T.peepMin) card('prone', 'cons', 'Optimise first: PEEP is under 5', {sub: 'P/F ' + r0(pf) + ' on PEEP ' + i.peep + ': the trial and the European guideline both required PEEP of at least 5. Optimise and recheck.', why: WHY.prone, more: prMore, tiers: prTiers});
+  else if (pf < T.pfProne && has(f) && f >= T.fio2Prone) card('prone', i.contra ? 'hold' : 'now', i.contra ? 'Prone: weigh the caution first' : 'Turn prone for 16 hours or more a day', {sub: 'P/F ' + r0(pf) + ' on FiO2 ' + r1(f * 100) / 100 + ': prone early, once settings are optimised, in sessions of at least 16 hours.', list: PRONE_CHECK, guards: i.contra ? ['A caution is ticked. The trial excluded these patients: decide with the team whether the benefit outweighs the risk.'] : null, why: WHY.prone, chips: [['prone', 'pro', 'Supine and prone']], more: prMore, tiers: prTiers});
+  else if (pf < T.pfProne) card('prone', 'cons', 'Optimise, then prone if P/F stays under 150', {sub: 'P/F ' + r0(pf) + ' but FiO2 under 0.6: the trial enrolled patients on 0.6 or more after stabilisation. Optimise PEEP and recheck.', why: WHY.prone, chips: [['prone', 'sup', 'Supine and prone']], more: prMore, tiers: prTiers});
+  else card('prone', 'not', 'Not yet: P/F is 150 or more', {sub: 'P/F ' + r0(pf) + '.', more: prMore, tiers: prTiers});
   /* 6 */
   var nmMore = ['Guidelines differ. SCCM 2026 suggests it at P/F under 150 with persistent hypoxemia. ATS 2024 suggests it in early (within 48 hours) severe ARDS (P/F 100 or less), for 48 hours at most where possible. ESICM 2023 recommends against routine continuous infusions.', 'ACURASYS (340 patients, against deep sedation): adjusted 90-day hazard ratio 0.68; crude deaths 31.6% against 40.7%. ROSE (1,006 patients, against light sedation): 42.5% against 42.8%.'];
   var nmTiers = ['P/F under 150 with persistent hypoxemia: conditional (SCCM 2026)', 'Early severe ARDS: conditional, low (ATS 2024)', 'Against routine continuous infusion: strong, moderate (ESICM 2023)'];
   var nmGuard = 'Never paralyse without deep sedation and analgesia: a paralytic does nothing for awareness or pain.';
   if (!intub) card('nmb', 'not', 'Applies once intubated', {empty: true});
   else if (pf === null) card('nmb', 'wait', 'Paralysis for persistent hypoxemia at P/F under 150', {sub: noPf, guards: [nmGuard], more: nmMore, tiers: nmTiers});
-  else if (pf < T.pfProne && i.persist && !i.deep) card('nmb', 'hold', 'Sedate deeply before any paralytic', {sub: 'P/F ' + pf + ' and still failing, but not yet deeply sedated.', guards: [nmGuard], links: [['/sedation/#paralysis', 'Sedation and paralysis']], why: WHY.nmb, more: nmMore, tiers: nmTiers});
-  else if (pf < T.pfProne && i.persist) card('nmb', 'cons', 'Consider a paralytic, 48 hours at most where possible', {sub: 'P/F ' + pf + ', still hypoxemic or fighting the ventilator despite deep sedation.', guards: [nmGuard], links: [['/sedation/#paralysis', 'Drug and dose on Sedation']], why: WHY.nmb, more: nmMore, tiers: nmTiers});
-  else card('nmb', 'not', pf < T.pfProne ? 'Only if failing despite optimised settings' : 'Not yet: P/F is 150 or more', {sub: 'P/F ' + pf + '.' + (pf < T.pfProne ? ' Tick "still hypoxemic or fighting the ventilator" if that is the case.' : ''), guards: [nmGuard], more: nmMore, tiers: nmTiers});
+  else if (pf < T.pfProne && i.persist && !i.deep) card('nmb', 'hold', 'Sedate deeply before any paralytic', {sub: 'P/F ' + r0(pf) + ' and still failing, but not yet deeply sedated.', guards: [nmGuard], links: [['/sedation/#paralysis', 'Sedation and paralysis']], why: WHY.nmb, more: nmMore, tiers: nmTiers});
+  else if (pf < T.pfProne && i.persist) card('nmb', 'cons', 'Consider a paralytic, 48 hours at most where possible', {sub: 'P/F ' + r0(pf) + ', still hypoxemic or fighting the ventilator despite deep sedation.', guards: [nmGuard], links: [['/sedation/#paralysis', 'Drug and dose on Sedation']], why: WHY.nmb, more: nmMore, tiers: nmTiers});
+  else card('nmb', 'not', pf < T.pfProne ? 'Only if failing despite optimised settings' : 'Not yet: P/F is 150 or more', {sub: 'P/F ' + r0(pf) + '.' + (pf < T.pfProne ? ' Tick "still hypoxemic or fighting the ventilator" if that is the case.' : ''), guards: [nmGuard], more: nmMore, tiers: nmTiers});
   /* 7 */
-  var ivMore = ['Cochrane review of inhaled nitric oxide (adults and children): deaths relative risk 1.04 (0.9 to 1.19); P/F up by about 16 at 24 hours; kidney failure relative risk 1.59 (1.17 to 2.16). Inhaled epoprostenol has less trial evidence.', 'ATS 2024 found too little data to make a recommendation; drugs other than paralytics were outside the European guideline.'];
+  var ivMore = ['Cochrane review of inhaled nitric oxide (adults and children): deaths relative risk 1.04 (0.9 to 1.19); P/F up by about 16 at 24 hours; kidney failure relative risk 1.59 (1.17 to 2.16). Inhaled epoprostenol has less trial evidence.', 'ATS 2024 did not address them and notes more data are needed; drugs other than paralytics were outside the European guideline.'];
   var ivTiers = ['No guideline recommendation; use as a bridge is expert practice'];
   if (!intub) card('ivd', 'not', 'Applies once intubated', {empty: true});
   else if (pf !== null && pf < T.pfEcmo) card('ivd', 'cons', 'A bridge only, while proning or ECMO is arranged', {sub: 'May raise the oxygen for hours. It does not change survival and is not a substitute for the steps above.', why: WHY.ivd, chips: [['shunt', 'inh', 'Shunt and vasodilators']], more: ivMore, tiers: ivTiers});
@@ -497,15 +499,19 @@ function ladder(i){
   else if ((pf !== null && pf < T.pfEcmo) || hyperc){
     var eg = [];
     if (has(i.dvent) && i.dvent > T.ventDays) eg.push('Over 7 days on the ventilator: at high settings this becomes a relative contraindication. Call now and let the center decide.');
-    card('ecmo', 'now', 'Call an ECMO center', {sub: (pf !== null && pf < T.pfEcmo ? 'P/F ' + pf + ' is under 80: if it stays there despite the steps above (the trial required more than 6 hours), call an ECMO center.' : 'pH ' + i.ph + ' with PaCO2 ' + i.paco2 + ': if it persists despite best ventilation, call an ECMO center.') + ' Referral is for selected patients early in the illness (within about 7 days).', list: ecList, guards: eg.length ? eg : null, why: WHY.ecmo, more: ecMore, tiers: ecTiers});
-  } else card('ecmo', pf === null ? 'wait' : 'not', 'ECMO criteria not met', {sub: pf === null ? noPf : 'P/F ' + pf + (hyperc ? '' : '; no severe hypercapnia entered') + '.', list: ecList.slice(0, 1), more: ecMore, tiers: ecTiers});
+    card('ecmo', 'now', 'Call an ECMO center', {sub: (pf !== null && pf < T.pfEcmo ? 'P/F ' + r0(pf) + ' is under 80: if it stays there despite the steps above (the trial required more than 6 hours), call an ECMO center.' : 'pH ' + i.ph + ' with PaCO2 ' + i.paco2 + ': if it persists despite best ventilation, call an ECMO center.') + ' Referral is for selected patients early in the illness (within about 7 days).', list: ecList, guards: eg.length ? eg : null, why: WHY.ecmo, more: ecMore, tiers: ecTiers});
+  } else card('ecmo', pf === null ? 'wait' : 'not', 'ECMO criteria not met', {sub: pf === null ? noPf : 'P/F ' + r0(pf) + (hyperc ? '' : '; no severe hypercapnia entered') + '.', list: ecList.slice(0, 1), more: ecMore, tiers: ecTiers});
 
+  /* Nothing to place yet, or the diagnosis is in doubt: do not light treatment rungs */
+  function setSt(k, st){ R[k] = st; cards[k].rung = st; }
+  if (pf === null && o.by !== 'sf'){ ['fluids','steroids'].forEach(function(k){ if (R[k] === 'now') setSt(k, 'wait'); }); }
+  if (doubt && R.steroids === 'now'){ setSt('steroids', 'wait'); cards.steroids.guards = (cards.steroids.guards || []).concat(['Diagnose flags cardiac edema or no trigger: settle whether this is ARDS first. Some mimics need steroids, others need something else.']); }
   /* Extras */
   var ex = [];
   var rvf = [];
   if ((i.risk || []).indexOf('pneu') >= 0) rvf.push('pneumonia as the cause');
   if (dp !== null && dp >= T.rvDp) rvf.push('driving pressure ' + r1(dp) + ' (18 or more)');
-  if (pf !== null && pf < T.rvPf) rvf.push('P/F ' + pf + ' (under 150)');
+  if (pf !== null && pf < T.rvPf) rvf.push('P/F ' + r0(pf) + ' (under 150)');
   if (has(i.paco2) && i.paco2 >= T.rvCo2) rvf.push('PaCO2 ' + i.paco2 + ' (48 or more)');
   var rvOn = i.rvd || rvf.length >= 2;
   ex.push({id: 'r-rv', label: 'Protect the right ventricle', rung: rvOn ? (i.rvd ? 'hold' : 'cons') : 'not', head: i.rvd ? 'Acute cor pulmonale: unload the right ventricle' : rvOn ? rvf.length + ' of 4 risk factors for right ventricular strain' : 'Right ventricle: no flags entered',
@@ -526,7 +532,7 @@ function ladder(i){
   var order = RUNGS.map(function(r){ return r[0]; }), top = null;
   order.forEach(function(k){ if (R[k] === 'now' || R[k] === 'hold' || R[k] === 'cons') top = k; });
   var head = !intub ? 'Not intubated: support, fluids and cause' : top ? 'Highest step now: ' + RUNGS[order.indexOf(top)][1] : 'Start with lung protection';
-  var sub = (!i.sup ? 'Assuming invasive ventilation; set the support on Diagnose. ' : '') + (pf !== null ? 'P/F ' + pf + (bandPf(pf) ? ', ' + bandPf(pf) : '') + '.' : o.by === 'sf' ? 'SpO2/FiO2 ' + o.sf + ': send a blood gas to place the steps.' : 'Enter FiO2 and PaO2 to light the steps.');
+  var sub = (!i.sup ? 'Assuming invasive ventilation; set the support on Diagnose. ' : '') + (doubt ? 'Diagnose flags cardiac edema or no trigger. ' : '') + (pf !== null ? 'P/F ' + r0(pf) + (intub && bandPf(pf) ? ', ' + bandPf(pf) : '') + '.' : o.by === 'sf' ? 'SpO2/FiO2 ' + r0(o.sf) + ': send a blood gas to place the steps.' : 'Enter FiO2 and PaO2 to light the steps.');
   return {rungs: order.map(function(k){ return {id: k, n: RUNGS[order.indexOf(k)][1], st: R[k]}; }), cards: order.map(function(k){ return cards[k]; }), extras: ex, head: head, sub: sub, top: top, pf: pf, dp: dp};
 }
 
@@ -549,8 +555,8 @@ var TRIALS = [
 var CASES = [
   {t: 'Pneumonia on high flow', s: 'Woman, 58, two days of pneumonia. High flow at 50 L/min, FiO2 0.6, SpO2 92%. Opacities on both sides of the film. Echo normal.', q: 'Is this ARDS, and by which definition?', i: {onset:'yes', img:'film', card:'no', risk:['pneu'], sup:'hfno', fio2:0.6, spo2:92}, p: 'SpO2/FiO2 153 on high flow of 30 L/min or more: ARDS by the global definition, not by Berlin. Not intubated, so there is no severity grade. High flow over ordinary oxygen; send a blood gas.'},
   {t: 'Day 1 after intubation', s: 'Man, 64, sepsis from a urinary source, intubated overnight. FiO2 0.7, PEEP 12, PaO2 84. Plateau 26. Off pressors this morning.', q: 'Which steps apply today?', i: {onset:'yes', img:'film', card:'no', risk:['sep'], sup:'inv', fio2:0.7, peep:12, pao2:84, plat:26, dsince:1, dvent:1}, p: 'P/F 120: moderate. Higher PEEP, a steroid, conservative fluids now that he is off pressors, and prone for 16 hours or more on FiO2 0.6 or more. Paralysis only if he keeps failing despite deep sedation.'},
-  {t: 'After two prone sessions', s: 'Day 3. Prone twice, paralysed and deeply sedated. FiO2 1.0, PaO2 70 for 8 hours. Rate 35, plateau 30, PEEP 16.', q: 'What next?', i: {onset:'yes', img:'film', card:'no', risk:['pneu'], sup:'inv', fio2:1.0, peep:16, pao2:70, plat:30, dsince:3, dvent:3, persist:true, deep:true}, p: 'P/F 70 for more than 6 hours despite the steps below: call an ECMO center now, while he is in the first week. An inhaled vasodilator can bridge the transfer; it will not change survival.'},
-  {t: 'New smoker, no trigger', s: 'Man, 24, started smoking three weeks ago. Fever, hypoxemia, opacities on both sides. Intubated, FiO2 0.6, PEEP 10, PaO2 90. No infection found; echo normal. Blood eosinophils normal.', q: 'What test settles it?', i: {onset:'yes', img:'film', card:'no', risk:['none'], sup:'inv', fio2:0.6, peep:10, pao2:90}, res: 'eos', p: 'No trigger, so look for a mimic. Bronchoscopy: lavage eosinophils over 25% point to acute eosinophilic pneumonia, which responds to steroids. Normal blood eosinophils do not exclude it.'},
+  {t: 'After two prone sessions', s: 'Day 3. Prone twice, paralysed and deeply sedated. FiO2 1.0, PaO2 70 for 8 hours. Rate 35, plateau 30, PEEP 16.', q: 'What next?', i: {onset:'yes', img:'film', card:'no', risk:['pneu'], sup:'inv', fio2:1.0, peep:16, pao2:70, plat:30, dsince:3, dvent:3, persist:true, deep:true}, p: 'P/F 70 for more than 6 hours despite the steps above: call an ECMO center now, while he is in the first week. An inhaled vasodilator can bridge the transfer; it will not change survival.'},
+  {t: 'New smoker, no trigger', s: 'Man, 24, started smoking three weeks ago. Fever, hypoxemia, opacities on both sides. Intubated, FiO2 0.6, PEEP 10, PaO2 90. No infection found; echo normal.', q: 'What test settles it?', i: {onset:'yes', img:'film', card:'no', risk:['none'], sup:'inv', fio2:0.6, peep:10, pao2:90}, res: 'eos', p: 'No trigger, so look for a mimic. Bronchoscopy: lavage eosinophils over 25% point to acute eosinophilic pneumonia, which responds to steroids.'},
   {t: 'Still on the ventilator at day 16', s: 'ARDS from aspiration, now day 16. FiO2 0.5, PEEP 10, PaO2 90. The team asks about starting steroids.', q: 'Start them?', i: {onset:'yes', img:'film', card:'no', risk:['asp'], sup:'inv', fio2:0.5, peep:10, pao2:90, dsince:16, dvent:16}, p: 'Starting more than 2 weeks after onset may do harm. The exception is a steroid-responsive mimic, which would need its own workup.'},
   {t: 'High CO2 and a big right ventricle', s: 'Pneumonia ARDS, day 2. FiO2 0.8, PEEP 14, PaO2 88, plateau 33, pH 7.22, PaCO2 62. Echo: dilated RV, flattened septum.', q: 'What does the right ventricle change?', i: {onset:'yes', img:'film', card:'no', risk:['pneu'], sup:'inv', fio2:0.8, peep:14, pao2:88, plat:33, ph:7.22, paco2:62, dsince:2, dvent:2, rvd:true}, p: 'All four risk factors and a dilated RV. Fix the plateau first on Ventilator basics, prone (it unloads the RV), and avoid fluid boluses. pH under 7.25 with PaCO2 60 or more: if it persists despite best ventilation, call an ECMO center.'}
 ];
@@ -615,7 +621,7 @@ function babySVG(k){
 
 var PRONE = {
   sup: {n: 'On the back', line: 'Supine, the weight of the heart and the wet lung presses on the back of the lung, the largest part, so it collapses; the breath goes to the smaller front.'},
-  pro: {n: 'Prone', line: 'Prone, the heart rests on the sternum and the large back of the lung reopens. Less lung collapses, the breath spreads more evenly, and the right ventricle is unloaded.'}
+  pro: {n: 'Prone', line: 'Prone, the heart rests on the sternum and the large back of the lung reopens. Less lung collapses, the breath spreads more evenly, and the right ventricle is often unloaded.'}
 };
 function proneSVG(k){
   var s = svgOpen('0 0 360 230', 'Chest cross-section: ' + PRONE[k].n), sup = k === 'sup';
@@ -679,9 +685,9 @@ var FIGS = {
 var DEFROWS = [
   ['Timing', 'Within 1 week of a known insult or new symptoms', 'Within 1 week of the risk factor or new symptoms', 'Unchanged.'],
   ['Imaging', 'Film or CT', 'Film, CT, or ultrasound (bilateral B lines or consolidation) in trained hands', 'Ultrasound lets the diagnosis be made where CT and films are hard to get.'],
-  ['Support', 'PEEP or CPAP of at least 5', 'Adds high flow of 30 L/min or more, for patients not intubated', 'High flow became common for hypoxemic failure after 2012; 30 L/min gives a little PEEP.'],
+  ['Support', 'PEEP of at least 5 (CPAP of at least 5 only for mild)', 'Adds high flow of 30 L/min or more, for patients not intubated', 'High flow became common for hypoxemic failure after Berlin was written; 30 L/min gives a little PEEP.'],
   ['Oxygen measure', 'P/F only', 'P/F or SpO2/FiO2 (SpO2 97% or less)', 'Lets the diagnosis be made without a blood gas; less accurate with poor traces, shock and darker skin.'],
-  ['Severity', 'Mild, moderate, severe on PEEP or CPAP', 'Mild, moderate, severe only once intubated; none for patients not intubated', 'A grade on high flow does not mean the same thing as a grade on a ventilator.'],
+  ['Severity', 'Mild, moderate, severe on PEEP (CPAP only for mild)', 'Mild, moderate, severe only once intubated; none for patients not intubated', 'A grade on high flow does not mean the same thing as a grade on a ventilator.'],
   ['Origin', 'Not fully explained by heart failure or fluid overload', 'Not mainly cardiac or overload, not mainly atelectasis; can coexist with them if a trigger is present', 'Many patients have both; the trigger is what makes it ARDS.'],
   ['Low-resource settings', 'Not covered', 'SpO2/FiO2 315 or less with no PEEP or flow minimum', 'Formally adopts the Kigali modification for places without gases or ventilators.']
 ];
@@ -690,7 +696,7 @@ var DEFROWS = [
 <script id="deeper-data" type="application/json">
 {"learn-edema": [["Mechanism", "A trigger such as pneumonia or sepsis injures the alveolar wall and the capillary lining. Protein-rich fluid, white cells and debris fill the air spaces, surfactant fails, and alveoli flood or collapse. Hydrostatic edema is different: the wall is intact and high capillary pressure pushes watery fluid across."], ["Why it matters", "The two look alike on a film but are treated differently. Hydrostatic edema clears when the pressure is lowered; permeability edema clears only as the injury heals, so the job is to support the lung without adding injury while the cause is treated."], ["Common trap", "Assuming a normal echo rules out heart failure, or that any heart disease rules out ARDS. Both can be present: the question is which explains most of the edema."]],
 "learn-baby": [["Mechanism", "In ARDS much of the lung is flooded or collapsed, so the part still taking air is small, like a child's lung. A breath sized for a whole adult lung lands entirely on that small part and overstretches it, and the stretch itself releases inflammation."], ["Why it matters", "This is why the breath is scaled to predicted weight and capped by plateau pressure, and why driving pressure, which reflects how much lung is open, adds information beyond the tidal volume."], ["Common trap", "Thinking the problem is a stiff lung. The open lung often has near-normal stiffness; it is simply small."]],
-"learn-prone": [["Mechanism", "Lying on the back, the weight of the heart and the heavy wet lung compresses the back of the lung, which holds most of the lung tissue. Turning prone lifts that weight, lets the back reopen, and makes the stretch more even across the lung, while blood flow stays largely toward the back."], ["Why it matters", "Proning is the rung with the strongest survival evidence, and its benefit comes from less injury as much as from better oxygen, so it is used early and for long sessions, not as a last resort."], ["Common trap", "Judging it by the first hour's oxygen, or turning back as soon as the number improves. Some patients improve slowly, and the trial sessions lasted at least 16 hours."]],
+"learn-prone": [["Mechanism", "Lying on the back, the weight of the heart and the heavy wet lung compresses the back of the lung, which holds most of the lung tissue. Turning prone lifts that weight, lets the back reopen, and makes the stretch more even across the lung, while blood flow stays largely toward the back."], ["Why it matters", "Proning is the rung with the strongest survival evidence, and its benefit is thought to come mainly from less lung injury, not just better oxygen, so it is used early and for long sessions, not as a last resort."], ["Common trap", "Judging it by the first hour's oxygen, or turning back as soon as the number improves. Some patients improve slowly, and the trial sessions lasted at least 16 hours."]],
 "learn-shunt": [["Mechanism", "Blood that passes flooded or collapsed alveoli never meets air, so it leaves without oxygen and mixes with oxygenated blood. Adding oxygen does little for it. Hypoxic pulmonary vasoconstriction narrows vessels beside poorly aerated alveoli and diverts some of that blood toward air."], ["Why it matters", "An inhaled vasodilator reaches only ventilated alveoli and widens their vessels, so it improves matching and raises the oxygen. A vasodilator by vein undoes the vasoconstriction everywhere and can make the shunt worse."], ["Common trap", "Reading a better oxygen number as a better outcome. In trials, inhaled nitric oxide improved oxygen briefly and did not reduce deaths, with more kidney injury."]],
 "learn-rv": [["Mechanism", "Collapsed lung, hypoxic and hypercapnic vasoconstriction, small-vessel clots and high airway pressure all raise pulmonary vascular resistance. The thin right ventricle dilates rather than generating more pressure, the septum shifts toward the left, and the left ventricle fills less."], ["Why it matters", "Right ventricular failure can cause the shock in ARDS. Keeping driving pressure low, avoiding high CO2 and proning all unload it; more fluid usually does not help."], ["Common trap", "Giving fluid for low blood pressure without looking at the right ventricle, or raising PEEP further when the lung does not recruit, which only adds load."]],
 "learn-def": [["Mechanism", "ARDS is a syndrome defined by timing, imaging, oxygenation and the absence of a better explanation, not by a test. Each definition draws a line through a continuum of lung injury."], ["Why it matters", "The global definition widens the net to patients on high flow and to places without blood gases, so lung-protective care and trials can reach them earlier. Severity grades still guide the ladder once the patient is intubated."], ["Common trap", "Treating the label as the diagnosis. Meeting the definition starts the search for the cause; it does not end it."]]}
