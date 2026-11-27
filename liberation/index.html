@@ -290,6 +290,7 @@ var WHY = {
   hfnc: 'High flow washes out dead space and gives a little pressure; in low-risk patients it lowered reintubation from 12.2% to 4.9%.',
   fail: 'Waiting on NIV once failure has set in delayed reintubation and was linked with higher ICU mortality.',
   emerg: 'Oxygenation comes first; a fresh tract can close or mislead a tube into the tissues, so the airway from above is the safer route.',
+  emergEst: 'Oxygenation comes first: a blocked or displaced tube must be cleared or removed before it is used to ventilate; the mouth or the stoma can then carry oxygen.',
   lary: 'After a laryngectomy the mouth no longer connects to the lungs, so oxygen and any airway can go only through the stoma.',
   hfncHigh: 'In high-risk patients high flow was non-inferior to NIV for reintubation, and was better tolerated (NIV stopped for side effects in 43%).',
   timing: 'Early tracheostomy did not lower mortality, and many patients in the late groups never received one, so timing follows the expected course, not a fixed day.',
@@ -364,7 +365,7 @@ function weanCards(i){
     var prol = (has(i.dfirst) && i.dfirst >= 7) || (has(i.nfail) && i.nfail >= 3);
     if (prol && !i.trach) n.list.push('Prolonged weaning: weigh a tracheostomy (Trach tab).');
     if (prol) n.list.push('If weaning is prolonged and the overall course is not improving, hold a goals-of-care conversation alongside the plan (expert practice).');
-    n.why = null; n.links = [['/vent/#screen', 'Daily screen and the trial']]; n.tiers = ['Pressure-support first trial: conditional, moderate'];
+    n.why = null; n.links = [['/vent/#screen', 'Daily screen and the trial']]; n.tiers = ['Pressure-support first trial: conditional, moderate (ATS/CHEST 2017)', 'Trial with or without pressure support: conditional, moderate (AARC 2024)'];
     cards.push(n);
   }
   return cards;
@@ -427,19 +428,19 @@ function extCards(i){
     p.sub = 'High risk: ' + [i.age65 ? 'over 65' : '', i.chronic ? 'chronic heart or lung disease' : '', i.hyperc ? 'hypercapnia on the trial' : ''].filter(Boolean).join(', ') + '.';
     p.list = ['Start NIV immediately after extubation, not once the patient is struggling.', 'High flow plus NIV against high flow alone in high-risk patients: reintubation 11.8% against 18.2% (HIGH-WEAN).'];
     p.why = WHY.niv; p.tiers = ['Preventive NIV, high risk, ventilated over 24 h: strong, moderate (ATS/CHEST 2017)', 'Conditional, low (ERS/ATS 2017)', 'NIV over high flow in high risk: conditional, moderate (ERS 2022)'];
-  } else if (hi && i.nivno){
-    p.head = 'High risk, NIV not possible: high flow';
+  } else if ((hi || other.length) && i.nivno){
+    p.head = (hi ? 'High risk' : 'Raised risk') + ', NIV not possible: high flow';
     p.sub = 'High flow when NIV is contraindicated or not tolerated (ERS 2022).';
     p.list = ['In high-risk patients high flow was non-inferior to NIV for reintubation (22.8% against 19.1%); NIV was stopped for side effects in 43%.'];
     p.why = WHY.hfncHigh; p.tiers = ['ERS 2022: conditional'];
   } else if (other.length){
     p.head = 'NIV, or high flow if NIV is unsuitable';
     p.sub = 'Other risk factors: ' + other.join(', ') + '. These defined the high-risk group in a trial where high flow was non-inferior to NIV.';
-    p.list = ['ERS 2022 suggests NIV over high flow at high risk unless NIV is contraindicated (conditional, moderate); high flow suits secretion or upper-airway problems.', 'Reintubation 22.8% with high flow against 19.1% with NIV (non-inferior); NIV was stopped for side effects in 43%.', 'NIV does not help a problem in the upper airway, and copious secretions make it harder to use.'];
+    p.list = ['ERS 2022 suggests NIV over high flow at high risk unless NIV is contraindicated (conditional, moderate).', 'Reintubation 22.8% with high flow against 19.1% with NIV (non-inferior); NIV was stopped for side effects in 43%.', 'NIV does not help a problem in the upper airway, and copious secretions make it harder to use, so high flow can suit those patients better (expert practice).'];
     p.why = WHY.hfncHigh; p.tiers = ['ERS 2022: conditional, moderate', 'Hernández 2016 (trial)'];
   } else {
     p.head = 'High-flow nasal oxygen';
-    p.sub = 'Low or moderate risk: high flow over conventional oxygen.';
+    p.sub = i.surg ? 'Low risk after surgery: high flow or conventional oxygen.' : 'Low or moderate risk: high flow over conventional oxygen.';
     p.list = ['Low-risk patients: reintubation 4.9% with high flow against 12.2% with conventional oxygen (527 patients).'];
     p.why = WHY.hfnc; p.tiers = ['Conditional, low (ERS 2022)', 'Suggested, risk-based (ATS 2026, abstract)'];
   }
@@ -464,10 +465,10 @@ function trachCards(i){
     e.steps = ['Call the airway team (anesthesia and ENT).', 'Look, listen and feel at the mouth and the tracheostomy. Not breathing: call the code team; CPR if no pulse.', 'Breathing: high-flow oxygen to both the face and the tracheostomy; capnography.', 'Remove a speaking valve or cap and the inner tube; pass a suction catheter.', 'Catheter will not pass: deflate the cuff. Do not bag through a tube you cannot confirm is patent.', 'Not stable or improving: remove the tracheostomy tube; recheck breathing; CPR if no pulse.', 'Oxygenate from above (bag-mask with the stoma covered, or a laryngeal mask), or over the stoma.', 'Then oral intubation with an uncut tube advanced beyond the stoma, or intubate the stoma with a small tube (for example a 6.0).'];
     if (fresh){
       e.steps[7] = 'Then oral intubation with an uncut tube advanced beyond the stoma. Do not reinsert or intubate through the fresh stoma unless an expert is doing it, ideally over a fiberoptic scope.';
-      e.guards.push(i.ttype === 'surg' ? 'Surgical tracheostomy under 4 days: manage from above; stay sutures, if placed, can lift the stoma for an expert.' : i.ttype === 'perc' ? 'Within 7 days of a percutaneous tracheostomy, it may be safer to manage the upper airway than to reinsert through the stoma (FICM/ICS 2020).' : 'Type not known: treat it as a percutaneous tract (under 7 days).');
+      e.guards.push(i.ttype === 'surg' ? (has(i.tdays) ? 'Surgical tracheostomy under 4 days: manage from above; stay sutures, if placed, can lift the stoma for an expert.' : 'Surgical tracheostomy, days not known: manage from above as if under 4 days; stay sutures, if placed, can lift the stoma for an expert.') : i.ttype === 'perc' ? 'Within 7 days of a percutaneous tracheostomy, it may be safer to manage the upper airway than to reinsert through the stoma (FICM/ICS 2020).' : 'Type not known: treat it as a percutaneous tract (under 7 days).');
     }
   }
-  e.why = i.lary ? WHY.lary : WHY.emerg; e.tiers = ['National Tracheostomy Safety Project algorithm (consensus)', 'FICM/ICS 2020'];
+  e.why = i.lary ? WHY.lary : fresh ? WHY.emerg : WHY.emergEst; e.tiers = ['National Tracheostomy Safety Project algorithm (consensus)', 'FICM/ICS 2020'];
   e.chips = [['neck', i.lary ? 'lary' : 'trach', 'Two airways']];
   var plan = {id: 'c-plan', label: 'When to place one', head: 'No fixed day: when a long course is expected',
     list: ['TracMan (909 patients): tracheostomy by day 4 against after day 10 gave the same 30-day mortality (30.8% against 31.5%); only 44.9% of the late group ever received one.', 'Day 6 to 8 against 13 to 15 (419 patients): pneumonia 14% against 21% (not significant).', 'Meta-analyses: early (by day 7 or 10) may lower pneumonia or mortality, with low certainty; one called the findings no more than suggestive.', 'For the family: it replaces the tube in the mouth, usually allows less sedation, talking later with a valve and eating once swallowing is checked; it is often temporary.'],
@@ -581,7 +582,7 @@ var FIGS = {
 };
 
 var PLATES = {
-  trach: {t: 'Cuff up, cuff down', src: '/media/liberation/speaking-valve.webp', w: 994, h: 570, alt: 'Two side views of a neck showing the mouth, larynx with vocal cords, trachea and esophagus, with a curved tracheostomy tube entering the trachea below the larynx. Left, cuff up: an inflated balloon cuff fills the trachea around the tube. Right, cuff down with a valve: the cuff lies flat against the tube, leaving space around it, and a small one-way valve is attached at the outer end.', cap: 'With the cuff up, all air moves through the tube. With the cuff fully down and a one-way valve on, air goes in through the tube and, on breathing out, passes up around the tube and through the vocal cords, so the patient can speak. A valve on a tube with the cuff up blocks breathing out completely.'}
+  trach: {t: 'Cuff up, cuff down', src: '/media/liberation/speaking-valve.webp', w: 945, h: 515, alt: 'Two side views of a neck showing the mouth, larynx and trachea, with a curved tracheostomy tube entering the trachea below the larynx. Left, cuff up: an inflated balloon cuff fills the trachea around the tube, and the outer end of the tube is open. Right, cuff down with a valve: the cuff is deflated, leaving space around the tube, and a small one-way valve caps the outer end.', cap: 'With the cuff up, all air moves through the tube. With the cuff fully down and a one-way valve on, air goes in through the tube and, on breathing out, passes up around the tube and through the vocal cords, so the patient can speak. A valve on a tube with the cuff up blocks breathing out completely.'}
 };
 function plateHTML(id){ var P = PLATES[id]; if (!P) return ''; return '<div class="plate"><img src="' + P.src + '" alt="' + P.alt + '" width="' + P.w + '" height="' + P.h + '" loading="lazy"><span class="credit">Created with BioRender.com</span></div><p class="line1">' + P.cap + '</p>'; }
 
