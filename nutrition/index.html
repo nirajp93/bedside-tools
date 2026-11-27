@@ -339,7 +339,7 @@ var PROP_KCAL = 1.1, PROP_FAT = 0.1;                               /* Diprivan l
 var D5_KCAL = 0.17;                                                /* D5W label: 170 kcal per liter */
 var LIPID_CAP = 1.5;                                               /* ESPEN 2023 rec 29: lipids not above 1.5 g/kg/day, propofol included */
 var TROPHIC = [10, 20];                                            /* EDEN: trophic feeding 10-20 kcal/h */
-var DOIG = { mmol:0.65, drop:0.16, h:72, kcalh:20 };               /* Doig 2015: phosphate <0.65 mmol/L within 72 h of starting and a fall >0.16 mmol/L; 20 kcal/h for at least 2 days */
+var DOIG = { mmol:0.65, drop:0.16, h:72, kcalh:20, mg:2.0, mgdrop:0.5 };               /* Doig 2015: phosphate <0.65 mmol/L within 72 h of starting and a fall >0.16 mmol/L; 20 kcal/h for at least 2 days */
 var P_MGDL = 3.097;                                                /* phosphate mg/dL = mmol/L x 3.097 */
 var DENS = [1.0, 1.2, 1.5, 2.0];
 
@@ -372,13 +372,14 @@ function startPlan(i){
     r.list.push(i.shock === 'unctrl' ? 'Shock is not controlled: perfusion goals not met, or pressors still rising (ASPEN: withhold if the mean pressure is below 50).' : 'Reason: ' + d.map(function(k){ return DELAY[k]; }).join('; ') + '.');
     r.list.push('Reassess daily; start low as soon as the reason has passed.');
     r.why = i.shock === 'unctrl' ? 'in uncontrolled shock the gut is poorly perfused, and feeding raises its oxygen demand; full early feeding in shock caused more bowel ischemia than parenteral feeding (NUTRIREA-2).' : 'these are the situations in which ESPEN suggests delaying enteral feeding until they are controlled.';
-    r.tiers = ['ESPEN 2023 rec 11 · B', 'SCCM/ASPEN 2016 B5 · expert consensus'];
+    r.tiers = i.shock === 'unctrl' ? ['ESPEN 2023 rec 11 · B', 'SCCM/ASPEN 2016 B5 · expert consensus'] : ['ESPEN 2023 rec 11 · B'];
+    if (i.gut.nogut) r.list.push('If the gut stays unusable, follow the parenteral nutrition timing (untick the delay reason to see it) once the patient is stable.');
     return r;
   }
   if (i.gut.nogut) {
     r.k = 'pn';
     if (i.gut.hirisk) { r.head = 'Parenteral nutrition as soon as possible'; r.why = 'with high nutrition risk or severe malnutrition and no usable gut, waiting a week adds a deficit the patient cannot afford.'; r.tiers = ['SCCM/ASPEN 2016 G2 · expert consensus', 'EN or PN acceptable: ASPEN 2022 strong, high']; }
-    else { r.head = i.day !== null && i.day >= 7 ? 'Day ' + i.day + ': start parenteral nutrition' : 'Low risk: parenteral nutrition can wait until day 7' + (i.day !== null ? ' (now day ' + i.day + ')' : ''); r.why = 'in a well-nourished patient, a week of little nutrition is tolerated, and starting parenteral nutrition early added infections without benefit (EPaNIC).'; r.tiers = ['SCCM/ASPEN 2016 G1', 'ASPEN 2022 strong, high']; }
+    else { r.head = i.day !== null && i.day >= 8 ? 'Day ' + i.day + ': start parenteral nutrition' : 'Low risk: parenteral nutrition can wait until after day 7' + (i.day !== null ? ' (now day ' + i.day + ')' : ''); r.why = 'in a well-nourished patient, a week of little nutrition is tolerated, and starting parenteral nutrition early added infections without benefit (EPaNIC).'; r.tiers = ['SCCM/ASPEN 2016 G1 · very low', 'EN or PN acceptable: ASPEN 2022 strong, high']; r.more = ['ESPEN 2023 differs: when the gut cannot be used, start parenteral nutrition within 3 to 7 days (rec 17, B).']; }
     r.list.push('Low risk means NRS 2002 of 3 or less, or NUTRIC 5 or less; high risk NRS 2002 of 5 or more, or NUTRIC 5 or more (the guideline\'s cut-offs overlap at 5).');
     r.list.push('Keep trying the gut: enteral and parenteral nutrition are equally acceptable once feeding is indicated.');
     return r;
@@ -394,13 +395,13 @@ function startPlan(i){
   r.k = 'go'; r.head = 'Start enteral feeding within 24 to 48 hours';
   r.list.push('Into the stomach first; past the pylorus only if a prokinetic has not fixed intolerance, or the aspiration risk is high.');
   r.list.push('Start low (trophic, 10 to 20 kcal an hour) and build up over the first days.');
-  r.why = 'early tube feeding keeps the gut working; in the first week, aiming low (' + NUT.kcalLo + ' to ' + NUT.kcalHi + ' kcal/kg) is as good as full feeding.';
+  r.why = 'early tube feeding keeps the gut working; in the first week, ' + NUT.kcalLo + ' to ' + NUT.kcalHi + ' kcal/kg did as well as higher intakes in trials.';
   r.tiers = ['SCCM/ASPEN 2016 · very low', 'ESPEN 2023 (48 h) · B'];
   return r;
 }
 function targets(i){
   if (i.wt === null) return null;
-  var b = bmi(i.wt, i.ht), ibw = pbw(i.ht, i.sex), r = { b:b, ibw:ibw, notes:[], tiers:[] };
+  var b = bmi(i.wt, i.ht), ibw = pbw(i.ht, i.sex), r = { b:b, ibw:ibw, notes:[], tiers:[], needHt: i.ht === null && i.wt >= 90 };
   if (b !== null && b >= OB.b1) {
     if (ibw === null) { r.need = 'Obesity: enter sex so ideal weight can be calculated.'; }
     if (b > OB.b3) { r.k = ibw ? [OB.kI[0] * ibw, OB.kI[1] * ibw] : null; r.kb = OB.kI[0] + ' to ' + OB.kI[1] + ' kcal/kg ideal weight'; }
@@ -434,11 +435,12 @@ function renderInputs(){
 }
 function renderFeed(){
   var i = inputs(), s = startPlan(i), t = targets(i), r = rates(i, t);
-  $('starthost').innerHTML = card({ id:'start', label:'Start now or wait', head:s.head, guard:s.guard, list:s.list, why:s.why, tiers:s.tiers, chips: s.k === 'hold' || s.k === 'low' ? chip('early', 'Figure: less in the first week') : '' });
+  $('starthost').innerHTML = card({ id:'start', label:'Start now or wait', head:s.head, guard:s.guard, list:s.list, why:s.why, tiers:s.tiers, more: s.more && s.more.length ? s.more : null, chips: s.k === 'hold' || s.k === 'low' ? chip('early', 'Figure: less in the first week') : '' });
   if (!t) { $('targethost').innerHTML = card({ id:'targets', label:'How much', head:'Enter weight for the first-week targets', list:[], tiers:null }); $('ratehost').innerHTML = ''; return; }
   var tl = [];
   if (t.b !== null) tl.push('BMI ' + t.b.toFixed(1) + (t.ibw ? ' · ideal (predicted) weight ' + fmt(t.ibw) + ' kg' : ''));
   if (t.need) tl.push(t.need);
+  if (t.needHt) tl.push('<b>Enter height:</b> if BMI is 30 or more, the obesity targets are lower than these.');
   if (t.k) tl.push('<b>Energy:</b> ' + fmt(t.k[0]) + ' to ' + fmt(t.k[1]) + ' kcal a day (' + t.kb + ')');
   if (t.p) tl.push('<b>Protein:</b> ' + (t.p[0] === t.p[1] ? (t.obese && t.b >= OB.b2 ? 'up to ' : '') + fmt(t.p[0]) : fmt(t.p[0]) + ' to ' + fmt(t.p[1])) + ' g a day (' + t.pb + ')');
   if (t.crrt) tl.push('<b>On CRRT:</b> protein up to ' + fmt(t.crrt) + ' g a day (' + CRRT_PRO + ' g/kg), because the filter removes amino acids.');
@@ -446,17 +448,18 @@ function renderFeed(){
   var tm = ['First 7 to 10 days. After that, and in recovery, needs rise; a dietitian, and indirect calorimetry where available, refine them.'];
   if (t.obese) tm.push('ASPEN 2016 also says energy should not exceed 65 to 70% of a measured target. ESPEN 2023 differs: it uses adjusted body weight and 1.3 g/kg adjusted weight of protein.');
   if (S.gut.aki || S.gut.crrt) tm.push('EFFORT Protein: a high protein target (2.2 g/kg or more) did not help, and in a subgroup it may have worsened outcomes for patients with acute kidney injury and high organ failure scores. ESPEN 2023 gives no protein number for CRRT; the CRRT line is ASPEN 2016 (J2, very low).');
-  $('targethost').innerHTML = card({ id:'targets', label:'How much · first week', head: t.k ? fmt(t.k[0]) + ' to ' + fmt(t.k[1]) + ' kcal a day' : 'Targets', list:tl, why:tw, more:tm, tiers:t.tiers.concat(t.crrt ? ['CRRT: SCCM/ASPEN 2016 · very low'] : []), chips: chip('protein', 'Figure: protein and the phases') });
+  $('targethost').innerHTML = card({ id:'targets', label:'How much · first week', head: t.needHt ? 'Enter height to check for obesity' : t.k ? fmt(t.k[0]) + ' to ' + fmt(t.k[1]) + ' kcal a day' : 'Targets', list:tl, why:tw, more:tm, tiers:t.tiers.concat(t.crrt ? ['CRRT: SCCM/ASPEN 2016 · very low'] : []), chips: chip('protein', 'Figure: protein and the phases') });
   if (!r) { $('ratehost').innerHTML = ''; return; }
   var rl = [];
   if (r.cut) rl.push('<b>From infusions:</b> ' + fmt(r.other) + ' kcal a day' + (r.nn.prop ? ' (propofol ' + fmt(r.nn.prop) + ')' : '') + (r.nn.d5 ? ' (dextrose ' + fmt(r.nn.d5) + ')' : '') + ', subtracted.');
   rl.push('<b>Goal rate:</b> ' + r.lo.toFixed(0) + ' to ' + r.hi.toFixed(0) + ' mL an hour of a ' + i.dens.toFixed(1) + ' kcal/mL feed, over 24 hours.');
   rl.push('<b>Start:</b> about ' + r.trophic[0].toFixed(0) + ' to ' + r.trophic[1].toFixed(0) + ' mL an hour (10 to 20 kcal an hour) and advance as tolerated.');
+  if (r.trophic[0] > r.lo) rl.push('Infusions already supply most of the lower target: start at the low end and check the total.');
   if (r.cut) rl.push('A lower feed rate also cuts protein: check the formula\'s protein against the target and add a protein supplement if short.');
   var g = null;
   if (r.nn.fat > r.fatCap) g = ['Lipid above 1.5 g/kg a day', 'Propofol alone gives ' + r.nn.fat.toFixed(0) + ' g of fat a day, above ' + r.fatCap.toFixed(0) + ' g. Check triglycerides and consider another sedative.'];
   $('ratehost').innerHTML = card({ id:'rate', label:'Rate to order', head: r.lo.toFixed(0) + ' to ' + r.hi.toFixed(0) + ' mL an hour at goal', guard:g, list:rl,
-    why: r.cut ? 'propofol is 1.1 kcal per mL of fat and dextrose 5% is 170 kcal per liter; ignoring them overfeeds a patient already getting a large share of the target.' : 'the feed runs continuously, so the daily target divided by 24 and by the feed\'s energy density gives the hourly rate.',
+    why: r.cut ? 'calories from ' + (r.nn.prop && r.nn.d5 ? 'propofol and dextrose' : r.nn.prop ? 'propofol' : 'dextrose') + ' (' + fmt(r.other) + ' kcal a day here) count toward the target; ignoring them overfeeds.' : 'the feed runs continuously, so the daily target divided by 24 and by the feed\'s energy density gives the hourly rate.',
     more:['Propofol: label, 0.1 g fat and 1.1 kcal per mL. Dextrose 5%: label, 170 kcal per liter. Lipid ceiling, propofol included: ESPEN 2023 rec 29. Trophic start, 10 to 20 kcal an hour: the EDEN trial\'s low arm. Citrate used in CRRT also adds calories (ESPEN 2023); no number is given here. How fast to advance: expert practice and local protocol.'], tiers:['labels', 'ESPEN 2023', EP], chips: chip('energy', 'Figure: hidden calories') });
 }
 
@@ -472,31 +475,31 @@ function renderRisk(){
     li(['Start below the usual target and build up over several days.', 'Thiamine first: the dose is in the alcohol withdrawal tool.', 'Recheck electrolytes often in the first days; if phosphate falls, see the next card.']) +
     why('insulin released by the first carbohydrate drives potassium, phosphate and magnesium into cells and uses up thiamine; a body already depleted cannot spare them.') +
     '<div class="linkrow"><a href="/alcohol-withdrawal/#thiamine-ref">Thiamine doses</a><a href="/electrolytes/">Replacing electrolytes</a></div>' + chip('refeed', 'Figure: refeeding') +
-    more(['The risk items follow the ASPEN 2020 consensus. Its table defines moderate and significant risk by BMI, weight loss, days of poor intake, electrolytes, fat and muscle loss and comorbidities, with starting calories, thiamine dosing and a monitoring schedule. Those numbers were read only from a reproduction of the table, not the original paper, so they are not shown here; follow your dietitian and local protocol.'], ['ASPEN 2020 consensus (items)', EP]) + '</div>';
+    more(['The risk items follow the ASPEN 2020 consensus. Its table defines moderate and significant risk by BMI, weight loss, days of poor intake, electrolytes, fat and muscle loss and comorbidities, with starting calories, thiamine dosing and a monitoring schedule. Its starting calories, thiamine doses and monitoring schedule are not reproduced here; follow your dietitian and local protocol.'], ['ASPEN 2020 consensus (items)', EP]) + '</div>';
 }
 function phos(p0, p1, h){
   if (p1 === null) return null;
-  var m0 = p0 === null ? null : p0 / P_MGDL, m1 = p1 / P_MGDL, r = { m1:m1 };
-  r.low = m1 < DOIG.mmol; r.drop = m0 !== null ? m0 - m1 : null; r.win = h !== null && h <= DOIG.h;
-  r.rhp = r.low && r.drop !== null && r.drop > DOIG.drop && r.win;
+  var r = { m1: p1 / P_MGDL };   /* compared in mg/dL: 0.65 mmol/L is about 2.0 mg/dL, 0.16 mmol/L about 0.5 mg/dL */
+  r.low = p1 < DOIG.mg; r.drop = p0 !== null ? p0 - p1 : null; r.win = h !== null && h <= DOIG.h;
+  r.rhp = r.low && r.drop !== null && r.drop > DOIG.mgdrop && r.win;
   return r;
 }
 function renderPhos(){
   var p0 = num('p0', 0.2, 12), p1 = num('p1', 0.2, 12), h = num('hrs', 0, 500), r = phos(p0, p1, h);
-  var cut = (DOIG.mmol * P_MGDL).toFixed(1), dcut = (DOIG.drop * P_MGDL).toFixed(1);
+  var cut = DOIG.mg.toFixed(1), dcut = DOIG.mgdrop.toFixed(1);
   if (!r) { $('phoshost').innerHTML = '<p class="sub" style="margin-top:8px">Enter phosphate now (and before feeding, with the hours since feeds started) to check for refeeding hypophosphatemia.</p>'; return; }
   if (r.rhp) {
     $('phoshost').innerHTML = '<div class="ans"><p class="head">Refeeding hypophosphatemia: cut feeds to 20 kcal an hour</p>' +
       li(['Phosphate ' + p1 + ' mg/dL (below ' + cut + '), down ' + (p0 - p1).toFixed(1) + ' mg/dL within ' + h + ' hours of starting feeds.', 'Restrict energy to 20 kcal an hour for at least 2 days, then return to the usual target over 2 to 3 days.', 'Replace phosphate; check electrolytes 2 to 3 times a day.']) +
       why('in the trial that defined this, restricting calories did not change the primary outcome, but more patients were alive at day 60 (91% against 78%).') +
       '<div class="linkrow"><a href="/electrolytes/">Replacing phosphate</a></div>' +
-      more(['Definition and regimen: Doig 2015 (phosphate below 0.65 mmol/L within 72 hours of starting nutrition, with a fall of more than 0.16 mmol/L). ESPEN 2023: restrict energy for 48 hours, then increase gradually (rec 59, B); electrolytes 2 to 3 times a day (rec 58, GPP). Conversion: mg/dL = mmol/L × 3.1.'], ['Doig 2015 RCT', 'ESPEN 2023 B']) + '</div>';
+      more(['Definition and regimen: Doig 2015 (phosphate below 0.65 mmol/L within 72 hours of starting nutrition, with a fall of more than 0.16 mmol/L). ESPEN 2023: restrict energy for 48 hours, then increase gradually (rec 59, B); electrolytes 2 to 3 times a day (rec 58, GPP). The trial thresholds are 0.65 and 0.16 mmol/L, shown here as about 2.0 and 0.5 mg/dL (mg/dL = mmol/L × 3.1).'], ['Doig 2015 RCT', 'ESPEN 2023 B']) + '</div>';
     return;
   }
   var reasons = [];
   if (!r.low) reasons.push('phosphate is ' + cut + ' mg/dL or more');
   if (r.low && r.drop === null) reasons.push('enter the value before feeding to check the fall');
-  if (r.low && r.drop !== null && r.drop <= DOIG.drop) reasons.push('it has not fallen by more than ' + dcut + ' mg/dL');
+  if (r.low && r.drop !== null && r.drop <= DOIG.mgdrop) reasons.push('it has not fallen by more than ' + dcut + ' mg/dL');
   if (r.low && h === null) reasons.push('enter the hours since feeds started');
   else if (r.low && !r.win) reasons.push('it is more than 72 hours since feeds started');
   $('phoshost').innerHTML = '<div class="ans"><p class="head">' + (r.low ? 'Low phosphate: replace it' : 'Not refeeding hypophosphatemia') + '</p><p class="sub">Not the trial definition: ' + esc(reasons.join('; ')) + '.</p>' + (r.low ? '<div class="linkrow"><a href="/electrolytes/">Replacing phosphate</a></div>' : '') + '</div>';
@@ -505,7 +508,7 @@ function renderPhos(){
 /* ================= Problems ================= */
 var PROB = {
   grv:  { n:'Gastric residual 250 to 500 mL', head:'Keep feeding', list:['Do not hold feeds for a residual under 500 mL without other signs of intolerance.','ASPEN suggests not measuring residuals routinely.'], why:'residual volume measures stomach emptying poorly; stopping feeds for it mostly lowers the calories delivered.', t:['SCCM/ASPEN 2016 D2 · low'] },
-  grvh: { n:'Residual over 500 mL in 6 h', head:'Pause, add a prokinetic, then think post-pyloric', list:['ESPEN delays feeding while the aspirate is over 500 mL in 6 hours.','Start erythromycin (see Prokinetics).','Still high after a prokinetic: a tube past the pylorus rather than stopping feeds.'], why:'a large residual with a prokinetic failing means the stomach will not empty; feeding beyond it keeps nutrition going.', t:['ESPEN 2023 rec 11 and 16 · B'] },
+  grvh: { n:'Residual over 500 mL in 6 h', head:'Pause, add a prokinetic, then think post-pyloric', list:['ESPEN delays feeding while the aspirate is over 500 mL in 6 hours.','Start erythromycin (see Prokinetics).','Still high after a prokinetic: a tube past the pylorus rather than stopping feeds.'], why:'a large residual with a prokinetic failing means the stomach will not empty; feeding beyond it keeps nutrition going.', t:['ESPEN 2023 rec 11 and 16 · B', 'erythromycin: ESPEN 2023 rec 55 · B'] },
   vom:  { n:'Vomiting or distension', head:'Stop, examine, look for the cause', list:['Check for gut ischemia, obstruction or ileus (examination, lactate, film).','Then: prokinetic, slower rate, or a tube past the pylorus.'], why:'vomiting is an aspiration risk and can be the first sign of a gut that should not be fed.', t:['SCCM/ASPEN 2016', EP] },
   diar: { n:'Diarrhea', head:'Keep feeding while you find the cause', list:['Do not stop feeds automatically.','Look for C. difficile, sorbitol-containing liquid medicines, laxatives and antibiotics.','Continuous rather than bolus feeding; a small-peptide formula if it persists.'], why:'diarrhea in the ICU is more often from drugs or infection than from the feed itself.', t:['SCCM/ASPEN 2016 D6 · expert consensus', 'ESPEN 2023'] }
 };
@@ -582,7 +585,7 @@ function figEnergy(){
 var PRST = [
   ['Early acute','Days 1 to 2: stress hormones and inflammation break muscle down for fuel and repair; feeding cannot switch this off.', [3,1]],
   ['Late acute','Days 3 to 7: breakdown continues; muscle responds poorly to protein (anabolic resistance). Targets are modest.', [2,1]],
-  ['Recovery','After the first week: muscle can rebuild; energy and protein needs rise, and mobilising helps protein reach muscle.', [1,3]]
+  ['Post-acute (recovery)','After the first week: muscle can rebuild; energy and protein needs rise, and mobilising helps protein reach muscle.', [1,3]]
 ];
 function figProtein(){
   var s = FIG.protein.st, p = PRST[s];
@@ -604,7 +607,7 @@ var TRIALS = [
   { n:'TARGET', q:'Does an energy-dense feed help?', d:'Randomized, 3,957 ventilated adults; 1.5 against 1.0 kcal/mL at the same volume.', r:'90-day death 26.8% against 25.7%.', c:'More calories by concentration did not help.', cite:'TARGET Investigators, N Engl J Med 2018;379:1823', doi:'10.1056/NEJMoa1811687' },
   { n:'NUTRIREA-3', q:'Low or standard calories and protein in the first week of shock?', d:'Randomized, 3,044 adults; 6 kcal/kg and 0.2 to 0.4 g/kg against 25 kcal/kg and 1.0 to 1.3 g/kg.', r:'90-day death 41.3% against 42.8%; ready for ICU discharge sooner; less vomiting, diarrhea and bowel ischemia.', c:'Low feeding is safe in the first week of shock.', cite:'Reignier J et al., Lancet Respir Med 2023;11:602', doi:'10.1016/S2213-2600(23)00092-9' },
   { n:'EFFORT Protein', weak:'subgroup signal', q:'High protein (2.2 g/kg or more) or usual (1.2 g/kg or less)?', d:'Randomized, 1,329 ventilated adults.', r:'Alive and discharged by day 60: 46.1% against 50.2% (HR 0.91); 60-day death 34.6% against 32.1%. Possible harm with AKI and high organ failure scores.', c:'More protein is not better; be cautious with high targets in AKI.', cite:'Heyland DK et al., Lancet 2023;401:568', doi:'10.1016/S0140-6736(22)02469-2' },
-  { n:'Refeeding: restrict calories', q:'When phosphate falls after feeding starts, cut calories or carry on?', d:'Randomized, 339 ICU adults with refeeding hypophosphatemia.', r:'Primary outcome (days alive after ICU discharge) no different (39.9 against 44.8); alive at day 60 91% with restriction against 78%.', c:'Cut to 20 kcal an hour for 2 days when refeeding hypophosphatemia appears.', cite:'Doig GS et al., Lancet Respir Med 2015;3:943', doi:'10.1016/S2213-2600(15)00418-X' }
+  { n:'Refeeding: restrict calories', q:'When phosphate falls after feeding starts, cut calories or carry on?', d:'Randomized, 339 ICU adults with refeeding hypophosphatemia.', r:'Primary outcome (days alive after ICU discharge) no different: 44.8 with restriction against 39.9 with standard care. Alive at day 60: 91% with restriction against 78%.', c:'Cut to 20 kcal an hour for 2 days when refeeding hypophosphatemia appears.', cite:'Doig GS et al., Lancet Respir Med 2015;3:943', doi:'10.1016/S2213-2600(15)00418-X' }
 ];
 function renderTrials(){
   $('trialhost').innerHTML = TRIALS.map(function(t){
@@ -619,7 +622,7 @@ function renderTrials(){
 function I(o){ var b = { wt:null, ht:null, day:null, sex:null, shock:'none', gut:{}, prop:0, d5:0, dens:1.0 }; Object.keys(o).forEach(function(k){ b[k] = o[k]; }); return b; }
 var CASES = [
   { t:'Rising norepinephrine', s:'Septic shock, day 1. Norepinephrine doubled in the last 2 hours, lactate rising. Ventilated.', i:I({ shock:'unctrl', day:1 }),
-    q:'Feeding?', opts:['hold','low','go'], name:function(k){ return { hold:'Hold enteral feeding for now', low:'Start low-dose enteral feeding', go:'Start enteral feeding at goal' }[k]; }, ans:function(c){ return [startPlan(c.i).k]; }, w:function(c){ return startPlan(c.i).why; } },
+    q:'Feeding?', opts:['hold','low','go'], name:function(k){ return { hold:'Hold enteral feeding for now', low:'Start low-dose enteral feeding', go:'Start enteral feeding at the full rate' }[k]; }, ans:function(c){ return [startPlan(c.i).k]; }, w:function(c){ return startPlan(c.i).why; } },
   { t:'Pressor steady', s:'Day 2. Norepinephrine steady at a moderate dose for 12 hours, lactate normal, abdomen soft.', i:I({ shock:'ctrl', day:2 }),
     q:'Feeding?', opts:['hold','low','go'], name:function(k){ return CASES[0].name(k); }, ans:function(c){ return [startPlan(c.i).k]; }, w:function(c){ return startPlan(c.i).list[1]; } },
   { t:'Propofol calories', s:'80 kg, BMI 25. Propofol 1% at 20 mL/h. Feed 1.0 kcal/mL.', i:I({ wt:80, ht:179, sex:'m', prop:20 }),
@@ -698,7 +701,7 @@ route();
 "learn-refeed": [["Mechanism", "During starvation the body runs on fat and protein, insulin is low, and the minerals inside cells are depleted even when blood levels look normal. Carbohydrate triggers insulin, which moves glucose, potassium, phosphate and magnesium into cells and increases the use of thiamine."], ["Why it matters", "The fall in blood levels comes in the first days of feeding and can cause arrhythmias, muscle weakness including the breathing muscles, and fluid retention."], ["Common trap", "Checking electrolytes once before feeding and not again, or treating a falling phosphate with replacement alone while continuing to advance the feed."]],
 "learn-early": [["Mechanism", "In early critical illness the body produces glucose and breaks down protein on its own, driven by stress hormones, and this is not suppressed by feeding. Extra calories on top of this can add to high glucose and fat accumulation in the liver."], ["Why it matters", "Several large trials found that giving less in the first week was not worse than full feeding, which is why the guideline target in that period is a range starting well below full needs."], ["Common trap", "Treating the first-week target as a deficit to be made up quickly, for example by adding parenteral nutrition to a patient already on tube feeds."]],
 "learn-energy": [["Mechanism", "Propofol is given in a lipid emulsion; the fat is metabolised like nutritional fat. Dextrose in maintenance or carrier fluids is metabolised like dietary carbohydrate."], ["Why it matters", "At higher propofol rates the emulsion can supply a large share of the daily energy target, so the feed rate needs to be lower, and protein then falls short unless it is supplemented."], ["Common trap", "Lowering the feed rate for propofol and forgetting that the patient now receives less protein, or forgetting to raise the feed again when propofol stops."]],
-"learn-protein": [["Mechanism", "Inflammation and immobility drive rapid muscle breakdown in the first days of critical illness, and muscle becomes less responsive to protein and amino acids (anabolic resistance)."], ["Why it matters", "Protein given early cannot fully stop this loss; a randomized trial of a high protein target found no benefit and a possible signal of harm in patients with kidney injury, so targets are kept moderate."], ["Common trap", "Assuming that more protein always means less muscle loss, especially in a patient with acute kidney injury who is not on dialysis."]]
+"learn-protein": [["Mechanism", "Inflammation and immobility drive rapid muscle breakdown in the first days of critical illness, and muscle becomes less responsive to protein and amino acids (anabolic resistance)."], ["Why it matters", "Protein given early cannot fully stop this loss; a randomized trial of a high protein target found no benefit and a possible signal of harm in patients with acute kidney injury and high organ failure scores, so targets are kept moderate."], ["Common trap", "Assuming that more protein always means less muscle loss, especially in a patient with acute kidney injury who is not on dialysis."]]
 };
   function add(){ Object.keys(D).forEach(function(id){ var c = document.getElementById(id); if (!c || c.querySelector(":scope > .deeper")) return; var d = document.createElement("details"); d.className = "deeper"; d.innerHTML = "<summary>Go deeper: mechanism and rationale</summary><div class=\"dpx\">" + D[id].map(function(r){ return "<div><span class=\"dl\">" + r[0] + "</span><p>" + r[1] + "</p></div>"; }).join("") + "</div>"; c.appendChild(d); }); }
   add();
