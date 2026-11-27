@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GI bleeding · bedside.tools</title>
+<meta name="description" content="Acute GI bleeding from the first hour to after endoscopy: upper or lower, Glasgow-Blatchford and Oakland scores, transfusion threshold, variceal path, endoscopy timing, PPI by Forrest class, anticoagulants and antiplatelets, rebleeding, and follow-through.">
+<script src="/theme.js"></script>
+<style>
+:root{--bg:#FBFBFA;--card:#FFFFFF;--ink:#111113;--muted:#55555D;--line:#ECECEE;--accent:#2B4BDB;--warn:#9A3B00;--warnbg:#FFF6EC}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5}
+.mono{font-family:var(--mono)}
+.wrap{max-width:720px;margin:0 auto;padding:20px 16px 48px}
+a{color:var(--accent)}
+.back{font-size:14px;text-decoration:none;display:inline-block;min-height:44px;line-height:44px}
+h1{font-size:26px;margin:4px 0 4px;letter-spacing:-.01em}
+.purpose{color:var(--muted);margin:0 0 20px}
+.tabs{display:flex;gap:6px;margin-bottom:16px}
+.tab{flex:1;min-width:0;min-height:44px;border:1px solid var(--line);background:var(--card);border-radius:14px;padding:0 4px;font:inherit;font-size:15px;font-weight:600;color:var(--muted);cursor:pointer}
+.tab[aria-selected="true"]{border-color:var(--accent);color:var(--accent)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
+.label{font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.field{display:flex;flex-direction:column;justify-content:flex-end}
+.field label{display:block;font-size:13px;color:var(--muted);margin-bottom:4px}
+.field input,.field select{width:100%;min-height:44px;border:1px solid var(--line);border-radius:10px;padding:8px 10px;font:inherit;font-family:var(--mono);background:var(--card);color:var(--ink)}
+.field input:focus,.field select:focus,.tab:focus-visible,.chk:focus-within,button:focus-visible,summary:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.checks{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.chk{display:flex;align-items:center;gap:10px;min-height:44px;border:1px solid var(--line);border-radius:10px;padding:6px 10px;font-size:14px;cursor:pointer}
+.chk input{width:20px;height:20px;accent-color:var(--accent);flex:none}
+.card h2{font-size:18px;margin:0 0 2px}
+.sub{font-size:14px;color:var(--muted);margin:0}
+.card ul{margin:6px 0 0;padding-left:20px}
+.card li{margin-bottom:4px}
+.guard{border-left:3px solid var(--warn);background:var(--warnbg);padding:8px 10px;border-radius:0 10px 10px 0;margin-top:8px;font-size:14.5px}
+.tier{display:inline-block;font-family:var(--mono);font-size:11px;border:1px solid var(--line);border-radius:999px;padding:2px 8px;color:var(--muted);margin:6px 6px 0 0}
+details{margin-top:10px;border-top:1px solid var(--line);padding-top:8px}
+.whyline{margin:10px 0 0;font-size:14.5px;color:var(--muted)}
+.whyline b{color:var(--ink);font-weight:600}
+summary{cursor:pointer;color:var(--accent);font-weight:600;min-height:44px;line-height:44px}
+details p{margin:0 0 8px;font-size:15px}
+.btn{min-height:44px;border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);border-radius:10px;padding:8px 14px;font:inherit;font-weight:600;cursor:pointer}
+.btn.ghost{background:var(--card);color:var(--accent)}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.note{font-size:14px;color:var(--muted)}
+.links{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:8px;font-size:14.5px}
+.links a{display:inline-flex;align-items:center;min-height:44px}
+.tl{position:relative;padding-left:26px;margin-top:6px}
+.tl:before{content:"";position:absolute;left:8px;top:10px;bottom:10px;width:2px;background:var(--line)}
+.st{position:relative;padding:6px 0 10px}
+.st:before{content:"";position:absolute;left:-24px;top:11px;width:12px;height:12px;border-radius:50%;background:var(--card);border:2px solid var(--muted)}
+.st.now:before{background:var(--accent);border-color:var(--accent)}
+.st.done:before{background:var(--ok);border-color:var(--ok)}
+.st .when{font-family:var(--mono);font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+.st b{display:block}
+.st small{color:var(--muted);font-size:13.5px;display:block}
+.st.done b{color:var(--muted)}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:6px 6px 6px 0;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:var(--mono);font-size:11.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);font-weight:500}
+.case h2{font-size:17px}
+.ans{margin-top:10px;border-top:1px solid var(--line);padding-top:10px}
+footer{margin-top:28px;font-size:13.5px;color:var(--muted)}
+footer p{margin:0 0 8px}
+.panel{display:none}.panel.on{display:block}
+.fig{display:block;width:100%;max-width:460px;height:auto;margin:0 auto}
+.states{display:flex;gap:6px;overflow-x:auto;margin:10px -16px;padding:2px 16px 6px;scrollbar-width:none}
+.states::-webkit-scrollbar{display:none}
+.states.wrapit{flex-wrap:wrap;overflow:visible;margin:10px 0;padding:0}
+.sbtn{flex:none;min-height:44px;min-width:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--ink);font:inherit;font-size:14px;cursor:pointer;white-space:nowrap}
+.sbtn[aria-pressed="true"]{border-color:var(--accent);color:var(--accent);font-weight:600}
+.line1{font-size:15px;margin:10px 0 0}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.chip{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--fill);color:var(--ink);font:inherit;font-size:14px;cursor:pointer;text-align:left}
+.chip svg{flex:none;color:var(--accent)}
+.scrim{position:fixed;inset:0;background:var(--scrim);z-index:20}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:21;max-height:90vh;overflow-y:auto;background:var(--card);border:1px solid var(--line);border-bottom:0;border-radius:20px 20px 0 0;padding:8px 16px 24px;max-width:560px;margin:0 auto}
+.sheethead{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.sheethead h2{font-size:18px;margin:0}
+.xbtn{min-height:44px;min-width:44px;border:0;background:transparent;color:var(--accent);font:inherit;font-weight:600;cursor:pointer}
+.pills{position:sticky;top:var(--bt-bar,0px);z-index:5;background:var(--bg);display:flex;gap:6px;overflow-x:auto;margin:0 -16px 12px;padding:8px 16px;border-bottom:1px solid var(--line);scrollbar-width:none}
+.pills::-webkit-scrollbar{display:none}
+.pill{flex:none;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--muted);font:inherit;font-size:14px;cursor:pointer;white-space:nowrap}
+.pill[aria-current="true"]{border-color:var(--accent);color:var(--accent);font-weight:600}
+.chap{scroll-margin-top:70px}
+.cause{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:8px 0;border-top:1px solid var(--line);font-size:15px}
+.cause small{color:var(--muted);font-size:13px;text-align:right;flex:0 1 58%}
+.cause.less>span{color:var(--muted)}
+.cause.fav span{font-weight:700}
+.cause.fav span:before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--accent);margin-right:8px}
+.trial{border-left:3px solid var(--accent);padding-left:12px}
+.trial p{margin:0 0 6px;font-size:15px}
+.trial .k{font-family:var(--mono);font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);display:block}
+.sl input[type=range]{width:100%;min-height:44px;accent-color:var(--accent)}
+.sl label{display:flex;justify-content:space-between;font-size:13px;color:var(--muted);margin-top:8px}
+.sl label b{font-family:var(--mono);color:var(--ink)}
+.zs{display:flex;gap:2px;height:8px;margin-top:4px}
+.zs i{display:block;border-radius:99px;background:var(--line)}
+.zs i.on{background:var(--accent)}
+.zt{font-family:var(--mono);font-size:12.5px;color:var(--ink);margin:6px 0 0}
+.dp{margin-top:10px;border:1px solid var(--line);border-radius:12px;padding:2px 12px;background:var(--card)}
+.dp>div{padding:10px 0;border-top:1px solid var(--line)}
+.dp>div:first-child{border-top:0}
+.dp .label{margin:0 0 3px}
+.dp p{font-size:15px;margin:0}
+.clock{font-family:var(--mono);font-size:14px;margin:8px 0 0}
+.deeper{margin-top:14px;border-top:1px solid var(--line)}
+.deeper>summary{min-height:44px;display:flex;align-items:center;gap:8px;color:var(--accent);font-weight:600;font-size:15px;cursor:pointer;list-style:none;line-height:1.3}
+.deeper>summary::-webkit-details-marker{display:none}
+.deeper>summary::before{content:"+";font-family:var(--mono);font-size:18px;line-height:1;width:14px;text-align:center}
+.deeper[open]>summary::before{content:"\2212"}
+.deeper .dpx{border:1px solid var(--line);border-radius:12px;padding:2px 12px;background:var(--card);text-align:left}
+.deeper .dpx>div{padding:10px 0;border-top:1px solid var(--line)}
+.deeper .dpx>div:first-child{border-top:0}
+.deeper .dl{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500;margin:0 0 3px}
+.deeper p{font-size:15px;line-height:1.45;color:var(--ink);margin:0 0 4px}
+.plate{margin-top:10px;border:1px solid var(--line);border-radius:12px;padding:6px;background:var(--card)}
+.plate img{display:block;width:100%;height:auto;border-radius:8px}
+.credit{display:block;font-family:var(--mono);font-size:11px;color:var(--muted);text-align:right;margin:4px 2px 0}
+@media (min-width:900px){
+  .wrap{max-width:1040px}
+  #p-tool.on{display:grid;grid-template-columns:380px minmax(0,1fr);gap:20px;align-items:start}
+  #p-src.on{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;align-items:start}
+  .scoregrid{grid-template-columns:1fr 1fr 1fr}
+  #p-learn{max-width:720px;margin:0 auto}
+}
+@media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="/">← bedside.tools</a>
+<h1>GI bleeding</h1>
+<p class="purpose">From the first hour to after the scope: upper or lower, who can go home, how much blood, the variceal path, endoscopy timing, acid suppression by what was found, and blood thinners.</p>
+
+<div class="tabs" role="tablist">
+  <button class="tab" role="tab" id="t-tool" aria-selected="true" aria-controls="p-tool">Manage</button>
+  <button class="tab" role="tab" id="t-src" aria-selected="false" aria-controls="p-src">Source</button>
+  <button class="tab" role="tab" id="t-learn" aria-selected="false" aria-controls="p-learn">Learn</button>
+  <button class="tab" role="tab" id="t-prac" aria-selected="false" aria-controls="p-prac">Practice</button>
+</div>
+
+<div class="panel on" id="p-tool" role="tabpanel" aria-labelledby="t-tool">
+  <div id="inputs">
+  <div class="card" id="presentation">
+    <p class="label">What was seen</p>
+    <div class="checks" id="ticks-s"></div>
+    <div class="checks" id="ticks-c"></div>
+  </div>
+  <div class="card" id="numbers">
+    <p class="label">Vital signs and labs</p>
+    <div class="grid">
+      <div class="field"><label for="hr">Heart rate (/min)</label><input id="hr" inputmode="decimal" autocomplete="off"></div>
+      <div class="field"><label for="sbp">Systolic (mm Hg)</label><input id="sbp" inputmode="decimal" autocomplete="off"></div>
+      <div class="field"><label for="hb">Hemoglobin (g/dL)</label><input id="hb" inputmode="decimal" autocomplete="off"></div>
+      <div class="field"><label for="bun">BUN (mg/dL)</label><input id="bun" inputmode="decimal" autocomplete="off"></div>
+      <div class="field"><label for="cr">Creatinine (mg/dL)</label><input id="cr" inputmode="decimal" autocomplete="off"></div>
+      <div class="field"><label for="plt">Platelets (×10³/µL)</label><input id="plt" inputmode="decimal" autocomplete="off"></div>
+      <div class="field"><label for="inr">INR</label><input id="inr" inputmode="decimal" autocomplete="off"></div>
+      <div class="field"><label for="age">Age (years)</label><input id="age" inputmode="decimal" autocomplete="off"></div>
+    </div>
+    <p class="sub" style="margin-top:12px">Sex (for the scores)</p>
+    <div class="states wrapit" id="sexseg" role="group" aria-label="Sex"></div>
+  </div>
+  <div class="card" id="history">
+    <p class="label">History</p>
+    <div class="checks" id="ticks-h"></div>
+  </div>
+  <div class="card" id="drugs">
+    <p class="label">Blood thinners</p>
+    <div class="checks" id="ticks-a"></div>
+    <p class="sub" style="margin-top:10px">Aspirin is for</p>
+    <div class="states wrapit" id="asaseg" role="group" aria-label="Aspirin indication"></div>
+  </div>
+  <div class="card" id="scope">
+    <p class="label">Endoscopy</p>
+    <p class="sub">What did it show? Leave as "Not yet" before the scope.</p>
+    <div class="states wrapit" id="findseg" role="group" aria-label="Endoscopy finding"></div>
+    <div class="checks" id="ticks-e"></div>
+  </div>
+  </div>
+  <div id="out"></div>
+</div>
+
+<div class="panel" id="p-src" role="tabpanel" aria-labelledby="t-src">
+  <div>
+  <div class="card" id="upper-lower">
+    <p class="label">Upper or lower</p>
+    <h2>Findings that point upstream</h2>
+    <p class="sub">Likelihood ratios for an upper source (Srygley 2012, systematic review). Above 1 favors upper; below 1 favors lower.</p>
+    <table id="lrtable"></table>
+    <p class="note" style="margin:8px 0 0">The ligament of Treitz divides upper from lower. A brisk upper bleed can come out red: hematochezia with instability is upper until shown otherwise (ACG 2023, key concept).</p>
+  </div>
+  <div class="card" id="workup">
+    <p class="label">Workup</p>
+    <h2>Send first, then by result</h2>
+    <p class="sub">First, with the IV lines:</p>
+    <ul id="wu-first"></ul>
+    <p class="sub" style="margin-top:10px">Then, guided by the source:</p>
+    <ul id="wu-then"></ul>
+  </div>
+  </div>
+  <div class="card" id="narrow">
+    <p class="label">Narrow the source</p>
+    <h2>Where is it bleeding from?</h2>
+    <p class="sub">Tap a finding. Causes it points away from fade, with the reason. Faded means less likely, not excluded.</p>
+    <div class="states wrapit" id="narseg" role="group" aria-label="Finding"></div>
+    <div id="narout"></div>
+    <p class="note" style="margin:10px 0 0">Expert practice, not a graded guideline. Endoscopy, CT angiography or colonoscopy decides the source.</p>
+  </div>
+</div>
+
+<div class="panel" id="p-learn" role="tabpanel" aria-labelledby="t-learn">
+  <div class="pills" id="pills"></div>
+  <div class="card chap" id="learn-where" data-pill="Upper or lower"><p class="label">1 · Anatomy</p><h2>Upper or lower: the ligament of Treitz</h2><div id="plate-tract"></div><p class="sub" style="margin-top:10px">Tap what came out. Color follows speed as much as site.</p><div data-figure="where"></div></div>
+  <div class="card chap" id="learn-bun" data-pill="Why BUN rises"><p class="label">2 · Labs</p><h2>Why the BUN rises in an upper bleed</h2><div data-figure="bun"></div></div>
+  <div class="card chap" id="learn-portal" data-pill="Less blood"><p class="label">3 · Varices</p><h2>Why less blood is safer in variceal bleeding</h2><p class="sub">Tap a state. Portal pressure follows blood volume.</p><div data-figure="portal"></div></div>
+  <div class="card chap" id="learn-acid" data-pill="Acid and clot"><p class="label">4 · Acid</p><h2>How acid suppression holds the clot</h2><div data-figure="acid"></div></div>
+  <div class="card chap" id="learn-forrest" data-pill="Forrest"><p class="label">5 · Endoscopy</p><h2>Forrest classes: what the ulcer shows</h2><p class="sub">Tap a class: the stigma, and what follows.</p><div id="plate-ulcer"></div><div data-figure="forrest"></div></div>
+  <div class="card chap" id="learn-scores" data-pill="Scores"><p class="label">6 · Scores</p><h2>Two scores, one job: who can go home</h2><div data-figure="scores"></div></div>
+  <div class="card chap" id="learn-thinners" data-pill="Blood thinners"><p class="label">7 · Blood thinners</p><h2>Stopping trades a bleed for a clot</h2><div data-figure="thin"></div></div>
+  <div class="card chap" id="trials" data-pill="Trials"><p class="label">8 · Trials</p><h2>The trials behind the practice</h2><div id="trialbox"></div><div class="row"><button class="btn" id="go-prac">Try the practice cases</button></div></div>
+</div>
+
+<div class="panel" id="p-prac" role="tabpanel" aria-labelledby="t-prac">
+  <div id="practice"></div>
+</div>
+
+<div class="scrim" id="scrim" hidden></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-t" hidden>
+  <div class="sheethead"><h2 id="sheet-t"></h2><button class="xbtn" id="sheet-x">Close</button></div>
+  <div id="sheet-b"></div>
+</div>
+
+<footer>
+  <p><strong>For education only. Not a substitute for clinical judgment.</strong> Built to the American College of Gastroenterology guidelines for upper (2021) and lower (2023) GI bleeding, the ACG and Canadian Association of Gastroenterology guideline on blood thinners in GI bleeding (2022), the International Consensus Group (2019), and AASLD 2024 and Baveno VII for variceal bleeding, with the ESGE 2026 ulcer-bleeding update where it adds to them. Transfusion thresholds match the transfusion tool; reversal doses are in the reversal tool; octreotide and ceftriaxone match the cirrhosis tool. Order sets, endoscopy and interventional radiology availability, and the PPI on formulary vary, so adjust to your institution. Evidence tiers are shown as strength and certainty (strong or conditional; high, moderate, low or very low), key concept or ungraded text; rows marked expert practice are not from a graded guideline.</p>
+  <p>Privacy: everything runs in your browser. Nothing you enter is sent anywhere or stored, and there are no analytics. Do not enter names, record numbers, or dates of birth.</p>
+  <p id="credit-line">Learn figures marked so were created with BioRender.com.</p>
+  <p class="mono">Last reviewed: 2026-11-27</p>
+  <p><strong>Sources:</strong> Laine L et al., ACG Clinical Guideline: Upper Gastrointestinal and Ulcer Bleeding, Am J Gastroenterol 2021;116:899 · Sengupta N et al., ACG Clinical Guideline: Management of Patients With Acute Lower Gastrointestinal Bleeding, Am J Gastroenterol 2023;118:208 · Abraham NS et al., ACG-CAG Clinical Practice Guideline: Management of Anticoagulants and Antiplatelets During Acute Gastrointestinal Bleeding and the Periendoscopic Period, Am J Gastroenterol 2022;117:542 · Barkun AN et al., Management of Nonvariceal Upper Gastrointestinal Bleeding: Guideline Recommendations From the International Consensus Group, Ann Intern Med 2019;171:805 · Gralnek IM et al., ESGE Guideline: Endoscopic diagnosis and management of peptic ulcer bleeding, update 2026, Endoscopy 2026;58:899, correction 58:C12 (abstract statements) · Kaplan DE et al., AASLD Practice Guidance on risk stratification and management of portal hypertension and varices in cirrhosis, Hepatology 2024;79:1180 · de Franchis R et al., Baveno VII: Renewing consensus in portal hypertension, J Hepatol 2022;76:959 · Tapper EB et al., ACG Clinical Guideline: Preventive Care for Patients With Cirrhosis, Am J Gastroenterol 2026 (abstract) · Chey WD et al., ACG Clinical Guideline: Treatment of Helicobacter pylori Infection, Am J Gastroenterol 2024;119:1730 · Blatchford O et al., Lancet 2000;356:1318 · Oakland K et al., Lancet Gastroenterol Hepatol 2017;2:635 · Srygley FD et al., JAMA 2012;307:1072 · Trials: Villanueva C et al., N Engl J Med 2013;368:11 · Lau JYW et al., N Engl J Med 2020;382:1299 · HALT-IT Trial Collaborators, Lancet 2020;395:1927 · Lau JYW et al., N Engl J Med 2000;343:310 · Barkun AN et al., Canadian Association of Gastroenterology guideline for nonvariceal nonpeptic ulcer upper GI bleeding, Gastroenterology 2025;169:863 (abstract) · Chavez-Tapia NC et al., Cochrane Database Syst Rev 2010;(9):CD002907 · García-Pagán JC et al., N Engl J Med 2010;362:2370.</p>
+</footer>
+</div>
+<script id="engine">
+/* Data and decision engine: no page access here, so the practice cases and the audits run the same code. */
+function has(v){ return v != null; }
+
+var TICKS_S = [['hem','Hematemesis or coffee grounds'],['mel','Melena (black, tarry)'],['red','Red blood per rectum'],['clot','Clots in the stool']];
+var TICKS_C = [['brisk','Still bleeding briskly'],['ams','Drowsy or confused'],['syn','Syncope'],['dre','Blood on rectal exam']];
+var TICKS_H = [['cirr','Cirrhosis or known varices'],['hfail','Heart failure'],['cvd','Coronary or other cardiovascular disease'],['plgib','Earlier admission for lower GI bleeding'],['nsaid','NSAID use'],['retch','Retching or vomiting before the blood']];
+var TICKS_A = [['warf','Warfarin'],['doac','DOAC (apixaban, rivaroxaban, edoxaban, dabigatran)'],['dose24','DOAC dose in the last 24 hours'],['asa','Aspirin'],['p2y','Clopidogrel, prasugrel or ticagrelor'],['stent','Coronary stent in the last 12 months']];
+var TICKS_E = [['rebleed','Bled again after endoscopic treatment']];
+var SEX = [['f','Female'],['m','Male']];
+var ASA = [['sec','Known heart or vessel disease (secondary)'],['pri','Prevention only (primary)']];
+var FIND = [['none','Not yet'],['fIa','Ulcer: spurting (Ia)'],['fIb','Ulcer: oozing (Ib)'],['fIIa','Ulcer: visible vessel (IIa)'],['fIIb','Ulcer: adherent clot (IIb)'],['fIIc','Ulcer: flat spot (IIc)'],['fIII','Ulcer: clean base (III)'],['varix','Varices'],['other','Other upper source'],['colon','Colon source found'],['neg','Nothing found']];
+var FINDN = {}; FIND.forEach(function(f){ FINDN[f[0]] = f[1]; });
+
+/* Forrest classes: the Learn figure and the after-endoscopy card read this one table. */
+var FORREST = {
+  fIa: {c: 'Ia', n: 'Active spurting', risk: 'high', tx: 'Endoscopic therapy (strong, moderate), then high-dose PPI for 3 days.'},
+  fIb: {c: 'Ib', n: 'Active oozing', risk: 'high', tx: 'Endoscopic therapy (strong, moderate), then high-dose PPI for 3 days.'},
+  fIIa: {c: 'IIa', n: 'Nonbleeding visible vessel', risk: 'high', tx: 'Endoscopic therapy (strong, moderate), then high-dose PPI for 3 days.'},
+  fIIb: {c: 'IIb', n: 'Adherent clot', risk: 'mid', tx: 'ACG 2021 could not recommend for or against treating it. Irrigate to dislodge it; treat what lies beneath if the endoscopist can (ICG 2019, ESGE 2026). High-dose PPI alone may be enough.'},
+  fIIc: {c: 'IIc', n: 'Flat pigmented spot', risk: 'low', tx: 'No endoscopic therapy. Once-daily oral PPI; eat within 24 hours; early discharge if stable (ICG 2019).'},
+  fIII: {c: 'III', n: 'Clean base', risk: 'low', tx: 'No endoscopic therapy. Once-daily oral PPI; eat within 24 hours; early discharge if stable (ICG 2019).'}
+};
+
+var T = {
+  acg21: 'ACG 2021', acg23: 'ACG 2023', cag: 'ACG-CAG 2022', icg: 'ICG 2019', esge: 'ESGE 2026', aasld: 'AASLD 2024', bav: 'Baveno VII'
+};
+
+var WHY = {
+  upper: 'Blood digested on the way down turns black and raises the BUN; melena on exam has a likelihood ratio of about 25 for an upper source.',
+  lowerClot: 'Clots in the stool mean blood that has not been digested, which makes an upper source unlikely (likelihood ratio about 0.05).',
+  redUnstable: 'A brisk upper bleed moves too fast to darken, so red blood with instability is upper until shown otherwise.',
+  gbsLow: 'With a Glasgow-Blatchford score of 0 or 1, almost no one needed a transfusion, endoscopic treatment or surgery, so admission adds little.',
+  gbsHigh: 'The Glasgow-Blatchford score predicts who will need an intervention; it does not grade how sick the patient is now.',
+  oakLow: 'An Oakland score of 8 or less predicted a 95% chance of discharge without rebleeding, transfusion, intervention, readmission or death.',
+  oakHigh: 'Above 8, the derivation study could not promise a safe discharge.',
+  tx: 'In Villanueva 2013, transfusing below 7 rather than 9 meant less rebleeding and better 6-week survival.',
+  txVarix: 'Extra blood raises portal pressure and the pressure in the varix, so over-transfusion invites rebleeding.',
+  txFast: 'The hemoglobin lags behind a fast bleed; it has not equilibrated yet.',
+  erythro: 'Erythromycin speeds gastric emptying, so the endoscopist sees the source instead of clot.',
+  timing: 'Scoping within 6 hours rather than 6 to 24 hours did not lower 30-day mortality even in the highest-risk patients (Lau 2020).',
+  varix: 'Octreotide lowers portal inflow, the antibiotic cuts infections and death, and banding closes the varix.',
+  ulcerHigh: 'A visible vessel or active bleeding rebleeds often without treatment; heat or clips seal it, and a high gastric pH keeps the clot from dissolving.',
+  ulcerLow: 'A clean base or flat spot rarely rebleeds, so endoscopic treatment and an IV infusion add nothing.',
+  clot: 'Under the clot may be a vessel or a clean base; the trials are too small to settle whether to lift it.',
+  rebleed: 'A second endoscopy stops most rebleeding, with fewer complications than surgery.',
+  warf: 'Reversal agents carry their own clot risk, and most GI bleeds stop with resuscitation and endoscopy.',
+  doac: 'A DOAC wears off within a day or two when kidney function is normal (longer for dabigatran with poor kidney function); reversal agents add clot risk with little proof of benefit in GI bleeding.',
+  asaSec: 'Stopping aspirin given for heart or vessel disease raises the risk of heart attack, stroke and death more than it lowers rebleeding.',
+  asaPri: 'Aspirin for prevention alone adds bleeding without a vascular reason to accept it.',
+  p2y: 'A recent stent can clot within days of stopping its P2Y12 inhibitor; a stent thrombosis is often worse than the bleed.',
+  hp: 'H. pylori and NSAIDs cause most ulcers; removing the cause stops the next bleed.',
+  colon: 'Most lower bleeds stop on their own, and colonoscopy within 24 hours did not improve rebleeding or mortality.',
+  cta: 'CT angiography finds a bleed that is still running and points the radiologist to the vessel.'
+};
+
+/* Glasgow-Blatchford (Blatchford 2000; points as in ACG 2021 Table 2, BUN in mg/dL). */
+function gbs(i){
+  var p = 0, miss = [], parts = [];
+  if (has(i.bun)){ var b = i.bun; var x = b >= 70 ? 6 : b >= 28 ? 4 : b >= 22.4 ? 3 : b >= 18.2 ? 2 : 0; p += x; parts.push(['BUN ' + b, x]); } else miss.push('BUN');
+  if (has(i.hb) && i.sex){ var h = i.hb, y; if (i.sex === 'm') y = h < 10 ? 6 : h < 12 ? 3 : h < 13 ? 1 : 0; else y = h < 10 ? 6 : h < 12 ? 1 : 0; p += y; parts.push(['Hemoglobin ' + h + (i.sex === 'm' ? ' (male)' : ' (female)'), y]); } else miss.push(has(i.hb) ? 'sex' : 'hemoglobin');
+  if (has(i.sbp)){ var s = i.sbp, z = s < 90 ? 3 : s < 100 ? 2 : s < 110 ? 1 : 0; p += z; parts.push(['Systolic ' + s, z]); } else miss.push('systolic');
+  if (has(i.hr)){ var q = i.hr >= 100 ? 1 : 0; p += q; parts.push(['Heart rate ' + i.hr, q]); } else miss.push('heart rate');
+  [['mel', 'Melena', 1], ['syn', 'Syncope', 2], ['cirr', 'Liver disease', 2], ['hfail', 'Heart failure', 2]].forEach(function(r){ if (i[r[0]]){ p += r[2]; parts.push([r[1], r[2]]); } });
+  return {score: p, miss: miss, parts: parts, complete: miss.length === 0};
+}
+/* Oakland (Oakland 2017; points as in ACG 2023). Hemoglobin in g/dL. */
+function oakland(i){
+  var p = 0, miss = [], parts = [];
+  if (has(i.age)){ var a = i.age >= 70 ? 2 : i.age >= 40 ? 1 : 0; p += a; parts.push(['Age ' + i.age, a]); } else miss.push('age');
+  if (i.sex){ var x = i.sex === 'm' ? 1 : 0; p += x; parts.push([i.sex === 'm' ? 'Male' : 'Female', x]); } else miss.push('sex');
+  if (i.plgib){ p += 1; parts.push(['Earlier lower GI bleed admission', 1]); }
+  if (i.dre){ p += 1; parts.push(['Blood on rectal exam', 1]); }
+  if (has(i.hr)){ var h = i.hr >= 110 ? 3 : i.hr >= 90 ? 2 : i.hr >= 70 ? 1 : 0; p += h; parts.push(['Heart rate ' + i.hr, h]); } else miss.push('heart rate');
+  if (has(i.sbp)){ var s = i.sbp >= 160 ? 0 : i.sbp >= 130 ? 2 : i.sbp >= 120 ? 3 : i.sbp >= 90 ? 4 : 5; p += s; parts.push(['Systolic ' + i.sbp, s]); } else miss.push('systolic');
+  if (has(i.hb)){ var g = i.hb >= 16 ? 0 : i.hb >= 13 ? 4 : i.hb >= 11 ? 8 : i.hb >= 9 ? 13 : i.hb >= 7 ? 17 : 22; p += g; parts.push(['Hemoglobin ' + i.hb, g]); } else miss.push('hemoglobin');
+  return {score: p, miss: miss, parts: parts, complete: miss.length === 0};
+}
+
+/* Where is it coming from. */
+function state(i){
+  var s = {};
+  s.unstable = (has(i.sbp) && i.sbp < 90) || (has(i.hr) && i.hr >= 100) || !!i.brisk;
+  s.ratio = has(i.bun) && has(i.cr) && i.cr > 0 ? Math.round(i.bun / i.cr) : null;
+  var up = !!i.hem || !!i.mel || (s.ratio != null && s.ratio > 30);
+  var low = !!i.red || !!i.clot;
+  if (i.find === 'colon') s.site = 'lower';
+  else if (['fIa','fIb','fIIa','fIIb','fIIc','fIII','varix','other'].indexOf(i.find) >= 0) s.site = 'upper';
+  else if (i.hem) s.site = 'upper';
+  else if (i.red && s.unstable) s.site = 'redUnstable';
+  else if (up && !low) s.site = 'upper';
+  else if (low && !up) s.site = 'lower';
+  else if (up && low) s.site = 'mixed';
+  else s.site = null;
+  s.upperPath = s.site === 'upper' || s.site === 'redUnstable' || s.site === 'mixed';
+  s.varix = !!i.cirr && (s.upperPath || ((i.red || i.mel) && s.unstable)) && i.find !== 'colon' && !(i.find && i.find !== 'none' && i.find !== 'varix' && i.find !== 'neg');
+  s.thr = s.varix ? 7 : (i.cvd ? 8 : 7);
+  s.vitals = has(i.hr) && has(i.sbp);
+  return s;
+}
+function anyInput(i){ return !!(i.hem || i.mel || i.red || i.clot || has(i.hb) || has(i.sbp) || has(i.hr) || has(i.bun) || (i.find && i.find !== 'none')); }
+
+function whereCard(i, s){
+  var c = {id: 'c-where', label: 'Upper or lower'};
+  var bits = [];
+  if (i.hem) bits.push('hematemesis');
+  if (i.mel) bits.push('melena');
+  if (s.ratio != null) bits.push('BUN to creatinine ratio ' + s.ratio);
+  if (i.red) bits.push('red blood per rectum');
+  if (i.clot) bits.push('clots in the stool');
+  c.sub = bits.length ? bits.join(', ').replace(/^./, function(x){ return x.toUpperCase(); }) + '.' : '';
+  if (i.find && i.find !== 'none' && i.find !== 'neg'){ c.head = i.find === 'colon' ? 'Lower source found at colonoscopy' : 'Upper source found at endoscopy'; c.sub = FINDN[i.find] + '.'; c.tiers = ['Endoscopy decides']; return c; }
+  if (s.site === 'upper'){ c.head = 'Likely upper (above the ligament of Treitz)'; c.why = i.hem ? 'Vomited blood places the source above the ligament of Treitz.' : i.mel ? WHY.upper : 'A BUN to creatinine ratio over 30 has a likelihood ratio of about 7.5 for an upper source.'; }
+  else if (s.site === 'redUnstable'){ c.head = 'Red blood with instability: treat as upper until shown otherwise'; if (i.clot) c.sub += ' Clots favor a lower source (likelihood ratio about 0.05 for upper), but instability keeps an upper source on the table.'; c.guards = ['Unstable hematochezia can be a brisk upper bleed. If suspicion is high, upper endoscopy first (ACG 2023 key concept). A nasogastric aspirate is not reliable enough to exclude it.']; c.why = WHY.redUnstable; }
+  else if (s.site === 'lower'){ c.head = 'Likely lower'; c.why = i.clot ? WHY.lowerClot : s.vitals ? 'Red blood per rectum in a stable patient usually comes from the colon or anorectum.' : 'Red blood per rectum usually comes from the colon or anorectum; enter heart rate and systolic, because instability changes the path.'; }
+  else if (s.site === 'mixed'){ c.head = 'Mixed signals: start on the upper path'; c.why = 'Upper findings (melena, a high BUN to creatinine ratio) outweigh red blood when they disagree, and missing an upper source is the costlier error.'; }
+  else { c.head = 'Tick what was seen'; c.sub = 'Hematemesis, melena or red blood, and enter BUN and creatinine for the ratio.'; c.empty = true; return c; }
+  c.chips = [['where', s.site === 'lower' ? 'low' : s.site === 'redUnstable' ? 'brisk' : 'up', 'Upper or lower'], ['plate:tract', '', 'The tract: illustration'], ['bun', 'digest', 'Why the BUN rises']];
+  c.links = [['#upper-lower', 'Likelihood ratios for an upper source']];
+  c.more = ['Unstable in this tool means systolic under 90, heart rate 100 or more, or brisk ongoing bleeding (expert practice; ACG-CAG defines a life-threatening bleed as shock or a need for pressors or surgery, a hemoglobin fall over 5 g/dL, 5 or more units of red cells, or death).', 'Patient-reported melena is weaker (likelihood ratio about 5 to 6) than melena seen on exam (about 25).'];
+  c.tiers = ['Likelihood ratios: Srygley 2012 (systematic review)', 'Unstable hematochezia: ACG 2023 key concept'];
+  return c;
+}
+
+function hourCard(i, s){
+  var steps = [];
+  steps.push({w: 'Now', t: 'Two large-bore IV lines, type and crossmatch, crystalloid for low pressure', d: 'Blood count, chemistry, coagulation tests, lactate if unstable.', st: 'now'});
+  if (i.ams || (i.hem && i.brisk)) steps.push({w: 'Now', t: 'Protect the airway', d: i.cirr ? 'Intubate before endoscopy if consciousness is altered or the patient is vomiting blood (Baveno VII 6.3).' : 'Drowsy or vomiting blood briskly: plan intubation before endoscopy with the ICU (expert practice).', st: 'now'});
+  if (s.varix) steps.push({w: 'Now', t: 'Octreotide and ceftriaxone', d: 'Start before endoscopy in known or suspected cirrhosis.', st: 'now'});
+  steps.push({w: 'Now', t: 'Transfuse below ' + s.thr + ' g/dL' + (s.varix ? ', target 7 to 8' : ''), d: 'One unit, then recheck; a massive bleed goes to the protocol.', st: 'now'});
+  if (i.warf || i.doac || i.asa || i.p2y) steps.push({w: 'Now', t: 'Decide on each blood thinner', d: ((i.warf || i.doac) ? 'Hold the anticoagulant; reversal only for a life-threatening bleed. ' : '') + (i.asa && i.asaFor === 'sec' ? 'Keep the aspirin. ' : i.asa && i.asaFor === 'pri' ? 'Stop prevention-only aspirin. ' : i.asa ? 'Aspirin: say what it is for. ' : '') + (i.p2y ? 'P2Y12 inhibitor: decide with cardiology.' : ''), st: 'now'});
+  var scoped = i.find && i.find !== 'none';
+  if (s.site === 'lower') steps.push(scoped ? {w: 'Hours', t: 'Colonoscopy done', d: '', st: 'done'} : !s.vitals ? {w: 'Hours', t: 'Enter heart rate and systolic: colonoscopy after bowel prep if stable, CT angiography if bleeding is ongoing', d: '', st: ''} : {w: 'Hours', t: s.unstable ? 'Ongoing bleeding: CT angiography' : 'Colonoscopy after bowel prep, not urgently, if admitted', d: s.unstable ? 'If positive, interventional radiology promptly.' : 'A low Oakland score may allow discharge for outpatient evaluation.', st: ''});
+  else steps.push({w: s.varix ? 'By 12 h' : s.unstable ? 'Soon' : 'By 24 h', t: scoped ? 'Endoscopy done' : 'Endoscopy', d: scoped ? '' : s.varix ? 'Within 12 hours after resuscitation; if still unstable, as soon as safely possible.' : s.unstable ? 'As soon as safely possible after resuscitation; emergent (6 hours or less) or urgent (12 hours or less) only if still unstable (ESGE 2026).' : 'Within 24 hours of presentation; sooner only if still unstable after resuscitation.', st: scoped ? 'done' : ''});
+  steps.push({w: 'After', t: 'Treat by what was found; plan rebleeding, blood thinners and the cause', d: '', st: i.find && i.find !== 'none' ? 'now' : ''});
+  return {id: 'c-hour', label: 'First hours, in order', head: 'Checklist', steps: steps, links: s.varix ? [['/cirrhosis/#bleed', 'Variceal bleed: cirrhosis tool']] : null};
+}
+
+function scoreCard(i, s){
+  if (s.site === null && !has(i.hb)) return null;
+  var lower = s.site === 'lower';
+  var g = gbs(i), o = oakland(i);
+  var c = {id: 'c-score', label: lower ? 'Oakland score' : 'Glasgow-Blatchford score'};
+  var r = lower ? o : g;
+  c.score = r;
+  if (lower){
+    c.head = 'Oakland ' + r.score + (r.complete ? '' : ' so far') + (s.unstable ? ': not for discharge decisions while unstable' : r.complete ? (r.score <= 8 ? ': low risk, discharge may be possible' : ': admit') : '');
+    c.sub = r.complete ? 'Validated for safe discharge from the emergency department, not for severity once admitted.' : 'Missing: ' + r.miss.join(', ') + '.';
+    if (r.complete && !s.unstable) c.why = r.score <= 8 ? WHY.oakLow : WHY.oakHigh;
+    c.more = ['ACG 2023 suggests a tool such as the Oakland score (8 or less) to pick out low-risk patients for discharge and outpatient evaluation (conditional, low). A validation study kept high sensitivity up to 10; the guideline cutoff is 8.', 'Points: age under 40, 0; 40 to 69, 1; 70 or more, 2. Male 1. Earlier lower GI bleed admission 1. Blood on rectal exam 1. Heart rate under 70, 0; 70 to 89, 1; 90 to 109, 2; 110 or more, 3. Systolic 50 to 89, 5; 90 to 119, 4; 120 to 129, 3; 130 to 159, 2; 160 or more, 0. Hemoglobin (g/dL) 3.6 to 6.9, 22; 7 to 8.9, 17; 9 to 10.9, 13; 11 to 12.9, 8; 13 to 15.9, 4; 16 or more, 0. Range 0 to 35.'];
+    c.tiers = ['Oakland 8 or less: ACG 2023 conditional, low'];
+  } else {
+    var low = r.complete && r.score <= 1 && !s.unstable;
+    c.head = 'Glasgow-Blatchford ' + r.score + (r.complete ? '' : ' so far') + (s.unstable && r.score <= 1 ? ': unstable or brisk bleeding, admit whatever the score' : r.complete ? (low ? ': very low risk, outpatient care possible' : ': admit for endoscopy') : '');
+    c.sub = r.complete ? (low ? 'From the emergency department, discharge with outpatient follow-up rather than admission.' : s.varix ? 'Admit; endoscopy within 12 hours after resuscitation.' : s.unstable ? 'Admit; resuscitate, then endoscopy as soon as safely possible.' : r.score >= 12 ? 'A score of 12 or more was the high-risk group in Lau 2020; endoscopy within 6 hours still did not help them.' : 'Admit; endoscopy within 24 hours.') : 'Missing: ' + r.miss.join(', ') + '. A score of 0 or 1 needs every item.';
+    if (r.complete) c.why = low ? WHY.gbsLow : WHY.gbsHigh;
+    if (i.cirr) c.guards = ['Cirrhosis: the score was not built for variceal bleeding. Treat suspected varices as high risk whatever the number.'];
+    c.more = ['ACG 2021 suggests that emergency department patients at very low risk (for example a score of 0 to 1) be discharged with outpatient follow-up (conditional, very low). The International Consensus Group (2019) uses 1 or less (conditional, low) and advises against AIMS65 for this decision.', 'Points: BUN 18.2 to under 22.4, 2; 22.4 to under 28, 3; 28 to under 70, 4; 70 or more, 6. Hemoglobin, men: 12 to under 13, 1; 10 to under 12, 3; under 10, 6. Women: 10 to under 12, 1; under 10, 6. Systolic 100 to 109, 1; 90 to 99, 2; under 90, 3. Heart rate 100 or more, 1. Melena 1. Syncope 2. Liver disease 2. Heart failure 2. Range 0 to 23. The original paper did not define liver disease or heart failure.'];
+    c.tiers = ['Score 0 to 1: ACG 2021 conditional, very low', 'ICG 2019 conditional, low'];
+  }
+  c.chips = [['scores', lower ? 'oak' : 'gbs', 'What each score predicts']];
+  return c;
+}
+
+function txCard(i, s){
+  if (!has(i.hb) && s.site === null) return null;
+  var c = {id: 'c-tx', label: 'Transfusion'};
+  var thr = s.thr, varix = s.varix;
+  var site = varix ? 'variceal or suspected' : s.site === 'lower' ? 'lower GI' : 'upper GI, not variceal';
+  if (!has(i.hb)){ c.head = 'Threshold ' + thr + ' g/dL (' + site + ')'; c.sub = 'Enter the hemoglobin.'; }
+  else if (i.hb < thr){ c.head = 'Transfuse one unit, then recheck'; c.sub = 'Hemoglobin ' + i.hb + ', below the threshold of ' + thr + ' (' + site + ').' + (varix ? ' Target 7 to 8.' : ''); }
+  else { c.head = 'No transfusion for this number'; c.sub = 'Hemoglobin ' + i.hb + ', at or above ' + thr + ' (' + site + ').' + (varix && i.hb >= 8 ? ' Above the 7 to 8 target.' : ''); }
+  c.guards = [];
+  if (varix) c.guards.push('Do not over-transfuse: aim for 7 to 8 g/dL. No plasma; no platelets to reach a count target (case by case only if bleeding cannot be controlled).');
+  if (s.unstable) c.guards.push((i.brisk ? 'Brisk bleeding: ' : 'Unstable: ') + 'the hemoglobin has not caught up. Transfuse for the bleeding, not the number; a massive bleed goes to the massive transfusion protocol.');
+  c.why = s.unstable ? WHY.txFast : varix ? WHY.txVarix : WHY.tx;
+  if (!varix && i.cirr) c.sub += ' Cirrhosis, but the bleed is not being treated as variceal: the non-variceal threshold applies.';
+  c.list = [i.cvd && !varix ? 'Cardiovascular disease ticked: 8 g/dL (ACG ' + (s.site === 'lower' ? '2023' : '2021') + ' text, ungraded).' : varix ? 'Baveno VII: target 7 to 8, weighing heart disease, age, hemodynamics and ongoing bleeding. AASLD 2024: about 7 unless comorbidity needs more.' : 'With cardiovascular disease the threshold becomes 8 g/dL.'];
+  if (has(i.plt) && i.plt < 50 && !varix) c.list.push('Platelets ' + i.plt + ': in major bleeding the transfusion tool keeps the count at 50 or more (UK guidance, expert practice).');
+  if (has(i.inr) && i.inr > 1.5 && !i.warf && !varix) c.list.push('INR ' + i.inr + ' off warfarin: look for liver disease, vitamin K deficiency or consumption; plasma only in a major bleed (transfusion tool).');
+  if (!varix && s.site !== 'lower') c.list.push('ICG 2019 suggests transfusing below 8 g/dL without cardiovascular disease (conditional, low); ACG 2021 uses 7.');
+  c.links = [['/transfusion/#red', 'Thresholds and trials: transfusion'], ['/transfusion/#massive', 'Massive transfusion']];
+  c.chips = varix ? [['portal', 'over', 'Why less blood is safer']] : [];
+  c.tiers = varix ? ['Target 7 to 8: Baveno VII A1', 'No plasma: Baveno VII B1'] : s.site === 'lower' ? ['7: ACG 2023 conditional, low (stable patients)'] : ['7: ACG 2021 conditional, low', '8 with cardiovascular disease: ungraded text'];
+  return c;
+}
+
+function preCard(i, s){
+  if (i.find && i.find !== 'none') return null;
+  if (s.site === null) return null;
+  var c = {id: 'c-pre', label: 'Before endoscopy'};
+  if (s.varix){
+    c.head = 'Cirrhosis: treat as variceal until the scope says otherwise';
+    c.list = ['Octreotide 50 mcg IV bolus, then 25 to 50 mcg/hour; start before endoscopy and continue 2 to 5 days if a portal hypertensive source is confirmed.', 'Ceftriaxone 1 g IV daily from admission, up to 5 days; stop once bleeding is controlled and there is no infection.', 'Endoscopy within 12 hours after resuscitation; if still unstable, as soon as safely possible (Baveno VII D1). Band ligation for esophageal varices.', 'Erythromycin 125 to 250 mg IV, 30 to 120 minutes before the scope, unless the QT is prolonged.', 'Lactulose to clear blood from the gut and prevent encephalopathy.', 'No tranexamic acid.'];
+    c.guards = ['Over-transfusion raises portal pressure: target hemoglobin 7 to 8.'];
+    c.why = WHY.varix;
+    c.links = [['/cirrhosis/#bleed', 'Variceal bleed, TIPS, beta-blocker: cirrhosis']];
+    c.chips = [['portal', 'bleed', 'Portal pressure and the varix']];
+    c.more = ['ACG 2026 (preventive care in cirrhosis) suggests a short course of antibiotic prophylaxis in upper GI bleeding (conditional, low; abstract read).', 'Stop any PPI once varices are confirmed as the source, unless there is another reason for it (AASLD 2024).', 'Baveno VII: antibiotics from admission (A1); benefit in Child-Pugh A is less certain (B2).'];
+    c.tiers = ['AASLD 2024 guidance statements (ungraded)', 'Baveno VII: vasoactive drug and antibiotic A1; scope within 12 h B1; erythromycin B1; no tranexamic acid A1'];
+    return c;
+  }
+  if (s.site === 'lower'){
+    c.head = s.unstable ? 'Ongoing bleeding: CT angiography first' : s.vitals ? 'Stable: colonoscopy in hospital, not urgently' : 'Enter heart rate and systolic: instability changes the first test';
+    c.list = s.unstable ? ['CT angiography as the first test in ongoing, hemodynamically significant hematochezia (conditional, low).', 'Positive: prompt referral to interventional radiology for catheter angiography and embolization (strong, moderate).', 'Negative: bleeding has likely slowed; manage conservatively and colonoscopy next.', 'Instability with red blood: consider upper endoscopy first (key concept).'] : ['Colonoscopy for most admitted patients (strong, low), done non-emergently after bowel prep: within 24 hours did not improve outcomes (strong, moderate).', 'May be skipped if bleeding has stopped and a good-quality colonoscopy was done recently (conditional, very low).', 'Surgery has little early role; localize first.'];
+    c.why = s.unstable ? WHY.cta : WHY.colon;
+    c.more = ['No tranexamic acid in lower GI bleeding (ACG 2023: strong, moderate; HALT-IT).', 'CT angiography is low yield once bleeding has stopped.'];
+    c.tiers = ['ACG 2023'];
+    return c;
+  }
+  c.head = s.unstable ? 'Unstable or brisk bleeding: resuscitate, then endoscopy as soon as safely possible' : 'Endoscopy within 24 hours; prepare the stomach';
+  c.list = ['Erythromycin 250 mg IV, 20 to 90 minutes before endoscopy (conditional, very low); it can prolong the QT interval.', 'High-dose IV PPI while waiting is reasonable: ACG 2021 makes no recommendation; ICG 2019 says it may be considered and ESGE 2026 suggests it. It must not delay endoscopy.', 'Endoscopy within 24 hours of presentation (conditional, very low). Emergent (6 hours or less) or urgent (12 hours or less) endoscopy only if still unstable after resuscitation (ESGE 2026).', (i.warf || i.doac) ? 'On an anticoagulant: do not delay endoscopy for it (ICG 2019, conditional, very low).' : 'A nasogastric tube is not routine.', 'No tranexamic acid (HALT-IT). No H2 blocker and no routine octreotide for a suspected ulcer (ICG 2019).'];
+  if (s.site === 'redUnstable') c.list.push('Red blood with instability and low suspicion of an upper source: CT angiography first (ACG 2023, conditional, low).');
+  c.why = s.unstable ? 'The 24-hour window is for patients who stabilize; if still unstable after resuscitation, emergent endoscopy is the exception (ESGE 2026).' : WHY.timing;
+  c.chips = [['acid', 'low', 'Why acid matters to the clot']];
+  c.more = ['Lau 2020 timed endoscopy from the gastroenterology consultation, not from arrival.', 'ICG 2019 allows a nasogastric tube in selected patients for its prognostic value.'];
+  c.tiers = ['Erythromycin: ACG 2021 conditional, very low', 'Within 24 h: ACG 2021 conditional, very low', 'Pre-endoscopy PPI: no ACG recommendation; ESGE 2026 suggests'];
+  return c;
+}
+
+function afterCard(i, s){
+  if (!i.find || i.find === 'none') return null;
+  var c = {id: 'c-after', label: 'After endoscopy'};
+  var F = FORREST[i.find];
+  if (F){
+    c.head = 'Forrest ' + F.c + ', ' + F.n.toLowerCase() + ': ' + (F.risk === 'high' ? 'high risk' : F.risk === 'low' ? 'low risk' : 'intermediate');
+    c.sub = F.tx;
+    if (F.risk === 'high'){
+      c.list = ['High-dose PPI for 3 days: 80 mg IV bolus then 8 mg/hour, or 80 mg bolus then 40 mg two to four times a day, oral or IV (strong, moderate to high).', 'Then oral PPI twice daily to day 14 in high-risk patients (conditional, low), then once daily; length after that follows the cause.', 'Most stay in hospital 72 hours or more after treatment of a high-risk stigma (ICG 2019).', 'Eat within 24 hours once hemostasis is secure (ESGE 2026).', 'No routine second-look endoscopy (ICG 2019).'];
+      c.why = WHY.ulcerHigh;
+      c.tiers = ['Endoscopic therapy: ACG 2021 strong, moderate', 'High-dose PPI 3 days: strong, moderate to high', 'Twice daily to 2 weeks: conditional, low'];
+    } else if (F.risk === 'mid'){
+      c.list = ['If the clot is treated, follow the high-risk PPI plan: 80 mg IV bolus then 8 mg/hour, or 80 mg bolus then 40 mg two to four times a day, for 3 days (strong, moderate to high).', 'If the clot is left, high-dose PPI alone may be enough (ICG 2019).'];
+      c.why = WHY.clot;
+      c.tiers = ['ACG 2021: no recommendation', 'ICG 2019 may be considered', 'ESGE 2026 suggests treating'];
+    } else {
+      c.list = ['Discharge on once-daily oral PPI (ICG 2019).'];
+      c.why = WHY.ulcerLow;
+      c.tiers = ['ICG 2019'];
+    }
+    c.chips = [['forrest', i.find, 'Forrest classes'], ['plate:ulcer', '', 'Forrest classes: illustration'], ['acid', 'ppi', 'How the PPI holds the clot']];
+  } else if (i.find === 'varix'){
+    c.head = 'Varices banded: octreotide on, then plan the next 72 hours';
+    c.list = ['Continue octreotide 2 to 5 days and ceftriaxone up to 5 days.', 'Pre-emptive TIPS within 72 hours (ideally 24) for esophageal or GOV1/2 variceal bleeding in Child-Pugh C 10 to 13, or Child-Pugh B above 7 with active bleeding at endoscopy.', 'No TIPS: a non-selective beta-blocker when octreotide stops, and repeat banding.', 'Stop the PPI unless there is another reason for it.'];
+    c.why = 'Pre-emptive TIPS lowers portal pressure for good; in high-risk patients it cut rebleeding and death (García-Pagán 2010).';
+    c.links = [['/cirrhosis/#bleed', 'TIPS check and beta-blocker: cirrhosis']];
+    c.tiers = ['AASLD 2024', 'Baveno VII A1 (pre-emptive TIPS)'];
+  } else if (i.find === 'other'){
+    c.head = 'Other upper source: treat by lesion';
+    c.list = ['Mallory-Weiss tear: endoscopic therapy only for active bleeding (band or clip); none for a nonbleeding tear (CAG 2025, conditional).', 'Esophagitis, gastritis, angioectasia, tumor: treat the lesion; tumor bleeding often needs oncology input.', 'Once-daily or twice-daily PPI by lesion.'];
+    c.tiers = ['Expert practice for this card'];
+  } else if (i.find === 'colon'){
+    c.head = 'Colon source found: after the bleed';
+    c.list = ['After diverticular bleeding: stop non-aspirin NSAIDs (strong, low); stop aspirin given only for prevention (conditional, low); keep aspirin with established heart or vessel disease (conditional, low).', 'Resume anticoagulation once the bleeding has stopped (strong, moderate).'];
+    c.why = 'Diverticular bleeding often recurs, and NSAIDs raise that risk.';
+    c.tiers = ['ACG 2023'];
+  } else {
+    c.head = 'Nothing found: look further';
+    c.list = ['Upper endoscopy negative with melena or ongoing bleeding: consider a second look at the upper tract, then colonoscopy, then the small bowel (capsule, CT enterography).', 'Brisk bleeding with a negative scope: CT angiography.'];
+    c.tiers = ['Expert practice'];
+  }
+  if (i.rebleed){
+    if (F || i.find === 'other'){ c.guards = ['Bled again: repeat endoscopy (conditional, low); an over-the-scope clip for recurrent ulcer bleeding (conditional, low). If endoscopy fails: transcatheter arterial embolization (conditional, very low), then surgery.']; c.why = WHY.rebleed; }
+    else if (i.find === 'varix') { c.guards = ['Bled again: repeat endoscopy with banding while on octreotide; if bleeding is not controlled, salvage TIPS (Baveno VII B1), with an esophageal stent (as effective and safer) or balloon tamponade as a bridge (B1).']; c.why = 'Rebleeding despite drugs and banding means portal pressure must come down another way: TIPS.'; }
+    else if (i.find === 'colon') { c.guards = ['Bled again: repeat colonoscopy, or CT angiography with embolization if bleeding is ongoing (expert practice, following the ACG 2023 first-bleed pathway).']; }
+    else { c.guards = ['Bled again with no source found: CT angiography, then targeted endoscopy or embolization.']; }
+  }
+  return c;
+}
+
+function thinCard(i, s){
+  if (!(i.warf || i.doac || i.asa || i.p2y)) return null;
+  var c = {id: 'c-thin', label: 'Blood thinners'};
+  var L = [], g = [], w = [];
+  var life = s.unstable && !!i.brisk;
+  if (i.warf){ L.push('Warfarin: hold it. Plasma is not suggested (conditional, very low). Vitamin K is not suggested routinely (conditional, very low). No recommendation for or against PCC (ACG-CAG); if reversal is needed, PCC rather than plasma (conditional, very low). Most patients do not need reversal.' + (has(i.inr) ? ' INR ' + i.inr + '.' : '')); w.push(WHY.warf); }
+  if (i.doac){ L.push('DOAC: hold it. Not suggested routinely: PCC, andexanet, idarucizumab (conditional, very low). In a life-threatening bleed with a dose in the last 24 hours, the guideline text allows selective use: idarucizumab for dabigatran, andexanet for apixaban or rivaroxaban, or PCC (andexanet is no longer sold in the US: see the reversal tool).' + (i.dose24 ? ' Dose in the last 24 hours ticked.' : '')); w.push(WHY.doac); }
+  if ((i.warf || i.doac) && life) g.push('Brisk bleeding with instability may be life-threatening: decide on reversal now, with the agent and dose from the reversal tool.');
+  if (i.asa){ if (i.asaFor === 'pri'){ L.push('Aspirin for prevention only: stop it (ACG 2023 after diverticular bleeding, conditional, low; for other bleeds this is reasoning, not a recommendation).'); w.push(WHY.asaPri); } else if (i.asaFor === 'sec'){ L.push('Aspirin for heart or vessel disease: do not hold it (conditional, very low). If it was held, restart on the day hemostasis is confirmed (conditional, very low).'); w.push(WHY.asaSec); } else L.push('Aspirin: tick what it is for. Secondary prevention is continued; primary prevention is stopped.'); }
+  if (i.p2y){ L.push('P2Y12 inhibitor: no guideline sets an acute-bleed rule.' + (i.asa && i.asaFor === 'sec' ? ' Keep the aspirin; any pause of the P2Y12 inhibitor is a joint decision with cardiology.' : ' Any pause is a joint decision with cardiology.')); if (i.stent) g.push('Stent in the last 12 months: talk to cardiology before stopping the P2Y12 inhibitor.'); w.push(i.stent ? WHY.p2y : 'Stopping an antiplatelet trades rebleeding for clot risk; how big that risk is depends on why it was started.'); }
+  if ((i.asa || i.p2y) && (!has(i.plt) || i.plt >= 150)) L.push('No platelet transfusion for antiplatelet-related bleeding when the count is normal (conditional, very low).');
+  var anti = i.warf || i.doac, ap = i.asa || i.p2y;
+  if (anti) L.push('Restart the anticoagulant once bleeding has stopped (ACG 2023, strong, moderate, lower GI; ESGE 2026: as soon as the clot risk calls for it). No guideline sets the day; the reversal tool weighs it.');
+  c.head = anti && ap ? 'Hold the anticoagulant; decide on each antiplatelet' : anti ? 'Hold the anticoagulant; reversal only if life-threatening' : i.asa && i.asaFor === 'sec' && !i.p2y ? 'Keep the aspirin' : i.asa && i.asaFor === 'pri' && !i.p2y ? 'Stop prevention-only aspirin' : i.p2y && i.asa ? 'Aspirin and a P2Y12 inhibitor: decide each with cardiology' : i.p2y ? 'P2Y12 inhibitor: decide with cardiology' : 'Aspirin: what is it for?';
+  c.list = L; c.guards = g;
+  c.why = w[0];
+  c.links = [['/reversal/#drug', 'Agent, dose and restart: reversal']];
+  c.chips = [['thin', i.warf || i.doac ? 'anti' : 'plt', 'Two risks: bleed and clot']];
+  c.more = ['ACG-CAG life-threatening bleed: shock, a need for pressors or surgery, hemoglobin fall over 5 g/dL, 5 or more units of red cells, or death.', 'Variceal bleeding: stop anticoagulants until the bleeding is controlled; how long to pause is individual (Baveno VII 6.39, D2).', 'ACG 2023 text: endoscopy is considered safe with an INR up to 2.5.'];
+  c.tiers = ['ACG-CAG 2022: conditional, very low throughout', 'Restart: ACG 2023 strong, moderate'];
+  return c;
+}
+
+function followCard(i, s){
+  if (!i.find || i.find === 'none') return null;
+  var ulcer = !!FORREST[i.find];
+  if (!ulcer && !i.nsaid) return null;
+  var c = {id: 'c-follow', label: 'Before discharge'};
+  c.head = ulcer ? 'Find the cause of the ulcer' : 'Stop the NSAID';
+  c.list = [];
+  if (ulcer) c.list.push('Test for H. pylori, treat, and confirm cure at least 4 weeks after treatment (ACG 2024). A negative test during the bleed should be repeated later (ICG 2019).');
+  if (i.nsaid || ulcer) c.list.push('Stop NSAIDs. If one is truly needed: a COX-2 inhibitor plus a PPI, with risk still above zero (ICG 2019).');
+  if (ulcer && (i.asa || i.p2y || i.warf || i.doac)) c.list.push('Continuing an antiplatelet or anticoagulant: add a PPI (ICG 2019, conditional).');
+  c.list.push('Iron before discharge for iron deficiency or anemia (ESGE 2026).');
+  c.why = WHY.hp;
+  c.tiers = ['ACG 2024 (H. pylori)', 'ICG 2019', 'ESGE 2026'];
+  return c;
+}
+
+function decide(i){
+  var s = state(i);
+  if (!anyInput(i)) return {s: s, cards: [{id: 'c-empty', label: 'Start', head: 'Enter what you know', sub: 'Tick what was seen, then the vital signs and labs. Every card updates as you type. After the scope, pick what it showed.', empty: true}]};
+  var cards = [whereCard(i, s), hourCard(i, s), scoreCard(i, s), txCard(i, s), preCard(i, s), afterCard(i, s), thinCard(i, s), followCard(i, s)].filter(Boolean);
+  return {s: s, cards: cards};
+}
+
+/* Upper-source likelihood ratios (Srygley 2012). */
+var LR = [['Melena seen on exam', '25'], ['Nasogastric aspirate with blood or coffee grounds', '9.6'], ['BUN to creatinine ratio over 30', '7.5'], ['Melena reported by the patient', '5.1 to 5.9'], ['Clots in the stool', '0.05']];
+
+/* Source narrowing (expert practice). */
+var NCAUSE = [['ulcer','Peptic ulcer'],['varix','Varices'],['mw','Mallory-Weiss tear'],['divert','Diverticular bleed'],['isch','Ischemic colitis'],['anorect','Hemorrhoids or fissure'],['postpol','Bleeding after polypectomy'],['angio','Angioectasia']];
+var NFIND = {
+  nsaid: {n: 'NSAID or aspirin use', fav: ['ulcer'], why: {ulcer: 'NSAIDs and aspirin, with H. pylori, cause most bleeding ulcers.'}},
+  cirr: {n: 'Cirrhosis, ascites, spider angiomas', fav: ['varix', 'ulcer'], why: {varix: 'Portal hypertension: treat as variceal until the scope says otherwise.', ulcer: 'Ulcers still cause many bleeds in cirrhosis.'}},
+  retch: {n: 'Retching before the blood', fav: ['mw'], why: {mw: 'Forceful retching tears the mucosa at the junction of esophagus and stomach.'}},
+  painless: {n: 'Painless red blood, older adult', fav: ['divert', 'angio'], why: {divert: 'The commonest cause of large painless lower bleeding.', angio: 'Painless, often recurrent, more common with age and kidney disease.'}},
+  pain: {n: 'Cramping pain, then bloody diarrhea', fav: ['isch'], why: {isch: 'Ischemic colitis: pain first, then blood, often with vascular disease.'}},
+  poly: {n: 'Polyp removed in the last weeks', fav: ['postpol'], why: {postpol: 'Bleeding can come days to weeks after removal.'}},
+  paper: {n: 'Blood on the paper, small volume', fav: ['anorect'], why: {anorect: 'Bright blood on the paper or dripping after stool fits an anorectal source.'}}
+};
+function narrowRows(k){
+  return NCAUSE.map(function(x){
+    if (!k) return {name: x[1], why: '', st: ''};
+    var F = NFIND[k], on = F.fav.indexOf(x[0]) >= 0;
+    return {name: x[1], why: on ? F.why[x[0]] : 'Less likely with this finding; not excluded.', st: on ? 'fav' : 'less'};
+  });
+}
+var WU_FIRST = ['Blood count, repeated: the first hemoglobin lags a fast bleed', 'Type and crossmatch', 'BUN, creatinine, electrolytes, liver tests', 'PT/INR and aPTT; fibrinogen in a large bleed', 'Lactate if unstable', 'ECG and troponin if older, cardiac history or chest pain'];
+var WU_THEN = ['Upper endoscopy within 24 hours (12 hours if variceal)', 'CT angiography for ongoing lower bleeding, or brisk bleeding with a negative scope', 'Colonoscopy after bowel prep for a stable lower bleed', 'H. pylori test for a peptic ulcer; repeat a negative test from the acute bleed', 'Small-bowel evaluation (capsule, CT enterography) when upper and lower scopes are negative'];
+</script>
+<script id="figs">
+/* Figures: site-drawn SVG, shared colour names only. */
+var FM = 'font-family:var(--mono)', FSn = 'font-family:var(--sans)';
+function svgOpen(vb, label){ return '<svg viewBox="' + vb + '" role="img" aria-label="' + label + '" class="fig">'; }
+function tx(x, y, t, o){ o = o || {}; return '<text x="' + x + '" y="' + y + '" text-anchor="' + (o.a || 'middle') + '" style="' + (o.sans ? FSn : FM) + ';font-size:' + (o.s || 11.5) + 'px;font-weight:' + (o.w || 400) + ';fill:' + (o.c || 'var(--ink)') + '">' + t + '</text>'; }
+function rect(x, y, w, h, st){ var s = st === 'hot' ? 'fill:var(--card);stroke:var(--accent);stroke-width:2.5' : st === 'dim' ? 'fill:var(--fill);stroke:var(--line);stroke-width:1.5' : 'fill:var(--card);stroke:var(--muted);stroke-width:1.5'; return '<rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="10" style="' + s + '"/>'; }
+function arrow(x1, y1, x2, y2, hot){ var c = hot ? 'var(--accent)' : 'var(--muted)'; var a = Math.atan2(y2 - y1, x2 - x1), l = 7; return '<line x1="' + x1 + '" y1="' + y1 + '" x2="' + x2 + '" y2="' + y2 + '" style="stroke:' + c + ';stroke-width:' + (hot ? 2.5 : 1.5) + '"/><path d="M' + x2 + ' ' + y2 + ' L' + (x2 - l * Math.cos(a - 0.45)) + ' ' + (y2 - l * Math.sin(a - 0.45)) + ' L' + (x2 - l * Math.cos(a + 0.45)) + ' ' + (y2 - l * Math.sin(a + 0.45)) + ' Z" style="fill:' + c + '"/>'; }
+
+var FIGS = {
+  where: {t: 'Upper or lower', states: ['up', 'low', 'brisk'], data: {
+    up: {n: 'Upper, slow', line: 'Bleeding above the ligament of Treitz: vomited blood or coffee grounds, and blood digested on the way down comes out black (melena).'},
+    low: {n: 'Lower', line: 'Bleeding from the colon or anorectum comes out red or maroon, often with clots, and the BUN stays near normal.'},
+    brisk: {n: 'Upper, brisk', line: 'A fast upper bleed outruns digestion and can come out red. Red blood with instability is upper until shown otherwise.'}},
+    svg: function(k){
+      var up = k !== 'low';
+      var h = svgOpen('0 0 360 300', 'The gut from esophagus to rectum, divided at the ligament of Treitz');
+      var seg = [['Esophagus', 14, up], ['Stomach', 58, up], ['Duodenum', 102, up], ['Small bowel', 166, k === 'brisk'], ['Colon', 210, !up || k === 'brisk'], ['Rectum', 254, !up || k === 'brisk']];
+      seg.forEach(function(s, n){
+        var src = (up && n < 3 && n === 1) || (!up && n === 4);
+        h += rect(20, s[1], 150, 34, src ? 'hot' : s[2] ? 'on' : 'dim') + tx(95, s[1] + 22, s[0], {w: 600, c: s[2] || src ? 'var(--ink)' : 'var(--muted)'});
+        if (n < 5 && n !== 2) h += arrow(95, s[1] + 35, 95, seg[n + 1][1] - 2, false);
+      });
+      h += arrow(95, 137, 95, 164, false);
+      h += '<line x1="12" y1="150" x2="348" y2="150" style="stroke:var(--accent);stroke-width:2;stroke-dasharray:6 5"/>';
+      h += tx(186, 146, 'Ligament of Treitz', {a: 'start', c: 'var(--accent)', w: 600});
+      h += tx(186, 40, 'UPPER', {a: 'start', w: 700}) + tx(186, 196, 'LOWER', {a: 'start', w: 700});
+      var out = k === 'up' ? ['Vomit: blood or', 'coffee grounds', 'Stool: black (melena)', 'BUN high'] : k === 'low' ? ['Stool: red or', 'maroon, clots', 'BUN near normal', ''] : ['Stool: red', 'with instability', 'BUN may be high', ''];
+      out.forEach(function(l, n){ h += tx(186, (k === 'low' ? 222 : 64) + n * 17, l, {a: 'start', sans: true, s: 12.5, c: n === 0 || n === 1 ? 'var(--accent)' : 'var(--muted)'}); });
+      return h + '</svg>';
+    }},
+  bun: {t: 'Why the BUN rises', states: ['digest', 'kidney'], data: {
+    digest: {n: 'Blood is digested', line: 'Blood in the upper gut is a protein meal. Its amino acids are absorbed and the liver turns their nitrogen into urea, so the BUN rises while creatinine does not.'},
+    kidney: {n: 'Kidney flow falls', line: 'Blood loss lowers kidney perfusion. The kidney then reabsorbs more urea, which pushes the BUN to creatinine ratio up further.'}},
+    svg: function(k){
+      var d = k === 'digest';
+      var h = svgOpen('0 0 360 250', 'Blood in the gut is digested into urea; low kidney flow retains urea');
+      h += rect(20, 14, 150, 44, d ? 'hot' : 'on') + tx(95, 33, 'Blood in the', {w: 600}) + tx(95, 49, 'upper gut', {w: 600});
+      h += arrow(95, 60, 95, 84, d);
+      h += rect(20, 86, 150, 44, d ? 'hot' : 'on') + tx(95, 105, 'Protein digested,', {w: 600, s: 11}) + tx(95, 121, 'amino acids absorbed', {s: 11, c: 'var(--muted)'});
+      h += arrow(95, 132, 95, 156, d);
+      h += rect(20, 158, 150, 44, d ? 'hot' : 'on') + tx(95, 177, 'Liver makes', {w: 600}) + tx(95, 193, 'urea', {w: 600});
+      h += rect(190, 86, 150, 44, !d ? 'hot' : 'on') + tx(265, 105, 'Kidney flow falls', {w: 600, s: 11}) + tx(265, 121, 'more urea reabsorbed', {s: 11, c: 'var(--muted)'});
+      h += arrow(172, 196, 220, 220, d) + arrow(265, 132, 265, 212, !d);
+      h += rect(150, 214, 190, 32, 'hot') + tx(245, 235, 'BUN up, creatinine not', {w: 700, s: 11});
+      return h + '</svg>';
+    }},
+  portal: {t: 'Portal pressure and the varix', states: ['norm', 'bleed', 'over'], data: {
+    norm: {n: 'Cirrhosis, not bleeding', line: 'Scarring raises resistance to portal flow, so pressure backs up into collateral veins at the lower esophagus: varices.'},
+    bleed: {n: 'Bleeding', line: 'A varix ruptures when the pressure and wall tension inside it are high enough. Octreotide lowers portal inflow; banding closes the vessel.'},
+    over: {n: 'Over-transfused', line: 'Restoring volume beyond need raises portal pressure again and the varix refills. In Villanueva 2013, transfusing below 9 rather than below 7 meant more rebleeding.'}},
+    svg: function(k){
+      var p = {norm: 0.55, bleed: 0.85, over: 0.95}[k], r = {norm: 12, bleed: 15, over: 18}[k];
+      var h = svgOpen('0 0 360 240', 'Portal vein pressure gauge and an esophageal varix');
+      h += rect(20, 150, 130, 44, 'on') + tx(85, 169, 'Portal vein', {w: 600}) + tx(85, 185, 'blood volume', {s: 11, c: 'var(--muted)'});
+      h += rect(20, 60, 130, 44, 'on') + tx(85, 79, 'Scarred liver', {w: 600}) + tx(85, 95, 'resistance high', {s: 11, c: 'var(--muted)'});
+      h += arrow(85, 148, 85, 106, false);
+      h += arrow(152, 172, 228, 120, k !== 'norm');
+      h += '<circle cx="270" cy="96" r="' + (r + 18) + '" style="fill:var(--fill);stroke:var(--muted);stroke-width:1.5"/>';
+      h += '<circle cx="270" cy="96" r="' + r + '" style="fill:var(--card);stroke:var(--accent);stroke-width:' + (k === 'norm' ? 1.5 : 2.5) + '"/>';
+      if (k === 'bleed') h += '<path d="M' + (270 + r) + ' 96 L' + (300 + r) + ' 112" style="stroke:var(--accent);stroke-width:3"/>';
+      h += tx(270, 30, 'Varix in the esophagus', {w: 600, s: 11});
+      h += tx(270, 162, k === 'norm' ? 'tense' : k === 'bleed' ? 'ruptured' : 'refilled', {c: 'var(--accent)', w: 600});
+      h += '<rect x="190" y="194" width="150" height="12" rx="6" style="fill:var(--line)"/><rect x="190" y="194" width="' + (150 * p) + '" height="12" rx="6" style="fill:var(--accent)"/>';
+      h += tx(265, 226, 'Portal pressure (schematic)', {s: 11, c: 'var(--muted)'});
+      return h + '</svg>';
+    }},
+  acid: {t: 'Acid and the clot', states: ['low', 'ppi'], data: {
+    low: {n: 'Acid stomach', line: 'At a low gastric pH, platelets clump poorly and pepsin digests fibrin, so a fresh clot on an ulcer breaks down (laboratory physiology).'},
+    ppi: {n: 'High-dose PPI', line: 'A PPI raises the gastric pH; the clot holds while the vessel heals. That is why high-dose PPI follows endoscopic treatment of a high-risk ulcer.'}},
+    svg: function(k){
+      var lo = k === 'low';
+      var h = svgOpen('0 0 360 220', 'Ulcer with a clot over a vessel at low and high gastric pH');
+      h += '<rect x="10" y="20" width="340" height="70" rx="12" style="fill:var(--fill);stroke:var(--line);stroke-width:1.5"/>';
+      h += tx(180, 46, 'Stomach', {w: 600}) + tx(180, 68, lo ? 'pH low: pepsin active' : 'pH raised by PPI', {c: lo ? 'var(--accent)' : 'var(--muted)', w: 600});
+      h += '<path d="M40 110 L140 110 Q180 170 220 110 L320 110" style="fill:none;stroke:var(--muted);stroke-width:2"/>';
+      h += '<line x1="40" y1="190" x2="320" y2="190" style="stroke:var(--accent);stroke-width:4"/>' + tx(300, 210, 'artery', {c: 'var(--muted)', s: 11});
+      h += '<line x1="180" y1="150" x2="180" y2="188" style="stroke:var(--accent);stroke-width:3"/>';
+      h += '<ellipse cx="180" cy="' + (lo ? 132 : 140) + '" rx="' + (lo ? 14 : 24) + '" ry="' + (lo ? 8 : 12) + '" style="fill:var(--card);stroke:var(--ink);stroke-width:' + (lo ? 1 : 2.5) + ';stroke-dasharray:' + (lo ? '3 3' : '0') + '"/>';
+      h += tx(lo ? 88 : 90, 140, lo ? 'clot dissolving' : 'clot holds', {c: lo ? 'var(--accent)' : 'var(--ink)', w: 600});
+      return h + '</svg>';
+    }},
+  forrest: {t: 'Forrest classes', states: ['fIa', 'fIb', 'fIIa', 'fIIb', 'fIIc', 'fIII'], data: (function(){ var o = {}; Object.keys(FORREST).forEach(function(k){ var F = FORREST[k]; o[k] = {n: F.c, line: F.c + ', ' + F.n.toLowerCase() + ' (' + (F.risk === 'high' ? 'high risk' : F.risk === 'low' ? 'low risk' : 'intermediate') + '). ' + F.tx}; }); return o; })(),
+    svg: function(k){
+      var F = FORREST[k];
+      var h = svgOpen('0 0 360 210', 'Ulcer crater in cross-section showing Forrest ' + F.c);
+      h += '<path d="M20 70 L110 70 Q180 170 250 70 L340 70" style="fill:none;stroke:var(--muted);stroke-width:2"/>';
+      h += tx(180, 40, 'Forrest ' + F.c + ': ' + F.n, {w: 700});
+      var base = 'M128 92 Q180 150 232 92';
+      if (k === 'fIa'){ h += '<path d="M180 122 L180 60" style="stroke:var(--accent);stroke-width:5"/><path d="M180 60 L168 52 M180 60 L192 52 M180 60 L180 48" style="stroke:var(--accent);stroke-width:3"/>'; }
+      if (k === 'fIb'){ [0, 1, 2].forEach(function(n){ h += '<circle cx="' + (166 + n * 14) + '" cy="' + (112 - n % 2 * 6) + '" r="5" style="fill:var(--accent)"/>'; }); }
+      if (k === 'fIIa'){ h += '<circle cx="180" cy="116" r="9" style="fill:var(--card);stroke:var(--accent);stroke-width:3"/>'; }
+      if (k === 'fIIb'){ h += '<ellipse cx="180" cy="110" rx="34" ry="14" style="fill:var(--fill);stroke:var(--ink);stroke-width:2"/>'; }
+      if (k === 'fIIc'){ h += '<ellipse cx="180" cy="118" rx="12" ry="4" style="fill:var(--muted)"/>'; }
+      if (k === 'fIII'){ h += '<path d="' + base + '" style="fill:none;stroke:var(--line);stroke-width:6"/>'; }
+      h += tx(180, 168, F.risk === 'high' ? 'Endoscopic therapy' : F.risk === 'low' ? 'No endoscopic therapy' : 'Lift the clot if able', {c: 'var(--accent)', w: 600});
+      h += tx(180, 190, F.risk === 'high' ? 'then high-dose PPI 3 days' : F.risk === 'low' ? 'once-daily oral PPI, eat' : 'high-dose PPI', {c: 'var(--muted)'});
+      return h + '</svg>';
+    }},
+  scores: {t: 'What each score predicts', states: ['gbs', 'oak'], data: {
+    gbs: {n: 'Glasgow-Blatchford', line: 'Upper bleeding. Built to predict who will need transfusion, endoscopic treatment or surgery. A score of 0 or 1 in the emergency department can go home with follow-up; above that, admit.'},
+    oak: {n: 'Oakland', line: 'Lower bleeding. Built to predict safe discharge: no rebleeding, transfusion, intervention, readmission or death by 28 days. A score of 8 or less may be discharged for outpatient evaluation.'}},
+    svg: function(k){
+      var g = k === 'gbs', max = g ? 23 : 35, cut = g ? 1 : 8;
+      var h = svgOpen('0 0 360 160', g ? 'Glasgow-Blatchford scale 0 to 23 with discharge zone 0 to 1' : 'Oakland scale 0 to 35 with discharge zone 0 to 8');
+      var W = 300, x0 = 30, cw = W * (cut + 1) / (max + 1);
+      h += tx(180, 26, g ? 'Glasgow-Blatchford, 0 to 23' : 'Oakland, 0 to 35', {w: 700});
+      h += '<rect x="' + x0 + '" y="50" width="' + W + '" height="22" rx="8" style="fill:var(--line)"/>';
+      h += '<rect x="' + x0 + '" y="50" width="' + cw + '" height="22" rx="8" style="fill:var(--accent)"/>';
+      h += tx(x0, 92, '0', {a: 'start'}) + tx(x0 + W, 92, String(max), {a: 'end'});
+      if (cw > 40) h += tx(x0 + cw, 92, String(cut), {});
+      h += tx(x0, 122, g ? '0 to 1: home with follow-up' : '8 or less: discharge possible', {a: 'start', c: 'var(--accent)', w: 600, sans: true, s: 13});
+      h += tx(x0, 144, g ? 'Not a severity score once admitted' : 'Not for upper bleeding', {a: 'start', c: 'var(--muted)', sans: true, s: 13});
+      return h + '</svg>';
+    }},
+  thin: {t: 'Two risks: bleed and clot', states: ['anti', 'plt'], data: {
+    anti: {n: 'Anticoagulant', line: 'Holding the anticoagulant lowers rebleeding; every day off it adds clot risk. Guidelines agree on restarting once bleeding has stopped but set no day. Schematic curves, not trial data.'},
+    plt: {n: 'Aspirin, secondary', line: 'For heart or vessel disease, the clot risk of stopping aspirin is larger than the rebleeding it prevents, so it is kept or restarted the day hemostasis is confirmed. Schematic curves, not trial data.'}},
+    svg: function(k){
+      var a = k === 'anti';
+      var h = svgOpen('0 0 360 200', 'Schematic of rebleeding risk falling and clot risk rising while a blood thinner is held');
+      h += '<line x1="40" y1="160" x2="340" y2="160" style="stroke:var(--muted);stroke-width:1.5"/><line x1="40" y1="160" x2="40" y2="20" style="stroke:var(--muted);stroke-width:1.5"/>';
+      h += '<path d="M40 40 Q' + (a ? 140 : 90) + ' 150 340 154" style="fill:none;stroke:var(--accent);stroke-width:2.5"/>';
+      h += '<path d="M40 150 Q' + (a ? 200 : 120) + ' ' + (a ? 140 : 90) + ' 340 ' + (a ? 50 : 30) + '" style="fill:none;stroke:var(--ink);stroke-width:2.5;stroke-dasharray:6 4"/>';
+      h += tx(110, 140, 'rebleeding', {c: 'var(--accent)', w: 600, a: 'start'}) + tx(260, a ? 64 : 44, 'clot', {c: 'var(--ink)', w: 600});
+      h += tx(190, 184, 'Time off the drug', {c: 'var(--muted)'});
+      return h + '</svg>';
+    }}
+};
+
+var PLATES = {
+  tract: {t: 'Upper and lower GI tract', src: '/media/gi-bleed/tract.webp', w: 465, h: 532, alt: 'Front view of the digestive tract in a torso outline. The esophagus, stomach and C-shaped duodenum are red; the color changes to blue where the duodenum meets the jejunum, left of the midline, and the small bowel, colon and rectum are blue.', cap: 'Red is upper, blue is lower. The color changes where the duodenum meets the jejunum, the point held by the ligament of Treitz.'},
+  ulcer: {t: 'Forrest classes', src: '/media/gi-bleed/forrest.webp', w: 640, h: 470, alt: 'Six cross-sections of an ulcer in the stomach wall, an artery beneath each, in two rows of three. Top row: blood spurting from the ulcer floor; drops of blood oozing from the ulcer floor; a small raised red knob on the floor. Bottom row: a dark red clot stuck to the ulcer; a small flat brown spot on the floor; a clean pale floor.', cap: 'Top row: Ia spurting, Ib oozing, IIa visible vessel. Bottom row: IIb adherent clot, IIc flat pigmented spot, III clean base.'}
+};
+function plateHTML(id){ var P = PLATES[id]; return '<div class="plate"><img src="' + P.src + '" alt="' + P.alt + '" width="' + P.w + '" height="' + P.h + '" loading="lazy"><span class="credit">Created with BioRender.com</span></div><p class="line1">' + P.cap + '</p>'; }
+
+var TRIALS = [
+  {q: 'How much blood in upper GI bleeding? (Villanueva)', d: 'Randomized, single center, 921 patients with acute upper GI bleeding; transfuse below 7 g/dL against below 9.', r: '6-week survival 95% against 91% (hazard ratio for death 0.55, 95% CI 0.33 to 0.92); further bleeding 10% against 16%; fewer adverse events (40% against 48%).', c: 'The restrictive threshold of 7 for GI bleeding, and the 7 to 8 target in variceal bleeding.', cite: 'Villanueva C et al. N Engl J Med 2013;368:11', doi: '10.1056/NEJMoa1211801'},
+  {q: 'Scope within 6 hours for the sickest? (Lau)', d: 'Randomized, 516 patients with Glasgow-Blatchford score 12 or more; endoscopy within 6 hours against 6 to 24 hours of gastroenterology consultation.', r: '30-day mortality 8.9% against 6.6% (not significant); further bleeding 10.9% against 7.8%.', c: 'Endoscopy within 24 hours after resuscitation, not as fast as possible.', cite: 'Lau JYW et al. N Engl J Med 2020;382:1299', doi: '10.1056/NEJMoa1912484'},
+  {q: 'Tranexamic acid for GI bleeding? (HALT-IT)', d: 'Randomized, double blind, 12,009 patients with significant upper or lower GI bleeding; tranexamic acid 1 g then 3 g over 24 hours against placebo.', r: 'Death from bleeding within 5 days 3.7% against 3.8% (risk ratio 0.99, 95% CI 0.82 to 1.18). Venous clots 0.8% against 0.4% (risk ratio 1.85).', c: 'Tranexamic acid is not used for GI bleeding outside a trial.', cite: 'HALT-IT Trial Collaborators. Lancet 2020;395:1927', doi: '10.1016/S0140-6736(20)30848-5'},
+  {q: 'High-dose PPI after endoscopic treatment? (Lau 2000)', d: 'Randomized, 240 patients with active bleeding or a visible vessel treated endoscopically; omeprazole 80 mg IV then 8 mg/hour for 72 hours against placebo.', r: 'Recurrent bleeding by 30 days 6.7% against 22.5%. Mortality 4.2% against 10% (not significant).', c: 'The high-dose PPI regimen after endoscopic hemostasis.', cite: 'Lau JYW et al. N Engl J Med 2000;343:310', doi: '10.1056/NEJM200008033430501'},
+  {q: 'Antibiotics for GI bleeding in cirrhosis? (Cochrane)', d: 'Meta-analysis, 12 randomized trials, 1,241 patients with cirrhosis and upper GI bleeding; antibiotic prophylaxis against none or placebo.', r: 'Mortality risk ratio 0.79 (95% CI 0.63 to 0.98); bacterial infections 0.36; rebleeding 0.53.', c: 'Antibiotics from admission in every cirrhotic GI bleed.', cite: 'Chavez-Tapia NC et al. Cochrane Database Syst Rev 2010;(9):CD002907', doi: '10.1002/14651858.CD002907.pub2'},
+  {q: 'Early TIPS after variceal bleeding? (García-Pagán)', d: 'Randomized, 63 high-risk patients (Child-Pugh C, or B with active bleeding); TIPS within 72 hours against drugs and banding. Small trial.', r: '1-year survival 86% against 61%; free of failure to control bleeding or rebleeding 97% against 50%.', c: 'The basis of pre-emptive TIPS.', cite: 'García-Pagán JC et al. N Engl J Med 2010;362:2370', doi: '10.1056/NEJMoa0910102'}
+];
+
+var CASES = [
+  {t: 'Melena, everything else normal', s: 'A 34-year-old woman with two black stools after a week of ibuprofen. Heart rate 84, systolic 128, hemoglobin 13.1, BUN 16, creatinine 0.8. No syncope, liver or heart disease.', q: 'Admit or home?', i: {mel: true, nsaid: true, hr: 84, sbp: 128, hb: 13.1, bun: 16, cr: 0.8, sex: 'f', age: 34}, p: 'Glasgow-Blatchford 1 (melena only): very low risk. From the emergency department she can go home with outpatient endoscopy, stopping the ibuprofen.'},
+  {t: 'Hematemesis on warfarin', s: 'A 72-year-old man on warfarin for atrial fibrillation vomits blood. Heart rate 108, systolic 96, hemoglobin 8.4, BUN 48, creatinine 1.1, INR 2.8. No cirrhosis.', q: 'Plasma, vitamin K, transfusion?', i: {hem: true, hr: 108, sbp: 96, hb: 8.4, bun: 48, cr: 1.1, inr: 2.8, warf: true, sex: 'm', age: 72}, p: 'Hold warfarin. No plasma and no routine vitamin K; PCC only if the bleed becomes life-threatening (reversal tool for the dose). Hemoglobin 8.4 is above 7: no transfusion for the number, but he is unstable and the hemoglobin lags. Resuscitate and give erythromycin, then endoscopy as soon as safely possible (within 24 hours at the latest); do not delay it for the INR.'},
+  {t: 'Cirrhosis and hematemesis', s: 'A 58-year-old with alcohol-related cirrhosis vomits a large amount of blood and is drowsy. Heart rate 118, systolic 88, hemoglobin 7.6.', q: 'What goes in before the scope, and how much blood?', i: {hem: true, brisk: true, ams: true, cirr: true, hr: 118, sbp: 88, hb: 7.6}, p: 'Treat as variceal: airway first (drowsy and vomiting blood), octreotide and ceftriaxone now, endoscopy within 12 hours after resuscitation. Hemoglobin 7.6 is inside the 7 to 8 target: no transfusion for the number, though brisk bleeding with instability is treated by the bleeding, not the number. No plasma, no tranexamic acid.'},
+  {t: 'Visible vessel treated', s: 'Endoscopy for the man on warfarin shows a duodenal ulcer with a nonbleeding visible vessel, treated with clips and thermal therapy.', q: 'What PPI, for how long, and what about H. pylori?', i: {hem: true, hr: 92, sbp: 112, hb: 8.0, warf: true, find: 'fIIa', sex: 'm', age: 72}, p: 'High-dose PPI for 3 days (80 mg bolus then 8 mg/hour, or 80 mg bolus then 40 mg two to four times a day), then twice daily to day 14, then once daily. Test for H. pylori, repeating a negative test later; restart warfarin once bleeding has stopped, with a PPI.'},
+  {t: 'Painless red blood, stable', s: 'A 78-year-old man with three episodes of painless red blood per rectum, now stopped. Heart rate 82, systolic 134, hemoglobin 12.2, BUN 18, creatinine 1.0. Blood on rectal exam. Aspirin for a past heart attack.', q: 'Home? Aspirin? Colonoscopy when?', i: {red: true, dre: true, hr: 82, sbp: 134, hb: 12.2, bun: 18, cr: 1.0, asa: true, asaFor: 'sec', sex: 'm', age: 78}, p: 'Oakland 15 (age 2, male 1, rectal exam 1, heart rate 1, systolic 2, hemoglobin 8): above 8, so admit. Keep the aspirin (secondary prevention). Colonoscopy in hospital after bowel prep, not urgently.'},
+  {t: 'Red blood and a falling pressure', s: 'A 66-year-old woman passes a large amount of maroon blood. Heart rate 124, systolic 84, still bleeding. BUN 52, creatinine 1.0.', q: 'Where is it coming from, and what first?', i: {red: true, brisk: true, hr: 124, sbp: 84, bun: 52, cr: 1.0, sex: 'f', age: 66}, p: 'Red blood with instability and a BUN to creatinine ratio of 52: treat as upper until shown otherwise; upper endoscopy first. Transfuse for the bleeding. If upper endoscopy is negative and bleeding continues, CT angiography.'}
+];
+</script>
+<script>
+(function(){
+var $ = function(id){ return document.getElementById(id); };
+function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+var ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M7 15l3-4 3 3 2-2 2 3"/></svg>';
+function chip(fig, state, label){ if (fig.indexOf('plate:') === 0) return '<button class="chip" type="button" data-plate="' + fig.slice(6) + '">' + ICON + esc(label) + '</button>'; return '<button class="chip" type="button" data-fig="' + fig + '" data-state="' + (state || '') + '">' + ICON + esc(label || FIGS[fig].t) + '</button>'; }
+function cardHTML(c){
+  var h = '<div class="card" id="' + c.id + '"><p class="label">' + esc(c.label) + '</p><h2>' + esc(c.head) + '</h2>';
+  if (c.sub) h += '<p class="sub">' + esc(c.sub) + '</p>';
+  if (c.steps) h += '<div class="tl">' + c.steps.map(function(s){ return '<div class="st' + (s.st ? ' ' + s.st : '') + '"><span class="when">' + esc(s.w) + '</span><b>' + esc(s.t) + '</b>' + (s.d ? '<small>' + esc(s.d) + '</small>' : '') + '</div>'; }).join('') + '</div>';
+  if (c.list) h += '<ul>' + c.list.map(function(s){ return '<li>' + esc(s) + '</li>'; }).join('') + '</ul>';
+  h += (c.guards || []).map(function(g){ return '<div class="guard">' + esc(g) + '</div>'; }).join('');
+  if (c.why) h += '<p class="whyline"><b>Why:</b> ' + esc(c.why) + '</p>';
+  if (c.links) h += '<div class="links">' + c.links.map(function(l){ return '<a href="' + l[0] + '">' + esc(l[1]) + ' →</a>'; }).join('') + '</div>';
+  if (c.chips && c.chips.length) h += '<div class="chips">' + c.chips.map(function(x){ return chip(x[0], x[1], x[2]); }).join('') + '</div>';
+  var tbl = c.score && c.score.parts.length ? '<table><tr><th>Item</th><th>Points</th></tr>' + c.score.parts.map(function(p){ return '<tr><td>' + esc(p[0]) + '</td><td class="mono">' + p[1] + '</td></tr>'; }).join('') + '</table>' : '';
+  if ((c.more && c.more.length) || (c.tiers && c.tiers.length) || tbl) h += '<details><summary>More</summary>' + tbl + (c.more || []).map(function(m){ return '<p>' + esc(m) + '</p>'; }).join('') + (c.tiers || []).map(function(t){ return '<span class="tier">' + esc(t) + '</span>'; }).join('') + '</details>';
+  return h + '</div>';
+}
+
+/* Inputs */
+var st = {sex: null, asaFor: null, find: 'none', t: {}};
+var NUMS = ['hr','sbp','hb','bun','cr','plt','inr','age'];
+var ALLT = TICKS_S.concat(TICKS_C, TICKS_H, TICKS_A, TICKS_E);
+function read(){
+  var i = {sex: st.sex, asaFor: st.asaFor, find: st.find};
+  NUMS.forEach(function(k){ var v = parseFloat($(k).value); i[k] = isFinite(v) && v >= 0 ? v : null; });
+  ALLT.forEach(function(t){ if (st.t[t[0]]) i[t[0]] = true; });
+  return i;
+}
+function seg(host, list, sel){ $(host).innerHTML = list.map(function(x){ return '<button class="sbtn" type="button" data-v="' + x[0] + '" aria-pressed="' + (x[0] === sel) + '">' + esc(x[1]) + '</button>'; }).join(''); }
+function ticks(host, list){ $(host).innerHTML = list.map(function(t){ return '<label class="chk"><input type="checkbox" data-t="' + t[0] + '"' + (st.t[t[0]] ? ' checked' : '') + '>' + esc(t[1]) + '</label>'; }).join(''); }
+function drawInputs(){ ticks('ticks-s', TICKS_S); ticks('ticks-c', TICKS_C); ticks('ticks-h', TICKS_H); ticks('ticks-a', TICKS_A); ticks('ticks-e', TICKS_E); seg('sexseg', SEX, st.sex); seg('asaseg', ASA, st.asaFor); seg('findseg', FIND, st.find); }
+function build(i){ var o = decide(i); return {o: o, html: o.cards.map(cardHTML).join('')}; }
+function render(){ $('out').innerHTML = build(read()).html; }
+function segClick(host, key, toggle){ $(host).addEventListener('click', function(e){ var v = e.target.getAttribute('data-v'); if (v){ st[key] = toggle && st[key] === v ? null : v; drawInputs(); render(); } }); }
+segClick('sexseg', 'sex', true); segClick('asaseg', 'asaFor', true); segClick('findseg', 'find', false);
+$('inputs').addEventListener('change', function(e){ var t = e.target.getAttribute && e.target.getAttribute('data-t'); if (t){ st.t[t] = e.target.checked; } render(); });
+$('inputs').addEventListener('input', render);
+
+/* Tabs */
+var tabs = [['t-tool','p-tool'],['t-src','p-src'],['t-learn','p-learn'],['t-prac','p-prac']];
+function show(t){ tabs.forEach(function(p){ var on = p[0] === t; $(p[0]).setAttribute('aria-selected', String(on)); $(p[1]).classList.toggle('on', on); }); }
+tabs.forEach(function(p){ $(p[0]).addEventListener('click', function(){ show(p[0]); }); });
+function fromHash(){ var id = location.hash.slice(1); if (!id) return; var el = $(id); if (!el) return; var pan = el.closest('.panel'); if (pan) tabs.forEach(function(p){ if (p[1] === pan.id) show(p[0]); }); el.scrollIntoView(); }
+window.addEventListener('hashchange', fromHash);
+
+/* Figures and the sheet */
+function mountFig(host, id, state){
+  var F = FIGS[id];
+  function draw(k){
+    var d = F.data[k];
+    host.innerHTML = '<div class="states" role="group" aria-label="' + esc(F.t) + '">' + F.states.map(function(x){ return '<button class="sbtn" type="button" data-k="' + x + '" aria-pressed="' + (x === k) + '">' + esc(F.data[x].n) + '</button>'; }).join('') + '</div>' + F.svg(k) + '<p class="line1">' + esc(d.line) + '</p>';
+  }
+  host.onclick = function(e){ var k = e.target.getAttribute && e.target.getAttribute('data-k'); if (k) draw(k); };
+  draw(state && F.data[state] ? state : F.states[0]);
+}
+var lastFocus = null;
+function openSheet(fig, state){
+  lastFocus = document.activeElement;
+  $('sheet-t').textContent = FIGS[fig].t;
+  mountFig($('sheet-b'), fig, state);
+  $('scrim').hidden = false; $('sheet').hidden = false; $('sheet').scrollTop = 0; $('sheet-x').focus();
+}
+function closeSheet(){ if ($('sheet').hidden) return; $('scrim').hidden = true; $('sheet').hidden = true; if (lastFocus && lastFocus.focus) lastFocus.focus(); }
+$('sheet-x').addEventListener('click', closeSheet); $('scrim').addEventListener('click', closeSheet);
+document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeSheet(); });
+document.addEventListener('click', function(e){ var c = e.target.closest && e.target.closest('[data-fig]'); if (c) openSheet(c.getAttribute('data-fig'), c.getAttribute('data-state')); var q = e.target.closest && e.target.closest('[data-plate]'); if (q){ lastFocus = document.activeElement; var id = q.getAttribute('data-plate'); $('sheet-t').textContent = PLATES[id].t; $('sheet-b').onclick = null; $('sheet-b').innerHTML = plateHTML(id); $('scrim').hidden = false; $('sheet').hidden = false; $('sheet').scrollTop = 0; $('sheet-x').focus(); } });
+Object.keys(PLATES).forEach(function(id){ var host = $('plate-' + id); if (host) host.innerHTML = plateHTML(id); });
+if (!Object.keys(PLATES).length) $('credit-line').hidden = true;
+document.querySelectorAll('[data-figure]').forEach(function(h){ mountFig(h, h.getAttribute('data-figure'), h.getAttribute('data-state')); });
+document.addEventListener('click', function(e){ var a = e.target.closest && e.target.closest('a[href^="#"]'); if (a){ var id = a.getAttribute('href').slice(1), el = $(id); if (el){ e.preventDefault(); var pan = el.closest('.panel'); if (pan) tabs.forEach(function(p){ if (p[1] === pan.id) show(p[0]); }); el.scrollIntoView(); } } });
+
+/* Source tab */
+$('lrtable').innerHTML = '<tr><th>Finding</th><th>LR, upper</th></tr>' + LR.map(function(r){ return '<tr><td>' + esc(r[0]) + '</td><td class="mono">' + esc(r[1]) + '</td></tr>'; }).join('');
+$('wu-first').innerHTML = WU_FIRST.map(function(s){ return '<li>' + esc(s) + '</li>'; }).join('');
+$('wu-then').innerHTML = WU_THEN.map(function(s){ return '<li>' + esc(s) + '</li>'; }).join('');
+var narSel = null;
+function drawNarrow(){
+  $('narseg').innerHTML = Object.keys(NFIND).map(function(k){ return '<button class="sbtn" type="button" data-v="' + k + '" aria-pressed="' + (k === narSel) + '">' + esc(NFIND[k].n) + '</button>'; }).join('');
+  $('narout').innerHTML = narrowRows(narSel).map(function(r){ return '<div class="cause' + (r.st ? ' ' + r.st : '') + '"><span>' + esc(r.name) + '</span><small>' + esc(r.why) + '</small></div>'; }).join('');
+}
+$('narseg').addEventListener('click', function(e){ var v = e.target.getAttribute('data-v'); if (v){ narSel = narSel === v ? null : v; drawNarrow(); } });
+drawNarrow();
+
+/* Learn tab */
+(function(){
+  var chaps = [].slice.call(document.querySelectorAll('.chap'));
+  $('pills').innerHTML = chaps.map(function(c, n){ return '<button class="pill" type="button" data-go="' + c.id + '" aria-current="' + (n === 0) + '">' + (n + 1) + ' ' + esc(c.getAttribute('data-pill')) + '</button>'; }).join('');
+  $('pills').addEventListener('click', function(e){ var g = e.target.getAttribute('data-go'); if (g) $(g).scrollIntoView(); });
+  function mark(id){ [].forEach.call($('pills').children, function(b){ var on = b.getAttribute('data-go') === id; b.setAttribute('aria-current', String(on)); if (on) $('pills').scrollLeft = Math.max(0, b.offsetLeft - 60); }); }
+  if ('IntersectionObserver' in window){
+    var io = new IntersectionObserver(function(es){ es.forEach(function(en){ if (en.isIntersecting) mark(en.target.id); }); }, {rootMargin: '-30% 0px -60% 0px'});
+    chaps.forEach(function(c){ io.observe(c); });
+  }
+  $('trialbox').innerHTML = TRIALS.map(function(t){ return '<div class="trial" style="margin-top:14px"><p><b>' + esc(t.q) + '</b></p><p><span class="k">Design</span>' + esc(t.d) + '</p><p><span class="k">Result</span>' + esc(t.r) + '</p><p><span class="k">What it changed</span>' + esc(t.c) + '</p><p class="mono" style="font-size:13px"><a href="https://doi.org/' + t.doi + '" rel="noopener">' + esc(t.cite) + '</a></p></div>'; }).join('');
+  $('go-prac').addEventListener('click', function(){ show('t-prac'); window.scrollTo(0, 0); });
+})();
+
+/* Practice: cases run through the same engine */
+$('practice').innerHTML = CASES.map(function(c, n){
+  return '<div class="card case"><p class="label">Case ' + (n + 1) + '</p><h2>' + esc(c.t) + '</h2><p>' + esc(c.s) + '</p><p><b>' + esc(c.q) + '</b></p><div class="row"><button class="btn" type="button" data-ans="' + n + '">Show the answer</button><button class="btn ghost" type="button" data-load="' + n + '">Open in the tool</button></div><div class="ans" id="ans' + n + '" hidden></div></div>';
+}).join('');
+function caseInput(c){ var inp = {find: 'none'}; Object.keys(c.i).forEach(function(k){ inp[k] = c.i[k]; }); NUMS.forEach(function(k){ if (inp[k] === undefined) inp[k] = null; }); return inp; }
+$('practice').addEventListener('click', function(e){
+  var a = e.target.getAttribute('data-ans'), l = e.target.getAttribute('data-load');
+  if (a != null){ var c = CASES[a], box = $('ans' + a), b = build(caseInput(c)); box.innerHTML = '<p>' + esc(c.p) + '</p>' + b.html.replace(/ id="[^"]*"/g, ''); box.hidden = false; e.target.hidden = true; }
+  if (l != null){ var c2 = CASES[l]; st = {sex: c2.i.sex || null, asaFor: c2.i.asaFor || null, find: c2.i.find || 'none', t: {}}; ALLT.forEach(function(t){ if (c2.i[t[0]]) st.t[t[0]] = true; }); drawInputs(); NUMS.forEach(function(k){ $(k).value = c2.i[k] != null ? c2.i[k] : ''; }); render(); show('t-tool'); window.scrollTo(0, 0); }
+});
+drawInputs(); render(); fromHash();
+})();
+</script>
+<script id="deeper-data">
+/* Go deeper: mechanism, rationale and the common trap for each Learn chapter. Text only; no doses or thresholds beyond the tool's own. */
+(function(){ var D = {"learn-where": [["Mechanism", "Blood from above the ligament of Treitz is exposed to gastric acid, then to enzymes and bacteria in the bowel, which turn hemoglobin black. Speed matters as much as site: the faster the bleed, the less time for that change."], ["Why it matters", "The likely site decides the first test: upper endoscopy for an upper source, colonoscopy or CT angiography for a lower one. Starting at the wrong end delays treatment."], ["Common trap", "Calling red blood per rectum a lower bleed in a patient who is unstable. A brisk upper bleed can look the same; consider upper endoscopy first when suspicion is high."]], "learn-bun": [["Mechanism", "Digested blood is absorbed as protein and turned into urea by the liver; low kidney perfusion adds to it by increasing urea reabsorption. Creatinine comes mainly from muscle, not from digested blood, so the ratio rises."], ["Why it matters", "A BUN to creatinine ratio over 30 points to an upper source, and the BUN is one of the strongest items in the Glasgow-Blatchford score."], ["Common trap", "Reading a high BUN as kidney injury alone and missing an upper bleed, or reading a normal BUN as proof of a lower source."]], "learn-portal": [["Mechanism", "In cirrhosis, portal pressure depends on resistance in the liver and on the volume flowing in. Transfusion and large fluid volumes raise that volume, and the pressure in the varix rises with it."], ["Why it matters", "In Villanueva 2013 the restrictive strategy lowered rebleeding and improved survival, with the benefit seen in Child-Pugh A and B cirrhosis. This is why variceal bleeding has a target of 7 to 8, not just a floor."], ["Common trap", "Giving plasma to fix the INR before banding. In cirrhosis the INR does not measure bleeding risk, and plasma adds volume and portal pressure."]], "learn-acid": [["Mechanism", "Platelet clumping and clot stability depend on pH; at the low pH of an acid stomach, pepsin digests the fibrin of a fresh clot. Raising the pH lets the clot persist while the ulcer heals."], ["Why it matters", "This is the reason for high-dose PPI after endoscopic treatment of a high-risk ulcer, and for once-daily PPI being enough for a clean-based ulcer."], ["Common trap", "Treating a PPI as a substitute for endoscopy. Before the scope it may downstage the lesion, but it does not replace or delay endoscopy."]], "learn-forrest": [["Mechanism", "The Forrest class describes what sits in the ulcer base: active bleeding, a vessel, a clot, a pigmented spot or nothing. Each reflects how exposed the underlying artery is."], ["Why it matters", "The class decides treatment: endoscopic therapy and high-dose PPI for active bleeding or a visible vessel, nothing beyond once-daily oral PPI for a flat spot or clean base."], ["Common trap", "Treating a flat pigmented spot as a visible vessel. A flat spot is a low-risk stigma and needs no endoscopic therapy."]], "learn-scores": [["Mechanism", "Both scores were built on outcomes that matter for disposition: the Glasgow-Blatchford score on the need for transfusion, endoscopic treatment or surgery in upper bleeding, the Oakland score on safe discharge in lower bleeding."], ["Why it matters", "A low score in the emergency department identifies patients who can go home with follow-up, saving admissions while rarely missing those who need treatment."], ["Common trap", "Using either score as a measure of severity in an admitted patient, or applying the Glasgow-Blatchford score to a suspected variceal bleed."]], "learn-thinners": [["Mechanism", "Holding a blood thinner removes one cause of continued bleeding, but each day off it the underlying reason for it, such as atrial fibrillation, a valve or coronary disease, keeps its clot risk."], ["Why it matters", "Secondary-prevention aspirin is continued or restarted the day hemostasis is confirmed, and anticoagulation is restarted once bleeding has stopped, because the clot risk usually outweighs the rebleeding risk."], ["Common trap", "Reversing every GI bleed on a DOAC or warfarin. The guideline suggests against routine reversal; most bleeds stop with resuscitation and endoscopy, and reversal agents add clot risk."]]};
+  function add(){ Object.keys(D).forEach(function(id){ var c = document.getElementById(id); if (!c || c.querySelector(":scope > .deeper")) return; var d = document.createElement("details"); d.className = "deeper"; d.innerHTML = "<summary>Go deeper: mechanism and rationale</summary><div class=\"dpx\">" + D[id].map(function(r){ return "<div><span class=\"dl\">" + r[0] + "</span><p>" + r[1] + "</p></div>"; }).join("") + "</div>"; c.appendChild(d); }); }
+  add();
+})();
+</script>
+</body>
+</html>
