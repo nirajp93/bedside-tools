@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Right heart cath and hemodynamics · bedside.tools</title>
+<meta name="description" content="Right heart catheterization interpreter: every derived number with its formula (SVR, PVR, gradients, cardiac power, PAPi, stroke volume), warm/cold and wet/dry profile, pulmonary hypertension by the 2022 ESC/ERS definition, shock and right-ventricle indices, Fick and thermodilution, waveforms and pitfalls.">
+<script src="/theme.js"></script>
+<style>
+:root{--bg:#FBFBFA;--card:#FFFFFF;--ink:#111113;--muted:#55555D;--line:#ECECEE;--accent:#2B4BDB;--warn:#9A3B00;--warnbg:#FFF6EC}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5}
+.mono{font-family:var(--mono)}
+.wrap{max-width:720px;margin:0 auto;padding:20px 16px 48px}
+a{color:var(--accent)}
+.back{font-size:14px;text-decoration:none;display:inline-block;min-height:44px;line-height:44px}
+h1{font-size:26px;margin:4px 0 4px;letter-spacing:-.01em}
+.purpose{color:var(--muted);margin:0 0 20px}
+.tabs{display:flex;gap:6px;margin-bottom:16px}
+.tab{flex:1;min-width:0;min-height:44px;border:1px solid var(--line);background:var(--card);border-radius:14px;padding:0 4px;font:inherit;font-size:15px;font-weight:600;color:var(--muted);cursor:pointer}
+.tab[aria-selected="true"]{border-color:var(--accent);color:var(--accent)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
+.label{font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.field{display:flex;flex-direction:column;justify-content:flex-end}
+.field label{display:block;font-size:13px;color:var(--muted);margin-bottom:4px}
+.field input,.field select{width:100%;min-height:44px;border:1px solid var(--line);border-radius:10px;padding:8px 10px;font:inherit;font-family:var(--mono);background:var(--card);color:var(--ink)}
+.field input:focus,.field select:focus,.tab:focus-visible,.chk:focus-within,button:focus-visible,summary:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.checks{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.chk{display:flex;align-items:center;gap:10px;min-height:44px;border:1px solid var(--line);border-radius:10px;padding:6px 10px;font-size:14px;cursor:pointer}
+.chk input{width:20px;height:20px;accent-color:var(--accent);flex:none}
+.card h2{font-size:18px;margin:0 0 2px}
+.sub{font-size:14px;color:var(--muted);margin:0}
+.card ul{margin:6px 0 0;padding-left:20px}
+.card li{margin-bottom:4px}
+.guard{border-left:3px solid var(--warn);background:var(--warnbg);padding:8px 10px;border-radius:0 10px 10px 0;margin-top:8px;font-size:14.5px}
+.tier{display:inline-block;font-family:var(--mono);font-size:11px;border:1px solid var(--line);border-radius:999px;padding:2px 8px;color:var(--muted);margin:6px 6px 0 0}
+details{margin-top:10px;border-top:1px solid var(--line);padding-top:8px}
+.whyline{margin:10px 0 0;font-size:14.5px;color:var(--muted)}
+.whyline b{color:var(--ink);font-weight:600}
+summary{cursor:pointer;color:var(--accent);font-weight:600;min-height:44px;line-height:44px}
+details p{margin:0 0 8px;font-size:15px}
+.btn{min-height:44px;border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);border-radius:10px;padding:8px 14px;font:inherit;font-weight:600;cursor:pointer}
+.btn.ghost{background:var(--card);color:var(--accent)}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.note{font-size:14px;color:var(--muted)}
+.links{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:8px;font-size:14.5px}
+.links a{display:inline-flex;align-items:center;min-height:44px}
+.tl{position:relative;padding-left:26px;margin-top:6px}
+.tl:before{content:"";position:absolute;left:8px;top:10px;bottom:10px;width:2px;background:var(--line)}
+.st{position:relative;padding:6px 0 10px}
+.st:before{content:"";position:absolute;left:-24px;top:11px;width:12px;height:12px;border-radius:50%;background:var(--card);border:2px solid var(--muted)}
+.st.now:before{background:var(--accent);border-color:var(--accent)}
+.st.done:before{background:var(--ok);border-color:var(--ok)}
+.st .when{font-family:var(--mono);font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+.st b{display:block}
+.st small{color:var(--muted);font-size:13.5px;display:block}
+.st.done b{color:var(--muted)}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:6px 6px 6px 0;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:var(--mono);font-size:11.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);font-weight:500}
+.case h2{font-size:17px}
+.ans{margin-top:10px;border-top:1px solid var(--line);padding-top:10px}
+footer{margin-top:28px;font-size:13.5px;color:var(--muted)}
+footer p{margin:0 0 8px}
+.panel{display:none}.panel.on{display:block}
+.fig{display:block;width:100%;max-width:460px;height:auto;margin:0 auto}
+.states{display:flex;gap:6px;overflow-x:auto;margin:10px -16px;padding:2px 16px 6px;scrollbar-width:none}
+.states::-webkit-scrollbar{display:none}
+.states.wrapit{flex-wrap:wrap;overflow:visible;margin:10px 0;padding:0}
+.sbtn{flex:none;min-height:44px;min-width:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--ink);font:inherit;font-size:14px;cursor:pointer;white-space:nowrap}
+.sbtn[aria-pressed="true"]{border-color:var(--accent);color:var(--accent);font-weight:600}
+.line1{font-size:15px;margin:10px 0 0}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.chip{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--fill);color:var(--ink);font:inherit;font-size:14px;cursor:pointer;text-align:left}
+.chip svg{flex:none;color:var(--accent)}
+.scrim{position:fixed;inset:0;background:var(--scrim);z-index:20}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:21;max-height:90vh;overflow-y:auto;background:var(--card);border:1px solid var(--line);border-bottom:0;border-radius:20px 20px 0 0;padding:8px 16px 24px;max-width:560px;margin:0 auto}
+.sheethead{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.sheethead h2{font-size:18px;margin:0}
+.xbtn{min-height:44px;min-width:44px;border:0;background:transparent;color:var(--accent);font:inherit;font-weight:600;cursor:pointer}
+.pills{position:sticky;top:var(--bt-bar,0px);z-index:5;background:var(--bg);display:flex;gap:6px;overflow-x:auto;margin:0 -16px 12px;padding:8px 16px;border-bottom:1px solid var(--line);scrollbar-width:none}
+.pills::-webkit-scrollbar{display:none}
+.pill{flex:none;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--muted);font:inherit;font-size:14px;cursor:pointer;white-space:nowrap}
+.pill[aria-current="true"]{border-color:var(--accent);color:var(--accent);font-weight:600}
+.chap{scroll-margin-top:70px}
+.cause{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:8px 0;border-top:1px solid var(--line);font-size:15px}
+.cause small{color:var(--muted);font-size:13px;text-align:right;flex:0 1 58%}
+.cause.less>span{color:var(--muted)}
+.cause.fav span{font-weight:700}
+.cause.fav span:before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--accent);margin-right:8px}
+.trial{border-left:3px solid var(--accent);padding-left:12px}
+.trial p{margin:0 0 6px;font-size:15px}
+.trial .k{font-family:var(--mono);font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);display:block}
+.sl input[type=range]{width:100%;min-height:44px;accent-color:var(--accent)}
+.sl label{display:flex;justify-content:space-between;font-size:13px;color:var(--muted);margin-top:8px}
+.sl label b{font-family:var(--mono);color:var(--ink)}
+.zs{display:flex;gap:2px;height:8px;margin-top:4px}
+.zs i{display:block;border-radius:99px;background:var(--line)}
+.zs i.on{background:var(--accent)}
+.zt{font-family:var(--mono);font-size:12.5px;color:var(--ink);margin:6px 0 0}
+.dp{margin-top:10px;border:1px solid var(--line);border-radius:12px;padding:2px 12px;background:var(--card)}
+.dp>div{padding:10px 0;border-top:1px solid var(--line)}
+.dp>div:first-child{border-top:0}
+.dp .label{margin:0 0 3px}
+.dp p{font-size:15px;margin:0}
+.clock{font-family:var(--mono);font-size:14px;margin:8px 0 0}
+.deeper{margin-top:14px;border-top:1px solid var(--line)}
+.deeper>summary{min-height:44px;display:flex;align-items:center;gap:8px;color:var(--accent);font-weight:600;font-size:15px;cursor:pointer;list-style:none;line-height:1.3}
+.deeper>summary::-webkit-details-marker{display:none}
+.deeper>summary::before{content:"+";font-family:var(--mono);font-size:18px;line-height:1;width:14px;text-align:center}
+.deeper[open]>summary::before{content:"\2212"}
+.deeper .dpx{border:1px solid var(--line);border-radius:12px;padding:2px 12px;background:var(--card);text-align:left}
+.deeper .dpx>div{padding:10px 0;border-top:1px solid var(--line)}
+.deeper .dpx>div:first-child{border-top:0}
+.deeper .dl{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500;margin:0 0 3px}
+.deeper p{font-size:15px;line-height:1.45;color:var(--ink);margin:0 0 4px}
+.plate{margin-top:10px;border:1px solid var(--line);border-radius:12px;padding:6px;background:var(--card)}
+.plate img{display:block;width:100%;height:auto;border-radius:8px}
+.credit{display:block;font-family:var(--mono);font-size:11px;color:var(--muted);text-align:right;margin:4px 2px 0}
+@media (min-width:900px){
+  .wrap{max-width:1040px}
+  #p-tool.on{display:grid;grid-template-columns:380px minmax(0,1fr);gap:20px;align-items:start}
+
+  .scoregrid{grid-template-columns:1fr 1fr 1fr}
+  #p-learn{max-width:720px;margin:0 auto}
+}
+@media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+.opt{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 10px;padding:9px 0;border-top:1px solid var(--line);font-size:15px;align-items:baseline}
+.opt .g{font-family:var(--mono);font-size:12px;color:var(--muted);text-align:right}
+.opt small{grid-column:1/-1;color:var(--muted);font-size:13.5px;line-height:1.4}
+.opt.lead>b:before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--accent);margin-right:8px}
+.opt.out>b{text-decoration:line-through;color:var(--muted)}
+.opt.dim>b{color:var(--muted)}
+.tag{display:inline-block;font-family:var(--mono);font-size:11px;font-weight:500;border-radius:999px;padding:1px 7px;border:1px solid var(--line);margin-left:6px;color:var(--muted)}
+.tag.here{color:var(--ok);border-color:var(--ok)}
+.tag.warn{color:var(--warn);border-color:var(--warn)}
+.sec{font-size:13px;color:var(--muted);margin:14px 0 0}
+.hint{font-size:13.5px;color:var(--muted);margin:8px 0 0}
+.checks.one{grid-template-columns:1fr}
+@media (max-width:420px){.checks{grid-template-columns:1fr}}
+.wk{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:4px;margin-top:10px}
+.wk div{border:1px solid var(--line);border-radius:10px;padding:6px 4px;font-family:var(--mono);font-size:11.5px;text-align:center;color:var(--muted);line-height:1.3}
+.wk div.on{border-color:var(--accent);color:var(--accent);font-weight:600}
+.score{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 10px;padding:7px 0;border-top:1px solid var(--line);font-size:15px}
+.score b{font-family:var(--mono)}
+.score small{grid-column:1/-1;color:var(--muted);font-size:13px}
+.big{font-family:var(--mono);font-size:22px;font-weight:700;margin:6px 0 0}
+.wsend{margin:6px 0 0;padding-left:20px}
+.res{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.nt td:nth-child(2){font-family:var(--mono);font-weight:700;width:38%}
+.nt td small{display:block;color:var(--muted);font-size:12.5px;font-family:var(--mono);font-weight:400}
+.nt td.hi{color:var(--warn)}
+.tw{overflow-x:auto}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+@media (max-width:420px){.grid3{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="/">← bedside.tools</a>
+<h1>Right heart cath and hemodynamics</h1>
+<p class="purpose">Enter the cath numbers: every derived value with its formula, the warm/cold and wet/dry profile, pulmonary hypertension by the current definition, shock and right-ventricle indices, and the pitfalls that make numbers lie.</p>
+
+<div class="tabs" role="tablist">
+  <button class="tab" role="tab" id="t-tool" aria-selected="true" aria-controls="p-tool">Interpret</button>
+  <button class="tab" role="tab" id="t-learn" aria-selected="false" aria-controls="p-learn">Learn</button>
+  <button class="tab" role="tab" id="t-prac" aria-selected="false" aria-controls="p-prac">Practice</button>
+</div>
+
+<div class="panel on" id="p-tool" role="tabpanel" aria-labelledby="t-tool">
+  <div id="inputs">
+  <div class="card" id="pressures">
+    <p class="label">Pressures (mmHg, end-expiration)</p>
+    <div class="grid3">
+      <div class="field"><label for="rap">RA mean</label><input id="rap" inputmode="decimal" autocomplete="off"></div>
+      <div class="field"><label for="pas">PA systolic</label><input id="pas" inputmode="decimal" autocomplete="off"></div>
+      <div class="field"><label for="pad">PA diastolic</label><input id="pad" inputmode="decimal" autocomplete="off"></div>
+      <div class="field"><label for="pam">PA mean</label><input id="pam" inputmode="decimal" autocomplete="off"></div>
+      <div class="field"><label for="pcwp">Wedge mean</label><input id="pcwp" inputmode="decimal" autocomplete="off"></div>
+      <div class="field"><label for="vw">Wedge v wave</label><input id="vw" inputmode="decimal" autocomplete="off"></div>
+      <div class="field"><label for="map">Systemic MAP</label><input id="map" inputmode="decimal" autocomplete="off"></div>
+      <div class="field"><label for="hr">Heart rate</label><input id="hr" inputmode="decimal" autocomplete="off"></div>
+    </div>
+  </div>
+  <div class="card" id="output">
+    <p class="label">Cardiac output</p>
+    <div class="grid3">
+      <div class="field"><label for="co">Thermodilution (L/min)</label><input id="co" inputmode="decimal" autocomplete="off"></div>
+      <div class="field"><label for="hb">Hemoglobin (g/dL)</label><input id="hb" inputmode="decimal" autocomplete="off"></div>
+      <div class="field"><label for="sao2">Arterial sat (%)</label><input id="sao2" inputmode="decimal" autocomplete="off"></div>
+      <div class="field"><label for="svo2">PA (mixed venous) sat (%)</label><input id="svo2" inputmode="decimal" autocomplete="off"></div>
+      <div class="field"><label for="vo2">Measured VO₂ (mL/min)</label><input id="vo2" inputmode="decimal" autocomplete="off"></div>
+    </div>
+    <p class="sec">Body size</p>
+    <div class="grid3">
+      <div class="field"><label for="ht">Height (cm)</label><input id="ht" inputmode="decimal" autocomplete="off"></div>
+      <div class="field"><label for="wt">Weight (kg)</label><input id="wt" inputmode="decimal" autocomplete="off"></div>
+      <div class="field"><label for="bsa">BSA from report (m²)</label><input id="bsa" inputmode="decimal" autocomplete="off"></div>
+    </div>
+  </div>
+  <div class="card" id="context">
+    <p class="label">Context</p>
+    <div class="checks" id="ticks-x"></div>
+  </div>
+  </div>
+  <div id="out"></div>
+</div>
+
+<div class="panel" id="p-learn" role="tabpanel" aria-labelledby="t-learn">
+  <div class="pills" id="pills"></div>
+  <div class="card chap" id="learn-path" data-pill="Path"><p class="label">1 · The path</p><h2>What the catheter reads in each chamber</h2><div id="plate-pa"></div><p class="sub" style="margin-top:12px">Tap a position. Normal values from the ESC/ERS 2022 table.</p><div data-figure="path"></div></div>
+  <div class="card chap" id="learn-waves" data-pill="Waves"><p class="label">2 · Waveforms</p><h2>a, c, x, v, y, and what each disease does to them</h2><p class="sub">Tap a state. Schematic right atrial trace, two beats.</p><div data-figure="wave"></div></div>
+  <div class="card chap" id="learn-profiles" data-pill="Profiles"><p class="label">3 · Warm or cold, wet or dry</p><h2>Two numbers place the patient in one of four boxes</h2><p class="sub">Tap a box.</p><div data-figure="prof"></div></div>
+  <div class="card chap" id="learn-ph" data-pill="PH"><p class="label">4 · Pulmonary hypertension</p><h2>Mean pressure, then wedge, then resistance</h2><p class="sub">Tap a type.</p><div data-figure="ph"></div></div>
+  <div class="card chap" id="learn-pvr" data-pill="PVR"><p class="label">5 · Resistance</p><h2>What each level of PVR means</h2><p class="sub">Drag the PVR.</p><div id="pvrslider"></div></div>
+  <div class="card chap" id="learn-output" data-pill="Output"><p class="label">6 · Cardiac output</p><h2>Fick, estimated Fick and thermodilution</h2><p class="sub">Tap a method.</p><div data-figure="co"></div></div>
+  <div class="card chap" id="trials" data-pill="Trials"><p class="label">7 · Evidence</p><h2>Does the PA catheter change outcomes?</h2><p class="sub">Two trials found no benefit from routine use; registries in cardiogenic shock favor it, but they are observational.</p><div id="trialbox"></div><div class="row"><button class="btn" id="go-prac">Try the practice cases</button></div></div>
+</div>
+
+<div class="panel" id="p-prac" role="tabpanel" aria-labelledby="t-prac">
+  <div id="practice"></div>
+</div>
+
+<div class="scrim" id="scrim" hidden></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-t" hidden>
+  <div class="sheethead"><h2 id="sheet-t"></h2><button class="xbtn" id="sheet-x">Close</button></div>
+  <div id="sheet-b"></div>
+</div>
+
+<footer>
+  <p><strong>For education only. Not a substitute for clinical judgment.</strong> Adults only. Pulmonary hypertension definitions are from the 2022 ESC/ERS guideline and the 7th World Symposium (2024), written for stable patients at rest. Shock thresholds are the 2026 SCAI SHOCK update (read in its public-comment draft) and the 2025 ACC concise guidance, and match the heart failure tool's Advanced tab. Cardiac power output, PAPi and RAP/wedge cut-offs come from single cohorts and predict outcome only modestly; they are shown as context, not as decision thresholds. Evidence tiers: ESC/ERS class and level; AHA/ACC class and level; expert consensus; cohort study; expert practice. Body surface area uses Du Bois unless the report's own value is entered; labs differ.</p>
+  <p>Privacy: everything runs in your browser. Nothing you enter is sent anywhere or stored, and there are no analytics. Do not enter names, record numbers, or dates of birth.</p>
+  <p id="credit-line">Learn figures marked so were created with BioRender.com.</p>
+  <p class="mono">Last reviewed: 2026-11-28</p>
+  <p><strong>Sources:</strong> Humbert M et al., 2022 ESC/ERS Guidelines for the diagnosis and treatment of pulmonary hypertension, Eur Heart J 2022;43:3618 · Kovacs G et al., Definition, classification and diagnosis of pulmonary hypertension (7th World Symposium), Eur Respir J 2024;64:2401324 · Sinha SS et al., 2025 ACC Concise Clinical Guidance on cardiogenic shock, J Am Coll Cardiol 2025;85:1618 · Baran DA et al., 2026 SCAI SHOCK Classification Expert Consensus Update, JSCAI 2026 (public-comment draft read) · Heidenreich PA et al., 2022 AHA/ACC/HFSA Heart Failure Guideline, Circulation 2022;145:e895 · Bootsma IT et al., pulmonary artery catheter review, Parts 1 and 2, J Clin Monit Comput 2022 and 2021 · Hsu S, Fang JC, Borlaug BA, hemodynamics review, 2022 (PMC8748277) · Harmon EK, Oh JK, Methodist DeBakey Cardiovasc J 2026;22(2):74 · Fincke R et al., J Am Coll Cardiol 2004;44:340 · Mendoza DD et al., Am Heart J 2007 · Korabathina R et al., Catheter Cardiovasc Interv 2012 · Morine KJ et al., J Card Fail 2016 · Kormos RL et al., J Thorac Cardiovasc Surg 2010;139:1316 · Berg DD et al., Eur Heart J Acute Cardiovasc Care 2023 · Narang N et al., Circulation 2014;129:203 · Vincent JL, De Backer D, Circulatory shock, N Engl J Med 2013;369:1726 · Du Bois D, Du Bois EF, Arch Intern Med 1916;17:863 · Trials: Binanay C et al. (ESCAPE), JAMA 2005;294:1625 · Harvey S et al. (PAC-Man), Lancet 2005;366:472 · Cooper LB et al., J Card Fail 2016;22:182.</p>
+</footer>
+</div>
+<script id="engine">
+/* Data and decision engine: no page access here, so the practice cases and the audits run the same code. */
+function has(v){ return v != null; }
+function f1(n){ return (Math.round(n * 10) / 10).toFixed(1); }
+function f2(n){ return (Math.round(n * 100) / 100).toFixed(2); }
+function r0(n){ return String(Math.round(n)); }
+
+var NUMS = ['rap','pas','pad','pam','pcwp','vw','map','hr','co','hb','sao2','svo2','vo2','ht','wt','bsa'];
+var TICKS_X = [['shock','Hypotensive or hypoperfused now'],['vaso','On a vasopressor'],['ino','On an inotrope'],['mcs','On a support device (balloon pump, Impella, ECMO)'],['vent','On a ventilator'],['tr','Severe tricuspid regurgitation'],['shunt','Shunt suspected'],['af','Atrial fibrillation'],['ami','Right ventricular infarction suspected'],['lvad','Being assessed for an LVAD']];
+var ALLT = TICKS_X;
+
+/* Normal values: 2022 ESC/ERS PH guideline Table 11 (SVR range: Bootsma Part 2). */
+var NORM = {rap: [2, 6], pas: [15, 30], pad: [4, 12], pam: [8, 20], pcwp: [null, 15], co: [4, 8], ci: [2.5, 4.0], sv: [60, 100], svi: [33, 47], svo2: [65, 80], pvr: [0.3, 2.0], svr: [800, 1200], pac: [2.3, null]};
+
+/* Du Bois body surface area (height cm, weight kg). */
+function dubois(ht, wt){ return 0.007184 * Math.pow(ht, 0.725) * Math.pow(wt, 0.425); }
+/* Fick: VO2 (mL/min) / (1.36 x Hb (g/dL) x 10 x (SaO2 - SvO2)), saturations as fractions; dissolved oxygen ignored. */
+function fick(vo2, hb, sa, sv){ var d = 1.36 * hb * 10 * ((sa - sv) / 100); return d > 0 ? vo2 / d : null; }
+
+function derive(i){
+  var o = {};
+  o.bsa = has(i.bsa) ? i.bsa : (has(i.ht) && has(i.wt) ? dubois(i.ht, i.wt) : null);
+  o.bsaSrc = has(i.bsa) ? 'report' : o.bsa ? 'Du Bois' : null;
+  if (has(i.hb) && has(i.sao2) && has(i.svo2)) {
+    if (has(i.vo2)) { o.fick = fick(i.vo2, i.hb, i.sao2, i.svo2); o.fickKind = 'direct'; }
+    else if (o.bsa) { o.vo2est = 125 * o.bsa; o.fick = fick(o.vo2est, i.hb, i.sao2, i.svo2); o.fickKind = 'estimated'; }
+  }
+  if (has(i.co)) { o.co = i.co; o.coSrc = 'thermodilution'; }
+  else if (o.fick) { o.co = o.fick; o.coSrc = o.fickKind === 'direct' ? 'direct Fick' : 'estimated Fick'; }
+  var co = o.co, pflow = co;
+  if (i.shunt) { o.shuntMode = true; co = null; o.co = null; pflow = o.fick || null; o.qp = o.fick || null; if (!o.fick && has(i.co)) o.coBad = true; }
+  if (co && o.bsa) o.ci = co / o.bsa;
+  if (co && has(i.hr)) o.sv = co / i.hr * 1000;
+  if (o.sv && o.bsa) o.svi = o.sv / o.bsa;
+  if (co && has(i.map) && has(i.rap)) { o.svr = 80 * (i.map - i.rap) / co; o.svrWU = (i.map - i.rap) / co; }
+  if (pflow && has(i.pam) && has(i.pcwp)) o.pvr = (i.pam - i.pcwp) / pflow;
+  if (has(i.pam) && has(i.pcwp)) o.tpg = i.pam - i.pcwp;
+  if (has(i.pad) && has(i.pcwp)) o.dpg = i.pad - i.pcwp;
+  if (o.sv && has(i.pas) && has(i.pad) && i.pas > i.pad) o.pac = o.sv / (i.pas - i.pad);
+  if (co && has(i.map)) o.cpo = i.map * co / 451;
+  if (has(i.pas) && has(i.pad) && has(i.rap) && i.rap > 0) o.papi = (i.pas - i.pad) / i.rap;
+  if (has(i.rap) && has(i.pcwp) && i.pcwp > 0) o.ratio = i.rap / i.pcwp;
+  return o;
+}
+
+function decide(i){
+  var o = derive(i), cards = [];
+  var onSupport = i.vaso || i.ino || i.mcs;
+  var anyIn = NUMS.some(function(k){ return has(i[k]); });
+
+  /* 1. Numbers */
+  var rows = [];
+  function out(v, lo, hi){ return v != null && ((lo != null && v < lo) || (hi != null && v > hi)); }
+  function row(name, val, unit, formula, n, flag){ rows.push('<tr><td>' + name + '<small>' + formula + '</small></td><td class="' + (flag ? 'hi' : '') + '">' + val + (unit ? ' ' + unit : '') + (n ? '<small>normal: ' + n + '</small>' : '') + '</td></tr>'); }
+  if (o.bsa) row('Body surface area', f2(o.bsa), 'm²', o.bsaSrc === 'report' ? 'from the report' : 'Du Bois: 0.007184 × height^0.725 × weight^0.425', '');
+  if (o.fick) row(o.shuntMode ? 'Pulmonary flow, Qp (' + o.fickKind + ' Fick)' : 'Fick output (' + o.fickKind + ')', f2(o.fick), 'L/min', 'VO₂ ÷ (1.36 × Hb × 10 × (SaO₂ − SvO₂))' + (o.vo2est ? '; VO₂ assumed 125 mL/min/m² × BSA = ' + r0(o.vo2est) : ''), o.shuntMode ? '' : '4 to 8', !o.shuntMode && out(o.fick, 4, 8));
+  if (has(i.co)) row('Thermodilution output', f2(i.co), 'L/min', 'measured', '4 to 8', out(i.co, 4, 8));
+  if (o.ci != null) row('Cardiac index', f2(o.ci), 'L/min/m²', 'output ÷ BSA (' + o.coSrc + ')', '2.5 to 4.0', out(o.ci, 2.5, 4.0));
+  if (o.sv != null) row('Stroke volume', r0(o.sv), 'mL', 'output ÷ heart rate × 1000', '60 to 100', out(o.sv, 60, 100));
+  if (o.svi != null) row('Stroke volume index', r0(o.svi), 'mL/m²', 'stroke volume ÷ BSA', '33 to 47', out(o.svi, 33, 47));
+  if (o.svr != null) row('Systemic vascular resistance', r0(o.svr), 'dyn·s·cm⁻⁵', '80 × (MAP − RA) ÷ output = ' + f1(o.svrWU) + ' WU', '800 to 1200', out(o.svr, 800, 1200));
+  if (o.pvr != null) row('Pulmonary vascular resistance', f1(o.pvr), 'WU', '(PA mean − wedge) ÷ ' + (o.shuntMode ? (o.coBad ? 'thermodilution (not valid with a shunt)' : 'pulmonary flow') : 'output'), '0.3 to 2.0', out(o.pvr, null, 2));
+  if (o.tpg != null) row('Transpulmonary gradient', r0(o.tpg), 'mmHg', 'PA mean − wedge', 'no cut-off used', false);
+  if (o.dpg != null) row('Diastolic pulmonary gradient', r0(o.dpg), 'mmHg', 'PA diastolic − wedge', 'no longer used to classify', false);
+  if (o.pac != null) row('PA compliance', f1(o.pac), 'mL/mmHg', 'stroke volume ÷ (PA systolic − PA diastolic)', 'over 2.3', out(o.pac, 2.3, null));
+  if (o.cpo != null) row('Cardiac power output', f2(o.cpo), 'W', 'MAP × output ÷ 451', 'see the shock card', o.cpo <= 0.53);
+  if (o.papi != null) row('PAPi', f2(o.papi), '', '(PA systolic − PA diastolic) ÷ RA', 'cut-off depends on setting', false);
+  if (o.ratio != null) row('RA ÷ wedge', f2(o.ratio), '', 'RA mean ÷ wedge mean', 'over 0.6 linked to worse outcome in cardiogenic shock (ACC 2025)', o.ratio > 0.6 && !!i.shock);
+  [['rap','RA mean'],['pas','PA systolic'],['pad','PA diastolic'],['pam','PA mean'],['pcwp','Wedge mean']].forEach(function(p){ if (has(i[p[0]])) { var n = NORM[p[0]]; row(p[1], r0(i[p[0]]), 'mmHg', 'measured', n[0] == null ? n[1] + ' or less' : n[0] + ' to ' + n[1], out(i[p[0]], n[0], n[1])); } });
+  if (has(i.svo2)) row('PA (mixed venous) saturation', r0(i.svo2), '%', 'measured from the PA', '65 to 80', out(i.svo2, 65, 80));
+  var num = {id: 'num-out', label: 'Derived numbers', head: rows.length ? 'Every value, with its formula' : 'Enter the cath numbers', more: [], tiers: ['ESC/ERS 2022 Table 11 normal values', 'Formulas: ESC/ERS 2022; Bootsma 2021 (SVR)'], links: [], guards: []};
+  if (rows.length) num.html = '<div class="tw"><table class="nt"><tr><th>Value and formula</th><th>Result</th></tr>' + rows.join('') + '</table></div>';
+  else num.sub = 'Pressures, then output (thermodilution, or hemoglobin and the two saturations for Fick), then height and weight. Each card below updates as you type.';
+  if (o.fickKind === 'estimated') { num.guards.push('Estimated Fick: the oxygen use is assumed, not measured. In 535 cath patients the assumption was more than 25% wrong in about 1 in 5, worst at high BMI. The 7th World Symposium does not suggest the indirect Fick method.'); num.why = 'Every resistance divides a pressure drop by flow, so an output that is 25% wrong makes SVR and PVR 25% wrong too.'; }
+  if (i.shunt) num.guards.push('Shunt suspected: thermodilution should not be used. With a left-to-right shunt the PA saturation is after the shunt, so Fick with it gives pulmonary flow (Qp), used here only for PVR. It assumes no right-to-left shunt (arterial saturation standing in for pulmonary vein saturation); if the arterial saturation is low, use a wedge or pulmonary vein saturation. Systemic output, index, SVR, cardiac power and the profile need a mixed venous sample from before the shunt and a saturation run, so they are not shown.');
+  if (has(i.svo2) && i.svo2 > 75) num.guards.push('PA saturation ' + i.svo2 + '%: over 75%, an oximetry run to look for a left-to-right shunt is recommended.');
+  if (i.tr && has(i.co)) num.guards.push('Severe tricuspid regurgitation: thermodilution may under- or over-read; sources disagree on how much. Compare with Fick if you can.');
+  if (has(i.co) && o.fick && !o.shuntMode) { var d = Math.abs(i.co - o.fick) / i.co * 100; num.list = ['Thermodilution ' + f2(i.co) + ' against ' + o.fickKind + ' Fick ' + f2(o.fick) + ' L/min: ' + r0(d) + '% apart.' + (d > 25 ? ' More than 25% apart: find out which to trust before acting on resistances.' : '')]; }
+  if (o.shuntMode && num.why) num.why = 'With an assumed oxygen use, Qp and so PVR can be 25% wrong.';
+  if (!num.why && rows.length) num.why = 'Resistances are pressure drops divided by flow; check the output method before trusting SVR or PVR.';
+  num.chips = [['plate:pa', '', 'Picture: the catheter in the heart'], ['path', '', 'Picture: the catheter path'], ['co', o.fickKind === 'estimated' ? 'est' : has(i.co) ? 'td' : 'fick', 'Picture: how output is measured']];
+  num.more.push('ESC/ERS 2022 normal values: RA 2 to 6, PA systolic 15 to 30, PA diastolic 4 to 12, PA mean 8 to 20, wedge 15 or less (mmHg); output 4 to 8 L/min; index 2.5 to 4.0; stroke volume 60 to 100 mL; index 33 to 47 mL/m²; PA saturation 65 to 80%; PVR 0.3 to 2.0 WU; PA compliance over 2.3 mL/mmHg. SVR 800 to 1200 dyn·s·cm⁻⁵ (Bootsma). Wood units × 80 = dyn·s·cm⁻⁵.');
+  num.more.push('Fick uses 1.36 mL oxygen per gram of hemoglobin (some labs use 1.34; the difference is under 2%) and ignores dissolved oxygen. The assumed VO₂ of 125 mL/min/m² is one of several formulas; all were often more than 25% off in cath patients. The 7th World Symposium: direct Fick is the reference, thermodilution (mean of at least three) a reliable alternative without a shunt.');
+  num.more.push('The DPG is no longer used to separate isolated from combined post-capillary PH (ESC/ERS 2022), though the guideline still mentions a high DPG and/or a high PVR as a marker of a severe pre-capillary component. The transpulmonary gradient is not part of any current definition.');
+  cards.push(num);
+
+  /* 2. Profile */
+  var pr = {id: 'prof-out', label: 'Profile', list: [], more: [], links: [['/hf/#advanced', 'Heart failure: Advanced tab']], tiers: ['SCAI SHOCK 2026 (draft read): CI under 2.2, wedge over 15', 'ACC 2025 concise guidance: RA over 15 right-sided']};
+  if (o.ci != null || has(i.pcwp) || has(i.rap)) {
+    var cold = o.ci != null && o.ci < 2.2, wetL = has(i.pcwp) && i.pcwp > 15, wetR = has(i.rap) && i.rap > 15;
+    var wetTxt = wetL && wetR ? 'wet on both sides' : wetL ? 'wet on the left' : wetR ? 'wet on the right' : (has(i.pcwp) ? 'dry' : '');
+    pr.head = o.ci == null ? (wetTxt ? 'Filling: ' + wetTxt + (o.shuntMode ? '; systemic output not calculated with a shunt' : '; output needed for warm or cold') : 'Needs output and filling pressures') : (cold ? 'Cold' : 'Warm') + (wetTxt ? ' and ' + wetTxt : '; enter the wedge');
+    pr.sub = (o.ci != null ? 'Cardiac index ' + f2(o.ci) + (cold ? ' (under 2.2). ' : ' (2.2 or more). ') : '') + (has(i.pcwp) ? 'Wedge ' + i.pcwp + (wetL ? ' (over 15). ' : ' (15 or less). ') : '') + (has(i.rap) ? 'RA ' + i.rap + (wetR ? ' (over 15).' : ' (15 or less).') : '');
+    pr.why = cold && (wetL || wetR) ? 'Low output with high filling pressure: the heart is failing as a pump, not running dry.' : cold ? 'Low output without high filling pressure: think of too little volume, or a right-sided or obstructive problem, before more inotrope.' : (wetL || wetR) ? 'Output is holding but filling pressure is high: congestion is the problem to treat.' : 'Output and filling pressure are in range.';
+    if (onSupport) pr.list.push('On a vasopressor, inotrope or device: these numbers are on support and understate how sick the heart is.');
+    if (o.ci != null && o.ci >= 2.2 && o.ci < 2.5) pr.list.push('Index 2.2 to under 2.5: above the shock threshold but below the normal range.');
+    if (cold && !i.shock) pr.list.push('Index under 2.2 is the shock-staging threshold; in a stable patient it marks low output, not shock by itself.');
+  } else { pr.head = 'Needs output and filling pressures'; pr.sub = 'Cardiac index and wedge place the patient; RA pressure shows right-sided congestion.'; }
+  pr.chips = [['prof', o.ci != null && has(i.pcwp) ? ((o.ci < 2.2 ? 'c' : 'w') + (i.pcwp > 15 ? 'w' : 'd')) : '', 'Picture: the four boxes']];
+  pr.more.push('Thresholds: cold is a cardiac index under 2.2 L/min/m² and left-sided wet a wedge over 15 mmHg (SCAI stage C); right-sided congestion is an RA pressure over 15 mmHg (ACC 2025). SCAI stage A reference: index 2.5 or more (if acute), CVP under 10, wedge under 15, PA saturation 65% or more. These match the heart failure tool’s Advanced tab.');
+  cards.push(pr);
+
+  /* 3. Pulmonary hypertension */
+  var ph = {id: 'ph-out', label: 'Pulmonary hypertension', list: [], guards: [], more: [], tiers: ['ESC/ERS 2022 Table 5 definitions', '7th World Symposium 2024 (unchanged)', 'ESC/ERS 2022: PVR over 5 WU severe pre-capillary component, class I, level C']};
+  if (!has(i.pam)) { ph.head = 'Needs the PA mean'; ph.sub = 'PH is a PA mean over 20 mmHg; then the wedge and PVR decide the type.'; }
+  else if (i.pam <= 20) { ph.head = 'No pulmonary hypertension at rest'; ph.sub = 'PA mean ' + i.pam + ' mmHg (20 or less).'; ph.why = 'The upper limit of normal for the PA mean is 20 mmHg.'; }
+  else if (!has(i.pcwp)) { ph.head = 'PA mean ' + i.pam + ': pulmonary hypertension; type needs the wedge'; }
+  else {
+    var pv = o.pvr;
+    if (i.pcwp <= 15) {
+      if (pv == null) ph.head = 'PH, wedge 15 or less: needs output for PVR';
+      else if (pv > 2) { ph.head = 'Pre-capillary pulmonary hypertension'; ph.why = 'A raised PVR with a normal wedge means the problem is in the lung vessels, not back-pressure from the left heart.'; }
+      else { ph.head = 'Unclassified: high pressure, normal resistance and wedge'; ph.why = 'A high PA mean with normal PVR and wedge usually reflects high flow (for example anemia, shunt, liver disease).'; }
+    } else {
+      if (pv == null) ph.head = 'Post-capillary pulmonary hypertension: needs output for PVR';
+      else if (pv > 2) { ph.head = 'Combined post- and pre-capillary PH'; ph.why = 'The wedge is high (left-heart back-pressure) and PVR is also high: a vascular component on top.'; }
+      else { ph.head = 'Isolated post-capillary PH'; ph.why = 'The high pressure is passed back from the left heart; the lung vessels themselves are not adding resistance.'; }
+    }
+    ph.sub = 'PA mean ' + i.pam + ', wedge ' + i.pcwp + (pv != null ? ', PVR ' + f1(pv) + ' WU.' : '.');
+    if (pv != null && pv > 5) ph.list.push('PVR over 5 WU: a severe pre-capillary component (ESC/ERS 2022); refer to a PH center.');
+    if (i.pcwp <= 15 && ((i.pam < 25) || (pv != null && pv > 2 && pv <= 3))) ph.list.push((i.pam < 25 ? 'PA mean 21 to 24' : 'PVR 2 to 3') + ': in a patient with a risk condition this is "early PH" (7th World Symposium). The PAH drugs were approved in trials of PA mean 25 or more, wedge 15 or less and PVR over 3, and are meant for patients meeting that definition.');
+    if (i.pcwp >= 12 && i.pcwp <= 18) ph.list.push('Wedge 12 to 18: the grey zone. Look at the whole patient (risk factors, echo, edema history); a fluid challenge or exercise can help.');
+    if (ph.head === 'Pre-capillary pulmonary hypertension') ph.list.push('Pre-capillary is not the same as PAH: lung disease, chronic clots and other groups are pre-capillary too.');
+  }
+  if (o.coBad && o.pvr != null) ph.guards.push('PVR here uses thermodilution, which is not valid with a shunt: recalculate with Fick before classifying.');
+  if (i.shock || onSupport) ph.guards.push('These definitions are for stable patients at rest. In shock or on vasoactive drugs, interpret the numbers in that context; diuretics and drugs can shift the class.');
+  ph.chips = [['ph', ph.head && ph.head.indexOf('Pre-capillary') === 0 ? 'pre' : ph.head && ph.head.indexOf('Isolated') === 0 ? 'ipc' : ph.head && ph.head.indexOf('Combined') === 0 ? 'cpc' : ph.head && ph.head.indexOf('Unclassified') === 0 ? 'unc' : '', 'Picture: the PH decision'], ['pvr', '', 'Slider: PVR zones']];
+  ph.more.push('ESC/ERS 2022 and the 7th World Symposium: PH = PA mean over 20 mmHg. Pre-capillary: wedge 15 or less and PVR over 2 WU. Isolated post-capillary: wedge over 15 and PVR 2 or less. Combined: wedge over 15 and PVR over 2. Exercise PH: PA mean/output slope over 3 mmHg/L/min. Upper limit of normal wedge is 13 (World Symposium), but 15 remains the threshold.');
+  ph.more.push('Vasoreactivity (only in idiopathic, heritable or drug-associated PAH): a positive test is a fall in PA mean of at least 10 mmHg to under 40 mmHg with unchanged or higher output. Fluid challenge: a wedge over 18 mmHg after 500 mL of saline may suggest left heart disease (World Symposium).');
+  cards.push(ph);
+
+  /* 4. Shock and the right ventricle */
+  var sh = {id: 'shock-out', label: 'Shock and the right ventricle', list: [], guards: [], more: [], links: [['/shock/', 'Undifferentiated shock'], ['/pressors/', 'Vasopressors']], tiers: ['ACC 2025 concise guidance (expert consensus)', 'Fincke 2004, Mendoza 2007, Korabathina 2012, Morine 2016, Kormos 2010: cohort studies', 'AHA/ACC 2022: PA line in shock 2b, B-NR']};
+  var lowCI = o.ci != null && o.ci < 2.2, wL = has(i.pcwp) && i.pcwp > 15, wR = has(i.rap) && i.rap > 15;
+  if (i.shock) {
+    if (lowCI && wL && wR) { sh.head = 'Cardiogenic pattern, both ventricles congested'; sh.why = 'Low output with both filling pressures high: biventricular failure. If RA, PA diastolic and wedge are nearly equal, think of tamponade, constriction or restriction.'; }
+    else if (lowCI && wL && has(i.rap)) { sh.head = 'Cardiogenic pattern, left-dominant'; sh.why = 'Low output with a high wedge and RA 15 or less: the left ventricle is failing.'; }
+    else if (lowCI && wR && has(i.pcwp)) { sh.head = 'Right-dominant low output'; sh.why = 'High RA with a wedge of 15 or less and low output: right ventricular failure, PE or RV infarction; the left side is underfilled.'; sh.links.unshift(['/pe-highrisk/', 'High-risk PE']); }
+    else if (lowCI && has(i.pcwp) && has(i.rap) && i.rap <= 6 && i.pcwp <= 12) { sh.head = 'Low output with low filling pressures'; sh.why = 'Low output with low RA and wedge fits too little volume (bleeding, losses, over-diuresis) rather than pump failure.'; }
+    else if (o.ci != null && o.ci >= 2.5 && o.svr != null && o.svr < 800) { sh.head = 'High output, low resistance'; sh.why = 'Shock with a normal or high output and low SVR fits a distributive state (sepsis, anaphylaxis, liver failure); an inodilator can do the same.'; sh.links.unshift(['/sepsis/', 'Sepsis']); }
+    else { sh.head = 'Shock: pattern not clear from these numbers'; sh.sub = o.ci == null ? (o.shuntMode ? 'With a shunt, systemic output is not calculated here.' : 'Enter output, RA, wedge and MAP; use the shock tool for the bedside sort.') : (lowCI ? 'Low output with mid-range or missing filling pressures' : 'Output not low, and SVR not low or not entered') + ': no clear pattern here; use the shock tool for the bedside sort.'; }
+    if (onSupport) sh.list.push('Numbers on vasopressors, inotropes or a device understate severity; read them with the doses.');
+  } else { sh.head = 'Right-ventricle and shock indices'; sh.sub = 'Tick "hypotensive or hypoperfused" for the shock pattern. The indices below are context, not decisions.'; }
+  if (o.cpo != null) sh.list.push('Cardiac power ' + f2(o.cpo) + ' W' + (o.cpo <= 0.53 ? ': 0.53 or less. In the SHOCK registry, in-hospital death was 58% at or below this cut-off (sensitivity and specificity 0.66).' : ': above 0.53, the SHOCK-registry cut-off (modest accuracy).'));
+  if (o.papi == null && has(i.rap) && i.rap === 0) sh.list.push('PAPi cannot be calculated with an RA pressure of 0.');
+  if (o.papi != null) sh.list.push('PAPi ' + f2(o.papi) + (i.ami ? (o.papi <= 0.9 ? ': 0.9 or less, which predicted death or need for RV support in a 20-patient RV infarction study.' : ': above 0.9, the RV infarction cut-off from a 20-patient study.') : i.lvad ? (o.papi < 1.85 ? ': under 1.85, which predicted RV failure after LVAD (sensitivity 94%, specificity 81%).' : ': 1.85 or more, above the LVAD cut-off.') : ': cut-offs differ by setting (0.9 or less in RV infarction; under 1.85 before LVAD).') + (has(i.rap) && i.rap <= 10 ? ' Most useful when RA is over 10.' : '') + (has(i.pas) && i.pas > 50 ? ' Less useful with PA systolic over 50.' : ''));
+  if (o.ratio != null) sh.list.push('RA ÷ wedge ' + f2(o.ratio) + (o.ratio > 0.6 ? ': over 0.6, a right-sided pattern.' : ': 0.6 or less.') + (i.lvad && o.ratio > 0.63 ? ' Over 0.63 predicted RV failure after LVAD (odds ratio 2.3).' : ''));
+  if (i.af) sh.list.push('Atrial fibrillation: no a wave; read the RA and wedge at end-diastole.');
+  sh.chips = [['prof', '', 'Picture: the four boxes']];
+  sh.more.push('ACC 2025: left-dominant congestion has a wedge or LVEDP over 15; right-dominant has a relatively normal wedge with RA over 15; biventricular has both raised. An RA/wedge ratio over 0.6 and a low PAPi are linked to worse outcomes. PAPi is most useful with RA over 10 and PA systolic 50 or less; low is 0.9 or less in RV infarction (Korabathina; ACC 2025 writes under 0.9 in MI shock) and under 1.85 before LVAD. The cut-offs for low filling pressures (RA 6, wedge 12, the upper normal values) and for low SVR with normal output (SVR under 800, index 2.5 or more) are this tool’s choices (expert practice), not guideline thresholds.');
+  sh.more.push('Hemodynamic patterns follow Vincent and De Backer (NEJM 2013) and the shock tool: low output with low filling pressures in hypovolemia; low output with high filling pressures in cardiogenic and obstructive shock; low SVR with usually high output in distributive shock. AHA/ACC 2022: a PA line may be considered in cardiogenic shock (2b, B-NR); routine invasive monitoring in heart failure is not recommended (3: No Benefit, B-R).');
+  cards.push(sh);
+
+  /* 5. Pitfalls */
+  var pt = {id: 'pit-out', label: 'Before you trust the numbers', list: [], guards: [], more: [], tiers: ['ESC/ERS 2022 and 7th World Symposium technique statements', 'Bootsma 2021-2022 and Hsu 2022 reviews']};
+  pt.head = 'Pitfalls that change the reading';
+  if (has(i.vw) && has(i.pcwp) && i.vw - i.pcwp >= 10) pt.guards.push('Large v wave (' + i.vw + ' against a mean of ' + i.pcwp + '): read the wedge at the a wave, not the v wave. Causes: mitral regurgitation, a stiff left atrium, high volume. The height of the v wave is a poor guide to how severe the regurgitation is. (Flagged when the v wave is 10 or more above the mean: expert practice.)');
+  if (i.vent) pt.guards.push('On a ventilator: end-expiration is the lowest point of the respiratory swing (in a patient breathing on their own it is the highest). PEEP 10 cmH₂O or more can make pressures overstate the left atrium.');
+  pt.list.push('Zero at the mid-chest (left atrial level), patient supine; read every pressure at end-expiration without a breath-hold, or average several breaths if swings are large.');
+  pt.list.push('Wedge: mean at mid to end a wave (before the QRS). Confirm the position with the waveform; a wedge saturation can confirm a true wedge. If the wedge is unreliable, measure LVEDP.');
+  pt.list.push('Output: thermodilution as the mean of at least three; not with a shunt. Estimated Fick can be over 25% wrong.');
+  pt.list.push('Cardiac power output leaves out RA pressure; in one large shock registry neither it nor cardiac index predicted mortality.');
+  pt.why = 'Most errors in a cath report come from where on the trace the number was read, not from the arithmetic.';
+  pt.chips = [['wave', has(i.vw) && has(i.pcwp) && i.vw - i.pcwp >= 10 ? 'mr' : i.tr ? 'tr' : i.af ? 'af' : '', 'Picture: waveforms']];
+  pt.more.push('ESC/ERS 2022: all pressures including the wedge at end-expiration without breath-holding; zero at the mid-thoracic level; output by direct Fick or thermodilution; indirect Fick less reliable; no thermodilution with shunts; consider LVEDP when the wedge is implausible; an oximetry run when PA saturation is over 75%.');
+  cards.push(pt);
+
+  return {cards: cards, d: o};
+}
+
+/* PVR slider zones: 2022 ESC/ERS and the 7th World Symposium. */
+var PVRZ = [
+  {max: 2, n: '2 WU or less: normal', what: 'Lung vessels add little resistance to flow.', why: '2 WU is the upper limit of normal and the lowest PVR linked to prognosis.', bed: 'With a high wedge this is isolated post-capillary PH; with a normal wedge and high PA mean, think of high flow.'},
+  {max: 3, n: 'Over 2 to 3 WU', what: 'Mild rise in pulmonary vascular resistance.', why: 'Over 2 WU defines a pre-capillary component; 2 to 3 WU with a risk condition is "early PH".', bed: 'PAH drugs for this range lack justification (World Symposium): the drug trials used over 3 WU.'},
+  {max: 5, n: 'Over 3 to 5 WU', what: 'Established pre-capillary disease or a combined picture with left heart disease.', why: 'PAH drug trials enrolled patients with PVR over 3 WU and PA mean 25 or more.', bed: 'Classify the group (heart, lung, clots, PAH) at a PH center before treating.'},
+  {max: 99, n: 'Over 5 WU', what: 'Severe pre-capillary component.', why: 'Over 5 WU carries worse prognosis in lung disease and marks a severe pre-capillary component in left heart disease (ESC/ERS 2022).', bed: 'Refer to an expert PH center; individualized treatment (class I, level C in left heart disease).'}
+];
+function pvrZone(v){ for (var k = 0; k < PVRZ.length; k++) if (v <= PVRZ[k].max) return k; return PVRZ.length - 1; }
+
+var TRIALS = [
+  {q: 'Does a PA catheter help in advanced heart failure? (ESCAPE)', d: '433 patients at 26 sites with severe heart failure (mean EF 19%); therapy guided by clinical assessment plus a PA catheter (targets wedge 15, RA 8) against clinical assessment alone.', r: 'Days alive out of hospital at 6 months 133 against 135 (HR 1.00, 0.82 to 1.21); deaths 10% against 9%. In-hospital adverse events 21.9% against 11.5%.', c: 'Behind the 2022 guideline’s advice against routine invasive monitoring in heart failure (3: No Benefit).', cite: 'Binanay C et al. JAMA 2005;294:1625', doi: '10.1001/jama.294.13.1625'},
+  {q: 'Does a PA catheter help in general ICU patients? (PAC-Man)', d: '1041 patients in 65 UK ICUs; management with or without a PA catheter, at the clinician’s discretion.', r: 'Hospital mortality 68% against 66% (adjusted HR 1.09, 0.94 to 1.27). Complications of insertion in 46 of 486, none fatal.', c: 'No benefit or harm from routine use; the catheter is a measuring tool, not a treatment.', cite: 'Harvey S et al. Lancet 2005;366:472', doi: '10.1016/S0140-6736(05)67061-4'},
+  {q: 'Which number predicts death in cardiogenic shock? (Fincke, SHOCK registry)', d: 'Observational: 541 patients in the SHOCK trial registry of cardiogenic shock; cardiac power output available in about 180.', r: 'Cardiac power was the strongest hemodynamic correlate of in-hospital death (odds ratio 0.60 per 0.2 W). A cut-off of 0.53 W had sensitivity and specificity of 0.66; death 58% at or below it.', c: 'Observational. A later shock registry (Berg 2023) found cardiac power not associated with mortality.', cite: 'Fincke R et al. J Am Coll Cardiol 2004;44:340', doi: '10.1016/j.jacc.2004.03.060'},
+  {q: 'Do final catheter numbers predict outcome? (ESCAPE catheter arm)', d: 'Observational analysis of the patients in the ESCAPE catheter arm.', r: 'In 151 patients with final measurements, a final wedge of 20 or more was linked to death, cardiovascular hospitalization or transplant (HR 2.03, 1.31 to 3.15), as was a higher final RA pressure (HR 1.09 per mmHg); final cardiac index was not.', c: 'Supports decongestion as the target rather than output. Observational.', cite: 'Cooper LB et al. J Card Fail 2016;22:182', doi: '10.1016/j.cardfail.2015.11.012'}
+];
+
+var CASES = [
+  {t: 'Breathless with scleroderma', s: 'RA 8, PA 62/24 (mean 38), wedge 9. Thermodilution 4.0 L/min. 165 cm, 60 kg. Stable.', q: 'Classify it.', i: {rap: 8, pas: 62, pad: 24, pam: 38, pcwp: 9, co: 4.0, ht: 165, wt: 60, hr: 80}, p: 'PVR (38 − 9) ÷ 4.0 = 7.3 WU with a wedge of 9: pre-capillary PH, with a PVR over 5. Refer to a PH center; group 1 is likely in scleroderma, but lung disease must be excluded.'},
+  {t: 'HFpEF with high pressures', s: 'RA 14, PA 50/24 (mean 34), wedge 24, v wave 30. Thermodilution 5.0. 170 cm, 95 kg.', q: 'Isolated or combined?', i: {rap: 14, pas: 50, pad: 24, pam: 34, pcwp: 24, vw: 30, co: 5.0, ht: 170, wt: 95, hr: 75}, p: 'PVR (34 − 24) ÷ 5.0 = 2.0 WU with wedge 24: isolated post-capillary PH. Warm and wet on the left. Treat the left heart.'},
+  {t: 'Same pressures, lower output', s: 'RA 14, PA 62/30 (mean 44), wedge 24. Thermodilution 3.6. 170 cm, 95 kg.', q: 'Has the type changed?', i: {rap: 14, pas: 62, pad: 30, pam: 44, pcwp: 24, co: 3.6, ht: 170, wt: 95, hr: 80}, p: 'PVR (44 − 24) ÷ 3.6 = 5.6 WU: combined post- and pre-capillary PH, with a severe pre-capillary component (over 5 WU).'},
+  {t: 'Cold and wet after an anterior MI', s: 'Hypotensive. RA 12, PA 42/26 (mean 32), wedge 26. Thermodilution 3.2. MAP 62. 178 cm, 85 kg. Heart rate 110.', q: 'Profile and cardiac power?', i: {shock: true, rap: 12, pas: 42, pad: 26, pam: 32, pcwp: 26, co: 3.2, map: 62, ht: 178, wt: 85, hr: 110}, p: 'Index about 1.6: cold and wet on the left; cardiogenic, left-dominant. Cardiac power 62 × 3.2 ÷ 451 = 0.44 W, under 0.53. RA/wedge 0.46.'},
+  {t: 'Inferior MI, clear lungs, low pressure', s: 'Hypotensive. RA 18, PA 26/14 (mean 18), wedge 12. Thermodilution 3.0. MAP 60. 175 cm, 80 kg.', q: 'Which ventricle?', i: {shock: true, ami: true, rap: 18, pas: 26, pad: 14, pam: 18, pcwp: 12, co: 3.0, map: 60, ht: 175, wt: 80, hr: 95}, p: 'Right-dominant low output: RA 18 over wedge 12 (ratio 1.5), PAPi (26 − 14) ÷ 18 = 0.67, at or below 0.9. RV infarction pattern.'},
+  {t: 'Warm and vasodilated', s: 'Hypotensive with fever. RA 6, PA 30/14 (mean 20), wedge 10. Thermodilution 8.5. MAP 58. 170 cm, 70 kg.', q: 'What pattern?', i: {shock: true, rap: 6, pas: 30, pad: 14, pam: 20, pcwp: 10, co: 8.5, map: 58, ht: 170, wt: 70, hr: 120}, p: 'Index about 4.7, SVR 80 × (58 − 6) ÷ 8.5 = 489: high output, low resistance, a distributive pattern.'},
+  {t: 'Dry after diuresis', s: 'Hypotensive after a large diuresis. RA 2, wedge 6, PA 22/8 (mean 13). Thermodilution 3.4. MAP 60. 165 cm, 70 kg.', q: 'Pump failure?', i: {shock: true, rap: 2, pas: 22, pad: 8, pam: 13, pcwp: 6, co: 3.4, map: 60, ht: 165, wt: 70, hr: 105}, p: 'Index about 1.9 with low RA and wedge: low output with low filling pressures, too little volume rather than pump failure.'},
+  {t: 'Estimated Fick in a big patient', s: 'Hb 12, arterial sat 95%, PA sat 62%. No measured VO₂ and no thermodilution. 175 cm, 140 kg. RA 10, PA mean 30, wedge 18, heart rate 90.', q: 'How far can you trust the PVR?', i: {hb: 12, sao2: 95, svo2: 62, ht: 175, wt: 140, rap: 10, pam: 30, pcwp: 18, hr: 90}, p: 'Estimated Fick gives 5.8 L/min and a PVR of 2.1, which just tips the class to combined post- and pre-capillary PH. The assumed VO₂ is often more than 25% wrong, worst at high BMI, so the class is not secure: measure VO₂ or use thermodilution.'},
+  {t: 'High saturation in the PA', s: 'PA sat 82%, arterial 97%. Thermodilution 7.5. PA mean 28, wedge 10.', q: 'What next?', i: {svo2: 82, sao2: 97, co: 7.5, pam: 28, pcwp: 10, shunt: true}, p: 'PA saturation over 75%: oximetry run for a left-to-right shunt; thermodilution is not valid with a shunt, so use Fick.'},
+  {t: 'LVAD work-up', s: 'RA 14, PA 40/22 (mean 28), wedge 20. Thermodilution 3.8. 180 cm, 90 kg.', q: 'Right ventricle?', i: {lvad: true, rap: 14, pas: 40, pad: 22, pam: 28, pcwp: 20, co: 3.8, ht: 180, wt: 90, hr: 85}, p: 'PAPi (40 − 22) ÷ 14 = 1.29, under 1.85; RA/wedge 0.70, over 0.63. Both predicted RV failure after LVAD in cohort studies.'}
+];
+</script>
+<script id="figs">
+/* Figures: site-drawn SVG, shared colour names only. Schematic, not to scale. */
+var FM = 'font-family:var(--mono)';
+function svgOpen(vb, label){ return '<svg viewBox="' + vb + '" role="img" aria-label="' + label + '" class="fig">'; }
+function tx(x, y, t, o){ o = o || {}; return '<text x="' + x + '" y="' + y + '" text-anchor="' + (o.a || 'middle') + '" style="' + FM + ';font-size:' + (o.s || 11.5) + 'px;font-weight:' + (o.w || 400) + ';fill:' + (o.c || 'var(--ink)') + '">' + t + '</text>'; }
+function rect(x, y, w, h, st){ var s = st === 'hot' ? 'fill:var(--card);stroke:var(--accent);stroke-width:2.5' : st === 'dim' ? 'fill:var(--fill);stroke:var(--line);stroke-width:1.5' : st === 'ok' ? 'fill:var(--okbg);stroke:var(--ok);stroke-width:2' : st === 'bad' ? 'fill:var(--badbg);stroke:var(--bad);stroke-width:2' : 'fill:var(--card);stroke:var(--muted);stroke-width:1.5'; return '<rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="10" style="' + s + '"/>'; }
+function arrow(x1, y1, x2, y2, hot){ var c = hot ? 'var(--accent)' : 'var(--muted)'; var a = Math.atan2(y2 - y1, x2 - x1), l = 7; return '<line x1="' + x1 + '" y1="' + y1 + '" x2="' + x2 + '" y2="' + y2 + '" style="stroke:' + c + ';stroke-width:' + (hot ? 2.5 : 1.5) + '"/><path d="M' + x2 + ' ' + y2 + ' L' + (x2 - l * Math.cos(a - 0.45)) + ' ' + (y2 - l * Math.sin(a - 0.45)) + ' L' + (x2 - l * Math.cos(a + 0.45)) + ' ' + (y2 - l * Math.sin(a + 0.45)) + ' Z" style="fill:' + c + '"/>'; }
+
+/* 1. Catheter path with ESC/ERS 2022 normal values. */
+var PTH = {
+  ra: {n: 'Right atrium', k: 0, v: 'RA mean 2 to 6', line: 'The RA mean is the right ventricle’s filling pressure. Over 15 means right-sided congestion (ACC 2025).'},
+  rv: {n: 'Right ventricle', k: 1, v: 'systolic as PA; diastolic low', line: 'RV systolic pressure matches the PA systolic when the pulmonary valve is normal; a dip-and-plateau diastolic trace suggests constriction, restriction or RV failure.'},
+  pa: {n: 'Pulmonary artery', k: 2, v: 'PA 15 to 30 / 4 to 12, mean 8 to 20', line: 'A PA mean over 20 mmHg is pulmonary hypertension. The PA sample gives the mixed venous saturation (65 to 80%).'},
+  w: {n: 'Wedge', k: 3, v: 'wedge 15 or less', line: 'With the balloon inflated, the catheter reads back through the lung veins to the left atrium. Over 15 means left-sided congestion or post-capillary PH.'}
+};
+function pathSVG(k){
+  var S = PTH[k], h = svgOpen('0 0 360 220', 'Catheter path from right atrium to wedge');
+  var bx = [[14, 'RA'], [100, 'RV'], [186, 'PA'], [272, 'Wedge']];
+  bx.forEach(function(b, n){ h += rect(b[0], 40, 74, 56, n === S.k ? 'hot' : n < S.k ? '' : 'dim') + tx(b[0] + 37, 74, b[1], {w: 700, c: n <= S.k ? 'var(--ink)' : 'var(--muted)'}); if (n < 3) h += arrow(b[0] + 74, 68, b[0] + 86, 68, n < S.k); });
+  h += tx(180, 132, S.v, {s: 12, w: 600, c: 'var(--accent)'});
+  h += tx(180, 160, 'catheter advanced from a central vein', {s: 10.5, c: 'var(--muted)'});
+  h += tx(180, 180, 'all pressures at end-expiration, zeroed mid-chest', {s: 10.5, c: 'var(--muted)'});
+  return h + '</svg>';
+}
+
+/* 2. RA waveform (Bootsma Part 1; Hsu 2022; Harmon & Oh 2026). Points: [x, y] over one beat of 150 units; y larger = lower pressure. */
+var WV = {
+  norm: {n: 'Normal', pts: [[0, 80], [18, 62], [30, 74], [38, 68], [62, 88], [92, 64], [118, 86], [150, 80]], lab: {a: [18, 62], c: [38, 68], x: [62, 88], v: [92, 64], y: [118, 86]}, line: 'a follows the P wave (atrial contraction); c follows the QRS; x is atrial relaxation; v is atrial filling during systole (after the T wave); y is early ventricular filling.'},
+  tr: {n: 'Tricuspid regurgitation', pts: [[0, 72], [18, 58], [30, 60], [50, 40], [92, 36], [116, 82], [150, 72]], lab: {a: [18, 58], v: [72, 34], y: [116, 82]}, line: 'Severe TR: a large holosystolic v wave merges with the c wave and the x descent disappears.'},
+  tamp: {n: 'Tamponade', pts: [[0, 50], [18, 40], [30, 46], [62, 68], [92, 44], [120, 48], [150, 50]], lab: {a: [18, 40], x: [62, 68], v: [92, 44]}, line: 'Tamponade: pressure is high, the x descent is kept, and the y descent is blunted or absent because the ventricle cannot fill in early diastole. Diastolic pressures equalize.'},
+  con: {n: 'Constriction', pts: [[0, 48], [18, 36], [44, 76], [74, 40], [92, 38], [110, 82], [128, 50], [150, 48]], lab: {a: [18, 36], x: [44, 76], v: [92, 38], y: [110, 82]}, line: 'Constriction: high pressure with steep x and y descents (an M or W shape). Equal diastolic pressures alone are not specific; discordant LV and RV systolic pressures with breathing favor constriction over restriction.'},
+  af: {n: 'Atrial fibrillation', pts: [[0, 80], [30, 78], [38, 72], [62, 84], [92, 64], [118, 86], [150, 80]], lab: {c: [38, 72], v: [92, 64], y: [118, 86]}, line: 'No atrial contraction, so no a wave; read the pressure at end-diastole.'},
+  mr: {n: 'Wedge: giant v', pts: [[0, 82], [18, 70], [30, 76], [50, 60], [90, 22], [118, 84], [150, 82]], lab: {a: [18, 70], v: [90, 22], y: [118, 84]}, line: 'Wedge trace with a giant v wave (mitral regurgitation, a stiff or overfilled left atrium). Read the mean at the a wave, not the v wave; v-wave height does not grade the regurgitation.'}
+};
+function waveSVG(k){
+  var S = WV[k], h = svgOpen('0 0 360 200', 'Atrial pressure waveform, two beats');
+  h += '<line x1="20" y1="170" x2="340" y2="170" style="stroke:var(--line);stroke-width:1"/>';
+  ['P', 'QRS', 'T'].forEach(function(t, j){ [0, 150].forEach(function(off){ var x = 30 + off + [8, 34, 82][j]; h += tx(x, 186, t, {s: 10.5, c: 'var(--muted)'}); }); });
+  var d = '';
+  [0, 150].forEach(function(off, b){ S.pts.forEach(function(p, j){ var x = 30 + off + p[0], y = 30 + p[1]; d += (b === 0 && j === 0 ? 'M' : 'L') + x.toFixed(1) + ' ' + y.toFixed(1) + ' '; }); });
+  h += '<path d="' + d + '" style="fill:none;stroke:var(--accent);stroke-width:2.5;stroke-linejoin:round"/>';
+  Object.keys(S.lab).forEach(function(l){ var p = S.lab[l], down = l === 'x' || l === 'y'; h += tx(30 + p[0], 30 + p[1] + (down ? 16 : -7), l, {w: 700, s: 12}); });
+  return h + '</svg>';
+}
+
+/* 3. Four boxes (SCAI stage C thresholds: CI 2.2, wedge 15). */
+var PRF = {
+  wd: {n: 'Warm, dry', line: 'Index 2.2 or more and wedge 15 or less: perfusion and filling are acceptable.'},
+  ww: {n: 'Warm, wet', line: 'Index 2.2 or more with wedge over 15: congested but perfusing. Decongest.'},
+  cd: {n: 'Cold, dry', line: 'Index under 2.2 with wedge 15 or less: low output without left-sided congestion. Think of low volume or a right-sided or obstructive cause.'},
+  cw: {n: 'Cold, wet', line: 'Index under 2.2 with wedge over 15: the pump is failing. This is the cardiogenic shock profile when perfusion is poor.'}
+};
+function profSVG(k){
+  var h = svgOpen('0 0 360 240', 'Warm or cold and wet or dry'), B = {wd: [60, 20], ww: [205, 20], cd: [60, 120], cw: [205, 120]};
+  Object.keys(B).forEach(function(q){ var b = B[q]; h += rect(b[0], b[1], 135, 90, q === k ? (q === 'cw' ? 'bad' : 'hot') : '') + tx(b[0] + 67, b[1] + 50, PRF[q].n, {w: 700, c: q === k ? 'var(--ink)' : 'var(--muted)'}); });
+  h += tx(30, 70, 'warm', {s: 10.5, c: 'var(--muted)'}) + tx(30, 170, 'cold', {s: 10.5, c: 'var(--muted)'}) + tx(127, 226, 'wedge 15 or less', {s: 10.5, c: 'var(--muted)'}) + tx(272, 226, 'wedge over 15', {s: 10.5, c: 'var(--muted)'});
+  h += '<line x1="56" y1="115" x2="344" y2="115" style="stroke:var(--accent);stroke-width:1.2;stroke-dasharray:4 4"/>' + tx(30, 119, 'CI 2.2', {s: 10.5, c: 'var(--accent)'});
+  return h + '</svg>';
+}
+
+/* 4. PH decision (ESC/ERS 2022; 7th WSPH). */
+var PHS = {
+  pre: {n: 'Pre-capillary', w: 0, p: 1, line: 'PA mean over 20, wedge 15 or less, PVR over 2: disease of the lung vessels (PAH, lung disease, chronic clots and others).'},
+  ipc: {n: 'Isolated post-capillary', w: 1, p: 0, line: 'PA mean over 20, wedge over 15, PVR 2 or less: pressure passed back from the left heart.'},
+  cpc: {n: 'Combined', w: 1, p: 1, line: 'PA mean over 20, wedge over 15, PVR over 2: left-heart back-pressure with a vascular component on top.'},
+  unc: {n: 'Unclassified', w: 0, p: 0, line: 'PA mean over 20 with wedge 15 or less and PVR 2 or less: usually high flow.'}
+};
+function phSVG(k){
+  var S = PHS[k], h = svgOpen('0 0 360 250', 'Classifying pulmonary hypertension');
+  h += rect(105, 10, 150, 40, 'hot') + tx(180, 35, 'PA mean over 20', {w: 700});
+  h += arrow(160, 50, 95, 80, S.w === 0) + arrow(200, 50, 265, 80, S.w === 1);
+  h += rect(20, 80, 150, 40, S.w === 0 ? 'hot' : 'dim') + tx(95, 105, 'wedge 15 or less', {w: 600, c: S.w === 0 ? 'var(--ink)' : 'var(--muted)'});
+  h += rect(190, 80, 150, 40, S.w === 1 ? 'hot' : 'dim') + tx(265, 105, 'wedge over 15', {w: 600, c: S.w === 1 ? 'var(--ink)' : 'var(--muted)'});
+  var x0 = S.w === 0 ? 95 : 265;
+  h += arrow(x0 - 20, 120, x0 - 50, 152, S.p === 0) + arrow(x0 + 20, 120, x0 + 50, 152, S.p === 1);
+  h += rect(x0 - 90, 152, 80, 36, S.p === 0 ? 'hot' : 'dim') + tx(x0 - 50, 175, 'PVR ≤2', {s: 11, w: 600}) + rect(x0 + 10, 152, 80, 36, S.p === 1 ? 'hot' : 'dim') + tx(x0 + 50, 175, 'PVR >2', {s: 11, w: 600});
+  h += tx(180, 220, S.n, {s: 13, w: 700, c: 'var(--accent)'});
+  return h + '</svg>';
+}
+
+/* 5. Output methods (7th WSPH; ESC/ERS 2022; Narang 2014). */
+var COS = {
+  fick: {n: 'Direct Fick', st: ['ok', 'ok', 'ok'], tag: {0: 'measured oxygen use', 2: 'reference method'}, line: 'Measured oxygen consumption divided by the arterial minus mixed venous oxygen content. The reference method (7th World Symposium).'},
+  est: {n: 'Estimated Fick', st: ['bad', 'ok', 'bad'], tag: {0: 'assumed, often 25% off', 2: 'not suggested'}, line: 'Same equation with an assumed oxygen use; in cath patients the assumption was more than 25% wrong in about 1 in 5.'},
+  td: {n: 'Thermodilution', st: ['ok', 'ok', 'hot'], tag: {0: 'cold injectate, temperature curve', 2: 'mean of 3; not with a shunt'}, line: 'A reliable alternative without a shunt; take the mean of at least three. With severe tricuspid regurgitation sources disagree on its accuracy.'}
+};
+var COB = [['Oxygen use or indicator', 'what goes in'], ['Arterial and PA samples', 'content difference'], ['Cardiac output', 'the result']];
+function coSVG(k){ var S = COS[k], h = svgOpen('0 0 360 220', 'How cardiac output is measured'), n = COB.length, gap = 66; for (var j = 0; j < n; j++){ var y = 10 + j * gap, s = S.st[j]; h += rect(20, y, 320, gap - 16, s); h += tx(180, y + 20, COB[j][0], {w: 600}); h += tx(180, y + 38, S.tag[j] || COB[j][1], {s: 10.5, w: S.tag[j] ? 600 : 400, c: S.tag[j] ? (s === 'bad' ? 'var(--bad)' : s === 'ok' ? 'var(--ok)' : 'var(--accent)') : 'var(--muted)'}); if (j < n - 1) h += arrow(180, y + gap - 16, 180, y + gap - 2); } return h + '</svg>'; }
+
+var FIGS = {
+  path: {t: 'The catheter path', states: ['ra', 'rv', 'pa', 'w'], data: PTH, svg: pathSVG},
+  wave: {t: 'Waveforms', states: ['norm', 'tr', 'tamp', 'con', 'af', 'mr'], data: WV, svg: waveSVG},
+  prof: {t: 'Four boxes', states: ['wd', 'ww', 'cd', 'cw'], data: PRF, svg: profSVG},
+  ph: {t: 'Classifying PH', states: ['pre', 'ipc', 'cpc', 'unc'], data: PHS, svg: phSVG},
+  co: {t: 'Measuring output', states: ['fick', 'est', 'td'], data: COS, svg: coSVG}
+};
+var PLATES = {
+  pa: {t: 'The catheter in the wedge position', src: '/media/rhc-hemodynamics/pa-catheter.webp', w: 543, h: 569, alt: 'Front view of the heart with the right side cut away. A thin catheter comes down the superior vena cava into the right atrium, crosses into the right ventricle, loops up through the pulmonary valve into the pulmonary artery, and ends with a small inflated balloon wedged in a branch of the left pulmonary artery inside the lung.', cap: 'From the superior vena cava through the right atrium and ventricle into the pulmonary artery; with the balloon inflated in a branch, the tip reads the pressure passed back from the left atrium. Drawn in the left lung; most catheters float to the right.'}
+};
+function plateHTML(id){ var P = PLATES[id]; return '<div class="plate"><img src="' + P.src + '" alt="' + P.alt + '" width="' + P.w + '" height="' + P.h + '" loading="lazy"><span class="credit">Created with BioRender.com</span></div><p class="line1">' + P.cap + '</p>'; }
+</script>
+<script>
+(function(){
+var $ = function(id){ return document.getElementById(id); };
+function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+var ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M7 15l3-4 3 3 2-2 2 3"/></svg>';
+function chip(fig, state, label){ return '<button class="chip" type="button" data-fig="' + fig + '" data-state="' + (state || '') + '">' + ICON + esc(label || (FIGS[fig] ? FIGS[fig].t : fig)) + '</button>'; }
+function cardHTML(c){
+  var h = '<div class="card" id="' + c.id + '"><p class="label">' + esc(c.label) + '</p><h2>' + esc(c.head) + '</h2>';
+  if (c.sub) h += '<p class="sub">' + esc(c.sub) + '</p>';
+  h += (c.guards || []).map(function(g){ return '<div class="guard">' + esc(g) + '</div>'; }).join('');
+  if (c.html) h += c.html;
+  if (c.list && c.list.length) h += '<ul>' + c.list.map(function(s){ return '<li>' + esc(s) + '</li>'; }).join('') + '</ul>';
+  if (c.why) h += '<p class="whyline"><b>Why:</b> ' + esc(c.why) + '</p>';
+  if (c.links && c.links.length) h += '<div class="links">' + c.links.map(function(l){ return '<a href="' + l[0] + '">' + esc(l[1]) + ' →</a>'; }).join('') + '</div>';
+  if (c.chips && c.chips.length) h += '<div class="chips">' + c.chips.map(function(x){ return chip(x[0], x[1], x[2]); }).join('') + '</div>';
+  if ((c.more && c.more.length) || (c.tiers && c.tiers.length)) h += '<details><summary>More</summary>' + (c.more || []).map(function(m){ return '<p>' + esc(m) + '</p>'; }).join('') + (c.tiers || []).map(function(t){ return '<span class="tier">' + esc(t) + '</span>'; }).join('') + '</details>';
+  return h + '</div>';
+}
+
+/* Inputs */
+var DEF = {};
+var st = {t: {}};
+function read(){
+  var i = {};
+  NUMS.forEach(function(k){ var v = parseFloat($(k).value); i[k] = isFinite(v) && (v > 0 || (v === 0 && ['rap','pcwp','pad'].indexOf(k) >= 0)) ? v : null; });
+  ALLT.forEach(function(t){ if (st.t[t[0]]) i[t[0]] = true; });
+  return i;
+}
+function seg(host, list, sel){ $(host).innerHTML = list.map(function(x){ return '<button class="sbtn" type="button" data-v="' + x[0] + '" aria-pressed="' + (x[0] === sel) + '">' + esc(x[1]) + '</button>'; }).join(''); }
+function ticks(host, list){ $(host).innerHTML = list.map(function(t){ return '<label class="chk"><input type="checkbox" data-t="' + t[0] + '"' + (st.t[t[0]] ? ' checked' : '') + '>' + esc(t[1]) + '</label>'; }).join(''); }
+function drawInputs(){ ticks('ticks-x', TICKS_X); }
+function build(i){ var o = decide(i); return {o: o, html: o.cards.map(cardHTML).join('')}; }
+function render(){ $('out').innerHTML = build(read()).html; }
+function segClick(host, key){ $(host).addEventListener('click', function(e){ var b = e.target.closest && e.target.closest('[data-v]'); if (b){ st[key] = b.getAttribute('data-v'); drawInputs(); render(); } }); }
+$('inputs').addEventListener('change', function(e){ var t = e.target.getAttribute && e.target.getAttribute('data-t'); if (t) st.t[t] = e.target.checked; render(); });
+$('inputs').addEventListener('input', render);
+
+/* Tabs */
+var tabs = [['t-tool','p-tool'],['t-learn','p-learn'],['t-prac','p-prac']];
+function show(t){ tabs.forEach(function(p){ var on = p[0] === t; $(p[0]).setAttribute('aria-selected', String(on)); $(p[1]).classList.toggle('on', on); }); }
+tabs.forEach(function(p){ $(p[0]).addEventListener('click', function(){ show(p[0]); }); });
+function fromHash(){ var id = location.hash.slice(1); if (!id) return; var el = $(id); if (!el) return; var pan = el.closest('.panel'); if (pan) tabs.forEach(function(p){ if (p[1] === pan.id) show(p[0]); }); el.scrollIntoView(); }
+window.addEventListener('hashchange', fromHash);
+
+/* Figures */
+function mountFig(host, id, state){
+  var F = FIGS[id];
+  function draw(k){
+    var d = F.data[k];
+    host.innerHTML = '<div class="states" role="group" aria-label="' + esc(F.t) + '">' + F.states.map(function(x){ return '<button class="sbtn" type="button" data-k="' + x + '" aria-pressed="' + (x === k) + '">' + esc(F.data[x].n) + '</button>'; }).join('') + '</div>' + F.svg(k) + '<p class="line1">' + esc(d.line) + '</p>';
+  }
+  host.onclick = function(e){ var b = e.target.closest && e.target.closest('[data-k]'); if (b) draw(b.getAttribute('data-k')); };
+  draw(state && F.data[state] ? state : F.states[0]);
+}
+
+/* PVR slider: zone scale and rows computed from PVRZ. */
+function mountSlider(host, v0){
+  var v = v0 || 2.5;
+  function draw(){
+    var z = pvrZone(v), Z = PVRZ[z];
+    var zs = '<div class="zs">' + [2, 1, 2, 3].map(function(w, k){ return '<i style="flex:' + w + '" class="' + (k === z ? 'on' : '') + '"></i>'; }).join('') + '</div>';
+    host.querySelector('.slv').textContent = v.toFixed(1) + ' WU';
+    host.querySelector('.slout').innerHTML = zs + '<p class="zt">' + esc(Z.n) + '</p><div class="dp"><div><p class="label">What is happening</p><p>' + esc(Z.what) + '</p></div><div><p class="label">Why the rule</p><p>' + esc(Z.why) + '</p></div><div><p class="label">At the bedside</p><p>' + esc(Z.bed) + '</p></div></div>';
+  }
+  host.innerHTML = '<div class="sl"><label for="' + host.id + '-r">PVR <b class="slv"></b></label><input type="range" id="' + host.id + '-r" min="0.5" max="8" step="0.1" value="' + v + '" aria-label="PVR in Wood units"></div><div class="slout"></div>';
+  host.querySelector('input').addEventListener('input', function(e){ v = +e.target.value; draw(); });
+  draw();
+}
+
+var lastFocus = null;
+function openSheet(fig, state){
+  lastFocus = document.activeElement;
+  var b = $('sheet-b'); b.onclick = null;
+  if (fig.indexOf('plate:') === 0) { var id = fig.slice(6); $('sheet-t').textContent = PLATES[id].t; b.innerHTML = plateHTML(id); }
+  else if (fig === 'pvr') { $('sheet-t').textContent = 'PVR zones'; b.innerHTML = '<div id="sheet-sl"></div>'; var o = decide(read()).d; mountSlider($('sheet-sl'), o.pvr != null ? Math.max(0.5, Math.min(8, Math.round(o.pvr * 10) / 10)) : 2.5); }
+  else { $('sheet-t').textContent = FIGS[fig].t; mountFig(b, fig, state); }
+  $('scrim').hidden = false; $('sheet').hidden = false; $('sheet').scrollTop = 0; $('sheet-x').focus();
+}
+function closeSheet(){ if ($('sheet').hidden) return; $('scrim').hidden = true; $('sheet').hidden = true; if (lastFocus && lastFocus.focus) lastFocus.focus(); }
+$('sheet-x').addEventListener('click', closeSheet); $('scrim').addEventListener('click', closeSheet);
+document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeSheet(); });
+document.addEventListener('click', function(e){ var c = e.target.closest && e.target.closest('[data-fig]'); if (c) openSheet(c.getAttribute('data-fig'), c.getAttribute('data-state')); });
+Object.keys(PLATES).forEach(function(id){ var host = $('plate-' + id); if (host) host.innerHTML = plateHTML(id); });
+if (!Object.keys(PLATES).length) $('credit-line').hidden = true;
+document.querySelectorAll('[data-figure]').forEach(function(h){ mountFig(h, h.getAttribute('data-figure'), h.getAttribute('data-state')); });
+mountSlider($('pvrslider'), 2.5);
+document.addEventListener('click', function(e){ var a = e.target.closest && e.target.closest('a[href^="#"]'); if (a){ var id = a.getAttribute('href').slice(1), el = $(id); if (el){ e.preventDefault(); var pan = el.closest('.panel'); if (pan) tabs.forEach(function(p){ if (p[1] === pan.id) show(p[0]); }); el.scrollIntoView(); } } });
+
+/* Learn tab */
+(function(){
+  var chaps = [].slice.call(document.querySelectorAll('.chap'));
+  $('pills').innerHTML = chaps.map(function(c, n){ return '<button class="pill" type="button" data-go="' + c.id + '" aria-current="' + (n === 0) + '">' + (n + 1) + ' ' + esc(c.getAttribute('data-pill')) + '</button>'; }).join('');
+  $('pills').addEventListener('click', function(e){ var g = e.target.getAttribute('data-go'); if (g) $(g).scrollIntoView(); });
+  function mark(id){ [].forEach.call($('pills').children, function(b){ var on = b.getAttribute('data-go') === id; b.setAttribute('aria-current', String(on)); if (on) $('pills').scrollLeft = Math.max(0, b.offsetLeft - 60); }); }
+  if ('IntersectionObserver' in window){
+    var io = new IntersectionObserver(function(es){ es.forEach(function(en){ if (en.isIntersecting) mark(en.target.id); }); }, {rootMargin: '-30% 0px -60% 0px'});
+    chaps.forEach(function(c){ io.observe(c); });
+  }
+  $('trialbox').innerHTML = TRIALS.map(function(t){ return '<div class="trial" style="margin-top:14px"><p><b>' + esc(t.q) + '</b></p><p><span class="k">Design</span>' + esc(t.d) + '</p><p><span class="k">Result</span>' + esc(t.r) + '</p><p><span class="k">What it changed</span>' + esc(t.c) + '</p><p class="mono" style="font-size:13px"><a href="https://doi.org/' + t.doi + '" rel="noopener">' + esc(t.cite) + '</a></p></div>'; }).join('');
+  $('go-prac').addEventListener('click', function(){ show('t-prac'); window.scrollTo(0, 0); });
+})();
+
+/* Practice: cases run through the same engine */
+$('practice').innerHTML = CASES.map(function(c, n){
+  return '<div class="card case"><p class="label">Case ' + (n + 1) + '</p><h2>' + esc(c.t) + '</h2><p>' + esc(c.s) + '</p><p><b>' + esc(c.q) + '</b></p><div class="row"><button class="btn" type="button" data-ans="' + n + '">Show the answer</button><button class="btn ghost" type="button" data-load="' + n + '">Open in the tool</button></div><div class="ans" id="ans' + n + '" hidden></div></div>';
+}).join('');
+function caseInput(c){ var inp = {}; Object.keys(c.i).forEach(function(k){ inp[k] = c.i[k]; }); NUMS.forEach(function(k){ if (inp[k] === undefined) inp[k] = null; }); return inp; }
+$('practice').addEventListener('click', function(e){
+  var a = e.target.getAttribute('data-ans'), l = e.target.getAttribute('data-load');
+  if (a != null){ var c = CASES[a], box = $('ans' + a), b = build(caseInput(c)); box.innerHTML = '<p>' + esc(c.p) + '</p>' + b.html.replace(/ id="[^"]*"/g, ''); box.hidden = false; e.target.hidden = true; }
+  if (l != null){ var c2 = CASES[l]; st = {t: {}}; ALLT.forEach(function(t){ if (c2.i[t[0]]) st.t[t[0]] = true; }); drawInputs(); NUMS.forEach(function(k){ $(k).value = c2.i[k] != null ? c2.i[k] : ''; }); render(); show('t-tool'); window.scrollTo(0, 0); }
+});
+drawInputs(); render(); fromHash();
+})();
+</script><script id="deeper-data">
+/* Go deeper: mechanism, rationale and the common trap for each Learn chapter. Text only; no doses or thresholds beyond the tool's own. */
+(function(){ var D = {
+"learn-path": [["Mechanism", "A balloon-tipped catheter floats with blood flow from a central vein through the right atrium and right ventricle into the pulmonary artery. Inflating the balloon in a branch stops flow, so the tip reads the pressure transmitted back from the left atrium."], ["Why it matters", "Each chamber answers a different question: the right atrium shows right-sided filling, the pulmonary artery shows lung-vessel pressure and mixed venous saturation, and the wedge stands in for left atrial pressure."], ["Common trap", "Reading a damped pulmonary artery trace as a wedge, or an over-wedged trace as a true wedge. Check the waveform shape, and a wedge saturation when in doubt."]],
+"learn-waves": [["Mechanism", "Each wave is a mechanical event: atrial contraction (a), valve closure and bulging (c), atrial relaxation (x), atrial filling against a closed valve (v), and emptying when the valve opens (y)."], ["Why it matters", "The shape of the trace can point to tricuspid regurgitation, tamponade, constriction or mitral regurgitation before any calculation, and it tells you where on the trace to read the mean."], ["Common trap", "Taking the monitor's automatic mean when a giant v wave or a large breathing swing is present. Read the pressure at the right point in the cycle and at end-expiration."]],
+"learn-profiles": [["Mechanism", "Cardiac index reflects whether the tissues get enough flow; the wedge reflects how much pressure backs up behind the left ventricle. Together they separate low flow from congestion."], ["Why it matters", "Warm and wet patients need decongestion; cold and wet patients need support for the pump as well; cold and dry patients may need volume or a search for a right-sided or obstructive cause."], ["Common trap", "Reading numbers taken on vasopressors, inotropes or a device as if they were the patient's own. Support makes the profile look better than the heart is."]],
+"learn-ph": [["Mechanism", "Pulmonary pressure rises either because the lung vessels resist flow (pre-capillary) or because pressure is passed back from a stiff or failing left heart (post-capillary). The wedge separates the two; PVR, the pressure drop across the lungs divided by flow, then shows whether the vessels add resistance."], ["Why it matters", "The type decides the treatment: pre-capillary disease needs its group identified at a PH center, while post-capillary PH is treated through the left heart."], ["Common trap", "Calling every pre-capillary case PAH, or starting PAH drugs for borderline numbers. Lung disease and chronic clots are pre-capillary too, and the drug trials used higher thresholds."]],
+"learn-pvr": [["Mechanism", "Resistance is the pressure drop across the lung vessels divided by flow. Remodelled or obstructed vessels raise it; a high flow with healthy vessels raises pressure but not resistance."], ["Why it matters", "The wedge separates pre- from post-capillary PH; PVR then shows whether the lung vessels add resistance (pre-capillary against high flow; isolated against combined post-capillary). Over 5 WU marks a severe pre-capillary component."], ["Common trap", "Trusting a PVR built on an estimated cardiac output. If the output is 25% wrong, the PVR is 25% wrong."]],
+"learn-output": [["Mechanism", "The Fick principle says the oxygen taken up by the body equals blood flow times the oxygen extracted. Thermodilution measures how fast a cold injectate is carried past the catheter tip."], ["Why it matters", "Cardiac output feeds every derived number: index, stroke volume, SVR, PVR and cardiac power."], ["Common trap", "Using estimated Fick as if it were measured, or thermodilution in a patient with a shunt."]],
+"trials": [["Mechanism", "A catheter only measures; benefit depends on what clinicians do with the numbers."], ["Why it matters", "The randomized trials tested routine use and found no benefit, which is why routine catheters in heart failure are not recommended, while use in cardiogenic shock rests on registries and expert consensus."], ["Common trap", "Reading the negative trials as proof that the numbers are useless in every patient. They tested routine use, not selected patients whose hemodynamics are uncertain."]]
+};
+  function add(){ Object.keys(D).forEach(function(id){ var c = document.getElementById(id); if (!c || c.querySelector(":scope > .deeper")) return; var d = document.createElement("details"); d.className = "deeper"; d.innerHTML = "<summary>Go deeper: mechanism and rationale</summary><div class=\"dpx\">" + D[id].map(function(r){ return "<div><span class=\"dl\">" + r[0] + "</span><p>" + r[1] + "</p></div>"; }).join("") + "</div>"; c.appendChild(d); }); }
+  add();
+})();
+</script>
+</body>
+</html>
