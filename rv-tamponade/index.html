@@ -269,7 +269,7 @@ footer p{margin:0 0 8px}
 var T_STATE = [['arrest','Cardiac arrest or peri-arrest'],['perf','Poor perfusion: cold, confused, low urine'],['vent','On positive pressure ventilation'],['hypovol','Bleeding, dehydrated or diuresed']];
 var T_PMASK = [['pmask','Aortic regurgitation, atrial septal defect, severe LV dysfunction or RV hypertrophy']];
 var T_EXAM = [['dysp','Short of breath'],['jvp','Raised JVP'],['quiet','Quiet heart sounds'],['lowv','Low voltage on ECG'],['alt','Electrical alternans']];
-var T_ECHO = [['ra','Right atrium collapses in systole'],['rv','Right ventricle collapses in diastole'],['ivc','IVC full, little change with breathing'],['inflow','Inflow swings with breathing (Doppler)'],['swing','Heart swings in the fluid']];
+var T_ECHO = [['ra','Right atrium collapses (end-diastole into systole)'],['rv','Right ventricle collapses in diastole'],['ivc','IVC full, little change with breathing'],['inflow','Inflow swings with breathing (Doppler)'],['swing','Heart swings in the fluid']];
 var T_CAUSE = [['cancer','Cancer'],['uremia','Kidney failure or uremia'],['proc','Recent catheter procedure (cath, ablation, pacing lead)'],['surg','Cardiac surgery in the last days'],['mi','Myocardial infarction in the last days'],['dissect','Possible type A aortic dissection'],['trauma','Chest trauma'],['pus','Fever, suspected bacterial infection'],['anticoag','On an anticoagulant']];
 var EFF = [['unk','Not scanned'],['none','None'],['small','Under 10 mm'],['mod','10 to 20 mm'],['large','Over 20 mm'],['loc','Loculated']];
 var R_STATE = [['perf','Poor perfusion: cold, confused, low urine'],['cong','Congested: liver tests or creatinine rising'],['press','On a vasopressor'],['ino','On an inotrope'],['av','Atrial fibrillation or heart block']];
@@ -290,8 +290,9 @@ function decideT(i){
   var cards = [];
   var eff = i.eff || 'unk', present = ['small','mod','large','loc'].indexOf(eff) >= 0;
   var pp = ppVal(i);
-  var echoSign = i.ra || i.rv || i.ivc || i.inflow || i.swing;
-  var ppHigh = pp != null && pp > 10;
+  var echoSign = i.ra || i.rv || i.inflow;
+  var ivcOnly = (i.ivc || i.swing) && !echoSign;
+  var ppHigh = pp != null && pp > 10 && !i.vent;
   var sign = echoSign || ppHigh;
   var low = (i.sbp != null && i.sbp < 90) || i.arrest || i.perf || (i.lac != null && i.lac > 2);
   var masked = i.vent || i.pmask || i.hypovol;
@@ -323,12 +324,20 @@ function decideT(i){
     var tag = {small: 'small (under 10 mm)', mod: 'moderate (10 to 20 mm)', large: 'large (over 20 mm)', loc: 'loculated'}[eff];
     if (low && sign){
       c.head = surgical ? 'Fits tamponade, with ' + surgWord + ': this needs a surgeon, not only a needle' : 'Fits tamponade: drain now';
-      c.why = 'A ' + tag + ' effusion with ' + (echoSign ? 'chambers being squeezed' : 'pulsus paradoxus') + ' and ' + (i.arrest ? 'arrest' : 'poor perfusion or low pressure') + ' is tamponade until proven otherwise; drainage should not wait in an unstable patient.';
+      c.why = 'A ' + tag + ' effusion with ' + (echoSign ? 'chambers being squeezed' : 'pulsus paradoxus') + ' and ' + (i.arrest ? 'arrest' : 'poor perfusion or low pressure') + ' is tamponade until proven otherwise; ' + (surgical ? 'relief is urgent, but by surgery: a needle alone can worsen the bleeding.' : 'drainage should not wait in an unstable patient.');
       c.tiers = ['ESC 2025: drain without delay if unstable', 'ESC 2025: pericardiocentesis for tamponade, I C'];
+    } else if (low && ivcOnly){
+      c.head = 'Possible tamponade: a full IVC alone does not confirm it. Look for right atrial or ventricular collapse';
+      c.sub = 'A full IVC is just as common with a failing right ventricle or pulmonary hypertension, which can also come with a small effusion.';
+      c.why = 'A full IVC is sensitive but not specific (40%); chamber collapse or pulsus paradoxus is what shows the sac squeezing the heart.';
+      c.list.push('Repeat the echo now, looking for right atrial and right ventricular collapse; if loculated or after surgery, transesophageal echo or CT before any needle.');
+      c.links = [['#t-rv', 'RV failure tab']];
+      c.tiers = ['ESC 2025 Table 17', 'ACC 2025: the IVC screens, it does not confirm'];
     } else if (low){
       c.head = 'An effusion and low pressure, but no sign of the sac squeezing the heart yet';
       c.sub = 'Look again for the signs below; if none are present, look for another cause of the shock.';
-      c.why = eff === 'small' ? 'A small effusion squeezes the heart only when it gathers fast, as with bleeding; otherwise it is usually a bystander.' : 'An effusion with shock is not tamponade until the heart is shown to be compressed; check right atrial and ventricular collapse and the IVC.';
+      c.why = eff === 'small' ? 'A small effusion squeezes the heart only when it gathers fast, as with bleeding; otherwise it is usually a bystander.' : 'An effusion with shock is not tamponade until the heart is shown to be compressed; check right atrial and ventricular collapse and inflow variation with breathing.';
+      c.list.push('Repeat the echo; if loculated or after surgery, transesophageal echo or CT before any needle.');
       c.tiers = ['ESC 2025: clinical diagnosis with echo confirmation'];
     } else if (sign){
       c.head = 'Signs of raised pressure in the sac, pressure still held: urgent cardiology review now';
@@ -338,7 +347,7 @@ function decideT(i){
     } else {
       c.head = 'Effusion without signs of tamponade';
       c.why = 'Nothing entered shows the fluid squeezing the heart; drainage is for tamponade, suspected bacterial or cancer-related effusion, or symptoms despite treatment.';
-      c.tiers = ['ACC 2025: no pericardiocentesis without tamponade', 'ESC 2025: drain if bacterial or neoplastic suspected, I C'];
+      c.tiers = ['ACC 2025: pericardiocentesis not recommended for effusion without tamponade (diagnostic taps aside)', 'ESC 2025: drain if bacterial or neoplastic suspected, I C'];
     }
     var sup = [], ag = [];
     if (i.ra) sup.push('Right atrial collapse: early sign; lasting over a third of the cycle is highly specific.');
@@ -351,15 +360,15 @@ function decideT(i){
     if (i.alt) sup.push('Electrical alternans: uncommon (16 to 21%) but points to a swinging heart.');
     if (i.lowv) sup.push('Low voltage (42%).');
     if (i.quiet) sup.push('Quiet heart sounds (28%).');
-    if (!echoSign && eff !== 'unk') ag.push('No chamber collapse or full IVC entered.');
-    if (pp != null && pp <= 10) ag.push(masked ? 'Pulsus ' + pp + ' mmHg, but something ticked can hide it, so it does not rule tamponade out.' : 'Pulsus ' + pp + ' mmHg: 10 or less argues against tamponade (LR 0.03, one small study).');
+    if (!echoSign && eff !== 'unk') ag.push('No chamber collapse or inflow variation entered.');
+    if (pp != null && pp < 10) ag.push(masked ? 'Pulsus ' + pp + ' mmHg, but something ticked can hide it, so it does not rule tamponade out.' : 'Pulsus ' + pp + ' mmHg: 10 or less argues against tamponade (LR 0.03, one small study).');
     if (eff === 'small') ag.push('Small effusion: tamponade only if it gathered fast.');
     if (i.hr != null && i.hr < 90 && !i.arrest) ag.push('Heart rate under 90: tachycardia is present in 77% with tamponade (beta-blockers, pacing and conduction disease can blunt it).');
     if (sup.length) { c.list = c.list.concat(sup.map(function(s){ return 'For: ' + s; })); }
     if (ag.length) { c.list = c.list.concat(ag.map(function(s){ return 'Against: ' + s; })); }
     c.chips.push(['sac', 'tamp', 'Why fluid in the sac drops output']);
     if (echoSign) c.chips.push(['echo', i.rv ? 'rv' : i.ra ? 'ra' : 'ivc', 'Echo signs']);
-    c.more = ['Tamponade is a clinical diagnosis: a suggestive history, symptoms and signs, confirmed on echo. An effusion on the screen is not tamponade until the patient fits.', 'Effusion size (end-diastole): mild under 10 mm, moderate 10 to 20 mm, large over 20 mm. How fast it gathered matters: the sac stretches slowly, so a litre that builds over weeks can be tolerated while a small bleed can kill.', 'Echo signs (ESC 2025 Table 17): right atrial collapse (lasting over 0.34 of the cycle: sensitivity over 90%, specificity 100%); right ventricular diastolic collapse (sensitivity 48 to 100%, specificity 72 to 100%); IVC over 20 mm with under 50% fall on breathing (sensitivity 97%, specificity 40%); respiratory change in mitral inflow over 25 to 30% and tricuspid over 40 to 60%. ACC 2025 uses an IVC over 2.1 cm and inflow changes over 30% and 60%.', 'Exam (Roy 2007, patients with tamponade): breathlessness 87 to 89%, tachycardia 77%, pulsus paradoxus 82%, raised JVP 76%, big heart on chest film 89%. A minority have none of these.', 'The ESC triage score (Ristić 2014), kept in ESC 2025 Figure 12, adds points for cause, presentation and imaging to time drainage in patients who are not unstable. It has not been prospectively validated and is not computed here.'];
+    c.more = ['Tamponade is a clinical diagnosis: a suggestive history, symptoms and signs, confirmed on echo. An effusion on the screen is not tamponade until the patient fits.', 'Effusion size (end-diastole): mild under 10 mm, moderate 10 to 20 mm, large over 20 mm. How fast it gathered matters: the sac stretches slowly, so a litre that builds over weeks can be tolerated while a small bleed can kill.', 'Echo signs (ESC 2025 Table 17): right atrial collapse (lasting over 0.34 of the cycle: sensitivity over 90%, specificity 100%); right ventricular diastolic collapse (sensitivity 48 to 100%, specificity 72 to 100%); IVC over 20 mm with under 50% fall on breathing (sensitivity 97%, specificity 40%); respiratory change in mitral inflow over 25 to 30% and tricuspid over 40 to 60%. ACC 2025 uses an IVC over 2.1 cm and inflow changes over 30% and 60%.', 'Exam (Roy 2007, patients with tamponade): breathlessness 87 to 89%, tachycardia 77%, pulsus paradoxus 82%, raised JVP 76%, big heart on chest film 89%. A minority have none of these.', 'The ESC triage score (Ristić 2014), kept in ESC 2025 Figure 12, adds points for cause, presentation and imaging to time drainage in patients who are not unstable. It is not computed here.'];
     if (eff === 'loc' && !c.guards.length) c.guards.push('Loculated fluid can compress one chamber with few of the usual signs; a transesophageal echo or CT shows where it is and whether a needle can reach it.');
   }
   if (i.arrest && eff !== 'none') c.guards.unshift('In arrest with suspected tamponade, drainage is part of the resuscitation: chest compressions cannot fill a compressed heart.');
@@ -367,18 +376,18 @@ function decideT(i){
 
   /* 2. Pulsus paradoxus */
   if (pp != null){
-    var p = {id: 'res-pp', label: 'Pulsus paradoxus', head: pp + ' mmHg' + (pp > 12 ? ': over 12' : pp > 10 ? ': over 10' : pp === 10 ? ': at the cutoff' : ': 10 or less'), list: [], chips: [['pulsus', pp > 10 ? 'tamp' : 'norm', 'How pulsus happens']]};
-    p.why = pp > 10 ? 'With an effusion, a pulsus over 10 mmHg makes tamponade more likely (LR 3.3; over 12, LR 5.9).' : masked ? 'Normal-looking, but ' + (i.vent ? 'positive pressure ventilation' : i.hypovol ? 'low filling (bleeding, dehydration, diuretics)' : 'the heart condition ticked') + ' can hide pulsus in true tamponade.' : 'With an effusion, a pulsus of 10 mmHg or less makes tamponade much less likely (LR 0.03), from one study of 65 patients.';
+    var p = {id: 'res-pp', label: 'Pulsus paradoxus', head: pp + ' mmHg' + ((pp > 10 && i.vent) ? ': not readable on the ventilator' : pp > 12 ? ': over 12' : pp > 10 ? ': over 10' : pp === 10 ? ': at the cutoff' : ': 10 or less'), list: [], chips: [['pulsus', (pp > 10 && !i.vent) ? 'tamp' : 'norm', 'How pulsus happens']]};
+    p.why = pp === 10 ? 'At the cutoff: ESC counts 10 or more as pulsus, while the likelihood ratios split at over 10. Treat it as indeterminate and repeat.' : (pp > 10 && i.vent) ? 'On positive pressure ventilation the breathing swing is reversed or blunted, so this number cannot be read as pulsus paradoxus.' : pp > 10 ? 'With an effusion, a pulsus over 10 mmHg makes tamponade more likely (LR 3.3; over 12, LR 5.9).' : masked ? 'Normal-looking, but ' + (i.vent ? 'positive pressure ventilation' : i.hypovol ? 'low filling (bleeding, dehydration, diuretics)' : 'the heart condition ticked') + ' can hide pulsus in true tamponade.' : 'With an effusion, a pulsus of 10 mmHg or less makes tamponade much less likely (LR 0.03), from one study of 65 patients.';
     p.more = ['ESC 2025 defines it as an inspiratory fall in systolic pressure of at least 10 mmHg. The likelihood ratios (Roy 2007) are for over 10 against 10 or less, from a single study, so the confidence intervals are wide (LR 3.3, 1.8 to 6.3; LR 0.03, 0.01 to 0.24).', 'Can be absent in tamponade: positive pressure ventilation, severe aortic regurgitation, atrial septal defect, severe LV dysfunction or hypertrophy, RV hypertrophy, low filling, pericardial adhesions.', 'Can be present without tamponade: severe asthma or COPD, massive pulmonary embolism, severe hypovolemic shock, obesity, tense ascites.', 'An automated cuff averages beats and cannot measure it; an arterial line shows it as a waveform that dips with each breath.'];
     p.tiers = ['Roy 2007, JAMA rational clinical examination', 'Schiavone 2013, review'];
     cards.push(p);
   }
 
-  var tamp = present && (sign || low);
+  var tamp = present && sign;
   /* 3. Hold the line until drainage */
   if (tamp || (i.arrest && eff !== 'none')){
     var h = {id: 'res-hold', label: 'Until it is drained', head: 'Give fluid, avoid diuretics and vasodilators, avoid the ventilator', guards: [INTUB, DIUR], list: [
-      'A fluid bolus can buy time while drainage is set up; it is a bridge, not a treatment.',
+      'A fluid bolus can buy time while drainage or surgery is set up; it is a bridge, not a treatment.',
       'Stop diuretics and vasodilators, including nitrates.',
       'Positive pressure ventilation should be avoided: give oxygen by mask or high-flow nasal cannula, and drain first if at all possible.',
       'A vasopressor can support pressure for minutes; it does not fix the filling problem.'], chips: [['sac', 'tamp', 'Why fluid helps and diuretics harm']]};
@@ -436,25 +445,25 @@ function decideT(i){
     cards.push(d);
 
     /* 5. After drainage */
-    cards.push({id: 'res-after', label: 'After drainage', head: 'Watch for return, send the fluid, check the pressure fell', list: [
+    if (!(i.dissect || i.trauma || i.mi)) cards.push({id: 'res-after', label: 'After drainage', head: 'Watch for return, send the fluid, check the pressure fell', list: [
       'Repeat echo after the tap and before removing the drain.',
       'Remove the drain when it puts out under 30 mL a day.',
       'Send the fluid for cell count, Gram stain and culture, tuberculosis testing and cytology (expert practice). Light\'s criteria for pleural fluid do not apply to pericardial fluid.',
       'Check CRP before the tap if you can: it rises after the procedure.',
       'If the right atrial pressure does not fall by half, or to under 10 mmHg, after the fluid is out, think effusive-constrictive pericarditis.',
-      'Recurrent large effusion after a tap: a surgical window is reasonable.'],
+      'Recurrent large effusion with tamponade after a prior tap: a surgical window is reasonable.'],
       why: 'Fluid can reaccumulate, and the drain is what lets you see it; the fluid tests find the cause, which decides recurrence risk.',
       tiers: ['ESC 2025: drain out under 30 mL/day; effusive-constrictive definition; CRP before tap', 'ACC 2025: window after a prior tap, reasonable', 'Fluid panel: expert practice']});
   }
 
   /* 6. Effusion without tamponade */
-  if (present && !tamp){
+  if (present && !tamp && !low){
     cards.push({id: 'res-eff', label: 'Effusion, no tamponade', head: 'Find the cause; drain only for a reason', list: [
       'Drain if bacterial or cancer-related effusion is suspected, or a moderate to large effusion still causes symptoms despite treatment.',
       'An effusion with pericarditis: anti-inflammatory treatment first.',
       'Re-examine and repeat the echo if anything changes: tachycardia, breathlessness, falling urine output.'],
       why: 'Without tamponade, a needle adds risk and rarely changes the cause; the cause decides treatment.',
-      tiers: ['ESC 2025: pericardiocentesis for suspected bacterial or neoplastic, or symptomatic moderate to large effusion, I C', 'ACC 2025: no pericardiocentesis without tamponade'],
+      tiers: ['ESC 2025: pericardiocentesis for suspected bacterial or neoplastic, or symptomatic moderate to large effusion, I C', 'ACC 2025: pericardiocentesis not recommended for effusion without tamponade (diagnostic taps aside)'],
       links: [['/pocus-cardiac/#q-eff', 'Effusion on ultrasound'], ['/exam-cardiac/', 'Cardiac exam']]});
   }
   return {cards: cards};
@@ -466,7 +475,7 @@ function decideR(i){
   var rvSigns = ['dil','sept','tapse','mcc'].filter(function(k){ return i[k]; }).length;
   var lowBP = (i.sbp != null && i.sbp < 90) || (i.map != null && i.map < 60);
   var poor = i.perf || (i.lac != null && i.lac > 2);
-  var full = i.ivcf || i.cong || (i.rap != null && i.pcwp != null && i.rap / i.pcwp > 0.8);
+  var full = i.ivcf || i.cong || (i.rap != null && i.rap > 15) || (i.rap != null && i.rap >= 10 && i.pcwp != null && i.rap / i.pcwp > 0.8);
 
   /* 1. Status */
   var c = {id: 'res-rv', label: 'Is the right ventricle failing?', list: [], guards: [], tiers: [], more: [], chips: [['sac', 'rv', 'Why a big RV squeezes the LV']]};
@@ -493,7 +502,7 @@ function decideR(i){
     ph: {head: 'Known pulmonary hypertension: find the trigger, call the PH team', list: ['Look for the trigger: infection, arrhythmia, anemia, missed doses of PH drugs, other illness.', 'Do not stop PH drugs, especially intravenous or subcutaneous prostacyclins.', 'Involve a PH centre early; transfer if support is not available on site.', 'New PAH with low output: combination therapy including IV or subcutaneous prostacyclin should be considered (PH team decision).'], tiers: ['ESC/ERS 2022: treat causative factors, involve expertise, I C', 'ESC/ERS 2022: transfer for support as bridge, IIa C'], why: 'A chronically loaded right ventricle tolerates more pressure but decompensates when a trigger raises demand or load; treating the trigger turns it back.'},
     rvmi: {head: 'Right ventricular infarction: reperfuse, keep the preload', list: ['Record right-sided leads in every inferior STEMI: ST elevation of 1 mm in V4R is the most sensitive ECG marker.', 'Classic triad: low pressure, clear lungs, raised JVP.', 'No nitrates, no diuretics.', 'Keep the preload: cautious volume if the lungs are clear and the IVC is not full.', 'Restore AV synchrony: pace high-grade block, cardiovert atrial fibrillation causing shock.', 'Inotrope if pressure stays low after volume.'], guards: [DIUR], links: [['/ekg-cath/#territories', 'Inferior and RV infarct ECG']], tiers: ['2013 ACCF/AHA STEMI §9.3 (no class given)', '2025 ACC/AHA ACS: right-sided leads in inferior STEMI; avoid nitroglycerin in RV infarction'], why: 'An infarcted right ventricle cannot pump; it is moved passively by filling pressure and atrial kick, so anything that lowers preload or loses atrial timing drops output.'},
     ards: {head: 'ARDS: ventilate to protect the right ventricle', list: ['See the ventilator card below.'], links: [['/ards/#learn-rv', 'ARDS and the RV'], ['/vent/', 'Ventilator basics']], why: 'Collapsed lung, high CO2 and high airway pressure all raise the resistance the right ventricle pumps against; the ventilator settings are the afterload.'},
-    lvad: {head: 'LVAD: call the LVAD team now', list: ['Right failure is a leading problem after LVAD; the pump speed, volume and inotropes are set by the LVAD team.', 'Check the pump flow and power, and look for suction events and tamponade.'], tiers: ['AHA 2018 statement'], why: 'An LVAD can only pump what the right ventricle delivers; pump speed shifts the septum and changes right ventricular function.'},
+    lvad: {head: 'LVAD: call the LVAD team now', list: ['Right failure is common after LVAD implantation; the pump speed, volume and inotropes are set by the LVAD team.', 'Check the pump flow and power, and look for suction events and tamponade.'], tiers: ['AHA 2018 statement'], why: 'An LVAD can only pump what the right ventricle delivers; pump speed shifts the septum and changes right ventricular function.'},
     csurg: {head: 'After cardiac surgery: rule out tamponade and graft problems with the surgeon', list: ['Loculated tamponade after surgery can mimic right ventricular failure; a transesophageal echo may be needed.', 'Post-cardiotomy right failure: inotrope, inhaled vasodilator and support decisions with the surgical team.'], links: [['#t-tamp', 'Tamponade tab']], why: 'After surgery, a clot behind the heart and right ventricular failure look alike, and the treatments are opposite.'},
     other: {head: 'Unclear cause: work through the common ones', list: ['Pulmonary embolism (CT or leg ultrasound if too unstable).', 'Hypoxia, high CO2 or acidemia raising lung vessel resistance.', 'RV infarction (right-sided ECG leads).', 'Myocarditis, sepsis.', 'Chronic lung disease or pulmonary hypertension not yet diagnosed.'], why: 'Treatment of the failing right ventricle supports it for hours; the cause decides whether it recovers.'}
   };
@@ -502,7 +511,8 @@ function decideR(i){
   /* 3. The four levers */
   var L = {id: 'res-levers', label: 'Support the right ventricle: four levers', head: 'Preload, afterload, squeeze, perfusion pressure', list: [], guards: [], chips: [['load', 'acute', 'Afterload and the RV'], ['cor', lowBP ? 'low' : 'norm', 'Coronary flow and the RV']], more: [], tiers: ['AHA 2018 statement', 'ESC/ERS 2022: ICU care of RV failure', 'ESC ACVC 2024 consensus']};
   var pre;
-  if (cause === 'rvmi' && !full) pre = 'Preload: keep it. Cautious volume, small boluses, rechecking the IVC and lungs each time; no nitrates or diuretics.';
+  if (cause === 'rvmi' && full) pre = 'Preload: the IVC is already full, so no more fluid. Restore AV synchrony and start an inotrope if the pressure stays low; no nitrates.';
+  else if (cause === 'rvmi') pre = 'Preload: keep it. Cautious volume, small boluses, rechecking the IVC and lungs each time; no nitrates or diuretics.';
   else if (full) pre = 'Preload: usually less, not more. The IVC is full or the organs are congested: diurese or use ultrafiltration, even with a low blood pressure, with pressor support.';
   else if (lowBP) pre = 'Preload: one small, cautious bolus may be reasonable when the pressure is low and there are no signs of high filling pressure; stop if the IVC fills or the RV grows.';
   else pre = 'Preload: most patients need a negative fluid balance; avoid fluid unless filling pressures are clearly low.';
@@ -510,9 +520,9 @@ function decideR(i){
   L.list.push('Afterload: correct hypoxemia, acidemia and high CO2; keep lung volumes near normal (avoid both collapse and over-distension). Inhaled nitric oxide or inhaled epoprostenol for selected patients, with expert input: off-label outside PAH, can worsen oxygenation, and can cause pulmonary edema when the left ventricle is failing.');
   L.list.push('Squeeze: dobutamine or milrinone are the usual inotropes; milrinone lowers pressure more. Doses on the Pressors tool.');
   L.list.push('Perfusion pressure: keep the mean pressure above 60 with norepinephrine; vasopressin is an option (data in acute RV failure are lacking).');
-  if (full && (lowBP || poor)) L.guards.push('Do not hold diuretics only because the pressure is low if the patient is clearly overloaded: support the pressure and decongest.');
+  if (full && (lowBP || poor) && cause !== 'rvmi') L.guards.push('Do not hold diuretics only because the pressure is low if the patient is clearly overloaded: support the pressure and decongest.');
   if (cause === 'rvmi') L.guards.push(DIUR);
-  L.why = full ? 'The right ventricle is already overfilled; more volume pushes the septum into the left ventricle and lowers output, so taking volume off often raises the pressure.' : lowBP ? 'Low pressure cuts flow down the right coronary artery to a ventricle that needs more oxygen; raising the mean pressure feeds it while the load is treated.' : 'Afterload is the main problem in most acute right failure; small falls in lung vessel resistance raise its output more than any change in preload.';
+  L.why = (full && cause === 'rvmi') ? 'The infarcted right ventricle is already full; more fluid only stretches it and pushes the septum into the left ventricle, so output now depends on atrial timing and an inotrope, not on volume.' : full ? 'The right ventricle is already overfilled; more volume pushes the septum into the left ventricle and lowers output, so taking volume off often raises the pressure.' : lowBP ? 'Low pressure cuts flow down the right coronary artery to a ventricle that needs more oxygen; raising the mean pressure feeds it while the load is treated.' : 'Afterload is the main problem in most acute right failure; small falls in lung vessel resistance raise its output more than any change in preload.';
   L.more = ['AHA 2018: the teaching that acute right failure is preload-dependent and needs volume is overly simplistic; excess preload can worsen it. Diuretics should not be held in a hypotensive patient who is clearly volume overloaded.', 'ESC/ERS 2022 (PH in the ICU): most need a negative fluid balance; keep the mean systemic pressure above 60 mmHg; norepinephrine or vasopressin for persistent hypotension; dobutamine and milrinone are the most used inotropes.', 'ESC ACVC 2024: cautious volume only with low pressure and no signs of high filling pressure; specific pulmonary vasodilators outside PAH and chronic thromboembolic disease are off-label rescue therapy.'];
   L.links = [['/pressors/#shock', 'Pressor and inotrope doses']];
   cards.push(L);
@@ -528,7 +538,7 @@ function decideR(i){
     if (i.pf != null && i.pf < 150) flags.push('P/F under 150');
     if (i.co2 != null && i.co2 >= 48) flags.push('PaCO2 48 or more');
     V.why = flags.length ? 'This patient has ' + flags.length + ' of the 4 risk factors for acute cor pulmonale in ARDS (' + flags.join(', ') + '); the more present, the more likely the right ventricle is failing, so look with echo.' : 'Each of these settings lowers the resistance in the lung vessels or the pressure around them, which is the right ventricle\'s afterload.';
-    V.more = ['Acute cor pulmonale was found in 22% of 752 patients with moderate to severe ARDS on protective ventilation (transesophageal echo). Severe cor pulmonale carried a higher hospital mortality (57% vs 42%). Four risk factors: pneumonia as the cause, driving pressure 18 cmH2O or more, P/F under 150, PaCO2 48 mmHg or more. Prone position was protective.'];
+    V.more = ['Acute cor pulmonale was found in 22% of 752 patients with moderate to severe ARDS on protective ventilation (transesophageal echo). Severe cor pulmonale carried a higher hospital mortality (57% vs 42%). Four risk factors: pneumonia as the cause, driving pressure 18 cmH2O or more, P/F under 150, PaCO2 48 mmHg or more. Prone positioning was independently associated with lower hospital mortality.'];
     if (i.pf != null && i.pf < 150) V.chips = [['load', 'acute', 'Afterload and the RV']];
     cards.push(V);
   }
@@ -543,19 +553,20 @@ function decideR(i){
   var papi = (i.rap != null && i.rap > 0 && i.pasp != null && i.padp != null && i.pasp >= i.padp) ? Math.round((i.pasp - i.padp) / i.rap * 100) / 100 : null;
   var markers = [];
   if (i.rap != null && i.rap > 15) markers.push('CVP ' + i.rap + ' (over 15)');
-  if (ratio != null && ratio > 0.8) markers.push('RAP/PCWP ' + ratio + ' (over 0.8)');
+  if (ratio != null && ratio > 0.8 && i.rap >= 10) markers.push('RAP/PCWP ' + ratio + ' (over 0.8)');
   if (papi != null && papi <= 1.85) markers.push('PAPi ' + papi + ' (1.85 or less)');
-  var onDrugs = i.press && i.ino;
+  var onDrugs = i.press || i.ino;
   if (((lowBP || poor) && (onDrugs || markers.length)) || ratio != null || papi != null){
     var M = {id: 'res-mcs', label: 'Mechanical support', list: [], guards: [], tiers: ['ESC ACVC 2024 consensus', 'ESC/ERS 2022: support as a bridge in PH, IIa C'], links: [['/hf/#advanced', 'Advanced heart failure and shock']]};
     if ((lowBP || poor) && (onDrugs || markers.length)){
       M.head = 'Call the shock team now about mechanical support';
-      M.why = (onDrugs ? 'Poor perfusion despite a pressor and an inotrope' : 'Poor perfusion with ' + markers.join(', ')) + ' means drugs alone are unlikely to be enough; support takes time to set up.';
+      if (!i.ino) M.list.push('Not yet on an inotrope: adding dobutamine or milrinone is the usual next step while the team is called.');
+      M.why = (onDrugs ? 'Low pressure or poor perfusion despite vasoactive drugs' : 'Low pressure or poor perfusion with ' + markers.join(', ')) + ' means drugs alone are unlikely to be enough; support takes time to set up.';
     } else {
       M.head = markers.length ? 'Hemodynamics show right ventricular failure; not yet in shock' : 'Hemodynamics do not meet the right failure markers';
       M.why = markers.length ? 'These numbers mark a failing right ventricle; with hypoperfusion they would point to mechanical support.' : 'None of the entered values crosses the right failure markers.';
     }
-    if (ratio != null) M.list.push('RAP/PCWP: ' + ratio + (ratio > 0.8 ? ' (over 0.8: right-sided pressure out of proportion)' : ''));
+    if (ratio != null) M.list.push('RAP/PCWP: ' + ratio + (ratio > 0.8 && i.rap >= 10 ? ' (over 0.8: right-sided pressure out of proportion)' : ratio > 0.8 ? ' (over 0.8, but with RA pressure under 10 this is not a right failure marker)' : ''));
     if (papi != null) M.list.push('PAPi = (PA systolic − PA diastolic) / RA pressure = ' + papi + (papi <= 1.85 ? ' (1.85 or less)' : ''));
     M.list.push('Options: VA-ECMO (also oxygenates; raises left ventricular afterload), Impella RP or ProtekDuo (right atrium to pulmonary artery; an oxygenator can be added to ProtekDuo). An intra-aortic balloon pump is generally not recommended for isolated right failure.');
     if (cause === 'ph') M.list.push('In pulmonary hypertension, support is a bridge to transplantation or recovery; transfer to a centre that offers it.');
@@ -674,13 +685,13 @@ var FIGS = {
   sac: {t: 'Two ventricles, one sac', states: ['norm','tamp','rv'], svg: sacSVG, data: {
     norm: {n: 'Normal', line: 'The pericardium is stiff, so the two ventricles share a fixed space and a common wall, the septum.'},
     tamp: {n: 'Tamponade', line: 'Fluid takes up the fixed space. The thin-walled right heart is squeezed first, and every chamber fills less, so output falls.'},
-    rv: {n: 'RV overload', line: 'A dilated right ventricle takes the space instead: the septum flattens into the left ventricle (D shape), which fills less. More fluid makes it worse.'}}},
+    rv: {n: 'RV overload', line: 'A dilated right ventricle takes the space instead: the septum flattens into the left ventricle (D shape), which fills less. Extra fluid often makes it worse once the right ventricle is full.'}}},
   pulsus: {t: 'Pulsus paradoxus', states: ['norm','tamp'], svg: pulsusSVG, data: {
     norm: {n: 'Normal', line: 'Breathing in normally lowers systolic pressure by a few mmHg.'},
     tamp: {n: 'Tamponade', line: 'Breathing in fills the right heart; in a fixed sac the septum shifts left, the left ventricle fills less and systolic pressure falls more than 10 mmHg.'}}},
   echo: {t: 'Echo signs of tamponade', states: ['eff','ra','rv','ivc'], svg: echoSVG, data: {
     eff: {n: 'Effusion', line: 'Fluid around the heart. Size alone does not make it tamponade.'},
-    ra: {n: 'RA collapse', line: 'The right atrial wall folds in during systole: an early sign; lasting over a third of the cycle is highly specific.'},
+    ra: {n: 'RA collapse', line: 'The right atrial wall folds in at end-diastole and into early systole: an early sign; lasting over a third of the cycle is highly specific.'},
     rv: {n: 'RV collapse', line: 'The right ventricular free wall folds in during diastole: the most specific sign.'},
     ivc: {n: 'Full IVC', line: 'A wide IVC that barely changes with breathing: sensitive (97%) but not specific (40%).'}}},
   load: {t: 'Afterload and the right ventricle', states: ['normal','acute','chronic'], svg: loadSVG, data: {
@@ -695,13 +706,13 @@ var FIGS = {
 
 var PLATES = {
   tamp: {t: 'Normal heart and tamponade', src: '/media/rv-tamponade/tamponade.webp', w: 900, h: 503, alt: 'Two panels of a frontal cutaway heart. Left: a normal heart with a thin pericardial sac wrapped closely around it. Right: the same heart with a large dark collection of fluid filling the sac all around it.', cap: 'Left: normal. Right: fluid fills the pericardial sac around the heart. The sac cannot stretch quickly, so the fluid raises the pressure around every chamber.'},
-  rv: {t: 'Normal heart and right ventricular overload', src: '/media/rv-tamponade/rv-overload.webp', w: 888, h: 525, alt: 'Two panels. Left: an open pulmonary artery above a short-axis view of a normal heart, with a round left ventricle and a thin crescent-shaped right ventricle. Right: a clot filling the pulmonary artery above a heart whose right ventricle is greatly dilated, with the septum flattened and a small D-shaped left ventricle.', cap: 'Left: normal. Right: a sudden load (here a clot in the pulmonary artery) dilates the right ventricle, flattens the septum and leaves a small, underfilled left ventricle.'}
+  rv: {t: 'Normal heart and right ventricular overload', src: '/media/rv-tamponade/rv-overload.webp', w: 888, h: 525, alt: 'Two panels. Left: an open pulmonary artery above a short-axis view of a normal heart, with a round left ventricle and a crescent-shaped right ventricle. Right: a clot filling the pulmonary artery above a heart whose right ventricle is greatly dilated, with the septum pushed into a small, compressed left ventricle.', cap: 'Left: normal. Right: a sudden load (here a clot in the pulmonary artery) dilates the right ventricle, flattens the septum and leaves a small, underfilled left ventricle.'}
 };
 function plateHTML(id){ var P = PLATES[id]; return '<div class="plate"><img src="' + P.src + '" alt="' + P.alt + '" width="' + P.w + '" height="' + P.h + '" loading="lazy"><span class="credit">Created with BioRender.com</span></div><p class="line1">' + P.cap + '</p>'; }
 
 var TRIALS = [
   {q: 'How well does the bedside exam detect tamponade? (Roy 2007)', d: 'Systematic review, 8 studies of patients with known effusion or tamponade.', r: 'Common in tamponade: breathlessness 87 to 89%, tachycardia 77%, pulsus paradoxus 82%, raised JVP 76%, big heart on chest film 89%. In one study, pulsus over 10 mmHg: LR 3.3 (1.8 to 6.3); 10 or less: LR 0.03 (0.01 to 0.24).', c: 'Why pulsus is the exam sign worth measuring, and why a normal exam does not end the question: the likelihood ratios come from a single small study.', cite: 'Roy CL et al. JAMA 2007;297:1810', doi: '10.1001/jama.297.16.1810'},
-  {q: 'How often does ARDS make the right ventricle fail? (Mekontso Dessap 2016)', d: 'Prospective cohort, 752 patients with moderate to severe ARDS on protective ventilation, transesophageal echo in 11 ICUs.', r: 'Acute cor pulmonale in 22% (19 to 25%). Severe cor pulmonale: hospital mortality 57% vs 42%. Risk factors: pneumonia, driving pressure 18 or more, P/F under 150, PaCO2 48 or more. Prone position was protective.', c: 'Why ventilator settings are treated as right ventricular afterload. Observational: it shows association, not that changing settings saves lives.', cite: 'Mekontso Dessap A et al. Intensive Care Med 2016;42:862', doi: '10.1007/s00134-015-4141-2'},
+  {q: 'How often does ARDS make the right ventricle fail? (Mekontso Dessap 2016)', d: 'Prospective cohort, 752 patients with moderate to severe ARDS on protective ventilation, transesophageal echo in 11 ICUs.', r: 'Acute cor pulmonale in 22% (19 to 25%). Severe cor pulmonale: hospital mortality 57% vs 42%. Risk factors: pneumonia, driving pressure 18 or more, P/F under 150, PaCO2 48 or more. Prone positioning was associated with lower mortality.', c: 'Why ventilator settings are treated as right ventricular afterload. Observational: it shows association, not that changing settings saves lives.', cite: 'Mekontso Dessap A et al. Intensive Care Med 2016;42:862', doi: '10.1007/s00134-015-4141-2'},
   {q: 'Can catheter numbers flag a right ventricle that needs a device? (Korabathina 2012)', d: 'Retrospective, 20 patients with proximal right coronary occlusion and suspected RV failure, against controls.', r: 'PAPi 0.9 or less predicted in-hospital death or a percutaneous RV support device with 100% sensitivity and 98.3% specificity.', c: 'Introduced the pulmonary artery pulsatility index now used in consensus documents (where the cutoff of 1.85 or less is used). Very small and retrospective.', cite: 'Korabathina R et al. Catheter Cardiovasc Interv 2012;80:593', doi: '10.1002/ccd.23309'}
 ];
 </script>
