@@ -257,13 +257,14 @@ function assess(i){
   if (i.f_gas) why.push('oxygen need rising');
   if (i.f_bp) why.push('low pressure or shock');
   if (i.f_tube) why.push('intubated');
-  var volHit = (has(i.vol1) && i.vol1 > V_HOUR) || (has(i.vol24) && i.vol24 > V_DAY);
-  var small = i.f_res && ((has(i.vol1) && i.vol1 >= V_SMALL) || (has(i.vol24) && i.vol24 >= V_SMALL));
+  var lung = i.src !== 'gi' && i.src !== 'nose';
+  var volHit = lung && ((has(i.vol1) && i.vol1 > V_HOUR) || (has(i.vol24) && i.vol24 > V_DAY));
+  var small = lung && i.f_res && ((has(i.vol1) && i.vol1 >= V_SMALL) || (has(i.vol24) && i.vol24 >= V_SMALL));
   if (volHit) why.push(has(i.vol1) && i.vol1 > V_HOUR ? 'over ' + V_HOUR + ' mL in an hour' : 'over ' + V_DAY + ' mL in 24 hours');
-  else if (small) why.push(V_SMALL + ' mL or more with poor reserve');
+  else if (small) why.push(V_SMALL + ' mL or more with poor reserve, which can be life-threatening');
   var func = !!(i.f_air || i.f_gas || i.f_bp || i.f_tube);
   var dah = !!(i.c_diff && (i.c_hb || i.c_renal || i.c_auto || i.c_hsct || i.c_coc || i.side === 'both'));
-  var unstable = !!(i.f_bp || ((i.f_air || i.f_gas) && !i.f_tube));
+  var unstable = !!(i.f_bp || i.f_gas || (i.f_air && !i.f_tube));
   return {lt: func || volHit || small, func: func, vol: volHit || small, why: why, dah: dah, unstable: unstable, any: func || has(i.vol1) || has(i.vol24) || i.side !== 'unk'};
 }
 
@@ -278,7 +279,7 @@ function decide(i){
     cards.push({id: 'c-src', label: 'Is it the lung?', head: gi ? 'Probably the stomach: look for an upper GI bleed' : 'Probably the nose or mouth: look there first', sub: gi ? 'Coffee-ground or acidic material, food, nausea, liver disease or melena point to the gut.' : 'Look at the nose, the back of the throat and the gums with a light; blood from the nose can run back and be coughed out.',
       guards: ['Either way, blood can cross over: blood swallowed from the airway can be vomited, and blood from the nose can be aspirated. If the patient is coughing blood with a rising oxygen need, treat it as the lung until shown otherwise.'],
       why: gi ? 'Blood from the lung is usually bright red, frothy and alkaline; blood from the stomach is darker, acidic and may hold food.' : 'Upper-airway bleeding is common and is found by looking, not by imaging the chest.',
-      links: gi ? [['/gi-bleed/', 'GI bleed']] : [], more: ['Clues from the Ittrich 2017 and Charya 2021 reviews: respiratory blood is bright red, foamy and alkaline with macrophages; GI blood is hematinized, acidic and may contain food; coffee-ground emesis, chronic liver disease, gingivitis or nasopharyngeal ulcers are clues to a source outside the lung.'], tiers: ['Expert practice (reviews)']});
+      links: gi ? [['/gi-bleed/', 'GI bleed']] : [], more: ['Clues from the Ittrich 2017 and Charya 2021 reviews: respiratory blood is bright red, foamy and alkaline; GI blood is hematinized, acidic and may contain food; coffee-ground emesis, chronic liver disease, gingivitis or nasopharyngeal ulcers are clues to a source outside the lung.'], tiers: ['Expert practice (reviews)']});
   }
 
   /* 1. Severity */
@@ -288,6 +289,9 @@ function decide(i){
     c.sub = 'Because: ' + A.why.join(', ') + '. ICU, the team at the bedside, and a plan for the airway.';
     c.why = 'Death from hemoptysis is usually by asphyxiation, not blood loss: about ' + DEAD + ' fills the conducting airways.';
     if (!A.func) c.guards = ['The volume alone has crossed the line. Treat it as life-threatening now; do not wait for the oxygen to fall.'];
+  } else if ((i.src === 'gi' || i.src === 'nose') && A.any){
+    c.head = 'No airway, oxygen or pressure trouble entered';
+    c.sub = 'A volume counts here only if the blood is coughed up. Manage the GI or upper-airway bleed; if it turns out to be the lung, switch the answer above to "Coughed up".';
   } else if (A.any){
     c.head = 'Not life-threatening yet: watch closely';
     c.sub = 'No sign of airway, oxygen or pressure trouble from what is entered. Keep someone able to manage the airway close, and recheck often.';
@@ -296,7 +300,7 @@ function decide(i){
     c.head = 'Start with the airway, the oxygen and the pressure';
     c.sub = 'Tick what you see above. Bleeding that threatens the airway, the gas exchange or the circulation is life-threatening at any volume.';
   }
-  c.more = ['Definitions: no consensus. Rates over ' + V_HOUR + ' mL an hour or over ' + V_DAY + ' mL in 24 hours are generally treated as life-threatening (Kathuria 2020); published thresholds range from 100 to over 1000 mL in 24 hours. A functional definition is more useful: any bleeding that threatens the airway, the gas exchange or the circulation (Charya 2021).', 'Estimates of volume are unreliable, and the hemoglobin falls late: asphyxia comes before anemia.', 'Markers of a worse outcome in cohorts (Kathuria 2020): blood aspirated into the other lung, mechanical ventilation, a pulmonary artery source, cancer or aspergillosis, and opacities in several lobes.'];
+  c.more = ['Definitions: no consensus. Rates over ' + V_HOUR + ' mL an hour or over ' + V_DAY + ' mL in 24 hours are generally treated as life-threatening (Kathuria 2020); published thresholds range from 100 to over 1000 mL in 24 hours. A functional definition is more useful: any bleeding that threatens the airway, the gas exchange or the circulation (Charya 2021).', 'Estimates of volume are unreliable, and the hemoglobin falls late: asphyxia comes before anemia.', 'Markers of a worse outcome in cohorts include (Kathuria 2020): chronic alcohol use, blood aspirated into the other lung, mechanical ventilation, a pulmonary artery source, cancer or aspergillosis, and opacities in several lobes.'];
   c.tiers = ['Expert practice (reviews)'];
   cards.push(c);
 
@@ -305,26 +309,26 @@ function decide(i){
 
   /* 2. First ten minutes */
   var steps = [], sw = sideWord(i.side);
-  steps.push(['Call', A.lt ? 'Pulmonology or interventional pulmonology, interventional radiology and thoracic surgery now; anesthesia if the airway is at risk; ICU bed.' : 'Tell pulmonology; a monitored bed. Interventional radiology if it does not settle.']);
+  if (A.dah && i.side === 'both') steps.push(['Call', 'Pulmonology and ICU now for bronchoscopy and lavage; rheumatology and nephrology the same day.']); else steps.push(['Call', A.lt ? 'Pulmonology or interventional pulmonology, interventional radiology and thoracic surgery now; anesthesia if the airway is at risk; ICU bed.' : 'Tell pulmonology; a monitored bed. Interventional radiology if it does not settle.']);
   steps.push(['Position', sw ? 'Lie the patient on the ' + sw + ' side, bleeding side down, so blood does not run into the good lung.' : i.side === 'both' ? 'Both sides: sit up; there is no good lung to protect by position.' : 'Side not known: find it (exam, chest X-ray, a known lesion). Once known, bleeding side down.']);
-  if (A.lt) steps.push(['Airway', i.f_tube ? 'Already intubated: suction, check the tube size, and get a bronchoscope to the bedside to clear the good lung and find the side.' : (i.f_air || i.f_gas) ? 'Intubate now with the most experienced operator: a large single-lumen tube (8.5 mm or more preferred, 8.0 minimum), two suction units, a bronchoscope ready.' : 'Breathing on their own for now: high-flow oxygen, keep upright or side down, and prepare for intubation before it is needed.']);
+  if (A.lt) steps.push(['Airway', i.f_tube ? 'Already intubated: suction, check the tube size, and get a bronchoscope to the bedside to clear the good lung and find the side.' : i.f_air ? 'Cannot clear the blood: intubate now with the most experienced operator, a large single-lumen tube (8.5 mm or more preferred, 8.0 minimum), two suction units and a bronchoscope ready.' : i.f_gas ? 'Rising oxygen need: high-flow oxygen and prepare to intubate now (most experienced operator, large single-lumen tube, two suction units, bronchoscope). Intubate if they cannot oxygenate or ventilate, become confused, tire, or cannot clear the blood.' : 'Breathing on their own for now: high-flow oxygen, keep upright or side down, and prepare for intubation before it is needed.']);
   steps.push(['Access and blood', 'Two large-bore IV lines; type and crossmatch; CBC, coagulation tests, creatinine and urinalysis.']);
-  if (i.ac !== 'none' || i.p_ap || (has(i.plt) && i.plt < PLT_FLOOR) || (has(i.inr) && i.inr > INR_HIGH)) steps.push(['Reverse', 'Stop the anticoagulant or antiplatelet and correct clotting: see the next card.']);
+  if (i.ac !== 'none' || i.p_ap || (has(i.plt) && i.plt < PLT_FLOOR) || (has(i.inr) && i.inr > INR_HIGH)) steps.push(['Reverse', A.lt ? 'Stop the anticoagulant or antiplatelet and correct clotting: see the next card.' : 'Hold the anticoagulant or antiplatelet; reverse if the bleeding becomes major: see the next card.']);
   if (i.c_tb) steps.push(['Isolate', 'Tuberculosis possible: airborne isolation room and N95 respirators for staff; bronchoscopy and intubation generate aerosols.']);
   steps.push(['Cough', 'Keep the cough: avoid heavy sedation while the patient protects their own airway. Suppressing the cough is not supported.']);
   steps.push(['Tranexamic acid', 'Not studied in life-threatening hemoptysis; it can be considered as a temporizing measure before definitive treatment. No dose is given here; see the trial cards.']);
   cards.push({id: 'c-first', label: 'The first ten minutes', head: A.lt ? 'Protect the good lung and secure the airway' : 'Prepare in case it gets worse', steps: steps,
     why: sw ? 'Blood runs downhill: with the bleeding side down, it stays in the lung that is already bleeding.' : (A.lt ? 'The first job is keeping blood out of the airways that are still working; finding the source comes next.' : null),
     links: [['/airway/', 'Airway and RSI'], ['/reversal/', 'Reversal']],
-    chips: [['iso', sw === 'left' ? 'lr' : sw === 'right' ? 'rl' : 'down', 'Protect the good lung'], ['fill', '', 'How much fills the airways']],
+    chips: [['iso', sw === 'left' ? 'lr' : sw === 'right' ? 'rl' : 'down', 'Protect the good lung'], ['plate:pos', '', 'Bleeding side down'], ['fill', '', 'How much fills the airways']],
     more: ['Positioning, tube size, sedation and cough advice are expert practice from the Kathuria 2020, Charya 2021 and Radchenko 2017 reviews. Isolation: CDC 2005 places suspected or confirmed infectious tuberculosis in an airborne infection isolation room with at least N95 protection, and bronchoscopy suites should meet the same standard.', 'Tranexamic acid: Kathuria 2020 notes it has not been studied in life-threatening hemoptysis; Charya 2021 notes nebulized tranexamic acid has been used in moderate, not life-threatening, hemoptysis.'],
     tiers: ['Expert practice', 'Isolation: CDC 2005']});
 
   /* 3. Airway and isolation of the bleeding lung */
   if (A.lt){
     var iso = sw === 'left' ? 'Left lung bleeding: the tube can be advanced into the right mainstem bronchus, ideally over a bronchoscope. It can block the right upper lobe; check that lobe is aerated.' : sw === 'right' ? 'Right lung bleeding: the tube must go into the left mainstem bronchus. A tube pushed blindly tends to go right, so guide it over a bronchoscope.' : i.side === 'both' ? 'Both lungs bleeding: there is no good lung to isolate. A large tube in the trachea for bronchoscopy and lavage, and lung-protective ventilation.' : 'Side not known yet: a large tube in the trachea, then a bronchoscope to find the side. Isolate once it is known.';
-    cards.push({id: 'c-air', label: 'Airway and isolating the bleeding lung', head: i.side === 'both' ? 'Large single-lumen tube; no side to isolate' : i.f_tube ? 'Find the side, then isolate it' : 'Large single-lumen tube, then isolate the bleeding side', list: ['Tube: single lumen, 8.5 mm or more preferred, 8.0 minimum. A tube this size takes a large-channel bronchoscope; a blocker and a scope together need room, so an 8.0 tube will not take a therapeutic scope beside a blocker.', iso, 'Or an endobronchial blocker in the bleeding bronchus: a temporizing step, usually for the first 48 to 72 hours, deflated periodically.', 'Double-lumen tubes: not for routine use; they are hard to place, their small lumens clot, and they need an expert.'],
-      guards: ['A blocker can slip. A sudden rise in airway pressure or fall in tidal volume means it has migrated: deflate it and pull it back. Tell the nurse and respiratory therapist the tube and blocker depths.'],
+    cards.push({id: 'c-air', label: 'Airway and isolating the bleeding lung', head: i.side === 'both' ? 'Large single-lumen tube; no side to isolate' : i.f_tube ? 'Find the side, then isolate it' : (i.f_air || i.f_gas) ? 'Large single-lumen tube, then isolate the bleeding side' : 'If intubation is needed: large single-lumen tube, then isolate', list: ['Tube: single lumen, 8.5 mm or more preferred, 8.0 minimum. A tube this size takes a large-channel bronchoscope; a blocker and a scope together need room, so an 8.0 tube will not take a therapeutic scope beside a blocker.', iso].concat(i.side === 'both' ? [] : ['Or an endobronchial blocker through the tube into the bleeding bronchus: a temporizing step, usually for the first 48 to 72 hours, deflated periodically.', 'Double-lumen tubes: not for routine use; they are hard to place, their small lumens clot, and they need an expert.']),
+      guards: i.side === 'both' ? [] : ['A blocker can slip. A sudden rise in airway pressure or fall in tidal volume means it has migrated: deflate it and pull it back. Tell the nurse and respiratory therapist the tube and blocker depths.'],
       why: i.side === 'both' ? 'With both lungs bleeding the aim is clearing the airways and supporting gas exchange while the cause is treated.' : sw ? 'Isolating the bleeding side keeps the other lung clear to oxygenate while the source is found and stopped.' : 'A large tube lets a bronchoscope clear the blood, find the side, and pass the tools that isolate it.',
       links: [['/airway/', 'Airway and RSI'], ['/vent/', 'Ventilator basics']], chips: [['iso', sw === 'left' ? 'lr' : sw === 'right' ? 'rl' : 'blocker', 'Tubes and blockers']],
       more: ['Tube size: 8.0 mm or larger (Kathuria 2020); 8.5 to 9 mm in men and 8.0 to 8.5 mm in women (Charya 2021); 8.5 mm and above (Radchenko 2017). The blocker and the bronchoscope together must be smaller than the tube\'s inner diameter, with at least 1 mm and preferably 2 mm to spare (Charya 2021).', 'Mainstem intubation does not allow bronchoscopic treatment of the bleeding lung (Kathuria 2020). Blockers are prone to dislodgement (Radchenko 2017); balloon catheters have been left 12 to 48 hours with periodic deflation (Charya 2021).', 'Double-lumen tubes: a 36% failure rate when placed by anesthesiologists without thoracic experience; reviews advise a single-lumen tube first (Charya 2021) and against routine double-lumen tubes (Kathuria 2020, Radchenko 2017).'],
@@ -340,7 +344,7 @@ function decide(i){
   if (i.p_ap) br.push('Antiplatelet: hold it. Platelet transfusion for bleeding on antiplatelet drugs has weak evidence; decide with the team.');
   if (i.p_stent) bg.push('Recent stent, mechanical valve or ECMO: stopping or reversing carries its own risk. Decide with cardiology or the ECMO team, and agree when to restart.');
   if (has(i.plt) && i.plt < PLT_FLOOR) bg.push('Platelets ' + i.plt + ': in a major bleed keep them over ' + PLT_FLOOR + ' (expert practice, as in the transfusion tool).');
-  if (has(i.inr) && i.inr > INR_HIGH && i.ac !== 'warf') br.push('INR ' + i.inr + ' without warfarin: think of liver disease, vitamin K deficiency or DIC; treat with the bleed in mind (transfusion tool).');
+  if (has(i.inr) && i.inr > INR_HIGH && i.ac === 'none') br.push('INR ' + i.inr + ' without warfarin: think of liver disease, vitamin K deficiency or DIC; treat with the bleed in mind (transfusion tool).');
   if (br.length || bg.length) cards.push({id: 'c-risk', label: 'Anticoagulants and clotting', head: A.lt ? 'Stop and reverse' : 'Hold, and be ready to reverse', list: br, guards: bg,
     why: A.lt ? 'Correcting clotting helps the bleeding vessel seal while the airway is protected and the source is found.' : 'Most bleeding on an anticoagulant settles once the drug is held; reversal is for major bleeding.',
     links: [['/reversal/', 'Reversal: agent and dose'], ['/transfusion/', 'Transfusion']], more: ['No hemoptysis source gives a reversal agent, an INR target or a platelet threshold; the reviews advise correcting any bleeding disorder (Kathuria 2020) and appropriate reversal by scenario (Radchenko 2017). Doses are in the reversal tool.'], tiers: ['Expert practice']});
@@ -350,7 +354,7 @@ function decide(i){
     var pr = i.c_renal;
     cards.push({id: 'c-dah', label: 'Diffuse alveolar hemorrhage?', head: A.dah ? (pr ? 'Think diffuse alveolar hemorrhage with a pulmonary-renal syndrome' : 'Think diffuse alveolar hemorrhage') : 'Diffuse infiltrates: consider alveolar hemorrhage',
       sub: 'Diffuse infiltrates, a falling hemoglobin and hypoxemia, with or without blood coughed up: up to a third of patients have no hemoptysis.',
-      list: ['Bronchoscopy with lavage from one segment: returns that get bloodier with each aliquot are diagnostic. Hemosiderin-laden macrophages take 48 to 72 hours to appear, so an early negative stain does not exclude it. In a hypoxemic patient the airway may need securing first.', 'Send: urinalysis with microscopy (in every patient), creatinine, CBC, coagulation tests, ESR and CRP, ANCA (MPO and PR3), anti-GBM, ANA, antiphospholipid antibodies; C3, C4 and anti-dsDNA if lupus is possible.', 'Rule out infection: lavage cultures (bacterial, fungal, viral, Pneumocystis) before high-dose immunosuppression.', 'Treat the cause with rheumatology and nephrology. Capillaritis from ANCA vasculitis: glucocorticoids (IV pulses allowed) with a reduced-dose taper, plus rituximab or cyclophosphamide. Do not wait for serologies or a kidney biopsy to start in pulmonary-renal syndrome.', 'Plasma exchange: the guidelines differ. ACR 2021 conditionally recommends against adding it for alveolar hemorrhage in GPA or MPA (salvage only); KDIGO 2024 says consider it when DAH comes with hypoxemia. Both advise it when anti-GBM antibodies are also present.'],
+      list: ['Bronchoscopy with lavage from one segment: returns that get bloodier with each aliquot are diagnostic. Hemosiderin-laden macrophages take 48 to 72 hours to appear, so an early negative stain does not exclude it. In a hypoxemic patient the airway may need securing first.', 'Send: urinalysis with microscopy (in every patient), creatinine, CBC, coagulation tests, ESR and CRP, ANCA (MPO and PR3), anti-GBM, ANA, antiphospholipid antibodies; C3, C4 and anti-dsDNA if lupus is possible.', 'Rule out infection: lavage cultures (bacterial, fungal, viral, Pneumocystis) before high-dose immunosuppression.', 'Treat the cause with rheumatology and nephrology. Capillaritis from ANCA vasculitis: glucocorticoids (IV pulses allowed) with a reduced-dose taper, plus rituximab or cyclophosphamide. Do not wait for a kidney biopsy once ANCA is positive; in a rapidly worsening pulmonary-renal picture, decide on empiric pulse steroids with rheumatology while serologies are pending (expert practice).', 'Plasma exchange: the guidelines differ. ACR 2021 conditionally recommends against adding it for alveolar hemorrhage in GPA or MPA (salvage only); KDIGO 2024 says consider it when DAH comes with hypoxemia. Both advise it when anti-GBM antibodies are also present.'],
       why: 'The bleeding comes from capillaries across both lungs, so there is no single vessel to embolize: treatment is the cause.',
       links: [['/ards/#mimics', 'ARDS mimics']], chips: [['dah', 'cap', 'Capillaritis and the lavage']],
       more: ['Patterns (Park 2013): capillaritis (ANCA vasculitis, anti-GBM disease, lupus), bland hemorrhage (coagulopathy, anticoagulants, mitral stenosis), and hemorrhage with diffuse alveolar damage (stem-cell transplant, infection, drugs, inhaled cocaine). Lupus and transplant-related DAH follow different treatment pathways from ANCA vasculitis.', 'PEXIVAS (2020): plasma exchange did not reduce death or end-stage kidney disease overall (HR 0.86); 191 patients had pulmonary hemorrhage, 61 severe, and the effect did not differ in them.'],
@@ -378,29 +382,30 @@ function decide(i){
 
   /* 7. Stop it */
   if (!(A.dah && i.side === 'both')){
-    var pa = i.c_pac || i.c_tb, sl = ['Bronchial artery embolization is the first-line treatment for bleeding that does not stop: it stops bleeding at once in 70 to 99%, but it recurs in 10 to 57%, so it is not the end of the plan.', 'While waiting, the bronchoscopist can tamponade: cold saline, topical vasoconstrictor (dose capped, with rhythm monitoring), topical tranexamic acid or thrombin, a balloon or a spigot. Mostly case series.', 'Surgery: emergent for chest trauma, a ruptured pulmonary artery, bleeding from a resectable tumor, or embolization that fails. Emergent resection carries far higher mortality than planned resection.'];
+    var pa = i.c_pac || i.c_tb, sl = ['Bronchial artery embolization is the first-line treatment in most massive hemoptysis: it stops bleeding at once in 70 to 99%, but it recurs in 10 to 57%, so it is not the end of the plan.', 'While waiting, the bronchoscopist can tamponade: cold saline, topical vasoconstrictor (dose capped, with rhythm monitoring), topical tranexamic acid or thrombin, a balloon or a spigot. Mostly case series.', 'Surgery: emergent for chest trauma, a ruptured pulmonary artery, bleeding from a resectable tumor, or embolization that fails. Emergent resection carries far higher mortality than planned resection.'];
     if (pa) sl.splice(1, 0, i.c_pac ? 'After a pulmonary artery catheter or chest procedure, think pulmonary artery injury: CT angiography and pulmonary angiography; it is closed with coils or plugs, or surgery. Bronchial embolization alone will not stop it.' : 'A cavity can erode a pulmonary artery branch (Rasmussen aneurysm): look for a pseudoaneurysm on CT angiography. It needs pulmonary angiography with coils or plugs; bronchial embolization alone will not stop it.');
     if (i.c_asp) sl.push('Fungus ball: embolization is a bridge; most rebleed without surgery, so plan resection after recovery.');
     cards.push({id: 'c-stop', label: 'Stop the bleeding', head: !A.lt ? 'If it does not settle: bronchial artery embolization' : pa ? 'Embolization, and check the pulmonary artery' : 'Bronchial artery embolization', list: sl,
       guards: ['Spinal cord ischemia is a rare complication of embolization: the artery to the spinal cord can arise from a bronchial artery.'],
       why: pa ? 'Most bleeding is bronchial, but a pulmonary artery source needs a different procedure, so the source vessel matters.' : 'About 90% of massive hemoptysis comes from bronchial arteries at systemic pressure, which embolization blocks.',
-      chips: [['circ', pa ? 'pa' : 'bron', 'Which vessel bleeds']],
+      chips: [['circ', pa ? 'pa' : 'bron', 'Which vessel bleeds'], ['plate:circ', '', 'The two circulations']],
       more: ['Panda 2017 (22 series, 50 or more patients each): immediate success 70 to 99%, recurrence 10 to 57%, from incomplete embolization, recanalization and new collaterals; recurrence is higher with non-bronchial systemic collaterals, aspergilloma and active or drug-resistant tuberculosis. Major complications had a median incidence of 0.1%; spinal cord ischemia 0.6 to 4.4% in older series. The spinal artery arises from a bronchial artery in about 5% (Kathuria 2020).', 'Sources (Kathuria 2020): bronchial arteries about 90%, non-bronchial systemic arteries about 5%, pulmonary arteries about 5%, rarely the aorta.', 'Bronchoscopic measures (Charya 2021, Radchenko 2017): saline at 4 °C in 50 mL aliquots (12 patients); topical epinephrine with a maximum of 0.6 mg, arrhythmia reported with 0.1 mg; fibrinogen-thrombin, oxidized cellulose, spigots and balloons in case series; one small trial of topical tranexamic acid against epinephrine. Laser is not used above FiO2 0.40 (fire risk).', 'Surgery (Kathuria 2020): emergent resection mortality 35 to 40%, against 0 to 18% when planned.'],
-      tiers: ['Observational (embolization series)', 'Expert practice']});
+      tiers: ['ACR Appropriateness Criteria (embolization)', 'Observational (embolization series)', 'Expert practice']});
   }
 
   /* 8. Comfort */
   if (i.c_term) cards.push({id: 'c-comfort', label: 'Goals of care', head: 'If the goal is comfort, plan for a terminal bleed', list: ['Talk early with the patient and family about what to do if a large bleed happens.', 'Have sedation and an opioid ordered and at the bedside for distress, dark towels to hide the blood, and someone to stay with the patient.', 'Position bleeding side down; suction for comfort.'], why: 'A massive bleed from a central tumor can be quick; a plan made beforehand spares the patient and family distress.', links: [['/goals-of-care/', 'Goals of care']], tiers: ['Expert practice']});
 
   /* 9. After */
-  cards.push({id: 'c-after', label: 'After it stops', head: 'Treat the cause and watch for a rebleed', list: ['Rebleeding is common, early (incomplete embolization) and again months to years later. It is highest with aspergilloma, tuberculosis and its sequelae (especially active or drug-resistant), sarcoidosis, cystic fibrosis, and cancer.', 'Fungus ball: referral for planned surgery. Repeat embolization is reasonable for recurrence from any cause.', 'No cause found (cryptogenic): about 6% are later found to have lung cancer, so follow-up imaging and smoking cessation.', 'Restarting an anticoagulant: no hemoptysis source gives a timing. Decide with the team, weighing the reason it was started against the rebleed risk.'], why: 'The bleeding vessel came from a disease that is still there, and recurrence after embolization is frequent.', more: ['Kathuria 2020: early recurrence within 2 weeks is usually incomplete embolization, with a second peak at 1 to 2 years; repeat embolization is appropriate for recurrence from all causes; most aspergillomas rebleed if not resected. Charya 2021: 6% of cryptogenic hemoptysis later developed lung cancer, at a mean of 17.3 months.'], tiers: ['Observational', 'Expert practice']});
+  if (A.dah && i.side === 'both') cards.push({id: 'c-after', label: 'After it stops', head: 'Treat the cause and watch for a relapse', list: ['Alveolar hemorrhage can recur, especially in ANCA vasculitis; a new fall in hemoglobin or new infiltrates is the warning.', 'Follow-up with rheumatology or nephrology for the underlying disease and its maintenance treatment.', 'Restarting an anticoagulant after bland hemorrhage: no source gives a timing. Decide with the team.'], why: 'The capillaries bled because of a disease that is still there.', more: ['Park 2013: recurrent episodes of DAH are described in vasculitis and other causes; treatment is aimed at the cause.'], tiers: ['Expert practice']});
+  else cards.push({id: 'c-after', label: 'After it stops', head: 'Treat the cause and watch for a rebleed', list: ['Rebleeding is common, early (incomplete embolization) and again months to years later. It is highest with aspergilloma, tuberculosis and its sequelae (especially active or drug-resistant), sarcoidosis, cystic fibrosis, and cancer.', 'Fungus ball: referral for planned surgery. Repeat embolization is reasonable for recurrence from any cause.', 'No cause found (cryptogenic): about 6% are later found to have lung cancer, so follow-up imaging and smoking cessation.', 'Restarting an anticoagulant: no hemoptysis source gives a timing. Decide with the team, weighing the reason it was started against the rebleed risk.'], why: 'The bleeding vessel came from a disease that is still there, and recurrence after embolization is frequent.', more: ['Kathuria 2020: early recurrence within 2 weeks is usually incomplete embolization, with a second peak at 1 to 2 years; repeat embolization is appropriate for recurrence from all causes; most aspergillomas rebleed if not resected. Charya 2021: 6% of cryptogenic hemoptysis later developed lung cancer, at a mean of 17.3 months.'], tiers: ['Observational', 'Expert practice']});
 
   return {cards: cards, a: A};
 }
 
 /* Workup that narrows: tap a result, the causes that do not fit fade. */
 var CAUSES = [
-  {k: 'bx', n: 'Bronchiectasis', s: 'Most common cause in the US; dilated airways with hypertrophied bronchial arteries.'},
+  {k: 'bx', n: 'Bronchiectasis', s: 'A leading cause in the US, with lung cancer; dilated airways with enlarged bronchial arteries.'},
   {k: 'ca', n: 'Lung cancer', s: 'Central and squamous tumors bleed most; bevacizumab adds risk.'},
   {k: 'tb', n: 'Tuberculosis or a cavity', s: 'Most common cause worldwide; a cavity can erode a pulmonary artery (Rasmussen).'},
   {k: 'asp', n: 'Aspergilloma', s: 'Fungus ball in an old cavity; rebleeds unless resected.'},
@@ -415,8 +420,8 @@ var RESULTS = [
   {k: 'mass', n: 'Mass or endobronchial lesion', keep: ['ca'], why: 'A mass or lesion in the airway is cancer until shown otherwise.'},
   {k: 'dil', n: 'Dilated airways on CT', keep: ['bx', 'tb'], why: 'Bronchiectasis, including after tuberculosis.'},
   {k: 'ball', n: 'Mobile mass inside a cavity', keep: ['asp'], why: 'A fungus ball that moves with position is an aspergilloma.'},
-  {k: 'pseudo', n: 'Pseudoaneurysm on CT angiography', keep: ['pa', 'tb'], why: 'A pulmonary artery pseudoaneurysm: injury, or a Rasmussen aneurysm in a cavity.'},
-  {k: 'diff', n: 'Diffuse bilateral infiltrates', keep: ['cap', 'bland', 'nec'], why: 'Diffuse filling suggests alveolar hemorrhage, or blood aspirated from a focal source, or infection.'},
+  {k: 'pseudo', n: 'Pseudoaneurysm on CT angiography', keep: ['pa', 'tb', 'nec', 'asp', 'ca', 'bx'], why: 'A pulmonary artery pseudoaneurysm: injury, a Rasmussen aneurysm in a tuberculous cavity, or erosion by necrotizing infection, a fungus ball, cancer or bronchiectasis.'},
+  {k: 'diff', n: 'Diffuse bilateral infiltrates', keep: ['cap', 'bland', 'nec', 'bx', 'ca', 'tb', 'asp'], why: 'Diffuse filling suggests alveolar hemorrhage or infection, but blood aspirated from a focal source can look the same, so focal causes stay until bronchoscopy.'},
   {k: 'bal', n: 'Lavage bloodier with each aliquot', keep: ['cap', 'bland'], why: 'Progressively bloodier returns from one segment are diagnostic of alveolar hemorrhage.'},
   {k: 'anca', n: 'ANCA or anti-GBM positive, or red cell casts', keep: ['cap'], why: 'An immune capillaritis, often with the kidneys involved.'},
   {k: 'neg', n: 'CT and bronchoscopy both normal', keep: ['cry'], why: 'No source found: cryptogenic, with follow-up.'}
@@ -484,7 +489,7 @@ var ISO = {
   down: {n: 'Side down', line: 'Lying on the bleeding side lets gravity keep blood in the lung that is already bleeding, so the upper lung stays clear to oxygenate.'},
   lr: {n: 'Left bleeds: tube right', line: 'Left lung bleeding: the tube can be advanced into the right mainstem bronchus, ideally over a bronchoscope. The cuff seals the right lung off from the blood; watch the right upper lobe, whose bronchus the tube can block.'},
   rl: {n: 'Right bleeds: tube left', line: 'Right lung bleeding: the tube goes into the left mainstem bronchus. A tube pushed blindly tends to go right, so it is guided over a bronchoscope.'},
-  blocker: {n: 'Blocker', line: 'A blocker balloon inflated in the bleeding bronchus, beside a tube in the trachea, isolates the bleeding side and leaves a large tube for the bronchoscope. It is temporary and can slip: a rise in airway pressure means it has moved.'}
+  blocker: {n: 'Blocker', line: 'A blocker passed through the tube and inflated in the bleeding bronchus isolates the bleeding side while the tube stays in the trachea. The blocker and the bronchoscope must both fit in the tube. It is temporary and can slip: a rise in airway pressure means it has moved.'}
 };
 function lungsSVG(k){
   var h = svgOpen('0 0 360 260', 'Trachea, both lungs and where the tube goes');
@@ -501,12 +506,12 @@ function lungsSVG(k){
   var lFill = bl === 'L' ? 'fill:var(--badbg);stroke:var(--bad);stroke-width:2.5' : 'fill:var(--fill);stroke:var(--muted);stroke-width:2';
   h += '<path d="M180 64 C150 70 90 80 70 140 C58 190 80 228 120 230 C150 232 160 200 164 160 Z" style="' + rFill + '"/>';
   h += '<path d="M180 64 C210 70 270 80 290 140 C302 190 280 228 240 230 C210 232 200 200 196 160 Z" style="' + lFill + '"/>';
-  h += '<path d="M172 10 L188 10 L188 74 L216 118 L204 124 L180 86 L156 124 L144 118 L172 74 Z" style="fill:var(--card);stroke:var(--ink);stroke-width:1.5"/>';
+  h += '<path d="M172 10 L188 10 L188 74 L220 114 L210 122 L180 88 L166 126 L154 122 L172 74 Z" style="fill:var(--card);stroke:var(--ink);stroke-width:1.5"/>';
   h += tx(96, 250, 'Right lung', {s: 11, w: 600}) + tx(264, 250, 'Left lung', {s: 11, w: 600});
   var tube = 'stroke:var(--accent);stroke-width:5;fill:none;stroke-linecap:round';
-  if (k === 'lr') h += '<path d="M180 2 L180 76 L158 112" style="' + tube + '"/><ellipse cx="163" cy="104" rx="9" ry="6" transform="rotate(-55 163 104)" style="fill:var(--accent);opacity:.75"/>' + tx(102, 92, 'tube in right', {s: 10.5, c: 'var(--accent)', w: 600}) + tx(102, 106, 'mainstem', {s: 10.5, c: 'var(--accent)', w: 600});
-  if (k === 'rl') h += '<path d="M180 2 L180 76 L202 112" style="' + tube + '"/><ellipse cx="197" cy="104" rx="9" ry="6" transform="rotate(55 197 104)" style="fill:var(--accent);opacity:.75"/>' + tx(258, 92, 'tube in left', {s: 10.5, c: 'var(--accent)', w: 600}) + tx(258, 106, 'mainstem', {s: 10.5, c: 'var(--accent)', w: 600});
-  if (k === 'blocker') h += '<path d="M180 2 L180 60" style="' + tube + '"/><ellipse cx="180" cy="54" rx="7" ry="5" style="fill:var(--accent);opacity:.75"/><path d="M184 4 L184 80 L204 112" style="stroke:var(--warn);stroke-width:2;fill:none"/><ellipse cx="203" cy="110" rx="9" ry="7" style="fill:var(--warn)"/>' + tx(268, 104, 'blocker balloon', {s: 10.5, c: 'var(--warn)', w: 600}) + tx(110, 40, 'tube in trachea', {s: 10.5, c: 'var(--accent)', w: 600});
+  if (k === 'lr') h += '<path d="M180 2 L180 76 L164 116" style="' + tube + '"/><ellipse cx="167" cy="107" rx="9" ry="6" transform="rotate(-68 167 107)" style="fill:var(--accent);opacity:.75"/>' + tx(102, 92, 'tube in right', {s: 10.5, c: 'var(--accent)', w: 600}) + tx(102, 106, 'mainstem', {s: 10.5, c: 'var(--accent)', w: 600});
+  if (k === 'rl') h += '<path d="M180 2 L180 76 L206 110" style="' + tube + '"/><ellipse cx="200" cy="102" rx="9" ry="6" transform="rotate(52 200 102)" style="fill:var(--accent);opacity:.75"/>' + tx(258, 92, 'tube in left', {s: 10.5, c: 'var(--accent)', w: 600}) + tx(258, 106, 'mainstem', {s: 10.5, c: 'var(--accent)', w: 600});
+  if (k === 'blocker') h += '<path d="M180 2 L180 60" style="' + tube + '"/><ellipse cx="180" cy="54" rx="7" ry="5" style="fill:var(--accent);opacity:.75"/><path d="M180 4 L180 80 L204 112" style="stroke:var(--warn);stroke-width:2;fill:none"/><ellipse cx="203" cy="110" rx="9" ry="7" style="fill:var(--warn)"/>' + tx(268, 104, 'blocker balloon', {s: 10.5, c: 'var(--warn)', w: 600}) + tx(110, 40, 'tube in trachea', {s: 10.5, c: 'var(--accent)', w: 600});
   h += tx(bl === 'R' ? 108 : 252, 176, 'bleeding', {s: 11, w: 600, c: 'var(--bad)'});
   return h + '</svg>';
 }
@@ -538,7 +543,7 @@ function dahSVG(k){
     h += tx(180, 232, 'each return bloodier than the last', {s: 11, w: 600, c: 'var(--bad)'});
     return h + '</svg>';
   }
-  h += '<circle cx="180" cy="118" r="78" style="fill:var(--card);stroke:var(--muted);stroke-width:2"/>' + tx(320, 216, 'alveolus', {s: 10.5, a: 'end', c: 'var(--muted)'});
+  h += '<circle cx="180" cy="118" r="78" style="fill:var(--card);stroke:var(--muted);stroke-width:2"/>' + tx(22, 200, 'alveolus', {s: 10.5, a: 'start', c: 'var(--muted)'});
   var wall = k === 'cap' ? 'stroke:var(--bad);stroke-width:7;stroke-dasharray:14 8' : 'stroke:var(--hrt-art);stroke-width:7';
   h += '<circle cx="180" cy="118" r="90" style="fill:none;' + wall + '"/>';
   h += tx(180, 226, k === 'cap' ? 'inflamed capillary wall, broken' : k === 'bland' ? 'capillary wall intact' : 'hyaline membrane lines the alveolus', {s: 11, w: 600, c: k === 'cap' ? 'var(--bad)' : 'var(--ink)'});
@@ -557,7 +562,10 @@ var FIGS = {
   dah: {t: 'Diffuse alveolar hemorrhage', states: ['cap', 'bland', 'dad', 'bal'], data: DAHS, svg: dahSVG},
   fill: {t: 'How much blood fills the airways', slider: true}
 };
-var PLATES = {};
+var PLATES = {
+  circ: {t: 'The two blood supplies of the lung', src: '/media/hemoptysis/two-circulations.webp', w: 605, h: 556, alt: 'Front view of the heart and both lungs. Blue pulmonary arteries leave the heart and branch through both lungs. Thin red bronchial arteries run alongside the main bronchi below the trachea, and the red aorta runs down behind the heart.', cap: 'Blue: the pulmonary arteries, carrying the whole output of the right ventricle at low pressure. Red: the small bronchial arteries along the bronchi, fed from the aorta at systemic pressure, the source of most massive hemoptysis. Colors here show the circuit, not oxygen content.'},
+  pos: {t: 'Bleeding side down', src: '/media/hemoptysis/side-down.webp', w: 925, h: 333, alt: 'A patient lying on their side on a hospital bed, with the chest drawn see-through: the lower lung, against the bed, is dark red with blood, and the upper lung is pink and clear.', cap: 'The patient lies on the bleeding side: blood (dark lung) stays below, and the upper lung stays clear to oxygenate.'}
+};
 </script>
 <script>
 (function(){
@@ -635,7 +643,7 @@ function mountFill(host, v0){
     host.querySelector('.sl b').textContent = v + ' mL';
     host.querySelector('.dp').innerHTML = R.rows.map(function(r){ return '<div><p class="label">' + esc(r[0]) + '</p><p>' + esc(r[1]) + '</p></div>'; }).join('');
   }
-  host.innerHTML = '<div class="fillfig"></div><div class="sl"><label for="' + host.id + '-r">Blood in the airways <b></b></label><input type="range" id="' + host.id + '-r" min="0" max="300" step="10" value="' + v0 + '"></div><div class="zs" aria-hidden="true"></div><p class="zt"></p><div class="dp"></div>';
+  host.innerHTML = '<div class="fillfig"></div><div class="sl"><label for="' + host.id + '-r">Blood in the airways <b></b></label><input type="range" id="' + host.id + '-r" min="0" max="300" step="10" value="' + v0 + '"></div><div class="zs" aria-hidden="true"></div><p class="zt"></p><div class="dp"></div><p class="hint">Zones: 50 mL from Kathuria 2020; airway volume 150 to 200 mL from Ittrich 2017 and Charya 2021. Expert practice.</p>';
   host.querySelector('input').addEventListener('input', function(e){ draw(parseInt(e.target.value, 10)); });
   draw(v0);
 }
