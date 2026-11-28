@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ICU nutrition and refeeding · bedside.tools</title>
+<meta name="description" content="ICU nutrition for residents: start enteral feeding now or wait (shock and gut), first-week calorie and protein targets including obesity and CRRT, feed rate after propofol and dextrose calories, parenteral nutrition timing, refeeding risk and refeeding hypophosphatemia, intolerance and prokinetics.">
+<script src="/theme.js"></script>
+<style>
+:root{--bg:#FBFBFA;--card:#FFFFFF;--ink:#111113;--muted:#55555D;--line:#ECECEE;--accent:#2B4BDB;--warn:#9A3B00;--warnbg:#FFF6EC}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5}
+.wrap{max-width:720px;margin:0 auto;padding:20px 16px 48px}
+a{color:var(--accent)}
+.back{font-size:14px;text-decoration:none;display:inline-block;min-height:44px;line-height:44px}
+h1{font-size:26px;margin:4px 0 4px;letter-spacing:-.01em}
+.purpose{color:var(--muted);margin:0 0 8px}
+.frame{font-size:14.5px;margin:0 0 18px;padding:8px 12px;border:1px solid var(--line);border-radius:12px;background:var(--card)}
+.tabs{display:flex;gap:6px;margin:0 -16px 14px;padding:2px 16px;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:0 0 auto;min-height:44px;border:1px solid var(--line);background:var(--card);border-radius:14px;padding:0 14px;font:inherit;font-size:14px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap}
+.tab[aria-selected="true"]{border-color:var(--accent);color:var(--accent)}
+.panel{display:none}.panel.on{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px;scroll-margin-top:calc(var(--bt-bar,0px) + 12px)}
+.label{font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+input:focus-visible,.tab:focus-visible,button:focus-visible,summary:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.sub{font-size:14px;color:var(--muted);margin:0}
+.head{font-size:18px;font-weight:700;margin:4px 0 4px;line-height:1.35}
+.whyline{margin:10px 0 0;font-size:14.5px;color:var(--muted)}
+.whyline b{color:var(--ink);font-weight:600}
+details{margin-top:10px;border-top:1px solid var(--line);padding-top:4px}
+summary{cursor:pointer;color:var(--accent);font-weight:600;min-height:44px;line-height:44px}
+details p{margin:0 0 8px;font-size:15px}
+.card ul,.card ol{margin:6px 0 0;padding-left:20px}.card li{margin-bottom:5px;font-size:15px}
+.tier{display:inline-block;font-family:var(--mono);font-size:11px;border:1px solid var(--line);border-radius:999px;padding:2px 8px;color:var(--muted);margin:2px 4px 0 0;white-space:normal;max-width:100%}
+.guard{border-left:3px solid var(--warn);background:var(--warnbg);padding:10px 12px;border-radius:0 10px 10px 0;margin:10px 0 0;font-size:15px}
+.guard b{display:block;color:var(--warn)}
+.note{font-size:14px;color:var(--muted)}
+.mono{font-family:var(--mono);font-size:14px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.fld label{display:block;font-size:13.5px;color:var(--muted);margin-bottom:4px}
+.fld input{width:100%;min-height:48px;border:1px solid var(--line);border-radius:12px;padding:10px 12px;font:inherit;font-family:var(--mono);font-size:16px;background:var(--card);color:var(--ink)}
+.rchips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 4px}
+.rchip{min-height:44px;padding:0 12px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--ink);font:inherit;font-size:14px;cursor:pointer;text-align:left}
+.rchip[aria-pressed="true"]{border-color:var(--accent);color:var(--accent);font-weight:600}
+.ans{margin:10px 0 0;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--fill)}
+.ans .head{font-size:16.5px}
+.ans:empty{display:none}
+.linkrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.linkrow a{display:inline-flex;align-items:center;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--accent);font-size:14px;font-weight:600;text-decoration:none}
+.figchips{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.fchip{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--fill);color:var(--ink);font:inherit;font-size:14px;cursor:pointer;text-align:left}
+.fchip svg{flex:none;color:var(--accent)}
+.fig svg{display:block;width:100%;max-width:520px;height:auto;margin:6px auto 0}
+.fig svg text{font-family:var(--mono)}
+.figcap{font-size:14.5px;margin:8px 0 0}
+.figsrc{font-family:var(--mono);font-size:11px;color:var(--muted);margin:6px 0 0}
+.seg{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.sbx{flex:1 1 auto;min-height:44px;padding:4px 10px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);font:inherit;font-size:14px;cursor:pointer}
+.sbx[aria-pressed="true"]{border-color:var(--accent);color:var(--accent);font-weight:600}
+.sl input[type=range]{width:100%;min-height:44px;accent-color:var(--accent)}
+.readout{font-family:var(--mono);font-size:15px;margin:4px 0 0}
+.rank{display:flex;gap:10px;align-items:baseline;padding:8px 0;border-top:1px solid var(--line);font-size:15px}
+.rank:first-of-type{border-top:0}
+.rank .n{font-family:var(--mono);font-weight:700;color:var(--accent);flex:none;width:20px}
+.rank.last .n,.rank.last b{color:var(--muted)}
+.rank small{display:block;color:var(--muted);font-size:13.5px}
+.step{display:flex;gap:12px;padding:10px 0;border-top:1px solid var(--line)}
+.step:first-child{border-top:0}
+.sn{flex:none;width:44px;height:44px;border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink);font:inherit;font-family:var(--mono);font-weight:700;cursor:pointer}
+.sn[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.step.fixed .sn{border-color:var(--warn);color:var(--warn)}
+.step.fixed .sn[aria-pressed="true"]{background:var(--warn);color:var(--accent-ink)}
+.stt{flex:1;min-width:0}
+.stt b{display:block;font-size:15.5px}
+.stt p{margin:2px 0 0;font-size:14.5px}
+.step.fixed .stt b:after{content:"fixed step";font-family:var(--mono);font-size:10.5px;font-weight:400;letter-spacing:.05em;text-transform:uppercase;color:var(--warn);border:1px solid var(--warn);border-radius:999px;padding:1px 6px;margin-left:8px;vertical-align:2px}
+.tgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.tcell{min-height:56px;text-align:left;border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink);font:inherit;font-size:14.5px;padding:8px 10px;cursor:pointer}
+.tcell[aria-pressed="true"]{border-color:var(--accent);color:var(--accent);font-weight:600}
+.trial{border-left:3px solid var(--accent);padding-left:12px;margin:6px 0 16px}
+.trial p{margin:0 0 6px;font-size:15px}
+.trial .k{font-family:var(--mono);font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);display:block}
+.flag{display:inline-block;font-family:var(--mono);font-size:11px;border-radius:999px;padding:2px 8px;background:var(--warnbg);color:var(--warn);margin-left:6px}
+.pills{position:sticky;top:var(--bt-bar,0px);z-index:5;background:var(--bg);display:flex;gap:6px;overflow-x:auto;margin:0 -16px 12px;padding:8px 16px;border-bottom:1px solid var(--line);scrollbar-width:none}
+.pills::-webkit-scrollbar{display:none}
+.pill{flex:none;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--muted);font-size:14px;white-space:nowrap;text-decoration:none;display:inline-flex;align-items:center}
+.lh{font-size:19px;margin:0 0 4px}
+.lead{color:var(--muted);margin:0 0 12px;font-size:15px}
+.fdots{display:flex;gap:4px;margin:4px 0 12px}
+.fd{flex:1;height:4px;border-radius:99px;background:var(--line)}.fd.on{background:var(--accent)}
+.case h2{font-size:17px;margin:0 0 6px}
+.page-text{font-family:var(--mono);font-size:14px;background:var(--fill);border-radius:10px;padding:10px 12px;margin:6px 0 0}
+.popts{display:grid;gap:8px;margin-top:12px}
+.popt{min-height:44px;text-align:left;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);font:inherit;font-size:15px;padding:8px 12px;cursor:pointer}
+.popt.right{border-color:var(--ok);color:var(--ok);font-weight:600}
+.popt.wrong{border-color:var(--bad);color:var(--bad);text-decoration:line-through}
+.ansb{margin-top:12px;border-top:1px solid var(--line);padding-top:12px}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.btn{min-height:44px;border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);border-radius:10px;padding:8px 14px;font:inherit;font-weight:600;cursor:pointer}
+.btn.ghost{background:var(--card);color:var(--accent)}
+.scrim{position:fixed;inset:0;background:var(--scrim);z-index:20}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:21;max-height:90vh;overflow-y:auto;background:var(--card);border:1px solid var(--line);border-bottom:0;border-radius:20px 20px 0 0;padding:8px 16px 24px;max-width:640px;margin:0 auto}
+.sheethead{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.sheethead h2{font-size:18px;margin:0}
+.xbtn{min-height:44px;min-width:44px;border:0;background:transparent;color:var(--accent);font:inherit;font-weight:600;cursor:pointer}
+.dp{margin-top:10px;border:1px solid var(--line);border-radius:12px;padding:2px 12px;background:var(--card);text-align:left}
+.dp>div{padding:10px 0;border-top:1px solid var(--line)}
+.dp>div:first-child{border-top:0}
+.dp .dl,.deeper .dl{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500;margin:0 0 3px}
+.dp p,.deeper p{font-size:15px;line-height:1.45;color:var(--ink);margin:0 0 4px}
+.zstrip{display:flex;height:30px;border-radius:8px;overflow:hidden;border:1px solid var(--line);margin-top:8px}
+.zstrip span{display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:11px;color:var(--muted);border-left:1px solid var(--line);padding:0 2px;text-align:center;line-height:1.1}
+.zstrip span:first-child{border-left:0}
+.zstrip span.on{background:var(--accent);color:var(--accent-ink);font-weight:700}
+.zname{font-family:var(--mono);font-size:13px;margin:6px 0 0;color:var(--ink)}
+.deeper{margin-top:14px;border-top:1px solid var(--line)}
+.deeper>summary{min-height:44px;display:flex;align-items:center;gap:8px;color:var(--accent);font-weight:600;font-size:15px;cursor:pointer;list-style:none}
+.deeper>summary::-webkit-details-marker{display:none}
+.deeper>summary::before{content:"+";font-family:var(--mono);font-size:18px;line-height:1;width:14px;text-align:center}
+.deeper[open]>summary::before{content:"\2212"}
+.deeper .dpx{border:1px solid var(--line);border-radius:12px;padding:2px 12px;background:var(--card)}
+.deeper .dpx>div{padding:10px 0;border-top:1px solid var(--line)}
+.deeper .dpx>div:first-child{border-top:0}
+.plate{margin-top:10px;border:1px solid var(--line);border-radius:12px;padding:6px;background:var(--card)}
+.plate img{display:block;width:100%;height:auto;border-radius:8px}
+.credit{display:block;font-family:var(--mono);font-size:11px;color:var(--muted);text-align:right;margin:4px 2px 0}
+.plate{margin-top:10px;border:1px solid var(--line);border-radius:12px;padding:6px;background:var(--card)}
+.plate img{display:block;width:100%;height:auto;border-radius:8px}
+.credit{display:block;font-family:var(--mono);font-size:11px;color:var(--muted);text-align:right;margin:4px 2px 0}
+footer{margin-top:28px;font-size:13.5px;color:var(--muted)}
+footer p{margin:0 0 8px}
+@media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+@media (min-width:900px){
+  .wrap{max-width:1040px}
+  .two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;align-items:start}
+  .two>.col{min-width:0}
+  #p-learn,#p-practice{max-width:780px;margin:0 auto}
+}
+</style>
+<script>function dpHtml(rows){ return rows.map(function(r){ return '<div><span class="dl">' + r[0] + '</span>' + r[1] + '</div>'; }).join(''); }</script>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="/">← bedside.tools</a>
+<h1>ICU nutrition and refeeding</h1>
+<p class="purpose">Start now or wait, how much and at what rate, propofol and dextrose calories, refeeding, and what to do when feeds do not go in.</p>
+
+<div class="tabs" role="tablist" aria-label="Sections">
+<button class="tab" role="tab" id="t-feed" aria-controls="p-feed" aria-selected="true">Feed</button>
+<button class="tab" role="tab" id="t-refeed" aria-controls="p-refeed" aria-selected="false">Refeeding</button>
+<button class="tab" role="tab" id="t-problems" aria-controls="p-problems" aria-selected="false">Problems</button>
+<button class="tab" role="tab" id="t-learn" aria-controls="p-learn" aria-selected="false">Learn</button>
+<button class="tab" role="tab" id="t-practice" aria-controls="p-practice" aria-selected="false">Practice</button>
+</div>
+
+<!-- ================= FEED ================= -->
+<section class="panel on" id="p-feed" role="tabpanel" aria-labelledby="t-feed">
+<div class="two"><div class="col">
+<div class="card" id="inputs">
+<p class="label">The patient</p>
+<div class="grid">
+<div class="fld"><label for="wt">Weight now (kg)</label><input id="wt" type="number" inputmode="decimal" min="30" max="300" placeholder="80"></div>
+<div class="fld"><label for="ht">Height (cm)</label><input id="ht" type="number" inputmode="numeric" min="130" max="215" placeholder="175"></div>
+<div class="fld"><label for="day">ICU day</label><input id="day" type="number" inputmode="numeric" min="1" max="120" placeholder="2"></div>
+</div>
+<p class="sub" style="margin-top:12px">Sex (for ideal weight)</p>
+<div class="seg" id="sexseg" role="group" aria-label="Sex"></div>
+<p class="sub" style="margin-top:12px">Circulation</p>
+<div class="seg" id="shockseg" role="group" aria-label="Shock"></div>
+<p class="sub" style="margin-top:12px">Gut and context (tap all that apply)</p>
+<div class="rchips" id="gutchips" role="group" aria-label="Gut and context"></div>
+<p class="note" style="margin:8px 0 0">Nothing entered is sent or saved.</p>
+</div>
+<div class="card" id="infusions">
+<p class="label">Calories from infusions</p>
+<div class="grid">
+<div class="fld"><label for="prop">Propofol 1% (mL/h)</label><input id="prop" type="number" inputmode="decimal" min="0" max="100" placeholder="0"></div>
+<div class="fld"><label for="d5">Dextrose 5% (mL/h)</label><input id="d5" type="number" inputmode="decimal" min="0" max="500" placeholder="0"></div>
+</div>
+<p class="sub" style="margin-top:12px">Feed strength</p>
+<div class="seg" id="denseg" role="group" aria-label="Formula energy density"></div>
+</div>
+</div><div class="col">
+<div id="starthost"></div>
+<div id="targethost"></div>
+<div id="ratehost"></div>
+</div></div>
+</section>
+
+<!-- ================= REFEEDING ================= -->
+<section class="panel" id="p-refeed" role="tabpanel" aria-labelledby="t-refeed">
+<div class="two"><div class="col">
+<div class="card" id="refeed-risk">
+<p class="label">Refeeding risk</p>
+<p class="head">Tap what applies before feeding starts</p>
+<div class="rchips" id="riskchips" role="group" aria-label="Refeeding risk"></div>
+<div id="riskhost" aria-live="polite"></div>
+</div>
+</div><div class="col">
+<div class="card" id="refeed-phos">
+<p class="label">After feeding starts: phosphate</p>
+<div class="grid">
+<div class="fld"><label for="p0">Phosphate before (mg/dL)</label><input id="p0" type="number" inputmode="decimal" step="0.1" min="0.2" max="12" placeholder="3.2"></div>
+<div class="fld"><label for="p1">Phosphate now (mg/dL)</label><input id="p1" type="number" inputmode="decimal" step="0.1" min="0.2" max="12" placeholder="1.7"></div>
+<div class="fld"><label for="hrs">Hours since feeds started</label><input id="hrs" type="number" inputmode="numeric" min="0" max="500" placeholder="36"></div>
+</div>
+<div id="phoshost" aria-live="polite"></div>
+</div>
+</div></div>
+</section>
+
+<!-- ================= PROBLEMS ================= -->
+<section class="panel" id="p-problems" role="tabpanel" aria-labelledby="t-problems">
+<div class="two"><div class="col">
+<div class="card" id="intolerance">
+<p class="label">Feeds not going in</p>
+<p class="head">Tap what you see</p>
+<div class="tgrid" id="probgrid" role="group" aria-label="Problem"></div>
+<div id="probhost" aria-live="polite"></div>
+</div>
+<div class="card" id="prokinetics">
+<p class="label">Prokinetics</p>
+<p class="head">Erythromycin first, for a day or two</p>
+<ul>
+<li><b>Erythromycin IV</b> 100 to 250 mg three times a day; use it for 24 to 48 hours and stop by day 3, when its effect has faded.</li>
+<li><b>Metoclopramide</b> 10 mg two to three times a day, alone or with erythromycin; lower the dose in kidney failure.</li>
+<li>Both prolong the QT interval: check the ECG and the other QT drugs.</li>
+<li>Still not tolerating after a prokinetic: a tube past the pylorus rather than stopping feeds.</li>
+</ul>
+<p class="whyline"><b>Why:</b> erythromycin acts on motilin receptors and empties the stomach, but the receptors stop responding within a few days.</p>
+<div class="linkrow"><a href="/qtc/">QT drugs</a></div>
+<details><summary>More</summary>
+<p>ESPEN 2023: IV erythromycin first-line (grade B), metoclopramide alone or combined (grade 0). ASPEN 2016 gives metoclopramide 10 mg four times a day with renal adjustment and notes QT prolongation for both.</p>
+<p><span class="tier">ESPEN 2023 B and 0</span><span class="tier">SCCM/ASPEN 2016</span></p>
+</details>
+</div>
+</div><div class="col">
+<div class="card" id="aspiration">
+<p class="label">Aspiration</p>
+<p class="head">Head up, continuous feeds</p>
+<ul>
+<li>Head of the bed at 30 to 45 degrees.</li>
+<li>Continuous rather than bolus feeding in the ICU.</li>
+<li>A tube past the pylorus for patients at high risk of aspiration.</li>
+</ul>
+<div class="figchips"><button type="button" class="fchip" data-chip="tubes"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><rect x="2" y="3" width="14" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M4 12l3-4 3 3 2-2 2 3" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>Picture: stomach or past the pylorus</button></div>
+<div class="linkrow"><a href="/icu-rounds/#ck-vap">ICU rounds: head of bed</a></div>
+<p style="margin:10px 0 0"><span class="tier">ESPEN 2023</span><span class="tier">SCCM/ASPEN 2016</span></p>
+</div>
+<div class="card" id="special">
+<p class="label">Special cases</p>
+<div class="tgrid" id="specgrid" role="group" aria-label="Special case"></div>
+<div id="spechost" aria-live="polite"></div>
+</div>
+</div></div>
+</section>
+
+<!-- ================= LEARN ================= -->
+<section class="panel" id="p-learn" role="tabpanel" aria-labelledby="t-learn">
+<nav class="pills" aria-label="Learn chapters">
+<a class="pill" href="#learn-refeed">Refeeding</a>
+<a class="pill" href="#learn-early">Less early</a>
+<a class="pill" href="#learn-energy">Hidden calories</a>
+<a class="pill" href="#learn-protein">Protein</a>
+<a class="pill" href="#trials">Trials</a>
+</nav>
+<div class="card" id="learn-refeed">
+<p class="label">1 · Refeeding</p>
+<h2 class="lh">Feeding a starved body pulls minerals into its cells</h2>
+<p class="lead">Step through what happens when carbohydrate arrives.</p>
+<div class="fig" data-fig="refeed"></div>
+</div>
+<div class="card" id="learn-early">
+<p class="label">2 · Less in the first week</p>
+<h2 class="lh">Full feeding early did not save lives</h2>
+<p class="lead">Tap a trial to compare its arms.</p>
+<div class="fig" data-fig="early"></div>
+</div>
+<div class="card" id="learn-energy">
+<p class="label">3 · Hidden calories</p>
+<h2 class="lh">Propofol is a fat infusion</h2>
+<p class="lead">Slide the propofol rate; the daily target is 1,600 kcal.</p>
+<div class="fig" data-fig="energy"></div>
+</div>
+<div class="card" id="learn-protein">
+<p class="label">4 · Protein</p>
+<h2 class="lh">Muscle breaks down whatever you give at first</h2>
+<p class="lead">Step through the phases of critical illness.</p>
+<div class="fig" data-fig="protein"></div>
+</div>
+<div class="card" id="trials">
+<p class="label">5 · Trials</p>
+<h2 class="lh">The trials behind the numbers</h2>
+<div id="trialhost"></div>
+</div>
+</section>
+
+<!-- ================= PRACTICE ================= -->
+<section class="panel" id="p-practice" role="tabpanel" aria-labelledby="t-practice">
+<div class="card case" id="practice">
+<p class="label">Practice · <span id="cnum"></span></p>
+<div class="fdots" id="fdots"></div>
+<div id="casehost"></div>
+</div>
+</section>
+
+<footer>
+<p>For education only. Not a substitute for clinical judgment.</p>
+<p>Privacy: everything runs in your browser. Nothing you enter is sent anywhere or stored, and there are no analytics. Do not enter names, record numbers, or dates of birth.</p>
+<p>Last reviewed: 27 November 2026.</p>
+<p>Sources: Compher C et al., ASPEN guideline for the nutrition support of the adult critically ill patient, JPEN 2022;46:12 (strength shown on each line) · McClave SA et al., SCCM/ASPEN guidelines for nutrition support therapy in the adult critically ill patient, JPEN 2016;40:159 (where the 2022 update is silent, 2016 stands) · Singer P et al., ESPEN practical and partially revised guideline: clinical nutrition in the intensive care unit, Clin Nutr 2023;42:1671 · Doig GS et al., Restricted versus continued standard caloric intake during the management of refeeding syndrome in critically ill adults, Lancet Respir Med 2015;3:943 · da Silva JSV et al., ASPEN consensus recommendations for refeeding syndrome, Nutr Clin Pract 2020;35:178 (risk items only; see More) · Diprivan (propofol) US prescribing information (0.1 g fat, 1.1 kcal per mL) · Dextrose 5% in water US prescribing information (170 kcal per liter) · ARDS Network, N Engl J Med 2000;342:1301 (predicted body weight) · Trials (EDEN, CALORIES, EPaNIC, PermiT, NUTRIREA-2, TARGET, NUTRIREA-3, EFFORT Protein) are cited on their cards under Learn. Lines marked "expert practice" are common practice, not a guideline recommendation; the figures are schematic and drawn for this site. Feeding plans in the ICU are usually made with a dietitian; adjust to your institution's formulary and protocols.</p>
+</footer>
+</div>
+
+<div class="scrim" id="scrim" hidden></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-t" hidden>
+<div class="sheethead"><h2 id="sheet-t"></h2><button class="xbtn" id="sheet-x" type="button">Close</button></div>
+<div id="sheet-b"></div>
+</div>
+
+<script>
+(function(){
+'use strict';
+var $ = function(id){ return document.getElementById(id); };
+function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+function tg(t){ return '<span class="tier">' + esc(t) + '</span>'; }
+function li(a){ return '<ul>' + a.map(function(x){ return '<li>' + x + '</li>'; }).join('') + '</ul>'; }
+function num(id, lo, hi){ var v = parseFloat($(id).value); return isFinite(v) && v >= lo && v <= hi ? v : null; }
+function why(t){ return t ? '<p class="whyline"><b>Why:</b> ' + t + '</p>' : ''; }
+function more(ps, tiers){ return '<details><summary>More</summary>' + ps.map(function(p){ return '<p>' + p + '</p>'; }).join('') + (tiers ? '<p>' + tiers.map(tg).join('') + '</p>' : '') + '</details>'; }
+function card(o){ return '<div class="card"' + (o.id ? ' id="' + o.id + '"' : '') + '><p class="label">' + esc(o.label) + '</p><p class="head">' + esc(o.head) + '</p>' + (o.sub ? '<p class="sub">' + o.sub + '</p>' : '') + (o.guard ? '<div class="guard"><b>' + esc(o.guard[0]) + '</b>' + o.guard[1] + '</div>' : '') + (o.list && o.list.length ? li(o.list) : '') + (o.extra || '') + why(o.why) + (o.chips || '') + (o.links || '') + (o.more ? more(o.more, o.tiers) : (o.tiers ? '<p style="margin:10px 0 0">' + o.tiers.map(tg).join('') + '</p>' : '')) + '</div>'; }
+function fmt(v){ return Math.round(v).toLocaleString('en-US'); }
+var EP = 'expert practice';
+var CHIPICON = '<svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="9" r="7" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="9" cy="9" r="2" fill="currentColor"/></svg>';
+function chip(id, name){ return '<div class="figchips"><button type="button" class="fchip" data-chip="' + id + '">' + CHIPICON + esc(name) + '</button></div>'; }
+
+/* ================= Constants (each with its source) ================= */
+var NUT = { kcalLo:12, kcalHi:25, proLo:1.2, proHi:2.0 };          /* ASPEN 2022 Q1 (weak, moderate); protein ASPEN 2016 C4 / 2022 Q2 (weak, low); identical to /icu-rounds/ */
+var OB = { b1:30, b2:40, b3:50, kA:[11,14], kI:[22,25], p1:2.0, p2:2.5 }; /* SCCM/ASPEN 2016 Q5 obesity (expert consensus): 11-14 kcal/kg actual (BMI 30-50); 22-25 kcal/kg IBW (BMI >50); protein 2.0 g/kg IBW (BMI 30-40), up to 2.5 g/kg IBW (BMI >=40) */
+var CRRT_PRO = 2.5;                                                /* SCCM/ASPEN 2016 J2: up to 2.5 g/kg/day on CRRT or frequent dialysis */
+var PROP_KCAL = 1.1, PROP_FAT = 0.1;                               /* Diprivan label: 0.1 g fat, 1.1 kcal per mL */
+var D5_KCAL = 0.17;                                                /* D5W label: 170 kcal per liter */
+var LIPID_CAP = 1.5;                                               /* ESPEN 2023 rec 29: lipids not above 1.5 g/kg/day, propofol included */
+var TROPHIC = [10, 20];                                            /* EDEN: trophic feeding 10-20 kcal/h */
+var DOIG = { mmol:0.65, drop:0.16, h:72, kcalh:20, mg:2.0, mgdrop:0.5 };               /* Doig 2015: phosphate <0.65 mmol/L within 72 h of starting and a fall >0.16 mmol/L; 20 kcal/h for at least 2 days */
+var P_MGDL = 3.097;                                                /* phosphate mg/dL = mmol/L x 3.097 */
+var DENS = [1.0, 1.2, 1.5, 2.0];
+
+/* ================= Inputs ================= */
+var GUT = [
+  ['nogut','Gut cannot be used'],
+  ['hirisk','High nutrition risk or severely malnourished'],
+  ['gas','Uncontrolled hypoxemia, hypercapnia or acidosis'],
+  ['ugib','Active upper GI bleeding'],
+  ['isch','Signs of gut ischemia'],
+  ['fist','High-output fistula, no distal access'],
+  ['acs','Abdominal compartment syndrome'],
+  ['crrt','On CRRT or frequent dialysis'],
+  ['aki','AKI, not on dialysis']
+];
+var SHOCK = [['none','No shock'],['ctrl','Shock controlled'],['unctrl','Shock not controlled']];
+var S = { sex:null, shock:'none', gut:{}, dens:1.0 };
+function inputs(){ return { wt:num('wt', 30, 300), ht:num('ht', 130, 215), day:num('day', 1, 120), sex:S.sex, shock:S.shock, gut:S.gut, prop:num('prop', 0, 100) || 0, d5:num('d5', 0, 500) || 0, dens:S.dens }; }
+
+/* ================= Engine ================= */
+function pbw(ht, sex){ if (ht === null || !sex) return null; return (sex === 'm' ? 50 : 45.5) + 0.91 * (ht - 152.4); }
+function bmi(wt, ht){ return wt !== null && ht !== null ? wt / Math.pow(ht / 100, 2) : null; }
+var DELAY = { gas:'uncontrolled hypoxemia, hypercapnia or acidosis', ugib:'active upper GI bleeding', isch:'signs of gut ischemia', fist:'a high-output fistula without distal feeding access', acs:'abdominal compartment syndrome' };
+function startPlan(i){
+  var r = { k:'', head:'', list:[], why:'', tiers:[], guard:null, more:[] };
+  var d = Object.keys(DELAY).filter(function(k){ return i.gut[k]; });
+  if (i.gut.isch) r.guard = ['Gut ischemia signs: stop feeds', 'Distension, rising tube output or gastric residuals, fewer stools and flatus, quiet bowel sounds, a worsening metabolic acidosis or base deficit. Hold feeds and look for the cause.'];
+  if (i.shock === 'unctrl' || d.length) {
+    r.k = 'hold'; r.head = 'Hold enteral feeding for now';
+    r.list.push(i.shock === 'unctrl' ? 'Shock is not controlled: perfusion goals not met, or pressors still rising (ASPEN: withhold if the mean pressure is below 50).' : 'Reason: ' + d.map(function(k){ return DELAY[k]; }).join('; ') + '.');
+    r.list.push('Reassess daily; start low as soon as the reason has passed.');
+    r.why = i.shock === 'unctrl' ? 'in uncontrolled shock the gut is poorly perfused, and feeding raises its oxygen demand; full early feeding in shock caused more bowel ischemia than parenteral feeding (NUTRIREA-2).' : 'these are the situations in which ESPEN suggests delaying enteral feeding until they are controlled.';
+    r.tiers = i.shock === 'unctrl' ? ['ESPEN 2023 rec 11 · B', 'SCCM/ASPEN 2016 B5 · expert consensus'] : ['ESPEN 2023 rec 11 · B'];
+    if (i.gut.nogut) r.list.push(i.shock === 'unctrl' ? 'The gut cannot be used: once the patient is stable, parenteral nutrition ' + (i.gut.hirisk ? 'as soon as possible (high risk).' : 'after day 7 if low risk (ESPEN: within 3 to 7 days).') : 'Parenteral nutrition instead: ' + (i.gut.hirisk ? 'as soon as possible (high risk or severely malnourished).' : 'after day 7 if low risk (ESPEN: within 3 to 7 days).'));
+    return r;
+  }
+  if (i.gut.nogut) {
+    r.k = 'pn';
+    if (i.gut.hirisk) { r.head = 'Parenteral nutrition as soon as possible'; r.why = 'with high nutrition risk or severe malnutrition and no usable gut, waiting a week adds a deficit the patient cannot afford.'; r.tiers = ['SCCM/ASPEN 2016 G2 · expert consensus', 'EN or PN acceptable: ASPEN 2022 strong, high']; }
+    else { r.head = i.day !== null && i.day >= 8 ? 'Day ' + i.day + ': start parenteral nutrition' : 'Low risk: parenteral nutrition can wait until after day 7' + (i.day !== null ? ' (now day ' + i.day + ')' : ''); r.why = 'in a well-nourished patient, a week of little nutrition is tolerated, and starting parenteral nutrition early added infections without benefit (EPaNIC).'; r.tiers = ['SCCM/ASPEN 2016 G1 · very low', 'EN or PN acceptable: ASPEN 2022 strong, high']; r.more = ['ESPEN 2023 differs: when the gut cannot be used, start parenteral nutrition within 3 to 7 days (rec 17, B).']; }
+    r.list.push('Low risk means NRS 2002 of 3 or less, or NUTRIC 5 or less; high risk NRS 2002 of 5 or more, or NUTRIC 5 or more (the guideline\'s cut-offs overlap at 5).');
+    r.list.push('Keep trying the gut: enteral and parenteral nutrition are equally acceptable once feeding is indicated.');
+    return r;
+  }
+  if (i.shock === 'ctrl') {
+    r.k = 'low'; r.head = 'Start low-dose enteral feeding, watching the gut';
+    r.list.push('Shock controlled with fluids and pressors: low-dose feeding can start; stop at any sign of gut ischemia.');
+    r.list.push('In the first week of shock, a low target (6 kcal/kg and 0.2 to 0.4 g/kg protein a day) did as well as a standard one and had fewer gut complications (NUTRIREA-3).');
+    r.why = 'once perfusion is restored, a small amount of feeding keeps the gut working without asking much of its blood supply.';
+    r.tiers = ['ESPEN 2023 rec 11 · B', 'SCCM/ASPEN 2016 B5'];
+    return r;
+  }
+  r.k = 'go'; r.head = 'Start enteral feeding within 24 to 48 hours';
+  r.list.push('Into the stomach first; past the pylorus only if a prokinetic has not fixed intolerance, or the aspiration risk is high.');
+  r.list.push('Start low (trophic, 10 to 20 kcal an hour) and build up over the first days.');
+  r.why = 'early tube feeding keeps the gut working; for the first week ' + NUT.kcalLo + ' to ' + NUT.kcalHi + ' kcal/kg is the suggested range, and in trials lower intakes did as well as higher ones.';
+  r.tiers = ['SCCM/ASPEN 2016 · very low', 'ESPEN 2023 (48 h) · B'];
+  return r;
+}
+function targets(i){
+  if (i.wt === null) return null;
+  var b = bmi(i.wt, i.ht), ibw = pbw(i.ht, i.sex), r = { b:b, ibw:ibw, notes:[], tiers:[], needHt: i.ht === null };
+  if (b !== null && b >= OB.b1) {
+    if (ibw === null) { r.need = 'Obesity: enter sex so ideal weight can be calculated.'; }
+    if (b > OB.b3) { r.k = ibw ? [OB.kI[0] * ibw, OB.kI[1] * ibw] : null; r.kb = OB.kI[0] + ' to ' + OB.kI[1] + ' kcal/kg ideal weight'; }
+    else { r.k = [OB.kA[0] * i.wt, OB.kA[1] * i.wt]; r.kb = OB.kA[0] + ' to ' + OB.kA[1] + ' kcal/kg actual weight'; }
+    var pk = b >= OB.b2 ? OB.p2 : OB.p1;
+    r.p = ibw ? [pk * ibw, pk * ibw] : null; r.pb = (b >= OB.b2 ? 'up to ' : '') + pk + ' g/kg ideal weight';
+    r.obese = true; r.tiers = ['SCCM/ASPEN 2016 Q5 · expert consensus (ASPEN 2022 silent)'];
+  } else {
+    r.k = [NUT.kcalLo * i.wt, NUT.kcalHi * i.wt]; r.kb = NUT.kcalLo + ' to ' + NUT.kcalHi + ' kcal/kg';
+    r.p = [NUT.proLo * i.wt, NUT.proHi * i.wt]; r.pb = NUT.proLo + ' to ' + NUT.proHi.toFixed(1) + ' g/kg actual weight';
+    r.tiers = ['ASPEN 2022 · weak, moderate (energy)', 'ASPEN 2016/2022 · weak, low (protein)'];
+  }
+  if (i.gut.crrt) { var base = r.obese && ibw ? ibw : i.wt; r.crrt = CRRT_PRO * base; }
+  return r;
+}
+function nonNutritional(i){ return { prop: i.prop * 24 * PROP_KCAL, d5: i.d5 * 24 * D5_KCAL, fat: i.prop * 24 * PROP_FAT }; }
+function rates(i, t){
+  if (!t || !t.k) return null;
+  var nn = nonNutritional(i), other = nn.prop + nn.d5;
+  var lo = Math.max(0, t.k[0] - other), hi = Math.max(0, t.k[1] - other);
+  return { other:other, nn:nn, lo: lo / i.dens / 24, hi: hi / i.dens / 24, trophic:[TROPHIC[0] / i.dens, TROPHIC[1] / i.dens], fatCap: LIPID_CAP * i.wt, cut: other > 0 };
+}
+
+/* ================= Render: feed ================= */
+function segHtml(list, cur, attr){ return list.map(function(x){ return '<button type="button" class="sbx" data-' + attr + '="' + x[0] + '" aria-pressed="' + (String(cur) === String(x[0])) + '">' + esc(x[1]) + '</button>'; }).join(''); }
+function renderInputs(){
+  $('sexseg').innerHTML = segHtml([['m','Male'],['f','Female']], S.sex, 'sex');
+  $('shockseg').innerHTML = segHtml(SHOCK, S.shock, 'shock');
+  $('gutchips').innerHTML = GUT.map(function(x){ return '<button type="button" class="rchip" data-gut="' + x[0] + '" aria-pressed="' + !!S.gut[x[0]] + '">' + esc(x[1]) + '</button>'; }).join('');
+  $('denseg').innerHTML = segHtml(DENS.map(function(d){ return [d, d.toFixed(1) + ' kcal/mL']; }), S.dens, 'dens');
+}
+function renderFeed(){
+  var i = inputs(), s = startPlan(i), t = targets(i), r = rates(i, t);
+  $('starthost').innerHTML = card({ id:'start', label:'Start now or wait', head:s.head, guard:s.guard, list:s.list, why:s.why, tiers:s.tiers, more: s.more && s.more.length ? s.more : null, chips: s.k === 'hold' || s.k === 'low' ? chip('early', 'Figure: less in the first week') : '' });
+  if (!t) { $('targethost').innerHTML = card({ id:'targets', label:'How much', head:'Enter weight for the first-week targets', list:[], tiers:null }); $('ratehost').innerHTML = ''; return; }
+  var tl = [];
+  if (t.b !== null) tl.push('BMI ' + t.b.toFixed(1) + (t.ibw ? ' · ideal (predicted) weight ' + fmt(t.ibw) + ' kg' : ''));
+  if (t.need) tl.push(t.need);
+  if (t.needHt) tl.push('<b>Enter height:</b> if BMI is 30 or more, the obesity targets are lower than these.');
+  if (t.k) tl.push('<b>Energy:</b> ' + fmt(t.k[0]) + ' to ' + fmt(t.k[1]) + ' kcal a day (' + t.kb + ')');
+  if (t.p) tl.push('<b>Protein:</b> ' + (t.p[0] === t.p[1] ? (t.obese && t.b >= OB.b2 ? 'up to ' : '') + fmt(t.p[0]) : fmt(t.p[0]) + ' to ' + fmt(t.p[1])) + ' g a day (' + t.pb + ')');
+  if (t.crrt) tl.push('<b>On CRRT:</b> protein up to ' + fmt(t.crrt) + ' g a day (' + CRRT_PRO + ' g/kg), because the filter removes amino acids.');
+  var tw = t.obese ? 'in obesity the guideline aims for less energy than measured needs, and more protein per kilogram of ideal weight, to preserve muscle while sparing excess calories.' : 'in the first days of critical illness the body breaks down its own stores whatever you give; aiming low did as well as full feeding in trials.';
+  var tm = ['First 7 to 10 days. After that, and in recovery, needs rise; a dietitian, and indirect calorimetry where available, refine them.'];
+  if (t.obese) tm.push('ASPEN 2016 also says energy should not exceed 65 to 70% of a measured target. ESPEN 2023 differs: it uses adjusted body weight and 1.3 g/kg adjusted weight of protein.');
+  if (S.gut.aki || S.gut.crrt) tm.push('EFFORT Protein: a high protein target (2.2 g/kg or more) did not help, and in a subgroup it may have worsened outcomes for patients with acute kidney injury and high organ failure scores. ESPEN 2023 gives no protein number for CRRT; the CRRT line is ASPEN 2016 (J2, very low).');
+  $('targethost').innerHTML = card({ id:'targets', label:'How much · first week', head: t.needHt ? 'Enter height to check for obesity' : t.k ? fmt(t.k[0]) + ' to ' + fmt(t.k[1]) + ' kcal a day' : 'Targets', list:tl, why:tw, more:tm, tiers:t.tiers.concat(t.crrt ? ['CRRT: SCCM/ASPEN 2016 · very low'] : []), chips: chip('protein', 'Figure: protein and the phases') });
+  if (!r || t.needHt) { $('ratehost').innerHTML = ''; return; }
+  var rl = [];
+  if (r.cut) rl.push('<b>From infusions:</b> ' + fmt(r.other) + ' kcal a day' + (r.nn.prop ? ' (propofol ' + fmt(r.nn.prop) + ')' : '') + (r.nn.d5 ? ' (dextrose ' + fmt(r.nn.d5) + ')' : '') + ', subtracted.');
+  rl.push('<b>Goal rate:</b> ' + r.lo.toFixed(0) + ' to ' + r.hi.toFixed(0) + ' mL an hour of a ' + i.dens.toFixed(1) + ' kcal/mL feed, over 24 hours.');
+  rl.push('<b>Start:</b> about ' + r.trophic[0].toFixed(0) + ' to ' + r.trophic[1].toFixed(0) + ' mL an hour (10 to 20 kcal an hour) and advance as tolerated.');
+  if (r.trophic[0] > r.lo) rl.push(r.lo === 0 ? 'Infusions already meet the lower target: feed mainly for protein, and check the total.' : 'Infusions already supply most of the lower target: start at the low end and check the total.');
+  if (r.cut) rl.push('A lower feed rate also cuts protein: check the formula\'s protein against the target and add a protein supplement if short.');
+  var g = null;
+  if (r.nn.fat > r.fatCap) g = ['Lipid above 1.5 g/kg a day', 'Propofol alone gives ' + r.nn.fat.toFixed(0) + ' g of fat a day, above ' + r.fatCap.toFixed(0) + ' g. Check triglycerides and consider another sedative.'];
+  $('ratehost').innerHTML = card({ id:'rate', label:'Rate to order', head: r.lo.toFixed(0) + ' to ' + r.hi.toFixed(0) + ' mL an hour at goal', guard:g, list:rl,
+    why: r.cut ? 'calories from ' + (r.nn.prop && r.nn.d5 ? 'propofol and dextrose' : r.nn.prop ? 'propofol' : 'dextrose') + ' (' + fmt(r.other) + ' kcal a day here) count toward the target; ignoring them overfeeds.' : 'the feed runs continuously, so the daily target divided by 24 and by the feed\'s energy density gives the hourly rate.',
+    more:['Propofol: label, 0.1 g fat and 1.1 kcal per mL. Dextrose 5%: label, 170 kcal per liter. Lipid ceiling, propofol included: ESPEN 2023 rec 29. Trophic start, 10 to 20 kcal an hour: the EDEN trial\'s low arm. Citrate used in CRRT also adds calories (ESPEN 2023); no number is given here. How fast to advance: expert practice and local protocol.'], tiers:['labels', 'ESPEN 2023', EP], chips: chip('energy', 'Figure: hidden calories') });
+}
+
+/* ================= Refeeding ================= */
+var RISK = [['bmi','Low BMI'],['loss','Recent weight loss'],['intake','Little or no intake for days'],['lyte','Low K, P or Mg before feeding'],['wasting','Visible fat or muscle loss'],['comorb','Alcohol use disorder, or another high-risk illness']];
+var RS = {};
+function refeedRisk(sel){ return Object.keys(sel).filter(function(k){ return sel[k]; }); }
+function renderRisk(){
+  $('riskchips').innerHTML = RISK.map(function(x){ return '<button type="button" class="rchip" data-risk="' + x[0] + '" aria-pressed="' + !!RS[x[0]] + '">' + esc(x[1]) + '</button>'; }).join('');
+  var n = refeedRisk(RS).length;
+  if (!n) { $('riskhost').innerHTML = '<p class="sub" style="margin-top:8px">No risk item tapped. Check potassium, phosphate and magnesium before starting anyway.</p>'; return; }
+  $('riskhost').innerHTML = '<div class="ans"><div class="guard" style="margin-top:0"><b>At risk of refeeding: start low</b>Thiamine before feeding or dextrose; potassium, phosphate and magnesium checked before starting and repleted; advance slowly.</div>' +
+    li(['Start below the usual target and build up over several days.', 'Thiamine first: the dose is in the alcohol withdrawal tool.', 'Recheck electrolytes often in the first days; if phosphate falls, see the next card.']) +
+    why('insulin released by the first carbohydrate drives potassium, phosphate and magnesium into cells and uses up thiamine; a body already depleted cannot spare them.') +
+    '<div class="linkrow"><a href="/alcohol-withdrawal/#thiamine-ref">Thiamine doses</a><a href="/electrolytes/">Replacing electrolytes</a></div>' + chip('refeed', 'Figure: refeeding') +
+    more(['The risk items follow the ASPEN 2020 consensus. Its table defines moderate and significant risk by BMI, weight loss, days of poor intake, electrolytes, fat and muscle loss and comorbidities, with starting calories, thiamine dosing and a monitoring schedule. Its starting calories, thiamine doses and monitoring schedule are not reproduced here; follow your dietitian and local protocol.'], ['ASPEN 2020 consensus (items)', EP]) + '</div>';
+}
+function phos(p0, p1, h){
+  if (p1 === null) return null;
+  var m0 = p0 === null ? null : p0 / P_MGDL, m1 = p1 / P_MGDL, r = { m1:m1 };   /* compared in mmol/L, as in the trial; shown in mg/dL as about 2.0 and 0.5 */
+  r.low = m1 < DOIG.mmol; r.drop = m0 !== null ? m0 - m1 : null; r.win = h !== null && h <= DOIG.h;
+  r.rhp = r.low && r.drop !== null && r.drop > DOIG.drop && r.win;
+  return r;
+}
+function renderPhos(){
+  var p0 = num('p0', 0.2, 12), p1 = num('p1', 0.2, 12), h = num('hrs', 0, 500), r = phos(p0, p1, h);
+  var cut = DOIG.mg.toFixed(1), dcut = DOIG.mgdrop.toFixed(1);
+  if (!r) { $('phoshost').innerHTML = '<p class="sub" style="margin-top:8px">Enter phosphate now (and before feeding, with the hours since feeds started) to check for refeeding hypophosphatemia.</p>'; return; }
+  if (r.rhp) {
+    $('phoshost').innerHTML = '<div class="ans"><p class="head">Refeeding hypophosphatemia: cut feeds to 20 kcal an hour</p>' +
+      li(['Phosphate ' + p1 + ' mg/dL (below about ' + cut + '), down ' + (p0 - p1).toFixed(1) + ' mg/dL within ' + h + ' hours of starting feeds.', 'Restrict energy to 20 kcal an hour for at least 2 days, then return to the usual target over 2 to 3 days.', 'Replace phosphate; check electrolytes 2 to 3 times a day.']) +
+      why('in the trial that defined this, restricting calories did not change the primary outcome, but more patients were alive at day 60 (91% against 78%).') +
+      '<div class="linkrow"><a href="/electrolytes/">Replacing phosphate</a></div>' +
+      more(['Definition and regimen: Doig 2015 (phosphate below 0.65 mmol/L within 72 hours of starting nutrition, with a fall of more than 0.16 mmol/L). ESPEN 2023: restrict energy for 48 hours, then increase gradually (rec 59, B); electrolytes 2 to 3 times a day (rec 58, GPP). The trial thresholds are 0.65 and 0.16 mmol/L, shown here as about 2.0 and 0.5 mg/dL (mg/dL = mmol/L × 3.1).'], ['Doig 2015 RCT', 'ESPEN 2023 B']) + '</div>';
+    return;
+  }
+  var reasons = [];
+  if (!r.low) reasons.push('phosphate is about ' + cut + ' mg/dL or more');
+  if (r.low && r.drop === null) reasons.push('enter the value before feeding to check the fall');
+  if (r.low && r.drop !== null && r.drop <= DOIG.drop) reasons.push('it has not fallen by more than about ' + dcut + ' mg/dL');
+  if (r.low && h === null) reasons.push('enter the hours since feeds started');
+  else if (r.low && !r.win) reasons.push('it is more than 72 hours since feeds started');
+  $('phoshost').innerHTML = '<div class="ans"><p class="head">' + (r.low ? 'Low phosphate: replace it' : 'Not refeeding hypophosphatemia') + '</p><p class="sub">Not the trial definition: ' + esc(reasons.join('; ')) + '.</p>' + (r.low ? '<div class="linkrow"><a href="/electrolytes/">Replacing phosphate</a></div>' : '') + '</div>';
+}
+
+/* ================= Problems ================= */
+var PROB = {
+  grv:  { n:'Gastric residual 250 to 500 mL', head:'Keep feeding', list:['Do not hold feeds for a residual under 500 mL without other signs of intolerance.','ASPEN suggests not measuring residuals routinely.'], why:'residual volume measures stomach emptying poorly; stopping feeds for it mostly lowers the calories delivered.', t:['SCCM/ASPEN 2016 D2 · low'] },
+  grvh: { n:'Residual over 500 mL in 6 h', head:'Pause, add a prokinetic, then think post-pyloric', list:['ESPEN delays feeding while the aspirate is over 500 mL in 6 hours.','Start erythromycin (see Prokinetics).','Still high after a prokinetic: a tube past the pylorus rather than stopping feeds.'], why:'a large residual with a prokinetic failing means the stomach will not empty; feeding beyond it keeps nutrition going.', t:['ESPEN 2023 rec 11 and 16 · B', 'erythromycin: ESPEN 2023 rec 55 · B'] },
+  vom:  { n:'Vomiting or distension', head:'Stop, examine, look for the cause', list:['Check for gut ischemia, obstruction or ileus (examination, lactate, film).','Then: prokinetic, slower rate, or a tube past the pylorus.'], why:'vomiting is an aspiration risk and can be the first sign of a gut that should not be fed.', t:['SCCM/ASPEN 2016', EP] },
+  diar: { n:'Diarrhea', head:'Keep feeding while you find the cause', list:['Do not stop feeds automatically.','Look for C. difficile, sorbitol-containing liquid medicines, laxatives and antibiotics.','Continuous rather than bolus feeding; a small-peptide formula if it persists.'], why:'diarrhea in the ICU is more often from drugs or infection than from the feed itself.', t:['SCCM/ASPEN 2016 D6 · expert consensus', 'ESPEN 2023'] }
+};
+var PROBK = ['grv','grvh','vom','diar'], probSel = null;
+function renderProb(){
+  $('probgrid').innerHTML = PROBK.map(function(k){ return '<button type="button" class="tcell" data-prob="' + k + '" aria-pressed="' + (probSel === k) + '">' + esc(PROB[k].n) + '</button>'; }).join('');
+  if (!probSel) { $('probhost').innerHTML = ''; return; }
+  var p = PROB[probSel];
+  $('probhost').innerHTML = '<div class="ans"><p class="head">' + esc(p.head) + '</p>' + li(p.list.map(esc)) + why(esc(p.why)) + '<p style="margin:8px 0 0">' + p.t.map(tg).join('') + '</p></div>';
+}
+var SPEC = {
+  obese:{ n:'Obesity', head:'Less energy, more protein per ideal kilogram', list:['BMI 30 to 50: 11 to 14 kcal/kg actual weight; over 50: 22 to 25 kcal/kg ideal weight.','Protein 2.0 g/kg ideal weight (BMI 30 to 40), up to 2.5 g/kg (40 or more).','Enter height and sex on the Feed tab and the numbers are calculated.'], t:['SCCM/ASPEN 2016 · expert consensus'] },
+  crrt: { n:'CRRT or AKI', head:'Do not restrict protein to delay dialysis', list:['On CRRT or frequent dialysis, ASPEN 2016 allows protein up to 2.5 g/kg a day.','EFFORT Protein: high protein targets may have harmed patients with AKI in a subgroup.','Citrate anticoagulation adds calories.'], t:['SCCM/ASPEN 2016 J2 · very low', 'EFFORT Protein 2023'] },
+  prop: { n:'Propofol running', head:'Count its calories and fat', list:['1.1 kcal and 0.1 g fat per mL.','Lipid, propofol included, not above 1.5 g/kg a day.','Check triglycerides on prolonged infusions.'], t:['label', 'ESPEN 2023 rec 29'] },
+  pn:   { n:'On parenteral nutrition', head:'Keep the gut in play', list:['Move to enteral feeding as soon as the gut works.','No supplemental parenteral nutrition before day 7 in a patient being fed enterally.'], t:['ASPEN 2022 · strong, high'] }
+};
+var SPECK = ['obese','crrt','prop','pn'], specSel = null;
+function renderSpec(){
+  $('specgrid').innerHTML = SPECK.map(function(k){ return '<button type="button" class="tcell" data-spec="' + k + '" aria-pressed="' + (specSel === k) + '">' + esc(SPEC[k].n) + '</button>'; }).join('');
+  if (!specSel) { $('spechost').innerHTML = ''; return; }
+  var p = SPEC[specSel];
+  $('spechost').innerHTML = '<div class="ans"><p class="head">' + esc(p.head) + '</p>' + li(p.list.map(esc)) + '<p style="margin:8px 0 0">' + p.t.map(tg).join('') + '</p></div>';
+}
+
+/* ================= Figures ================= */
+var FIG = { refeed:{ title:'Refeeding', st:0 }, early:{ title:'Less in the first week', st:0 }, energy:{ title:'Hidden calories', p:15 }, protein:{ title:'Protein and the phases', st:0 } };
+function T(x, y, s, o){ o = o || {}; return '<text x="' + x + '" y="' + y + '" text-anchor="' + (o.a || 'middle') + '" font-size="' + (o.s || 11) + '" fill="' + (o.f || 'var(--ink)') + '" style="font-family:var(--mono)' + (o.b ? ';font-weight:700' : '') + '">' + esc(s) + '</text>'; }
+function segBtns(list, cur, attr, lab){ return '<div class="seg" role="group" aria-label="' + lab + '">' + list.map(function(a, i){ return '<button type="button" class="sbx" data-' + attr + '="' + i + '" aria-pressed="' + (i === cur) + '">' + esc(a[0]) + '</button>'; }).join('') + '</div>'; }
+
+var RFST = [
+  ['Starved','Little insulin; the body burns fat. Total-body potassium, phosphate and magnesium are depleted, but blood levels can look normal.', [2,2,2], 0],
+  ['Feeding starts','Carbohydrate arrives; insulin surges and drives glucose, potassium, phosphate and magnesium into cells. Thiamine is used up making energy.', [2,2,2], 1],
+  ['Levels fall','Blood levels drop within days: arrhythmia, weakness, breathing failure; fluid and sodium retention can tip the heart into failure.', [0,0,1], 2],
+  ['Start low','Fewer calories at first and repletion before and during: the shift is smaller and slower.', [1,1,2], 1]
+];
+function figRefeed(){
+  var s = FIG.refeed.st, st = RFST[s], L = ['K','PO4','Mg'];
+  var svg = '<svg viewBox="0 0 340 180" role="img" aria-label="A cell with potassium, phosphate and magnesium moving in from the blood: ' + esc(st[0]) + '">' +
+    '<rect x="180" y="20" width="140" height="130" rx="30" fill="var(--fill)" stroke="var(--muted)" stroke-width="2"/>' + T(250, 42, 'CELL', { s:10.5, f:'var(--muted)' }) + T(70, 42, 'BLOOD', { s:10.5, f:'var(--muted)' });
+  L.forEach(function(x, i){ var y = 70 + i * 30, lvl = st[2][i];
+    svg += T(30, y + 4, x, { s:11, a:'start', b:true }) + '<rect x="70" y="' + (y - 8) + '" width="80" height="14" rx="7" fill="var(--line)"/><rect x="70" y="' + (y - 8) + '" width="' + (20 + lvl * 30) + '" height="14" rx="7" fill="' + (lvl === 0 ? 'var(--warn)' : 'var(--accent)') + '"/>';
+    if (st[3]) svg += '<path d="M156 ' + y + ' h' + (st[3] === 2 ? 50 : 30) + ' m-6 -5 l6 5 l-6 5" stroke="var(--accent)" stroke-width="' + (st[3] === 2 ? 3 : 1.8) + '" fill="none"/>'; });
+  if (st[3]) svg += T(250, 136, 'INSULIN', { s:10.5, f:'var(--accent)', b:true });
+  svg += T(110, 170, 'BLOOD LEVEL', { s:10.5, f:'var(--muted)' }) + '</svg>';
+  return segBtns(RFST, s, 'rfs', 'Stage') + svg + '<p class="figcap"><b>' + esc(st[0]) + ':</b> ' + esc(st[1]) + '</p><p class="figsrc">Schematic. Bars in the warning colour are dangerously low.</p>';
+}
+var ERST = [
+  ['EDEN','Trophic vs full enteral, first 6 days, acute lung injury (1,000)', ['Trophic','Full'], [23.2, 22.2], '60-day death %'],
+  ['PermiT','40 to 60% vs 70 to 100% of calories, same protein (894)', ['Lower','Standard'], [27.2, 28.9], '90-day death %'],
+  ['NUTRIREA-3','6 vs 25 kcal/kg, first week of shock (3,044)', ['Low','Standard'], [41.3, 42.8], '90-day death %'],
+  ['TARGET','1.5 vs 1.0 kcal/mL feed (3,957)', ['Energy-dense','Routine'], [26.8, 25.7], '90-day death %']
+];
+function figEarly(){
+  var s = FIG.early.st, e = ERST[s];
+  var svg = '<svg viewBox="0 0 340 170" role="img" aria-label="' + esc(e[0]) + ': ' + esc(e[2][0]) + ' ' + e[3][0] + '% against ' + esc(e[2][1]) + ' ' + e[3][1] + '%"><line x1="30" y1="130" x2="320" y2="130" stroke="var(--muted)"/>';
+  e[3].forEach(function(v, i){ var h = 100 * v / 50, x = 80 + i * 120; svg += '<rect x="' + x + '" y="' + (130 - h) + '" width="70" height="' + h + '" rx="6" fill="' + (i === 0 ? 'var(--accent)' : 'var(--muted)') + '"/>' + T(x + 35, 124 - h, v + '%', { s:12, b:true }) + T(x + 35, 148, e[2][i].toUpperCase(), { s:10.5, f:'var(--muted)' }); });
+  svg += T(175, 166, e[4].toUpperCase(), { s:10.5, f:'var(--muted)' }) + '</svg>';
+  return segBtns(ERST, s, 'ers', 'Trial') + svg + '<p class="figcap"><b>' + esc(e[0]) + ':</b> ' + esc(e[1]) + '. No difference in death.</p><p class="figsrc">Trial abstracts; full cards under Trials.</p>';
+}
+var ETARGET = 1600;
+function figEnergy(){
+  var p = FIG.energy.p, pk = p * 24 * PROP_KCAL, share = Math.min(1, pk / ETARGET), W = 300;
+  var svg = '<svg viewBox="0 0 340 90" role="img" aria-label="Daily target of 1,600 kcal with propofol providing ' + fmt(pk) + ' kcal">' +
+    '<rect x="20" y="20" width="' + W + '" height="30" rx="8" fill="var(--fill)" stroke="var(--line)"/>' +
+    '<rect x="20" y="20" width="' + (W * share) + '" height="30" rx="8" fill="var(--warn)"/>' +
+    T(20, 70, 'PROPOFOL ' + fmt(pk) + ' KCAL', { s:10.5, a:'start', f:'var(--warn)', b:true }) + T(320, 70, 'FEED ' + fmt(Math.max(0, ETARGET - pk)) + ' KCAL', { s:10.5, a:'end', f:'var(--muted)' }) + '</svg>';
+  var z = share < 0.15 ? 0 : share < 0.35 ? 1 : 2, Z = ['under 15%','15 to 35%','over 35%'], ZN = ['Small share','Large share','Most of the target'];
+  var rows = [['What is happening','<p>' + p + ' mL/h of 1% propofol gives ' + fmt(pk) + ' kcal and ' + fmt(p * 24 * PROP_FAT) + ' g of fat a day: ' + Math.round(share * 100) + '% of a 1,600 kcal target.</p>'],
+    ['Why the rule','<p>Propofol is dissolved in a 10% lipid emulsion, the same fat used in parenteral nutrition, so its calories count toward the target.</p>'],
+    ['At the bedside','<p>' + (z === 0 ? 'Subtract it anyway; it adds up over days.' : 'Lower the feed rate to allow for it, keep protein up with a supplement, and check triglycerides.') + '</p>']];
+  return '<div class="sl"><label class="note">Propofol 1% (mL/h)<input type="range" class="prr" min="0" max="50" step="5" value="' + p + '"></label></div>' + svg +
+    '<div class="zstrip" aria-hidden="true">' + Z.map(function(x, i){ return '<span class="' + (i === z ? 'on' : '') + '" style="flex:1">' + x + '</span>'; }).join('') + '</div><p class="zname">Zone: ' + ZN[z] + '</p><div class="dp">' + dpHtml(rows) + '</div><p class="figsrc">Diprivan label: 1.1 kcal and 0.1 g fat per mL. Zone names are teaching labels.</p>';
+}
+var PRST = [
+  ['Early acute','Days 1 to 2: stress hormones and inflammation break muscle down for fuel and repair; feeding cannot switch this off.', [3,1]],
+  ['Late acute','Days 3 to 7: breakdown continues; muscle responds poorly to protein (anabolic resistance). Targets are modest.', [2,1]],
+  ['Post-acute (recovery)','After the first week: muscle can rebuild; energy and protein needs rise, and mobilising helps protein reach muscle.', [1,3]]
+];
+function figProtein(){
+  var s = FIG.protein.st, p = PRST[s];
+  var svg = '<svg viewBox="0 0 340 160" role="img" aria-label="Muscle breakdown against muscle building: ' + esc(p[0]) + '"><line x1="30" y1="120" x2="320" y2="120" stroke="var(--muted)"/>';
+  [['BREAKDOWN','var(--warn)'],['BUILDING','var(--ok)']].forEach(function(b, i){ var h = 25 * p[2][i] + 5, x = 80 + i * 120; svg += '<rect x="' + x + '" y="' + (120 - h) + '" width="70" height="' + h + '" rx="6" fill="' + b[1] + '"/>' + T(x + 35, 140, b[0], { s:10.5, f:'var(--muted)' }); });
+  svg += '</svg>';
+  return segBtns(PRST, s, 'prs', 'Phase') + svg + '<p class="figcap"><b>' + esc(p[0]) + ':</b> ' + esc(p[1]) + '</p><p class="figsrc">Schematic. Phase framing: ESPEN 2023.</p>';
+}
+var TUBES = '<div class="plate"><img src="/media/nutrition/tube-routes.webp" width="1024" height="572" loading="lazy" alt="Two views of an adult, the body seen from the front and the head from the side, with the gut shown through the skin. Left: a feeding tube passes through the nose and down the esophagus, ending in the stomach. Right: the tube continues through the stomach and past the pylorus, ending in the small bowel."><span class="credit">Created with BioRender.com</span></div><p class="figcap">Gastric feeding is the standard start. A tube past the pylorus is for intolerance that a prokinetic has not fixed, or a high risk of aspiration.</p><p class="figsrc">Schematic. ESPEN 2023 rec 13, 15, 16; SCCM/ASPEN 2016.</p>';
+var FIGF = { refeed:figRefeed, early:figEarly, energy:figEnergy, protein:figProtein };
+function renderFigs(){ document.querySelectorAll('[data-fig]').forEach(function(el){ el.innerHTML = FIGF[el.getAttribute('data-fig')](); }); }
+
+/* ================= Trials ================= */
+var TRIALS = [
+  { n:'EDEN', q:'Trophic or full enteral feeding for the first 6 days in acute lung injury?', d:'Randomized, 1,000 ventilated adults.', r:'Ventilator-free days 14.9 against 15.0; 60-day death 23.2% against 22.2%. Less gut intolerance with trophic feeding.', c:'Low feeding early is acceptable.', cite:'NHLBI ARDS Network, JAMA 2012;307:795', doi:'10.1001/jama.2012.137' },
+  { n:'EPaNIC', q:'Start supplemental parenteral nutrition at 48 hours or day 8?', d:'Randomized, 4,640 ICU adults.', r:'Late start: discharged alive from the ICU slightly sooner (HR 1.06); ICU infections 22.8% against 26.2%.', c:'Do not add parenteral nutrition in the first week to top up enteral feeding.', cite:'Casaer MP et al., N Engl J Med 2011;365:506', doi:'10.1056/NEJMoa1102662' },
+  { n:'CALORIES', q:'Early parenteral or enteral feeding?', d:'Randomized, 2,400 ICU adults.', r:'30-day death 33.1% against 34.2% (RR 0.97); less hypoglycemia and vomiting with parenteral.', c:'The route matters less than once thought.', cite:'Harvey SE et al., N Engl J Med 2014;371:1673', doi:'10.1056/NEJMoa1409860' },
+  { n:'PermiT', q:'Permissive underfeeding with full protein?', d:'Randomized, 894 ICU adults; 40 to 60% against 70 to 100% of calories.', r:'90-day death 27.2% against 28.9%.', c:'Fewer calories with protein kept is acceptable.', cite:'Arabi YM et al., N Engl J Med 2015;372:2398', doi:'10.1056/NEJMoa1502826' },
+  { n:'NUTRIREA-2', q:'Enteral or parenteral feeding in ventilated patients in shock?', d:'Randomized, 2,410 adults; both at 20 to 25 kcal/kg.', r:'28-day death 37% against 35%; bowel ischemia 2% with enteral against under 1% with parenteral.', c:'Full early enteral feeding in shock carries a gut ischemia risk.', cite:'Reignier J et al., Lancet 2018;391:133', doi:'10.1016/S0140-6736(17)32146-3' },
+  { n:'TARGET', q:'Does an energy-dense feed help?', d:'Randomized, 3,957 ventilated adults; 1.5 against 1.0 kcal/mL at the same volume.', r:'90-day death 26.8% against 25.7%.', c:'More calories by concentration did not help.', cite:'TARGET Investigators, N Engl J Med 2018;379:1823', doi:'10.1056/NEJMoa1811687' },
+  { n:'NUTRIREA-3', q:'Low or standard calories and protein in the first week of shock?', d:'Randomized, 3,044 adults; 6 kcal/kg and 0.2 to 0.4 g/kg against 25 kcal/kg and 1.0 to 1.3 g/kg.', r:'90-day death 41.3% against 42.8%; ready for ICU discharge sooner; less vomiting, diarrhea and bowel ischemia.', c:'Low feeding is safe in the first week of shock.', cite:'Reignier J et al., Lancet Respir Med 2023;11:602', doi:'10.1016/S2213-2600(23)00092-9' },
+  { n:'EFFORT Protein', weak:'subgroup signal', q:'High protein (2.2 g/kg or more) or usual (1.2 g/kg or less)?', d:'Randomized, 1,329 ventilated adults.', r:'Alive and discharged by day 60: 46.1% against 50.2% (HR 0.91); 60-day death 34.6% against 32.1%. Possible harm with AKI and high organ failure scores.', c:'More protein is not better; be cautious with high targets in AKI.', cite:'Heyland DK et al., Lancet 2023;401:568', doi:'10.1016/S0140-6736(22)02469-2' },
+  { n:'Refeeding: restrict calories', q:'When phosphate falls after feeding starts, cut calories or carry on?', d:'Randomized, 339 ICU adults with refeeding hypophosphatemia.', r:'Primary outcome (days alive after ICU discharge) no different: 44.8 with restriction against 39.9 with standard care. Alive at day 60: 91% with restriction against 78%.', c:'Cut to 20 kcal an hour for 2 days when refeeding hypophosphatemia appears.', cite:'Doig GS et al., Lancet Respir Med 2015;3:943', doi:'10.1016/S2213-2600(15)00418-X' }
+];
+function renderTrials(){
+  $('trialhost').innerHTML = TRIALS.map(function(t){
+    return '<div class="trial"><p><b>' + esc(t.n) + '</b>' + (t.weak ? '<span class="flag">' + esc(t.weak) + '</span>' : '') + '</p>' +
+      '<p><span class="k">Question</span>' + esc(t.q) + '</p><p><span class="k">Design</span>' + esc(t.d) + '</p>' +
+      '<p><span class="k">Result</span>' + esc(t.r) + '</p><p><span class="k">What it changed</span>' + esc(t.c) + '</p>' +
+      '<p class="figsrc">' + esc(t.cite) + ' · doi:<a href="https://doi.org/' + t.doi + '">' + t.doi + '</a></p></div>';
+  }).join('');
+}
+
+/* ================= Practice ================= */
+function I(o){ var b = { wt:null, ht:null, day:null, sex:null, shock:'none', gut:{}, prop:0, d5:0, dens:1.0 }; Object.keys(o).forEach(function(k){ b[k] = o[k]; }); return b; }
+var CASES = [
+  { t:'Rising norepinephrine', s:'Septic shock, day 1. Norepinephrine doubled in the last 2 hours, lactate rising. Ventilated.', i:I({ shock:'unctrl', day:1 }),
+    q:'Feeding?', opts:['hold','low','go'], name:function(k){ return { hold:'Hold enteral feeding for now', low:'Start low-dose enteral feeding', go:'Start enteral feeding at the full rate' }[k]; }, ans:function(c){ return [startPlan(c.i).k]; }, w:function(c){ return startPlan(c.i).why; } },
+  { t:'Pressor steady', s:'Day 2. Norepinephrine steady at a moderate dose for 12 hours, lactate normal, abdomen soft.', i:I({ shock:'ctrl', day:2 }),
+    q:'Feeding?', opts:['hold','low','go'], name:function(k){ return CASES[0].name(k); }, ans:function(c){ return [startPlan(c.i).k]; }, w:function(c){ return startPlan(c.i).list[1]; } },
+  { t:'Propofol calories', s:'80 kg, BMI 25. Propofol 1% at 20 mL/h. Feed 1.0 kcal/mL.', i:I({ wt:80, ht:179, sex:'m', prop:20 }),
+    q:'How many kcal a day does the propofol give?', opts:['528','220','1100'], name:function(k){ return k + ' kcal'; }, ans:function(c){ return [String(Math.round(nonNutritional(c.i).prop))]; }, w:function(c){ var t = targets(c.i), r = rates(c.i, t); return '20 mL/h × 24 h × 1.1 kcal/mL = ' + fmt(r.nn.prop) + ' kcal. Goal feed rate ' + r.lo.toFixed(0) + ' to ' + r.hi.toFixed(0) + ' mL/h after subtracting it.'; } },
+  { t:'BMI 42', s:'Woman, 165 cm, 115 kg (BMI 42), ventilated for pneumonia.', i:I({ wt:115, ht:165, sex:'f' }),
+    q:'Protein target?', opts:['a','b','c'], name:function(k){ return { a:'About 142 g a day (2.5 g/kg ideal weight)', b:'About 230 g a day (2.0 g/kg actual weight)', c:'About 138 g a day (1.2 g/kg actual weight)' }[k]; }, ans:function(c){ var t = targets(c.i); return Math.round(t.p[0]) === 142 ? ['a'] : []; }, w:function(c){ var t = targets(c.i); return 'BMI 40 or more: up to 2.5 g/kg of ideal weight; ideal weight ' + fmt(t.ibw) + ' kg, so about ' + fmt(t.p[0]) + ' g. Energy ' + fmt(t.k[0]) + ' to ' + fmt(t.k[1]) + ' kcal (11 to 14 kcal/kg actual).'; } },
+  { t:'Phosphate after feeds', s:'Alcohol use disorder, poor intake for 2 weeks. Phosphate 3.0 mg/dL before feeds; 1.6 mg/dL 36 hours after starting.', p:[3.0, 1.6, 36],
+    q:'Next step?', opts:['cut','keep','stop'], name:function(k){ return { cut:'Cut feeds to 20 kcal/h for at least 2 days and replace phosphate', keep:'Replace phosphate and keep feeding at goal', stop:'Stop feeding until phosphate is normal' }[k]; }, ans:function(c){ return phos(c.p[0], c.p[1], c.p[2]).rhp ? ['cut'] : ['keep']; }, w:function(){ return 'Below about 2.0 mg/dL (0.65 mmol/L), a fall of more than about 0.5 mg/dL (0.16 mmol/L), within 72 hours of starting: refeeding hypophosphatemia as defined in the trial; restricting calories for 2 days, then returning over 2 to 3, was the tested approach.'; } },
+  { t:'Residual 300 mL', s:'Day 4 on gastric feeds at goal. Residual 300 mL; abdomen soft, no vomiting, passing stool.', k:'grv',
+    q:'Next step?', opts:['keep','hold','pyl'], name:function(k){ return { keep:'Keep feeding', hold:'Hold feeds for 4 hours', pyl:'Place a post-pyloric tube now' }[k]; }, ans:function(){ return ['keep']; }, w:function(){ return PROB.grv.list[0] + ' ' + PROB.grv.why; } }
+];
+var ci = 0, answered = false;
+function renderCase(){
+  var c = CASES[ci];
+  $('cnum').textContent = (ci + 1) + ' of ' + CASES.length;
+  $('fdots').innerHTML = CASES.map(function(_, i){ return '<span class="fd' + (i <= ci ? ' on' : '') + '"></span>'; }).join('');
+  answered = false;
+  $('casehost').innerHTML = '<h2>' + esc(c.t) + '</h2><p class="page-text">' + esc(c.s) + '</p><p class="sub" style="margin-top:10px">' + esc(c.q) + '</p>' +
+    '<div class="popts">' + c.opts.map(function(k){ return '<button type="button" class="popt" data-o="' + k + '">' + esc(c.name(k)) + '</button>'; }).join('') + '</div><div id="ans"></div>';
+}
+function answer(k){
+  if (answered) return; answered = true;
+  var c = CASES[ci], right = c.ans(c);
+  document.querySelectorAll('.popt').forEach(function(b){ var o = b.getAttribute('data-o'); if (right.indexOf(o) >= 0) b.classList.add('right'); else if (o === k) b.classList.add('wrong'); });
+  $('ans').innerHTML = '<div class="ansb"><p class="whyline"><b>' + (right.indexOf(k) >= 0 ? 'Right.' : 'Not quite: ' + esc(c.name(right[0])) + '.') + ' Why:</b> ' + esc(c.w(c)) + '</p>' +
+    '<div class="row"><button type="button" class="btn" data-next="1">' + (ci < CASES.length - 1 ? 'Next case' : 'Start again') + '</button></div></div>';
+}
+
+/* ================= Tabs, sheet, events ================= */
+var TABS = ['feed','refeed','problems','learn','practice'];
+function selectTab(name){ TABS.forEach(function(t){ $('t-' + t).setAttribute('aria-selected', t === name); $('p-' + t).classList.toggle('on', t === name); }); }
+var lastFocus = null;
+function openSheet(id){ lastFocus = document.activeElement; if (id === 'tubes') { $('sheet-t').textContent = 'Where the tube ends'; $('sheet-b').innerHTML = TUBES; } else { $('sheet-t').textContent = FIG[id].title; $('sheet-b').innerHTML = '<div class="fig" data-fig="' + id + '">' + FIGF[id]() + '</div>'; } $('sheet').hidden = false; $('scrim').hidden = false; $('sheet-x').focus(); }
+function closeSheet(){ $('sheet').hidden = true; $('scrim').hidden = true; $('sheet-b').innerHTML = ''; if (lastFocus) try { lastFocus.focus(); } catch (e) {} }
+function route(){ var h = decodeURIComponent((location.hash || '').slice(1)); if (!h) return; var el = $(h); if (!el) return; var p = el.closest('.panel'); if (p) selectTab(p.id.slice(2)); try { el.scrollIntoView({block:'start'}); } catch (e) {} }
+function refocus(sel){ var b = document.querySelector(sel); if (b) b.focus(); }
+function figSet(key, attr, t){ FIG[key].st = +t.getAttribute('data-' + attr); renderFigs(); refocus('.sbx[data-' + attr + '="' + FIG[key].st + '"]'); }
+function all(){ renderInputs(); renderFeed(); }
+
+document.addEventListener('click', function(e){
+  var t = e.target.closest('button, a'); if (!t) return;
+  if (t.classList.contains('tab')) { selectTab(t.id.slice(2)); return; }
+  if (t.hasAttribute('data-sex')) { var x = t.getAttribute('data-sex'); S.sex = S.sex === x ? null : x; all(); refocus('[data-sex="' + x + '"]'); return; }
+  if (t.hasAttribute('data-shock')) { S.shock = t.getAttribute('data-shock'); all(); refocus('[data-shock="' + S.shock + '"]'); return; }
+  if (t.hasAttribute('data-gut')) { var g = t.getAttribute('data-gut'); S.gut[g] = !S.gut[g]; all(); refocus('[data-gut="' + g + '"]'); return; }
+  if (t.hasAttribute('data-dens')) { S.dens = +t.getAttribute('data-dens'); all(); refocus('[data-dens="' + t.getAttribute('data-dens') + '"]'); return; }
+  if (t.hasAttribute('data-risk')) { var r = t.getAttribute('data-risk'); RS[r] = !RS[r]; renderRisk(); refocus('[data-risk="' + r + '"]'); return; }
+  if (t.hasAttribute('data-prob')) { var p = t.getAttribute('data-prob'); probSel = probSel === p ? null : p; renderProb(); refocus('[data-prob="' + p + '"]'); return; }
+  if (t.hasAttribute('data-spec')) { var sp = t.getAttribute('data-spec'); specSel = specSel === sp ? null : sp; renderSpec(); refocus('[data-spec="' + sp + '"]'); return; }
+  if (t.hasAttribute('data-chip')) { openSheet(t.getAttribute('data-chip')); return; }
+  if (t.hasAttribute('data-rfs')) return figSet('refeed', 'rfs', t);
+  if (t.hasAttribute('data-ers')) return figSet('early', 'ers', t);
+  if (t.hasAttribute('data-prs')) return figSet('protein', 'prs', t);
+  if (t.hasAttribute('data-o')) { answer(t.getAttribute('data-o')); return; }
+  if (t.hasAttribute('data-next')) { ci = (ci + 1) % CASES.length; renderCase(); try { $('practice').scrollIntoView({block:'start'}); } catch (er) {} return; }
+  if (t.tagName === 'A' && t.getAttribute('href') && t.getAttribute('href').charAt(0) === '#') { var target = $(t.getAttribute('href').slice(1)); if (target) { e.preventDefault(); try { target.scrollIntoView({block:'start'}); } catch (er) {} } }
+});
+document.addEventListener('input', function(e){
+  var id = e.target.id;
+  if (['wt','ht','day','prop','d5'].indexOf(id) >= 0) renderFeed();
+  if (['p0','p1','hrs'].indexOf(id) >= 0) renderPhos();
+  if (e.target.classList.contains('prr')) { var a = Array.prototype.slice.call(document.querySelectorAll('.prr')), k = a.indexOf(e.target); FIG.energy.p = +e.target.value; renderFigs(); var n = document.querySelectorAll('.prr')[k]; if (n) n.focus(); }
+});
+document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && !$('sheet').hidden) closeSheet(); });
+$('scrim').addEventListener('click', closeSheet);
+$('sheet-x').addEventListener('click', closeSheet);
+window.addEventListener('hashchange', route);
+
+all(); renderRisk(); renderPhos(); renderProb(); renderSpec(); renderFigs(); renderTrials(); renderCase();
+route();
+})();
+</script>
+<script id="deeper-data">
+/* Go deeper: mechanism, rationale and the common trap for each Learn chapter. Text only; no doses or thresholds beyond the tool's own. */
+(function(){ var D = {
+"learn-refeed": [["Mechanism", "During starvation the body runs on fat and protein, insulin is low, and the minerals inside cells are depleted even when blood levels look normal. Carbohydrate triggers insulin, which moves glucose, potassium, phosphate and magnesium into cells and increases the use of thiamine."], ["Why it matters", "The fall in blood levels comes in the first days of feeding and can cause arrhythmias, muscle weakness including the breathing muscles, and fluid retention."], ["Common trap", "Checking electrolytes once before feeding and not again, or treating a falling phosphate with replacement alone while continuing to advance the feed."]],
+"learn-early": [["Mechanism", "In early critical illness the body produces glucose and breaks down protein on its own, driven by stress hormones, and this is not suppressed by feeding. Extra calories on top of this can add to high glucose and fat accumulation in the liver."], ["Why it matters", "Several large trials found that giving less in the first week was not worse than full feeding, which is why the guideline target in that period is a range starting well below full needs."], ["Common trap", "Treating the first-week target as a deficit to be made up quickly, for example by adding parenteral nutrition to a patient already on tube feeds."]],
+"learn-energy": [["Mechanism", "Propofol is given in a lipid emulsion; the fat is metabolised like nutritional fat. Dextrose in maintenance or carrier fluids is metabolised like dietary carbohydrate."], ["Why it matters", "At higher propofol rates the emulsion can supply a large share of the daily energy target, so the feed rate needs to be lower, and protein then falls short unless it is supplemented."], ["Common trap", "Lowering the feed rate for propofol and forgetting that the patient now receives less protein, or forgetting to raise the feed again when propofol stops."]],
+"learn-protein": [["Mechanism", "Inflammation and immobility drive rapid muscle breakdown in the first days of critical illness, and muscle becomes less responsive to protein and amino acids (anabolic resistance)."], ["Why it matters", "Protein given early cannot fully stop this loss; a randomized trial of a high protein target found no benefit and a possible signal of harm in patients with acute kidney injury and high organ failure scores, so targets are kept moderate."], ["Common trap", "Assuming that more protein always means less muscle loss, especially in a patient with acute kidney injury who is not on dialysis."]]
+};
+  function add(){ Object.keys(D).forEach(function(id){ var c = document.getElementById(id); if (!c || c.querySelector(":scope > .deeper")) return; var d = document.createElement("details"); d.className = "deeper"; d.innerHTML = "<summary>Go deeper: mechanism and rationale</summary><div class=\"dpx\">" + D[id].map(function(r){ return "<div><span class=\"dl\">" + r[0] + "</span><p>" + r[1] + "</p></div>"; }).join("") + "</div>"; c.appendChild(d); }); }
+  add();
+})();
+</script>
+</body>
+</html>
