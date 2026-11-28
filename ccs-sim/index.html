@@ -1,0 +1,1240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CCS case simulator · bedside.tools</title>
+<meta name="description" content="Step 3 computer-based case simulation practice: ten cases with typed orders, a simulated clock, results that come back on time, and a review of what you did, when, and why it matters.">
+<script src="/theme.js"></script>
+<style>
+:root{--bg:#FBFBFA;--card:#FFFFFF;--ink:#111113;--muted:#55555D;--line:#ECECEE;--accent:#2B4BDB;--warn:#9A3B00;--warnbg:#FFF6EC}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5}
+.mono{font-family:var(--mono)}
+.wrap{max-width:720px;margin:0 auto;padding:20px 16px 48px}
+a{color:var(--accent)}
+.back{font-size:14px;text-decoration:none;display:inline-block;min-height:44px;line-height:44px}
+h1{font-size:26px;margin:4px 0 4px;letter-spacing:-.01em}
+.purpose{color:var(--muted);margin:0 0 20px}
+.tabs{display:flex;gap:6px;margin-bottom:16px;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:1 0 auto;min-width:0;min-height:44px;border:1px solid var(--line);background:var(--card);border-radius:14px;padding:0 12px;font:inherit;font-size:14px;font-weight:600;color:var(--muted);cursor:pointer}
+.tab[aria-selected="true"]{border-color:var(--accent);color:var(--accent)}
+.panel{display:none}.panel.on{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
+.card h2{font-size:18px;margin:0 0 4px}
+.card h3{font-size:16px;margin:0 0 4px}
+.label{font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0 0 8px}
+.sub{font-size:14px;color:var(--muted);margin:4px 0 0}
+.note{font-size:14px;color:var(--muted)}
+.guard{border-left:3px solid var(--warn);background:var(--warnbg);padding:8px 10px;border-radius:0 10px 10px 0;margin-top:8px;font-size:14.5px}
+.okline{border-left:3px solid var(--ok);background:var(--okbg);padding:8px 10px;border-radius:0 10px 10px 0;margin-top:8px;font-size:14.5px}
+.tier{display:inline-block;font-family:var(--mono);font-size:11px;border:1px solid var(--line);border-radius:999px;padding:2px 8px;color:var(--muted);margin:4px 6px 0 0}
+.whyline{margin:6px 0 0;font-size:14.5px;color:var(--muted)}
+.whyline b{color:var(--ink);font-weight:600}
+details.more{margin-top:10px;border-top:1px solid var(--line);padding-top:4px}
+summary{cursor:pointer;color:var(--accent);font-weight:600;min-height:44px;line-height:44px}
+details p{margin:0 0 8px;font-size:15px}
+.tab:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.btn{min-height:44px;border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);border-radius:10px;padding:8px 14px;font:inherit;font-weight:600;cursor:pointer}
+.btn.ghost{background:var(--card);color:var(--accent)}
+.btn.warnb{border-color:var(--warn);background:var(--card);color:var(--warn)}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.sbtn{min-height:44px;min-width:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--ink);font:inherit;font-size:14px;cursor:pointer;text-align:left}
+.sbtn[aria-pressed="true"]{border-color:var(--accent);color:var(--accent);font-weight:600}
+.sbtn:disabled{color:var(--muted);cursor:default;opacity:.74}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.chip{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--fill);color:var(--ink);font:inherit;font-size:14px;cursor:pointer}
+.chip i{width:9px;height:9px;border-radius:2px;background:var(--accent);flex:none}
+.caselist{display:grid;gap:10px}
+.cc{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px;align-items:center}
+.cc .where{font-family:var(--mono);font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+.cc h3{margin:0;font-size:16.5px}
+.cc p{margin:0;font-size:14.5px;color:var(--muted);grid-column:1}
+.cc .btn{grid-column:2;grid-row:1 / span 3}
+.cc .done{font-family:var(--mono);font-size:12px;color:var(--ok)}
+.stick{position:sticky;top:var(--bt-bar,0px);z-index:5;background:var(--bg);margin:0 -16px 12px;padding:8px 16px;border-bottom:1px solid var(--line)}
+.clockrow{display:flex;align-items:baseline;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.clock{font-family:var(--mono);font-size:20px;font-weight:600}
+.loc{font-family:var(--mono);font-size:13px;color:var(--muted)}
+.vit{display:flex;flex-wrap:wrap;gap:4px 14px;font-family:var(--mono);font-size:13.5px;margin-top:2px}
+.vit span b{font-weight:600}
+.vit .chg{color:var(--warn);font-weight:600}
+.pres p{margin:0 0 8px;font-size:15px}
+.meds{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.ordbox{position:relative}
+.ordbox input{width:100%;min-height:48px;border:1px solid var(--line);border-radius:12px;padding:10px 12px;font:inherit;font-size:16px;background:var(--card);color:var(--ink)}
+.sugg{display:grid;gap:4px;margin-top:6px}
+.sug{display:flex;justify-content:space-between;align-items:center;gap:10px;min-height:44px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);font:inherit;font-size:15px;padding:6px 12px;cursor:pointer;text-align:left}
+.sug small{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:nowrap}
+.flash{font-size:14px;margin-top:8px;min-height:21px}
+.pend{list-style:none;margin:6px 0 0;padding:0}
+.pend li{display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-top:1px solid var(--line);font-size:14.5px}
+.pend li:first-child{border-top:0}
+.pend small{font-family:var(--mono);font-size:12px;color:var(--muted);white-space:nowrap}
+.log{display:grid;gap:8px}
+.ent{border-left:3px solid var(--line);padding:4px 0 4px 10px}
+.ent.upd{border-left-color:var(--warn)}
+.ent.res{border-left-color:var(--accent)}
+.ent .when{font-family:var(--mono);font-size:11.5px;color:var(--muted);display:block}
+.ent b{font-weight:600}
+.ent p{margin:2px 0 0;font-size:15px}
+.cause{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:8px 0;border-top:1px solid var(--line);font-size:15px}
+.cause:first-of-type{border-top:0}
+.cause small{color:var(--muted);font-size:13px;text-align:right;flex:0 1 58%}
+.cause.less>span{color:var(--muted)}
+.cause.fav>span{font-weight:700}
+.cause.fav>span:before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--accent);margin-right:8px}
+.kact{padding:10px 0;border-top:1px solid var(--line)}
+.kact:first-of-type{border-top:0}
+.kact .top{display:flex;gap:8px;align-items:baseline;justify-content:space-between}
+.kact .top span:first-child{font-weight:600;font-size:15px}
+.st{font-family:var(--mono);font-size:11px;letter-spacing:.04em;text-transform:uppercase;border-radius:999px;padding:1px 8px;white-space:nowrap}
+.st.ok{background:var(--okbg);color:var(--ok)}
+.st.late{background:var(--warnbg);color:var(--warn)}
+.st.miss{background:var(--badbg);color:var(--bad)}
+.st.harm{background:var(--badbg);color:var(--bad)}
+.st.ni{background:var(--fill);color:var(--muted)}
+.kact .t{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.tally{display:flex;flex-wrap:wrap;gap:6px 16px;font-family:var(--mono);font-size:14px;margin:6px 0 0}
+.big{font-family:var(--mono);font-size:24px;font-weight:600;line-height:1.15}
+.fig{display:block;width:100%;max-width:520px;height:auto;margin:6px auto 0}
+.fig text{font-family:var(--mono)}
+.scrim{position:fixed;inset:0;background:var(--scrim);z-index:20}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:21;max-height:90vh;overflow-y:auto;background:var(--card);border:1px solid var(--line);border-bottom:0;border-radius:20px 20px 0 0;padding:8px 16px 24px;max-width:640px;margin:0 auto}
+.sheethead{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.sheethead h2{font-size:18px;margin:0}
+.xbtn{min-height:44px;min-width:44px;border:0;background:transparent;color:var(--accent);font:inherit;font-weight:600;cursor:pointer}
+.trial{border-left:3px solid var(--accent);padding-left:12px;margin-top:6px}
+.trial p{margin:0 0 6px;font-size:15px}
+.trial .k{font-family:var(--mono);font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);display:block}
+.pills{position:sticky;top:var(--bt-bar,0px);z-index:5;background:var(--bg);display:flex;gap:6px;overflow-x:auto;margin:0 -16px 12px;padding:8px 16px;border-bottom:1px solid var(--line);scrollbar-width:none}
+.pills::-webkit-scrollbar{display:none}
+.pill{flex:none;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--muted);font:inherit;font-size:14px;cursor:pointer;white-space:nowrap}
+.pill[aria-current="true"]{border-color:var(--accent);color:var(--accent);font-weight:600}
+.chap{scroll-margin-top:70px}
+.line1{font-size:15px;margin:10px 0 0}
+.dp{border:1px solid var(--line);border-radius:12px;padding:2px 12px;margin-top:10px}
+.dp>div{padding:9px 0;border-top:1px solid var(--line)}
+.dp>div:first-child{border-top:0}
+.dp .dl{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:2px}
+.dp p{margin:0;font-size:14.5px}
+ul.plain{margin:6px 0 0;padding-left:18px}
+ul.plain li{margin:0 0 6px;font-size:15px}
+footer{margin-top:28px;font-size:13.5px;color:var(--muted)}
+footer p{margin:0 0 8px}
+.deeper{margin-top:14px;border-top:1px solid var(--line)}
+.deeper>summary{min-height:44px;display:flex;align-items:center;gap:8px;color:var(--accent);font-weight:600;font-size:15px;cursor:pointer;list-style:none;line-height:1.3}
+.deeper>summary::-webkit-details-marker{display:none}
+.deeper>summary::before{content:"+";font-family:var(--mono);font-size:18px;line-height:1;width:14px;text-align:center}
+.deeper[open]>summary::before{content:"\2212"}
+.deeper .dpx{border:1px solid var(--line);border-radius:12px;padding:2px 12px;background:var(--card)}
+.deeper .dpx>div{padding:10px 0;border-top:1px solid var(--line)}
+.deeper .dpx>div:first-child{border-top:0}
+.deeper .dl{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0 0 3px}
+.deeper p{font-size:15px;line-height:1.45;margin:0}
+.steps{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+@media (min-width:900px){
+  .wrap{max-width:1040px}
+  #p-play.on.live{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:20px;align-items:start}
+  #p-play .side{position:sticky;top:calc(var(--bt-bar,0px) + 8px)}
+  #p-cases,#p-learn{max-width:720px;margin:0 auto}
+  .stick{margin:0 0 12px;border:1px solid var(--line);border-radius:14px}
+}
+@media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="/">← bedside.tools</a>
+<h1>CCS case simulator</h1>
+<p class="purpose">Step 3 case practice. Type orders, move the clock, read results as they come back, place the patient, then see what you did, when, and why it matters.</p>
+
+<div class="tabs" role="tablist">
+  <button class="tab" role="tab" id="t-cases" aria-selected="true" aria-controls="p-cases">Cases</button>
+  <button class="tab" role="tab" id="t-play" aria-selected="false" aria-controls="p-play">Case</button>
+  <button class="tab" role="tab" id="t-learn" aria-selected="false" aria-controls="p-learn">Learn</button>
+</div>
+
+<!-- ===== Cases ===== -->
+<section class="panel on" id="p-cases" role="tabpanel" aria-labelledby="t-cases">
+  <div class="card" id="how">
+    <p class="label">How a case runs</p>
+    <ul class="plain">
+      <li>Read the opening screen. Nothing happens until you order it: monitoring and pulse oximetry included.</li>
+      <li>Type orders (three letters bring up matches). Medicines are ordered by name; this simulator, like the exam, does not ask for doses.</li>
+      <li>Move the clock to get results. Tests take simulated time; examining the patient takes a few minutes.</li>
+      <li>Move the patient to the right place, then end the case and read the review.</li>
+    </ul>
+    <div class="chips"><button class="chip" type="button" data-fig="loop"><i></i>The CCS loop</button></div>
+  </div>
+  <div class="caselist" id="cases"></div>
+</section>
+
+<!-- ===== Case (play) ===== -->
+<section class="panel" id="p-play" role="tabpanel" aria-labelledby="t-play">
+  <div id="noplay" class="card">
+    <h2>No case open</h2>
+    <p class="sub">Pick one from Cases. A case keeps running here while you look at Learn.</p>
+    <div class="row"><button class="btn" type="button" id="go-cases">Choose a case</button></div>
+  </div>
+  <div id="play" hidden>
+    <div class="main">
+      <div class="stick" id="clockbar">
+        <div class="clockrow"><span class="clock" id="clock"></span><span class="loc" id="locnow"></span></div>
+        <div class="vit" id="vitals"></div>
+      </div>
+      <div class="card pres" id="opening">
+        <p class="label" id="op-where"></p>
+        <h2 id="op-title"></h2>
+        <div id="op-body"></div>
+        <div id="op-meds"></div>
+      </div>
+      <div id="review" hidden></div>
+      <div class="card" id="orders">
+        <p class="label">Orders</p>
+        <div class="ordbox">
+          <label for="ordq" class="note">Type an order: a test, a medicine, a procedure, a consult, counselling</label>
+          <input id="ordq" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="for example: cbc, aspirin, cardiology">
+          <div class="sugg" id="sugg"></div>
+        </div>
+        <div class="flash" id="flash" aria-live="polite"></div>
+      </div>
+      <div class="card" id="clockcard">
+        <p class="label">Move the clock</p>
+        <div class="steps" id="advb"></div>
+        <p class="sub" id="advnote"></p>
+        <p class="label" style="margin-top:14px">Pending</p>
+        <ul class="pend" id="pend"></ul>
+      </div>
+      <div class="card" id="exam">
+        <p class="label">Examine (2 minutes each)</p>
+        <div class="steps" id="examb"></div>
+      </div>
+      <div class="card" id="chart">
+        <p class="label">Chart: results and updates, newest first</p>
+        <div class="log" id="log"></div>
+      </div>
+    </div>
+    <div class="side">
+      <div class="card" id="where">
+        <p class="label">Location</p>
+        <div class="steps" id="locb"></div>
+      </div>
+      <div class="card" id="ddx">
+        <p class="label">Differential: narrows as results come back</p>
+        <div id="ddxl"></div>
+      </div>
+      <div class="card" id="endcard">
+        <div class="row" style="margin-top:0"><button class="btn warnb" type="button" id="endbtn">End case and review</button></div>
+        <p class="sub">Ending stops the clock. Results still pending are not seen, as on the exam.</p>
+        <div class="chips"><button class="chip" type="button" data-fig="loop"><i></i>The CCS loop</button></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Learn ===== -->
+<section class="panel" id="p-learn" role="tabpanel" aria-labelledby="t-learn">
+  <div class="pills" id="pills"></div>
+
+  <div class="card chap" id="learn-loop" data-pill="The loop">
+    <p class="label">1 · The loop</p>
+    <h2>Order, move the clock, reassess</h2>
+    <div id="fig-loop"></div>
+    <p class="line1" id="loopline">Tap a step.</p>
+  </div>
+
+  <div class="card chap" id="learn-clock" data-pill="Two clocks">
+    <p class="label">2 · Two clocks</p>
+    <h2>Real minutes, simulated hours</h2>
+    <div id="fig-clocks"></div>
+    <div class="steps" id="clockseg">
+      <button class="sbtn" type="button" data-cl="ed" aria-pressed="true">Emergency case</button>
+      <button class="sbtn" type="button" data-cl="off" aria-pressed="false">Office case</button>
+    </div>
+    <p class="line1" id="clockline"></p>
+  </div>
+
+  <div class="card chap" id="learn-score" data-pill="What scores">
+    <p class="label">3 · What scores</p>
+    <h2>The right thing, soon enough, in order</h2>
+    <div id="fig-score"></div>
+    <ul class="plain">
+      <li>Credit goes to indicated actions, judged by <b>timing and sequence</b>. A correct step made late or out of order may earn nothing.</li>
+      <li>Actions that are not indicated, or carry risk, <b>lower</b> the score. Cost counts indirectly, through how inappropriate an order is.</li>
+      <li>Being aggressive when watching and waiting is the standard of care also scores lower.</li>
+      <li>Counselling, diet and activity orders tend to carry little or no weight.</li>
+    </ul>
+    <p class="sub">From the USMLE description of CCS scoring. The NBME does not publish its keys; this simulator's grading is its own.</p>
+  </div>
+
+  <div class="card chap" id="learn-open" data-pill="Opening orders">
+    <p class="label">4 · Opening orders</p>
+    <h2>Stabilise, then the test that changes the plan</h2>
+    <div id="fig-open"></div>
+    <div class="steps" id="openseg">
+      <button class="sbtn" type="button" data-op="sick" aria-pressed="true">Unstable</button>
+      <button class="sbtn" type="button" data-op="clear" aria-pressed="false">Diagnosis obvious</button>
+      <button class="sbtn" type="button" data-op="well" aria-pressed="false">Stable office visit</button>
+    </div>
+    <p class="line1" id="openline"></p>
+    <p class="sub">Expert practice: a way to order, not a rule the exam publishes.</p>
+  </div>
+
+  <div class="card chap" id="learn-end" data-pill="Ending">
+    <p class="label">5 · Ending a case</p>
+    <h2>Finish the plan before you leave</h2>
+    <ul class="plain">
+      <li>When the case ends you get a few minutes to add or cancel orders. After that you cannot examine, move the patient, book follow-up or see pending results.</li>
+      <li>Use those minutes for what a discharge or handover needs: the long-term medicine, the counselling that matters for this patient, the follow-up.</li>
+      <li>On the exam you must also select Exit Case. Here, End case opens the review.</li>
+    </ul>
+  </div>
+</section>
+
+<div class="scrim" id="scrim" hidden></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-t" hidden>
+  <div class="sheethead"><h2 id="sheet-t"></h2><button class="xbtn" type="button" id="sheet-x">Close</button></div>
+  <div id="sheet-b"></div>
+</div>
+
+<footer>
+<p>For education only. Not a substitute for clinical judgment. Cases are invented for practice, simplified, and written for adults in US practice.</p>
+<p>The grading here is this site's own. The NBME does not publish how CCS cases are scored; time windows are teaching windows, taken from a guideline where it gives a time and otherwise labelled expert practice. Result times are this simulator's estimates.</p>
+<p>Privacy: everything runs in your browser. Nothing you enter is sent anywhere or stored, and there are no analytics. Do not enter names, record numbers, or dates of birth.</p>
+<p><b>Last reviewed:</b> 27 November 2026</p>
+<p id="srcs"><b>Sources:</b> Exam format: USMLE, Step 3 exam content and Computer-based Case Simulations pages, and the "How to run a Step 3 CCS case" transcript (read November 2026) · Rao SV et al., 2025 ACC/AHA/ACEP/NAEMSP/SCAI guideline for the management of acute coronary syndromes, Circulation 2025;151:e771 (class and level shown) · Umpierrez GE et al., Hyperglycemic crises in adults with diabetes: a consensus report (ADA, EASD, JBDS, AACE, DTS), Diabetes Care 2024;47:1257 (ungraded) · Prescott HC et al., Surviving Sepsis Campaign: international guidelines for management of sepsis and septic shock 2026, Crit Care Med 2026;54:725 (strength and certainty shown) · Laine L et al., ACG clinical guideline: upper gastrointestinal and ulcer bleeding, Am J Gastroenterol 2021;116:899 · Chey WD et al., ACG clinical guideline: treatment of Helicobacter pylori infection, Am J Gastroenterol 2024;119:1730 · Creager MA et al., 2026 AHA/ACC/ACCP/ACEP/CHEST/SCAI/SHM/SIR/SVM/SVN guideline for the evaluation and management of acute pulmonary embolism in adults, Circulation 2026;153:e977 · Konstantinides SV et al., 2019 ESC guidelines for acute pulmonary embolism, Eur Heart J 2020;41:543 · Verbalis JG et al., Diagnosis, evaluation, and treatment of hyponatremia: expert panel recommendations, Am J Med 2013;126(10 Suppl 1):S1 · Spasovski G et al., Clinical practice guideline on diagnosis and treatment of hyponatraemia, Eur J Endocrinol 2014;170:G1 · Sterns RH et al., Treatment guidelines for hyponatremia: stay the course, Clin J Am Soc Nephrol 2024;19:129 · SAMSCA (tolvaptan) prescribing information, 2021 · Global Initiative for Chronic Obstructive Lung Disease, GOLD 2026 report (the GOLD 2027 report, November 2026, lists no change to exacerbation management) · Rochwerg B et al., ERS/ATS clinical practice guidelines: noninvasive ventilation for acute respiratory failure, Eur Respir J 2017;50:1602426 · O'Driscoll BR et al., BTS guideline for oxygen use in adults, Thorax 2017;72 Suppl 1:ii1 · Austin MA et al., BMJ 2010;341:c5462 · Prabhakaran S et al., 2026 guideline for the early management of patients with acute ischemic stroke, Stroke 2026;57:e316 (class and level shown); the 60-minute door-to-needle goal is from the AHA Target: Stroke quality program · Metlay JP et al., Diagnosis and treatment of adults with community-acquired pneumonia (ATS/IDSA), Am J Respir Crit Care Med 2019;200:e45 · Jones BE et al., ATS clinical practice guideline update on community-acquired pneumonia, Am J Respir Crit Care Med 2026;212:24 · KDIGO clinical practice guideline for acute kidney injury, Kidney Int Suppl 2012;2:1 · UK Kidney Association clinical practice guideline: treatment of acute hyperkalaemia in adults, 2026 update (graded) · Trials: Villanueva C et al., N Engl J Med 2013;368:11 · Meyer G et al., N Engl J Med 2014;370:1402 · Hacke W et al., N Engl J Med 2008;359:1317 · Rows marked expert practice have no primary source. Diagrams are schematic and drawn for this site.</p>
+</footer>
+</div>
+<script id="deeper-data" type="application/json">
+{
+"learn-loop":{"m":"CCS is a model of time. An order is only a plan until the simulated clock passes its report time, so the case moves only when you move it.","w":"Because results take simulated time, the orders you place before moving the clock decide how long the patient waits for treatment.","t":"Moving the clock to see a result before ordering the treatment the opening screen already justifies."},
+"learn-clock":{"m":"Each case has a fixed allowance of real minutes, while the patient's clock runs as far as you move it: minutes for an emergency, months for a clinic problem.","w":"Real time limits how much you can type; simulated time is what the patient experiences, and it is what the timing of your actions is judged on.","t":"Rushing the real clock but letting simulated hours pass before giving the urgent drug."},
+"learn-score":{"m":"Scoring follows expert criteria: indicated actions earn credit when done in time and in a sensible order; risky or unneeded actions lower the score.","w":"Ordering everything is not safe: unnecessary invasive tests and aggressive treatment when watching is the standard both cost points.","t":"Thinking a long list of tests protects you. Extra orders that carry risk count against you."},
+"learn-open":{"m":"The first orders follow the patient's danger: monitoring and access for the unstable, the time-critical treatment path when the diagnosis is already clear, and restraint for the stable outpatient.","w":"Order and timing are graded, so a sensible first screen of orders earns most of the credit in many cases.","t":"Forgetting that monitoring and pulse oximetry are not automatic in CCS."},
+"learn-end":{"m":"At case end the clock stops; only orders can still be added or cancelled for a few minutes.","w":"Long-term treatment, follow-up and the counselling that fits the patient belong to a complete plan, so add them before the case closes.","t":"Ending the case with key results still pending, or with no follow-up for a patient sent home."}
+}
+</script>
+<script>
+/* ---------- Order catalogue: [id, name, other words, kind, minutes to result, usual result] ----------
+   Kinds: lab, img (imaging), ecg, med, flu (fluid), proc, mon (monitoring), con (consult), cou (counselling), diet.
+   Result times are this simulator's estimates, not exam values. */
+var CAT = [
+ ['fsg','Fingerstick glucose','bedside glucose capillary glucose point of care','lab',2,'Glucose 104 mg/dL.'],
+ ['cbc','Complete blood count','cbc hemoglobin hgb hematocrit platelets wbc white count blood count','lab',45,'Hemoglobin 13.8 g/dL, white cells 7.2, platelets 245.'],
+ ['bmp','Basic metabolic panel','bmp chem7 chemistry electrolytes sodium potassium creatinine bun renal function','lab',45,'Sodium 139, potassium 4.1, chloride 103, bicarbonate 25, BUN 14, creatinine 0.9, glucose 98.'],
+ ['cmp','Comprehensive metabolic panel','cmp chem14 liver function','lab',45,'Electrolytes normal; creatinine 0.9; albumin 4.0; AST 22, ALT 19, alkaline phosphatase 70, bilirubin 0.6.'],
+ ['mg','Magnesium','serum magnesium mg level','lab',45,'Magnesium 2.0 mg/dL.'],
+ ['phos','Phosphate','phosphorus serum phosphate','lab',45,'Phosphate 3.4 mg/dL.'],
+ ['lft','Hepatic panel','liver function tests lfts ast alt bilirubin alkaline phosphatase','lab',45,'AST 24, ALT 20, alkaline phosphatase 72, bilirubin 0.7, albumin 4.0.'],
+ ['lip','Lipase','pancreatic enzyme amylase','lab',45,'Lipase 30 U/L (normal).'],
+ ['coag','PT/INR and aPTT','coagulation coags prothrombin time inr ptt aptt','lab',45,'INR 1.0, aPTT 30 s.'],
+ ['tc','Type and crossmatch','type and screen crossmatch blood bank group and hold','lab',50,'Group O positive. Two units crossmatched and ready.'],
+ ['trop','Troponin (high-sensitivity)','troponin hs-troponin cardiac enzymes trop','lab',60,'High-sensitivity troponin T 6 ng/L (normal).'],
+ ['bnp','BNP','b-type natriuretic peptide nt-probnp natriuretic','lab',60,'BNP 40 pg/mL (normal).'],
+ ['lac','Lactate','lactic acid serum lactate','lab',20,'Lactate 1.2 mmol/L.'],
+ ['abg','Arterial blood gas','abg arterial gas blood gas with electrolytes','lab',15,'pH 7.41, PaCO2 39, PaO2 92, bicarbonate 24.'],
+ ['vbg','Venous blood gas with electrolytes','vbg venous gas point of care sodium potassium istat','lab',15,'pH 7.38, pCO2 44, sodium 139, potassium 4.0, glucose 100.'],
+ ['bhb','Beta-hydroxybutyrate','ketones serum ketones bhb beta hydroxybutyrate','lab',45,'Beta-hydroxybutyrate 0.2 mmol/L (normal).'],
+ ['ua','Urinalysis','ua urine dipstick urine microscopy','lab',30,'Urinalysis: no blood, protein, glucose, nitrite or leukocyte esterase.'],
+ ['ucx','Urine culture','urine culture','lab',1440,'Urine culture: no growth.'],
+ ['bcx','Blood cultures','blood culture x2 cultures','lab',1440,'Blood cultures: no growth so far.'],
+ ['spx','Sputum culture and Gram stain','sputum gram stain sputum culture','lab',1440,'Sputum: normal flora.'],
+ ['rvp','Respiratory viral panel','influenza covid sars-cov-2 rsv viral pcr flu swab nasal swab','lab',90,'Influenza A/B, SARS-CoV-2 and RSV not detected.'],
+ ['pct','Procalcitonin','procalcitonin','lab',90,'Procalcitonin 0.08 ng/mL.'],
+ ['sosm','Serum osmolality','serum osmolality osm plasma osmolality','lab',90,'Serum osmolality 290 mOsm/kg.'],
+ ['uosm','Urine osmolality','urine osmolality urine osm','lab',90,'Urine osmolality 450 mOsm/kg.'],
+ ['una','Urine sodium','urine sodium spot urine na','lab',90,'Urine sodium 40 mmol/L.'],
+ ['ucr','Urine creatinine','urine creatinine fena fractional excretion','lab',90,'Urine creatinine 80 mg/dL.'],
+ ['hcg','Pregnancy test (hCG)','hcg beta hcg pregnancy urine pregnancy','lab',30,'hCG negative.'],
+ ['tsh','TSH','thyroid stimulating hormone thyroid function','lab',120,'TSH 1.9 mIU/L.'],
+ ['cort','Cortisol','am cortisol serum cortisol','lab',120,'Cortisol 18 mcg/dL.'],
+ ['ddim','D-dimer','d dimer ddimer','lab',45,'D-dimer 0.3 mg/L FEU (normal).'],
+ ['hp','H. pylori test','helicobacter pylori stool antigen urea breath test biopsy urease','lab',1440,'H. pylori not detected.'],
+ ['utox','Urine drug screen','tox screen drugs of abuse','lab',60,'Urine drug screen negative.'],
+ ['etoh','Blood alcohol','ethanol level alcohol level','lab',45,'Ethanol not detected.'],
+ ['ck','Creatine kinase','ck cpk','lab',45,'CK 110 U/L.'],
+ ['a1c','Hemoglobin A1c','a1c glycated hemoglobin','lab',120,'A1c 5.4%.'],
+ ['lipd','Lipid panel','cholesterol ldl lipids','lab',120,'LDL 128 mg/dL, HDL 44, triglycerides 150.'],
+ ['ecg','12-lead ECG','ecg ekg electrocardiogram 12 lead','ecg',5,'Sinus rhythm 78, normal intervals, no ST or T changes.'],
+ ['recg','Right-sided ECG (V4R)','right sided ecg v4r right ventricular leads','ecg',5,'No ST elevation in V4R.'],
+ ['cxr','Chest x-ray','cxr chest radiograph chest film portable xray','img',30,'Clear lungs, normal heart size and mediastinum.'],
+ ['cth','CT head without contrast','ct head noncontrast ct brain head ct','img',25,'No acute abnormality.'],
+ ['cta','CT angiography head and neck','cta head neck ct angiogram vessel imaging','img',40,'No large-vessel occlusion.'],
+ ['ctp','CT perfusion','ct perfusion core penumbra','img',45,'No perfusion deficit.'],
+ ['mri','MRI brain','mri brain diffusion mri head','img',120,'No acute abnormality.'],
+ ['ctpa','CT pulmonary angiogram','ctpa ct chest pe protocol ct angiogram chest pulmonary embolism','img',60,'No pulmonary embolism.'],
+ ['vq','Ventilation-perfusion scan','v/q vq scan lung scan','img',180,'Low probability.'],
+ ['ctap','CT abdomen and pelvis with contrast','ct abdomen pelvis contrast ct belly','img',60,'No acute abnormality.'],
+ ['ctnc','CT abdomen and pelvis without contrast','ct stone protocol noncontrast ct kidneys renal stone ct','img',45,'No acute abnormality.'],
+ ['rus','Renal ultrasound','kidney ultrasound renal us bladder ultrasound','img',120,'Normal kidneys, no hydronephrosis.'],
+ ['ruq','Abdominal ultrasound','ruq ultrasound abdominal us liver gallbladder','img',120,'Normal liver and gallbladder.'],
+ ['echo','Echocardiogram','echo tte transthoracic echocardiogram cardiac ultrasound','img',120,'Normal ventricular size and function.'],
+ ['ledup','Leg venous duplex','lower extremity doppler dvt ultrasound leg ultrasound duplex','img',120,'No deep vein thrombosis.'],
+ ['bscan','Bladder scan','bladder scan post void residual pvr','proc',5,'Bladder volume 80 mL.'],
+ ['mon','Cardiac monitor','telemetry cardiac monitoring monitor heart monitor','mon',0,''],
+ ['pox','Pulse oximetry, continuous','pulse ox oximetry spo2 continuous oxygen saturation','mon',0,''],
+ ['neuroc','Neuro checks','neuro checks neurologic checks gcs checks','mon',0,''],
+ ['io','Strict intake and output','urine output monitoring intake output i/o','mon',0,''],
+ ['nihss','NIH stroke scale','nihss stroke scale nih','proc',5,''],
+ ['iv','IV access (two large-bore)','iv access peripheral iv cannula large bore line','proc',0,''],
+ ['o2','Oxygen by nasal cannula, titrated','oxygen nasal cannula o2 supplemental oxygen','proc',0,''],
+ ['vent','Venturi mask oxygen, controlled','venturi mask 28% controlled oxygen','proc',0,''],
+ ['nrb','Non-rebreather mask, 100% oxygen','non rebreather 100% oxygen high concentration oxygen','proc',0,''],
+ ['hfnc','High-flow nasal oxygen','hfnc high flow nasal cannula optiflow','proc',0,''],
+ ['niv','Noninvasive ventilation (BiPAP)','bipap niv noninvasive ventilation bilevel cpap','proc',0,''],
+ ['intub','Intubation and mechanical ventilation','intubate endotracheal intubation ventilator rsi','proc',0,''],
+ ['foley','Urinary catheter','foley catheter bladder catheter straight cath urethral catheter','proc',0,''],
+ ['ngt','Nasogastric tube','ng tube ngt lavage nasogastric','proc',0,''],
+ ['cvc','Central venous catheter','central line cvc','proc',0,''],
+ ['aline','Arterial line','arterial catheter a-line','proc',0,''],
+ ['egd','Upper endoscopy','egd endoscopy upper endoscopy esophagogastroduodenoscopy scope','proc',60,''],
+ ['pci','Cardiac catheterization (primary PCI)','cardiac cath coronary angiography pci cath lab angioplasty stent','proc',60,''],
+ ['evt','Mechanical thrombectomy','thrombectomy endovascular evt clot retrieval','proc',90,''],
+ ['hd','Emergent hemodialysis','dialysis hemodialysis emergent dialysis crrt','proc',0,''],
+ ['swal','Bedside swallow screen','swallow screen dysphagia screen swallow evaluation','proc',10,'Passes the bedside swallow screen.'],
+ ['npo','NPO (nothing by mouth)','npo nothing by mouth nil by mouth','diet',0,''],
+ ['asa','Aspirin','aspirin asa acetylsalicylic','med',0,''],
+ ['ntg','Nitroglycerin','nitroglycerin ntg nitro glyceryl trinitrate','med',0,''],
+ ['morph','Morphine','morphine opioid analgesia','med',0,''],
+ ['ticag','Ticagrelor','ticagrelor brilinta p2y12','med',0,''],
+ ['prasu','Prasugrel','prasugrel effient p2y12','med',0,''],
+ ['clopi','Clopidogrel','clopidogrel plavix p2y12','med',0,''],
+ ['ufh','Heparin infusion (unfractionated)','heparin ufh heparin drip unfractionated heparin','med',0,''],
+ ['enox','Enoxaparin','enoxaparin lovenox lmwh low molecular weight heparin','med',0,''],
+ ['bival','Bivalirudin','bivalirudin angiomax','med',0,''],
+ ['apix','Apixaban','apixaban eliquis doac','med',0,''],
+ ['riva','Rivaroxaban','rivaroxaban xarelto doac','med',0,''],
+ ['warf','Warfarin','warfarin coumadin','med',0,''],
+ ['tpa','Alteplase','alteplase tpa tissue plasminogen activator thrombolysis fibrinolytic','med',0,''],
+ ['tnk','Tenecteplase','tenecteplase tnk thrombolysis fibrinolytic','med',0,''],
+ ['ivbb','Metoprolol IV','metoprolol iv beta blocker iv lopressor','med',0,''],
+ ['pobb','Metoprolol by mouth','metoprolol oral beta blocker tartrate succinate','med',0,''],
+ ['statin','Atorvastatin (high intensity)','atorvastatin statin lipitor rosuvastatin','med',0,''],
+ ['ns','Normal saline IV','normal saline 0.9% sodium chloride ns bolus crystalloid','flu',0,''],
+ ['lr','Lactated Ringer\'s IV','lactated ringers ringer lactate lr balanced crystalloid plasmalyte','flu',0,''],
+ ['d5w','Dextrose 5% in water IV','d5w dextrose 5% free water','flu',0,''],
+ ['d5h','Dextrose 5% with 0.45% saline IV','d5 half normal d5 1/2ns dextrose containing fluid','flu',0,''],
+ ['d50','Dextrose 50% IV','d50 dextrose 50 amp of dextrose','med',0,''],
+ ['hts','Hypertonic saline 3% bolus','3% saline hypertonic saline bolus','flu',0,''],
+ ['alb','Albumin IV','albumin 5% 25% colloid','flu',0,''],
+ ['hes','Hydroxyethyl starch','hetastarch hes hespan starch colloid','flu',0,''],
+ ['prbc','Packed red cells, transfuse','transfuse prbc red cells blood transfusion packed red blood cells','flu',0,''],
+ ['ffp','Fresh frozen plasma','ffp plasma','flu',0,''],
+ ['plt','Platelet transfusion','platelets transfuse platelets','flu',0,''],
+ ['kcl','Potassium chloride IV','potassium chloride kcl potassium replacement iv potassium','med',0,''],
+ ['kpo','Potassium chloride by mouth','oral potassium kcl tablets','med',0,''],
+ ['insd','Insulin infusion (regular)','insulin drip insulin infusion iv insulin regular insulin infusion','med',0,''],
+ ['insb','Insulin regular IV bolus','insulin regular iv push 10 units insulin bolus','med',0,''],
+ ['inss','Insulin subcutaneous (basal)','glargine basal insulin subcutaneous insulin lantus','med',0,''],
+ ['bicarb','Sodium bicarbonate IV','bicarbonate sodium bicarb nahco3','med',0,''],
+ ['cag','Calcium gluconate IV','calcium gluconate iv calcium','med',0,''],
+ ['cacl','Calcium chloride IV','calcium chloride','med',0,''],
+ ['kbind','Potassium binder (sodium zirconium cyclosilicate)','lokelma szc patiromer veltassa kayexalate binder','med',0,''],
+ ['furo','Furosemide IV','furosemide lasix loop diuretic','med',0,''],
+ ['alb2','Albuterol nebulised','albuterol salbutamol neb nebulizer saba','med',0,''],
+ ['ipra','Ipratropium nebulised','ipratropium atrovent sama','med',0,''],
+ ['pred','Prednisone by mouth','prednisone oral steroid corticosteroid','med',0,''],
+ ['mpred','Methylprednisolone IV','methylprednisolone solumedrol iv steroid','med',0,''],
+ ['hydro','Hydrocortisone IV','hydrocortisone solucortef stress dose','med',0,''],
+ ['theo','Aminophylline / theophylline','aminophylline theophylline methylxanthine','med',0,''],
+ ['mgiv','Magnesium sulfate IV','magnesium sulfate iv magnesium','med',0,''],
+ ['amox','Amoxicillin','amoxicillin','med',0,''],
+ ['augm','Amoxicillin-clavulanate','augmentin amoxicillin clavulanate','med',0,''],
+ ['doxy','Doxycycline','doxycycline','med',0,''],
+ ['azi','Azithromycin','azithromycin zithromax macrolide','med',0,''],
+ ['levo','Levofloxacin','levofloxacin fluoroquinolone levaquin','med',0,''],
+ ['moxi','Moxifloxacin','moxifloxacin fluoroquinolone','med',0,''],
+ ['cro','Ceftriaxone','ceftriaxone rocephin cephalosporin','med',0,''],
+ ['fep','Cefepime','cefepime','med',0,''],
+ ['tzp','Piperacillin-tazobactam','piperacillin tazobactam zosyn pip tazo','med',0,''],
+ ['mero','Meropenem','meropenem carbapenem','med',0,''],
+ ['vanc','Vancomycin IV','vancomycin vanc','med',0,''],
+ ['ppiv','Pantoprazole IV','pantoprazole iv ppi proton pump inhibitor protonix','med',0,''],
+ ['ppo','Omeprazole by mouth','omeprazole oral ppi','med',0,''],
+ ['eryth','Erythromycin IV','erythromycin prokinetic','med',0,''],
+ ['octr','Octreotide','octreotide somatostatin','med',0,''],
+ ['norepi','Norepinephrine','norepinephrine levophed pressor vasopressor noradrenaline','med',0,''],
+ ['dopa','Dopamine','dopamine','med',0,''],
+ ['vaso','Vasopressin','vasopressin pitressin','med',0,''],
+ ['phen','Phenylephrine','phenylephrine neosynephrine','med',0,''],
+ ['dobut','Dobutamine','dobutamine inotrope','med',0,''],
+ ['tolv','Tolvaptan','tolvaptan samsca vaptan','med',0,''],
+ ['ddavp','Desmopressin IV','desmopressin ddavp','med',0,''],
+ ['labet','Labetalol IV','labetalol','med',0,''],
+ ['nicar','Nicardipine infusion','nicardipine cardene','med',0,''],
+ ['hydral','Hydralazine IV','hydralazine','med',0,''],
+ ['loraz','Lorazepam','lorazepam ativan benzodiazepine','med',0,''],
+ ['levet','Levetiracetam IV','levetiracetam keppra antiseizure','med',0,''],
+ ['apap','Acetaminophen','acetaminophen paracetamol tylenol','med',0,''],
+ ['ondan','Ondansetron','ondansetron zofran antiemetic','med',0,''],
+ ['nsaid','Ibuprofen','ibuprofen nsaid ketorolac naproxen','med',0,''],
+ ['c_card','Cardiology consult','cardiology cardiologist consult cards','con',30,'Cardiology: agrees with your plan and will follow.'],
+ ['c_gi','Gastroenterology consult','gi consult gastroenterology gastroenterologist','con',60,'Gastroenterology: will see the patient.'],
+ ['c_neuro','Neurology / stroke team','neurology stroke team code stroke neurologist','con',10,'Stroke team at the bedside.'],
+ ['c_neph','Nephrology consult','nephrology renal consult nephrologist','con',60,'Nephrology: will see the patient.'],
+ ['c_pulm','Pulmonary consult','pulmonology pulmonary consult','con',60,'Pulmonary: agrees with your plan.'],
+ ['c_icu','Critical care consult','icu consult critical care intensivist','con',30,'Critical care: will see the patient.'],
+ ['c_uro','Urology consult','urology urologist','con',60,'Urology: will see the patient.'],
+ ['c_ir','Interventional radiology consult','interventional radiology ir consult','con',60,'Interventional radiology: will see the patient.'],
+ ['c_surg','Surgery consult','general surgery surgical consult','con',60,'Surgery: no surgical issue now.'],
+ ['k_smoke','Counsel: stop smoking','smoking cessation tobacco counsel quit smoking','cou',0,''],
+ ['k_contra','Counsel: contraception','contraception counselling birth control counsel','cou',0,''],
+ ['k_anti','Counsel: anticoagulation, duration and bleeding','anticoagulation counselling education duration','cou',0,''],
+ ['k_sick','Counsel: insulin and sick-day rules','diabetes education sick day insulin counselling','cou',0,''],
+ ['k_nsaid','Counsel: avoid NSAIDs','avoid nsaids counsel','cou',0,''],
+ ['k_ret','Counsel: when to return','return precautions warning signs counsel','cou',0,''],
+ ['fu','Follow-up visit in 2 to 3 days','follow up appointment office visit recheck clinic','cou',0,'']
+];
+
+/* ---------- Case bank ----------
+   Each case: opening screen, exam by component, results (text, or a function of what has been done),
+   patient updates (ev), key actions with time windows (key) and actions that are not indicated or harmful (bad).
+   S.f(ids, from) = first time any of ids was ordered at or after 'from'; S.all(id) = every time; S.ev(id) = when an update fired.
+   Locations are recorded as orders 'loc:<place>'. Times are minutes from arrival. */
+function bpS(s,d){ return s + '/' + d; }
+var CASES = [
+
+/* 1 ─────────────── STEMI, inferior with right ventricle */
+{ id:'stemi', title:'Chest pressure at rest', where:'Emergency department', start:'09:40', max:240, tool:['/chest-pain/','Chest pain'],
+  dx:'Inferior ST-elevation myocardial infarction with right ventricular involvement',
+  open:['58-year-old man. One hour of crushing central chest pressure going to the jaw, with sweating and nausea. It began at rest.',
+        'History: hypertension, smokes 20 cigarettes a day. No bleeding history, no recent surgery.'],
+  meds:[['amlo','Amlodipine']],
+  vit:function(S,t){ var v={hr:58,bp:'98/62',rr:18,temp:36.8,spo2:'95% room air'};
+     var n=S.f('ntg'); if(n!=null&&t>=n+5){ v.bp='74/42'; v.hr=54; }
+     var b=S.f('ivbb'); if(b!=null&&t>=b+10){ v.bp='80/46'; v.hr=42; }
+     if(S.f(['ns','lr'])!=null&&n!=null&&t>=S.f(['ns','lr'])+20&&t>=n+5) v.bp='92/58';
+     var p=S.f(['pci','loc:cath']); if(p!=null&&t>=p+60){ v.hr=66; v.bp='108/66'; }
+     return v; },
+  exam:{gen:'Grey and sweating, in pain.', heent:'Jugular venous pressure raised to the angle of the jaw.', chest:'Clear to auscultation; no crackles.', cv:'Slow regular rhythm; no murmur or rub. Blood pressure equal in both arms.', abd:'Soft, non-tender.', ext:'Cool hands; pulses equal in all four limbs; no leg swelling.', neuro:'Alert, no focal deficit.'},
+  hist:function(S,t){ var p=S.f(['pci','loc:cath']); return (p!=null&&t>=p+60)?'Pain gone after the procedure.':'Pain 8 out of 10, unchanged.'; },
+  res:{ ecg:'Sinus bradycardia 56. ST elevation 3 mm in II, III and aVF (III more than II); ST depression in I and aVL.',
+        recg:'ST elevation 1.5 mm in V4R: right ventricular involvement.',
+        trop:'High-sensitivity troponin T 48 ng/L (raised).',
+        cbc:'Hemoglobin 14.6 g/dL, white cells 10.1, platelets 230.',
+        bmp:'Sodium 138, potassium 4.1, creatinine 1.0, glucose 162.',
+        coag:'INR 1.0, aPTT 29 s.',
+        cxr:'Clear lungs; normal heart size; mediastinum not widened.',
+        echo:'Inferior wall and right ventricular free wall move poorly; left ventricular ejection fraction about 50%.',
+        pci:'Catheterisation: occluded proximal right coronary artery, opened and stented; normal flow restored. Pain resolved.',
+        c_card:'Cardiology: interventional team activated; cath lab ready.' },
+  ev:[ {id:'ntgdrop', at:function(S){var n=S.f('ntg');return n==null?null:n+5;}, text:'Nurse: after nitroglycerin the blood pressure fell to 74/42 and he is light-headed.', stop:true},
+       {id:'bbdrop', at:function(S){var n=S.f('ivbb');return n==null?null:n+10;}, text:'Nurse: heart rate 42, blood pressure 80/46 after IV metoprolol.', stop:true},
+       {id:'noreperf', at:function(){return 120;}, when:function(S){return S.f(['pci','loc:cath'])==null;}, text:'Nurse: still in pain. Repeat ECG shows Q waves forming in III and aVF.', stop:true} ],
+  ddx:[ {n:'Inferior STEMI', fav:['ecg'], why:'ST elevation in an artery\'s territory with reciprocal depression'},
+        {n:'Aortic dissection', out:['cxr'], why:'equal arm pressures and a normal mediastinum make it less likely; not excluded'},
+        {n:'Acute pericarditis', out:['ecg'], why:'reciprocal ST depression and a territorial pattern point away from it'},
+        {n:'Pulmonary embolism', out:['echo','pci'], why:'an occluded coronary artery explains the picture'},
+        {n:'Esophageal spasm', out:['trop'], why:'troponin is raised'} ],
+  key:[ {l:'12-lead ECG', any:['ecg'], by:10, late:20, why:'Within 10 minutes of arrival, because the ECG alone decides reperfusion.', src:'2025 ACC/AHA ACS guideline, 3.1', tier:'1, B-NR'},
+        {l:'Aspirin', any:['asa'], by:30, late:60, why:'Aspirin as soon as possible lowers death after MI.', src:'2025 ACS guideline, 4.3.1', tier:'1, A'},
+        {l:'Cardiac monitor', any:['mon'], by:15, late:30, why:'Inferior MI with a slow rate can progress to heart block; monitoring is not automatic in CCS.', src:'Expert practice', tier:'expert practice'},
+        {l:'Call cardiology / activate the cath lab', any:['c_card','pci','loc:cath'], by:30, late:60, why:'Primary PCI is the reperfusion of choice; the system goal is the device within 90 minutes of first contact.', src:'2025 ACS guideline, 4.5', tier:'1, A (PCI); 1, B-NR (90 min)'},
+        {l:'Primary PCI (patient to the cath lab)', any:['pci','loc:cath'], by:90, late:120, why:'Every minute of occlusion is lost muscle; do not wait for troponin when the ECG shows STEMI.', src:'2025 ACS guideline, 4.5', tier:'1, A'},
+        {l:'Prasugrel or ticagrelor', any:['prasu','ticag'], part:['clopi'], by:90, late:120, why:'A potent P2Y12 inhibitor is loaded for PCI; clopidogrel only when these are unavailable (half credit).', src:'2025 ACS guideline, 4.3', tier:'1, B-R; clopidogrel 1, C-LD'},
+        {l:'Anticoagulant for PCI (heparin or bivalirudin)', any:['ufh','bival'], by:90, late:120, why:'Anticoagulation during primary PCI prevents thrombus on the wire and stent.', src:'2025 ACS guideline, 4.4', tier:'1, C-EO (heparin); 1, B-R (bivalirudin)'},
+        {l:'Right-sided ECG', any:['recg'], by:30, late:60, why:'Inferior STEMI with low pressure and a high JVP: V4R shows right ventricular involvement, which changes fluids and nitrates.', src:'2025 ACS guideline, supportive text', tier:'no class given'},
+        {l:'Coronary care after PCI', any:['loc:icu'], by:240, late:240, why:'After STEMI the patient goes to a coronary or intensive care unit for rhythm and pressure monitoring.', src:'Expert practice', tier:'expert practice'} ],
+  bad:[ {l:'Nitroglycerin with right ventricular infarction', any:['ntg'], kind:'harm', why:'The right ventricle depends on filling; nitrates drop preload and pressure.', src:'2025 ACS guideline, Table 6 (avoid in suspected RV infarction)', tier:'no class given'},
+        {l:'IV beta-blocker', any:['ivbb'], kind:'harm', why:'Low output, a rate of 58 and a pressure under 100 contraindicate it; routine IV beta-blockers before PCI are not supported.', src:'2025 ACS guideline, supportive text', tier:'no class given'},
+        {l:'Fibrinolytic with PCI available', any:['tpa','tnk'], kind:'ni', why:'Fibrinolysis is for when PCI cannot happen within 120 minutes; here the cath lab is open.', src:'2025 ACS guideline, 4.6', tier:'1, A when PCI delay over 120 min'},
+        {l:'Oxygen with saturation 90% or more', any:['o2','nrb','vent','hfnc'], kind:'ni', why:'Oxygen does not help when the saturation is 90% or higher.', src:'2025 ACS guideline, 4.1', tier:'3: No benefit, A'} ],
+  teach:'Inferior STEMI with a raised JVP, clear lungs and low pressure means the right ventricle is involved: give fluid, avoid nitrates, and get to the cath lab.' },
+
+/* 2 ─────────────── DKA */
+{ id:'dka', title:'Vomiting and fast breathing', where:'Emergency department', start:'22:10', max:720, tool:['/dka/','DKA and HHS'],
+  dx:'Severe diabetic ketoacidosis from missed insulin, with low potassium',
+  open:['24-year-old woman with type 1 diabetes. Ran out of insulin 2 days ago. Vomiting since yesterday, abdominal pain, very thirsty.',
+        'Weight 60 kg. Sexually active; last period 3 weeks ago.'],
+  meds:[['glar','Insulin glargine (not taken for 2 days)'],['lisp','Insulin lispro with meals']],
+  m:function(S,t){ var ti=S.f('insd'), tk=S.f(['kcl']), tf=S.f(['ns','lr']), td=S.f(['d5w','d5h','d50']);
+     var K=3.2; if(tk!=null&&t>tk) K+=Math.min(0.8,(t-tk)/120*0.6); if(ti!=null&&t>ti) K-=Math.min(0.9,(t-ti)/60*0.3); if(tk!=null&&ti!=null&&t>ti) K+=Math.min(0.5,(t-Math.max(ti,tk))/120*0.5);
+     var G=512; if(tf!=null&&t>tf) G-=Math.min(60,(t-tf)/2); if(ti!=null&&t>ti) G-=(t-ti)*1.1; if(td!=null&&ti!=null&&t>td) G+= (t-td)*1.0; G=Math.max(ti!=null&&td==null?58:150,Math.round(G));
+     var h=9, ag=26, ph=7.12; if(ti!=null&&t>ti){ var x=(t-ti)/60; h=Math.min(20,9+x*1.4); ag=Math.max(10,26-x*1.8); ph=Math.min(7.36,7.12+x*0.03); }
+     return {K:Math.round(K*10)/10, G:G, h:Math.round(h), ag:Math.round(ag), ph:Math.round(ph*100)/100}; },
+  vit:function(S,t){ var tf=S.f(['ns','lr']); var v={hr:124,bp:'102/64',rr:30,temp:37.2,spo2:'99% room air'};
+     if(tf!=null&&t>tf+60){ v.hr=108; v.bp='112/70'; } else if(t>90){ v.hr=132; v.bp='92/58'; }
+     var ti=S.f('insd'); if(ti!=null&&t>ti+240) v.rr=20; return v; },
+  exam:{gen:'Drowsy but answers; deep, rapid breathing; fruity breath.', heent:'Very dry mouth.', chest:'Clear.', cv:'Fast regular rhythm.', abd:'Diffusely mildly tender; no guarding.', ext:'Cool; capillary refill 3 seconds.', neuro:'Oriented; no focal deficit.'},
+  hist:function(S,t){ return t>240&&S.f('insd')!=null?'Less nauseated; thirsty.':'Still nauseated; abdominal pain.'; },
+  res:{ fsg:function(S,d){var m=CASES_BY.dka.m(S,d); return m.G>500?'Meter reads HI (over 500 mg/dL).':'Glucose '+m.G+' mg/dL.';},
+        bmp:function(S,d){var m=CASES_BY.dka.m(S,d); return 'Sodium 131, potassium '+m.K+', chloride 96, bicarbonate '+m.h+', BUN 28, creatinine 1.3, glucose '+m.G+'. Anion gap '+m.ag+'.';},
+        vbg:function(S,d){var m=CASES_BY.dka.m(S,d); return 'pH '+m.ph.toFixed(2)+', pCO2 22, potassium '+m.K+', glucose '+(m.G>500?'over 500':m.G)+'.';},
+        abg:function(S,d){var m=CASES_BY.dka.m(S,d); return 'pH '+m.ph.toFixed(2)+', PaCO2 21, PaO2 104, bicarbonate '+m.h+'.';},
+        bhb:function(S,d){var ti=S.f('insd'); return 'Beta-hydroxybutyrate '+(ti!=null&&d>ti+240?'2.1':'6.8')+' mmol/L.';},
+        ua:'Glucose 4+, ketones 3+; no nitrite or leukocyte esterase.',
+        hcg:'hCG negative.', cbc:'White cells 14.2 (no left shift), hemoglobin 14.9, platelets 310.',
+        lip:'Lipase 48 U/L (normal).', ecg:function(S,d){var m=CASES_BY.dka.m(S,d); return m.K<3?'Sinus tachycardia 118; flat T waves and U waves.':'Sinus tachycardia 118; flattened T waves.';},
+        cxr:'Clear.', mg:'Magnesium 1.8 mg/dL.', phos:'Phosphate 3.0 mg/dL.' },
+  ev:[ {id:'lowk', at:function(S){var ti=S.f('insd');return ti==null?null:ti+60;}, when:function(S){return CASES_BY.dka.m(S,S.f('insd')).K<3.5;}, text:'Monitor alarm: runs of ventricular ectopy. Bedside potassium 2.7.', stop:true},
+       {id:'g250', at:function(S){var ti=S.f('insd'); if(ti==null)return null; for(var t=ti;t<ti+720;t+=10){ if(CASES_BY.dka.m(S,t).G<250) return t; } return null;}, text:'Nurse: fingerstick glucose is now below 250 mg/dL.', stop:true},
+       {id:'hypo', at:function(S){var g=S.ev('g250'); return g==null?null:g+150;}, when:function(S){return S.f(['d5w','d5h','d50'])==null;}, text:'Nurse: sweaty and confused; fingerstick glucose 58 mg/dL.', stop:true},
+       {id:'dry', at:function(){return 90;}, when:function(S){return S.f(['ns','lr'])==null;}, text:'Nurse: heart rate 132, blood pressure 92/58, still vomiting.', stop:true} ],
+  ddx:[ {n:'Diabetic ketoacidosis', fav:['bmp','vbg','bhb'], why:'high glucose, anion-gap acidosis and ketones'},
+        {n:'Pregnancy-related vomiting', out:['hcg'], why:'hCG negative'},
+        {n:'Pancreatitis as the trigger', out:['lip'], why:'normal lipase'},
+        {n:'Infection as the trigger', out:['ua','cxr'], why:'clean urine and clear film; missed insulin explains it'},
+        {n:'Hyperosmolar state', out:['bmp'], why:'the acidosis and anion gap make this DKA'} ],
+  key:[ {l:'Fingerstick glucose', any:['fsg'], by:10, late:20, why:'The first number in any vomiting, breathless patient with diabetes.', src:'Expert practice', tier:'expert practice'},
+        {l:'Chemistry and a blood gas', done:function(S){var a=S.f('bmp'),b=S.f(['vbg','abg']); return a!=null&&b!=null?{t:Math.max(a,b)}:null;}, by:30, late:60, why:'The anion gap, bicarbonate, pH and potassium define the severity and set the potassium gate.', src:'ADA/EASD/JBDS/AACE/DTS consensus 2024', tier:'consensus, ungraded'},
+        {l:'Beta-hydroxybutyrate', any:['bhb'], by:60, late:120, why:'Measuring blood ketones directly is recommended; urine ketones miss the main ketone.', src:'Consensus 2024', tier:'consensus, ungraded'},
+        {l:'IV fluid now', any:['ns','lr'], by:30, late:60, why:'Isotonic saline or a balanced crystalloid at 500 to 1000 mL an hour for the first 2 to 4 hours restores volume and starts lowering glucose.', src:'Consensus 2024', tier:'consensus, ungraded'},
+        {l:'Potassium before insulin', done:function(S){var k=S.f('kcl'),i=S.f('insd'); return k!=null&&(i==null||k<=i)?{t:k}:null;}, by:90, late:150, why:'Potassium is 3.2: replace it and delay insulin until it is above 3.5, because insulin drives potassium into cells.', src:'Consensus 2024', tier:'consensus, ungraded'},
+        {l:'Insulin infusion once potassium is above 3.5', done:function(S){var i=S.f('insd'); return i!=null&&CASES_BY.dka.m(S,i).K>3.5?{t:i}:null;}, by:240, late:360, why:'Insulin is what clears the ketoacidosis, and it starts only once potassium is safe.', src:'Consensus 2024', tier:'consensus, ungraded'},
+        {l:'Recheck potassium within 2 hours of starting insulin', done:function(S){var i=S.f('insd'); if(i==null)return null; var r=S.f(['bmp','vbg','abg'],i); return r!=null?{t:r}:null;}, base:function(S){return S.f('insd');}, nr:'insulin was not started', by:120, late:180, why:'Potassium falls fastest in the first hours of insulin.', src:'Consensus 2024', tier:'consensus, ungraded'},
+        {l:'Add dextrose when glucose falls below 250', any:['d5w','d5h','d50'], base:function(S){return S.ev('g250');}, nr:'glucose never fell below 250 (insulin not started)', by:60, late:120, why:'Glucose corrects long before ketones clear; dextrose lets the insulin keep running.', src:'Consensus 2024', tier:'consensus, ungraded'},
+        {l:'Intensive care', any:['loc:icu'], part:['loc:tele'], by:120, late:240, why:'Bicarbonate under 10 and ketones over 6 meet the consensus definition of severe DKA: ICU (step-down half credit).', src:'Consensus 2024, Table 2', tier:'consensus, ungraded'},
+        {l:'Look for the trigger: pregnancy test and urinalysis', done:function(S){var a=S.f('hcg'),b=S.f('ua'); return a!=null&&b!=null?{t:Math.max(a,b)}:null;}, by:120, late:240, why:'Missed insulin is likely, but pregnancy and infection change management.', src:'Consensus 2024 (treat the precipitant); hCG expert practice', tier:'consensus, ungraded'} ],
+  bad:[ {l:'Insulin while potassium was under 3.5', any:['insd','insb','inss'], when:function(S,t){return CASES_BY.dka.m(S,t).K<=3.5;}, kind:'harm', why:'Insulin with potassium at or below 3.5 risks arrhythmia.', src:'Consensus 2024', tier:'consensus, ungraded'},
+        {l:'Bicarbonate at pH above 7.0', any:['bicarb'], kind:'ni', why:'Bicarbonate offers no advantage above pH 7.0 and can worsen low potassium.', src:'Consensus 2024', tier:'consensus, ungraded'} ],
+  teach:'Fluids first, potassium before insulin, insulin until the ketones clear, dextrose when glucose falls. Give basal insulin before the infusion stops so they overlap (expert practice).' },
+
+/* 3 ─────────────── Septic shock, obstructed pyelonephritis */
+{ id:'sepsis', title:'Fever and confusion', where:'Emergency department', start:'14:20', max:1440, tool:['/sepsis/','Sepsis'],
+  dx:'Septic shock from an obstructed, infected right kidney',
+  open:['72-year-old woman. Two days of burning urine and right flank pain; today confused. Daughter brought her in.',
+        'Type 2 diabetes on metformin. Weight 60 kg. No drug allergies. No cardiac or kidney history.'],
+  meds:[['metf','Metformin']],
+  vit:function(S,t){ var tf=S.f(['ns','lr']), tn=S.f('norepi'), ta=S.f(['cro','fep','tzp','mero']); var v={hr:118,bp:'82/48',rr:24,temp:39.1,spo2:'95% room air'};
+     if(tf==null&&ta==null&&t>90) { v.bp='74/40'; v.hr=128; }
+     if(tf!=null&&t>tf+45) { v.bp='80/44'; v.hr=112; }
+     if(tn!=null&&t>tn+15) { v.bp='104/58'; v.hr=104; }
+     var u=S.f(['c_uro','c_ir']); if(u!=null&&t>u+300&&ta!=null){ v.temp=37.9; v.hr=92; }
+     return v; },
+  exam:{gen:'Drowsy, oriented to name only; hot and flushed.', heent:'Dry mouth.', chest:'Clear.', cv:'Fast regular rhythm; no murmur.', abd:'Soft; right costovertebral-angle tenderness.', ext:'Mottled knees; capillary refill 4 seconds.', neuro:'No focal deficit; neck supple.'},
+  hist:function(S,t){ return 'Daughter: no cough, no rash, no headache. Flank pain began two days ago.'; },
+  res:{ lac:function(S,d){var tf=S.f(['ns','lr']),ta=S.f(['cro','fep','tzp','mero']); return 'Lactate '+(tf!=null&&ta!=null&&d>Math.max(tf,ta)+150?'2.3':'4.6')+' mmol/L.';},
+        cbc:'White cells 19.8 with 15% bands, hemoglobin 11.9, platelets 138.',
+        bmp:'Sodium 136, potassium 4.4, bicarbonate 17, BUN 38, creatinine 1.9, glucose 214.',
+        cmp:'Creatinine 1.9; bilirubin 1.1; AST 30, ALT 28.',
+        coag:'INR 1.3.', ua:'Leukocyte esterase 3+, nitrite positive, over 50 white cells per field, many bacteria.',
+        ucx:'Urine: over 100,000 Escherichia coli (sensitivities to follow).',
+        bcx:'Blood cultures: gram-negative rods in 2 of 2 sets.',
+        cxr:'Clear lungs.', ecg:'Sinus tachycardia 116.',
+        rus:'Moderate right hydronephrosis; 9 mm stone at the right ureter. Left kidney normal.',
+        ctnc:'9 mm obstructing stone in the proximal right ureter with moderate hydronephrosis and perinephric stranding.',
+        ctap:'Obstructing 9 mm right ureteric stone with hydronephrosis and perinephric stranding.',
+        c_uro:'Urology: emergency decompression; right ureteric stent placed. Purulent urine drained.',
+        c_ir:'Interventional radiology: right nephrostomy placed; pus drained.' },
+  ev:[ {id:'worse', at:function(){return 90;}, when:function(S){return S.f(['ns','lr'])==null&&S.f(['cro','fep','tzp','mero'])==null;}, text:'Nurse: blood pressure 74/40, more drowsy.', stop:true},
+       {id:'afterfl', at:function(S){var tf=S.f(['ns','lr']); return tf==null?null:tf+90;}, when:function(S){return S.f('norepi')==null;}, text:'Nurse: 1.8 litres in; blood pressure 80/44 (mean 56). Lungs still clear.', stop:true} ],
+  ddx:[ {n:'Septic shock, urinary source', fav:['ua','bcx'], why:'pyuria, nitrite, bacteremia'},
+        {n:'Obstructed infected kidney', fav:['rus','ctnc','ctap'], why:'hydronephrosis with a stone needs drainage'},
+        {n:'Pneumonia', out:['cxr'], why:'clear film'},
+        {n:'Meningitis', out:['ua'], why:'a clear urinary source, supple neck'},
+        {n:'Cardiogenic shock', out:['ecg'], why:'warm, flushed, no ischemia; source is infection'} ],
+  key:[ {l:'Lactate', any:['lac'], by:60, late:120, why:'Lactate is a sign of hypoperfusion and its trend guides resuscitation.', src:'Surviving Sepsis Campaign 2026', tier:'conditional, low'},
+        {l:'Blood cultures before antibiotics', done:function(S){var b=S.f('bcx'),a=S.f(['cro','fep','tzp','mero','levo','vanc']); return b!=null&&(a==null||b<=a)?{t:b}:null;}, by:60, late:90, why:'Cultures drawn first, as long as they do not delay the antibiotic.', src:'Surviving Sepsis Campaign 2026', tier:'strong, low'},
+        {l:'Broad-spectrum IV antibiotic', any:['cro','fep','tzp','mero'], by:60, late:180, why:'In shock, antibiotics immediately, ideally within an hour of recognition.', src:'Surviving Sepsis Campaign 2026', tier:'strong, very low'},
+        {l:'IV crystalloid, at least 30 mL/kg (about 1.8 L)', any:['lr','ns'], by:60, late:120, why:'At least 30 mL/kg in the first 3 hours; a balanced solution is preferred over saline.', src:'Surviving Sepsis Campaign 2026', tier:'conditional, low; balanced: conditional, moderate'},
+        {l:'Norepinephrine when pressure stays low', any:['norepi'], by:180, late:300, why:'First-line vasopressor; it may start peripherally and run alongside fluid. Target mean pressure 65 (60 to 65 is acceptable at age 65 or over).', src:'Surviving Sepsis Campaign 2026', tier:'strong, high (norepinephrine); conditional, low (60 to 65 at 65+)'},
+        {l:'Urinalysis and urine culture', done:function(S){var a=S.f('ua'),b=S.f('ucx'); return a!=null&&b!=null?{t:Math.max(a,b)}:null;}, by:60, late:120, why:'Confirms the source and gives an organism to narrow to.', src:'Expert practice', tier:'expert practice'},
+        {l:'Imaging for an obstructed kidney', any:['rus','ctnc','ctap'], by:240, late:360, why:'Urosepsis with flank pain: look for obstruction, because pus behind a stone does not clear with antibiotics.', src:'Surviving Sepsis Campaign 2026 (source control within 6 h)', tier:'conditional, very low'},
+        {l:'Drain the kidney (urology or IR)', any:['c_uro','c_ir'], base:function(S){var r=S.f(['rus','ctnc','ctap']); if(r==null)return null; return r+({rus:120,ctnc:45,ctap:60}[S.which(['rus','ctnc','ctap'])]||60);}, nr:'the obstruction was never imaged', by:120, late:240, why:'Source control: decompress an infected obstructed kidney as soon as it is found.', src:'Surviving Sepsis Campaign 2026', tier:'conditional, very low'},
+        {l:'Repeat lactate', done:function(S){var a=S.all('lac'); return a.length>1?{t:a[1]}:null;}, by:360, late:480, why:'A falling lactate is one sign the resuscitation is working.', src:'Surviving Sepsis Campaign 2026', tier:'conditional, low'},
+        {l:'Intensive care', any:['loc:icu'], by:360, late:480, why:'A patient on a vasopressor belongs in the ICU, ideally within 6 hours.', src:'Surviving Sepsis Campaign 2026', tier:'conditional, low'} ],
+  bad:[ {l:'Hydroxyethyl starch', any:['hes'], kind:'harm', why:'Starches increase kidney injury and need for dialysis.', src:'Surviving Sepsis Campaign 2026', tier:'strong, high'},
+        {l:'Dopamine first line', any:['dopa'], when:function(S,t){return S.f('norepi')==null||S.f('norepi')>t;}, kind:'harm', why:'Dopamine causes more arrhythmias than norepinephrine.', src:'Surviving Sepsis Campaign 2026', tier:'strong, high'} ],
+  teach:'Septic shock with flank pain: cultures, antibiotics, fluid and norepinephrine in the first hours, then find and drain the obstructed kidney. Antibiotics alone do not clear pus behind a stone.' },
+
+/* 4 ─────────────── Upper GI bleed */
+{ id:'ugib', title:'Black stools', where:'Emergency department', start:'07:30', max:1800, tool:['/gi-bleed/','GI bleed'],
+  dx:'Bleeding duodenal ulcer from naproxen, with H. pylori',
+  open:['64-year-old man. Three days of black, tarry stools; light-headed when standing this morning. No vomiting of blood.',
+        'Takes naproxen daily for knee arthritis. No liver disease, no heavy alcohol, no heart disease. Not on any blood thinner.'],
+  meds:[['napr','Naproxen']],
+  vit:function(S,t){ var v={hr:112,bp:'104/66',rr:18,temp:36.9,spo2:'98% room air'}; var tf=S.f(['ns','lr']);
+     if(tf!=null&&t>tf+45){ v.hr=100; v.bp='112/70'; }
+     if(t>=240){ v.hr=118; v.bp='100/62'; } var tr=S.f('prbc',200); if(tr!=null&&t>tr+60){ v.hr=96; v.bp='118/72'; }
+     var e=S.f('egd'); if(e!=null&&t>e+60){ v.hr=88; v.bp='122/74'; } return v; },
+  exam:{gen:'Pale, alert.', heent:'Pale conjunctivae.', chest:'Clear.', cv:'Fast regular rhythm; no murmur.', abd:'Mild epigastric tenderness; no guarding. No signs of liver disease.', ext:'Cool hands.', neuro:'Normal.', rect:'Black tarry stool on the glove.'},
+  hist:function(S,t){ return t>=240?'Another black stool; feels faint.':'Light-headed; no chest pain.'; },
+  res:{ cbc:function(S,d){ var tr=S.f('prbc',200); if(d<240) return 'Hemoglobin 7.9 g/dL (14.1 a year ago), MCV 88, platelets 260.'; if(tr!=null&&d>tr+60) return 'Hemoglobin 7.8 g/dL after transfusion.'; return 'Hemoglobin 6.8 g/dL, platelets 250.';},
+        bmp:'Sodium 139, potassium 4.2, BUN 48, creatinine 1.0.', coag:'INR 1.0, aPTT 31 s.', tc:'Group A positive; 2 units crossmatched.',
+        lft:'Normal.', trop:'Troponin normal.', ecg:'Sinus tachycardia 110; no ischemic change.',
+        egd:'Endoscopy: 1.5 cm duodenal ulcer with a visible vessel, treated with clips and epinephrine. Gastric biopsies sent for H. pylori.',
+        hp:'H. pylori positive.', c_gi:'Gastroenterology: will scope today.' },
+  ev:[ {id:'drop', at:function(){return 240;}, text:'Nurse: another large black stool. Repeat hemoglobin 6.8 g/dL; heart rate 118, blood pressure 100/62.', stop:true} ],
+  gate:{egd:['c_gi','Order a gastroenterology consult first; they perform the endoscopy.']},
+  ddx:[ {n:'Peptic ulcer bleeding', fav:['egd'], why:'NSAID use, melena, high BUN'},
+        {n:'Variceal bleeding', out:['lft','egd'], why:'no liver disease, normal liver tests'},
+        {n:'Lower GI source', out:['bmp'], why:'melena with a BUN of 48 points upward'},
+        {n:'Coagulopathy', out:['coag'], why:'normal INR, no anticoagulant'} ],
+  key:[ {l:'IV access and crystalloid', done:function(S){var a=S.f('iv'),b=S.f(['ns','lr']); return a!=null&&b!=null?{t:Math.max(a,b)}:null;}, by:30, late:60, why:'Tachycardic and light-headed: two large-bore lines and fluid while blood is prepared.', src:'Expert practice (ACG 2021 makes no resuscitation recommendation)', tier:'expert practice'},
+        {l:'Blood count, chemistry, INR, type and crossmatch', done:function(S){var x=['cbc','bmp','coag','tc'].map(function(i){return S.f(i);}); return x.indexOf(null)<0?{t:Math.max.apply(null,x)}:null;}, by:30, late:60, why:'Hemoglobin, BUN and INR feed risk scoring; crossmatch so blood is ready.', src:'Expert practice; ACG 2021 (Glasgow-Blatchford risk assessment)', tier:'expert practice'},
+        {l:'Transfuse when hemoglobin is under 7', any:['prbc'], base:function(){return 240;}, by:90, late:180, why:'A threshold of 7 g/dL lowered death and rebleeding compared with 9 (8 is reasonable with heart disease).', src:'ACG 2021; Villanueva 2013', tier:'conditional, low'},
+        {l:'Gastroenterology and endoscopy within 24 hours', any:['egd'], by:1440, late:1800, why:'Endoscopy within 24 hours finds the source and treats it.', src:'ACG 2021', tier:'conditional, very low'},
+        {l:'IV proton pump inhibitor', done:function(S){var p=S.f('ppiv'),e=S.f('egd'); return p!=null&&(e==null||p<=e+240)?{t:p}:null;}, by:720, late:1800, why:'High-dose PPI for 3 days after endoscopic treatment of a high-risk ulcer; before endoscopy it is reasonable, though the guideline makes no recommendation either way.', src:'ACG 2021', tier:'strong (after hemostasis); none before endoscopy'},
+        {l:'Stop naproxen', any:['stop:napr'], by:240, late:720, why:'The NSAID caused the ulcer and keeps it bleeding.', src:'Expert practice', tier:'expert practice'},
+        {l:'Test for H. pylori', any:['hp'], by:1800, late:1800, why:'Treating H. pylori lowers the chance the ulcer bleeds again.', src:'ACG 2024 H. pylori guideline', tier:'see guideline'},
+        {l:'Monitored bed (step-down or ICU)', any:['loc:tele','loc:icu'], part:['loc:ward'], by:240, late:360, why:'Ongoing bleeding with tachycardia needs close monitoring (ward half credit).', src:'Expert practice', tier:'expert practice'} ],
+  bad:[ {l:'Red cells at hemoglobin 7.9 while stable', any:['prbc'], when:function(S,t){return t<240;}, kind:'ni', why:'Above 7 in a patient without heart disease, transfusion does not help and adds risk.', src:'ACG 2021', tier:'conditional, low'},
+        {l:'Octreotide without liver disease', any:['octr'], kind:'ni', why:'Octreotide is for suspected variceal bleeding.', src:'Expert practice', tier:'expert practice'} ],
+  trial:{n:'Villanueva 2013 (restrictive transfusion in upper GI bleeding)', q:'Transfuse at hemoglobin 7 or at 9?', d:'921 adults with acute upper GI bleeding, one centre, randomised to a threshold of 7 or 9 g/dL.', r:'6-week survival 95% vs 91% (hazard ratio for death 0.55, 0.33 to 0.92); further bleeding 10% vs 16%. In the peptic ulcer subgroup the survival difference was not significant.', c:'Set 7 g/dL as the usual threshold.', ref:'Villanueva C et al. N Engl J Med 2013;368:11. doi:10.1056/NEJMoa1211801'},
+  teach:'Resuscitate, crossmatch, transfuse below 7, scope within 24 hours, PPI after treatment, stop the NSAID, test and treat H. pylori.' },
+
+/* 5 ─────────────── PE, normotensive with RV strain */
+{ id:'pe', title:'Short of breath after a flight', where:'Emergency department', start:'16:05', max:1800, tool:['/vte-treatment/','VTE treatment'],
+  dx:'Acute pulmonary embolism, normal blood pressure, right ventricular strain and raised troponin',
+  open:['45-year-old woman. Two days of right-sided chest pain on breathing in and breathlessness, after an 11-hour flight. Right calf swollen.',
+        'Takes a combined oral contraceptive. No bleeding history, no recent surgery. Weight 70 kg.'],
+  meds:[['coc','Combined oral contraceptive']],
+  vit:function(S,t){ var v={hr:110,bp:'128/80',rr:24,temp:37.4,spo2:'90% room air'}; if(S.f(['o2','vent','nrb','hfnc'])!=null&&t>=S.f(['o2','vent','nrb','hfnc'])) v.spo2='95% on oxygen';
+     var a=S.f(['enox','apix','riva','ufh']); if(a==null&&t>180){ v.hr=124; v.spo2=v.spo2.indexOf('oxygen')>0?'88% on oxygen':'86% room air'; }
+     if(a!=null&&t>a+600){ v.hr=92; v.rr=18; } return v; },
+  exam:{gen:'Breathless at rest; speaking in sentences.', heent:'Jugular venous pressure not raised.', chest:'Clear.', cv:'Fast regular rhythm; loud second sound.', abd:'Soft.', ext:'Right calf 3 cm larger than left, tender.', neuro:'Normal.'},
+  hist:function(S,t){ return 'No hemoptysis. Pain worse on breathing in.'; },
+  res:{ ecg:'Sinus tachycardia 112; T-wave inversion V1 to V3.', cxr:'Clear lungs.',
+        ctpa:'Pulmonary emboli in the right lower lobar and left segmental arteries; right ventricle enlarged (RV/LV ratio 1.2).',
+        trop:'High-sensitivity troponin T 38 ng/L (raised).', bnp:'BNP 410 pg/mL (raised).',
+        echo:'Right ventricle dilated with reduced function; no clot in transit.', ledup:'Right popliteal deep vein thrombosis.',
+        ddim:'D-dimer 2.8 mg/L FEU (raised).', hcg:'hCG negative.', bmp:'Sodium 138, potassium 4.0, creatinine 0.8.', cbc:'Hemoglobin 13.2, platelets 240.', coag:'INR 1.0.',
+        abg:'pH 7.47, PaCO2 31, PaO2 58 on room air.' },
+  ev:[ {id:'worse', at:function(){return 180;}, when:function(S){return S.f(['enox','apix','riva','ufh'])==null;}, text:'Nurse: heart rate 124, saturation falling.', stop:true} ],
+  ddx:[ {n:'Pulmonary embolism', fav:['ctpa'], why:'emboli seen on CT'},
+        {n:'Pneumonia', out:['cxr'], why:'clear film, no fever'},
+        {n:'Acute coronary syndrome', out:['ctpa'], why:'emboli explain the troponin'},
+        {n:'Pneumothorax', out:['cxr'], why:'clear film'} ],
+  key:[ {l:'Oxygen', any:['o2','vent','hfnc'], by:15, late:30, why:'Saturation 90% and breathless.', src:'Expert practice', tier:'expert practice'},
+        {l:'CT pulmonary angiogram (no D-dimer first)', any:['ctpa'], by:60, late:120, why:'High clinical probability goes straight to imaging; a D-dimer cannot rule PE out here.', src:'2026 AHA/ACC PE guideline; ESC 2019', tier:'1, A (imaging); 1, B-R (CT over V/Q)'},
+        {l:'Start anticoagulation without waiting for the scan', any:['enox','apix','riva'], part:['ufh'], by:60, late:120, why:'High probability and low bleeding risk: start while imaging is awaited. LMWH or a DOAC is preferred over heparin infusion when the patient is not at high risk (heparin half credit).', src:'ESC 2019; 2026 AHA/ACC (2a, C-EO when imaging is delayed; LMWH over UFH 1, B-R)', tier:'see source'},
+        {l:'Troponin or BNP', any:['trop','bnp'], by:240, late:360, why:'At least one biomarker of right ventricular strain places the patient in a risk category.', src:'2026 AHA/ACC PE guideline', tier:'1, B-NR'},
+        {l:'Right ventricle imaging (echo or CT)', done:function(S){var a=S.f(['echo','ctpa']); return a!=null?{t:a}:null;}, by:240, late:360, why:'RV size on CT or echo is part of risk stratification.', src:'2026 AHA/ACC PE guideline', tier:'1, A'},
+        {l:'Admit to a monitored bed', any:['loc:tele','loc:icu'], part:['loc:ward'], by:240, late:360, why:'RV strain with raised troponin: observe for decompensation over the first days (ward half credit).', src:'2026 AHA/ACC PE guideline (hospitalise); monitored bed expert practice', tier:'expert practice'},
+        {l:'Counsel on contraception', any:['k_contra'], by:1800, late:1800, why:'Contraception counselling is part of the plan for a woman starting anticoagulation; estrogen may be continued while anticoagulated.', src:'2026 AHA/ACC PE guideline', tier:'1, C-EO (counselling); 2b, C-LD (continuing hormones)'},
+        {l:'Counsel on anticoagulation: initial 3 to 6 months', any:['k_anti'], by:1800, late:1800, why:'Every patient gets an initial phase of 3 to 6 months, then a decision about stopping or extending.', src:'2026 AHA/ACC PE guideline', tier:'1, B-NR'} ],
+  bad:[ {l:'Systemic thrombolysis with normal blood pressure', any:['tpa','tnk'], kind:'ni', why:'In PEITHO, lytics cut decompensation but raised major bleeding and stroke, with no difference in death; routine use here is not recommended.', src:'2026 AHA/ACC (2b, uncertain, for this group); ESC 2019 (routine use not recommended)', tier:'2b'},
+        {l:'D-dimer with high clinical probability', any:['ddim'], kind:'ni', why:'A normal D-dimer cannot exclude PE when probability is high, so it only delays the scan.', src:'ESC 2019', tier:'see source'} ],
+  trial:{n:'PEITHO 2014 (tenecteplase in intermediate-risk PE)', q:'Do lytics help normotensive PE with RV dysfunction and positive troponin?', d:'1005 patients randomised to tenecteplase plus heparin or placebo plus heparin.', r:'Death or hemodynamic decompensation at 7 days 2.6% vs 5.6%; major extracranial bleeding 6.3% vs 1.2%; stroke 2.4% vs 0.2%. No difference in death at 7 or 30 days.', c:'Lytics are kept for patients who decompensate, not given routinely.', ref:'Meyer G et al. N Engl J Med 2014;370:1402. doi:10.1056/NEJMoa1302097'},
+  teach:'High probability: anticoagulate and scan. Stratify with blood pressure, RV imaging and a biomarker. Normal pressure with strain is watched, not lysed.' },
+
+/* 6 ─────────────── Hyponatremia with seizure */
+{ id:'na', title:'Seizure, sodium 114', where:'Emergency department', start:'11:00', max:1440, tool:['/hyponatremia/','Hyponatremia'],
+  dx:'Severe symptomatic hyponatremia from a thiazide, high risk of osmotic demyelination (low potassium)',
+  open:['68-year-old woman. Started hydrochlorothiazide 3 weeks ago. Vomiting and eating little for 2 days. Had a generalised seizure at home 30 minutes ago; now drowsy.',
+        'The paramedics\' point-of-care sodium was 114 mmol/L and potassium 3.0.'],
+  meds:[['hctz','Hydrochlorothiazide']],
+  m:function(S,t){ var b=S.all('hts').filter(function(x){return x+20<=t;}).length; b=Math.min(b,4);
+     var na=114+2*b; var start=300; if(t>start){ var cl=S.f(['d5w','ddavp']); var end=(cl!=null&&cl<t)?Math.max(start,cl):t; na+=Math.max(0,(end-start))/60*1.5; }
+     var tk=S.f(['kcl','kpo']); if(tk!=null&&t>tk+120) na+=0.5; return Math.round(na*10)/10; },
+  vit:function(S,t){ return {hr:96,bp:'118/70',rr:16,temp:36.8,spo2:'97% room air'}; },
+  exam:{gen:'Drowsy, rousable; follows simple commands.', heent:'Dry mouth; tongue bitten.', chest:'Clear.', cv:'Regular rhythm.', abd:'Soft.', ext:'No edema.', neuro:'Confused; no focal deficit.'},
+  hist:function(S,t){ return S.f('hts')!=null&&t>S.f('hts')+30?'More awake; knows where she is.':'Drowsy; mumbles answers.'; },
+  res:{ bmp:function(S,d){ var k=S.f(['kcl','kpo'])!=null&&d>S.f(['kcl','kpo'])+120?3.6:3.0; return 'Sodium '+CASES_BY.na.m(S,d)+', potassium '+k+', chloride 80, bicarbonate 28, BUN 18, creatinine 0.9, glucose 104.';},
+        vbg:function(S,d){ return 'Sodium '+CASES_BY.na.m(S,d)+', potassium '+(S.f(['kcl','kpo'])!=null&&d>S.f(['kcl','kpo'])+120?3.6:3.0)+', pH 7.44.';},
+        abg:function(S,d){ return 'pH 7.44, PaCO2 40, sodium '+CASES_BY.na.m(S,d)+'.';},
+        sosm:'Serum osmolality 238 mOsm/kg.', uosm:'Urine osmolality 380 mOsm/kg.', una:'Urine sodium 52 mmol/L (on a thiazide).',
+        tsh:'TSH 2.1 mIU/L.', cort:'Cortisol 21 mcg/dL.', cth:'No acute abnormality.', mg:'Magnesium 1.6 mg/dL.', fsg:'Glucose 104 mg/dL.', ecg:'Sinus rhythm 94; U waves.' },
+  ev:[ {id:'seiz2', at:function(){return 45;}, when:function(S){return S.f('hts')==null||S.f('hts')>45;}, text:'Nurse: another generalised seizure, 2 minutes.', stop:true},
+       {id:'awake', at:function(S){var h=S.f('hts');return h==null?null:h+30;}, text:'Nurse: more awake after the hypertonic saline; no further seizure.', stop:true},
+       {id:'diur', at:function(){return 360;}, text:'Nurse: urine output 350 mL an hour for the last 2 hours, pale urine.', stop:true} ],
+  ddx:[ {n:'Thiazide-induced hyponatremia', fav:['una','uosm'], why:'new thiazide, high urine sodium, concentrated urine'},
+        {n:'Hypothyroidism', out:['tsh'], why:'normal TSH'},
+        {n:'Adrenal insufficiency', out:['cort'], why:'normal cortisol'},
+        {n:'Pseudohyponatremia', out:['sosm'], why:'serum osmolality is low'},
+        {n:'Primary polydipsia', out:['uosm'], why:'urine is concentrated, not dilute'} ],
+  key:[ {l:'Hypertonic (3%) saline bolus', any:['hts'], by:30, late:60, why:'A seizure means severe symptoms: a bolus raises sodium by a few points fast. US panel: 100 mL over 10 min, up to 3 times; European guideline: 150 mL over 20 min, up to 3 times in all.', src:'Verbalis 2013 (US expert panel); Spasovski 2014', tier:'consensus; 1D (European)'},
+        {l:'Recheck sodium 20 to 60 minutes after the bolus', done:function(S){var h=S.f('hts'); if(h==null) return null; var r=S.f(['vbg','abg','bmp'],h); return r!=null?{t:r}:null;}, base:function(S){return S.f('hts');}, nr:'no bolus was given', by:60, late:120, why:'Each bolus is judged by the sodium after it; a blood gas returns sodium fastest.', src:'Spasovski 2014', tier:'2D'},
+        {l:'Intensive care', any:['loc:icu'], part:['loc:tele'], by:120, late:240, why:'Hypertonic saline and hourly-to-2-hourly sodium checks need close monitoring.', src:'Spasovski 2014', tier:'ungraded'},
+        {l:'Stop the thiazide', any:['stop:hctz'], by:120, late:360, why:'Withhold the cause and do not restart a thiazide.', src:'Verbalis 2013', tier:'consensus'},
+        {l:'Serum osmolality, urine osmolality and urine sodium', done:function(S){var x=['sosm','uosm','una'].map(function(i){return S.f(i);}); return x.indexOf(null)<0?{t:Math.max.apply(null,x)}:null;}, by:240, late:480, why:'They confirm hypotonic hyponatremia and point to the cause; send them without delaying treatment.', src:'Spasovski 2014', tier:'1D'},
+        {l:'Replace potassium', any:['kcl','kpo'], by:240, late:480, why:'Potassium 3.0 makes her high risk, and replacing it also raises sodium.', src:'Verbalis 2013 (hypokalemia as a risk factor)', tier:'consensus'},
+        {l:'Respond to the water diuresis (D5W or desmopressin)', done:function(S){var e=S.ev('diur'), a=S.f(['d5w','ddavp']); return a!=null?{t:Math.max(a,e)}:null;}, base:function(S){return S.ev('diur');}, nr:'the case ended before the urine output rose', by:60, late:120, why:'Once the thiazide is stopped and volume is back, the kidney dumps water and sodium can climb over 2 an hour; replace the water or give desmopressin.', src:'Sterns 2024; Spasovski 2014 (7.5)', tier:'expert practice; 1D'},
+        {l:'Sodium checked at least every 4 hours', done:function(S){var t=S.all('vbg').concat(S.all('abg'),S.all('bmp')).sort(function(a,b){return a-b;}); if(!t.length) return null; var p=0; for(var i=0;i<t.length;i++){ if(t[i]-p>240) return null; p=t[i]; } return (Math.min(S.t,720)-p<=240)?{t:p}:null;}, base:function(S){return S.t>=480?0:null;}, nr:'the case ended within 8 hours', by:9999, late:9999, why:'Sodium can overshoot within hours; check it every 2 to 4 hours while it is moving.', src:'Spasovski 2014', tier:'2D'},
+        {l:'Rise held to 8 or less in 24 hours', done:function(S){ return CASES_BY.na.m(S,Math.min(S.t,1440))-114<=8&&S.f('hts')!=null?{t:0}:null; }, base:function(S){return S.t>=1200?0:null;}, nr:'the case ended before 20 hours', by:9999, late:9999, why:'With low potassium she is high risk: limit the rise to 8 in any 24 hours (aim for at least 4 to 6).', src:'Verbalis 2013; Sterns 2024', tier:'consensus'} ],
+  bad:[ {l:'Sodium rose more than 8 in 24 hours', any:['hts'], when:function(S,t){return t===S.f('hts')&&CASES_BY.na.m(S,Math.min(S.t,1440))-114>8;}, kind:'harm', why:'Overcorrection in a high-risk patient risks osmotic demyelination; re-lower with water and desmopressin.', src:'Verbalis 2013; Spasovski 2014 (7.5)', tier:'consensus; 1D'},
+        {l:'Tolvaptan', any:['tolv'], kind:'harm', why:'Not for urgent correction, and contraindicated in volume depletion.', src:'Samsca prescribing information', tier:'label'},
+        {l:'Normal saline as the main treatment', any:['ns'], when:function(S,t){return S.f('hts')==null||S.f('hts')>t;}, kind:'ni', why:'With seizures the treatment is hypertonic saline; isotonic fluid is too slow and can trigger a later water diuresis.', src:'Spasovski 2014; Verbalis 2013', tier:'1D'},
+        {l:'A fourth hypertonic bolus', any:['hts'], when:function(S,t){return S.all('hts').filter(function(x){return x<=t;}).length>3;}, kind:'ni', why:'Both guidelines stop after three boluses or when symptoms improve.', src:'Verbalis 2013; Spasovski 2014', tier:'consensus'} ],
+  teach:'Severe symptoms: hypertonic bolus, recheck, stop when symptoms improve. Then the danger flips: once the thiazide is stopped the kidney dumps water, so watch urine output and hold the rise to 8 in 24 hours.' },
+
+/* 7 ─────────────── COPD exacerbation */
+{ id:'copd', title:'Breathless smoker', where:'Emergency department', start:'03:15', max:1440, tool:['/obstructive/','Severe asthma and COPD'],
+  dx:'COPD exacerbation with acute hypercapnic respiratory acidosis',
+  open:['70-year-old man with severe COPD (FEV1 38% of predicted). Three days of worse breathlessness and more sputum, now green.',
+        'Smokes 20 cigarettes a day. Uses tiotropium and an albuterol inhaler.'],
+  meds:[['tio','Tiotropium inhaler'],['saba','Albuterol inhaler']],
+  vit:function(S,t){ var v={hr:108,bp:'148/86',rr:28,temp:37.6,spo2:'84% room air'}; var o=S.f(['o2','vent']), n=S.f('nrb'), nv=S.f('niv');
+     if(o!=null&&t>=o) v.spo2='90% on controlled oxygen'; if(n!=null&&t>=n) v.spo2='99% on 100% oxygen';
+     if(nv!=null&&t>nv+60){ v.rr=22; v.hr=98; } return v; },
+  exam:{gen:'Using neck muscles, pursed lips, speaking in short phrases; tired.', heent:'No cyanosis of lips.', chest:'Wheeze throughout, long expiration, poor air entry; no focal crackles.', cv:'Fast regular rhythm.', abd:'Soft.', ext:'No leg swelling.', neuro:'Alert; no flap.'},
+  hist:function(S,t){ return S.f('niv')!=null&&t>S.f('niv')+60?'Breathing a little easier on the mask.':'Very short of breath.'; },
+  res:{ abg:function(S,d){ var n=S.f('nrb'), nv=S.f('niv'); if(n!=null&&d>n+30&&(nv==null||nv>n)) return 'pH 7.22, PaCO2 78, PaO2 180 on 100% oxygen.'; if(nv!=null&&d>nv+55) return 'pH 7.35, PaCO2 54, PaO2 64 on NIV.'; return 'pH 7.30, PaCO2 62, PaO2 50, bicarbonate 30.';},
+        vbg:'pH 7.30, pCO2 66.', cxr:'Hyperinflated lungs; no consolidation, no pneumothorax.', cbc:'White cells 12.1, hemoglobin 15.8.', bmp:'Bicarbonate 31, otherwise normal.',
+        ecg:'Sinus tachycardia 106; no ischemic change.', bnp:'BNP 80 pg/mL (normal).', trop:'Troponin normal.', spx:'Sputum: Haemophilus influenzae.', rvp:'Respiratory viruses not detected.', ctpa:'No pulmonary embolism; emphysema.' },
+  ev:[ {id:'co2', at:function(S){var n=S.f('nrb');return n==null?null:n+45;}, when:function(S){return S.f('niv')==null||S.f('niv')>S.f('nrb')+45;}, text:'Nurse: on the 100% mask he is drowsy and hard to rouse.', stop:true},
+       {id:'tire', at:function(){return 90;}, when:function(S){return S.f('niv')==null;}, text:'Nurse: more drowsy, breathing rate 32.', stop:true} ],
+  ddx:[ {n:'COPD exacerbation', fav:['abg'], why:'more breathless, more and purulent sputum, hypercapnic acidosis'},
+        {n:'Pneumonia', out:['cxr'], why:'no consolidation'},
+        {n:'Pneumothorax', out:['cxr'], why:'no pneumothorax'},
+        {n:'Heart failure', out:['bnp','cxr'], why:'normal BNP, no edema'},
+        {n:'Pulmonary embolism', out:['ctpa'], why:'no clot (purulent sputum already favoured infection)'} ],
+  key:[ {l:'Controlled oxygen, target 88 to 92%', any:['o2','vent'], by:15, late:30, why:'Enough oxygen to correct hypoxemia without driving the CO2 up; titrated oxygen lowered death compared with high-flow oxygen.', src:'Austin 2010 (BMJ); BTS 2017 oxygen guideline; GOLD (controlled oxygen)', tier:'trial; guideline'},
+        {l:'Arterial blood gas', any:['abg'], by:30, late:60, why:'pH and CO2 decide whether he needs ventilation.', src:'GOLD 2026', tier:'see report'},
+        {l:'Short-acting bronchodilators', any:['alb2'], by:30, late:60, why:'Albuterol, with or without ipratropium, is the first treatment.', src:'GOLD 2026', tier:'see report'},
+        {l:'Systemic corticosteroid', any:['pred','mpred'], by:120, late:240, why:'Prednisone 40 mg a day for 5 days speeds recovery and lowers failure.', src:'GOLD 2026', tier:'evidence moderate'},
+        {l:'Antibiotic', any:['augm','doxy','azi','levo','cro'], by:240, late:480, why:'Purulent sputum with more breathlessness, and a need for NIV, each meet the antibiotic criteria.', src:'GOLD 2026', tier:'see report'},
+        {l:'Noninvasive ventilation', any:['niv'], by:60, late:120, why:'pH 7.35 or lower with a PaCO2 above 45: bilevel NIV cuts intubation and death.', src:'ERS/ATS 2017 NIV guideline; GOLD 2026', tier:'strong, high'},
+        {l:'Chest x-ray', any:['cxr'], by:120, late:240, why:'Looks for pneumonia, pneumothorax and edema that change treatment.', src:'GOLD 2026 (expert practice)', tier:'expert practice'},
+        {l:'Step-down or ICU', any:['loc:icu','loc:tele'], by:120, late:240, why:'NIV needs a bed with the staff and monitoring to run it.', src:'GOLD 2026', tier:'see report'},
+        {l:'Counsel to stop smoking', any:['k_smoke'], by:1440, late:1440, why:'Stopping smoking slows decline; the admission is a moment to start.', src:'GOLD 2026', tier:'see report'} ],
+  bad:[ {l:'100% oxygen by non-rebreather', any:['nrb'], kind:'harm', why:'High-concentration oxygen worsens hypercapnia in COPD.', src:'Austin 2010; BTS 2017', tier:'trial'},
+        {l:'Benzodiazepine', any:['loraz'], kind:'harm', why:'Sedation suppresses breathing in hypercapnic failure.', src:'Expert practice', tier:'expert practice'},
+        {l:'Aminophylline or theophylline', any:['theo'], kind:'ni', why:'Not recommended in exacerbations because of side effects.', src:'GOLD 2026', tier:'see report'} ],
+  teach:'Controlled oxygen to 88 to 92%, nebulisers, steroid, antibiotic for purulent sputum, and NIV when pH is 7.35 or lower with a high CO2.' },
+
+/* 8 ─────────────── Acute ischemic stroke with LVO */
+{ id:'stroke', title:'Cannot find his words', where:'Emergency department', start:'08:00', max:1560, tool:null,
+  dx:'Acute ischemic stroke from a left M1 occlusion, within the thrombolysis window',
+  open:['67-year-old man. His wife saw him normal at 07:00. At 07:40 he dropped his coffee, could not speak properly and his right arm was weak. It is now 08:00.',
+        'Hypertension. No anticoagulant, no recent surgery, bleeding or stroke.'],
+  meds:[['amlo','Amlodipine']],
+  bp:function(S,t){ var l=S.all('labet').concat(S.all('nicar')).sort(function(a,b){return a-b;}); var lyt=S.f(['tpa','tnk']);
+     var after=lyt!=null&&t>=lyt+110; var ctl=l.filter(function(x){return x+10<=t;});
+     if(after){ var post=l.filter(function(x){return x>=lyt+110&&x+10<=t;}); return post.length?'170/96':'186/100'; }
+     return ctl.length?'176/98':'192/104'; },
+  vit:function(S,t){ return {hr:84,bp:CASES_BY.stroke.bp(S,t),rr:16,temp:36.9,spo2:'97% room air'}; },
+  exam:{gen:'Alert, frustrated.', heent:'No neck bruit.', chest:'Clear.', cv:'Regular rhythm.', abd:'Soft.', ext:'No leg swelling.', neuro:'Expressive aphasia, right facial droop, right arm falls to the bed, right leg drifts. Gaze deviated to the left. NIH stroke scale about 14.'},
+  hist:function(S,t){ var e=S.f('evt'); return e!=null&&t>e+90?'Speaking short sentences; right arm lifting.':'Cannot answer; points to his right arm.'; },
+  res:{ fsg:'Glucose 132 mg/dL.', cth:function(S,d){ var l=S.f(['tpa','tnk']); return l!=null&&d>l+1200?'24-hour scan: small left basal ganglia infarct; no hemorrhage.':'No hemorrhage; no early ischemic change.';},
+        cta:'Occlusion of the left middle cerebral artery, M1 segment.', ctp:'Small core, large penumbra in the left MCA territory.', mri:'Acute left MCA infarct.',
+        cbc:'Platelets 220.', coag:'INR 1.0.', bmp:'Creatinine 1.0, glucose 130.', ecg:'Sinus rhythm 84.', trop:'Troponin normal.', nihss:'NIH stroke scale 14.', swal:'Fails the bedside swallow screen.',
+        evt:'Thrombectomy: left M1 clot removed; near-complete reperfusion.', c_neuro:'Stroke team at the bedside; agrees he may be eligible for thrombolysis and thrombectomy.' },
+  ev:[ {id:'postbp', at:function(S){var l=S.f(['tpa','tnk']);return l==null?null:l+120;}, text:'Nurse, neuro checks after thrombolysis: blood pressure 186/100.', stop:true} ],
+  gate:{tpa:['cth','A noncontrast CT head must be done first to exclude bleeding.'], tnk:['cth','A noncontrast CT head must be done first to exclude bleeding.']},
+  ddx:[ {n:'Ischemic stroke, large vessel', fav:['cta'], why:'M1 occlusion'},
+        {n:'Intracerebral hemorrhage', out:['cth'], why:'no blood on CT'},
+        {n:'Hypoglycemia', out:['fsg'], why:'glucose 132'},
+        {n:'Seizure with post-ictal weakness', out:['cta'], why:'an occluded artery explains the deficit'} ],
+  key:[ {l:'Fingerstick glucose', any:['fsg'], by:10, late:20, why:'Low glucose mimics stroke and must be checked before thrombolysis.', src:'2026 AHA/ASA acute ischemic stroke guideline, 4.6.1', tier:'1, C-LD'},
+        {l:'Stroke team', any:['c_neuro'], by:15, late:30, why:'Protocols built around the fastest onset-to-treatment time improve outcome.', src:'2026 AHA/ASA guideline, 2.7', tier:'1, A (systems)'},
+        {l:'Noncontrast CT head', any:['cth'], by:25, late:45, why:'Brain imaging as fast as possible, for example within 25 minutes of arrival, to exclude bleeding.', src:'2026 AHA/ASA guideline, 3.2', tier:'1, B-NR'},
+        {l:'Lower blood pressure below 185/110 before thrombolysis', done:function(S){var l=S.f(['labet','nicar']),y=S.f(['tpa','tnk']); return l!=null&&(y==null||l+10<=y)?{t:l}:null;}, by:45, late:60, why:'Thrombolysis above 185/110 raises the risk of brain hemorrhage.', src:'2026 AHA/ASA guideline, 4.3', tier:'1, B-NR'},
+        {l:'IV thrombolysis (alteplase or tenecteplase)', any:['tpa','tnk'], by:60, late:90, why:'Within 4.5 hours of last known well, as quickly as possible; the quality goal is within 60 minutes of arrival.', src:'2026 AHA/ASA guideline, 4.6; 60-minute goal from the AHA quality program', tier:'1 (treatment)'},
+        {l:'CT angiography for a large-vessel occlusion', any:['cta'], by:60, late:90, why:'Vessel imaging as fast as possible to select thrombectomy, without waiting for creatinine.', src:'2026 AHA/ASA guideline, 3.2', tier:'1, A'},
+        {l:'Thrombectomy', any:['evt'], by:180, late:300, why:'Anterior large-vessel occlusion within 6 hours with a significant deficit: thrombectomy, after lytics where eligible.', src:'2026 AHA/ASA guideline, 4.7.2', tier:'1'},
+        {l:'Keep blood pressure below 180/105 after thrombolysis', done:function(S){var e=S.ev('postbp'); if(e==null) return null; var l=S.f(['labet','nicar'],e); return l!=null?{t:l}:null;}, base:function(S){return S.ev('postbp');}, nr:'no thrombolysis was given', by:30, late:60, why:'For 24 hours after thrombolysis, below 180/105, checked with neuro checks.', src:'2026 AHA/ASA guideline, 4.3', tier:'1, B-R'},
+        {l:'ICU or stroke unit', any:['loc:icu'], by:240, late:360, why:'After thrombolysis: an intensive care or stroke unit for monitoring.', src:'2026 AHA/ASA guideline, Table 7', tier:'see table'},
+        {l:'Swallow screen before anything by mouth', done:function(S){var s=S.f('swal'), a=S.f(['asa','ppo','pred','kpo']); return s!=null&&(a==null||s<=a)?{t:s}:null;}, by:1560, late:1560, why:'A bedside swallow screen before food, drink or oral medicine prevents aspiration.', src:'2026 AHA/ASA guideline, 5.2', tier:'1, C-EO'},
+        {l:'Aspirin after the 24-hour scan', done:function(S){var l=S.f(['tpa','tnk']); var c=l==null?null:S.f('cth',l+1200); if(c==null)return null; var a=S.f('asa',c+25); return a!=null?{t:a}:null;}, by:1560, late:1560, why:'After the 24-hour scan shows no bleeding, aspirin within 48 hours lowers early recurrence.', src:'2026 AHA/ASA guideline, 4.8; Table 7 (scan before antithrombotics)', tier:'1, A'} ],
+  bad:[ {l:'Thrombolysis with blood pressure 185/110 or higher', any:['tpa','tnk'], when:function(S,t){return CASES_BY.stroke.bp(S,t)==='192/104';}, kind:'harm', why:'Lower the pressure first.', src:'2026 AHA/ASA guideline, 4.3', tier:'1, B-NR'},
+        {l:'Antiplatelet or anticoagulant before the 24-hour scan', any:['asa','clopi','ufh','enox'], when:function(S,t){var l=S.f(['tpa','tnk']); return l!=null&&t<l+1200;}, kind:'ni', why:'The risk of antiplatelets in the first 24 hours after lytics is uncertain, and the scan comes first.', src:'2026 AHA/ASA guideline, 4.8 (2b); Table 7', tier:'2b, B-R'},
+        {l:'MRI before treatment', any:['mri'], when:function(S,t){return S.f(['tpa','tnk'])==null||S.f(['tpa','tnk'])>t;}, kind:'ni', why:'Noncontrast CT is enough to decide on thrombolysis; MRI first costs time.', src:'Expert practice', tier:'expert practice'} ],
+  trial:{n:'ECASS III 2008 (why the window reaches 4.5 hours)', q:'Does alteplase help 3 to 4.5 hours after onset?', d:'821 patients randomised to alteplase or placebo 3 to 4.5 hours after onset.', r:'Good outcome (modified Rankin 0 to 1) 52.4% vs 45.2% (odds ratio 1.34); symptomatic hemorrhage 2.4% vs 0.2%; death 7.7% vs 8.4% (no difference).', c:'Extended the thrombolysis window from 3 to 4.5 hours. This patient is inside 3 hours.', ref:'Hacke W et al. N Engl J Med 2008;359:1317. doi:10.1056/NEJMoa0804656'},
+  teach:'Glucose, CT, blood pressure under 185/110, lytics, CTA, thrombectomy. Then 24 hours of blood pressure under 180/105, a swallow screen, and aspirin only after the 24-hour scan.' },
+
+/* 9 ─────────────── CAP, outpatient */
+{ id:'cap', title:'Cough and fever', where:'Office', start:'10:30', max:4320, tool:['/abx-empiric/','Empiric antibiotics'], startloc:'office', locs:['office','home','ed','ward'],
+  dx:'Community-acquired pneumonia, low risk, safe for treatment at home',
+  open:['45-year-old man. Three days of fever, cough with yellow sputum and right-sided chest pain on breathing in.',
+        'Smokes 10 cigarettes a day. No other illness, no antibiotics or hospital stay in the last 3 months. No drug allergies.'],
+  meds:[],
+  vit:function(S,t){ var v={hr:92,bp:'128/78',rr:18,temp:38.4,spo2:'96% room air'}; var a=S.f(['amox','doxy','azi','augm','levo','moxi','cro']); if(a!=null&&t>a+2880){ v.temp=37.0; v.hr=76; } return v; },
+  exam:{gen:'Looks unwell but comfortable; alert and oriented.', heent:'Normal.', chest:'Crackles and bronchial breathing at the right base.', cv:'Regular rhythm.', abd:'Soft.', ext:'Normal.', neuro:'Normal.'},
+  hist:function(S,t){ var a=S.f(['amox','doxy','azi','augm','levo','moxi','cro']); return a!=null&&t>a+2880?'Fever gone; cough easing.':'Feels feverish; eating and drinking.'; },
+  res:{ cxr:'Right lower lobe consolidation; no effusion.', cbc:'White cells 13.8, hemoglobin 15.0, platelets 260.', bmp:'BUN 14, creatinine 0.9, sodium 138.',
+        rvp:'Influenza A/B, SARS-CoV-2 and RSV not detected.', pct:'Procalcitonin 0.9 ng/mL.', bcx:'No growth.', spx:'Normal flora.', lac:'Lactate 1.1.' },
+  ev:[ {id:'fuv', at:function(S){var f=S.f('fu'); var h=S.f('loc:home'); return f!=null&&h!=null?Math.max(f,h)+2880:null;}, text:'Follow-up visit: fever gone, eating, cough easing.', stop:true} ],
+  ddx:[ {n:'Community-acquired pneumonia', fav:['cxr'], why:'consolidation on the film'},
+        {n:'Acute bronchitis', out:['cxr'], why:'consolidation makes it pneumonia'},
+        {n:'Influenza or COVID-19 alone', out:['rvp'], why:'viral panel negative'},
+        {n:'Pulmonary embolism', out:['cxr'], why:'fever, purulent sputum and consolidation fit infection'} ],
+  key:[ {l:'Chest x-ray', any:['cxr'], by:120, late:240, why:'Pneumonia is a diagnosis made on imaging; lung ultrasound is an acceptable alternative.', src:'ATS/IDSA 2019; ATS 2025', tier:'definition; conditional, low (ultrasound)'},
+        {l:'Treat at home', any:['loc:home'], by:4320, late:4320, why:'Age 45, no comorbidities, normal mental state, vital signs and oxygen: very low risk (CURB-65 0, PSI class I).', src:'ATS/IDSA 2019 (PSI preferred over CURB-65, plus judgment)', tier:'strong, moderate (PSI)'},
+        {l:'Amoxicillin (or doxycycline)', any:['amox','doxy'], part:['azi'], by:4320, late:4320, why:'Healthy outpatient: amoxicillin 1 g three times a day, or doxycycline; a macrolide only where pneumococcal macrolide resistance is under 25% (half credit).', src:'ATS/IDSA 2019', tier:'strong, moderate (amoxicillin); conditional (doxycycline, macrolide)'},
+        {l:'Follow-up in 2 to 3 days with return advice', done:function(S){var a=S.f('fu'),b=S.f('k_ret'); return a!=null||b!=null?{t:Math.min(a==null?1e9:a,b==null?1e9:b)}:null;}, by:4320, late:4320, why:'Most get better in 2 to 3 days; anyone who does not needs to be seen again.', src:'Expert practice', tier:'expert practice'},
+        {l:'Counsel to stop smoking', any:['k_smoke'], by:4320, late:4320, why:'A quick word now is one of the most useful things in the visit.', src:'Expert practice', tier:'expert practice'} ],
+  bad:[ {l:'Admission', any:['loc:ward','loc:ed'], kind:'ni', why:'Low-risk pneumonia does well at home; admitting is aggressive management where it is not needed.', src:'ATS/IDSA 2019', tier:'strong, moderate'},
+        {l:'Fluoroquinolone in a healthy outpatient', any:['levo','moxi'], kind:'ni', why:'Reserved for outpatients with comorbidities; side effects outweigh benefit here.', src:'ATS/IDSA 2019', tier:'see guideline'},
+        {l:'Blood or sputum cultures in an outpatient', any:['bcx','spx'], kind:'ni', why:'They rarely change treatment for an outpatient.', src:'ATS/IDSA 2019', tier:'strong, very low'},
+        {l:'Corticosteroid in non-severe pneumonia', any:['pred','mpred','hydro'], kind:'ni', why:'No benefit outside severe pneumonia.', src:'ATS/IDSA 2019; ATS 2025', tier:'strong'} ],
+  teach:'Low risk by PSI or CURB-65: home with amoxicillin (or doxycycline), follow-up in 2 to 3 days. The 2025 ATS update suggests less than 5 days of antibiotics, at least 3, once stable.' },
+
+/* 10 ─────────────── AKI from retention with hyperkalemia */
+{ id:'aki', title:'Confused and not passing urine', where:'Emergency department', start:'19:45', max:1440, tool:['/aki/','AKI workup'],
+  dx:'Acute kidney injury from bladder outlet obstruction, with hyperkalemia and ECG changes',
+  open:['78-year-old man with an enlarged prostate. Three days of confusion after starting diphenhydramine for sleep. Only dribbling urine. Taking ibuprofen for back pain.',
+        'Hypertension on lisinopril. Creatinine 1.1 three months ago.'],
+  meds:[['dphn','Diphenhydramine'],['ibu','Ibuprofen'],['lisi','Lisinopril']],
+  m:function(S,t){ var K=6.4, s=S.f(['insb','insd']), d=S.f(['d50','d5w','d5h']), f=S.f('foley'), b=S.f('kbind');
+     if(s!=null&&t>s) K-=Math.min(0.8,(t-s)/30*0.8)*(t>s+240?0.4:1); if(f!=null&&t>f) K-=Math.min(1.0,(t-f)/360*1.0); if(b!=null&&t>b+120) K-=0.2;
+     return Math.round(Math.max(4.2,K)*10)/10; },
+  vit:function(S,t){ return {hr:76,bp:'154/88',rr:16,temp:36.8,spo2:'97% room air'}; },
+  exam:{gen:'Confused, restless.', heent:'Dry mouth.', chest:'Clear.', cv:'Regular rhythm.', abd:'Tender, distended lower abdomen; dull to percussion up to the umbilicus.', ext:'No edema.', neuro:'Disoriented to time; no focal deficit.'},
+  hist:function(S,t){ return S.f('foley')!=null&&t>S.f('foley')+30?'Much more comfortable after the catheter.':'Restless, says he needs to pass water.'; },
+  res:{ bmp:function(S,d){ var f=S.f('foley'); var cr=f!=null&&d>f+600?2.6:4.1; return 'Sodium 136, potassium '+CASES_BY.aki.m(S,d)+', bicarbonate 18, BUN 72, creatinine '+cr+'.';},
+        vbg:function(S,d){ return 'pH 7.31, potassium '+CASES_BY.aki.m(S,d)+'.';},
+        ecg:function(S,d){ var c=S.f(['cag','cacl']); return CASES_BY.aki.m(S,d)>=6&&(c==null||c>d)?'Sinus rhythm 74; tall peaked T waves V2 to V4; QRS 96 ms.':'Sinus rhythm 74; T waves less peaked.';},
+        fsg:function(S,d){ var s=S.f(['insb','insd']), g=S.f(['d50','d5w','d5h']); return s!=null&&d>s+60&&(g==null)?'Glucose 48 mg/dL.':'Glucose 118 mg/dL.';},
+        bscan:'Bladder volume 1,150 mL.', rus:'Bilateral hydronephrosis; enlarged prostate; bladder decompressed by the catheter.',
+        ua:'Bland: trace protein, no blood, no casts.', cbc:'Hemoglobin 13.0, white cells 8.0.', ctap:'Distended bladder, bilateral hydronephrosis.', ctnc:'Distended bladder, bilateral hydronephrosis; no stones.',
+        una:'Urine sodium 60 mmol/L.', mg:'Magnesium 2.4 mg/dL.', c_neph:'Nephrology: relieve the obstruction; no dialysis needed now.', c_uro:'Urology: catheter to stay; outpatient prostate review.' },
+  ev:[ {id:'drain', at:function(S){var f=S.f('foley');return f==null?null:f+5;}, text:'Catheter placed: 1,200 mL of urine drained.', stop:false},
+       {id:'pod', at:function(S){var f=S.f('foley');return f==null?null:f+300;}, text:'Nurse: urine output 300 mL an hour for the last 2 hours.', stop:true},
+       {id:'hypog', at:function(S){var s=S.f(['insb','insd']);return s==null?null:s+60;}, when:function(S){return S.f(['d50','d5w','d5h'])==null;}, text:'Nurse: sweaty and more confused.', stop:true} ],
+  ddx:[ {n:'Obstruction at the bladder outlet', fav:['bscan','rus'], why:'large residual volume, hydronephrosis'},
+        {n:'Prerenal injury (NSAID, ACE inhibitor)', out:['bscan'], why:'a full bladder explains it; the drugs add to it'},
+        {n:'Acute interstitial nephritis', out:['ua'], why:'bland urine'},
+        {n:'Glomerulonephritis', out:['ua'], why:'no blood or protein'} ],
+  key:[ {l:'ECG', any:['ecg'], by:15, late:30, why:'Potassium 6 or more: an urgent ECG decides whether the heart needs protecting.', src:'UK Kidney Association hyperkalaemia guideline, 2026 update', tier:'1B'},
+        {l:'IV calcium', any:['cag','cacl'], by:30, late:60, why:'Peaked T waves: calcium stabilises the heart within minutes while potassium is lowered.', src:'UK Kidney Association 2026', tier:'2C'},
+        {l:'Insulin with dextrose', done:function(S){var a=S.f(['insb','insd']),b=S.f(['d50','d5w','d5h']); return a!=null&&b!=null?{t:Math.max(a,b)}:null;}, by:60, late:90, why:'Shifts potassium into cells within half an hour; dextrose prevents hypoglycemia.', src:'UK Kidney Association 2026', tier:'2C (6.0 to 6.4)'},
+        {l:'Glucose checks after insulin', done:function(S){var a=S.f(['insb','insd']); if(a==null)return null; var g=S.f('fsg',a); return g!=null?{t:g}:null;}, base:function(S){return S.f(['insb','insd']);}, nr:'no insulin was given', by:60, late:120, why:'Hypoglycemia after insulin is more common when the kidneys are failing.', src:'UK Kidney Association 2026', tier:'see guideline'},
+        {l:'Cardiac monitor', any:['mon'], by:30, late:60, why:'ECG changes from potassium need continuous monitoring.', src:'UK Kidney Association 2026', tier:'1C at 6.5 or more; when unwell at 6.0 to 6.4'},
+        {l:'Bladder scan or catheter', any:['bscan','foley'], by:60, late:90, why:'Look for the reversible cause first: retention.', src:'KDIGO 2012 (find reversible causes promptly)', tier:'not graded'},
+        {l:'Urinary catheter', any:['foley'], by:90, late:150, why:'Relieving the obstruction treats the kidney injury and the potassium.', src:'KDIGO 2012; expert practice', tier:'expert practice'},
+        {l:'Recheck potassium within 2 hours', done:function(S){var a=S.f(['insb','insd','cag','cacl']); if(a==null)return null; var r=S.f(['bmp','vbg'],a); return r!=null?{t:r}:null;}, base:function(S){return S.f(['insb','insd','cag','cacl']);}, nr:'no treatment was given', by:120, late:180, why:'The shift wears off; recheck at about 1, 2, 4, 6 and 24 hours.', src:'UK Kidney Association 2026', tier:'2C'},
+        {l:'Stop ibuprofen and diphenhydramine; hold lisinopril', done:function(S){var x=['stop:ibu','stop:dphn','stop:lisi'].map(function(i){return S.f(i);}); return x.indexOf(null)<0?{t:Math.max.apply(null,x)}:null;}, by:240, late:480, why:'The anticholinergic caused the retention; the NSAID and ACE inhibitor worsen kidney injury and potassium.', src:'KDIGO 2012; expert practice', tier:'expert practice'},
+        {l:'Watch and replace urine output after drainage', any:['io','ns','lr'], base:function(S){return S.ev('pod');}, nr:'the catheter was not placed', by:60, late:120, why:'Post-obstructive diuresis can cause dehydration and electrolyte loss.', src:'Expert practice', tier:'expert practice'},
+        {l:'Renal ultrasound', any:['rus'], by:720, late:1440, why:'Confirms hydronephrosis and excludes other causes.', src:'Expert practice', tier:'expert practice'} ],
+  bad:[ {l:'CT with IV contrast', any:['ctap'], kind:'ni', why:'Ultrasound answers the question without contrast in a failing kidney.', src:'KDIGO 2012 (consider alternative imaging)', tier:'not graded'},
+        {l:'Emergent dialysis before relieving obstruction', any:['hd'], when:function(S,t){return S.f('foley')==null||S.f('foley')>t;}, kind:'ni', why:'Emergent dialysis is for life-threatening problems that do not respond; a catheter is the treatment.', src:'KDIGO 2012', tier:'not graded'},
+        {l:'Potassium supplement', any:['kcl','kpo'], kind:'harm', why:'Potassium is 6.4.', src:'Expert practice', tier:'expert practice'},
+        {l:'Insulin without dextrose', any:['insb','insd'], when:function(S,t){return S.f(['d50','d5w','d5h'])==null;}, kind:'harm', why:'Insulin alone causes hypoglycemia.', src:'UK Kidney Association 2026', tier:'see guideline'} ],
+  teach:'Protect the heart (calcium), shift potassium (insulin with dextrose, then check glucose), and treat the cause (a catheter). Watch for the diuresis that follows.' }
+];
+var CASES_BY = {}; CASES.forEach(function(c){ CASES_BY[c.id] = c; });
+
+(function(){
+'use strict';
+function $(id){ return document.getElementById(id); }
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+var ORD = {}; CAT.forEach(function(r){ ORD[r[0]] = {id:r[0], n:r[1], s:(r[1]+' '+r[2]).toLowerCase(), k:r[3], d:r[4], r:r[5]}; });
+var LOCN = {ed:'Emergency department', ward:'Ward', tele:'Step-down / telemetry', icu:'Intensive care', cath:'Cath lab', office:'Office', home:'Home'};
+var EXAMN = [['gen','General'],['heent','Head and neck'],['chest','Chest and lungs'],['cv','Heart'],['abd','Abdomen'],['ext','Extremities'],['neuro','Neuro'],['rect','Rectal']];
+var KINDN = {lab:'lab',img:'imaging',ecg:'ECG',med:'medicine',flu:'fluid or blood',proc:'procedure',mon:'monitoring',con:'consult',cou:'counselling',diet:'diet'};
+var DONE = {}; // cases finished this session (page memory only)
+
+/* ---------- State ---------- */
+var C = null, S = null;
+function newState(c){
+  var st = {t:0, ord:[], log:[], fired:{}, loc:c.startloc || 'ed', ended:false, seen:{}};
+  st.f = function(ids, from){ ids = [].concat(ids); from = from || 0; var b = null; st.ord.forEach(function(o){ if (ids.indexOf(o.id) >= 0 && o.t >= from && (b === null || o.t < b)) b = o.t; }); return b; };
+  st.all = function(id){ return st.ord.filter(function(o){ return o.id === id; }).map(function(o){ return o.t; }); };
+  st.ev = function(id){ return st.fired[id] == null ? null : st.fired[id]; };
+  st.back = function(ids){ ids = [].concat(ids); var b = null; st.ord.forEach(function(o){ if (ids.indexOf(o.id) >= 0 && o.due != null && (b === null || o.due < b)) b = o.due; }); return b; };
+  st.which = function(ids){ var b = null, w = null; st.ord.forEach(function(o){ if (ids.indexOf(o.id) >= 0 && (b === null || o.t < b)){ b = o.t; w = o.id; } }); return w; };
+  return st;
+}
+function clockStr(t){
+  var p = C.start.split(':'); var m = (+p[0]) * 60 + (+p[1]) + t; var day = Math.floor(m / 1440) + 1; m = m % 1440;
+  var hh = Math.floor(m / 60), mm = m % 60;
+  return 'Day ' + day + ' · ' + (hh < 10 ? '0' : '') + hh + ':' + (mm < 10 ? '0' : '') + mm;
+}
+function dur(m){ m = Math.round(m); if (m < 60) return m + ' min'; var h = Math.floor(m / 60), r = m % 60; if (h < 48) return h + ' h' + (r ? ' ' + r + ' min' : ''); return Math.round(m / 1440 * 10) / 10 + ' days'; }
+function resText(o){
+  var r = C.res[o.id]; if (typeof r === 'function') r = r(S, o.due);
+  if (r == null || r === '') r = ORD[o.id] ? ORD[o.id].r : '';
+  return r || 'Done.';
+}
+function vitStr(v){ return 'Heart rate ' + v.hr + ', blood pressure ' + v.bp + ', breathing ' + v.rr + ', temperature ' + v.temp + ' °C, saturation ' + v.spo2 + '.'; }
+
+/* ---------- Start a case ---------- */
+function start(id){
+  C = CASES_BY[id]; S = newState(C);
+  $('noplay').hidden = true; $('play').hidden = false; $('p-play').classList.add('live');
+  $('review').hidden = true; $('review').innerHTML = '';
+  ['orders','exam','clockcard','where','endcard'].forEach(function(x){ $(x).hidden = false; });
+  $('op-where').textContent = C.where; $('op-title').textContent = C.title;
+  $('op-body').innerHTML = C.open.map(function(p){ return '<p>' + esc(p) + '</p>'; }).join('') + '<p class="note">On arrival: ' + esc(vitStr(C.vit(S, 0))) + '</p>';
+  addLog(0, 'upd', 'Arrival', 'Vital signs taken automatically. Nothing else is ordered until you order it.');
+  $('ordq').value = ''; $('sugg').innerHTML = ''; flash('');
+  render(); show('t-play'); window.scrollTo(0, 0);
+}
+function addLog(t, cls, title, text){ S.log.push({t:t, c:cls, h:title, p:text}); }
+
+/* ---------- Orders ---------- */
+function match(q){
+  q = q.toLowerCase().trim(); if (q.length < 3) return [];
+  var words = q.split(/\s+/), out = [];
+  CAT.forEach(function(r){ var o = ORD[r[0]]; var sc = 0;
+    if (o.n.toLowerCase().indexOf(q) === 0) sc = 3; else if (words.every(function(w){ return o.s.indexOf(w) >= 0; })) sc = o.n.toLowerCase().indexOf(words[0]) >= 0 ? 2 : 1;
+    if (sc) out.push([sc, o]); });
+  return out.sort(function(a, b){ return b[0] - a[0]; }).slice(0, 8).map(function(x){ return x[1]; });
+}
+function drawSugg(){
+  var q = $('ordq').value, m = match(q);
+  if (q.trim().length > 0 && q.trim().length < 3){ $('sugg').innerHTML = '<p class="note">Keep typing: matches appear after three letters.</p>'; return; }
+  if (q.trim().length >= 3 && !m.length){ $('sugg').innerHTML = '<p class="note">Not in this simulator\'s list. Try another word for it (for example "heparin" or "cath").</p>'; return; }
+  $('sugg').innerHTML = m.map(function(o){ return '<button class="sug" type="button" data-ord="' + o.id + '"><span>' + esc(o.n) + '</span><small>' + KINDN[o.k] + (o.d ? ' · ' + dur(o.d) : '') + '</small></button>'; }).join('');
+}
+function flash(h){ $('flash').innerHTML = h; }
+function order(id){
+  if (!S || S.ended) return;
+  var o = ORD[id];
+  var g = C.gate && C.gate[id];
+  if (g){ var back = S.back(g[0]); if (back == null || back > S.t){ flash('<span class="guard" style="display:block">' + esc(g[1]) + '</span>'); return; } }
+  var rec = {id:id, t:S.t, due:null};
+  var hasRes = o.k === 'lab' || o.k === 'img' || o.k === 'ecg' || o.k === 'con' || (o.k === 'proc' && (o.d > 0 || C.res[id]));
+  if (hasRes) rec.due = S.t + (o.d || 0);
+  S.ord.push(rec);
+  var again = S.all(id).length > 1 ? ' (again)' : '';
+  if (hasRes && rec.due === S.t){ addLog(S.t, 'res', o.n, resText(rec)); rec.seen = true; }
+  else if (!hasRes) addLog(S.t, 'ord', o.n + again, o.k === 'cou' ? 'Done.' : o.k === 'mon' ? 'Started.' : 'Ordered and given or started.');
+  flash('Ordered: <b>' + esc(o.n) + '</b>' + again + (rec.due > S.t ? ' · result in about ' + dur(rec.due - S.t) : ''));
+  $('ordq').value = ''; $('sugg').innerHTML = '';
+  settle(); render(); $('ordq').focus();
+}
+function stopMed(m){ if (S.ended || S.f('stop:' + m) != null) return; S.ord.push({id:'stop:' + m, t:S.t, due:null}); var mm = C.meds.filter(function(x){ return x[0] === m; })[0]; addLog(S.t, 'ord', 'Stopped: ' + mm[1], ''); render(); }
+function moveTo(l){ if (S.ended || S.loc === l) return; S.loc = l; S.ord.push({id:'loc:' + l, t:S.t, due:null}); addLog(S.t, 'upd', 'Moved to ' + LOCN[l], 'Vital signs on arrival: ' + vitStr(C.vit(S, S.t))); settle(); render(); }
+
+/* ---------- Clock ---------- */
+function evAt(e){ var a = typeof e.at === 'function' ? e.at(S) : e.at; return a; }
+function nextEvent(limit){
+  var best = null;
+  C.ev.forEach(function(e){ if (S.fired[e.id] != null) return; var a = evAt(e); if (a == null) return; a = Math.max(a, S.t); if (a <= limit && (best === null || a < best.a)) best = {e:e, a:a}; });
+  return best;
+}
+function nextResult(limit){ var b = null; S.ord.forEach(function(o){ if (o.due != null && !o.seen && o.due <= limit && (b === null || o.due < b)) b = o.due; }); return b; }
+function settle(){ // fire anything due at the current minute (results with no delay, immediate updates)
+  advance(S.t, false);
+}
+function advance(target, toNext){
+  target = Math.min(target, C.max); var stopped = null;
+  for (var guard = 0; guard < 400; guard++){
+    var r = nextResult(target), e = nextEvent(target);
+    var m = r; if (e && (m === null || e.a < m)) m = e.a;
+    if (m === null){ S.t = Math.max(S.t, target); break; }
+    S.t = Math.max(S.t, m);
+    S.ord.forEach(function(o){ if (o.due != null && !o.seen && o.due <= S.t){ o.seen = true; addLog(o.due, 'res', ORD[o.id].n, resText(o)); } });
+    var hit = false;
+    C.ev.forEach(function(ev){ if (S.fired[ev.id] != null) return; var a = evAt(ev); if (a == null || Math.max(a, 0) > S.t) return;
+      var ok = !ev.when || ev.when(S); S.fired[ev.id] = ok ? S.t : -1; if (ok){ addLog(S.t, 'upd', 'Update', ev.text); if (ev.stop) hit = true; } });
+    if (hit){ stopped = 'An update came in, so the clock stopped.'; break; }
+    if (toNext && r !== null && r <= S.t) break;
+  }
+  Object.keys(S.fired).forEach(function(k){ if (S.fired[k] === -1) delete S.fired[k]; });
+  if (S.t >= C.max){ endCase('The simulated time for this case is up.'); return; }
+  $('advnote').textContent = stopped || '';
+}
+function adv(kind){
+  if (!S || S.ended) return;
+  if (kind === 'next'){ var r = nextResult(1e9); if (r === null){ $('advnote').textContent = 'Nothing is pending. Pick a time instead.'; return; } advance(r, true); }
+  else if (kind === 'morn'){ var p = C.start.split(':'); var now = (+p[0]) * 60 + (+p[1]) + S.t; var nxt = (Math.floor(now / 1440) + 1) * 1440 + 8 * 60; advance(S.t + (nxt - now), false); }
+  else advance(S.t + kind, false);
+  if (!S.ended) render();
+}
+function examine(part){
+  if (!S || S.ended) return;
+  advance(S.t + 2, false); if (S.ended) return;
+  var txt = part === 'hist' ? C.hist(S, S.t) : (C.exam[part] || 'Normal.');
+  var nm = part === 'hist' ? 'Interval history' : 'Exam: ' + EXAMN.filter(function(x){ return x[0] === part; })[0][1];
+  addLog(S.t, 'ex', nm, txt); render();
+}
+
+/* ---------- Render the case ---------- */
+function render(){
+  if (!C) return;
+  $('clock').textContent = clockStr(S.t) + (S.t ? '  (' + dur(S.t) + ')' : '');
+  $('locnow').textContent = LOCN[S.loc];
+  var v = C.vit(S, S.t), v0 = C.vit(S, 0);
+  function vb(k, n, u){ var ch = String(v[k]) !== String(v0[k]); return '<span' + (ch ? ' class="chg"' : '') + '>' + n + ' <b>' + v[k] + '</b>' + (u || '') + '</span>'; }
+  $('vitals').innerHTML = vb('hr', 'HR', '') + vb('bp', 'BP', '') + vb('rr', 'RR', '') + vb('temp', 'T', ' °C') + vb('spo2', 'SpO2', '');
+  $('op-meds').innerHTML = C.meds.length ? '<p class="label" style="margin-top:6px">Current medicines (tap to stop)</p><div class="meds">' + C.meds.map(function(m){ var st = S.f('stop:' + m[0]) != null; return '<button class="sbtn" type="button" data-stop="' + m[0] + '" aria-pressed="' + st + '"' + (st || S.ended ? ' disabled' : '') + '>' + esc(m[1]) + (st ? ': stopped' : '') + '</button>'; }).join('') + '</div>' : '';
+  $('examb').innerHTML = '<button class="sbtn" type="button" data-ex="hist">Interval history</button>' + EXAMN.filter(function(x){ return x[0] !== 'rect' || C.exam.rect; }).map(function(x){ return '<button class="sbtn" type="button" data-ex="' + x[0] + '">' + x[1] + '</button>'; }).join('');
+  $('advb').innerHTML = [['next','Next result'],[15,'+15 min'],[60,'+1 hour'],[240,'+4 hours'],['morn','Next morning']].map(function(a){ return '<button class="sbtn" type="button" data-adv="' + a[0] + '">' + a[1] + '</button>'; }).join('');
+  var pend = S.ord.filter(function(o){ return o.due != null && !o.seen; }).sort(function(a, b){ return a.due - b.due; });
+  $('pend').innerHTML = pend.length ? pend.map(function(o){ return '<li><span>' + esc(ORD[o.id].n) + '</span><small>in ' + dur(o.due - S.t) + '</small></li>'; }).join('') : '<li><span class="note">Nothing pending</span></li>';
+  var locs = C.locs || ['ed','ward','tele','icu','cath'];
+  if (C.id !== 'stemi') locs = locs.filter(function(l){ return l !== 'cath'; });
+  if (!C.locs) locs = locs.concat(['home']);
+  $('locb').innerHTML = locs.map(function(l){ return '<button class="sbtn" type="button" data-loc="' + l + '" aria-pressed="' + (S.loc === l) + '">' + LOCN[l] + '</button>'; }).join('');
+  var lg = S.log.map(function(e, i){ return [e, i]; }).sort(function(a, b){ return b[0].t - a[0].t || b[1] - a[1]; }).map(function(x){ return x[0]; });
+  $('log').innerHTML = lg.map(function(e){ return '<div class="ent ' + (e.c === 'upd' ? 'upd' : e.c === 'res' ? 'res' : '') + '"><span class="when">' + clockStr(e.t) + '</span><b>' + esc(e.h) + '</b>' + (e.p ? '<p>' + esc(e.p) + '</p>' : '') + '</div>'; }).join('');
+  drawDdx();
+}
+function drawDdx(){
+  $('ddxl').innerHTML = C.ddx.map(function(d){
+    var back = function(ids){ var b = S.back(ids); return b != null && b <= S.t; };
+    var less = d.out && back(d.out), fav = d.fav && back(d.fav);
+    return '<div class="cause' + (less ? ' less' : '') + (fav ? ' fav' : '') + '"><span>' + esc(d.n) + '</span><small>' + (less || fav ? esc(d.why) : 'not yet tested') + '</small></div>'; }).join('');
+}
+
+/* ---------- Review ---------- */
+function grade(){
+  var rows = C.key.map(function(k){
+    var base = k.base ? k.base(S) : 0;
+    if (base == null || base > S.t) return {k:k, st:'miss', note:'Not reached: ' + (k.nr || 'the case ended first'), base:base};
+    var r = null, part = false;
+    if (k.done) r = k.done(S);
+    else { var a = S.f(k.any, base); if (a != null) r = {t:a}; else if (k.part){ var p = S.f(k.part, base); if (p != null){ r = {t:p}; part = true; } } }
+    if (!r) return {k:k, st:'miss', note:'Not done', base:base};
+    var dt = r.t - base;
+    var st = dt <= k.by ? (part ? 'part' : 'ok') : dt <= k.late ? 'late' : 'toolate';
+    var when = k.by >= 9999 ? 'checked at the end' : (base ? dur(dt) + ' after the trigger' : 'at ' + dur(r.t));
+    return {k:k, st:st, t:r.t, base:base, note:when};
+  });
+  var bads = [];
+  C.bad.forEach(function(b){ var hitT = null; b.any.forEach(function(id){ S.all(id).forEach(function(t){ if ((!b.when || b.when(S, t)) && (hitT === null || t < hitT)) hitT = t; }); }); if (hitT !== null) bads.push({b:b, t:hitT}); });
+  return {rows:rows, bads:bads};
+}
+var STN = {ok:'On time', part:'Half credit', late:'Late', toolate:'Too late', miss:'Missed'};
+var STC = {ok:'ok', part:'late', late:'late', toolate:'miss', miss:'miss'};
+function endCase(why){
+  if (!S || S.ended) return;
+  S.ended = true; DONE[C.id] = true; drawCases();
+  var g = grade(); S.g = g;
+  var n = g.rows.length, ok = g.rows.filter(function(r){ return r.st === 'ok'; }).length, half = g.rows.filter(function(r){ return r.st === 'part' || r.st === 'late'; }).length;
+  var harm = g.bads.filter(function(x){ return x.b.kind === 'harm'; }).length, ni = g.bads.length - harm;
+  var h = '<div class="card" id="rv-sum"><p class="label">Case review' + (why ? ' · ' + esc(why) : '') + '</p><h2>' + esc(C.dx) + '</h2>' +
+    '<div class="tally"><span><b class="big">' + ok + '</b> of ' + n + ' on time</span><span>' + half + ' late or half</span><span>' + (n - ok - half) + ' missed</span><span>' + harm + ' harmful</span><span>' + ni + ' not indicated</span></div>' +
+    '<p class="whyline"><b>Why:</b> ' + esc(C.teach) + '</p>' +
+    '<div class="chips"><button class="chip" type="button" data-fig="timeline"><i></i>Your timeline</button>' + (C.tool ? '<a class="chip" href="' + C.tool[0] + '"><i></i>Open the ' + esc(C.tool[1]) + ' tool</a>' : '') + '</div>' +
+    '<details class="more"><summary>More</summary><p>Simulated time used: ' + dur(S.t) + '. Grading is this site\'s own, not the NBME\'s: each essential action has a window (on time, then late for half credit). Harmful and not-indicated orders are listed separately and are not offset by good ones.</p></details></div>';
+  h += '<div class="card" id="rv-key"><p class="label">Essential actions</p>' + g.rows.map(function(r){
+      return '<div class="kact"><div class="top"><span>' + esc(r.k.l) + '</span><span class="st ' + STC[r.st] + '">' + STN[r.st] + '</span></div><span class="t">' + esc(r.note) + (r.k.by < 9999 ? ' · window ' + (r.k.base ? 'from the trigger: ' : '') + dur(r.k.by) + (r.k.late > r.k.by ? ', late to ' + dur(r.k.late) : '') : '') + '</span><p class="whyline"><b>Why:</b> ' + esc(r.k.why) + '</p></div>'; }).join('') +
+    '<details class="more"><summary>More</summary>' + g.rows.map(function(r){ return '<p><b>' + esc(r.k.l) + ':</b> ' + esc(r.k.src) + ' <span class="tier">' + esc(r.k.tier) + '</span></p>'; }).join('') + '</details></div>';
+  h += '<div class="card" id="rv-bad"><p class="label">Harmful or not indicated</p>' + (g.bads.length ? g.bads.map(function(x){
+      return '<div class="kact"><div class="top"><span>' + esc(x.b.l) + '</span><span class="st ' + (x.b.kind === 'harm' ? 'harm' : 'ni') + '">' + (x.b.kind === 'harm' ? 'Harmful' : 'Not indicated') + '</span></div><span class="t">at ' + dur(x.t) + '</span><p class="whyline"><b>Why:</b> ' + esc(x.b.why) + '</p></div>'; }).join('') : '<p class="okline">None of the harmful or not-indicated orders this case watches for.</p>') +
+    '<details class="more"><summary>More</summary><p>Watched in this case:</p><ul class="plain">' + C.bad.map(function(b){ return '<li>' + esc(b.l) + ': ' + esc(b.src) + ' <span class="tier">' + esc(b.tier) + '</span></li>'; }).join('') + '</ul></details></div>';
+  if (C.trial){ var tr = C.trial; h += '<div class="card" id="rv-trial"><p class="label">Trial behind this case</p><div class="trial"><p><b>' + esc(tr.n) + '</b></p><p><span class="k">Question</span>' + esc(tr.q) + '</p><p><span class="k">Design</span>' + esc(tr.d) + '</p><p><span class="k">Result</span>' + esc(tr.r) + '</p><p><span class="k">What it changed</span>' + esc(tr.c) + '</p><p class="note">' + esc(tr.ref) + '</p></div></div>'; }
+  h += '<div class="card"><div class="row" style="margin-top:0"><button class="btn" type="button" data-start="' + C.id + '">Run this case again</button><button class="btn ghost" type="button" id="go-cases2">Another case</button></div></div>';
+  $('review').innerHTML = h; $('review').hidden = false;
+  ['orders','exam','clockcard','where','endcard'].forEach(function(x){ $(x).hidden = true; });
+  render(); $('review').scrollIntoView();
+}
+
+/* ---------- Timeline figure (from the grade) ---------- */
+function tx(x, y, s, sz, cls, anc){ return '<text x="' + x + '" y="' + y + '" font-size="' + (sz || 11) + '"' + (anc ? ' text-anchor="' + anc + '"' : '') + ' fill="var(--' + (cls || 'ink') + ')">' + esc(s) + '</text>'; }
+function timelineSvg(){
+  if (!S || !S.g) return '<p class="note">Finish a case to see its timeline.</p>';
+  var rows = S.g.rows, W = 340, top = 26, rh = 34, T = Math.max(60, S.t);
+  var X = function(t){ return 8 + Math.sqrt(Math.max(0, Math.min(t, T)) / T) * (W - 16); };
+  var h = '';
+  var ticks = [[0,'0'],[15,'15m'],[60,'1h'],[240,'4h'],[720,'12h'],[1440,'24h'],[2880,'48h']].filter(function(k){ return k[0] <= T; });
+  ticks.forEach(function(k, i){ var x = X(k[0]); h += '<line x1="' + x + '" y1="14" x2="' + x + '" y2="' + (top + rows.length * rh) + '" stroke="var(--line)"/>' + tx(Math.min(x + 2, W - 22), 11, k[1], 10.5, 'muted'); });
+  rows.forEach(function(r, i){
+    var y = top + i * rh, b = r.base == null ? 0 : r.base, lab = r.k.l.length > 36 ? r.k.l.slice(0, 35) + '…' : r.k.l;
+    h += tx(8, y + 10, lab, 10.5, 'ink') + tx(W - 8, y + 10, STN[r.st], 10.5, STC[r.st] === 'ok' ? 'ok' : STC[r.st] === 'late' ? 'warn' : 'bad', 'end');
+    if (r.base != null && r.base <= S.t && r.k.by < 9999){
+      var x0 = X(b), x1 = X(b + r.k.by), x2 = X(b + r.k.late);
+      h += '<rect x="' + x0 + '" y="' + (y + 15) + '" width="' + Math.max(2, x1 - x0) + '" height="8" rx="2" fill="var(--okbg)" stroke="var(--ok)" stroke-width=".8"/>';
+      if (x2 > x1) h += '<rect x="' + x1 + '" y="' + (y + 15) + '" width="' + (x2 - x1) + '" height="8" rx="2" fill="var(--warnbg)" stroke="var(--warn)" stroke-width=".8"/>';
+    }
+    if (r.t != null && r.k.by < 9999){ var xm = X(r.t); h += '<circle cx="' + xm + '" cy="' + (y + 19) + '" r="4.5" fill="var(--' + (STC[r.st] === 'ok' ? 'ok' : STC[r.st] === 'late' ? 'warn' : 'bad') + ')"/>'; }
+  });
+  var H = top + rows.length * rh + 4;
+  return '<svg class="fig" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Timeline: each essential action\'s window (green on time, amber late) and when it was done (dot).">' + h + '</svg><p class="sub">Green band: on time. Amber: late (half credit). Dot: when you did it. The time scale stretches the first hour.</p>';
+}
+
+/* ---------- Learn figures ---------- */
+var LOOP = [
+  ['ord','Orders','Type orders on the order sheet; nothing happens on its own. Vital signs are taken at the start and after each move, but monitoring and pulse oximetry must be ordered.'],
+  ['clk','Move the clock','Tests and treatments only happen as simulated time moves. Choose the next result, or a time to see the patient again.'],
+  ['res','Results and updates','Results arrive at their report time; updates (the patient gets worse or better, a nurse calls) can stop the clock.'],
+  ['rea','Reassess','Interval history and exam each cost simulated minutes. Use them when a real doctor would, then add or cancel orders.'],
+  ['loc','Location','Move the patient as you would in real life: home, ward, ICU. Location is one of the scored domains.']];
+var loopOn = 'ord';
+function loopSvg(){
+  var cx = 175, cy = 118, R = 84, h = '';
+  h += '<ellipse cx="' + cx + '" cy="' + cy + '" rx="122" ry="' + R + '" fill="none" stroke="var(--line)" stroke-width="2"/>';
+  LOOP.forEach(function(s, i){ var a = -Math.PI / 2 + i * 2 * Math.PI / LOOP.length; var x = cx + 122 * Math.cos(a), y = cy + R * Math.sin(a); var on = s[0] === loopOn;
+    var w = s[1].length * 6.8 + 18; var bx = Math.max(4, Math.min(346 - w, x - w / 2));
+    h += '<rect x="' + bx + '" y="' + (y - 13) + '" width="' + w + '" height="26" rx="13" fill="var(--' + (on ? 'accent' : 'card') + ')" stroke="var(--' + (on ? 'accent' : 'line') + ')"/>';
+    h += '<text x="' + (bx + w / 2) + '" y="' + (y + 4) + '" font-size="11" text-anchor="middle" fill="var(--' + (on ? 'accent-ink' : 'ink') + ')">' + esc(s[1]) + '</text>'; });
+  h += tx(cx, cy - 4, 'End case:', 11, 'muted', 'middle') + tx(cx, cy + 12, 'final orders', 11, 'muted', 'middle');
+  return '<svg class="fig" viewBox="0 0 350 236" role="img" aria-label="The CCS loop: orders, move the clock, results and updates, reassess, location, repeated until the case ends.">' + h + '</svg>';
+}
+function drawLoop(){
+  $('fig-loop').innerHTML = loopSvg() + '<div class="steps" id="loopb">' + LOOP.map(function(s){ return '<button class="sbtn" type="button" data-loop="' + s[0] + '" aria-pressed="' + (s[0] === loopOn) + '">' + s[1] + '</button>'; }).join('') + '</div>';
+  $('loopline').textContent = LOOP.filter(function(s){ return s[0] === loopOn; })[0][2];
+}
+var clk = 'ed';
+function drawClocks(){
+  var ed = clk === 'ed', h = '';
+  h += tx(8, 22, 'Real time (your exam clock)', 11, 'muted');
+  h += '<rect x="8" y="30" width="334" height="16" rx="4" fill="var(--fill)" stroke="var(--line)"/><rect x="8" y="30" width="334" height="16" rx="4" fill="var(--accent)"/>';
+  h += tx(8, 62, '0', 10.5, 'muted') + tx(342, 62, '10 or 20 min, either case', 10.5, 'muted', 'end');
+  h += tx(8, 92, 'Simulated time (the patient\'s clock)', 11, 'muted');
+  var marks = ed ? [['arrive',0],['labs',.24],['CT',.44],['ICU',.68],['next day',1]] : [['visit',0],['home',.22],['day 3',.46],['week 2',.7],['month 3',1]];
+  h += '<line x1="12" y1="112" x2="338" y2="112" stroke="var(--ink)" stroke-width="1.5"/>';
+  marks.forEach(function(m, i){ var x = 12 + m[1] * 326; h += '<circle cx="' + x + '" cy="112" r="4" fill="var(--accent)"/>' + tx(Math.max(12, Math.min(338, x)), 134, m[0], 10.5, 'ink', i === 0 ? 'start' : i === marks.length - 1 ? 'end' : 'middle'); });
+  $('fig-clocks').innerHTML = '<svg class="fig" viewBox="0 0 350 150" role="img" aria-label="Real time is fixed at 10 or 20 minutes; simulated time can run from minutes to months.">' + h + '</svg>';
+  $('clockline').textContent = ed ? 'An emergency case plays out over minutes to a day of simulated time. Order the urgent things before you move the clock, because every step forward is time the patient waits.' : 'An office case can cover weeks or months: treat, book follow-up, and move the clock to the next visit. Each case gets 10 or 20 real minutes, and simulated time can run from minutes to months.';
+  [].forEach.call(document.querySelectorAll('[data-cl]'), function(b){ b.setAttribute('aria-pressed', String(b.getAttribute('data-cl') === clk)); });
+}
+function drawScoreFig(){
+  var h = '', y = 40;
+  h += tx(8, 18, 'One essential action, three outcomes', 11, 'muted');
+  h += '<rect x="20" y="' + y + '" width="140" height="14" rx="3" fill="var(--okbg)" stroke="var(--ok)"/>' + tx(90, y + 32, 'on time', 11, 'ok', 'middle');
+  h += '<rect x="160" y="' + y + '" width="90" height="14" rx="3" fill="var(--warnbg)" stroke="var(--warn)"/>' + tx(205, y + 32, 'late', 11, 'warn', 'middle');
+  h += tx(300, y + 32, 'missed', 11, 'bad', 'middle') + '<line x1="250" y1="' + (y + 7) + '" x2="340" y2="' + (y + 7) + '" stroke="var(--line)" stroke-width="2" stroke-dasharray="4 3"/>';
+  h += '<line x1="20" y1="' + (y - 6) + '" x2="20" y2="' + (y + 20) + '" stroke="var(--ink)"/>' + tx(14, y - 10, 'trigger', 10.5, 'ink');
+  h += tx(8, 104, 'Harmful or not indicated orders count against you', 11, 'muted');
+  h += tx(8, 120, 'separately: good orders do not cancel them.', 11, 'muted');
+  $('fig-score').innerHTML = '<svg class="fig" viewBox="0 0 350 130" role="img" aria-label="An action done inside its window is on time, a little after is late, and after that it is missed.">' + h + '</svg>';
+}
+var OPEN = {
+  sick:[['1','Monitor, pulse oximetry, IV access'],['2','Oxygen only if saturation is low'],['3','Bedside tests: glucose, ECG, blood gas'],['4','Treat what is already clear'],['5','Labs and imaging; then the right bed']],
+  clear:[['1','Start the time-critical path now'],['2','Only the test that path needs first'],['3','The definitive treatment, without waiting'],['4','The rest of the workup alongside'],['5','The right bed, then the follow-up']],
+  well:[['1','History and focused exam'],['2','The test that confirms the diagnosis'],['3','Treat at home when it is safe'],['4','Follow-up and when to return'],['5','The counselling that matters here']] };
+var OPENL = {sick:'An unstable patient: monitoring first, then the bedside tests that return in minutes, then treatment that does not need a result.',
+  clear:'When the opening screen already gives the diagnosis (STEMI on the ECG, a stroke inside the window), every minute counts: order the treatment path before anything that only adds detail.',
+  well:'A stable office patient: being aggressive scores lower. Confirm, treat at home if safe, book follow-up.'};
+var opk = 'sick';
+function drawOpen(){
+  var h = ''; OPEN[opk].forEach(function(r, i){ var y = 6 + i * 34; h += '<rect x="6" y="' + y + '" width="338" height="28" rx="8" fill="var(--' + (i === 0 ? 'accent' : 'card') + ')" stroke="var(--' + (i === 0 ? 'accent' : 'line') + ')"/>' + '<text x="20" y="' + (y + 18) + '" font-size="11" fill="var(--' + (i === 0 ? 'accent-ink' : 'muted') + ')">' + r[0] + '</text>' + '<text x="38" y="' + (y + 18) + '" font-size="11.5" fill="var(--' + (i === 0 ? 'accent-ink' : 'ink') + ')">' + esc(r[1]) + '</text>'; });
+  $('fig-open').innerHTML = '<svg class="fig" viewBox="0 0 350 178" role="img" aria-label="An order of priorities for the opening orders.">' + h + '</svg>';
+  $('openline').textContent = OPENL[opk];
+  [].forEach.call(document.querySelectorAll('[data-op]'), function(b){ b.setAttribute('aria-pressed', String(b.getAttribute('data-op') === opk)); });
+}
+
+/* ---------- Case list ---------- */
+function drawCases(){
+  $('cases').innerHTML = CASES.map(function(c, i){ return '<div class="card cc" id="case-' + c.id + '"><span class="where">' + (i + 1) + ' · ' + esc(c.where) + (DONE[c.id] ? ' · <span class="done">reviewed</span>' : '') + '</span><h3>' + esc(c.title) + '</h3><p>' + esc(c.open[0]) + '</p><button class="btn" type="button" data-start="' + c.id + '">Start</button></div>'; }).join('');
+}
+
+/* ---------- Sheet ---------- */
+var FIGS = {loop:{t:'The CCS loop', f:function(){ return loopSvg() + '<p class="line1">' + esc(LOOP.map(function(s){ return s[1] + ': ' + s[2]; }).join(' ')) + '</p>'; }}, timeline:{t:'Your timeline', f:timelineSvg}};
+var lastFocus = null;
+function openSheet(k){ lastFocus = document.activeElement; $('sheet-t').textContent = FIGS[k].t; $('sheet-b').innerHTML = FIGS[k].f(); $('scrim').hidden = false; $('sheet').hidden = false; $('sheet-x').focus(); }
+function closeSheet(){ if ($('sheet').hidden) return; $('scrim').hidden = true; $('sheet').hidden = true; if (lastFocus && lastFocus.focus) lastFocus.focus(); }
+$('sheet-x').addEventListener('click', closeSheet); $('scrim').addEventListener('click', closeSheet);
+document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeSheet(); });
+
+/* ---------- Events ---------- */
+document.addEventListener('click', function(e){
+  var t = e.target.closest ? e.target.closest('button,a') : null; if (!t) return;
+  var a;
+  if ((a = t.getAttribute('data-fig'))) { openSheet(a); return; }
+  if ((a = t.getAttribute('data-start'))) { start(a); return; }
+  if ((a = t.getAttribute('data-ord'))) { order(a); return; }
+  if ((a = t.getAttribute('data-adv'))) { adv(a === 'next' || a === 'morn' ? a : +a); return; }
+  if ((a = t.getAttribute('data-ex'))) { examine(a); return; }
+  if ((a = t.getAttribute('data-loc'))) { moveTo(a); return; }
+  if ((a = t.getAttribute('data-stop'))) { stopMed(a); return; }
+  if ((a = t.getAttribute('data-loop'))) { loopOn = a; drawLoop(); return; }
+  if ((a = t.getAttribute('data-cl'))) { clk = a; drawClocks(); return; }
+  if ((a = t.getAttribute('data-op'))) { opk = a; drawOpen(); return; }
+  if (t.id === 'endbtn') { endCase(''); return; }
+  if (t.id === 'go-cases' || t.id === 'go-cases2') { show('t-cases'); window.scrollTo(0, 0); }
+});
+$('ordq').addEventListener('input', drawSugg);
+$('ordq').addEventListener('keydown', function(e){ if (e.key === 'Enter'){ var m = match($('ordq').value); if (m.length) order(m[0].id); e.preventDefault(); } });
+
+/* ---------- Tabs, pills ---------- */
+var tabs = [['t-cases','p-cases'],['t-play','p-play'],['t-learn','p-learn']];
+function show(t){ tabs.forEach(function(p){ var on = p[0] === t; $(p[0]).setAttribute('aria-selected', String(on)); $(p[1]).classList.toggle('on', on); }); }
+tabs.forEach(function(p){ $(p[0]).addEventListener('click', function(){ show(p[0]); }); });
+function fromHash(){ var id = location.hash.slice(1); if (!id) return; var el = $(id); if (!el) return; var pan = el.closest('.panel'); if (pan) tabs.forEach(function(p){ if (p[1] === pan.id) show(p[0]); }); el.scrollIntoView(); }
+window.addEventListener('hashchange', fromHash);
+(function(){
+  var chaps = [].slice.call(document.querySelectorAll('.chap'));
+  var deeper = {}; try { deeper = JSON.parse($('deeper-data').textContent); } catch (err) {}
+  chaps.forEach(function(c){ var d = deeper[c.id]; if (!d) return; var el = document.createElement('details'); el.className = 'deeper';
+    el.innerHTML = '<summary>Go deeper: mechanism and rationale</summary><div class="dpx"><div><span class="dl">Mechanism</span><p>' + esc(d.m) + '</p></div><div><span class="dl">Why it matters</span><p>' + esc(d.w) + '</p></div><div><span class="dl">Common trap</span><p>' + esc(d.t) + '</p></div></div>'; c.appendChild(el); });
+  $('pills').innerHTML = chaps.map(function(c, n){ return '<button class="pill" type="button" data-go="' + c.id + '" aria-current="' + (n === 0) + '">' + (n + 1) + ' ' + esc(c.getAttribute('data-pill')) + '</button>'; }).join('');
+  $('pills').addEventListener('click', function(e){ var g = e.target.getAttribute('data-go'); if (g) $(g).scrollIntoView(); });
+  function mark(id){ [].forEach.call($('pills').children, function(b){ var on = b.getAttribute('data-go') === id; b.setAttribute('aria-current', String(on)); if (on) $('pills').scrollLeft = Math.max(0, b.offsetLeft - 60); }); }
+  if ('IntersectionObserver' in window){ var io = new IntersectionObserver(function(es){ es.forEach(function(en){ if (en.isIntersecting) mark(en.target.id); }); }, {rootMargin:'-30% 0px -60% 0px'}); chaps.forEach(function(c){ io.observe(c); }); }
+})();
+drawCases(); drawLoop(); drawClocks(); drawScoreFig(); drawOpen(); fromHash();
+window.__ccs = {start:start, order:order, adv:adv, advance:function(m){ advance(S.t + m, false); render(); }, end:function(){ endCase(''); }, moveTo:moveTo, stopMed:stopMed, state:function(){ return S; }, grade:grade, match:match};
+})();
+
+</script>
+</body>
+</html>
